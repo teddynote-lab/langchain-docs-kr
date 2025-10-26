@@ -2,15 +2,15 @@
 title: Hippo
 ---
 
->[Transwarp Hippo](https://www.transwarp.cn/en/subproduct/hippo) is an enterprise-level cloud-native distributed vector database that supports storage, retrieval, and management of massive vector-based datasets. It efficiently solves problems such as vector similarity search and high-density vector clustering. `Hippo` features high availability, high performance, and easy scalability. It has many functions, such as multiple vector search indexes, data partitioning and sharding, data persistence, incremental data ingestion, vector scalar field filtering, and mixed queries. It can effectively meet the high real-time search demands of enterprises for massive vector data
+>[Transwarp Hippo](https://www.transwarp.cn/en/subproduct/hippo)는 대규모 벡터 기반 데이터셋의 저장, 검색 및 관리를 지원하는 엔터프라이즈급 클라우드 네이티브 분산 벡터 데이터베이스입니다. 벡터 유사도 검색 및 고밀도 벡터 클러스터링과 같은 문제를 효율적으로 해결합니다. `Hippo`는 고가용성, 고성능 및 손쉬운 확장성을 특징으로 합니다. 다중 벡터 검색 인덱스, 데이터 파티셔닝 및 샤딩, 데이터 영속성, 증분 데이터 수집, 벡터 스칼라 필드 필터링, 혼합 쿼리 등 다양한 기능을 갖추고 있습니다. 대규모 벡터 데이터에 대한 기업의 높은 실시간 검색 요구사항을 효과적으로 충족할 수 있습니다.
 
-## Getting Started
+## 시작하기
 
-The only prerequisite here is an API key from the OpenAI website. Make sure you have already started a Hippo instance.
+여기서 유일한 전제 조건은 OpenAI 웹사이트의 API key입니다. Hippo 인스턴스를 이미 시작했는지 확인하세요.
 
-## Installing Dependencies
+## 의존성 설치
 
-Initially, we require the installation of certain dependencies, such as OpenAI, LangChain, and Hippo-API. Please note, that you should install the appropriate versions tailored to your environment.
+먼저 OpenAI, LangChain, Hippo-API와 같은 특정 의존성을 설치해야 합니다. 환경에 맞는 적절한 버전을 설치해야 합니다.
 
 ```python
 pip install -qU  langchain langchain_community tiktoken langchain-openai
@@ -22,11 +22,11 @@ Requirement already satisfied: hippo-api==1.1.0.rc3 in /Users/daochengzhang/mini
 Requirement already satisfied: pyyaml>=6.0 in /Users/daochengzhang/miniforge3/envs/py310/lib/python3.10/site-packages (from hippo-api==1.1.0.rc3) (6.0.1)
 ```
 
-Note: Python version needs to be >=3.8.
+참고: Python 버전은 >=3.8이어야 합니다.
 
-## Best Practices
+## 모범 사례
 
-### Importing Dependency Packages
+### 의존성 패키지 가져오기
 
 ```python
 import os
@@ -37,7 +37,7 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_text_splitters import CharacterTextSplitter
 ```
 
-### Loading Knowledge Documents
+### 지식 문서 로드하기
 
 ```python
 os.environ["OPENAI_API_KEY"] = "YOUR OPENAI KEY"
@@ -45,18 +45,18 @@ loader = TextLoader("../../how_to/state_of_the_union.txt")
 documents = loader.load()
 ```
 
-### Segmenting the Knowledge Document
+### 지식 문서 분할하기
 
-Here, we use LangChain's CharacterTextSplitter for segmentation. The delimiter is a period. After segmentation, the text segment does not exceed 1000 characters, and the number of repeated characters is 0.
+여기서는 LangChain의 CharacterTextSplitter를 사용하여 분할합니다. 구분 기호는 마침표입니다. 분할 후 텍스트 세그먼트는 1000자를 초과하지 않으며, 반복되는 문자 수는 0입니다.
 
 ```python
 text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=0)
 docs = text_splitter.split_documents(documents)
 ```
 
-### Declaring the Embedding Model
+### Embedding Model 선언하기
 
-Below, we create the OpenAI or Azure embedding model using the @[`OpenAIEmbeddings`] method from LangChain.
+아래에서는 LangChain의 @[`OpenAIEmbeddings`] 메서드를 사용하여 OpenAI 또는 Azure embedding model을 생성합니다.
 
 ```python
 # openai
@@ -72,13 +72,13 @@ embeddings = OpenAIEmbeddings()
 # )
 ```
 
-### Declaring Hippo Client
+### Hippo Client 선언하기
 
 ```python
 HIPPO_CONNECTION = {"host": "IP", "port": "PORT"}
 ```
 
-### Storing the Document
+### 문서 저장하기
 
 ```python
 print("input...")
@@ -97,11 +97,11 @@ input...
 success
 ```
 
-### Conducting Knowledge-based Question and Answer
+### 지식 기반 질의응답 수행하기
 
-#### Creating a Large Language Question-Answering Model
+#### 대규모 언어 질의응답 모델 생성하기
 
-Below, we create the OpenAI or Azure large language question-answering model respectively using the AzureChatOpenAI and ChatOpenAI methods from LangChain.
+아래에서는 LangChain의 AzureChatOpenAI 및 ChatOpenAI 메서드를 사용하여 각각 OpenAI 또는 Azure 대규모 언어 질의응답 모델을 생성합니다.
 
 ```python
 # llm = AzureChatOpenAI(
@@ -115,7 +115,7 @@ Below, we create the OpenAI or Azure large language question-answering model res
 llm = ChatOpenAI(openai_api_key="YOUR OPENAI KEY", model_name="gpt-3.5-turbo-16k")
 ```
 
-### Acquiring Related Knowledge Based on the Question
+### 질문을 기반으로 관련 지식 획득하기
 
 ```python
 query = "Please introduce COVID-19"
@@ -130,7 +130,7 @@ content_list = [item.page_content for item in res]
 text = "".join(content_list)
 ```
 
-### Constructing a Prompt Template
+### Prompt Template 구성하기
 
 ```python
 prompt = f"""
@@ -140,7 +140,7 @@ Please answer this question in conjunction with the above article:{query}
 """
 ```
 
-### Waiting for the Large Language Model to Generate an Answer
+### 대규모 언어 모델이 답변을 생성할 때까지 대기하기
 
 ```python
 response_with_hippo = llm.predict(prompt)

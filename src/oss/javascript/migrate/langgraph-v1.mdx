@@ -1,11 +1,11 @@
 ---
-title: LangGraph v1 migration guide
-sidebarTitle: Migration guide
+title: LangGraph v1 마이그레이션 가이드
+sidebarTitle: 마이그레이션 가이드
 ---
 
-This guide outlines changes in LangGraph v1 and how to migrate from previous versions. For a high-level overview of what's new, see the [release notes](/oss/releases/langgraph-v1).
+이 가이드는 LangGraph v1의 변경 사항과 이전 버전에서 마이그레이션하는 방법을 설명합니다. 새로운 기능에 대한 개요는 [릴리스 노트](/oss/releases/langgraph-v1)를 참조하세요.
 
-To upgrade,
+업그레이드하려면,
 
 <CodeGroup>
 ```bash npm
@@ -22,25 +22,25 @@ bun add @langchain/langgraph@latest @langchain/core@latest
 ```
 </CodeGroup>
 
-## Summary of changes
+## 변경 사항 요약
 
-| Area | What changed |
+| 영역 | 변경 내용 |
 |------|--------------|
-| React prebuilt | `createReactAgent` deprecated; use LangChain `createAgent` |
-| Interrupts | Typed interrupts supported via `interrupts` config |
-| `toLangGraphEventStream` removed | Use `graph.stream` with the desired `encoding` format |
-| `useStream` | Supports custom transports |
+| React prebuilt | `createReactAgent` 지원 중단; LangChain `createAgent` 사용 |
+| Interrupts | `interrupts` config를 통한 타입 지정 interrupt 지원 |
+| `toLangGraphEventStream` 제거 | 원하는 `encoding` 형식으로 `graph.stream` 사용 |
+| `useStream` | 커스텀 transport 지원 |
 
 ---
 
-## Deprecation: `createReactAgent` → `createAgent`
+## 지원 중단: `createReactAgent` → `createAgent`
 
-LangGraph v1 deprecates the `createReactAgent` prebuilt. Use LangChain's `createAgent`, which runs on LangGraph and adds a flexible middleware system.
+LangGraph v1은 `createReactAgent` prebuilt를 지원 중단합니다. LangGraph에서 실행되고 유연한 middleware 시스템을 추가하는 LangChain의 `createAgent`를 사용하세요.
 
-See the LangChain v1 docs for details:
+자세한 내용은 LangChain v1 문서를 참조하세요:
 
-- [Release notes](/oss/releases/langchain-v1#createagent)
-- [Migration guide](/oss/migrate/langchain-v1#createagent)
+- [릴리스 노트](/oss/releases/langchain-v1#createagent)
+- [마이그레이션 가이드](/oss/migrate/langchain-v1#createagent)
 
 <CodeGroup>
 ```typescript v1 (new)
@@ -64,9 +64,9 @@ const agent = createReactAgent({
 </CodeGroup>
 ---
 
-## Typed interrupts
+## 타입 지정 interrupts
 
-You can now define interrupt types at graph construction to strictly type the values passed to and received from interrupts.
+이제 graph 생성 시 interrupt 타입을 정의하여 interrupt로 전달되고 받는 값을 엄격하게 타입 지정할 수 있습니다.
 
 <CodeGroup>
 ```typescript v1 (new)
@@ -100,13 +100,13 @@ const graph = new StateGraph(State)
 ```
 </CodeGroup>
 
-See [Interrupts](/oss/langgraph/interrupts) to learn more.
+자세한 내용은 [Interrupts](/oss/langgraph/interrupts)를 참조하세요.
 
 ---
 
 ## Event stream encoding
 
-The low-level `toLangGraphEventStream` helper is removed. Streaming responses are handled by the SDK; when using low-level clients, select the wire format via an `encoding` option passed to `graph.stream`.
+저수준 `toLangGraphEventStream` helper가 제거되었습니다. Streaming 응답은 SDK에서 처리됩니다. 저수준 client를 사용할 때는 `graph.stream`에 전달되는 `encoding` 옵션을 통해 wire format을 선택하세요.
 
 <CodeGroup>
 ```typescript v1 (new)
@@ -133,10 +133,10 @@ return toLangGraphEventStreamResponse({
 
 ## Breaking changes
 
-### Dropped Node 18 support
+### Node 18 지원 중단
 
-All LangGraph packages now require **Node.js 20 or higher**. Node.js 18 reached [end of life](https://nodejs.org/en/about/releases/) in March 2025.
+모든 LangGraph package는 이제 **Node.js 20 이상**이 필요합니다. Node.js 18은 2025년 3월에 [지원 종료](https://nodejs.org/en/about/releases/)되었습니다.
 
-### New build outputs
+### 새로운 빌드 출력
 
-Builds for all langgraph packages now use a bundler based approach instead of using raw typescript outputs. If you were importing files from the `dist/` directory (which is not recommended), you will need to update your imports to use the new module system.
+모든 langgraph package의 빌드는 이제 raw typescript 출력 대신 bundler 기반 접근 방식을 사용합니다. `dist/` 디렉토리에서 파일을 import하고 있었다면 (권장되지 않음), 새로운 module 시스템을 사용하도록 import를 업데이트해야 합니다.

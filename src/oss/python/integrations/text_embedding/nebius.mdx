@@ -2,25 +2,25 @@
 title: Nebius
 ---
 
-[Nebius AI Studio](https://studio.nebius.ai/) provides API access to high-quality embedding models through a unified interface. The Nebius embedding models convert text into numerical vectors that capture semantic meaning, making them useful for various applications like semantic search, clustering, and recommendations.
+[Nebius AI Studio](https://studio.nebius.ai/)는 통합 인터페이스를 통해 고품질 embedding 모델에 대한 API 액세스를 제공합니다. Nebius embedding 모델은 텍스트를 의미론적 의미를 포착하는 숫자 벡터로 변환하여 의미론적 검색, 클러스터링, 추천과 같은 다양한 애플리케이션에 유용합니다.
 
 ## Overview
 
-The `NebiusEmbeddings` class provides access to Nebius AI Studio's embedding models through LangChain. These embeddings can be used for semantic search, document similarity, and other NLP tasks requiring vector representations of text.
+`NebiusEmbeddings` 클래스는 LangChain을 통해 Nebius AI Studio의 embedding 모델에 대한 액세스를 제공합니다. 이러한 embedding은 의미론적 검색, 문서 유사도 및 텍스트의 벡터 표현이 필요한 기타 NLP 작업에 사용할 수 있습니다.
 
 ### Integration details
 
 - **Provider**: Nebius AI Studio
-- **Model Types**: Text embedding models
-- **Primary Use Case**: Generate vector representations of text for semantic similarity and retrieval
-- **Available Models**: Various embedding models including BAAI/bge-en-icl and others
-- **Dimensions**: Varies by model (typically 1024-4096 dimensions)
+- **Model Types**: Text embedding 모델
+- **Primary Use Case**: 의미론적 유사도 및 검색을 위한 텍스트의 벡터 표현 생성
+- **Available Models**: BAAI/bge-en-icl 등 다양한 embedding 모델
+- **Dimensions**: 모델에 따라 다름 (일반적으로 1024-4096 차원)
 
 ## Setup
 
 ### Installation
 
-The Nebius integration can be installed via pip:
+Nebius integration은 pip를 통해 설치할 수 있습니다:
 
 ```python
 pip install -U langchain-nebius
@@ -28,7 +28,7 @@ pip install -U langchain-nebius
 
 ### Credentials
 
-Nebius requires an API key that can be passed as an initialization parameter `api_key` or set as the environment variable `NEBIUS_API_KEY`. You can obtain an API key by creating an account on [Nebius AI Studio](https://studio.nebius.ai/).
+Nebius는 초기화 매개변수 `api_key`로 전달하거나 환경 변수 `NEBIUS_API_KEY`로 설정할 수 있는 API key가 필요합니다. [Nebius AI Studio](https://studio.nebius.ai/)에서 계정을 생성하여 API key를 얻을 수 있습니다.
 
 ```python
 import getpass
@@ -41,7 +41,7 @@ if "NEBIUS_API_KEY" not in os.environ:
 
 ## Instantiation
 
-The `NebiusEmbeddings` class can be instantiated with optional parameters for the API key and model name:
+`NebiusEmbeddings` 클래스는 API key 및 모델 이름에 대한 선택적 매개변수로 인스턴스화할 수 있습니다:
 
 ```python
 from langchain_nebius import NebiusEmbeddings
@@ -55,11 +55,11 @@ embeddings = NebiusEmbeddings(
 
 ### Available Models
 
-The list of supported models is available at [studio.nebius.com/?modality=embedding](https://studio.nebius.com/?modality=embedding)
+지원되는 모델 목록은 [studio.nebius.com/?modality=embedding](https://studio.nebius.com/?modality=embedding)에서 확인할 수 있습니다.
 
 ## Indexing and Retrieval
 
-Embedding models are often used in retrieval-augmented generation (RAG) flows, both for indexing data and later retrieving it. The following example demonstrates how to use `NebiusEmbeddings` with a vector store for document retrieval.
+Embedding 모델은 데이터 인덱싱과 이후 검색 모두에서 retrieval-augmented generation (RAG) 플로우에 자주 사용됩니다. 다음 예제는 문서 검색을 위해 vector store와 함께 `NebiusEmbeddings`를 사용하는 방법을 보여줍니다.
 
 ```python
 from langchain_community.vectorstores import FAISS
@@ -97,7 +97,7 @@ Result 2: Deep learning uses neural networks with many layers
 
 ### Using with InMemoryVectorStore
 
-You can also use the `InMemoryVectorStore` for lightweight applications:
+경량 애플리케이션을 위해 `InMemoryVectorStore`를 사용할 수도 있습니다:
 
 ```python
 from langchain_core.vectorstores import InMemoryVectorStore
@@ -125,11 +125,11 @@ Retrieved document: LangChain is a framework for developing applications powered
 
 ## Direct Usage
 
-You can directly use the `NebiusEmbeddings` class to generate embeddings for text without using a vector store.
+vector store를 사용하지 않고 `NebiusEmbeddings` 클래스를 직접 사용하여 텍스트에 대한 embedding을 생성할 수 있습니다.
 
 ### Embedding a Single Text
 
-You can use the `embed_query` method to embed a single piece of text:
+`embed_query` 메서드를 사용하여 단일 텍스트를 embedding할 수 있습니다:
 
 ```python
 query = "What is machine learning?"
@@ -147,7 +147,7 @@ First few values: [0.007419586181640625, 0.002246856689453125, 0.001930236816406
 
 ### Embedding Multiple Texts
 
-You can embed multiple texts at once using the `embed_documents` method:
+`embed_documents` 메서드를 사용하여 여러 텍스트를 한 번에 embedding할 수 있습니다:
 
 ```python
 documents = [
@@ -170,7 +170,7 @@ Each embedding has 4096 dimensions
 
 ### Async Support
 
-NebiusEmbeddings supports async operations:
+NebiusEmbeddings는 비동기 작업을 지원합니다:
 
 ```python
 import asyncio
@@ -242,4 +242,4 @@ Document 4: ['0.7985', '0.8315', '0.5918', '1.0000']
 
 ## API reference
 
-For more details about the Nebius AI Studio API, visit the [Nebius AI Studio Documentation](https://studio.nebius.ai/docs/api-reference).
+Nebius AI Studio API에 대한 자세한 내용은 [Nebius AI Studio Documentation](https://studio.nebius.ai/docs/api-reference)을 참조하세요.

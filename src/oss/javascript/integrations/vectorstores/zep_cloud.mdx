@@ -1,44 +1,44 @@
+```mdx
 ---
 title: Zep Cloud
 ---
 
-> [Zep](https://www.getzep.com) is a long-term memory service for AI Assistant apps.
-> With Zep, you can provide AI assistants with the ability to recall past conversations, no matter how distant,
-> while also reducing hallucinations, latency, and cost.
+> [Zep](https://www.getzep.com)은 AI Assistant 앱을 위한 장기 메모리 서비스입니다.
+> Zep을 사용하면 AI 어시스턴트가 아무리 오래된 대화라도 기억할 수 있도록 하면서
+> 환각, 지연 시간 및 비용을 줄일 수 있습니다.
 
-**Note:** The `ZepCloudVectorStore` works with `Documents` and is intended to be used as a `Retriever`.
-It offers separate functionality to Zep's `ZepCloudMemory` class, which is designed for persisting, enriching
-and searching your user's chat history.
+**참고:** `ZepCloudVectorStore`는 `Documents`와 함께 작동하며 `Retriever`로 사용하도록 설계되었습니다.
+이는 사용자의 채팅 기록을 유지, 강화 및 검색하도록 설계된 Zep의 `ZepCloudMemory` 클래스와는 별도의 기능을 제공합니다.
 
-## Why Zep's VectorStore? 🤖🚀
+## 왜 Zep의 VectorStore를 사용해야 할까요? 🤖🚀
 
-Zep automatically embeds documents added to the Zep Vector Store using low-latency models local to the Zep server.
-The Zep TS/JS client can be used in non-Node edge environments. These two together with Zep's chat memory functionality
-make Zep ideal for building conversational LLM apps where latency and performance are important.
+Zep은 Zep 서버에 로컬로 있는 저지연 모델을 사용하여 Zep Vector Store에 추가된 문서를 자동으로 임베딩합니다.
+Zep TS/JS 클라이언트는 Node가 아닌 엣지 환경에서도 사용할 수 있습니다. 이 두 가지와 Zep의 채팅 메모리 기능을
+결합하면 지연 시간과 성능이 중요한 대화형 LLM 앱을 구축하는 데 Zep이 이상적입니다.
 
-### Supported Search Types
+### 지원되는 검색 유형
 
-Zep supports both similarity search and Maximal Marginal Relevance (MMR) search. MMR search is particularly useful
-for Retrieval Augmented Generation applications as it re-ranks results to ensure diversity in the returned documents.
+Zep은 유사도 검색과 Maximal Marginal Relevance (MMR) 검색을 모두 지원합니다. MMR 검색은
+반환된 문서의 다양성을 보장하기 위해 결과를 재순위화하므로 Retrieval Augmented Generation 애플리케이션에 특히 유용합니다.
 
-## Installation
+## 설치
 
-Sign up for [Zep Cloud](https://app.getzep.com/) and create a project.
+[Zep Cloud](https://app.getzep.com/)에 가입하고 프로젝트를 생성하세요.
 
-Follow the [Zep Cloud Typescript SDK Installation Guide](https://help.getzep.com/sdks) to install and get started with Zep.
+[Zep Cloud Typescript SDK 설치 가이드](https://help.getzep.com/sdks)를 따라 Zep을 설치하고 시작하세요.
 
-## Usage
+## 사용법
 
-You'll need your Zep Cloud Project API Key to use the Zep VectorStore. See the [Zep Cloud docs](https://help.getzep.com/projects) for more information.
+Zep VectorStore를 사용하려면 Zep Cloud Project API Key가 필요합니다. 자세한 내용은 [Zep Cloud 문서](https://help.getzep.com/projects)를 참조하세요.
 
-Zep auto embeds all documents by default, and it's not expecting to receive any embeddings from the user.
-Since LangChain requires passing in a @[`Embeddings`] instance, we pass in `FakeEmbeddings`.
+Zep은 기본적으로 모든 문서를 자동으로 임베딩하며, 사용자로부터 임베딩을 받을 것으로 예상하지 않습니다.
+LangChain은 @[`Embeddings`] 인스턴스를 전달해야 하므로 `FakeEmbeddings`를 전달합니다.
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+[LangChain 패키지 설치에 대한 일반 지침은 이 섹션을 참조하세요](/oss/langchain/install).
 </Tip>
 
-### Example: Creating a ZepVectorStore from Documents & Querying
+### 예제: Documents로부터 ZepVectorStore 생성 및 쿼리하기
 
 ```bash npm
 npm install @getzep/zep-cloud @langchain/openai @langchain/community @langchain/core
@@ -96,7 +96,7 @@ console.log("MMR Results:");
 console.log(JSON.stringify(results2));
 ```
 
-### Example: Using ZepCloudVectorStore with Expression Language
+### 예제: Expression Language와 함께 ZepCloudVectorStore 사용하기
 
 ```typescript
 import { ZepClient } from "@getzep/zep-cloud";
@@ -167,7 +167,8 @@ const result = await chain.invoke("Project Gutenberg?");
 console.log("result", result);
 ```
 
-## Related
+## 관련 문서
 
-- Vector store [conceptual guide](/oss/integrations/vectorstores)
-- Vector store [how-to guides](/oss/integrations/vectorstores)
+- Vector store [개념 가이드](/oss/integrations/vectorstores)
+- Vector store [사용 방법 가이드](/oss/integrations/vectorstores)
+```

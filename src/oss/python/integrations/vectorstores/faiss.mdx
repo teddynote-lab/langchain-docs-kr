@@ -2,25 +2,25 @@
 title: Faiss
 ---
 
->[Facebook AI Similarity Search (FAISS)](https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/) is a library for efficient similarity search and clustering of dense vectors. It contains algorithms that search in sets of vectors of any size, up to ones that possibly do not fit in RAM. It also includes supporting code for evaluation and parameter tuning.
+>[Facebook AI Similarity Search (FAISS)](https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/)는 밀집 벡터의 효율적인 유사도 검색 및 클러스터링을 위한 라이브러리입니다. RAM에 맞지 않을 수 있는 크기를 포함하여 모든 크기의 벡터 집합에서 검색하는 알고리즘을 포함합니다. 또한 평가 및 매개변수 튜닝을 위한 지원 코드도 포함되어 있습니다.
 >
->See [The FAISS Library](https://arxiv.org/pdf/2401.08281) paper.
+>[The FAISS Library](https://arxiv.org/pdf/2401.08281) 논문을 참조하세요.
 
-You can find the FAISS documentation at [this page](https://faiss.ai/).
+FAISS 문서는 [이 페이지](https://faiss.ai/)에서 찾을 수 있습니다.
 
-This notebook shows how to use functionality related to the `FAISS` vector database. It will show functionality specific to this integration. After going through, it may be useful to explore [relevant use-case pages](/oss/langchain/rag) to learn how to use this vectorstore as part of a larger chain.
+이 노트북은 `FAISS` vector database와 관련된 기능을 사용하는 방법을 보여줍니다. 이 통합에 특화된 기능을 보여줄 것입니다. 이 내용을 살펴본 후, [관련 사용 사례 페이지](/oss/langchain/rag)를 탐색하여 이 vectorstore를 더 큰 chain의 일부로 사용하는 방법을 배우는 것이 유용할 수 있습니다.
 
 ## Setup
 
-The integration lives in the `langchain-community` package. We also need to install the `faiss` package itself. We can install these with:
+이 통합은 `langchain-community` 패키지에 포함되어 있습니다. 또한 `faiss` 패키지 자체도 설치해야 합니다. 다음과 같이 설치할 수 있습니다:
 
-Note that you can also install `faiss-gpu` if you want to use the GPU enabled version
+GPU 지원 버전을 사용하려면 `faiss-gpu`를 설치할 수도 있습니다.
 
 ```python
 pip install -qU langchain-community faiss-cpu
 ```
 
-If you want to get best in-class automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 최고 수준의 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수 있습니다:
 
 ```python
 os.environ["LANGSMITH_TRACING"] = "true"
@@ -155,13 +155,13 @@ True
 
 ## Query vector store
 
-Once your vector store has been created and the relevant documents have been added you will most likely wish to query it during the running of your chain or agent.
+vector store가 생성되고 관련 문서가 추가되면, chain이나 agent를 실행하는 동안 쿼리하고 싶을 것입니다.
 
 ### Query directly
 
 #### Similarity search
 
-Performing a simple similarity search with filtering on metadata can be done as follows:
+metadata에 대한 필터링과 함께 간단한 유사도 검색을 수행하는 방법은 다음과 같습니다:
 
 ```python
 results = vector_store.similarity_search(
@@ -178,7 +178,7 @@ for res in results:
 * LangGraph is the best framework for building stateful, agentic applications! [{'source': 'tweet'}]
 ```
 
-Some [MongoDB query and projection operators](https://www.mongodb.com/docs/manual/reference/operator/query/) are supported for more advanced metadata filtering. The current list of supported operators are as follows:
+더 고급 metadata 필터링을 위해 일부 [MongoDB query and projection operators](https://www.mongodb.com/docs/manual/reference/operator/query/)가 지원됩니다. 현재 지원되는 operator 목록은 다음과 같습니다:
 
 - `$eq` (equals)
 - `$neq` (not equals)
@@ -192,7 +192,7 @@ Some [MongoDB query and projection operators](https://www.mongodb.com/docs/manua
 - `$or` (any condition must match)
 - `$not` (negation of condition)
 
-Performing the same above similarity search with advanced metadata filtering can be done as follows:
+고급 metadata 필터링을 사용한 동일한 유사도 검색은 다음과 같이 수행할 수 있습니다:
 
 ```python
 results = vector_store.similarity_search(
@@ -211,7 +211,7 @@ for res in results:
 
 #### Similarity search with score
 
-You can also search with score:
+score와 함께 검색할 수도 있습니다:
 
 ```python
 results = vector_store.similarity_search_with_score(
@@ -227,11 +227,11 @@ for res, score in results:
 
 #### Other search methods
 
-There are a variety of other ways to search a FAISS vector store. For a complete list of those methods, please refer to the [API Reference](https://python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.faiss.FAISS.html)
+FAISS vector store를 검색하는 다양한 다른 방법이 있습니다. 이러한 메서드의 전체 목록은 [API Reference](https://python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.faiss.FAISS.html)를 참조하세요.
 
 ### Query by turning into retriever
 
-You can also transform the vector store into a retriever for easier usage in your chains.
+vector store를 retriever로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
 
 ```python
 retriever = vector_store.as_retriever(search_type="mmr", search_kwargs={"k": 1})
@@ -244,7 +244,7 @@ retriever.invoke("Stealing from the bank is a crime", filter={"source": "news"})
 
 ## Usage for retrieval-augmented generation
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+retrieval-augmented generation (RAG)을 위해 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
 
 - [Tutorials](/oss/langchain/rag)
 - [How-to: Question and answer with RAG](https://python.langchain.com/docs/how_to/#qa-with-rag)
@@ -252,7 +252,7 @@ For guides on how to use this vector store for retrieval-augmented generation (R
 
 ## Saving and loading
 
-You can also save and load a FAISS index. This is useful so you don't have to recreate it everytime you use it.
+FAISS index를 저장하고 로드할 수도 있습니다. 이는 사용할 때마다 다시 생성할 필요가 없어 유용합니다.
 
 ```python
 vector_store.save_local("faiss_index")
@@ -274,7 +274,7 @@ Document(metadata={'source': 'tweet'}, page_content='Building an exciting new pr
 
 ## Merging
 
-You can also merge two FAISS vectorstores
+두 개의 FAISS vectorstore를 병합할 수도 있습니다.
 
 ```python
 db1 = FAISS.from_texts(["foo"], embeddings)
@@ -310,4 +310,4 @@ db1.docstore._dict
 
 ## API reference
 
-For detailed documentation of all `FAISS` vector store features and configurations head to the API reference: [python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.faiss.FAISS.html](https://python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.faiss.FAISS.html)
+모든 `FAISS` vector store 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.faiss.FAISS.html](https://python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.faiss.FAISS.html)

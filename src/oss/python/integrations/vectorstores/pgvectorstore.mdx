@@ -2,25 +2,25 @@
 title: PGVectorStore
 ---
 
-`PGVectorStore` is an implementation of a LangChain vectorstore using `postgres` as the backend.
+`PGVectorStore`는 `postgres`를 백엔드로 사용하는 LangChain vectorstore의 구현입니다.
 
-This notebook goes over how to use the `PGVectorStore` API.
+이 노트북에서는 `PGVectorStore` API 사용 방법을 다룹니다.
 
-The code lives in an integration package called: [langchain-postgres](https://github.com/langchain-ai/langchain-postgres/).
+코드는 [langchain-postgres](https://github.com/langchain-ai/langchain-postgres/)라는 integration 패키지에 있습니다.
 
-## Setup
+## 설정
 
-This package requires a PostgreSQL database with the `pgvector` extension.
+이 패키지는 `pgvector` 확장이 포함된 PostgreSQL 데이터베이스가 필요합니다.
 
-You can run the following command to spin up a container for a `pgvector` enabled Postgres instance:
+다음 명령을 실행하여 `pgvector`가 활성화된 Postgres 인스턴스용 컨테이너를 실행할 수 있습니다:
 
 ```shell
 docker run --name pgvector-container -e POSTGRES_USER=langchain -e POSTGRES_PASSWORD=langchain -e POSTGRES_DB=langchain -p 6024:5432 -d pgvector/pgvector:pg16
 ```
 
-### Install
+### 설치
 
-Install the integration library, `langchain-postgres`.
+integration 라이브러리 `langchain-postgres`를 설치하세요.
 
 ```python
 pip install -qU  langchain-postgres
@@ -28,9 +28,9 @@ pip install -qU  langchain-postgres
 pip install -qU  langchain-core langchain-cohere sqlalchemy
 ```
 
-### Set your Postgres values
+### Postgres 값 설정
 
-Set your Postgres values to test the functionality in this notebook against a Postgres instance.
+이 노트북에서 Postgres 인스턴스를 대상으로 기능을 테스트할 수 있도록 Postgres 값을 설정하세요.
 
 ```python
 # @title Set your values or use the defaults to connect to Docker { display-mode: "form" }
@@ -43,19 +43,19 @@ TABLE_NAME = "vectorstore"  # @param {type: "string"}
 VECTOR_SIZE = 1024  # @param {type: "int"}
 ```
 
-## Initialization
+## 초기화
 
-### PGEngine Connection Pool
+### PGEngine 연결 풀
 
-One of the requirements and arguments to establish PostgreSQL as a vector store is a `PGEngine` object. The `PGEngine`  configures a shared connection pool  to your Postgres database. This is an industry best practice to manage number of connections and to reduce latency through cached database connections.
+PostgreSQL을 vector store로 설정하기 위한 요구 사항 및 인자 중 하나는 `PGEngine` 객체입니다. `PGEngine`은 Postgres 데이터베이스에 대한 공유 connection pool을 구성합니다. 이는 연결 수를 관리하고 캐시된 데이터베이스 연결을 통해 대기 시간을 줄이기 위한 업계 모범 사례입니다.
 
-`PGVectorStore` can be used with the `asyncpg` and `psycopg3` drivers.
+`PGVectorStore`는 `asyncpg` 및 `psycopg3` 드라이버와 함께 사용할 수 있습니다.
 
-To create a `PGEngine` using `PGEngine.from_connection_string()` you need to provide:
+`PGEngine.from_connection_string()`을 사용하여 `PGEngine`을 생성하려면 다음이 필요합니다:
 
-1. `url` : Connection string using the `postgresql+asyncpg` driver.
+1. `url` : `postgresql+asyncpg` 드라이버를 사용하는 connection string.
 
-**Note:** This tutorial demonstrates the async interface. All async methods have corresponding sync methods.
+주의: 이 튜토리얼은 async 인터페이스를 보여줍니다. 모든 async 메서드에는 해당하는 sync 메서드가 있습니다.
 
 ```python
 # See docker command above to launch a Postgres instance with pgvector enabled.
@@ -72,9 +72,9 @@ from langchain_postgres import PGEngine
 pg_engine = PGEngine.from_connection_string(url=CONNECTION_STRING)
 ```
 
-To create a `PGEngine` using `PGEngine.from_engine()` you need to provide:
+`PGEngine.from_engine()`을 사용하여 `PGEngine`을 생성하려면 다음이 필요합니다:
 
-1. `engine` : An object of `AsyncEngine`
+1. `engine` : `AsyncEngine` 객체
 
 ```python
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -87,11 +87,11 @@ engine = create_async_engine(
 pg_engine = PGEngine.from_engine(engine=engine)
 ```
 
-### Initialize a table
+### 테이블 초기화
 
-The `PGVectorStore` class requires a database table. The `PGEngine` engine has a helper method `ainit_vectorstore_table()` that can be used to create a table with the proper schema for you.
+`PGVectorStore` 클래스는 데이터베이스 테이블을 필요로 합니다. `PGEngine` 엔진에는 올바른 스키마로 테이블을 생성하는 데 사용할 수 있는 `ainit_vectorstore_table()` 헬퍼 메서드가 있습니다.
 
-See [Create a custom Vector Store](#create-a-custom-vector-store) or [Create a Vector Store using existing table](#create-a-vector-store-using-existing-table) for customizing the schema.
+스키마를 사용자 지정하려면 [Create a custom Vector Store](#create-a-custom-vector-store) 또는 [Create a Vector Store using existing table](#create-a-vector-store-using-existing-table)를 참고하세요.
 
 ```python
 await pg_engine.ainit_vectorstore_table(
@@ -100,9 +100,9 @@ await pg_engine.ainit_vectorstore_table(
 )
 ```
 
-#### Optional Tip: 💡
+#### 선택 사항 팁: 💡
 
-You can also specify a schema name by passing `schema_name` wherever you pass `table_name`. Eg:
+`table_name`을 전달하는 모든 곳에서 `schema_name`을 전달하여 스키마 이름도 지정할 수 있습니다. 예:
 
 ```python
 SCHEMA_NAME="my_schema"
@@ -114,9 +114,9 @@ await pg_engine.ainit_vectorstore_table(
 )
 ```
 
-### Create an embedding class instance
+### Embedding 클래스 인스턴스 생성
 
-You can use any [LangChain embeddings model](https://python.langchain.com/docs/integrations/text_embedding/).
+원하는 [LangChain embeddings model](https://python.langchain.com/docs/integrations/text_embedding/)을 사용할 수 있습니다.
 
 ```python
 from langchain_cohere import CohereEmbeddings
@@ -124,11 +124,11 @@ from langchain_cohere import CohereEmbeddings
 embedding = CohereEmbeddings(model="embed-english-v3.0")
 ```
 
-### Initialize a default PGVectorStore
+### 기본 PGVectorStore 초기화
 
-Use the default table schema to connect to the vectorstore.
+기본 테이블 스키마를 사용하여 vectorstore에 연결합니다.
 
-See [Create a custom Vector Store](#create-a-custom-vector-store) or [Create a Vector Store using existing table](#create-a-vector-store-using-existing-table) for customizing the schema.
+스키마를 사용자 지정하려면 [Create a custom Vector Store](#create-a-custom-vector-store) 또는 [Create a Vector Store using existing table](#create-a-vector-store-using-existing-table)를 참고하세요.
 
 ```python
 from langchain_postgres import PGVectorStore
@@ -141,11 +141,11 @@ store = await PGVectorStore.create(
 )
 ```
 
-## Manage vector store
+## 벡터 저장소 관리
 
-### Add documents
+### 문서 추가
 
-Add documents to the vector store. Metadata is stored in a JSON column, see "Create a custom Vector Store" to store metadata to be used for filters.
+벡터 저장소에 문서를 추가합니다. Metadata는 JSON 컬럼에 저장됩니다. 필터에 사용할 metadata를 저장하려면 "Create a custom Vector Store"를 참고하세요.
 
 ```python
 import uuid
@@ -173,9 +173,9 @@ docs = [
 await store.aadd_documents(docs)
 ```
 
-### Add texts
+### 텍스트 추가
 
-Add text directly to the vectorstore, if not structured as a Document.
+문서로 구조화되지 않은 경우 텍스트를 vectorstore에 직접 추가하세요.
 
 ```python
 import uuid
@@ -187,19 +187,19 @@ ids = [str(uuid.uuid4()) for _ in all_texts]
 await store.aadd_texts(all_texts, metadatas=metadatas, ids=ids)
 ```
 
-### Delete documents
+### 문서 삭제
 
-Documents can be deleted using ids.
+문서는 id를 사용하여 삭제할 수 있습니다.
 
 ```python
 await store.adelete([ids[1]])
 ```
 
-## Query vector store
+## 벡터 저장소 질의
 
-### Search for documents
+### 문서 검색
 
-Use a natural language query to search for similar documents.
+자연어 쿼리를 사용하여 유사한 문서를 검색합니다.
 
 ```python
 query = "I'd like a fruit."
@@ -207,9 +207,9 @@ docs = await store.asimilarity_search(query)
 print(docs)
 ```
 
-### Search for documents by vector
+### 벡터로 문서 검색
 
-Search for similar documents using a vector embedding.
+벡터 embedding을 사용하여 유사한 문서를 검색합니다.
 
 ```python
 query_vector = embedding.embed_query(query)
@@ -217,11 +217,11 @@ docs = await store.asimilarity_search_by_vector(query_vector, k=2)
 print(docs)
 ```
 
-## Add a Index
+## 인덱스 추가
 
-Speed up vector search queries by applying a vector index. Learn more about [vector indexes](https://cloud.google.com/blog/products/databases/faster-similarity-search-performance-with-pgvector-indexes).
+[vector indexes](https://cloud.google.com/blog/products/databases/faster-similarity-search-performance-with-pgvector-indexes)를 적용하여 벡터 검색 쿼리를 빠르게 합니다.
 
-Indexes will use a default index name if a name is not provided. To add multiple indexes, different index names are required.
+인덱스 이름을 제공하지 않으면 기본 인덱스 이름이 사용됩니다. 여러 인덱스를 추가하려면 서로 다른 인덱스 이름이 필요합니다.
 
 ```python
 from langchain_postgres.v2.indexes import HNSWIndex, IVFFlatIndex
@@ -233,44 +233,44 @@ index = HNSWIndex(name="my-hnsw-index")
 await store.aapply_vector_index(index)
 ```
 
-Set index parameters to tune the index for optimal balance between recall and QPS.
+인덱스 파라미터를 설정하여 recall과 QPS 간 최적의 균형을 위해 인덱스를 튜닝하세요.
 
 ```python
 index = IVFFlatIndex(name="my-ivfflat", lists=120)
 await store.aapply_vector_index(index)
 ```
 
-### Re-index
+### 재인덱싱
 
-Rebuild an index using the data stored in the index's table, replacing the old copy of the index. Some index types may require re-indexing after a considerable amount of new data is added.
+인덱스의 테이블에 저장된 데이터를 사용하여 인덱스를 다시 빌드하고 오래된 사본을 교체합니다. 일부 인덱스 유형은 상당한 양의 새로운 데이터가 추가된 후 재인덱싱이 필요할 수 있습니다.
 
 ```python
 await store.areindex()  # Re-index using the default index name
 await store.areindex("my-hnsw-index")  # Re-index using the index name
 ```
 
-### Drop an index
+### 인덱스 삭제
 
-Remove a vector index.
+벡터 인덱스를 제거합니다.
 
 ```python
 await store.adrop_vector_index()  # Delete index using the default name
 await store.adrop_vector_index("my-hnsw-index")  # Delete index using the index name
 ```
 
-### Create a custom Vector Store
+### 사용자 지정 Vector Store 만들기
 
-Customize the vectorstore with special column names or with custom metadata columns.
+특별한 컬럼 이름이나 사용자 지정 metadata 컬럼으로 vectorstore를 사용자 지정합니다.
 
 `ainit_vectorstore_table`
 
-* Use fields `content_column`, `embedding_column`,`metadata_columns`, `metadata_json_column`, `id_column` to rename the columns.
-* Use the `Column` class to create custom id or metadata columns. A Column is defined by a name and data type. Any Postgres [data type](https://www.postgresql.org/docs/current/datatype.html) can be used.
-* Use `store_metadata` to create a JSON column to store extra metadata.
+- `content_column`, `embedding_column`,`metadata_columns`, `metadata_json_column`, `id_column` 필드를 사용하여 컬럼 이름을 변경합니다.
+- 사용자 지정 id 또는 metadata 컬럼을 만들려면 `Column` 클래스를 사용합니다. Column은 이름과 데이터 타입으로 정의됩니다. 모든 Postgres [data type](https://www.postgresql.org/docs/current/datatype.html)을 사용할 수 있습니다.
+- 추가 metadata를 저장하기 위해 `store_metadata`를 사용하여 JSON 컬럼을 생성합니다.
 
-#### Optional Tip: 💡
+#### 선택 사항 팁: 💡
 
-To use non-uuid ids, you must customize the id column:
+uuid가 아닌 id를 사용하려면 id 컬럼을 사용자 지정해야 합니다:
 
 ```python
 await pg_engine.ainit_vectorstore_table(
@@ -281,10 +281,10 @@ await pg_engine.ainit_vectorstore_table(
 
 `PGVectorStore`
 
-* Use fields `content_column`, `embedding_column`,`metadata_columns`, `metadata_json_column`, `id_column` to rename the columns.
-* `ignore_metadata_columns` to ignore columns that should not be used for Document metadata. This is helpful when using a preexisting table, where all data columns are not necessary.
-* Use a different `distance_strategy` for the similarity calculation during vector search.
-* Use `index_query_options` to tune local index parameters during vector search.
+- `content_column`, `embedding_column`,`metadata_columns`, `metadata_json_column`, `id_column` 필드를 사용하여 컬럼 이름을 변경합니다.
+- `ignore_metadata_columns`를 사용하여 Document metadata에 사용되지 않아야 하는 컬럼을 무시합니다. 이는 기존 테이블을 사용할 때 모든 데이터 컬럼이 필요하지 않은 경우에 유용합니다.
+- 벡터 검색 중 유사도 계산에 대해 다른 `distance_strategy`를 사용합니다.
+- 벡터 검색 중 로컬 인덱스 파라미터를 튜닝하려면 `index_query_options`를 사용합니다.
 
 ```python
 from langchain_postgres import Column
@@ -311,28 +311,28 @@ custom_store = await PGVectorStore.create(
 )
 ```
 
-### Search for documents with metadata filter
+### 메타데이터 필터로 문서 검색
 
-A Vector Store can take advantage of relational data to filter similarity searches. The vectorstore supports a set of filters that can be applied against the metadata fields of the documents. See the [migration guide](https://github.com/langchain-ai/langchain-postgres/blob/main/examples/migrate_pgvector_to_pgvectorstore.ipynb) for details on how to migrate to use metadata columns.
+Vector Store는 관계형 데이터를 활용하여 유사도 검색을 필터링할 수 있습니다. vectorstore는 문서의 metadata 필드에 적용할 수 있는 일련의 필터를 지원합니다. metadata 컬럼을 사용하도록 마이그레이션하는 방법에 대한 자세한 내용은 [migration guide](https://github.com/langchain-ai/langchain-postgres/blob/main/examples/migrate_pgvector_to_pgvectorstore.ipynb)를 참고하세요.
 
-`PGVectorStore` currently supports the following operators and all Postgres data types.
+`PGVectorStore`는 현재 다음 연산자와 모든 Postgres 데이터 타입을 지원합니다.
 
-| Operator  | Meaning/Category        |
+| 연산자  | 의미/범주                 |
 |-----------|-------------------------|
-| $eq       | Equality (==)           |
-| $ne       | Inequality (!=)         |
-| $lt       | Less than (\<)           |
-| $lte      | Less than or equal (\<=) |
-| $gt       | Greater than (>)        |
-| $gte      | Greater than or equal (>=) |
-| $in       | Special Cased (in)      |
-| $nin      | Special Cased (not in)  |
-| $between  | Special Cased (between) |
-| $exists   | Special Cased (is null) |
-| $like     | Text (like)             |
-| $ilike    | Text (case-insensitive like) |
-| $and      | Logical (and)           |
-| $or       | Logical (or)            |
+| $eq       | 동등 (`==`)               |
+| $ne       | 비동등 (`!=`)             |
+| $lt       | 미만 (`<`)                |
+| $lte      | 이하 (`<=`)               |
+| $gt       | 초과 (`>`)                |
+| $gte      | 이상 (`>=`)               |
+| $in       | 특수 처리 (`in`)          |
+| $nin      | 특수 처리 (not in)      |
+| $between  | 특수 처리 (between)     |
+| $exists   | 특수 처리 (is null)     |
+| $like     | 텍스트 (like)           |
+| $ilike    | 텍스트 (대소문자 무시 like) |
+| $and      | 논리 (and)              |
+| $or       | 논리 (or)               |
 
 ```python
 import uuid
@@ -363,16 +363,16 @@ docs = await custom_store.asimilarity_search(query, filter={"content": {"$gte": 
 print(docs)
 ```
 
-### Create a Vector Store using existing table
+### 기존 테이블을 사용하여 Vector Store 만들기
 
-A Vector Store can be built up on an existing table.
+기존 테이블 위에 Vector Store를 구축할 수 있습니다.
 
-Assuming there's a pre-existing table in PG DB: `products`, which stores product details for an eComm venture.
+PG DB에 미리 존재하는 테이블 `products`가 있고, eComm 벤처를 위한 제품 상세 정보를 저장한다고 가정합니다.
 
 <details>
-    <summary>Click for Table Schema Details</summary>
+    <summary>테이블 스키마 상세 보기</summary>
 
-### SQL query for table creation
+### 테이블 생성용 SQL 쿼리
 
   ```
     CREATE TABLE products (
@@ -389,7 +389,7 @@ Assuming there's a pre-existing table in PG DB: `products`, which stores product
     );
   ```
 
-### Insertion of records
+### 레코드 삽입
 
   ```
 INSERT INTO
@@ -412,17 +412,17 @@ VALUES
 
 </details>
 
-Here is how this table mapped to `PGVectorStore`:
+이 테이블을 `PGVectorStore`에 매핑하는 방법은 다음과 같습니다:
 
-* **`id_column="product_id"`**: ID column uniquely identifies each row in the products table.
+- **`id_column="product_id"`**: ID 컬럼은 products 테이블의 각 행을 고유하게 식별합니다.
 
-* **`content_column="description"`**: The `description` column contains text descriptions of each product. This text is used by the `embedding_service` to create vectors that go in embedding_column and represent the semantic meaning of each description.
+- **`content_column="description"`**: `description` 컬럼에는 각 제품의 텍스트 설명이 들어 있습니다. 이 텍스트는 `embedding_service`에 의해 벡터로 생성되어 embedding_column에 저장되고, 각 설명의 의미를 표현합니다.
 
-* **`embedding_column="embed"`**: The `embed` column stores the vectors created from the product descriptions. These vectors are used to find products with similar descriptions.
+- **`embedding_column="embed"`**: `embed` 컬럼은 제품 설명에서 생성된 벡터를 저장합니다. 이 벡터는 유사한 설명을 가진 제품을 찾는 데 사용됩니다.
 
-* **`metadata_columns=["name", "category", "price_usd", "quantity", "sku", "image_url"]`**: These columns are treated as metadata for each product. Metadata provides additional information about a product, such as its name, category, price, quantity available, SKU (Stock Keeping Unit), and an image URL. This information is useful for displaying product details in search results or for filtering and categorization.
+- **`metadata_columns=["name", "category", "price_usd", "quantity", "sku", "image_url"]`**: 이 컬럼들은 각 제품의 metadata로 취급됩니다. Metadata는 제품 이름, 카테고리, 가격, 재고 수량, SKU(Stock Keeping Unit), 이미지 URL 등 추가 정보를 제공합니다. 이 정보는 검색 결과에 제품 세부 정보를 표시하거나 필터링 및 분류에 유용합니다.
 
-* **`metadata_json_column="metadata"`**: The `metadata` column can store any additional information about the products in a flexible JSON format. This allows for storing varied and complex data that doesn't fit into the standard columns.
+- **`metadata_json_column="metadata"`**: `metadata` 컬럼은 제품에 대한 추가 정보를 유연한 JSON 형식으로 저장할 수 있습니다. 표준 컬럼에 맞지 않는 다양한 복잡한 데이터를 저장하는 데 유용합니다.
 
 ```python
 # Set an existing table name
@@ -444,32 +444,32 @@ custom_store = await PGVectorStore.create(
 )
 ```
 
-Note:
+참고:
 
-1. Optional: If the `embed` column is newly created or has different dimensions than supported by embedding model, it is required to one-time add the embeddings for the old records, like this:
+1. 선택 사항: `embed` 컬럼이 새로 생성되었거나 embedding 모델이 지원하는 차원과 다른 경우, 기존 레코드에 대해 임시로 embedding을 추가해야 합니다. 예:
 
     `ALTER TABLE products ADD COLUMN embed vector(768) DEFAULT NULL`
 
-1. For new records, added via @[`VectorStore`] embeddings are automatically generated.
+1. 새 레코드는 @[`VectorStore`]를 통해 추가되면 embedding이 자동으로 생성됩니다.
 
-## Clean up
+## 정리
 
-**⚠️ WARNING: this can not be undone**
+⚠️ 경고: 이 작업은 되돌릴 수 없습니다
 
-Drop the vector store table.
+vector store 테이블을 드롭합니다.
 
 ```python
 await pg_engine.adrop_table(TABLE_NAME)
 ```
 
-## Usage for retrieval-augmented generation
+## 검색 증강 생성(RAG) 사용법
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+이 vector store를 검색 증강 생성(RAG)에 사용하는 방법에 대한 가이드는 다음 섹션을 참고하세요:
 
-* [Tutorials](/oss/langchain/rag)
-* [How-to: Question and answer with RAG](https://python.langchain.com/docs/how_to/#qa-with-rag)
-* [Retrieval conceptual docs](https://python.langchain.com/docs/concepts/retrieval)
+- [튜토리얼](/oss/langchain/rag)
+- [방법: RAG로 질문과 답변](https://python.langchain.com/docs/how_to/#qa-with-rag)
+- [Retrieval 개념 문서](https://python.langchain.com/docs/concepts/retrieval)
 
-## API reference
+## API 참고 문서
 
-For detailed documentation of all VectorStore features and configurations head to the API reference: [python.langchain.com/api_reference/postgres/v2/langchain_postgres.v2.vectorstores.PGVectorStore.html](https://python.langchain.com/api_reference/postgres/v2/langchain_postgres.v2.vectorstores.PGVectorStore.html)
+모든 VectorStore 기능 및 구성에 대한 자세한 문서는 API 참고 문서를 확인하세요: [python.langchain.com/api_reference/postgres/v2/langchain_postgres.v2.vectorstores.PGVectorStore.html](https://python.langchain.com/api_reference/postgres/v2/langchain_postgres.v2.vectorstores.PGVectorStore.html)

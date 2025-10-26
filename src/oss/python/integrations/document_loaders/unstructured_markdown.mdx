@@ -2,7 +2,7 @@
 title: UnstructuredMarkdownLoader
 ---
 
-This guide provides a quick overview for getting started with UnstructuredMarkdown [document loader](https://python.langchain.com/docs/concepts/document_loaders). For detailed documentation of all __ModuleName__Loader features and configurations head to the [API reference](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.markdown.UnstructuredMarkdownLoader.html).
+이 가이드는 UnstructuredMarkdown [document loader](https://python.langchain.com/docs/concepts/document_loaders) 시작하기에 대한 간단한 개요를 제공합니다. 모든 __ModuleName__Loader 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.markdown.UnstructuredMarkdownLoader.html)를 참조하세요.
 
 ## Overview
 
@@ -20,13 +20,13 @@ This guide provides a quick overview for getting started with UnstructuredMarkdo
 
 ## Setup
 
-To access UnstructuredMarkdownLoader document loader you'll need to install the `langchain-community` integration package and the `unstructured` python package.
+UnstructuredMarkdownLoader document loader에 액세스하려면 `langchain-community` integration package와 `unstructured` python package를 설치해야 합니다.
 
 ### Credentials
 
-No credentials are needed to use this loader.
+이 loader를 사용하는 데 필요한 자격 증명은 없습니다.
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -35,7 +35,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-Install **langchain_community** and **unstructured**
+**langchain_community**와 **unstructured**를 설치합니다
 
 ```python
 pip install -qU langchain_community unstructured
@@ -43,9 +43,9 @@ pip install -qU langchain_community unstructured
 
 ## Initialization
 
-Now we can instantiate our model object and load documents.
+이제 model object를 인스턴스화하고 document를 로드할 수 있습니다.
 
-You can run the loader in one of two modes: "single" and "elements". If you use "single" mode, the document will be returned as a single @[`Document`] object. If you use "elements" mode, the unstructured library will split the document into elements such as `Title` and `NarrativeText`. You can pass in additional `unstructured` kwargs after mode to apply different `unstructured` settings.
+loader는 "single"과 "elements" 두 가지 모드 중 하나로 실행할 수 있습니다. "single" 모드를 사용하면 document가 단일 @[`Document`] object로 반환됩니다. "elements" 모드를 사용하면 unstructured library가 document를 `Title` 및 `NarrativeText`와 같은 요소로 분할합니다. mode 이후에 추가 `unstructured` kwargs를 전달하여 다양한 `unstructured` 설정을 적용할 수 있습니다.
 
 ```python
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
@@ -96,7 +96,7 @@ Document(metadata={'source': './example_data/example.md', 'link_texts': ['OpenAI
 
 ## Load Elements
 
-In this example we will load in the `elements` mode, which will return a list of the different elements in the markdown document:
+이 예제에서는 `elements` 모드로 로드하여 markdown document의 다양한 요소 목록을 반환합니다:
 
 ```python
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
@@ -115,7 +115,7 @@ len(docs)
 29
 ```
 
-As you see there are 29 elements that were pulled from the `example.md` file. The first element is the title of the document as expected:
+보시다시피 `example.md` 파일에서 29개의 요소가 추출되었습니다. 첫 번째 요소는 예상대로 document의 제목입니다:
 
 ```python
 docs[0].page_content
@@ -127,4 +127,4 @@ docs[0].page_content
 
 ## API reference
 
-For detailed documentation of all UnstructuredMarkdownLoader features and configurations head to the API reference: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.markdown.UnstructuredMarkdownLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.markdown.UnstructuredMarkdownLoader.html)
+모든 UnstructuredMarkdownLoader 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.markdown.UnstructuredMarkdownLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.markdown.UnstructuredMarkdownLoader.html)

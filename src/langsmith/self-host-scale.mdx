@@ -1,105 +1,105 @@
 ---
-title: Configure LangSmith for scale
-sidebarTitle: Configure for scale
+title: 확장을 위한 LangSmith 구성
+sidebarTitle: 확장을 위한 구성
 ---
 
-A self-hosted LangSmith instance can handle a large number of traces and users. The default configuration for the self-hosted deployment can handle substantial load, and you can configure your deployment to be able to achieve higher scale. This page describes scaling considerations and provides some examples to help configure your self-hosted instance.
+자체 호스팅 LangSmith 인스턴스는 대량의 trace와 사용자를 처리할 수 있습니다. 자체 호스팅 배포의 기본 구성은 상당한 부하를 처리할 수 있으며, 더 높은 확장성을 달성하기 위해 배포를 구성할 수 있습니다. 이 페이지에서는 확장 고려 사항을 설명하고 자체 호스팅 인스턴스를 구성하는 데 도움이 되는 몇 가지 예제를 제공합니다.
 
-For example configurations, refer to [Example LangSmith configurations for scale](#example-langsmith-configurations-for-scale).
+예제 구성은 [확장을 위한 LangSmith 구성 예제](#example-langsmith-configurations-for-scale)를 참조하세요.
 
-## Summary
+## 요약
 
-The table below provides an overview comparing different LangSmith configurations for various load patterns (reads / writes):
+아래 표는 다양한 부하 패턴(읽기 / 쓰기)에 대한 여러 LangSmith 구성을 비교한 개요를 제공합니다:
 
-|  | **[Low / low](#low-reads-low-writes)** | **[Low / high](#low-reads-high-writes)** | **[High / low](#high-reads-low-writes)** | [Medium / medium](#medium-reads-medium-writes) | [High / high](#high-reads-high-writes) |
+|  | **[낮음 / 낮음](#low-reads-low-writes)** | **[낮음 / 높음](#low-reads-high-writes)** | **[높음 / 낮음](#high-reads-low-writes)** | [중간 / 중간](#medium-reads-medium-writes) | [높음 / 높음](#high-reads-high-writes) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| <Tooltip tip="Number of users actively viewing traces on the frontend">Concurrent frontend users</Tooltip> | 5 | 5 | 50 | 20 | 50 |
-| <Tooltip tip="Number of traces being ingested via SDKs or API endpoints">Traces submitted per second</Tooltip> | 10 | 1000 | 10 | 100 | 1000 |
-| **Frontend replicas** | 1 (default) | 4 | 2 | 2 | 4 |
-| **Platform backend replicas** | 3 (default) | 20 | 3 (default) | 3 (default) | 20 |
-| **Queue replicas** | 3 (default) | 160 | 6 | 10 | 160 |
-| **Backend replicas** | 2 (default) | 5 | 40 | 16 | 50 |
-| **Redis resources** | 8 Gi (default) | 200 Gi external | 8 Gi (default) | 13Gi external | 200 Gi external |
-| **ClickHouse resources** | 4 CPU<br />16 Gi (default) | 10 CPU<br />32Gi memory | 8 CPU<br />16 Gi per replica | 16 CPU<br />24Gi memory | 14 CPU<br />24 Gi per replica |
-| **ClickHouse setup** | Single instance | Single instance | 3-node <Tooltip tip="Recommended for high read loads to prevent degraded performance. Another option would be [managed clickhouse](/langsmith/self-host-external-clickhouse#langsmith-managed-clickhouse).">replicated cluster</Tooltip> | Single instance | 3-node <Tooltip tip="Recommended for high read loads to prevent degraded performance. Another option would be [managed clickhouse](/langsmith/self-host-external-clickhouse#langsmith-managed-clickhouse).">replicated cluster</Tooltip> |
-| <Tooltip tip="We recommend using an external instance and enabling autoexpansion for the disk to handle growing data requirements.">Postgres resources</Tooltip> | 2 CPU<br />8 GB memory<br />10GB storage (external) | 2 CPU<br />8 GB memory<br />10GB storage (external) | 2 CPU<br />8 GB memory<br />10GB storage (external) | 2 CPU<br />8 GB memory<br />10GB storage (external) | 2 CPU<br />8 GB memory<br />10GB storage (external) |
+| <Tooltip tip="프론트엔드에서 trace를 적극적으로 보고 있는 사용자 수">동시 프론트엔드 사용자</Tooltip> | 5 | 5 | 50 | 20 | 50 |
+| <Tooltip tip="SDK 또는 API endpoint를 통해 수집되는 trace 수">초당 제출되는 trace</Tooltip> | 10 | 1000 | 10 | 100 | 1000 |
+| **Frontend replica** | 1 (기본값) | 4 | 2 | 2 | 4 |
+| **Platform backend replica** | 3 (기본값) | 20 | 3 (기본값) | 3 (기본값) | 20 |
+| **Queue replica** | 3 (기본값) | 160 | 6 | 10 | 160 |
+| **Backend replica** | 2 (기본값) | 5 | 40 | 16 | 50 |
+| **Redis 리소스** | 8 Gi (기본값) | 200 Gi external | 8 Gi (기본값) | 13Gi external | 200 Gi external |
+| **ClickHouse 리소스** | 4 CPU<br />16 Gi (기본값) | 10 CPU<br />32Gi memory | 8 CPU<br />16 Gi per replica | 16 CPU<br />24Gi memory | 14 CPU<br />24 Gi per replica |
+| **ClickHouse 설정** | Single instance | Single instance | 3-node <Tooltip tip="성능 저하를 방지하기 위해 높은 읽기 부하에 권장됩니다. 다른 옵션으로는 [managed clickhouse](/langsmith/self-host-external-clickhouse#langsmith-managed-clickhouse)가 있습니다.">replicated cluster</Tooltip> | Single instance | 3-node <Tooltip tip="성능 저하를 방지하기 위해 높은 읽기 부하에 권장됩니다. 다른 옵션으로는 [managed clickhouse](/langsmith/self-host-external-clickhouse#langsmith-managed-clickhouse)가 있습니다.">replicated cluster</Tooltip> |
+| <Tooltip tip="증가하는 데이터 요구 사항을 처리하기 위해 외부 인스턴스를 사용하고 디스크 자동 확장을 활성화하는 것을 권장합니다.">Postgres 리소스</Tooltip> | 2 CPU<br />8 GB memory<br />10GB storage (external) | 2 CPU<br />8 GB memory<br />10GB storage (external) | 2 CPU<br />8 GB memory<br />10GB storage (external) | 2 CPU<br />8 GB memory<br />10GB storage (external) | 2 CPU<br />8 GB memory<br />10GB storage (external) |
 | **Blob storage** | Disabled | Enabled | Enabled | Enabled | Enabled |
 
 
-Below we go into more details about the read and write paths as well as provide a `values.yaml` snippet for you to start with for your self-hosted LangSmith instance.
+아래에서는 읽기 및 쓰기 경로에 대한 자세한 내용을 설명하고 자체 호스팅 LangSmith 인스턴스를 시작하기 위한 `values.yaml` 스니펫을 제공합니다.
 
-## Trace ingestion (write path)
+## Trace 수집 (쓰기 경로)
 
-Common usage that put load on the write path:
+쓰기 경로에 부하를 주는 일반적인 사용:
 
-- Ingesting traces via the Python or JavaScript LangSmith SDK
-- Ingesting traces via the `@traceable` wrapper
-- Submitting traces via the `/runs/multipart` endpoint
+- Python 또는 JavaScript LangSmith SDK를 통한 trace 수집
+- `@traceable` wrapper를 통한 trace 수집
+- `/runs/multipart` endpoint를 통한 trace 제출
 
-Services that play a large role in trace ingestion:
+trace 수집에서 중요한 역할을 하는 서비스:
 
-- Platform backend service: Receives initial request to ingest traces and places traces on a Redis queue
-- Redis cache: Used to queue traces that need to be persisted
-- Queue service: Persists traces for querying
-- ClickHouse: Persistent storage used for traces
+- Platform backend service: trace 수집을 위한 초기 요청을 받고 trace를 Redis queue에 배치
+- Redis cache: 지속되어야 하는 trace를 queue에 저장하는 데 사용
+- Queue service: 쿼리를 위해 trace를 지속
+- ClickHouse: trace에 사용되는 영구 저장소
 
-When scaling up the write path (trace ingestion), it is helpful to monitor the four services/resources listed above. Here are some typical changes that can help increase performance of trace ingestion:
+쓰기 경로(trace 수집)를 확장할 때 위에 나열된 네 가지 서비스/리소스를 모니터링하는 것이 도움이 됩니다. 다음은 trace 수집 성능을 향상시킬 수 있는 일반적인 변경 사항입니다:
 
-- Give ClickHouse more resources (CPU and memory) if it is approaching resource limits.
-- Increase the number of platform-backend pods if ingest requests are taking long to respond.
-- Increase queue service pod replicas if traces are not being processed from Redis fast enough.
-- Use a larger Redis cache if you notice that the current Redis instance is reaching resource limits. This could also be a reason why ingest requests take a long time.
+- ClickHouse가 리소스 한계에 도달하는 경우 더 많은 리소스(CPU 및 메모리)를 제공합니다.
+- 수집 요청이 응답하는 데 오래 걸리는 경우 platform-backend pod 수를 늘립니다.
+- trace가 Redis에서 충분히 빠르게 처리되지 않는 경우 queue service pod replica를 늘립니다.
+- 현재 Redis 인스턴스가 리소스 한계에 도달하는 것을 발견하면 더 큰 Redis cache를 사용합니다. 이것은 수집 요청이 오래 걸리는 이유일 수도 있습니다.
 
-## Trace querying (read path)
+## Trace 쿼리 (읽기 경로)
 
-Common usage that puts load on the read path:
+읽기 경로에 부하를 주는 일반적인 사용:
 
-- Users on the frontend looking at tracing projects or individual traces
-- Scripts used to query for trace info
-- Hitting either the `/runs/query` or `/runs/<run-id>` api endpoints
+- 프론트엔드에서 tracing project 또는 개별 trace를 보는 사용자
+- trace 정보를 쿼리하는 데 사용되는 스크립트
+- `/runs/query` 또는 `/runs/<run-id>` api endpoint 호출
 
-Services that play a large role in querying traces:
+trace 쿼리에서 중요한 역할을 하는 서비스:
 
-- Backend service: Receives the request and submits a query to ClickHouse to then respond to the request
-- ClickHouse: Persistent storage for traces. This is the main database that is queried when requesting trace info.
+- Backend service: 요청을 받고 ClickHouse에 쿼리를 제출한 다음 요청에 응답
+- ClickHouse: trace를 위한 영구 저장소. trace 정보를 요청할 때 쿼리되는 주요 데이터베이스입니다.
 
-When scaling up the read path (trace querying), it is helpful to monitor the two services/resources listed above. Here are some typical changes that can help improve performance of trace querying:
+읽기 경로(trace 쿼리)를 확장할 때 위에 나열된 두 가지 서비스/리소스를 모니터링하는 것이 도움이 됩니다. 다음은 trace 쿼리 성능을 향상시킬 수 있는 일반적인 변경 사항입니다:
 
-- Increase the number of backend service pods. This would be most impactful if backend service pods are reaching 1 core CPU usage.
-- Give ClickHouse more resources (CPU or Memory). ClickHouse can be very resource intensive, but it should lead to better performance.
-- Move to a [replicated ClickHouse cluster](/langsmith/self-host-external-clickhouse#ha-replicated-clickhouse-cluster). Adding replicas of ClickHouse helps with read performance, but we recommend staying below 5 replicas (start with 3).
+- backend service pod 수를 늘립니다. backend service pod가 1 core CPU 사용량에 도달하는 경우 가장 효과적입니다.
+- ClickHouse에 더 많은 리소스(CPU 또는 메모리)를 제공합니다. ClickHouse는 매우 리소스 집약적일 수 있지만 더 나은 성능으로 이어질 것입니다.
+- [replicated ClickHouse cluster](/langsmith/self-host-external-clickhouse#ha-replicated-clickhouse-cluster)로 이동합니다. ClickHouse replica를 추가하면 읽기 성능에 도움이 되지만 5개 미만의 replica를 유지하는 것을 권장합니다(3개로 시작).
 
-For more precise guidance on how this translates to helm chart values, refer to the examples the following [section](#example-langsmith-configurations-for-scale). If you are unsure why your LangSmith instance cannot handle a certain load pattern, contact the LangChain team.
+이것이 helm chart 값으로 어떻게 변환되는지에 대한 보다 정확한 지침은 다음 [섹션](#example-langsmith-configurations-for-scale)의 예제를 참조하세요. LangSmith 인스턴스가 특정 부하 패턴을 처리할 수 없는 이유를 확실하지 않은 경우 LangChain 팀에 문의하세요.
 
-## Example LangSmith configurations for scale
+## 확장을 위한 LangSmith 구성 예제
 
-Below we provide some example LangSmith configurations based on expected read and write loads.
+아래에서는 예상되는 읽기 및 쓰기 부하를 기반으로 한 몇 가지 LangSmith 구성 예제를 제공합니다.
 
-For read load (trace querying):
+읽기 부하(trace 쿼리)의 경우:
 
-- Low means roughly 5 users looking at traces at a time (about 10 requests per second)
-- Medium means roughly 20 users looking at traces at a time (about 40 requests per second)
-- High means roughly 50 users looking at traces at a time (about 100 requests per second)
+- 낮음은 대략 5명의 사용자가 동시에 trace를 보는 것을 의미합니다(초당 약 10개의 요청)
+- 중간은 대략 20명의 사용자가 동시에 trace를 보는 것을 의미합니다(초당 약 40개의 요청)
+- 높음은 대략 50명의 사용자가 동시에 trace를 보는 것을 의미합니다(초당 약 100개의 요청)
 
-For write load (trace ingestion):
+쓰기 부하(trace 수집)의 경우:
 
-- Low means up to 10 traces submitted per second
-- Medium means up to 100 traces submitted per second
-- High means up to 1000 traces submitted per second
+- 낮음은 초당 최대 10개의 trace가 제출되는 것을 의미합니다
+- 중간은 초당 최대 100개의 trace가 제출되는 것을 의미합니다
+- 높음은 초당 최대 1000개의 trace가 제출되는 것을 의미합니다
 
 <Note>
-The exact optimal configuration depends on your usage and trace payloads. Use the examples below in combination with the information above and your specific usage to update your LangSmith configuration as you see fit. If you have any questions, please reach out to the LangChain team.
+정확한 최적 구성은 사용량과 trace payload에 따라 다릅니다. 위의 정보와 특정 사용량을 결합하여 아래 예제를 사용하여 적합하다고 판단되는 대로 LangSmith 구성을 업데이트하세요. 질문이 있으시면 LangChain 팀에 문의하세요.
 </Note>
 
-### Low reads, low writes <a name="low-reads-low-writes"></a>
+### 낮은 읽기, 낮은 쓰기 <a name="low-reads-low-writes"></a>
 
-The default LangSmith configuration will handle this load. No custom resource configuration is needed here.
+기본 LangSmith 구성이 이 부하를 처리합니다. 여기서는 사용자 정의 리소스 구성이 필요하지 않습니다.
 
-### Low reads, high writes <a name="low-reads-high-writes"></a>
+### 낮은 읽기, 높은 쓰기 <a name="low-reads-high-writes"></a>
 
-You have a very high scale of trace ingestions, but single digit number of users on the frontend querying traces at any one time.
+매우 높은 규모의 trace 수집이 있지만 프론트엔드에서 trace를 쿼리하는 사용자는 한 자릿수입니다.
 
-For this, we recommend a configuration like this:
+이를 위해 다음과 같은 구성을 권장합니다:
 
 ```yaml
 config:
@@ -172,13 +172,13 @@ commonEnv:
     value: "0"
 ```
 
-### High reads, low writes <a name="high-reads-low-writes"></a>
+### 높은 읽기, 낮은 쓰기 <a name="high-reads-low-writes"></a>
 
-You have a relatively low scale of trace ingestions, but many frontend users querying traces and/or have scripts that hit the `/runs/query` or `/runs/<run-id>` endpoints frequently.
+상대적으로 낮은 규모의 trace 수집이 있지만 많은 프론트엔드 사용자가 trace를 쿼리하거나 `/runs/query` 또는 `/runs/<run-id>` endpoint를 자주 호출하는 스크립트가 있습니다.
 
-**For this, we strongly recommend setting up a replicated ClickHouse cluster to enable high read scale at low latency.** See our [external ClickHouse doc](/langsmith/self-host-external-clickhouse#ha-replicated-clickhouse-cluster) for more guidance on how to setup a replicated ClickHouse cluster. For this load pattern, we recommend using a 3 node replicated setup, where each replica in the cluster should have resource requests of 8+ cores and 16+ GB memory, and resource limit of 12 cores and 32 GB memory.
+**이를 위해 낮은 지연 시간으로 높은 읽기 규모를 가능하게 하는 replicated ClickHouse cluster를 설정하는 것을 강력히 권장합니다.** replicated ClickHouse cluster를 설정하는 방법에 대한 자세한 지침은 [external ClickHouse 문서](/langsmith/self-host-external-clickhouse#ha-replicated-clickhouse-cluster)를 참조하세요. 이 부하 패턴의 경우 3 node replicated 설정을 사용하는 것을 권장하며, cluster의 각 replica는 8+ core 및 16+ GB 메모리의 리소스 요청과 12 core 및 32 GB 메모리의 리소스 제한을 가져야 합니다.
 
-For this, we recommend a configuration like this:
+이를 위해 다음과 같은 구성을 권장합니다:
 
 ```yaml
 config:
@@ -221,11 +221,11 @@ clickhouse:
     cluster: "replicated"
 ```
 
-### Medium reads, medium writes <a name="medium-reads-medium-writes"></a>
+### 중간 읽기, 중간 쓰기 <a name="medium-reads-medium-writes"></a>
 
-This is a good all around configuration that should be able to handle most usage patterns of LangSmith. In internal testing, this configuration allowed us to scale to 100 traces ingested per second and 40 read requests per second.
+이것은 LangSmith의 대부분의 사용 패턴을 처리할 수 있는 좋은 전반적인 구성입니다. 내부 테스트에서 이 구성을 통해 초당 100개의 trace 수집과 초당 40개의 읽기 요청으로 확장할 수 있었습니다.
 
-For this, we recommend a configuration like this:
+이를 위해 다음과 같은 구성을 권장합니다:
 
 ```yaml
 config:
@@ -288,16 +288,16 @@ commonEnv:
 ```
 
 <Warning>
-If you still notice slow reads with the above configuration, we recommend moving to a [replicated Clickhouse cluster setup](/langsmith/self-host-external-clickhouse#ha-replicated-clickhouse-cluster)
+위의 구성으로도 여전히 느린 읽기가 발생하는 경우 [replicated Clickhouse cluster 설정](/langsmith/self-host-external-clickhouse#ha-replicated-clickhouse-cluster)으로 이동하는 것을 권장합니다
 </Warning>
 
-### High reads, high writes <a name="high-reads-high-writes"></a>
+### 높은 읽기, 높은 쓰기 <a name="high-reads-high-writes"></a>
 
-You have a very high rate of trace ingestion (approaching 1000 traces submitted per second) and also have many users querying traces on the frontend (over 50 users) and/or scripts that are consistently making requests to `/runs/query` or `/runs/<run-id>` endpoints.
+매우 높은 trace 수집 속도(초당 1000개의 trace 제출에 근접)와 프론트엔드에서 trace를 쿼리하는 많은 사용자(50명 이상) 및/또는 `/runs/query` 또는 `/runs/<run-id>` endpoint에 지속적으로 요청하는 스크립트가 있습니다.
 
-**For this, we very strongly recommend setting up a replicated ClickHouse cluster to prevent degraded read performance at high write scale.** See our [external ClickHouse doc](/langsmith/self-host-external-clickhouse#ha-replicated-clickhouse-cluster) for more guidance on how to set up a replicated ClickHouse cluster. For this load pattern, we recommend using a 3 node replicated setup, where each replica in the cluster should have resource requests of 14+ cores and 24+ GB memory, and resource limit of 20 cores and 48 GB memory. We also recommend that each node/instance of ClickHouse has 600 Gi of volume storage for each day of TTL that you enable (as per the configuration below).
+**이를 위해 높은 쓰기 규모에서 읽기 성능 저하를 방지하기 위해 replicated ClickHouse cluster를 설정하는 것을 매우 강력히 권장합니다.** replicated ClickHouse cluster를 설정하는 방법에 대한 자세한 지침은 [external ClickHouse 문서](/langsmith/self-host-external-clickhouse#ha-replicated-clickhouse-cluster)를 참조하세요. 이 부하 패턴의 경우 3 node replicated 설정을 사용하는 것을 권장하며, cluster의 각 replica는 14+ core 및 24+ GB 메모리의 리소스 요청과 20 core 및 48 GB 메모리의 리소스 제한을 가져야 합니다. 또한 ClickHouse의 각 node/instance가 활성화한 TTL의 각 일에 대해 600 Gi의 볼륨 스토리지를 갖는 것을 권장합니다(아래 구성에 따라).
 
-Overall, we recommend a configuration like this:
+전반적으로 다음과 같은 구성을 권장합니다:
 
 ```yaml
 config:
@@ -371,7 +371,7 @@ commonEnv:
 ```
 
 <Note>
-Ensure that the Kubernetes cluster is configured with sufficient resources to scale to the recommended size. After deployment, all of the pods in the Kubernetes cluster should be in a `Running` state. Pods stuck in `Pending` may indicate that you are reaching node pool limits or need larger nodes.
+Kubernetes cluster가 권장 크기로 확장할 수 있는 충분한 리소스로 구성되어 있는지 확인하세요. 배포 후 Kubernetes cluster의 모든 pod는 `Running` 상태여야 합니다. `Pending` 상태에 있는 pod는 node pool 한계에 도달했거나 더 큰 node가 필요함을 나타낼 수 있습니다.
 
-Also, ensure that any ingress controller deployed on the cluster is able to handle the desired load to prevent bottlenecks.
+또한 cluster에 배포된 모든 ingress controller가 병목 현상을 방지하기 위해 원하는 부하를 처리할 수 있는지 확인하세요.
 </Note>

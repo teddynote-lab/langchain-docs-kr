@@ -2,7 +2,7 @@
 title: ChatCloudflareWorkersAI
 ---
 
-This will help you get started with CloudflareWorkersAI [chat models](/oss/langchain/models). For detailed documentation of all ChatCloudflareWorkersAI features and configurations head to the [API reference](https://python.langchain.com/docs/integrations/chat/cloudflare_workersai/).
+이 문서는 CloudflareWorkersAI [chat models](/oss/langchain/models) 시작하는 데 도움을 드립니다. ChatCloudflareWorkersAI의 모든 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/docs/integrations/chat/cloudflare_workersai/)를 참조하세요.
 
 ## Overview
 
@@ -20,11 +20,11 @@ This will help you get started with CloudflareWorkersAI [chat models](/oss/langc
 
 ## Setup
 
-To access CloudflareWorkersAI models you'll need to create a/an CloudflareWorkersAI account, get an API key, and install the `langchain-cloudflare` integration package.
+CloudflareWorkersAI 모델에 액세스하려면 CloudflareWorkersAI 계정을 생성하고 API 키를 받은 다음 `langchain-cloudflare` integration package를 설치해야 합니다.
 
 ### Credentials
 
-Head to [www.cloudflare.com/developer-platform/products/workers-ai/](https://www.cloudflare.com/developer-platform/products/workers-ai/) to sign up to CloudflareWorkersAI and generate an API key. Once you've done this set the CF_AI_API_KEY environment variable and the CF_ACCOUNT_ID environment variable:
+[www.cloudflare.com/developer-platform/products/workers-ai/](https://www.cloudflare.com/developer-platform/products/workers-ai/)로 이동하여 CloudflareWorkersAI에 가입하고 API 키를 생성하세요. 완료한 후 CF_AI_API_KEY environment variable과 CF_ACCOUNT_ID environment variable을 설정하세요:
 
 ```python
 import getpass
@@ -41,7 +41,7 @@ if not os.getenv("CF_ACCOUNT_ID"):
     )
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
 
 ```python
 os.environ["LANGSMITH_TRACING"] = "true"
@@ -50,7 +50,7 @@ os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key:
 
 ### Installation
 
-The LangChain CloudflareWorkersAI integration lives in the `langchain-cloudflare` package:
+LangChain CloudflareWorkersAI integration은 `langchain-cloudflare` package에 있습니다:
 
 ```python
 pip install -qU langchain-cloudflare
@@ -58,9 +58,9 @@ pip install -qU langchain-cloudflare
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
-- Update model instantiation with relevant params.
+- 관련 매개변수로 모델 인스턴스화를 업데이트하세요.
 
 ```python
 from langchain_cloudflare.chat_models import ChatCloudflareWorkersAI

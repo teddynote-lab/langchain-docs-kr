@@ -2,13 +2,13 @@
 title: Nebius
 ---
 
-All functionality related to Nebius AI Studio
+Nebius AI Studio와 관련된 모든 기능
 
->[Nebius AI Studio](https://studio.nebius.ai/) provides API access to a wide range of state-of-the-art large language models and embedding models for various use cases.
+>[Nebius AI Studio](https://studio.nebius.ai/)는 다양한 사용 사례를 위한 최첨단 대규모 언어 모델 및 embedding 모델에 대한 API 액세스를 제공합니다.
 
 ## Installation and Setup
 
-The Nebius integration can be installed via pip:
+Nebius integration은 pip를 통해 설치할 수 있습니다:
 
 <CodeGroup>
 ```bash pip
@@ -20,7 +20,7 @@ uv add langchain-nebius
 ```
 </CodeGroup>
 
-To use Nebius AI Studio, you'll need an API key which you can obtain from [Nebius AI Studio](https://studio.nebius.ai/). The API key can be passed as an initialization parameter `api_key` or set as the environment variable `NEBIUS_API_KEY`.
+Nebius AI Studio를 사용하려면 [Nebius AI Studio](https://studio.nebius.ai/)에서 얻을 수 있는 API key가 필요합니다. API key는 초기화 parameter `api_key`로 전달하거나 환경 변수 `NEBIUS_API_KEY`로 설정할 수 있습니다.
 
 ```python
 import os
@@ -29,16 +29,16 @@ os.environ["NEBIUS_API_KEY"] = "YOUR-NEBIUS-API-KEY"
 
 ### Available Models
 
-The full list of supported models can be found in the [Nebius AI Studio Documentation](https://studio.nebius.com/).
+지원되는 모델의 전체 목록은 [Nebius AI Studio Documentation](https://studio.nebius.com/)에서 확인할 수 있습니다.
 
 
 ## Chat models
 
 ### ChatNebius
 
-The `ChatNebius` class allows you to interact with Nebius AI Studio's chat models.
+`ChatNebius` class를 사용하면 Nebius AI Studio의 chat model과 상호작용할 수 있습니다.
 
-See a [usage example](/oss/integrations/chat/nebius).
+[사용 예제](/oss/integrations/chat/nebius)를 참조하세요.
 
 ```python
 from langchain_nebius import ChatNebius
@@ -55,9 +55,9 @@ chat = ChatNebius(
 
 ### NebiusEmbeddings
 
-The `NebiusEmbeddings` class allows you to generate vector embeddings using Nebius AI Studio's embedding models.
+`NebiusEmbeddings` class를 사용하면 Nebius AI Studio의 embedding model을 사용하여 vector embedding을 생성할 수 있습니다.
 
-See a [usage example](/oss/integrations/text_embedding/nebius).
+[사용 예제](/oss/integrations/text_embedding/nebius)를 참조하세요.
 
 ```python
 from langchain_nebius import NebiusEmbeddings
@@ -72,9 +72,9 @@ embeddings = NebiusEmbeddings(
 
 ### NebiusRetriever
 
-The `NebiusRetriever` enables efficient similarity search using embeddings from Nebius AI Studio. It leverages high-quality embedding models to enable semantic search over documents.
+`NebiusRetriever`는 Nebius AI Studio의 embedding을 사용하여 효율적인 유사도 검색을 가능하게 합니다. 고품질 embedding model을 활용하여 문서에 대한 의미론적 검색을 가능하게 합니다.
 
-See a [usage example](/oss/integrations/retrievers/nebius).
+[사용 예제](/oss/integrations/retrievers/nebius)를 참조하세요.
 
 ```python
 from langchain_core.documents import Document
@@ -101,7 +101,7 @@ retriever = NebiusRetriever(
 
 ### NebiusRetrievalTool
 
-The `NebiusRetrievalTool` allows you to create a tool for agents based on the NebiusRetriever.
+`NebiusRetrievalTool`을 사용하면 NebiusRetriever를 기반으로 agent용 tool을 생성할 수 있습니다.
 
 ```python
 from langchain_nebius import NebiusEmbeddings, NebiusRetriever, NebiusRetrievalTool

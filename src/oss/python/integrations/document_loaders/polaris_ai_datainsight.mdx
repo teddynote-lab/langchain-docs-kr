@@ -2,13 +2,11 @@
 title: PolarisAIDataInsightLoader
 ---
 
-> [Polaris AI DataInsight](https://datainsight.polarisoffice.com/playground) is a document parser
-> that extracts document elements (text, images, complex tables, charts, etc.) from various file formats
-> into structured JSON, making them easy to integrate into RAG systems.
+> [Polaris AI DataInsight](https://datainsight.polarisoffice.com/playground)는 다양한 파일 형식에서 문서 요소(텍스트, 이미지, 복잡한 표, 차트 등)를 구조화된 JSON으로 추출하여 RAG 시스템에 쉽게 통합할 수 있도록 하는 문서 파서입니다.
 
 ## Installation
 
-Install `langchain-polaris-ai-datainsight` package.
+`langchain-polaris-ai-datainsight` package를 설치합니다.
 
 ```bash
 pip install langchain-polaris-ai-datainsight
@@ -16,9 +14,9 @@ pip install langchain-polaris-ai-datainsight
 
 ## Environment Setup
 
-Make sure to set the following environment variables:
+다음 환경 변수를 설정해야 합니다:
 
-- `POLARIS_AI_DATA_INSIGHT_API_KEY`: Your Polaris AI DataInsight API key. Read [Polaris AI DataInsight Documentation](https://datainsight.polarisoffice.com/api/keys) to get your API key.
+- `POLARIS_AI_DATA_INSIGHT_API_KEY`: Polaris AI DataInsight API key입니다. API key를 얻으려면 [Polaris AI DataInsight Documentation](https://datainsight.polarisoffice.com/api/keys)을 참조하세요.
 
 
 ## Usage
@@ -52,7 +50,7 @@ for doc in docs[:3]:
 ```
 
 
-Then, you will see the extracted content and metadata from the document as below:
+그러면 아래와 같이 문서에서 추출된 내용과 metadata를 확인할 수 있습니다:
 
 ```output
 --------- < Page Content > ---------

@@ -2,19 +2,19 @@
 title: AgentQL
 ---
 
-[AgentQL](https://www.agentql.com/) tools provides web interaction and structured data extraction from any web page using an [AgentQL query](https://docs.agentql.com/agentql-query) or a Natural Language prompt. AgentQL can be used across multiple languages and web pages without breaking over time and change.
+[AgentQL](https://www.agentql.com/) tool은 [AgentQL query](https://docs.agentql.com/agentql-query) 또는 자연어 프롬프트를 사용하여 모든 웹 페이지에서 웹 상호작용 및 구조화된 데이터 추출을 제공합니다. AgentQL은 여러 언어와 웹 페이지에서 시간이 지나도 변경에 영향받지 않고 사용할 수 있습니다.
 
 ## Overview
 
-AgentQL provides the following three tools:
+AgentQL은 다음 세 가지 tool을 제공합니다:
 
-- **`ExtractWebDataTool`** extracts structured data as JSON from a web page given a URL using either an [AgentQL query](https://docs.agentql.com/agentql-query/query-intro) or a Natural Language description of the data.
+- **`ExtractWebDataTool`**은 [AgentQL query](https://docs.agentql.com/agentql-query/query-intro) 또는 데이터에 대한 자연어 설명을 사용하여 URL이 주어진 웹 페이지에서 구조화된 데이터를 JSON으로 추출합니다.
 
-The following two tools are also bundled as `AgentQLBrowserToolkit` and must be used with a `Playwright` browser or a remote browser instance via Chrome DevTools Protocal (CDP):
+다음 두 tool은 `AgentQLBrowserToolkit`으로 번들되어 있으며 `Playwright` browser 또는 Chrome DevTools Protocol (CDP)을 통한 원격 browser instance와 함께 사용해야 합니다:
 
-- **`ExtractWebDataBrowserTool`** extracts structured data as JSON from the active web page in a browser using either an [AgentQL query](https://docs.agentql.com/agentql-query/query-intro) or a Natural Language description.
+- **`ExtractWebDataBrowserTool`**은 [AgentQL query](https://docs.agentql.com/agentql-query/query-intro) 또는 자연어 설명을 사용하여 browser의 활성 웹 페이지에서 구조화된 데이터를 JSON으로 추출합니다.
 
-- **`GetWebElementBrowserTool`** finds a web element on the active web page in a browser using a Natural Language description and returns its CSS selector for further interaction.
+- **`GetWebElementBrowserTool`**은 자연어 설명을 사용하여 browser의 활성 웹 페이지에서 웹 element를 찾고 추가 상호작용을 위해 CSS selector를 반환합니다.
 
 ### Integration details
 
@@ -36,7 +36,7 @@ The following two tools are also bundled as `AgentQLBrowserToolkit` and must be 
 pip install --quiet -U langchain-agentql
 ```
 
-To run this notebook, install `Playwright` browser and configure Jupyter Notebook's `asyncio` loop.
+이 notebook을 실행하려면 `Playwright` browser를 설치하고 Jupyter Notebook의 `asyncio` loop를 구성해야 합니다.
 
 ```python
 !playwright install
@@ -49,7 +49,7 @@ nest_asyncio.apply()
 
 ### Credentials
 
-To use the AgentQL tools, you will need to get your own API key from the [AgentQL Dev Portal](https://dev.agentql.com/) and set the AgentQL environment variable.
+AgentQL tool을 사용하려면 [AgentQL Dev Portal](https://dev.agentql.com/)에서 자신의 API key를 받아 AgentQL 환경 변수를 설정해야 합니다.
 
 ```python
 import os
@@ -61,17 +61,17 @@ os.environ["AGENTQL_API_KEY"] = "YOUR_AGENTQL_API_KEY"
 
 ### `ExtractWebDataTool`
 
-You can instantiate `ExtractWebDataTool` with the following params:
+다음 매개변수로 `ExtractWebDataTool`을 인스턴스화할 수 있습니다:
 
-- `api_key`: Your AgentQL API key from [dev.agentql.com](https://dev.agentql.com). **`Optional`.**
-- `timeout`: The number of seconds to wait for a request before timing out. Increase if data extraction times out. **Defaults to `900`.**
-- `is_stealth_mode_enabled`: Whether to enable experimental anti-bot evasion strategies. This feature may not work for all websites at all times. Data extraction may take longer to complete with this mode enabled. **Defaults to `False`.**
-- `wait_for`: The number of seconds to wait for the page to load before extracting data. **Defaults to `0`.**
-- `is_scroll_to_bottom_enabled`: Whether to scroll to bottom of the page before extracting data. **Defaults to `False`.**
-- `mode`: `"standard"` uses deep data analysis, while `"fast"` trades some depth of analysis for speed and is adequate for most usecases. [Learn more about the modes in this guide.](https://docs.agentql.com/accuracy/standard-mode) **Defaults to `"fast"`.**
-- `is_screenshot_enabled`: Whether to take a screenshot before extracting data. Returned in 'metadata' as a Base64 string. **Defaults to `False`.**
+- `api_key`: [dev.agentql.com](https://dev.agentql.com)에서 받은 AgentQL API key. **`선택사항`.**
+- `timeout`: 요청이 timeout되기 전에 대기할 시간(초). 데이터 추출이 timeout되면 증가시키세요. **기본값은 `900`.**
+- `is_stealth_mode_enabled`: 실험적인 봇 회피 전략을 활성화할지 여부. 이 기능은 모든 웹사이트에서 항상 작동하지 않을 수 있습니다. 이 모드를 활성화하면 데이터 추출이 더 오래 걸릴 수 있습니다. **기본값은 `False`.**
+- `wait_for`: 데이터를 추출하기 전에 페이지가 로드될 때까지 대기할 시간(초). **기본값은 `0`.**
+- `is_scroll_to_bottom_enabled`: 데이터를 추출하기 전에 페이지 하단으로 스크롤할지 여부. **기본값은 `False`.**
+- `mode`: `"standard"`는 심층 데이터 분석을 사용하고, `"fast"`는 일부 분석 깊이를 속도와 교환하며 대부분의 사용 사례에 적합합니다. [이 가이드에서 모드에 대해 자세히 알아보세요.](https://docs.agentql.com/accuracy/standard-mode) **기본값은 `"fast"`.**
+- `is_screenshot_enabled`: 데이터를 추출하기 전에 스크린샷을 찍을지 여부. Base64 문자열로 'metadata'에 반환됩니다. **기본값은 `False`.**
 
-`ExtractWebDataTool` is implemented with AgentQL's REST API, you can view more details about the parameters in the [API Reference docs](https://docs.agentql.com/rest-api/api-reference).
+`ExtractWebDataTool`은 AgentQL의 REST API로 구현되어 있으며, [API Reference docs](https://docs.agentql.com/rest-api/api-reference)에서 매개변수에 대한 자세한 내용을 확인할 수 있습니다.
 
 ```python
 from langchain_agentql.tools import ExtractWebDataTool
@@ -81,16 +81,16 @@ extract_web_data_tool = ExtractWebDataTool()
 
 ### `ExtractWebDataBrowserTool`
 
-To instantiate **ExtractWebDataBrowserTool**, you need to connect the tool with a browser instance.
+**ExtractWebDataBrowserTool**을 인스턴스화하려면 tool을 browser instance와 연결해야 합니다.
 
-You can set the following params:
+다음 매개변수를 설정할 수 있습니다:
 
-- `timeout`: The number of seconds to wait for a request before timing out. Increase if data extraction times out. **Defaults to `900`.**
-- `wait_for_network_idle`: Whether to wait until the network reaches a full idle state before executing. **Defaults to `True`.**
-- `include_hidden`: Whether to take into account visually hidden elements on the page. **Defaults to `True`.**
-- `mode`: `"standard"` uses deep data analysis, while `"fast"` trades some depth of analysis for speed and is adequate for most usecases. [Learn more about the modes in this guide.](https://docs.agentql.com/accuracy/standard-mode) **Defaults to `"fast"`.**
+- `timeout`: 요청이 timeout되기 전에 대기할 시간(초). 데이터 추출이 timeout되면 증가시키세요. **기본값은 `900`.**
+- `wait_for_network_idle`: 실행하기 전에 네트워크가 완전히 유휴 상태에 도달할 때까지 대기할지 여부. **기본값은 `True`.**
+- `include_hidden`: 페이지에서 시각적으로 숨겨진 element를 고려할지 여부. **기본값은 `True`.**
+- `mode`: `"standard"`는 심층 데이터 분석을 사용하고, `"fast"`는 일부 분석 깊이를 속도와 교환하며 대부분의 사용 사례에 적합합니다. [이 가이드에서 모드에 대해 자세히 알아보세요.](https://docs.agentql.com/accuracy/standard-mode) **기본값은 `"fast"`.**
 
-`ExtractWebDataBrowserTool` is implemented with AgentQL's SDK. You can find more details about the parameters and the functions in AgentQL's [API References](https://docs.agentql.com/python-sdk/api-references/agentql-page#querydata).
+`ExtractWebDataBrowserTool`은 AgentQL의 SDK로 구현되어 있습니다. 매개변수와 함수에 대한 자세한 내용은 AgentQL의 [API References](https://docs.agentql.com/python-sdk/api-references/agentql-page#querydata)에서 확인할 수 있습니다.
 
 ```python
 from langchain_agentql.tools import ExtractWebDataBrowserTool
@@ -103,16 +103,16 @@ extract_web_data_browser_tool = ExtractWebDataBrowserTool(async_browser=async_br
 
 ### `GetWebElementBrowserTool`
 
-To instantiate **GetWebElementBrowserTool**, you need to connect the tool with a browser instance.
+**GetWebElementBrowserTool**을 인스턴스화하려면 tool을 browser instance와 연결해야 합니다.
 
-You can set the following params:
+다음 매개변수를 설정할 수 있습니다:
 
-- `timeout`: The number of seconds to wait for a request before timing out. Increase if data extraction times out. **Defaults to `900`.**
-- `wait_for_network_idle`: Whether to wait until the network reaches a full idle state before executing. **Defaults to `True`.**
-- `include_hidden`: Whether to take into account visually hidden elements on the page. **Defaults to `False`.**
-- `mode`: `"standard"` uses deep data analysis, while `"fast"` trades some depth of analysis for speed and is adequate for most usecases. [Learn more about the modes in this guide.](https://docs.agentql.com/accuracy/standard-mode) **Defaults to `"fast"`.**
+- `timeout`: 요청이 timeout되기 전에 대기할 시간(초). 데이터 추출이 timeout되면 증가시키세요. **기본값은 `900`.**
+- `wait_for_network_idle`: 실행하기 전에 네트워크가 완전히 유휴 상태에 도달할 때까지 대기할지 여부. **기본값은 `True`.**
+- `include_hidden`: 페이지에서 시각적으로 숨겨진 element를 고려할지 여부. **기본값은 `False`.**
+- `mode`: `"standard"`는 심층 데이터 분석을 사용하고, `"fast"`는 일부 분석 깊이를 속도와 교환하며 대부분의 사용 사례에 적합합니다. [이 가이드에서 모드에 대해 자세히 알아보세요.](https://docs.agentql.com/accuracy/standard-mode) **기본값은 `"fast"`.**
 
-`GetWebElementBrowserTool` is implemented with AgentQL's SDK. You can find more details about the parameters and the functions in AgentQL's [API References](https://docs.agentql.com/python-sdk/api-references/agentql-page#queryelements).`
+`GetWebElementBrowserTool`은 AgentQL의 SDK로 구현되어 있습니다. 매개변수와 함수에 대한 자세한 내용은 AgentQL의 [API References](https://docs.agentql.com/python-sdk/api-references/agentql-page#queryelements)에서 확인할 수 있습니다.
 
 ```python
 from langchain_agentql.tools import GetWebElementBrowserTool
@@ -124,13 +124,13 @@ extract_web_element_tool = GetWebElementBrowserTool(async_browser=async_browser)
 
 ### `ExtractWebDataTool`
 
-This tool uses AgentQL's REST API under the hood, sending the publically available web page's URL to AgentQL's endpoint. This will not work with private pages or logged in sessions. Use `ExtractWebDataBrowserTool` for those usecases.
+이 tool은 내부적으로 AgentQL의 REST API를 사용하여 공개적으로 사용 가능한 웹 페이지의 URL을 AgentQL의 endpoint로 전송합니다. 이는 비공개 페이지나 로그인된 세션에서는 작동하지 않습니다. 이러한 사용 사례에는 `ExtractWebDataBrowserTool`을 사용하세요.
 
-- `url`: The URL of the web page you want to extract data from.
-- `query`: The AgentQL query to execute. Use AgentQL query if you want to extract precisely structured data. Learn more about [how to write an AgentQL query in the docs](https://docs.agentql.com/agentql-query) or test one out in the [AgentQL Playground](https://dev.agentql.com/playground).
-- `prompt`: A Natural Language description of the data to extract from the page. AgentQL will infer the data’s structure from your prompt. Use `prompt` if you want to extract data defined by free-form language without defining a particular structure.
+- `url`: 데이터를 추출하려는 웹 페이지의 URL.
+- `query`: 실행할 AgentQL query. 정확하게 구조화된 데이터를 추출하려면 AgentQL query를 사용하세요. [문서에서 AgentQL query 작성 방법에 대해 자세히 알아보거나](https://docs.agentql.com/agentql-query) [AgentQL Playground](https://dev.agentql.com/playground)에서 테스트해보세요.
+- `prompt`: 페이지에서 추출할 데이터에 대한 자연어 설명. AgentQL은 프롬프트에서 데이터 구조를 추론합니다. 특정 구조를 정의하지 않고 자유 형식 언어로 정의된 데이터를 추출하려면 `prompt`를 사용하세요.
 
-**Note:** You must define either a `query` or a `prompt` to use AgentQL.
+**참고:** AgentQL을 사용하려면 `query` 또는 `prompt` 중 하나를 정의해야 합니다.
 
 ```python
 # You can invoke the tool with either a query or a prompt
@@ -178,12 +178,12 @@ extract_web_data_tool.invoke(
 
 ### `ExtractWebDataBrowserTool`
 
-- `query`: The AgentQL query to execute. Use AgentQL query if you want to extract precisely structured data. Learn more about [how to write an AgentQL query in the docs](https://docs.agentql.com/agentql-query) or test one out in the [AgentQL Playground](https://dev.agentql.com/playground).
-- `prompt`: A Natural Language description of the data to extract from the page. AgentQL will infer the data’s structure from your prompt. Use `prompt` if you want to extract data defined by free-form language without defining a particular structure.
+- `query`: 실행할 AgentQL query. 정확하게 구조화된 데이터를 추출하려면 AgentQL query를 사용하세요. [문서에서 AgentQL query 작성 방법에 대해 자세히 알아보거나](https://docs.agentql.com/agentql-query) [AgentQL Playground](https://dev.agentql.com/playground)에서 테스트해보세요.
+- `prompt`: 페이지에서 추출할 데이터에 대한 자연어 설명. AgentQL은 프롬프트에서 데이터 구조를 추론합니다. 특정 구조를 정의하지 않고 자유 형식 언어로 정의된 데이터를 추출하려면 `prompt`를 사용하세요.
 
-**Note:** You must define either a `query` or a `prompt` to use AgentQL.
+**참고:** AgentQL을 사용하려면 `query` 또는 `prompt` 중 하나를 정의해야 합니다.
 
-To extract data, first you must navigate to a web page using LangChain's [Playwright](https://python.langchain.com/docs/integrations/tools/playwright/) tool.
+데이터를 추출하려면 먼저 LangChain의 [Playwright](https://python.langchain.com/docs/integrations/tools/playwright/) tool을 사용하여 웹 페이지로 이동해야 합니다.
 
 ```python
 from langchain_community.tools.playwright import NavigateTool
@@ -238,7 +238,7 @@ await extract_web_data_browser_tool.ainvoke(
 
 ### `GetWebElementBrowserTool`
 
-- `prompt`: A Natural Language description of the web element to find on the page.
+- `prompt`: 페이지에서 찾을 웹 element에 대한 자연어 설명.
 
 ```python
 selector = await extract_web_element_tool.ainvoke({"prompt": "Next page button"})
@@ -274,7 +274,7 @@ await CurrentWebPageTool(async_browser=async_browser).ainvoke({})
 
 ## Chaining
 
-You can use AgentQL tools in a chain by first binding one to a [tool-calling model](/oss/langchain/tools/) and then calling it:
+AgentQL tool을 [tool-calling model](/oss/langchain/tools/)에 먼저 바인딩한 다음 호출하여 chain에서 사용할 수 있습니다:
 
 ### Instantiate LLM
 
@@ -331,7 +331,7 @@ tool_chain.invoke(
 
 ## Use within an agent
 
-You can use AgentQL tools with an AI Agent using the `AgentQLBrowserToolkit` . This toolkit includes `ExtractDataBrowserTool` and `GetWebElementBrowserTool`. Here's an example of agentic browser actions that combine AgentQL's toolkit with the Playwright tools.
+`AgentQLBrowserToolkit`을 사용하여 AI Agent와 함께 AgentQL tool을 사용할 수 있습니다. 이 toolkit에는 `ExtractDataBrowserTool`과 `GetWebElementBrowserTool`이 포함되어 있습니다. 다음은 AgentQL의 toolkit을 Playwright tool과 결합한 agentic browser action의 예시입니다.
 
 ### Instantiate Toolkit
 
@@ -588,4 +588,4 @@ Here's a summary of the actions and results:
 
 ## API reference
 
-For more information on how to use this integration, please refer to the [git repo](https://github.com/tinyfish-io/agentql-integrations/tree/main/langchain) or the [langchain integration documentation](https://docs.agentql.com/integrations/langchain)
+이 integration을 사용하는 방법에 대한 자세한 내용은 [git repo](https://github.com/tinyfish-io/agentql-integrations/tree/main/langchain) 또는 [langchain integration documentation](https://docs.agentql.com/integrations/langchain)을 참조하세요.

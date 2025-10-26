@@ -1,10 +1,11 @@
+```mdx
 ---
 title: ChatYI
 ---
 
-This will help you get started with Yi [chat models](/oss/langchain/models). For detailed documentation of all ChatYi features and configurations head to the [API reference](https://python.langchain.com/api_reference/lanchain_community/chat_models/lanchain_community.chat_models.yi.ChatYi.html).
+이 문서는 Yi [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 ChatYi 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/lanchain_community/chat_models/lanchain_community.chat_models.yi.ChatYi.html)를 참조하세요.
 
-[01.AI](https://www.lingyiwanwu.com/en), founded by Dr. Kai-Fu Lee, is a global company at the forefront of AI 2.0. They offer cutting-edge large language models, including the Yi series, which range from 6B to hundreds of billions of parameters. 01.AI also provides multimodal models, an open API platform, and open-source options like Yi-34B/9B/6B and Yi-VL.
+[01.AI](https://www.lingyiwanwu.com/en)는 Dr. Kai-Fu Lee가 설립한 AI 2.0의 최전선에 있는 글로벌 기업입니다. 6B에서 수천억 개의 parameter에 이르는 Yi 시리즈를 포함한 최첨단 large language model을 제공합니다. 01.AI는 또한 multimodal model, open API platform, 그리고 Yi-34B/9B/6B 및 Yi-VL과 같은 오픈소스 옵션을 제공합니다.
 
 ## Overview
 
@@ -22,11 +23,11 @@ This will help you get started with Yi [chat models](/oss/langchain/models). For
 
 ## Setup
 
-To access ChatYi models you'll need to create a/an 01.AI account, get an API key, and install the `langchain_community` integration package.
+ChatYi model에 접근하려면 01.AI 계정을 생성하고, API key를 발급받고, `langchain_community` integration package를 설치해야 합니다.
 
 ### Credentials
 
-Head to [01.AI](https://platform.01.ai) to sign up for 01.AI and generate an API key. Once you've done this set the `YI_API_KEY` environment variable:
+[01.AI](https://platform.01.ai)로 이동하여 01.AI에 가입하고 API key를 생성하세요. 완료되면 `YI_API_KEY` environment variable을 설정하세요:
 
 ```python
 import getpass
@@ -36,7 +37,7 @@ if "YI_API_KEY" not in os.environ:
     os.environ["YI_API_KEY"] = getpass.getpass("Enter your Yi API key: ")
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+model 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -45,7 +46,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-The LangChain __ModuleName__ integration lives in the `langchain_community` package:
+LangChain __ModuleName__ integration은 `langchain_community` package에 있습니다:
 
 ```python
 pip install -qU langchain_community
@@ -53,9 +54,9 @@ pip install -qU langchain_community
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
-- TODO: Update model instantiation with relevant params.
+- TODO: 관련 params로 model instantiation을 업데이트하세요.
 
 ```python
 from langchain_community.chat_models.yi import ChatYi
@@ -91,4 +92,5 @@ AIMessage(content="Large Language Models (LLMs) have the potential to significan
 
 ## API reference
 
-For detailed documentation of all ChatYi features and configurations, head to the API reference: [python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.yi.ChatYi.html](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.yi.ChatYi.html)
+모든 ChatYi 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.yi.ChatYi.html](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.yi.ChatYi.html)
+```

@@ -1,19 +1,20 @@
+```markdown
 ---
 title: AskNews
 ---
 
-> [AskNews](https://asknews.app) infuses any LLM with the latest global news (or historical news), using a single natural language query. Specifically, AskNews is enriching over 300k articles per day by translating, summarizing, extracting entities, and indexing them into hot and cold vector databases. AskNews puts these vector databases on a low-latency endpoint for you. When you query AskNews, you get back a prompt-optimized string that contains all the most pertinent enrichments (e.g. entities, classifications, translation, summarization). This means that you do not need to manage your own news RAG, and you do not need to worry about how to properly convey news information in a condensed way to your LLM.
-> AskNews is also committed to transparency, which is why our coverage is monitored and diversified across hundreds of countries, 13 languages, and 50 thousand sources. If you'd like to track our source coverage, you can visit our [transparency dashboard](https://asknews.app/en/transparency).
+> [AskNews](https://asknews.app)는 단일 자연어 쿼리를 사용하여 최신 글로벌 뉴스(또는 과거 뉴스)를 모든 LLM에 주입합니다. 구체적으로, AskNews는 매일 30만 개 이상의 기사를 번역, 요약, 엔티티 추출 및 hot/cold vector database에 인덱싱하여 풍부하게 만듭니다. AskNews는 이러한 vector database를 저지연 엔드포인트로 제공합니다. AskNews를 쿼리하면 가장 관련성 높은 enrichment(예: 엔티티, 분류, 번역, 요약)를 포함하는 프롬프트 최적화 문자열을 받게 됩니다. 이는 자체 뉴스 RAG를 관리할 필요가 없으며, 뉴스 정보를 LLM에 압축된 방식으로 적절하게 전달하는 방법에 대해 걱정할 필요가 없음을 의미합니다.
+> AskNews는 또한 투명성을 중요하게 생각하며, 이것이 바로 수백 개 국가, 13개 언어, 5만 개 소스에 걸쳐 우리의 커버리지가 모니터링되고 다양화되는 이유입니다. 소스 커버리지를 추적하고 싶다면 [투명성 대시보드](https://asknews.app/en/transparency)를 방문할 수 있습니다.
 
 ## Setup
 
-The integration lives in the `langchain-community` package. We also need to install the `asknews` package itself.
+이 integration은 `langchain-community` 패키지에 포함되어 있습니다. 또한 `asknews` 패키지 자체도 설치해야 합니다.
 
 ```bash
 pip install -U langchain-community asknews
 ```
 
-We also need to set our AskNews API credentials, which can be generated at the [AskNews console](https://my.asknews.app).
+또한 [AskNews console](https://my.asknews.app)에서 생성할 수 있는 AskNews API 자격 증명을 설정해야 합니다.
 
 ```python
 import getpass
@@ -23,7 +24,7 @@ os.environ["ASKNEWS_CLIENT_ID"] = getpass.getpass()
 os.environ["ASKNEWS_CLIENT_SECRET"] = getpass.getpass()
 ```
 
-It's also helpful (but not needed) to set up [LangSmith](https://smith.langchain.com/) for best-in-class observability
+최고 수준의 observability를 위해 [LangSmith](https://smith.langchain.com/)를 설정하는 것도 도움이 됩니다(필수는 아님)
 
 ```python
 os.environ["LANGSMITH_TRACING"] = "true"
@@ -73,7 +74,7 @@ retriever.invoke("federal reserve S&P500")
 
 ## Chaining
 
-We can easily combine this retriever in to a chain.
+이 retriever를 chain에 쉽게 결합할 수 있습니다.
 
 ```python
 import getpass
@@ -115,4 +116,5 @@ chain.invoke({"question": "What is the impact of fed policy on the tech sector?"
 
 ```python
 
+```
 ```

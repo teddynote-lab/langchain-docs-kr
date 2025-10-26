@@ -2,10 +2,10 @@
 title: Gradient
 ---
 
->[Gradient](https://gradient.ai/) allows to fine tune and get completions on LLMs with a simple web API.
+>[Gradient](https://gradient.ai/)는 간단한 web API를 통해 LLM을 fine tune하고 completion을 얻을 수 있게 해줍니다.
 
 ## Installation and Setup
-- Install the Python SDK :
+- Python SDK 설치:
 <CodeGroup>
 ```bash pip
 pip install gradientai
@@ -15,12 +15,12 @@ pip install gradientai
 uv add gradientai
 ```
 </CodeGroup>
-Get a [Gradient access token and workspace](https://gradient.ai/) and set it as an environment variable (`Gradient_ACCESS_TOKEN`) and (`GRADIENT_WORKSPACE_ID`)
+[Gradient access token과 workspace](https://gradient.ai/)를 받아서 환경 변수로 설정하세요 (`Gradient_ACCESS_TOKEN`) 및 (`GRADIENT_WORKSPACE_ID`)
 
 ## LLM
 
-There exists an Gradient LLM wrapper, which you can access with
-See a [usage example](/oss/integrations/llms/gradient).
+Gradient LLM wrapper가 존재하며, 다음과 같이 접근할 수 있습니다
+[사용 예제](/oss/integrations/llms/gradient)를 참조하세요.
 
 ```python
 from langchain_community.llms import GradientLLM
@@ -28,8 +28,8 @@ from langchain_community.llms import GradientLLM
 
 ## Text Embedding Model
 
-There exists an Gradient Embedding model, which you can access with
+Gradient Embedding model이 존재하며, 다음과 같이 접근할 수 있습니다
 ```python
 from langchain_community.embeddings import GradientEmbeddings
 ```
-For a more detailed walkthrough of this, see [this notebook](/oss/integrations/text_embedding/gradient)
+더 자세한 안내는 [이 notebook](/oss/integrations/text_embedding/gradient)을 참조하세요

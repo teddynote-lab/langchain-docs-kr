@@ -2,21 +2,21 @@
 title: PredictionGuardEmbeddings
 ---
 
->[Prediction Guard](https://predictionguard.com) is a secure, scalable GenAI platform that safeguards sensitive data, prevents common AI malfunctions, and runs on affordable hardware.
+>[Prediction Guard](https://predictionguard.com)는 민감한 데이터를 보호하고, 일반적인 AI 오작동을 방지하며, 저렴한 하드웨어에서 실행되는 안전하고 확장 가능한 GenAI 플랫폼입니다.
 
 ## Overview
 
 ### Integration details
 
-This integration shows how to use the Prediction Guard embeddings integration with LangChain. This integration supports text and images, separately or together in matched pairs.
+이 integration은 LangChain과 함께 Prediction Guard embeddings integration을 사용하는 방법을 보여줍니다. 이 integration은 텍스트와 이미지를 개별적으로 또는 매칭된 쌍으로 함께 지원합니다.
 
 ## Setup
 
-To access Prediction Guard models, contact us [here](https://predictionguard.com/get-started) to get a Prediction Guard API key and get started.
+Prediction Guard 모델에 액세스하려면 [여기](https://predictionguard.com/get-started)에서 문의하여 Prediction Guard API key를 받고 시작하세요.
 
 ### Credentials
 
-Once you have a key, you can set it with
+key를 받으면 다음과 같이 설정할 수 있습니다
 
 ```python
 import os
@@ -32,7 +32,7 @@ pip install -qU langchain-predictionguard
 
 ## Instantiation
 
-First, install the Prediction Guard and LangChain packages. Then, set the required env vars and set up package imports.
+먼저 Prediction Guard와 LangChain 패키지를 설치합니다. 그런 다음 필요한 환경 변수를 설정하고 패키지 import를 설정합니다.
 
 ```python
 from langchain_predictionguard import PredictionGuardEmbeddings
@@ -42,7 +42,7 @@ from langchain_predictionguard import PredictionGuardEmbeddings
 embeddings = PredictionGuardEmbeddings(model="bridgetower-large-itm-mlm-itc")
 ```
 
-Prediction Guard embeddings generation supports both text and images. This integration includes that support spread across various functions.
+Prediction Guard embeddings 생성은 텍스트와 이미지를 모두 지원합니다. 이 integration은 다양한 함수에 걸쳐 해당 지원을 포함합니다.
 
 ## Indexing and Retrieval
 
@@ -73,9 +73,9 @@ retrieved_documents[0].page_content
 
 ## Direct Usage
 
-The vectorstore and retriever implementations are calling `embeddings.embed_documents(...)` and `embeddings.embed_query(...)` to create embeddings from the texts used in the `from_texts` and retrieval `invoke` operations.
+vectorstore와 retriever 구현은 `embeddings.embed_documents(...)`와 `embeddings.embed_query(...)`를 호출하여 `from_texts` 및 retrieval `invoke` 작업에 사용되는 텍스트로부터 embeddings를 생성합니다.
 
-These methods can be directly called with the following commands.
+이러한 메서드는 다음 명령으로 직접 호출할 수 있습니다.
 
 ### Embed single texts
 
@@ -197,4 +197,4 @@ for vector in two_vectors:
 
 ## API reference
 
-For detailed documentation of all PredictionGuardEmbeddings features and configurations check out the API reference: [python.langchain.com/api_reference/community/embeddings/langchain_community.embeddings.predictionguard.PredictionGuardEmbeddings.html](https://python.langchain.com/api_reference/community/embeddings/langchain_community.embeddings.predictionguard.PredictionGuardEmbeddings.html)
+모든 PredictionGuardEmbeddings 기능 및 구성에 대한 자세한 문서는 API reference를 확인하세요: [python.langchain.com/api_reference/community/embeddings/langchain_community.embeddings.predictionguard.PredictionGuardEmbeddings.html](https://python.langchain.com/api_reference/community/embeddings/langchain_community.embeddings.predictionguard.PredictionGuardEmbeddings.html)

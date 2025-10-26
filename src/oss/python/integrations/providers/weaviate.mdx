@@ -2,25 +2,25 @@
 title: Weaviate
 ---
 
->[Weaviate](https://weaviate.io/) is an open-source vector database. It allows you to store data objects and vector embeddings from
->your favorite ML models, and scale seamlessly into billions of data objects.
+>[Weaviate](https://weaviate.io/)는 오픈소스 vector database입니다. 좋아하는 ML model에서 data object와 vector embedding을 저장하고,
+>수십억 개의 data object로 원활하게 확장할 수 있습니다.
 
 
-What is `Weaviate`?
-- Weaviate is an open-source ​database of the type ​vector search engine.
-- Weaviate allows you to store JSON documents in a class property-like fashion while attaching machine learning vectors to these documents to represent them in vector space.
-- Weaviate can be used stand-alone (aka bring your vectors) or with a variety of modules that can do the vectorization for you and extend the core capabilities.
-- Weaviate has a GraphQL-API to access your data easily.
-- We aim to bring your vector search set up to production to query in mere milliseconds (check our [open-source benchmarks](https://weaviate.io/developers/weaviate/current/benchmarks/) to see if Weaviate fits your use case).
-- Get to know Weaviate in the [basics getting started guide](https://weaviate.io/developers/weaviate/current/core-knowledge/basics.html) in under five minutes.
+`Weaviate`란 무엇인가요?
+- Weaviate는 vector search engine 유형의 오픈소스 데이터베이스입니다.
+- Weaviate를 사용하면 class property와 유사한 방식으로 JSON document를 저장하면서 machine learning vector를 이러한 document에 첨부하여 vector space에서 표현할 수 있습니다.
+- Weaviate는 독립적으로 사용하거나(즉, 자체 vector 가져오기) vectorization을 수행하고 핵심 기능을 확장할 수 있는 다양한 module과 함께 사용할 수 있습니다.
+- Weaviate는 데이터에 쉽게 액세스할 수 있는 GraphQL-API를 제공합니다.
+- 우리는 단 몇 밀리초 만에 쿼리할 수 있도록 vector search 설정을 프로덕션에 적용하는 것을 목표로 합니다(Weaviate가 사용 사례에 적합한지 확인하려면 [오픈소스 벤치마크](https://weaviate.io/developers/weaviate/current/benchmarks/)를 확인하세요).
+- 5분 이내에 [기본 시작 가이드](https://weaviate.io/developers/weaviate/current/core-knowledge/basics.html)에서 Weaviate를 알아보세요.
 
-**Weaviate in detail:**
+**Weaviate 상세 정보:**
 
-`Weaviate` is a low-latency vector search engine with out-of-the-box support for different media types (text, images, etc.). It offers Semantic Search, Question-Answer Extraction, Classification, Customizable Models (PyTorch/TensorFlow/Keras), etc. Built from scratch in Go, Weaviate stores both objects and vectors, allowing for combining vector search with structured filtering and the fault tolerance of a cloud-native database. It is all accessible through GraphQL, REST, and various client-side programming languages.
+`Weaviate`는 다양한 미디어 유형(텍스트, 이미지 등)을 기본적으로 지원하는 저지연 vector search engine입니다. Semantic Search, Question-Answer Extraction, Classification, Customizable Models(PyTorch/TensorFlow/Keras) 등을 제공합니다. Go로 처음부터 구축된 Weaviate는 object와 vector를 모두 저장하여 vector search를 구조화된 필터링 및 cloud-native database의 fault tolerance와 결합할 수 있습니다. GraphQL, REST 및 다양한 클라이언트 측 프로그래밍 언어를 통해 모두 액세스할 수 있습니다.
 
 ## Installation and Setup
 
-Install the Python SDK:
+Python SDK 설치:
 
 <CodeGroup>
 ```bash pip
@@ -35,12 +35,11 @@ uv add langchain-weaviate
 
 ## Vector Store
 
-There exists a wrapper around `Weaviate` indexes, allowing you to use it as a vectorstore,
-whether for semantic search or example selection.
+`Weaviate` index를 감싸는 wrapper가 존재하여 semantic search 또는 example selection을 위한 vectorstore로 사용할 수 있습니다.
 
-To import this vectorstore:
+이 vectorstore를 import하려면:
 ```python
 from langchain_weaviate import WeaviateVectorStore
 ```
 
-For a more detailed walkthrough of the Weaviate wrapper, see [this notebook](/oss/integrations/vectorstores/weaviate)
+Weaviate wrapper에 대한 자세한 안내는 [이 notebook](/oss/integrations/vectorstores/weaviate)을 참조하세요

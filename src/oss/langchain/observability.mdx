@@ -1,22 +1,23 @@
+```mdx
 ---
-title: Observability
+title: 관찰 가능성
 ---
 
 import observability from '/snippets/oss/observability.mdx';
 
-Observability is crucial for understanding how your agents behave in production. With LangChain's @[`create_agent`], you get built-in observability through [LangSmith](https://smith.langchain.com/) - a powerful platform for tracing, debugging, evaluating, and monitoring your LLM applications.
+관찰 가능성은 프로덕션 환경에서 에이전트가 어떻게 동작하는지 이해하는 데 매우 중요합니다. LangChain의 @[`create_agent`]를 사용하면 [LangSmith](https://smith.langchain.com/)를 통해 내장된 관찰 가능성을 얻을 수 있습니다. LangSmith는 LLM 애플리케이션을 추적, 디버깅, 평가 및 모니터링하기 위한 강력한 플랫폼입니다.
 
-Traces capture every step your agent takes, from the initial user input to the final response, including all tool calls, model interactions, and decision points. This enables you to debug your agents, evaluate performance, and monitor usage.
+Trace는 초기 사용자 입력부터 최종 응답까지 에이전트가 수행하는 모든 단계를 캡처하며, 여기에는 모든 tool 호출, model 상호작용 및 의사결정 지점이 포함됩니다. 이를 통해 에이전트를 디버깅하고, 성능을 평가하며, 사용량을 모니터링할 수 있습니다.
 
-## Prerequisites
+## 사전 요구사항
 
-Before you begin, ensure you have the following:
+시작하기 전에 다음 사항을 확인하세요:
 
-* A [LangSmith account](https://smith.langchain.com/) (free to sign up)
+* [LangSmith 계정](https://smith.langchain.com/) (무료 가입 가능)
 
-## Enable tracing
+## tracing 활성화
 
-All LangChain agents automatically support LangSmith tracing. To enable it, set the following environment variables:
+모든 LangChain 에이전트는 자동으로 LangSmith tracing을 지원합니다. 이를 활성화하려면 다음 환경 변수를 설정하세요:
 
 ```bash
 export LANGSMITH_TRACING=true
@@ -24,12 +25,12 @@ export LANGSMITH_API_KEY=<your-api-key>
 ```
 
 <Info>
-You can get your API key from your [LangSmith settings](https://smith.langchain.com/settings).
+API key는 [LangSmith 설정](https://smith.langchain.com/settings)에서 얻을 수 있습니다.
 </Info>
 
-## Quick start
+## 빠른 시작
 
-No extra code is needed to log a trace to LangSmith. Just run your agent code as you normally would:
+LangSmith에 trace를 기록하기 위해 추가 코드가 필요하지 않습니다. 평소처럼 에이전트 코드를 실행하기만 하면 됩니다:
 
 :::python
 ```python
@@ -86,6 +87,7 @@ const response = await agent.invoke({
 ```
 :::
 
-By default, the trace will be logged to the project with the name `default`. To configure a custom project name, see [Log to a project](#log-to-a-project).
+기본적으로 trace는 `default`라는 이름의 프로젝트에 기록됩니다. 사용자 정의 프로젝트 이름을 구성하려면 [프로젝트에 로그 기록하기](#log-to-a-project)를 참조하세요.
 
 <observability />
+```

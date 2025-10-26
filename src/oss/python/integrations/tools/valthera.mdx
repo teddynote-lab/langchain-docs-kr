@@ -1,24 +1,25 @@
+```markdown
 ---
 title: Valthera
 ---
 
-Enable AI agents to engage users when they're most likely to respond.
+사용자가 응답할 가능성이 가장 높을 때 AI 에이전트가 사용자와 상호작용할 수 있도록 합니다.
 
 ## Overview
 
-Valthera is an open-source framework that enables LLM Agents to engage users in a more meaningful way. It is built on BJ Fogg's Behavior Model (B=MAT) and leverages data from multiple sources (such as HubSpot, PostHog, and Snowflake) to assess a user's **motivation** and **ability** before triggering an action.
+Valthera는 LLM Agent가 더 의미 있는 방식으로 사용자와 상호작용할 수 있도록 하는 오픈 소스 프레임워크입니다. BJ Fogg의 행동 모델(B=MAT)을 기반으로 구축되었으며, 여러 소스(HubSpot, PostHog, Snowflake 등)의 데이터를 활용하여 액션을 트리거하기 전에 사용자의 **동기(motivation)**와 **능력(ability)**을 평가합니다.
 
-In this guide, you'll learn:
+이 가이드에서는 다음을 배웁니다:
 
-- **Core Concepts:** Overview of the components (Data Aggregator, Scorer, Reasoning Engine, and Trigger Generator).
-- **System Architecture:** How data flows through the system and how decisions are made.
-- **Customization:** How to extend connectors, scoring metrics, and decision rules to fit your needs.
+- **핵심 개념:** 구성 요소(Data Aggregator, Scorer, Reasoning Engine, Trigger Generator)에 대한 개요.
+- **시스템 아키텍처:** 시스템을 통해 데이터가 흐르는 방식과 의사 결정이 이루어지는 방식.
+- **커스터마이징:** 필요에 맞게 connector, scoring metric, decision rule을 확장하는 방법.
 
-Let's dive in!
+시작해봅시다!
 
 ## Setup
 
-This section covers installation of dependencies and setting up custom data connectors for Valthera.
+이 섹션에서는 의존성 설치와 Valthera를 위한 커스텀 데이터 connector 설정을 다룹니다.
 
 ```python
 pip install openai langchain langchain_openai valthera langchain_valthera langgraph
@@ -114,7 +115,7 @@ class MockSnowflakeConnector(BaseConnector):
 
 ## Instantiation
 
-In this section, we instantiate the core components. First, we create a Data Aggregator to combine data from the custom connectors. Then, we configure the scoring metrics for motivation and ability.
+이 섹션에서는 핵심 구성 요소를 인스턴스화합니다. 먼저, 커스텀 connector의 데이터를 결합하기 위한 Data Aggregator를 생성합니다. 그런 다음, 동기와 능력에 대한 scoring metric을 구성합니다.
 
 ```python
 from valthera.aggregator import DataAggregator
@@ -227,7 +228,7 @@ scorer = ValtheraScorer(motivation_config, ability_config)
 
 ## Invocation
 
-Next, we set up the Reasoning Engine and Trigger Generator, then bring all components together by instantiating the Valthera Tool. Finally, we execute the agent workflow to process an input message.
+다음으로, Reasoning Engine과 Trigger Generator를 설정한 다음, Valthera Tool을 인스턴스화하여 모든 구성 요소를 통합합니다. 마지막으로, 입력 메시지를 처리하기 위해 에이전트 워크플로우를 실행합니다.
 
 ```python
 import os
@@ -336,16 +337,17 @@ except Exception as e:
 
 ## Chaining
 
-This integration does not currently support chaining operations. Future releases may include chaining support.
+이 통합은 현재 chaining 작업을 지원하지 않습니다. 향후 릴리스에서 chaining 지원이 포함될 수 있습니다.
 
 ## API reference
 
-Below is an overview of the key APIs provided by the Valthera integration:
+다음은 Valthera 통합에서 제공하는 주요 API에 대한 개요입니다:
 
-- **Data Aggregator:** Use `data_aggregator.get_user_context(user_id)` to fetch aggregated user data.
-- **Scorer:** The `ValtheraScorer` computes motivation and ability scores based on the provided configurations.
-- **Reasoning Engine:** The `ReasoningEngine` evaluates decision rules to determine the appropriate action (trigger, improve motivation, improve ability, or defer).
-- **Trigger Generator:** Generates personalized trigger messages using the LLM.
-- **Valthera Tool:** Integrates all the components to process inputs and execute the agent workflow.
+- **Data Aggregator:** `data_aggregator.get_user_context(user_id)`를 사용하여 집계된 사용자 데이터를 가져옵니다.
+- **Scorer:** `ValtheraScorer`는 제공된 구성을 기반으로 동기 및 능력 점수를 계산합니다.
+- **Reasoning Engine:** `ReasoningEngine`은 decision rule을 평가하여 적절한 액션(trigger, improve motivation, improve ability, defer)을 결정합니다.
+- **Trigger Generator:** LLM을 사용하여 개인화된 trigger 메시지를 생성합니다.
+- **Valthera Tool:** 모든 구성 요소를 통합하여 입력을 처리하고 에이전트 워크플로우를 실행합니다.
 
-For detailed usage, refer to the inline documentation in the source code.
+자세한 사용법은 소스 코드의 인라인 문서를 참조하세요.
+```

@@ -2,9 +2,9 @@
 title: Lindorm
 ---
 
-Lindorm is a cloud-native multimodal database from Alibaba-Cloud, It supports unified access and integrated processing of various types of data, including wide tables, time-series, text, objects, streams, and spatial data. It is compatible with multiple standard interfaces such as SQL, HBase/Cassandra/S3, TSDB, HDFS, Solr, and Kafka, and seamlessly integrates with third-party ecosystem tools. This makes it suitable for scenarios such as logging, monitoring, billing, advertising, social networking, travel, and risk control. Lindorm is also one of the databases that support Alibaba's core businesses.
+Lindorm은 Alibaba-Cloud의 클라우드 네이티브 멀티모달 데이터베이스입니다. 와이드 테이블, 시계열, 텍스트, 객체, 스트림, 공간 데이터 등 다양한 유형의 데이터에 대한 통합 액세스 및 통합 처리를 지원합니다. SQL, HBase/Cassandra/S3, TSDB, HDFS, Solr, Kafka와 같은 여러 표준 인터페이스와 호환되며, 서드파티 생태계 도구와 원활하게 통합됩니다. 이를 통해 로깅, 모니터링, 과금, 광고, 소셜 네트워킹, 여행, 위험 관리와 같은 시나리오에 적합합니다. Lindorm은 또한 Alibaba의 핵심 비즈니스를 지원하는 데이터베이스 중 하나입니다.
 
-To use the AI and vector capabilities of Lindorm, you should [get the service](https://help.aliyun.com/document_detail/174640.html?spm=a2c4g.11186623.help-menu-172543.d_0_1_0.4c6367558DN8Uq) and install `langchain-lindorm-integration` package.
+Lindorm의 AI 및 벡터 기능을 사용하려면 [서비스를 받고](https://help.aliyun.com/document_detail/174640.html?spm=a2c4g.11186623.help-menu-172543.d_0_1_0.4c6367558DN8Uq) `langchain-lindorm-integration` 패키지를 설치해야 합니다.
 
 ```python
 !pip install -U langchain-lindorm-integration
@@ -12,7 +12,7 @@ To use the AI and vector capabilities of Lindorm, you should [get the service](h
 
 ## Embeddings
 
-To use the embedding model deployed in Lindorm AI Service, import the LindormAIEmbeddings.
+Lindorm AI Service에 배포된 embedding 모델을 사용하려면 LindormAIEmbeddings를 import하세요.
 
 ```python
 from langchain_lindorm_integration import LindormAIEmbeddings
@@ -20,7 +20,7 @@ from langchain_lindorm_integration import LindormAIEmbeddings
 
 ## Rerank
 
-The Lindorm AI Service also supports reranking.
+Lindorm AI Service는 reranking도 지원합니다.
 
 ```python
 from langchain_lindorm_integration.reranker import LindormAIRerank
@@ -28,7 +28,7 @@ from langchain_lindorm_integration.reranker import LindormAIRerank
 
 ## Vector Store
 
-Lindorm also supports vector store.
+Lindorm은 vector store도 지원합니다.
 
 ```python
 from langchain_lindorm_integration import LindormVectorStore
@@ -36,7 +36,7 @@ from langchain_lindorm_integration import LindormVectorStore
 
 ## ByteStore
 
-Use ByteStore from Lindorm
+Lindorm의 ByteStore 사용하기
 
 ```python
 from langchain_lindorm_integration import LindormByteStore

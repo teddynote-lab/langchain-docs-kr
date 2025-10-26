@@ -1,22 +1,22 @@
 ---
-title: Make conversations private
-sidebarTitle: Make conversations private
+title: 대화를 비공개로 만들기
+sidebarTitle: 대화를 비공개로 만들기
 ---
-In this tutorial, you will extend [the chatbot created in the last tutorial](/langsmith/set-up-custom-auth) to give each user their own private conversations. You'll add [resource-level access control](/langsmith/auth#single-owner-resources) so users can only see their own threads.
+이 튜토리얼에서는 [지난 튜토리얼에서 만든 챗봇](/langsmith/set-up-custom-auth)을 확장하여 각 사용자에게 자신만의 비공개 대화를 제공합니다. [리소스 수준 접근 제어](/langsmith/auth#single-owner-resources)를 추가하여 사용자가 자신의 thread만 볼 수 있도록 합니다.
 
-![Authorization flow: after authentication, an authorization handler tags each resource with owner=user id and returns a filter so users only see their own threads.](/langsmith/images/authorization.png)
+![Authorization 흐름: 인증 후, authorization handler가 각 리소스에 owner=user id 태그를 지정하고 사용자가 자신의 thread만 볼 수 있도록 필터를 반환합니다.](/langsmith/images/authorization.png)
 
-## Prerequisites
+## 사전 요구 사항
 
-Before you start this tutorial, ensure you have the [bot from the first tutorial](/langsmith/set-up-custom-auth) running without errors.
+이 튜토리얼을 시작하기 전에 [첫 번째 튜토리얼의 봇](/langsmith/set-up-custom-auth)이 오류 없이 실행되고 있는지 확인하세요.
 
-## 1. Add resource authorization
+## 1. 리소스 authorization 추가
 
-Recall that in the last tutorial, the [`Auth`](/langsmith/langgraph-python-sdk#langgraph_sdk.auth.Auth) object lets you register an [authentication function](/langsmith/auth#authentication), which LangSmith uses to validate the bearer tokens in incoming requests. Now you'll use it to register an **authorization** handler.
+지난 튜토리얼에서 [`Auth`](/langsmith/langgraph-python-sdk#langgraph_sdk.auth.Auth) 객체를 사용하여 [authentication 함수](/langsmith/auth#authentication)를 등록했으며, LangSmith는 이를 사용하여 들어오는 요청의 bearer token을 검증합니다. 이제 **authorization** handler를 등록하는 데 사용할 것입니다.
 
-Authorization handlers are functions that run **after** authentication succeeds. These handlers can add [metadata](/langsmith/auth#filter-operations) to resources (like who owns them) and filter what each user can see.
+Authorization handler는 authentication이 성공한 **후에** 실행되는 함수입니다. 이러한 handler는 리소스에 [메타데이터](/langsmith/auth#filter-operations)(예: 소유자)를 추가하고 각 사용자가 볼 수 있는 내용을 필터링할 수 있습니다.
 
-Update your `src/security/auth.py` and add one authorization handler to run on every request:
+`src/security/auth.py`를 업데이트하고 모든 요청에서 실행될 authorization handler를 추가하세요:
 
 ```python {highlight={29-39}} title="src/security/auth.py"
 from langgraph_sdk import Auth
@@ -105,19 +105,19 @@ async def add_owner(
     return filters
 ```
 
-The handler receives two parameters:
+handler는 두 개의 매개변수를 받습니다:
 
-1. `ctx` ([AuthContext](/langsmith/langgraph-python-sdk#langgraph_sdk.auth.types.AuthContext)): contains info about the current `user`, the user's `permissions`, the `resource` ("threads", "crons", "assistants"), and the `action` being taken ("create", "read", "update", "delete", "search", "create_run")
-2. `value` (`dict`): data that is being created or accessed. The contents of this dict depend on the resource and action being accessed. See [adding scoped authorization handlers](#scoped-authorization) below for information on how to get more tightly scoped access control.
+1. `ctx` ([AuthContext](/langsmith/langgraph-python-sdk#langgraph_sdk.auth.types.AuthContext)): 현재 `user`, 사용자의 `permissions`, `resource`("threads", "crons", "assistants"), 그리고 수행 중인 `action`("create", "read", "update", "delete", "search", "create_run")에 대한 정보를 포함합니다
+2. `value` (`dict`): 생성되거나 접근되는 데이터입니다. 이 dict의 내용은 접근되는 resource와 action에 따라 다릅니다. 더 세밀한 접근 제어를 얻는 방법에 대한 정보는 아래의 [범위가 지정된 authorization handler 추가](#scoped-authorization)를 참조하세요.
 
-Notice that the simple handler does two things:
+간단한 handler가 두 가지 작업을 수행한다는 점에 주목하세요:
 
-1. Adds the user's ID to the resource's metadata.
-2. Returns a metadata filter so users only see resources they own.
+1. 사용자의 ID를 리소스의 메타데이터에 추가합니다.
+2. 사용자가 자신이 소유한 리소스만 볼 수 있도록 메타데이터 필터를 반환합니다.
 
-## 2. Test private conversations
+## 2. 비공개 대화 테스트
 
-Test your authorization. If you have set things up correctly, you will see all ✅ messages. Be sure to have your development server running (run `langgraph dev`):
+authorization을 테스트하세요. 올바르게 설정했다면 모든 ✅ 메시지가 표시됩니다. 개발 서버가 실행 중인지 확인하세요(`langgraph dev` 실행):
 
 ```python
 from langgraph_sdk import get_client
@@ -170,7 +170,7 @@ print(f"✅ Alice sees {len(alice_threads)} thread")
 print(f"✅ Bob sees {len(bob_threads)} thread")
 ```
 
-Output:
+출력:
 
 ```bash
 ✅ Alice created assistant: fc50fb08-78da-45a9-93cc-1d3928a3fc37
@@ -182,18 +182,18 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
 ✅ Bob sees 1 thread
 ```
 
-This means:
+이것은 다음을 의미합니다:
 
-1. Each user can create and chat in their own threads
-2. Users can't see each other's threads
-3. Listing threads only shows your own
+1. 각 사용자는 자신의 thread를 생성하고 채팅할 수 있습니다
+2. 사용자는 서로의 thread를 볼 수 없습니다
+3. thread 목록은 자신의 것만 표시합니다
 
 <a id="scoped-authorization"></a>
-## 3. Add scoped authorization handlers
+## 3. 범위가 지정된 authorization handler 추가
 
-The broad `@auth.on` handler matches on all [authorization events](/langsmith/auth#supported-resources). This is concise, but it means the contents of the `value` dict are not well-scoped, and the same user-level access control is applied to every resource. If you want to be more fine-grained, you can also control specific actions on resources.
+광범위한 `@auth.on` handler는 모든 [authorization 이벤트](/langsmith/auth#supported-resources)와 일치합니다. 이것은 간결하지만 `value` dict의 내용이 잘 범위가 지정되지 않고 모든 리소스에 동일한 사용자 수준 접근 제어가 적용된다는 것을 의미합니다. 더 세밀하게 제어하려면 리소스에 대한 특정 action을 제어할 수도 있습니다.
 
-Update `src/security/auth.py` to add handlers for specific resource types:
+`src/security/auth.py`를 업데이트하여 특정 리소스 유형에 대한 handler를 추가하세요:
 
 ```python
 # Keep our previous handlers...
@@ -264,15 +264,15 @@ async def authorize_store(ctx: Auth.types.AuthContext, value: dict):
     assert namespace[0] == ctx.user.identity, "Not authorized"
 ```
 
-Notice that instead of one global handler, you now have specific handlers for:
+하나의 전역 handler 대신 이제 다음에 대한 특정 handler가 있습니다:
 
-1. Creating threads
-2. Reading threads
-3. Accessing assistants
+1. thread 생성
+2. thread 읽기
+3. assistant 접근
 
-The first three of these match specific **actions** on each resource (see [resource actions](/langsmith/auth#resource-specific-handlers)), while the last one (`@auth.on.assistants`) matches _any_ action on the `assistants` resource. For each request, LangGraph will run the most specific handler that matches the resource and action being accessed. This means that the four handlers above will run rather than the broadly scoped "`@auth.on`" handler.
+처음 세 개는 각 리소스에 대한 특정 **action**과 일치하며([리소스 action](/langsmith/auth#resource-specific-handlers) 참조), 마지막 하나(`@auth.on.assistants`)는 `assistants` 리소스에 대한 _모든_ action과 일치합니다. 각 요청에 대해 LangGraph는 접근 중인 리소스와 action과 일치하는 가장 구체적인 handler를 실행합니다. 이는 광범위하게 범위가 지정된 "`@auth.on`" handler가 아닌 위의 네 가지 handler가 실행된다는 것을 의미합니다.
 
-Try adding the following test code to your test file:
+테스트 파일에 다음 테스트 코드를 추가해 보세요:
 
 ```python
 # ... Same as before
@@ -295,7 +295,7 @@ alice_thread = await alice.threads.create()
 print(f"✅ Alice created thread: {alice_thread['thread_id']}")
 ```
 
-Output:
+출력:
 
 ```bash
 ✅ Alice created thread: dcea5cd8-eb70-4a01-a4b6-643b14e8f754
@@ -309,12 +309,12 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
 ✅ Alice correctly denied access to searching assistants:
 ```
 
-Congratulations! You've built a chatbot where each user has their own private conversations. While this system uses simple token-based authentication, these authorization patterns will work with implementing any real authentication system. In the next tutorial, you'll replace your test users with real user accounts using OAuth2.
+축하합니다! 각 사용자가 자신만의 비공개 대화를 가진 챗봇을 구축했습니다. 이 시스템은 간단한 token 기반 인증을 사용하지만, 이러한 authorization 패턴은 실제 인증 시스템을 구현할 때도 작동합니다. 다음 튜토리얼에서는 OAuth2를 사용하여 테스트 사용자를 실제 사용자 계정으로 교체할 것입니다.
 
-## What's Next?
+## 다음 단계
 
-Now that you can control access to resources, you might want to:
+이제 리소스에 대한 접근을 제어할 수 있으므로 다음을 수행할 수 있습니다:
 
-1. Move on to [Connect an authentication provider](/langsmith/add-auth-server) to add real user accounts.
-2. Read more about [authorization patterns](/langsmith/auth#authorization).
-3. Check out the [API reference](/langsmith/langgraph-python-sdk#langgraph_sdk.auth.Auth) for details about the interfaces and methods used in this tutorial.
+1. [인증 제공자 연결](/langsmith/add-auth-server)로 이동하여 실제 사용자 계정을 추가합니다.
+2. [authorization 패턴](/langsmith/auth#authorization)에 대해 자세히 알아봅니다.
+3. 이 튜토리얼에서 사용된 인터페이스와 메서드에 대한 자세한 내용은 [API 참조](/langsmith/langgraph-python-sdk#langgraph_sdk.auth.Auth)를 확인하세요.

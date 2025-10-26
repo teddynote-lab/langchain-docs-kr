@@ -1,13 +1,14 @@
+```markdown
 ---
 title: Python REPL
 ---
 
-Sometimes, for complex calculations, rather than have an LLM generate the answer directly, it can be better to have the LLM generate code to calculate the answer, and then run that code to get the answer. In order to easily do that, we provide a simple Python REPL to execute commands in.
+때로는 복잡한 계산의 경우, LLM이 답을 직접 생성하도록 하는 것보다 LLM이 답을 계산하는 코드를 생성하도록 한 다음, 그 코드를 실행하여 답을 얻는 것이 더 나을 수 있습니다. 이를 쉽게 수행하기 위해 명령을 실행할 수 있는 간단한 Python REPL을 제공합니다.
 
-This interface will only return things that are printed - therefore, if you want to use it to calculate an answer, make sure to have it print out the answer.
+이 인터페이스는 출력된 내용만 반환합니다. 따라서 답을 계산하는 데 사용하려면 반드시 답을 출력하도록 해야 합니다.
 
 <Warning>
-**Python REPL can execute arbitrary code on the host machine (e.g., delete files, make network requests). Use with caution.**
+**Python REPL은 호스트 머신에서 임의의 코드를 실행할 수 있습니다(예: 파일 삭제, 네트워크 요청). 주의해서 사용하세요.**
 
 </Warning>
 
@@ -39,4 +40,5 @@ repl_tool = Tool(
     description="A Python shell. Use this to execute python commands. Input should be a valid python command. If you want to see the output of a value, you should print it out with `print(...)`.",
     func=python_repl.run,
 )
+```
 ```

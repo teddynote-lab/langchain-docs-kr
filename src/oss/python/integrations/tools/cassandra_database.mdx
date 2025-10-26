@@ -2,29 +2,29 @@
 title: Cassandra Database Toolkit
 ---
 
->`Apache Cassandra®` is a widely used database for storing transactional application data. The introduction of functions and >tooling in Large Language Models has opened up some exciting use cases for existing data in Generative AI applications.
+>`Apache Cassandra®`는 트랜잭션 애플리케이션 데이터를 저장하는 데 널리 사용되는 데이터베이스입니다. Large Language Model에 함수와 도구가 도입되면서 생성형 AI 애플리케이션에서 기존 데이터를 활용할 수 있는 흥미로운 사용 사례들이 열렸습니다.
 
->The `Cassandra Database` toolkit enables AI engineers to integrate agents with Cassandra data efficiently, offering
->the following features:
+>`Cassandra Database` toolkit은 AI 엔지니어가 Cassandra 데이터와 agent를 효율적으로 통합할 수 있도록 하며,
+>다음과 같은 기능을 제공합니다:
 >
-> - Fast data access through optimized queries. Most queries should run in single-digit ms or less.
-> - Schema introspection to enhance LLM reasoning capabilities
-> - Compatibility with various Cassandra deployments, including Apache Cassandra®, DataStax Enterprise™, and DataStax Astra™
-> - Currently, the toolkit is limited to SELECT queries and schema introspection operations. (Safety first)
+> - 최적화된 쿼리를 통한 빠른 데이터 액세스. 대부분의 쿼리는 한 자릿수 ms 이하로 실행됩니다.
+> - LLM 추론 능력을 향상시키는 스키마 introspection
+> - Apache Cassandra®, DataStax Enterprise™, DataStax Astra™를 포함한 다양한 Cassandra 배포와의 호환성
+> - 현재 toolkit은 SELECT 쿼리와 스키마 introspection 작업으로 제한됩니다. (안전 우선)
 
-For more information on creating a Cassandra DB agent see the [CQL agent cookbook](https://github.com/langchain-ai/langchain/blob/v0.3/cookbook/cql_agent.ipynb)
+Cassandra DB agent 생성에 대한 자세한 내용은 [CQL agent cookbook](https://github.com/langchain-ai/langchain/blob/v0.3/cookbook/cql_agent.ipynb)을 참조하세요
 
 ## Quick Start
 
-- Install the `cassio` library
-- Set environment variables for the Cassandra database you are connecting to
-- Initialize `CassandraDatabase`
-- Pass the tools to your agent with `toolkit.get_tools()`
-- Sit back and watch it do all your work for you
+- `cassio` 라이브러리 설치
+- 연결할 Cassandra 데이터베이스에 대한 환경 변수 설정
+- `CassandraDatabase` 초기화
+- `toolkit.get_tools()`로 agent에 도구 전달
+- 편히 앉아서 모든 작업이 자동으로 수행되는 것을 지켜보세요
 
 ## Theory of Operation
 
-`Cassandra Query Language (CQL)` is the primary *human-centric* way of interacting with a Cassandra database. While offering some flexibility when generating queries, it requires knowledge of Cassandra data modeling best practices. LLM function calling gives an agent the ability to reason and then choose a tool to satisfy the request. Agents using LLMs should reason using Cassandra-specific logic when choosing the appropriate toolkit or chain of toolkits. This reduces the randomness introduced when LLMs are forced to provide a top-down solution. Do you want an LLM to have complete unfettered access to your database? Yeah. Probably not. To accomplish this, we provide a prompt for use when constructing questions for the agent:
+`Cassandra Query Language (CQL)`는 Cassandra 데이터베이스와 상호작용하는 주요 *인간 중심* 방법입니다. 쿼리 생성 시 어느 정도의 유연성을 제공하지만, Cassandra 데이터 모델링 모범 사례에 대한 지식이 필요합니다. LLM function calling은 agent에게 추론한 후 요청을 충족할 도구를 선택할 수 있는 능력을 제공합니다. LLM을 사용하는 Agent는 적절한 toolkit 또는 toolkit 체인을 선택할 때 Cassandra 특정 로직을 사용하여 추론해야 합니다. 이는 LLM이 하향식 솔루션을 제공하도록 강요될 때 발생하는 무작위성을 줄입니다. LLM이 데이터베이스에 완전히 제한 없이 액세스하도록 하시겠습니까? 네. 아마 아닐 겁니다. 이를 달성하기 위해 agent에 대한 질문을 구성할 때 사용할 prompt를 제공합니다:
 
 You are an Apache Cassandra expert query analysis bot with the following features
 and rules:
@@ -67,19 +67,19 @@ The following is an example of a query path in JSON format:
 
 ### `cassandra_db_schema`
 
-Gathers all schema information for the connected database or a specific schema. Critical for the agent when determining actions.
+연결된 데이터베이스 또는 특정 스키마에 대한 모든 스키마 정보를 수집합니다. Agent가 작업을 결정할 때 중요합니다.
 
 ### `cassandra_db_select_table_data`
 
-Selects data from a specific keyspace and table. The agent can pass parameters for a predicate and limits on the number of returned records.
+특정 keyspace와 table에서 데이터를 선택합니다. Agent는 predicate와 반환되는 레코드 수 제한에 대한 매개변수를 전달할 수 있습니다.
 
 ### `cassandra_db_query`
 
-Expiriemental alternative to `cassandra_db_select_table_data` which takes a query string completely formed by the agent instead of parameters. *Warning*: This can lead to unusual queries that may not be as performant(or even work). This may be removed in future releases. If it does something cool, we want to know about that too. You never know!
+매개변수 대신 agent가 완전히 구성한 쿼리 문자열을 받는 `cassandra_db_select_table_data`의 실험적 대안입니다. *경고*: 이는 성능이 떨어지거나(또는 작동하지 않을 수도 있는) 비정상적인 쿼리로 이어질 수 있습니다. 향후 릴리스에서 제거될 수 있습니다. 멋진 작업을 수행한다면 그것도 알고 싶습니다. 알 수 없는 일이죠!
 
 ## Environment Setup
 
-Install the following Python modules:
+다음 Python 모듈을 설치하세요:
 
 ```bash
 pip install ipykernel python-dotenv cassio langchain-openai langchain langchain-community langchainhub
@@ -87,9 +87,9 @@ pip install ipykernel python-dotenv cassio langchain-openai langchain langchain-
 
 ### .env file
 
-Connection is via `cassio` using `auto=True` parameter, and the notebook uses OpenAI. You should create a `.env` file accordingly.
+연결은 `auto=True` 매개변수를 사용하는 `cassio`를 통해 이루어지며, notebook은 OpenAI를 사용합니다. 이에 따라 `.env` 파일을 생성해야 합니다.
 
-For Casssandra, set:
+Cassandra의 경우 다음을 설정하세요:
 
 ```bash
 CASSANDRA_CONTACT_POINTS
@@ -98,7 +98,7 @@ CASSANDRA_PASSWORD
 CASSANDRA_KEYSPACE
 ```
 
-For Astra, set:
+Astra의 경우 다음을 설정하세요:
 
 ```bash
 ASTRA_DB_APPLICATION_TOKEN
@@ -106,7 +106,7 @@ ASTRA_DB_DATABASE_ID
 ASTRA_DB_KEYSPACE
 ```
 
-For example:
+예시:
 
 ```bash
 # Connection to Astra:
@@ -118,7 +118,7 @@ ASTRA_DB_KEYSPACE=notebooks
 OPENAI_API_KEY=sk-....
 ```
 
-(You may also modify the below code to directly connect with `cassio`.)
+(아래 코드를 수정하여 `cassio`로 직접 연결할 수도 있습니다.)
 
 ```python
 from dotenv import load_dotenv

@@ -2,9 +2,9 @@
 title: UpstashVectorStore
 ---
 
-[Upstash Vector](https://upstash.com/) is a REST based serverless vector database, designed for working with vector embeddings.
+[Upstash Vector](https://upstash.com/)는 REST 기반의 서버리스 vector database로, vector embedding 작업을 위해 설계되었습니다.
 
-This guide provides a quick overview for getting started with Upstash [vector stores](/oss/integrations/vectorstores). For detailed documentation of all `UpstashVectorStore` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_upstash.UpstashVectorStore.html).
+이 가이드는 Upstash [vector store](/oss/integrations/vectorstores) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `UpstashVectorStore` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_upstash.UpstashVectorStore.html)를 참조하세요.
 
 ## Overview
 
@@ -16,9 +16,9 @@ This guide provides a quick overview for getting started with Upstash [vector st
 
 ## Setup
 
-To use Upstash vector stores, you'll need to create an Upstash account, create an index, and install the `@langchain/community` integration package. You'll also need to install the [`@upstash/vector`](https://www.npmjs.com/package/@upstash/vector) package as a peer dependency.
+Upstash vector store를 사용하려면 Upstash 계정을 생성하고, index를 만들고, `@langchain/community` integration package를 설치해야 합니다. 또한 peer dependency로 [`@upstash/vector`](https://www.npmjs.com/package/@upstash/vector) package를 설치해야 합니다.
 
-This guide will also use [OpenAI embeddings](/oss/integrations/text_embedding/openai), which require you to install the `@langchain/openai` integration package. You can also use [other supported embeddings models](/oss/integrations/text_embedding) if you wish.
+이 가이드는 [OpenAI embeddings](/oss/integrations/text_embedding/openai)도 사용하며, 이를 위해 `@langchain/openai` integration package를 설치해야 합니다. 원하는 경우 [다른 지원되는 embedding 모델](/oss/integrations/text_embedding)을 사용할 수도 있습니다.
 
 <CodeGroup>
 ```bash npm
@@ -32,31 +32,31 @@ pnpm add @langchain/community @langchain/core @upstash/vector @langchain/openai
 ```
 </CodeGroup>
 
-You can create an index from the [Upstash Console](https://console.upstash.com/login). For further reference, see [the official docs](https://upstash.com/docs/vector/overall/getstarted).
+[Upstash Console](https://console.upstash.com/login)에서 index를 생성할 수 있습니다. 자세한 내용은 [공식 문서](https://upstash.com/docs/vector/overall/getstarted)를 참조하세요.
 
-Upstash vector also has built in embedding support. Which means you can use it directly without the need for an additional embedding model. Check the [embedding models documentation](https://upstash.com/docs/vector/features/embeddingmodels) for more details.
+Upstash vector는 내장 embedding 지원 기능도 제공합니다. 즉, 추가 embedding 모델 없이 직접 사용할 수 있습니다. 자세한 내용은 [embedding 모델 문서](https://upstash.com/docs/vector/features/embeddingmodels)를 확인하세요.
 
 <Note>
-To use the built-in Upstash embeddings, you'll need to select an embedding model when creating the index.
+내장 Upstash embedding을 사용하려면 index를 생성할 때 embedding 모델을 선택해야 합니다.
 </Note>
 
 
 ### Credentials
 
-Once you've set up an index, set the following environment variables:
+index를 설정한 후 다음 환경 변수를 설정하세요:
 
 ```typescript
 process.env.UPSTASH_VECTOR_REST_URL = "your-rest-url";
 process.env.UPSTASH_VECTOR_REST_TOKEN = "your-rest-token";
 ```
 
-If you are using OpenAI embeddings for this guide, you'll need to set your OpenAI key as well:
+이 가이드에서 OpenAI embedding을 사용하는 경우 OpenAI key도 설정해야 합니다:
 
 ```typescript
 process.env.OPENAI_API_KEY = "YOUR_API_KEY";
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_TRACING="true"
@@ -65,7 +65,7 @@ If you want to get automated tracing of your model calls you can also set your [
 
 ## Instantiation
 
-Make sure your index has the same dimension count as your embeddings. The default for OpenAI `text-embedding-3-small` is 1536.
+index의 dimension 수가 embedding과 동일한지 확인하세요. OpenAI `text-embedding-3-small`의 기본값은 1536입니다.
 
 ```typescript
 import { UpstashVectorStore } from "@langchain/community/vectorstores/upstash";
@@ -89,9 +89,9 @@ const vectorStore = new UpstashVectorStore(embeddings, {
 });
 ```
 
-## Usage with built-in embeddings
+## 내장 embedding 사용법
 
-To use the built-in Upstash embeddings, you can pass a `FakeEmbeddings` instance to the `UpstashVectorStore` constructor. This will make the `UpstashVectorStore` use the built-in embeddings, which you selected when creating the index.
+내장 Upstash embedding을 사용하려면 `UpstashVectorStore` constructor에 `FakeEmbeddings` instance를 전달할 수 있습니다. 이렇게 하면 `UpstashVectorStore`가 index를 생성할 때 선택한 내장 embedding을 사용합니다.
 
 ```typescript
 import { UpstashVectorStore } from "@langchain/community/vectorstores/upstash";
@@ -109,9 +109,9 @@ const vectorStore = new UpstashVectorStore(new FakeEmbeddings(), {
 });
 ```
 
-## Manage vector store
+## Vector store 관리
 
-### Add items to vector store
+### Vector store에 항목 추가
 
 ```typescript
 import type { Document } from "@langchain/core/documents";
@@ -145,21 +145,21 @@ await vectorStore.addDocuments(documents, { ids: ["1", "2", "3", "4"] });
 [ '1', '2', '3', '4' ]
 ```
 
-**Note:** After adding documents, there may be a slight delay before they become queryable.
+**참고:** 문서를 추가한 후 쿼리 가능해지기까지 약간의 지연이 있을 수 있습니다.
 
-### Delete items from vector store
+### Vector store에서 항목 삭제
 
 ```typescript
 await vectorStore.delete({ ids: ["4"] });
 ```
 
-## Query vector store
+## Vector store 쿼리
 
-Once your vector store has been created and the relevant documents have been added you will most likely wish to query it during the running of your chain or agent.
+Vector store가 생성되고 관련 문서가 추가되면 chain 또는 agent를 실행하는 동안 쿼리하고 싶을 것입니다.
 
-### Query directly
+### 직접 쿼리
 
-Performing a simple similarity search can be done as follows:
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
 
 ```typescript
 const filter = "source = 'https://example.com'";
@@ -176,9 +176,9 @@ for (const doc of similaritySearchResults) {
 * Mitochondria are made out of lipids [{"source":"https://example.com"}]
 ```
 
-See [this page](https://upstash.com/docs/vector/features/filtering) for more on Upstash Vector filter syntax.
+Upstash Vector filter 구문에 대한 자세한 내용은 [이 페이지](https://upstash.com/docs/vector/features/filtering)를 참조하세요.
 
-If you want to execute a similarity search and receive the corresponding scores you can run:
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
 
 ```typescript
 const similaritySearchWithScoreResults = await vectorStore.similaritySearchWithScore("biology", 2, filter)
@@ -193,9 +193,9 @@ for (const [doc, score] of similaritySearchWithScoreResults) {
 * [SIM=0.557] Mitochondria are made out of lipids [{"source":"https://example.com"}]
 ```
 
-### Query by turning into retriever
+### Retriever로 변환하여 쿼리
 
-You can also transform the vector store into a [retriever](/oss/langchain/retrieval) for easier usage in your chains.
+Vector store를 [retriever](/oss/langchain/retrieval)로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
 
 ```typescript
 const retriever = vectorStore.asRetriever({
@@ -221,14 +221,14 @@ await retriever.invoke("biology");
 ]
 ```
 
-### Usage for retrieval-augmented generation
+### Retrieval-augmented generation 사용법
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+Retrieval-augmented generation (RAG)을 위해 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
 
-- [Build a RAG app with LangChain](/oss/langchain/rag).
+- [LangChain으로 RAG 앱 만들기](/oss/langchain/rag)
 - [Agentic RAG](/oss/langgraph/agentic-rag)
-- [Retrieval docs](/oss/langchain/retrieval)
+- [Retrieval 문서](/oss/langchain/retrieval)
 
 ## API reference
 
-For detailed documentation of all `UpstashVectorStore` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_upstash.UpstashVectorStore.html).
+모든 `UpstashVectorStore` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_upstash.UpstashVectorStore.html)를 참조하세요.

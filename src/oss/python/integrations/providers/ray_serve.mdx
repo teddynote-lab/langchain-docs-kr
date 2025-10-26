@@ -2,19 +2,19 @@
 title: Ray Serve
 ---
 
-[Ray Serve](https://docs.ray.io/en/latest/serve/index.html) is a scalable model serving library for building online inference APIs. Serve is particularly well suited for system composition, enabling you to build a complex inference service consisting of multiple chains and business logic all in Python code.
+[Ray Serve](https://docs.ray.io/en/latest/serve/index.html)는 온라인 추론 API를 구축하기 위한 확장 가능한 모델 서빙 라이브러리입니다. Serve는 시스템 구성에 특히 적합하며, 여러 chain과 비즈니스 로직으로 구성된 복잡한 추론 서비스를 모두 Python 코드로 구축할 수 있습니다.
 
-## Goal of this notebook
+## 이 노트북의 목표
 
-This notebook shows a simple example of how to deploy an OpenAI chain into production. You can extend it to deploy your own self-hosted models where you can easily define amount of hardware resources (GPUs and CPUs) needed to run your model in production efficiently. Read more about available options including autoscaling in the Ray Serve [documentation](https://docs.ray.io/en/latest/serve/getting_started.html).
+이 노트북은 OpenAI chain을 프로덕션에 배포하는 간단한 예제를 보여줍니다. 이를 확장하여 자체 호스팅 모델을 배포할 수 있으며, 프로덕션에서 모델을 효율적으로 실행하는 데 필요한 하드웨어 리소스(GPU 및 CPU)의 양을 쉽게 정의할 수 있습니다. 자동 스케일링을 포함한 사용 가능한 옵션에 대한 자세한 내용은 Ray Serve [문서](https://docs.ray.io/en/latest/serve/getting_started.html)를 참조하세요.
 
-## Setup Ray Serve
+## Ray Serve 설정
 
-Install ray with `pip install ray[serve]`.
+`pip install ray[serve]`로 ray를 설치합니다.
 
-## General Skeleton
+## 일반적인 구조
 
-The general skeleton for deploying a service is the following:
+서비스를 배포하기 위한 일반적인 구조는 다음과 같습니다:
 
 ```python
 # 0: Import ray serve and request from starlette
@@ -47,9 +47,9 @@ serve.api.run(deployment)
 serve.api.shutdown()
 ```
 
-## Example of deploying and OpenAI chain with custom prompts
+## 커스텀 prompt를 사용한 OpenAI chain 배포 예제
 
-Get an OpenAI API key from [here](https://platform.openai.com/account/api-keys). By running the following code, you will be asked to provide your API key.
+[여기](https://platform.openai.com/account/api-keys)에서 OpenAI API key를 받으세요. 다음 코드를 실행하면 API key를 제공하라는 메시지가 표시됩니다.
 
 ```python
 from langchain.chains import LLMChain
@@ -85,14 +85,14 @@ class DeployLLM:
         return resp["text"]
 ```
 
-Now we can bind the deployment.
+이제 deployment를 바인딩할 수 있습니다.
 
 ```python
 # Bind the model to deployment
 deployment = DeployLLM.bind()
 ```
 
-We can assign the port number and host when we want to run the deployment.
+deployment를 실행할 때 포트 번호와 host를 할당할 수 있습니다.
 
 ```python
 # Example port number
@@ -101,7 +101,7 @@ PORT_NUMBER = 8282
 serve.api.run(deployment, port=PORT_NUMBER)
 ```
 
-Now that service is deployed on port `localhost:8282` we can send a post request to get the results back.
+이제 서비스가 `localhost:8282` 포트에 배포되었으므로 post 요청을 보내 결과를 받을 수 있습니다.
 
 ```python
 import requests

@@ -2,14 +2,14 @@
 title: Pinecone Hybrid Search
 ---
 
->[Pinecone](https://docs.pinecone.io/docs/overview) is a vector database with broad functionality.
+>[Pinecone](https://docs.pinecone.io/docs/overview)은 광범위한 기능을 제공하는 vector database입니다.
 
-This notebook goes over how to use a retriever that under the hood uses Pinecone and Hybrid Search.
+이 notebook은 내부적으로 Pinecone과 Hybrid Search를 사용하는 retriever를 사용하는 방법을 다룹니다.
 
-The logic of this retriever is taken from [this documentation](https://docs.pinecone.io/docs/hybrid-search)
+이 retriever의 로직은 [이 문서](https://docs.pinecone.io/docs/hybrid-search)에서 가져왔습니다.
 
-To use Pinecone, you must have an API key and an Environment.
-Here are the [installation instructions](https://docs.pinecone.io/docs/quickstart).
+Pinecone을 사용하려면 API key와 Environment가 필요합니다.
+[설치 지침](https://docs.pinecone.io/docs/quickstart)은 여기에서 확인하세요.
 
 ```python
 pip install -qU  pinecone pinecone-text pinecone-notebooks
@@ -32,7 +32,7 @@ from langchain_community.retrievers import (
 )
 ```
 
-We want to use `OpenAIEmbeddings` so we have to get the OpenAI API Key.
+`OpenAIEmbeddings`를 사용하려면 OpenAI API Key를 가져와야 합니다.
 
 ```python
 import getpass
@@ -41,9 +41,9 @@ if "OPENAI_API_KEY" not in os.environ:
     os.environ["OPENAI_API_KEY"] = getpass.getpass("OpenAI API Key:")
 ```
 
-## Setup Pinecone
+## Pinecone 설정
 
-You should only have to do this part once.
+이 부분은 한 번만 수행하면 됩니다.
 
 ```python
 import os
@@ -69,15 +69,15 @@ if index_name not in pc.list_indexes().names():
 WhoAmIResponse(username='load', user_label='label', projectname='load-test')
 ```
 
-Now that the index is created, we can use it.
+이제 index가 생성되었으므로 사용할 수 있습니다.
 
 ```python
 index = pc.Index(index_name)
 ```
 
-## Get embeddings and sparse encoders
+## Embeddings와 sparse encoders 가져오기
 
-Embeddings are used for the dense vectors, tokenizer is used for the sparse vector
+Embeddings는 dense vectors에 사용되고, tokenizer는 sparse vector에 사용됩니다.
 
 ```python
 from langchain_openai import OpenAIEmbeddings
@@ -85,9 +85,9 @@ from langchain_openai import OpenAIEmbeddings
 embeddings = OpenAIEmbeddings()
 ```
 
-To encode the text to sparse values you can either choose SPLADE or BM25. For out of domain tasks we recommend using BM25.
+텍스트를 sparse 값으로 인코딩하려면 SPLADE 또는 BM25 중 하나를 선택할 수 있습니다. 도메인 외 작업의 경우 BM25를 사용하는 것이 좋습니다.
 
-For more information about the sparse encoders you can checkout pinecone-text library [docs](https://pinecone-io.github.io/pinecone-text/pinecone_text.html).
+sparse encoders에 대한 자세한 내용은 pinecone-text library [문서](https://pinecone-io.github.io/pinecone-text/pinecone_text.html)를 확인하세요.
 
 ```python
 from pinecone_text.sparse import BM25Encoder
@@ -98,7 +98,7 @@ from pinecone_text.sparse import BM25Encoder
 bm25_encoder = BM25Encoder().default()
 ```
 
-The above code is using default tfids values. It's highly recommended to fit the tf-idf values to your own corpus. You can do it as follow:
+위 코드는 기본 tfids 값을 사용합니다. tf-idf 값을 자신의 corpus에 맞추는 것을 강력히 권장합니다. 다음과 같이 수행할 수 있습니다:
 
 ```python
 corpus = ["foo", "bar", "world", "hello"]
@@ -113,9 +113,9 @@ bm25_encoder.dump("bm25_values.json")
 bm25_encoder = BM25Encoder().load("bm25_values.json")
 ```
 
-## Load Retriever
+## Retriever 로드
 
-We can now construct the retriever!
+이제 retriever를 구성할 수 있습니다!
 
 ```python
 retriever = PineconeHybridSearchRetriever(
@@ -123,9 +123,9 @@ retriever = PineconeHybridSearchRetriever(
 )
 ```
 
-## Add texts (if necessary)
+## 텍스트 추가 (필요한 경우)
 
-We can optionally add texts to the retriever (if they aren't already in there)
+필요한 경우 retriever에 텍스트를 추가할 수 있습니다 (아직 없는 경우).
 
 ```python
 retriever.add_texts(["foo", "bar", "world", "hello"])
@@ -135,9 +135,9 @@ retriever.add_texts(["foo", "bar", "world", "hello"])
 100%|██████████| 1/1 [00:02<00:00,  2.27s/it]
 ```
 
-## Use Retriever
+## Retriever 사용
 
-We can now use the retriever!
+이제 retriever를 사용할 수 있습니다!
 
 ```python
 result = retriever.invoke("foo")

@@ -2,22 +2,22 @@
 title: Time-Weighted Retriever
 ---
 
-A Time-Weighted Retriever is a retriever that takes into account recency in addition to similarity. The scoring algorithm is:
+Time-Weighted Retriever는 유사성 외에도 최신성을 고려하는 retriever입니다. 점수 계산 알고리즘은 다음과 같습니다:
 
 ```typescript
 let score = (1.0 - this.decayRate) ** hoursPassed + vectorRelevance;
 ```
 
-Notably, `hoursPassed` above refers to the time since the object in the retriever was last accessed, not since it was created. This means that frequently accessed objects remain "fresh" and score higher.
+특히, 위의 `hoursPassed`는 객체가 생성된 이후의 시간이 아니라 retriever의 객체가 마지막으로 액세스된 이후의 시간을 나타냅니다. 즉, 자주 액세스되는 객체는 "신선한" 상태로 유지되며 더 높은 점수를 받습니다.
 
-`this.decayRate` is a configurable decimal number between 0 and 1. A lower number means that documents will be "remembered" for longer, while a higher number strongly weights more recently accessed documents.
+`this.decayRate`는 0과 1 사이의 구성 가능한 십진수입니다. 낮은 숫자는 문서가 더 오래 "기억"된다는 것을 의미하며, 높은 숫자는 최근에 액세스된 문서에 강하게 가중치를 부여합니다.
 
-Note that setting a decay rate of exactly 0 or 1 makes `hoursPassed` irrelevant and makes this retriever equivalent to a standard vector lookup.
+decay rate를 정확히 0 또는 1로 설정하면 `hoursPassed`가 무관해지고 이 retriever는 표준 vector lookup과 동일하게 됩니다.
 
-## Usage
+## 사용법
 
-This example shows how to intialize a `TimeWeightedVectorStoreRetriever` with a vector store.
-It is important to note that due to required metadata, all documents must be added to the backing vector store using the `addDocuments` method on the **retriever**, not the vector store itself.
+이 예제는 vector store로 `TimeWeightedVectorStoreRetriever`를 초기화하는 방법을 보여줍니다.
+필수 metadata로 인해 모든 document는 vector store 자체가 아닌 **retriever**의 `addDocuments` method를 사용하여 백엔드 vector store에 추가해야 한다는 점에 유의해야 합니다.
 
 ```typescript
 import { TimeWeightedVectorStoreRetriever } from "@langchain/classic/retrievers/time_weighted";
@@ -65,6 +65,6 @@ console.log(results2);
  */
 ```
 
-## Related
+## 관련 문서
 
-- [Retrieval guide](/oss/langchain/retrieval)
+- [Retrieval 가이드](/oss/langchain/retrieval)

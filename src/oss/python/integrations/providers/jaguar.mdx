@@ -2,36 +2,36 @@
 title: Jaguar
 ---
 
-This page describes how to use Jaguar vector database within LangChain.
-It contains three sections: introduction, installation and setup, and Jaguar API.
+이 페이지는 LangChain 내에서 Jaguar vector database를 사용하는 방법을 설명합니다.
+세 개의 섹션으로 구성되어 있습니다: 소개, 설치 및 설정, 그리고 Jaguar API.
 
 
-## Introduction
+## 소개
 
-Jaguar vector database has the following characteristics:
+Jaguar vector database는 다음과 같은 특징을 가지고 있습니다:
 
-1. It is a distributed vector database
-2. The “ZeroMove” feature of JaguarDB enables instant horizontal scalability
-3. Multimodal: embeddings, text, images, videos, PDFs, audio, time series, and geospatial
-4. All-masters: allows both parallel reads and writes
-5. Anomaly detection capabilities
-6. RAG support: combines LLM with proprietary and real-time data
-7. Shared metadata: sharing of metadata across multiple vector indexes
-8. Distance metrics: Euclidean, Cosine, InnerProduct, Manhatten, Chebyshev, Hamming, Jeccard, Minkowski
+1. 분산 vector database입니다
+2. JaguarDB의 "ZeroMove" 기능은 즉각적인 수평 확장성을 제공합니다
+3. 멀티모달: embeddings, 텍스트, 이미지, 비디오, PDF, 오디오, 시계열 데이터, 지리공간 데이터 지원
+4. All-masters: 병렬 읽기 및 쓰기를 모두 허용합니다
+5. 이상 탐지 기능
+6. RAG 지원: LLM을 독점 데이터 및 실시간 데이터와 결합합니다
+7. 공유 metadata: 여러 vector index 간 metadata 공유
+8. 거리 메트릭: Euclidean, Cosine, InnerProduct, Manhatten, Chebyshev, Hamming, Jeccard, Minkowski
 
-[Overview of Jaguar scalable vector database](http://www.jaguardb.com)
+[Jaguar 확장 가능한 vector database 개요](http://www.jaguardb.com)
 
-You can run JaguarDB in docker container; or download the software and run on-cloud or off-cloud.
+JaguarDB는 docker container에서 실행하거나, 소프트웨어를 다운로드하여 클라우드 또는 온프레미스에서 실행할 수 있습니다.
 
-## Installation and Setup
+## 설치 및 설정
 
-- Install the JaguarDB on one host or multiple hosts
-- Install the Jaguar HTTP Gateway server on one host
-- Install the JaguarDB HTTP Client package
+- 하나 또는 여러 호스트에 JaguarDB 설치
+- 하나의 호스트에 Jaguar HTTP Gateway server 설치
+- JaguarDB HTTP Client package 설치
 
-The steps are described in [Jaguar Documents](http://www.jaguardb.com/support.html)
+자세한 단계는 [Jaguar Documents](http://www.jaguardb.com/support.html)에 설명되어 있습니다
 
-Environment Variables in client programs:
+클라이언트 프로그램의 환경 변수:
 
         export OPENAI_API_KEY="......"
         export JAGUAR_API_KEY="......"
@@ -39,13 +39,13 @@ Environment Variables in client programs:
 
 ## Jaguar API
 
-Together with LangChain, a Jaguar client class is provided by importing it in Python:
+LangChain과 함께 Jaguar client class를 Python에서 import하여 사용할 수 있습니다:
 
 ```python
 from langchain_community.vectorstores.jaguar import Jaguar
 ```
 
-Supported API functions of the Jaguar class are:
+Jaguar class에서 지원하는 API 함수는 다음과 같습니다:
 
 - `add_texts`
 - `add_documents`
@@ -61,4 +61,4 @@ Supported API functions of the Jaguar class are:
 - `logout`
 
 
-For more details of the Jaguar API, please refer to [this notebook](/oss/integrations/vectorstores/jaguar)
+Jaguar API에 대한 자세한 내용은 [이 notebook](/oss/integrations/vectorstores/jaguar)을 참조하세요

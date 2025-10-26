@@ -2,7 +2,7 @@
 title: UnstructuredXMLLoader
 ---
 
-This guide provides a quick overview for getting started with UnstructuredXMLLoader [document loader](https://python.langchain.com/docs/concepts/document_loaders). The `UnstructuredXMLLoader` is used to load `XML` files. The loader works with `.xml` files. The page content will be the text extracted from the XML tags.
+이 가이드는 UnstructuredXMLLoader [document loader](https://python.langchain.com/docs/concepts/document_loaders) 시작하기에 대한 간단한 개요를 제공합니다. `UnstructuredXMLLoader`는 `XML` 파일을 로드하는 데 사용됩니다. 이 loader는 `.xml` 파일과 함께 작동합니다. 페이지 콘텐츠는 XML 태그에서 추출된 텍스트가 됩니다.
 
 ## Overview
 
@@ -20,13 +20,13 @@ This guide provides a quick overview for getting started with UnstructuredXMLLoa
 
 ## Setup
 
-To access UnstructuredXMLLoader document loader you'll need to install the `langchain-community` integration package.
+UnstructuredXMLLoader document loader에 액세스하려면 `langchain-community` integration package를 설치해야 합니다.
 
 ### Credentials
 
-No credentials are needed to use the UnstructuredXMLLoader
+UnstructuredXMLLoader를 사용하는 데 필요한 credentials는 없습니다
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -35,7 +35,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-Install **langchain_community**.
+**langchain_community**를 설치합니다.
 
 ```python
 pip install -qU langchain_community
@@ -43,7 +43,7 @@ pip install -qU langchain_community
 
 ## Initialization
 
-Now we can instantiate our model object and load documents:
+이제 model object를 인스턴스화하고 documents를 로드할 수 있습니다:
 
 ```python
 from langchain_community.document_loaders import UnstructuredXMLLoader
@@ -87,4 +87,4 @@ for doc in loader.lazy_load():
 
 ## API reference
 
-For detailed documentation of all __ModuleName__Loader features and configurations head to the API reference: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.xml.UnstructuredXMLLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.xml.UnstructuredXMLLoader.html)
+모든 __ModuleName__Loader features 및 configurations에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.xml.UnstructuredXMLLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.xml.UnstructuredXMLLoader.html)

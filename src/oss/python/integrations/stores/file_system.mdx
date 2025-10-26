@@ -2,11 +2,11 @@
 title: LocalFileStore
 ---
 
-This will help you get started with local filesystem [key-value stores](/oss/integrations/stores). For detailed documentation of all LocalFileStore features and configurations head to the [API reference](https://python.langchain.com/api_reference/langchain/storage/langchain.storage.file_system.LocalFileStore.html).
+이 문서는 로컬 파일시스템 [key-value stores](/oss/integrations/stores) 시작하기를 도와줍니다. 모든 LocalFileStore 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/langchain/storage/langchain.storage.file_system.LocalFileStore.html)를 참조하세요.
 
 ## Overview
 
-The `LocalFileStore` is a persistent implementation of `ByteStore` that stores everything in a folder of your choosing. It's useful if you're using a single machine and are tolerant of files being added or deleted.
+`LocalFileStore`는 선택한 폴더에 모든 것을 저장하는 `ByteStore`의 영구 구현입니다. 단일 머신을 사용하고 파일이 추가되거나 삭제되는 것을 허용할 수 있는 경우 유용합니다.
 
 ### Integration details
 
@@ -16,7 +16,7 @@ The `LocalFileStore` is a persistent implementation of `ByteStore` that stores e
 
 ### Installation
 
-The LangChain `LocalFileStore` integration lives in the `langchain` package:
+LangChain `LocalFileStore` integration은 `langchain` 패키지에 포함되어 있습니다:
 
 ```python
 pip install -qU langchain-classic
@@ -24,7 +24,7 @@ pip install -qU langchain-classic
 
 ## Instantiation
 
-Now we can instantiate our byte store:
+이제 byte store를 인스턴스화할 수 있습니다:
 
 ```python
 from pathlib import Path
@@ -38,7 +38,7 @@ kv_store = LocalFileStore(root_path)
 
 ## Usage
 
-You can set data under keys like this using the `mset` method:
+`mset` method를 사용하여 다음과 같이 key 아래에 데이터를 설정할 수 있습니다:
 
 ```python
 kv_store.mset(
@@ -60,7 +60,7 @@ kv_store.mget(
 [b'value1', b'value2']
 ```
 
-You can see the created files in your `data` folder:
+`data` 폴더에서 생성된 파일을 확인할 수 있습니다:
 
 ```python
 !ls {root_path}
@@ -70,7 +70,7 @@ You can see the created files in your `data` folder:
 key1 key2
 ```
 
-And you can delete data using the `mdelete` method:
+그리고 `mdelete` method를 사용하여 데이터를 삭제할 수 있습니다:
 
 ```python
 kv_store.mdelete(
@@ -94,4 +94,4 @@ kv_store.mget(
 
 ## API reference
 
-For detailed documentation of all `LocalFileStore` features and configurations, head to the API reference: [python.langchain.com/api_reference/langchain/storage/langchain.storage.file_system.LocalFileStore.html](https://python.langchain.com/api_reference/langchain/storage/langchain.storage.file_system.LocalFileStore.html)
+모든 `LocalFileStore` 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/langchain/storage/langchain.storage.file_system.LocalFileStore.html](https://python.langchain.com/api_reference/langchain/storage/langchain.storage.file_system.LocalFileStore.html)

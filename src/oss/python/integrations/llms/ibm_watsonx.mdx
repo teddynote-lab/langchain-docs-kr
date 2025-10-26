@@ -2,28 +2,28 @@
 title: IBM watsonx.ai
 ---
 
->[WatsonxLLM](https://ibm.github.io/watsonx-ai-python-sdk/fm_extensions.html#langchain) is a wrapper for IBM [watsonx.ai](https://www.ibm.com/products/watsonx-ai) foundation models.
+>[WatsonxLLM](https://ibm.github.io/watsonx-ai-python-sdk/fm_extensions.html#langchain)은 IBM [watsonx.ai](https://www.ibm.com/products/watsonx-ai) foundation model을 위한 wrapper입니다.
 
-This example shows how to communicate with `watsonx.ai` models using `LangChain`.
+이 예제는 `LangChain`을 사용하여 `watsonx.ai` model과 통신하는 방법을 보여줍니다.
 
-## Overview
+## 개요
 
-### Integration details
+### Integration 세부 정보
 
 | Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/llms/ibm/) | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [WatsonxLLM](https://python.langchain.com/api_reference/ibm/llms/langchain_ibm.llms.WatsonxLLM.html) | [langchain-ibm](https://python.langchain.com/api_reference/ibm/index.html) | ❌ | ❌ | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-ibm?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-ibm?style=flat-square&label=%20) |
 
-## Setup
+## 설정
 
-To access IBM watsonx.ai models you'll need to create an IBM watsonx.ai account, get an API key, and install the `langchain-ibm` integration package.
+IBM watsonx.ai model에 액세스하려면 IBM watsonx.ai 계정을 생성하고, API key를 받고, `langchain-ibm` integration package를 설치해야 합니다.
 
-### Credentials
+### 자격 증명
 
-The cell below defines the credentials required to work with watsonx Foundation Model inferencing.
+아래 셀은 watsonx Foundation Model inferencing 작업에 필요한 자격 증명을 정의합니다.
 
-**Action:** Provide the IBM Cloud user API key. For details, see
-[Managing user API keys](https://cloud.ibm.com/docs/account?topic=account-userapikey&interface=ui).
+**작업:** IBM Cloud 사용자 API key를 제공하세요. 자세한 내용은
+[Managing user API keys](https://cloud.ibm.com/docs/account?topic=account-userapikey&interface=ui)를 참조하세요.
 
 ```python
 import os
@@ -33,7 +33,7 @@ watsonx_api_key = getpass()
 os.environ["WATSONX_APIKEY"] = watsonx_api_key
 ```
 
-Additionaly you are able to pass additional secrets as an environment variable.
+추가로 환경 변수로 추가 secret을 전달할 수 있습니다.
 
 ```python
 import os
@@ -45,17 +45,17 @@ os.environ["WATSONX_USERNAME"] = "your username for accessing the CPD cluster"
 os.environ["WATSONX_INSTANCE_ID"] = "your instance_id for accessing the CPD cluster"
 ```
 
-### Installation
+### 설치
 
-The LangChain IBM integration lives in the `langchain-ibm` package:
+LangChain IBM integration은 `langchain-ibm` package에 있습니다:
 
 ```python
 !pip install -qU langchain-ibm
 ```
 
-## Instantiation
+## 인스턴스화
 
-You might need to adjust model `parameters` for different models or tasks. For details, refer to [documentation](https://ibm.github.io/watsonx-ai-python-sdk/fm_model.html#metanames.GenTextParamsMetaNames).
+다양한 model이나 작업에 대해 model `parameters`를 조정해야 할 수 있습니다. 자세한 내용은 [documentation](https://ibm.github.io/watsonx-ai-python-sdk/fm_model.html#metanames.GenTextParamsMetaNames)을 참조하세요.
 
 ```python
 parameters = {
@@ -68,16 +68,16 @@ parameters = {
 }
 ```
 
-Initialize the `WatsonxLLM` class with previously set parameters.
+이전에 설정한 parameter로 `WatsonxLLM` class를 초기화합니다.
 
-**Note**:
+**참고**:
 
-- To provide context for the API call, you must add `project_id` or `space_id`. For more information see [documentation](https://www.ibm.com/docs/en/watsonx-as-a-service?topic=projects).
-- Depending on the region of your provisioned service instance, use one of the urls described [here](https://ibm.github.io/watsonx-ai-python-sdk/setup_cloud.html#authentication).
+- API 호출에 대한 context를 제공하려면 `project_id` 또는 `space_id`를 추가해야 합니다. 자세한 내용은 [documentation](https://www.ibm.com/docs/en/watsonx-as-a-service?topic=projects)을 참조하세요.
+- 프로비저닝된 서비스 인스턴스의 지역에 따라 [여기](https://ibm.github.io/watsonx-ai-python-sdk/setup_cloud.html#authentication)에 설명된 url 중 하나를 사용하세요.
 
-In this example, we’ll use the `project_id` and Dallas url.
+이 예제에서는 `project_id`와 Dallas url을 사용합니다.
 
-You need to specify `model_id` that will be used for inferencing. All available models you can find in [documentation](https://ibm.github.io/watsonx-ai-python-sdk/fm_model.html#TextModels).
+inferencing에 사용할 `model_id`를 지정해야 합니다. 사용 가능한 모든 model은 [documentation](https://ibm.github.io/watsonx-ai-python-sdk/fm_model.html#TextModels)에서 찾을 수 있습니다.
 
 ```python
 from langchain_ibm import WatsonxLLM
@@ -90,7 +90,7 @@ watsonx_llm = WatsonxLLM(
 )
 ```
 
-Alternatively you can use Cloud Pak for Data credentials. For details, see [documentation](https://ibm.github.io/watsonx-ai-python-sdk/setup_cpd.html).
+또는 Cloud Pak for Data 자격 증명을 사용할 수 있습니다. 자세한 내용은 [documentation](https://ibm.github.io/watsonx-ai-python-sdk/setup_cpd.html)을 참조하세요.
 
 ```python
 watsonx_llm = WatsonxLLM(
@@ -105,7 +105,7 @@ watsonx_llm = WatsonxLLM(
 )
 ```
 
-Instead of `model_id`, you can also pass the `deployment_id` of the previously tuned model. The entire model tuning workflow is described in [Working with TuneExperiment and PromptTuner](https://ibm.github.io/watsonx-ai-python-sdk/pt_tune_experiment_run.html).
+`model_id` 대신 이전에 튜닝된 model의 `deployment_id`를 전달할 수도 있습니다. 전체 model tuning workflow는 [Working with TuneExperiment and PromptTuner](https://ibm.github.io/watsonx-ai-python-sdk/pt_tune_experiment_run.html)에 설명되어 있습니다.
 
 ```python
 watsonx_llm = WatsonxLLM(
@@ -116,7 +116,7 @@ watsonx_llm = WatsonxLLM(
 )
 ```
 
-For certain requirements, there is an option to pass the IBM's [`APIClient`](https://ibm.github.io/watsonx-ai-python-sdk/base.html#apiclient) object into the `WatsonxLLM` class.
+특정 요구 사항의 경우, IBM의 [`APIClient`](https://ibm.github.io/watsonx-ai-python-sdk/base.html#apiclient) 객체를 `WatsonxLLM` class에 전달하는 옵션이 있습니다.
 
 ```python
 from ibm_watsonx_ai import APIClient
@@ -129,7 +129,7 @@ watsonx_llm = WatsonxLLM(
 )
 ```
 
-You can also pass the IBM's [`ModelInference`](https://ibm.github.io/watsonx-ai-python-sdk/fm_model_inference.html) object into the `WatsonxLLM` class.
+IBM의 [`ModelInference`](https://ibm.github.io/watsonx-ai-python-sdk/fm_model_inference.html) 객체를 `WatsonxLLM` class에 전달할 수도 있습니다.
 
 ```python
 from ibm_watsonx_ai.foundation_models import ModelInference
@@ -139,9 +139,9 @@ model = ModelInference(...)
 watsonx_llm = WatsonxLLM(watsonx_model=model)
 ```
 
-## Invocation
+## 호출
 
-To obtain completions, you can call the model directly using a string prompt.
+completion을 얻으려면 문자열 prompt를 사용하여 model을 직접 호출할 수 있습니다.
 
 ```python
 # Calling a single prompt
@@ -168,9 +168,9 @@ watsonx_llm.generate(
 LLMResult(generations=[[Generation(text='The fastest dog in the world is the greyhound. Greyhounds can run up to 45 mph, which is about the same speed as a Usain Bolt.', generation_info={'finish_reason': 'eos_token'})], [Generation(text='The Labrador Retriever is a breed of retriever that was bred for hunting. They are a very smart breed and are very easy to train. They are also very loyal and will make great companions. ', generation_info={'finish_reason': 'eos_token'})]], llm_output={'token_usage': {'generated_token_count': 82, 'input_token_count': 13}, 'model_id': 'ibm/granite-13b-instruct-v2', 'deployment_id': None}, run=[RunInfo(run_id=UUID('750b8a0f-8846-456d-93d0-e039e95b1276')), RunInfo(run_id=UUID('aa4c2a1c-5b08-4fcf-87aa-50228de46db5'))], type='LLMResult')
 ```
 
-## Streaming the Model output
+## Model output Streaming
 
-You can stream the model output.
+model output을 streaming할 수 있습니다.
 
 ```python
 for chunk in watsonx_llm.stream(
@@ -185,7 +185,7 @@ My favorite breed of dog is a Labrador Retriever. They are my favorite breed bec
 
 ## Chaining
 
-Create `PromptTemplate` objects which will be responsible for creating a random question.
+무작위 질문을 생성하는 `PromptTemplate` 객체를 생성합니다.
 
 ```python
 from langchain_core.prompts import PromptTemplate
@@ -195,7 +195,7 @@ template = "Generate a random question about {topic}: Question: "
 prompt = PromptTemplate.from_template(template)
 ```
 
-Provide a topic and run the chain.
+주제를 제공하고 chain을 실행합니다.
 
 ```python
 llm_chain = prompt | watsonx_llm
@@ -211,4 +211,4 @@ llm_chain.invoke(topic)
 
 ## API reference
 
-For detailed documentation of all `WatsonxLLM` features and configurations head to the [API reference](https://python.langchain.com/api_reference/ibm/llms/langchain_ibm.llms.WatsonxLLM.html).
+모든 `WatsonxLLM` 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/ibm/llms/langchain_ibm.llms.WatsonxLLM.html)를 참조하세요.

@@ -2,7 +2,7 @@
 title: RSS Feeds
 ---
 
-This covers how to load HTML news articles from a list of RSS feed URLs into a document format that we can use downstream.
+이 문서는 RSS feed URL 목록에서 HTML 뉴스 기사를 로드하여 다운스트림에서 사용할 수 있는 document 형식으로 변환하는 방법을 다룹니다.
 
 ```python
 pip install -qU  feedparser newspaper3k listparser
@@ -16,7 +16,7 @@ from langchain_community.document_loaders import RSSFeedLoader
 urls = ["https://news.ycombinator.com/rss"]
 ```
 
-Pass in urls to load them into Documents
+URL을 전달하여 Document로 로드합니다
 
 ```python
 loader = RSSFeedLoader(urls=urls)
@@ -50,7 +50,7 @@ I have made many friends through Clojure and Cognitect, and I hope to nurture th
 Retirement returns me to the freedom and independence I had when originally developing Clojure. The journey continues!
 ```
 
-You can pass arguments to the NewsURLLoader which it uses to load articles.
+기사를 로드하는 데 사용할 인수를 NewsURLLoader에 전달할 수 있습니다.
 
 ```python
 loader = RSSFeedLoader(urls=urls, nlp=True)
@@ -92,7 +92,7 @@ data[0].metadata["summary"]
 'It’s been thrilling to see Clojure and Datomic successfully applied at scale.\nI look forward to continuing to lead ongoing work maintaining and enhancing Clojure with Alex, Stu, Fogus and many others, as an independent developer once again.\nThe community remains friendly, mature and productive, and is taking Clojure into many interesting new domains.\nI want to highlight and thank Nubank for their ongoing sponsorship of Alex, Fogus and the core team, as well as the Clojure community at large.\nStu will continue to lead the development of Datomic at Nubank, where the Datomic team grows and thrives.'
 ```
 
-You can also use an OPML file such as a Feedly export.  Pass in either a URL or the OPML contents.
+Feedly export와 같은 OPML 파일을 사용할 수도 있습니다. URL 또는 OPML 내용을 전달하세요.
 
 ```python
 with open("example_data/sample_rss_feeds.opml", "r") as f:

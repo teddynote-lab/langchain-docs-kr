@@ -2,7 +2,7 @@
 title: Huawei OBS File
 ---
 
-The following code demonstrates how to load an object from the Huawei OBS (Object Storage Service) as document.
+다음 코드는 Huawei OBS(Object Storage Service)에서 객체를 문서로 로드하는 방법을 보여줍니다.
 
 ```python
 # Install the required package
@@ -32,9 +32,9 @@ loader = OBSFileLoader("your-bucket-name", "your-object-key", client=obs_client)
 loader.load()
 ```
 
-## Each Loader with Separate Authentication Information
+## 각 Loader에 별도의 인증 정보 사용
 
-If you don't need to reuse OBS connections between different loaders, you can directly configure the `config`. The loader will use the config information to initialize its own OBS client.
+서로 다른 loader 간에 OBS 연결을 재사용할 필요가 없다면, `config`를 직접 구성할 수 있습니다. loader는 config 정보를 사용하여 자체 OBS client를 초기화합니다.
 
 ```python
 # Configure your access credentials\n
@@ -48,9 +48,9 @@ loader = OBSFileLoader(
 loader.load()
 ```
 
-## Get Authentication Information from ECS
+## ECS에서 인증 정보 가져오기
 
-If your langchain is deployed on Huawei Cloud ECS and [Agency is set up](https://support.huaweicloud.com/intl/en-us/usermanual-ecs/ecs_03_0166.html#section7), the loader can directly get the security token from ECS without needing access key and secret key.
+langchain이 Huawei Cloud ECS에 배포되어 있고 [Agency가 설정](https://support.huaweicloud.com/intl/en-us/usermanual-ecs/ecs_03_0166.html#section7)되어 있다면, loader는 access key와 secret key 없이도 ECS에서 직접 security token을 가져올 수 있습니다.
 
 ```python
 config = {"get_token_from_ecs": True}
@@ -63,9 +63,9 @@ loader = OBSFileLoader(
 loader.load()
 ```
 
-## Access a Publicly Accessible Object
+## 공개적으로 접근 가능한 객체에 액세스
 
-If the object you want to access allows anonymous user access (anonymous users have `GetObject` permission), you can directly load the object without configuring the `config` parameter.
+액세스하려는 객체가 익명 사용자 액세스를 허용하는 경우(익명 사용자에게 `GetObject` 권한이 있는 경우), `config` 매개변수를 구성하지 않고도 객체를 직접 로드할 수 있습니다.
 
 ```python
 loader = OBSFileLoader("your-bucket-name", "your-object-key", endpoint=endpoint)

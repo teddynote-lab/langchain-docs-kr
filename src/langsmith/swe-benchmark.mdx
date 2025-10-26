@@ -1,13 +1,13 @@
 ---
-title: Run SWE-bench with LangSmith
-sidebarTitle: Run SWE-bench
+title: LangSmith로 SWE-bench 실행하기
+sidebarTitle: SWE-bench 실행
 ---
 
-SWE-bench is one of the most popular (and difficult!) benchmarks for developers to test their coding agents against. In this walkthrough we will show you how to load the SWE-bench dataset into LangSmith and easily run evals on it, allowing you to have much better visibility into your agents behaviour then using the off-the-shelf SWE-bench eval suite. This allows you to pin specific problems quicker and iterate on your agent rapidly to improve performance!
+SWE-bench는 개발자들이 코딩 에이전트를 테스트하기 위해 사용하는 가장 인기 있는 (그리고 어려운!) 벤치마크 중 하나입니다. 이 가이드에서는 SWE-bench 데이터셋을 LangSmith에 로드하고 쉽게 평가를 실행하는 방법을 보여드립니다. 이를 통해 기본 제공되는 SWE-bench 평가 도구를 사용하는 것보다 에이전트의 동작을 훨씬 더 잘 파악할 수 있습니다. 이를 통해 특정 문제를 더 빠르게 찾아내고 에이전트를 신속하게 반복 개선하여 성능을 향상시킬 수 있습니다!
 
-## Loading the data
+## 데이터 로드하기
 
-To load the data, we will pull the `dev` split from Hugging Face, but for your use case you may wish to pull one of the `test`, or `train` splits, and if you want to combine multiple splits you can use `pd.concat`.
+데이터를 로드하기 위해 Hugging Face에서 `dev` split을 가져오겠지만, 사용 사례에 따라 `test` 또는 `train` split 중 하나를 가져올 수 있으며, 여러 split을 결합하려면 `pd.concat`을 사용할 수 있습니다.
 
 ```python
 import pandas as pd
@@ -21,47 +21,47 @@ splits = {
 df = pd.read_parquet("hf://datasets/princeton-nlp/SWE-bench/" + splits["dev"])
 ```
 
-### Editing the 'version' column
+### 'version' 컬럼 수정하기
 
 <Note>
-This is a very important step! If you skip, the rest of the code WILL NOT WORK!
+이것은 매우 중요한 단계입니다! 건너뛰면 나머지 코드가 작동하지 않습니다!
 </Note>
 
-The `version` column contains all string values but all are in float format so they get converted to floats when you upload the CSV to create a LangSmith dataset. Although you can convert the values to strings during your experiments, the issue arises with values like `"0.10"`. When getting converted to a float, you get the value `0.1`, which would become `"0.1"` if you converted it to a string - causing a key error during execution of your proposed patch.
+`version` 컬럼은 모든 문자열 값을 포함하지만 모두 float 형식이므로 CSV를 업로드하여 LangSmith 데이터셋을 생성할 때 float로 변환됩니다. 실험 중에 값을 문자열로 변환할 수 있지만, `"0.10"`과 같은 값에서 문제가 발생합니다. float로 변환되면 `0.1` 값을 얻게 되고, 이를 문자열로 변환하면 `"0.1"`이 되어 제안된 패치를 실행하는 동안 키 오류가 발생합니다.
 
-In order to fix this, we need LangSmith to stop trying to convert the `version` column to floats. In order to do this, we can just append a string prefix to each of them that is not float compatible. We then need to split on this prefix when doing evaluation to get the actual `version` value. The prefix we choose here is the string `"version:"`.
+이 문제를 해결하려면 LangSmith가 `version` 컬럼을 float로 변환하지 않도록 해야 합니다. 이를 위해 float와 호환되지 않는 문자열 접두사를 각 값에 추가할 수 있습니다. 그런 다음 평가를 수행할 때 이 접두사를 분리하여 실제 `version` 값을 가져와야 합니다. 여기서 선택한 접두사는 문자열 `"version:"`입니다.
 
 <Note>
-The ability to select column types when uploading a CSV to LangSmith will be added in the future to avoid having to use this workaround.
+이 해결 방법을 사용하지 않아도 되도록, CSV를 LangSmith에 업로드할 때 컬럼 타입을 선택하는 기능이 향후 추가될 예정입니다.
 </Note>
 
 ```python
 df['version'] = df['version'].apply(lambda x: f"version:{x}")
 ```
 
-## Upload the data to LangSmith
+## LangSmith에 데이터 업로드하기
 
-### Save to CSV
+### CSV로 저장하기
 
-To upload the data to LangSmith, we first need to save it to a CSV, which we can do using the `to_csv` function provided by pandas. Make sure to save this file somewhere that is easily accessible to you.
+데이터를 LangSmith에 업로드하려면 먼저 CSV로 저장해야 하며, pandas에서 제공하는 `to_csv` 함수를 사용하여 저장할 수 있습니다. 쉽게 접근할 수 있는 위치에 이 파일을 저장하세요.
 
 ```python
 df.to_csv("./../SWE-bench.csv",index=False)
 ```
 
-### Upload CSV to LangSmith Manually
+### LangSmith에 수동으로 CSV 업로드하기
 
-We are now ready to upload the CSV to LangSmith. Once you are on the [LangSmith website ](https://smith.langchain.com), go to the `Datasets & Testing` tab on the left side navigation bar, and then click the `+ New Dataset` button in the top right corner.
+이제 CSV를 LangSmith에 업로드할 준비가 되었습니다. [LangSmith 웹사이트](https://smith.langchain.com)에 접속한 후, 왼쪽 사이드 네비게이션 바에서 `Datasets & Testing` 탭으로 이동한 다음 오른쪽 상단의 `+ New Dataset` 버튼을 클릭하세요.
 
-Then click the `Upload CSV` button on the top, and select the CSV file you saved in the previous step. You can then give your dataset a name and description.
+그런 다음 상단의 `Upload CSV` 버튼을 클릭하고 이전 단계에서 저장한 CSV 파일을 선택하세요. 그런 다음 데이터셋에 이름과 설명을 지정할 수 있습니다.
 
-Next, select `Key-Value` as the dataset type. Lastly head to the `Create Schema` section and add ALL OF THE KEYS as `Input fields`. There are no `Output fields` in this example because our evaluator is not comparing against a reference, but instead will run the output of our experiments in docker containers to ensure that the code actually solves the PR issue.
+다음으로 데이터셋 타입으로 `Key-Value`를 선택하세요. 마지막으로 `Create Schema` 섹션으로 이동하여 모든 키를 `Input fields`로 추가하세요. 이 예제에는 `Output fields`가 없습니다. 평가자가 참조와 비교하는 대신 실험의 출력을 docker 컨테이너에서 실행하여 코드가 실제로 PR 이슈를 해결하는지 확인하기 때문입니다.
 
-Once you have populated the `Input fields` (and left the `Output fields` empty!) you can click the blue `Create` button in the top right corner, and your dataset will be created!
+`Input fields`를 채우고 (`Output fields`는 비워둔 상태로!) 오른쪽 상단의 파란색 `Create` 버튼을 클릭하면 데이터셋이 생성됩니다!
 
-### Upload CSV to LangSmith Programmatically
+### 프로그래밍 방식으로 LangSmith에 CSV 업로드하기
 
-Alternatively you can upload your csv to LangSmith using the sdk as shown in the code block below:
+또는 아래 코드 블록에 표시된 것처럼 SDK를 사용하여 csv를 LangSmith에 업로드할 수 있습니다:
 
 ```python
 dataset = client.upload_csv(
@@ -74,13 +74,13 @@ dataset = client.upload_csv(
 )
 ```
 
-### Create dataset split for quicker testing
+### 빠른 테스트를 위한 데이터셋 split 생성하기
 
-Since running the SWE-bench evaluator takes a long time when run on all examples, you can create a "test" split for quickly testing the evaluator and your code. Read [this guide](/langsmith/manage-datasets-in-application#create-and-manage-dataset-splits) to learn more about managing dataset splits.
+모든 예제에서 SWE-bench 평가자를 실행하는 데 시간이 오래 걸리므로, 평가자와 코드를 빠르게 테스트하기 위한 "test" split을 생성할 수 있습니다. 데이터셋 split 관리에 대한 자세한 내용은 [이 가이드](/langsmith/manage-datasets-in-application#create-and-manage-dataset-splits)를 참조하세요.
 
-## Running our prediction function
+## prediction 함수 실행하기
 
-Running evaluation over SWE-bench works a little differently than most evals you will typically run on LangSmith since we don't have a reference output. Because of this, we first generate all of our outputs without running an evaluator (note how the `evaluate` call doesn't have the `evaluators` parameter set). In this case we returned a dummy predict function, but you can insert your agent logic inside the `predict` function to make it work as intended.
+SWE-bench에 대한 평가 실행은 참조 출력이 없기 때문에 LangSmith에서 일반적으로 실행하는 대부분의 평가와는 조금 다르게 작동합니다. 따라서 먼저 평가자를 실행하지 않고 모든 출력을 생성합니다 (`evaluate` 호출에 `evaluators` 매개변수가 설정되지 않은 것을 확인하세요). 이 경우 더미 predict 함수를 반환했지만, `predict` 함수 내부에 에이전트 로직을 삽입하여 의도한 대로 작동하도록 만들 수 있습니다.
 
 ```python
 from langsmith import evaluate
@@ -104,17 +104,17 @@ result = evaluate(
 )
 ```
 
-View the evaluation results for experiment: ['perfect-lip-22'](https://smith.langchain.com/o/ebbaf2eb-769b-4505-aca2-d11de10372a4/datasets/a9bffcdf-1dfe-4aef-8805-8806f0110067/compare?selectedSessions=182de5dc-fc9d-4065-a3e1-34527f952fd8)
+실험에 대한 평가 결과 보기: ['perfect-lip-22'](https://smith.langchain.com/o/ebbaf2eb-769b-4505-aca2-d11de10372a4/datasets/a9bffcdf-1dfe-4aef-8805-8806f0110067/compare?selectedSessions=182de5dc-fc9d-4065-a3e1-34527f952fd8)
 
-## Evaluating our predictions using SWE-bench
+## SWE-bench를 사용하여 예측 평가하기
 
-Now we can run the following code to run the predicted patches we generated above in Docker. This code is edited slightly from the `SWE-bench` [run\_evaluation.py](https://github.com/princeton-nlp/SWE-bench/blob/main/swebench/harness/run_evaluation.py) file.
+이제 다음 코드를 실행하여 위에서 생성한 예측 패치를 Docker에서 실행할 수 있습니다. 이 코드는 `SWE-bench` [run\_evaluation.py](https://github.com/princeton-nlp/SWE-bench/blob/main/swebench/harness/run_evaluation.py) 파일에서 약간 수정되었습니다.
 
-Basically, the code sets up docker images to run the predictions in parallel, which greatly reduces the time needed for evaluation. This screenshot explains the basics of how `SWE-bench` does evaluation under the hood. To understand it in full, make sure to read through the code in the [GitHub repository](https://github.com/princeton-nlp/SWE-bench).
+기본적으로 이 코드는 예측을 병렬로 실행하기 위해 docker 이미지를 설정하여 평가에 필요한 시간을 크게 줄입니다. 이 스크린샷은 `SWE-bench`가 내부적으로 평가를 수행하는 방법의 기본 사항을 설명합니다. 전체적으로 이해하려면 [GitHub 저장소](https://github.com/princeton-nlp/SWE-bench)의 코드를 읽어보세요.
 
 ![Eval Diagram](/langsmith/images/swebench-evaluation.png)
 
-The function `convert_runs_to_langsmith_feedback` converts the logs generated by the docker file into a nice .json file that contains feedback in the typical key/score method of LangSmith.
+`convert_runs_to_langsmith_feedback` 함수는 docker 파일에서 생성된 로그를 LangSmith의 일반적인 key/score 방식의 피드백을 포함하는 깔끔한 .json 파일로 변환합니다.
 
 ```python
 from swebench.harness.run_evaluation import run_instances
@@ -272,9 +272,9 @@ evaluate_predictions(
     Removed 0 images.
 ```
 
-## Sending Evaluation to LangSmith
+## LangSmith로 평가 전송하기
 
-Now, we can actually send our evaluation feedback to LangSmith by using the `evaluate_existing` function. Our evaluate function is incredibly simple in this case, because the `convert_runs_to_langsmith_feedback` function above made our life very easy by saving all the feedback to a single file.
+이제 `evaluate_existing` 함수를 사용하여 평가 피드백을 LangSmith로 실제로 전송할 수 있습니다. 위의 `convert_runs_to_langsmith_feedback` 함수가 모든 피드백을 단일 파일에 저장하여 작업을 매우 쉽게 만들었기 때문에 이 경우 평가 함수는 매우 간단합니다.
 
 ```python
 from langsmith import evaluate_existing
@@ -296,6 +296,6 @@ evaluate_existing(experiment_name, evaluators=[swe_bench_evaluator])
     <ExperimentResults perfect-lip-22>
 ```
 
-After running, we can go to the experiments tab of our dataset, and check that our feedback keys were properly assigned. If they were, you should see something that resembles the following image:
+실행 후 데이터셋의 experiments 탭으로 이동하여 피드백 키가 제대로 할당되었는지 확인할 수 있습니다. 제대로 할당되었다면 다음 이미지와 유사한 내용이 표시됩니다:
 
 ![LangSmith feedback](/langsmith/images/swebench-langsmith-feedback.png)

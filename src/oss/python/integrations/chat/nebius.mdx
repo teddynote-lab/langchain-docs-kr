@@ -2,9 +2,9 @@
 title: Nebius Chat Models
 ---
 
-This page will help you get started with Nebius AI Studio [chat models](/oss/langchain/models). For detailed documentation of all ChatNebius features and configurations head to the [API reference](https://python.langchain.com/api_reference/nebius/chat_models/langchain_nebius.chat_models.ChatNebius.html).
+이 페이지는 Nebius AI Studio [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 ChatNebius 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/nebius/chat_models/langchain_nebius.chat_models.ChatNebius.html)를 참조하세요.
 
-[Nebius AI Studio](https://studio.nebius.ai/) provides API access to a wide range of state-of-the-art large language models and embedding models for various use cases.
+[Nebius AI Studio](https://studio.nebius.ai/)는 다양한 사용 사례를 위한 최첨단 대규모 언어 모델 및 embedding 모델에 대한 API 액세스를 제공합니다.
 
 ## Overview
 
@@ -22,11 +22,11 @@ This page will help you get started with Nebius AI Studio [chat models](/oss/lan
 
 ## Setup
 
-To access Nebius models you'll need to create a Nebius account, get an API key, and install the `langchain-nebius` integration package.
+Nebius 모델에 액세스하려면 Nebius 계정을 생성하고 API key를 받은 다음 `langchain-nebius` integration package를 설치해야 합니다.
 
 ### Installation
 
-The Nebius integration can be installed via pip:
+Nebius integration은 pip를 통해 설치할 수 있습니다:
 
 ```python
 pip install -U langchain-nebius
@@ -34,7 +34,7 @@ pip install -U langchain-nebius
 
 ### Credentials
 
-Nebius requires an API key that can be passed as an initialization parameter `api_key` or set as the environment variable `NEBIUS_API_KEY`. You can obtain an API key by creating an account on [Nebius AI Studio](https://studio.nebius.ai/).
+Nebius는 초기화 parameter `api_key`로 전달하거나 환경 변수 `NEBIUS_API_KEY`로 설정할 수 있는 API key가 필요합니다. [Nebius AI Studio](https://studio.nebius.ai/)에서 계정을 생성하여 API key를 얻을 수 있습니다.
 
 ```python
 import getpass
@@ -47,7 +47,7 @@ if "NEBIUS_API_KEY" not in os.environ:
 
 ## Instantiation
 
-Now we can instantiate our model object to generate chat completions:
+이제 chat completion을 생성하기 위해 model object를 인스턴스화할 수 있습니다:
 
 ```python
 from langchain_nebius import ChatNebius
@@ -63,7 +63,7 @@ chat = ChatNebius(
 
 ## Invocation
 
-You can use the `invoke` method to get a completion from the model:
+`invoke` method를 사용하여 모델로부터 completion을 얻을 수 있습니다:
 
 ```python
 response = chat.invoke("Explain quantum computing in simple terms")
@@ -121,7 +121,7 @@ Quantum computing is like having a magic calculator that can explore many paths 
 
 ### Streaming
 
-You can also stream the response using the `stream` method:
+`stream` method를 사용하여 응답을 스트리밍할 수도 있습니다:
 
 ```python
 for chunk in chat.stream("Write a short poem about artificial intelligence"):
@@ -170,7 +170,7 @@ A future shaped by minds allied.
 
 ### Chat Messages
 
-You can use different message types to structure your conversations with the model:
+다양한 message type을 사용하여 모델과의 대화를 구조화할 수 있습니다:
 
 ```python
 from langchain.messages import AIMessage, HumanMessage, SystemMessage
@@ -248,7 +248,7 @@ Would you like to explore the effects of black holes on spacetime or their role 
 
 ### Parameters
 
-You can customize the chat model behavior using various parameters:
+다양한 parameter를 사용하여 chat model 동작을 사용자 정의할 수 있습니다:
 
 ```python
 # Initialize with custom parameters
@@ -268,7 +268,7 @@ print(response.content)
 DNA, or deoxyribonucleic acid, is a molecule that contains the genetic instructions used in the development and function of all living organisms. It is often referred to as the "building blocks of life" because it carries the information necessary for the creation and growth of cells, tissues, and entire organisms. The DNA molecule is made up of two complementary strands of nucleotides that are twisted together in a double helix structure, with the sequence of these nucleotides determining the genetic code
 ```
 
-You can also pass parameters at invocation time:
+호출 시점에 parameter를 전달할 수도 있습니다:
 
 ```python
 # Standard model
@@ -292,7 +292,7 @@ Because light attracts bugs.
 
 ### Async Support
 
-ChatNebius supports async operations:
+ChatNebius는 async 작업을 지원합니다:
 
 ```python
 import asyncio
@@ -328,11 +328,11 @@ The capital of Germany is **Berlin**. It is also the largest city in the country
 
 ### Available Models
 
-The full list of supported models can be found in the [Nebius AI Studio Documentation](https://studio.nebius.com/).
+지원되는 모델의 전체 목록은 [Nebius AI Studio Documentation](https://studio.nebius.com/)에서 확인할 수 있습니다.
 
 ## Chaining
 
-You can use `ChatNebius` in LangChain chains and agents:
+LangChain chain과 agent에서 `ChatNebius`를 사용할 수 있습니다:
 
 ```python
 from langchain_core.output_parsers import StrOutputParser
@@ -402,7 +402,7 @@ And none shall be alone, though far away.
 
 ## API reference
 
-For more details about the Nebius AI Studio API, visit the [Nebius AI Studio Documentation](https://studio.nebius.com/api-reference).
+Nebius AI Studio API에 대한 자세한 내용은 [Nebius AI Studio Documentation](https://studio.nebius.com/api-reference)을 참조하세요.
 
 ```python
 

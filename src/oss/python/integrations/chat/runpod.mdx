@@ -2,22 +2,22 @@
 title: RunPod Chat Model
 ---
 
-Get started with RunPod chat models.
+RunPod chat model을 시작하세요.
 
-## Overview
+## 개요
 
-This guide covers how to use the LangChain `ChatRunPod` class to interact with chat models hosted on [RunPod Serverless](https://www.runpod.io/serverless-gpu).
+이 가이드는 [RunPod Serverless](https://www.runpod.io/serverless-gpu)에 호스팅된 chat model과 상호작용하기 위해 LangChain `ChatRunPod` class를 사용하는 방법을 다룹니다.
 
-## Setup
+## 설정
 
-1. **Install the package:**
+1. **패키지 설치:**
 
     ```bash
     pip install -qU langchain-runpod
     ```
 
-2. **Deploy a Chat Model Endpoint:** Follow the setup steps in the [RunPod Provider Guide](/oss/integrations/providers/runpod#setup) to deploy a compatible chat model endpoint on RunPod Serverless and get its Endpoint ID.
-3. **Set Environment Variables:** Make sure `RUNPOD_API_KEY` and `RUNPOD_ENDPOINT_ID` (or a specific `RUNPOD_CHAT_ENDPOINT_ID`) are set.
+2. **Chat Model Endpoint 배포:** [RunPod Provider 가이드](/oss/integrations/providers/runpod#setup)의 설정 단계를 따라 RunPod Serverless에 호환 가능한 chat model endpoint를 배포하고 Endpoint ID를 받으세요.
+3. **환경 변수 설정:** `RUNPOD_API_KEY`와 `RUNPOD_ENDPOINT_ID` (또는 특정 `RUNPOD_CHAT_ENDPOINT_ID`)가 설정되어 있는지 확인하세요.
 
 ```python
 import getpass
@@ -45,9 +45,9 @@ if not chat_endpoint_id:
     )
 ```
 
-## Instantiation
+## 인스턴스화
 
-Initialize the `ChatRunPod` class. You can pass model-specific parameters via `model_kwargs` and configure polling behavior.
+`ChatRunPod` class를 초기화합니다. `model_kwargs`를 통해 model별 parameter를 전달하고 polling 동작을 구성할 수 있습니다.
 
 ```python
 from langchain_runpod import ChatRunPod
@@ -66,9 +66,9 @@ chat = ChatRunPod(
 )
 ```
 
-## Invocation
+## 호출
 
-Use the standard LangChain `.invoke()` and `.ainvoke()` methods to call the model. Streaming is also supported via `.stream()` and `.astream()` (simulated by polling the RunPod `/stream` endpoint).
+표준 LangChain `.invoke()` 및 `.ainvoke()` method를 사용하여 model을 호출합니다. Streaming도 `.stream()` 및 `.astream()`을 통해 지원됩니다 (RunPod `/stream` endpoint를 polling하여 시뮬레이션).
 
 ```python
 from langchain.messages import HumanMessage, SystemMessage
@@ -121,9 +121,9 @@ except Exception as e:
     )
 ```
 
-## Chaining
+## 체이닝
 
-The chat model integrates seamlessly with LangChain Expression Language (LCEL) chains.
+chat model은 LangChain Expression Language (LCEL) chain과 원활하게 통합됩니다.
 
 ```python
 from langchain_core.output_parsers import StrOutputParser
@@ -161,27 +161,27 @@ except Exception as e:
     print(f"Error running async chain: {e}")
 ```
 
-## Model Features (Endpoint Dependent)
+## Model 기능 (Endpoint 의존적)
 
-The availability of advanced features depends **heavily** on the specific implementation of your RunPod endpoint handler. The `ChatRunPod` integration provides the basic framework, but the handler must support the underlying functionality.
+고급 기능의 가용성은 RunPod endpoint handler의 특정 구현에 **크게** 의존합니다. `ChatRunPod` integration은 기본 framework를 제공하지만, handler가 기본 기능을 지원해야 합니다.
 
-| Feature                                                    | Integration Support | Endpoint Dependent? | Notes                                                                                                                                                                      |
+| 기능                                                    | Integration 지원 | Endpoint 의존적? | 참고사항                                                                                                                                                                      |
 | :--------------------------------------------------------- | :-----------------: | :-----------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Tool calling](/oss/langchain/tools)                | ❌                  | ✅                  | Requires handler to process tool definitions and return tool calls (e.g., OpenAI format). Integration needs parsing logic.                                                 |
-| [Structured output](/oss/langchain/structured-output)        | ❌                  | ✅                  | Requires handler support for forcing structured output (JSON mode, function calling). Integration needs parsing logic.                                                   |
-| JSON mode                                                  | ❌                  | ✅                  | Requires handler to accept a `json_mode` parameter (or similar) and guarantee JSON output.                                                                               |
-| [Image input](/oss/langchain/messages#multimodal)            | ❌                  | ✅                  | Requires multimodal handler accepting image data (e.g., base64). Integration does not support multimodal messages.                                                       |
-| Audio input                                                | ❌                  | ✅                  | Requires handler accepting audio data. Integration does not support audio messages.                                                                                        |
-| Video input                                                | ❌                  | ✅                  | Requires handler accepting video data. Integration does not support video messages.                                                                                        |
-| [Token-level streaming](/oss/langchain/streaming)       | ✅ (Simulated)      | ✅                  | Polls `/stream`. Requires handler to populate `stream` list in status response with token chunks (e.g., `[{"output": "token"}]`). True low-latency streaming not built-in. |
-| Native async                                               | ✅                  | ✅                  | Core `ainvoke`/`astream` implemented. Relies on endpoint handler performance.                                                                                              |
-| [Token usage](/oss/langchain/models#token-usage)    | ❌                  | ✅                  | Requires handler to return `prompt_tokens`, `completion_tokens` in the final response. Integration currently does not parse this.                                           |
-| [Logprobs](/oss/langchain/models#log-probabilities)                          | ❌                  | ✅                  | Requires handler to return log probabilities. Integration currently does not parse this.                                                                                  |
+| [Tool calling](/oss/langchain/tools)                | ❌                  | ✅                  | handler가 tool 정의를 처리하고 tool call을 반환해야 합니다 (예: OpenAI 형식). Integration에는 parsing 로직이 필요합니다.                                                 |
+| [Structured output](/oss/langchain/structured-output)        | ❌                  | ✅                  | handler가 structured output을 강제하는 기능을 지원해야 합니다 (JSON mode, function calling). Integration에는 parsing 로직이 필요합니다.                                                   |
+| JSON mode                                                  | ❌                  | ✅                  | handler가 `json_mode` parameter (또는 유사한 것)를 받아들이고 JSON output을 보장해야 합니다.                                                                               |
+| [Image input](/oss/langchain/messages#multimodal)            | ❌                  | ✅                  | image data를 받아들이는 multimodal handler가 필요합니다 (예: base64). Integration은 multimodal message를 지원하지 않습니다.                                                       |
+| Audio input                                                | ❌                  | ✅                  | audio data를 받아들이는 handler가 필요합니다. Integration은 audio message를 지원하지 않습니다.                                                                                        |
+| Video input                                                | ❌                  | ✅                  | video data를 받아들이는 handler가 필요합니다. Integration은 video message를 지원하지 않습니다.                                                                                        |
+| [Token-level streaming](/oss/langchain/streaming)       | ✅ (시뮬레이션)      | ✅                  | `/stream`을 polling합니다. handler가 status response의 `stream` list를 token chunk로 채워야 합니다 (예: `[{"output": "token"}]`). 실제 저지연 streaming은 내장되지 않았습니다. |
+| Native async                                               | ✅                  | ✅                  | 핵심 `ainvoke`/`astream`이 구현되었습니다. endpoint handler 성능에 의존합니다.                                                                                              |
+| [Token usage](/oss/langchain/models#token-usage)    | ❌                  | ✅                  | handler가 최종 response에서 `prompt_tokens`, `completion_tokens`를 반환해야 합니다. Integration은 현재 이를 parsing하지 않습니다.                                           |
+| [Logprobs](/oss/langchain/models#log-probabilities)                          | ❌                  | ✅                  | handler가 log probability를 반환해야 합니다. Integration은 현재 이를 parsing하지 않습니다.                                                                                  |
 
-**Key Takeaway:** Standard chat invocation and simulated streaming work if the endpoint follows basic RunPod API conventions. Advanced features require specific handler implementations and potentially extending or customizing this integration package.
+**핵심 요점:** endpoint가 기본 RunPod API 규칙을 따르는 경우 표준 chat 호출 및 시뮬레이션된 streaming이 작동합니다. 고급 기능은 특정 handler 구현이 필요하며 잠재적으로 이 integration package를 확장하거나 사용자 정의해야 합니다.
 
 ## API reference
 
-For detailed documentation of the `ChatRunPod` class, parameters, and methods, refer to the source code or the generated API reference (if available).
+`ChatRunPod` class, parameter 및 method에 대한 자세한 문서는 소스 코드 또는 생성된 API reference (사용 가능한 경우)를 참조하세요.
 
-Link to source code: [https://github.com/runpod/langchain-runpod/blob/main/langchain_runpod/chat_models.py](https://github.com/runpod/langchain-runpod/blob/main/langchain_runpod/chat_models.py)
+소스 코드 링크: [https://github.com/runpod/langchain-runpod/blob/main/langchain_runpod/chat_models.py](https://github.com/runpod/langchain-runpod/blob/main/langchain_runpod/chat_models.py)

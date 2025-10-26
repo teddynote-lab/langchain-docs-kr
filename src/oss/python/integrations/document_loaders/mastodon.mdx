@@ -2,13 +2,13 @@
 title: Mastodon
 ---
 
->[Mastodon](https://joinmastodon.org/) is a federated social media and social networking service.
+>[Mastodon](https://joinmastodon.org/)은 연합형 소셜 미디어 및 소셜 네트워킹 서비스입니다.
 
-This loader fetches the text from the "toots" of a list of `Mastodon` accounts, using the `Mastodon.py` Python package.
+이 loader는 `Mastodon.py` Python package를 사용하여 `Mastodon` 계정 목록의 "toots"에서 텍스트를 가져옵니다.
 
-Public accounts can the queried by default without any authentication. If non-public accounts or instances are queried, you have to register an application for your account which gets you an access token, and set that token and your account's API base URL.
+공개 계정은 기본적으로 인증 없이 조회할 수 있습니다. 비공개 계정이나 인스턴스를 조회하는 경우, 계정에 대한 application을 등록하여 access token을 받아야 하며, 해당 token과 계정의 API base URL을 설정해야 합니다.
 
-Then you need to pass in the Mastodon account names you want to extract, in the `@account@instance` format.
+그런 다음 추출하려는 Mastodon 계정 이름을 `@account@instance` 형식으로 전달해야 합니다.
 
 ```python
 from langchain_community.document_loaders import MastodonTootsLoader
@@ -51,4 +51,4 @@ for doc in documents[:3]:
 ================================================================================
 ```
 
-The toot texts (the documents' `page_content`) is by default HTML as returned by the Mastodon API.
+toot 텍스트(documents의 `page_content`)는 기본적으로 Mastodon API에서 반환된 HTML입니다.

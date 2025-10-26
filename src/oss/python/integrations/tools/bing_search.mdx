@@ -2,13 +2,13 @@
 title: Bing Search
 ---
 
-> [Bing Search](https://learn.microsoft.com/en-us/bing/search-apis/bing-web-search/) is an Azure service and enables safe, ad-free, location-aware search results, surfacing relevant information from billions of web documents. Help your users find what they're looking for from the world-wide-web by harnessing Bing's ability to comb billions of webpages, images, videos, and news with a single API call.
+> [Bing Search](https://learn.microsoft.com/en-us/bing/search-apis/bing-web-search/)는 Azure 서비스로, 안전하고 광고 없는 위치 인식 검색 결과를 제공하여 수십억 개의 웹 문서에서 관련 정보를 표시합니다. 단일 API 호출로 수십억 개의 웹페이지, 이미지, 비디오 및 뉴스를 검색하는 Bing의 기능을 활용하여 사용자가 월드 와이드 웹에서 원하는 정보를 찾을 수 있도록 도와줍니다.
 
 ## Setup
 
-Following the [instruction](https://learn.microsoft.com/en-us/bing/search-apis/bing-web-search/create-bing-search-service-resource) to create Azure Bing Search v7 service, and get the subscription key
+[지침](https://learn.microsoft.com/en-us/bing/search-apis/bing-web-search/create-bing-search-service-resource)에 따라 Azure Bing Search v7 서비스를 생성하고 subscription key를 받으세요.
 
-The integration lives in the `langchain-community` package.
+이 integration은 `langchain-community` 패키지에 포함되어 있습니다.
 
 ```python
 pip install -U langchain-community
@@ -40,7 +40,7 @@ search.run("python")
 
 ## Number of results
 
-You can use the `k` parameter to set the number of results
+`k` parameter를 사용하여 결과 수를 설정할 수 있습니다.
 
 ```python
 search = BingSearchAPIWrapper(k=1)
@@ -56,11 +56,11 @@ search.run("python")
 
 ## Metadata Results
 
-Run query through BingSearch and return snippet, title, and link metadata.
+BingSearch를 통해 쿼리를 실행하고 snippet, title, link metadata를 반환합니다.
 
-- Snippet: The description of the result.
-- Title: The title of the result.
-- Link: The link to the result.
+- Snippet: 결과의 설명입니다.
+- Title: 결과의 제목입니다.
+- Link: 결과의 링크입니다.
 
 ```python
 search = BingSearchAPIWrapper()
@@ -124,7 +124,7 @@ for item in response:
 
 ## Chaining
 
-We show here how to use it as part of an [agent](/oss/langchain/agents). We use the OpenAI Functions Agent, so we will need to setup and install the required dependencies for that. We will also use [LangSmith Hub](https://smith.langchain.com/hub) to pull the prompt from, so we will need to install that.
+여기서는 [agent](/oss/langchain/agents)의 일부로 사용하는 방법을 보여줍니다. OpenAI Functions Agent를 사용하므로 필요한 종속성을 설정하고 설치해야 합니다. 또한 [LangSmith Hub](https://smith.langchain.com/hub)를 사용하여 prompt를 가져오므로 이를 설치해야 합니다.
 
 ```python
 # you need a model to use in the chain

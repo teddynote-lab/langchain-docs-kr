@@ -2,33 +2,33 @@
 title: Google Cloud SQL for MySQL
 ---
 
-> [Cloud SQL](https://cloud.google.com/sql) is a fully managed relational database service that offers high performance, seamless integration, and impressive scalability. It offers PostgreSQL, MySQL, and SQL Server database engines. Extend your database application to build AI-powered experiences leveraging Cloud SQL's LangChain integrations.
+> [Cloud SQL](https://cloud.google.com/sql)은 고성능, 원활한 통합, 인상적인 확장성을 제공하는 완전 관리형 관계형 데이터베이스 서비스입니다. PostgreSQL, MySQL, SQL Server 데이터베이스 엔진을 제공합니다. Cloud SQL의 LangChain 통합을 활용하여 데이터베이스 애플리케이션을 확장하고 AI 기반 경험을 구축하세요.
 
-This notebook goes over how to use `Cloud SQL for MySQL` to store vector embeddings with the `MySQLVectorStore` class.
+이 노트북은 `MySQLVectorStore` 클래스를 사용하여 `Cloud SQL for MySQL`로 벡터 임베딩을 저장하는 방법을 다룹니다.
 
-Learn more about the package on [GitHub](https://github.com/googleapis/langchain-google-cloud-sql-mysql-python/).
+[GitHub](https://github.com/googleapis/langchain-google-cloud-sql-mysql-python/)에서 패키지에 대해 자세히 알아보세요.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/googleapis/langchain-google-cloud-sql-mysql-python/blob/main/docs/vector_store.ipynb)
 
-## Before you begin
+## 시작하기 전에
 
-To run this notebook, you will need to do the following:
+이 노트북을 실행하려면 다음을 수행해야 합니다:
 
-* [Create a Google Cloud Project](https://developers.google.com/workspace/guides/create-project)
-* [Enable the Cloud SQL Admin API.](https://console.cloud.google.com/flows/enableapi?apiid=sqladmin.googleapis.com)
-* [Create a Cloud SQL instance.](https://cloud.google.com/sql/docs/mysql/connect-instance-auth-proxy#create-instance) (version must be >= **8.0.36** with **cloudsql_vector** database flag configured to "On")
-* [Create a Cloud SQL database.](https://cloud.google.com/sql/docs/mysql/create-manage-databases)
-* [Add a User to the database.](https://cloud.google.com/sql/docs/mysql/create-manage-users)
+* [Google Cloud Project 생성](https://developers.google.com/workspace/guides/create-project)
+* [Cloud SQL Admin API 활성화](https://console.cloud.google.com/flows/enableapi?apiid=sqladmin.googleapis.com)
+* [Cloud SQL 인스턴스 생성](https://cloud.google.com/sql/docs/mysql/connect-instance-auth-proxy#create-instance) (버전은 **8.0.36** 이상이어야 하며 **cloudsql_vector** 데이터베이스 플래그가 "On"으로 구성되어야 함)
+* [Cloud SQL 데이터베이스 생성](https://cloud.google.com/sql/docs/mysql/create-manage-databases)
+* [데이터베이스에 사용자 추가](https://cloud.google.com/sql/docs/mysql/create-manage-users)
 
-### 🦜🔗 Library Installation
+### 🦜🔗 라이브러리 설치
 
-Install the integration library, `langchain-google-cloud-sql-mysql`, and the library for the embedding service, `langchain-google-vertexai`.
+통합 라이브러리인 `langchain-google-cloud-sql-mysql`과 임베딩 서비스용 라이브러리인 `langchain-google-vertexai`를 설치합니다.
 
 ```python
 pip install -qU langchain-google-cloud-sql-mysql langchain-google-vertexai
 ```
 
-**Colab only:** Uncomment the following cell to restart the kernel or use the button to restart the kernel. For Vertex AI Workbench you can restart the terminal using the button on top.
+**Colab 전용:** 다음 셀의 주석을 해제하여 커널을 재시작하거나 버튼을 사용하여 커널을 재시작하세요. Vertex AI Workbench의 경우 상단의 버튼을 사용하여 터미널을 재시작할 수 있습니다.
 
 ```python
 # # Automatically restart kernel after installs so that your environment can access the new packages
@@ -38,12 +38,12 @@ pip install -qU langchain-google-cloud-sql-mysql langchain-google-vertexai
 # app.kernel.do_shutdown(True)
 ```
 
-### 🔐 Authentication
+### 🔐 인증
 
-Authenticate to Google Cloud as the IAM user logged into this notebook in order to access your Google Cloud Project.
+Google Cloud Project에 액세스하기 위해 이 노트북에 로그인한 IAM 사용자로 Google Cloud에 인증합니다.
 
-* If you are using Colab to run this notebook, use the cell below and continue.
-* If you are using Vertex AI Workbench, check out the setup instructions [here](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env).
+* Colab을 사용하여 이 노트북을 실행하는 경우 아래 셀을 사용하고 계속 진행하세요.
+* Vertex AI Workbench를 사용하는 경우 [여기](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env)에서 설정 지침을 확인하세요.
 
 ```python
 from google.colab import auth
@@ -51,15 +51,15 @@ from google.colab import auth
 auth.authenticate_user()
 ```
 
-### ☁ Set Your Google Cloud Project
+### ☁ Google Cloud Project 설정
 
-Set your Google Cloud project so that you can leverage Google Cloud resources within this notebook.
+이 노트북 내에서 Google Cloud 리소스를 활용할 수 있도록 Google Cloud 프로젝트를 설정합니다.
 
-If you don't know your project ID, try the following:
+프로젝트 ID를 모르는 경우 다음을 시도해보세요:
 
-* Run `gcloud config list`.
-* Run `gcloud projects list`.
-* See the support page: [Locate the project ID](https://support.google.com/googleapi/answer/7014113).
+* `gcloud config list`를 실행합니다.
+* `gcloud projects list`를 실행합니다.
+* 지원 페이지를 참조하세요: [프로젝트 ID 찾기](https://support.google.com/googleapi/answer/7014113).
 
 ```python
 # @markdown Please fill in the value below with your Google Cloud project ID and then run the cell.
@@ -70,15 +70,15 @@ PROJECT_ID = "my-project-id"  # @param {type:"string"}
 !gcloud config set project {PROJECT_ID}
 ```
 
-## Basic Usage
+## 기본 사용법
 
-### Set Cloud SQL database values
+### Cloud SQL 데이터베이스 값 설정
 
-Find your database values, in the [Cloud SQL Instances page](https://console.cloud.google.com/sql?_ga=2.223735448.2062268965.1707700487-2088871159.1707257687).
+[Cloud SQL 인스턴스 페이지](https://console.cloud.google.com/sql?_ga=2.223735448.2062268965.1707700487-2088871159.1707257687)에서 데이터베이스 값을 찾으세요.
 
-**Note:** MySQL vector support is only available on MySQL instances with version **>= 8.0.36**.
+**참고:** MySQL 벡터 지원은 버전 **>= 8.0.36**인 MySQL 인스턴스에서만 사용할 수 있습니다.
 
-For existing instances, you may need to perform a [self-service maintenance update](https://cloud.google.com/sql/docs/mysql/self-service-maintenance) to update your maintenance version to **MYSQL_8_0_36.R20240401.03_00** or greater. Once updated, [configure your database flags](https://cloud.google.com/sql/docs/mysql/flags) to have the new **cloudsql_vector** flag to "On".
+기존 인스턴스의 경우 [셀프 서비스 유지보수 업데이트](https://cloud.google.com/sql/docs/mysql/self-service-maintenance)를 수행하여 유지보수 버전을 **MYSQL_8_0_36.R20240401.03_00** 이상으로 업데이트해야 할 수 있습니다. 업데이트 후 [데이터베이스 플래그를 구성](https://cloud.google.com/sql/docs/mysql/flags)하여 새로운 **cloudsql_vector** 플래그를 "On"으로 설정하세요.
 
 ```python
 # @title Set Your Values Here { display-mode: "form" }
@@ -90,26 +90,26 @@ TABLE_NAME = "vector_store"  # @param {type: "string"}
 
 ### MySQLEngine Connection Pool
 
-One of the requirements and arguments to establish Cloud SQL as a vector store is a `MySQLEngine` object. The `MySQLEngine` configures a connection pool to your Cloud SQL database, enabling successful connections from your application and following industry best practices.
+Cloud SQL을 벡터 저장소로 설정하기 위한 요구사항 및 인수 중 하나는 `MySQLEngine` 객체입니다. `MySQLEngine`은 Cloud SQL 데이터베이스에 대한 연결 풀을 구성하여 애플리케이션에서 성공적인 연결을 가능하게 하고 업계 모범 사례를 따릅니다.
 
-To create a `MySQLEngine` using `MySQLEngine.from_instance()` you need to provide only 4 things:
+`MySQLEngine.from_instance()`를 사용하여 `MySQLEngine`을 생성하려면 다음 4가지만 제공하면 됩니다:
 
-1. `project_id` : Project ID of the Google Cloud Project where the Cloud SQL instance is located.
-1. `region` : Region where the Cloud SQL instance is located.
-1. `instance` : The name of the Cloud SQL instance.
-1. `database` : The name of the database to connect to on the Cloud SQL instance.
+1. `project_id` : Cloud SQL 인스턴스가 위치한 Google Cloud Project의 Project ID.
+1. `region` : Cloud SQL 인스턴스가 위치한 리전.
+1. `instance` : Cloud SQL 인스턴스의 이름.
+1. `database` : Cloud SQL 인스턴스에서 연결할 데이터베이스의 이름.
 
-By default, [IAM database authentication](https://cloud.google.com/sql/docs/mysql/iam-authentication#iam-db-auth) will be used as the method of database authentication. This library uses the IAM principal belonging to the [Application Default Credentials (ADC)](https://cloud.google.com/docs/authentication/application-default-credentials) sourced from the envionment.
+기본적으로 [IAM 데이터베이스 인증](https://cloud.google.com/sql/docs/mysql/iam-authentication#iam-db-auth)이 데이터베이스 인증 방법으로 사용됩니다. 이 라이브러리는 환경에서 가져온 [Application Default Credentials (ADC)](https://cloud.google.com/docs/authentication/application-default-credentials)에 속한 IAM principal을 사용합니다.
 
-For more informatin on IAM database authentication please see:
+IAM 데이터베이스 인증에 대한 자세한 내용은 다음을 참조하세요:
 
-* [Configure an instance for IAM database authentication](https://cloud.google.com/sql/docs/mysql/create-edit-iam-instances)
-* [Manage users with IAM database authentication](https://cloud.google.com/sql/docs/mysql/add-manage-iam-users)
+* [IAM 데이터베이스 인증을 위한 인스턴스 구성](https://cloud.google.com/sql/docs/mysql/create-edit-iam-instances)
+* [IAM 데이터베이스 인증으로 사용자 관리](https://cloud.google.com/sql/docs/mysql/add-manage-iam-users)
 
-Optionally, [built-in database authentication](https://cloud.google.com/sql/docs/mysql/built-in-authentication) using a username and password to access the Cloud SQL database can also be used. Just provide the optional `user` and `password` arguments to `MySQLEngine.from_instance()`:
+선택적으로 사용자 이름과 비밀번호를 사용하여 Cloud SQL 데이터베이스에 액세스하는 [기본 제공 데이터베이스 인증](https://cloud.google.com/sql/docs/mysql/built-in-authentication)도 사용할 수 있습니다. `MySQLEngine.from_instance()`에 선택적 `user` 및 `password` 인수를 제공하기만 하면 됩니다:
 
-* `user` : Database user to use for built-in database authentication and login
-* `password` : Database password to use for built-in database authentication and login.
+* `user` : 기본 제공 데이터베이스 인증 및 로그인에 사용할 데이터베이스 사용자
+* `password` : 기본 제공 데이터베이스 인증 및 로그인에 사용할 데이터베이스 비밀번호.
 
 ```python
 from langchain_google_cloud_sql_mysql import MySQLEngine
@@ -119,9 +119,9 @@ engine = MySQLEngine.from_instance(
 )
 ```
 
-### Initialize a table
+### 테이블 초기화
 
-The `MySQLVectorStore` class requires a database table. The `MySQLEngine` class has a helper method `init_vectorstore_table()` that can be used to create a table with the proper schema for you.
+`MySQLVectorStore` 클래스는 데이터베이스 테이블이 필요합니다. `MySQLEngine` 클래스에는 적절한 스키마로 테이블을 생성하는 데 사용할 수 있는 헬퍼 메서드 `init_vectorstore_table()`이 있습니다.
 
 ```python
 engine.init_vectorstore_table(
@@ -130,12 +130,12 @@ engine.init_vectorstore_table(
 )
 ```
 
-### Create an embedding class instance
+### 임베딩 클래스 인스턴스 생성
 
-You can use any [LangChain embeddings model](/oss/integrations/text_embedding/).
-You may need to enable the Vertex AI API to use `VertexAIEmbeddings`.
+모든 [LangChain 임베딩 모델](/oss/integrations/text_embedding/)을 사용할 수 있습니다.
+`VertexAIEmbeddings`를 사용하려면 Vertex AI API를 활성화해야 할 수 있습니다.
 
-We recommend pinning the embedding model's version for production, learn more about the [Text embeddings models](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/text-embeddings).
+프로덕션 환경에서는 임베딩 모델의 버전을 고정하는 것이 좋습니다. [텍스트 임베딩 모델](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/text-embeddings)에 대해 자세히 알아보세요.
 
 ```python
 # enable Vertex AI API
@@ -150,13 +150,13 @@ embedding = VertexAIEmbeddings(
 )
 ```
 
-### Initialize a default MySQLVectorStore
+### 기본 MySQLVectorStore 초기화
 
-To initialize a `MySQLVectorStore` class you need to provide only 3 things:
+`MySQLVectorStore` 클래스를 초기화하려면 다음 3가지만 제공하면 됩니다:
 
-1. `engine` - An instance of a `MySQLEngine` engine.
-1. `embedding_service` - An instance of a LangChain embedding model.
-1. `table_name` : The name of the table within the Cloud SQL database to use as the vector store.
+1. `engine` - `MySQLEngine` 엔진의 인스턴스.
+1. `embedding_service` - LangChain 임베딩 모델의 인스턴스.
+1. `table_name` : 벡터 저장소로 사용할 Cloud SQL 데이터베이스 내 테이블의 이름.
 
 ```python
 from langchain_google_cloud_sql_mysql import MySQLVectorStore
@@ -168,7 +168,7 @@ store = MySQLVectorStore(
 )
 ```
 
-### Add texts
+### 텍스트 추가
 
 ```python
 import uuid
@@ -180,15 +180,15 @@ ids = [str(uuid.uuid4()) for _ in all_texts]
 store.add_texts(all_texts, metadatas=metadatas, ids=ids)
 ```
 
-### Delete texts
+### 텍스트 삭제
 
-Delete vectors from the vector store by ID.
+ID로 벡터 저장소에서 벡터를 삭제합니다.
 
 ```python
 store.delete([ids[1]])
 ```
 
-### Search for documents
+### 문서 검색
 
 ```python
 query = "I'd like a fruit."
@@ -200,9 +200,9 @@ print(docs[0].page_content)
 Pineapple
 ```
 
-### Search for documents by vector
+### 벡터로 문서 검색
 
-It is also possible to do a search for documents similar to a given embedding vector using `similarity_search_by_vector` which accepts an embedding vector as a parameter instead of a string.
+문자열 대신 임베딩 벡터를 매개변수로 받는 `similarity_search_by_vector`를 사용하여 주어진 임베딩 벡터와 유사한 문서를 검색할 수도 있습니다.
 
 ```python
 query_vector = embedding.embed_query(query)
@@ -214,11 +214,11 @@ print(docs)
 [Document(page_content='Pineapple', metadata={'len': 9}), Document(page_content='Banana', metadata={'len': 6})]
 ```
 
-### Add an index
+### 인덱스 추가
 
-Speed up vector search queries by applying a vector index. Learn more about [MySQL vector indexes](https://github.com/googleapis/langchain-google-cloud-sql-mysql-python/blob/main/src/langchain_google_cloud_sql_mysql/indexes.py).
+벡터 인덱스를 적용하여 벡터 검색 쿼리 속도를 높입니다. [MySQL 벡터 인덱스](https://github.com/googleapis/langchain-google-cloud-sql-mysql-python/blob/main/src/langchain_google_cloud_sql_mysql/indexes.py)에 대해 자세히 알아보세요.
 
-**Note:** For IAM database authentication (default usage), the IAM database user will need to be granted the following permissions by a privileged database user for full control of vector indexes.
+**참고:** IAM 데이터베이스 인증(기본 사용)의 경우, 벡터 인덱스를 완전히 제어하려면 권한이 있는 데이터베이스 사용자가 IAM 데이터베이스 사용자에게 다음 권한을 부여해야 합니다.
 
 ```
 GRANT EXECUTE ON PROCEDURE mysql.create_vector_index TO '<IAM_DB_USER>'@'%';
@@ -233,19 +233,19 @@ from langchain_google_cloud_sql_mysql import VectorIndex
 store.apply_vector_index(VectorIndex())
 ```
 
-### Remove an index
+### 인덱스 제거
 
 ```python
 store.drop_vector_index()
 ```
 
-## Advanced Usage
+## 고급 사용법
 
-### Create a MySQLVectorStore with custom metadata
+### 사용자 정의 메타데이터로 MySQLVectorStore 생성
 
-A vector store can take advantage of relational data to filter similarity searches.
+벡터 저장소는 관계형 데이터를 활용하여 유사도 검색을 필터링할 수 있습니다.
 
-Create a table and `MySQLVectorStore` instance with custom metadata columns.
+사용자 정의 메타데이터 컬럼으로 테이블과 `MySQLVectorStore` 인스턴스를 생성합니다.
 
 ```python
 from langchain_google_cloud_sql_mysql import Column
@@ -273,11 +273,11 @@ custom_store = MySQLVectorStore(
 )
 ```
 
-### Search for documents with metadata filter
+### 메타데이터 필터로 문서 검색
 
-It can be helpful to narrow down the documents before working with them.
+문서를 작업하기 전에 범위를 좁히는 것이 도움이 될 수 있습니다.
 
-For example, documents can be filtered on metadata using the `filter` argument.
+예를 들어, `filter` 인수를 사용하여 메타데이터로 문서를 필터링할 수 있습니다.
 
 ```python
 import uuid

@@ -1,32 +1,33 @@
+```markdown
 ---
 title: Scrapeless Universal Scraping
 ---
 
-**Scrapeless** offers flexible and feature-rich data acquisition services with extensive parameter customization and multi-format export support. These capabilities empower LangChain to integrate and leverage external data more effectively. The core functional modules include:
+**Scrapeless**는 광범위한 매개변수 커스터마이징과 다중 형식 내보내기 지원을 통해 유연하고 기능이 풍부한 데이터 수집 서비스를 제공합니다. 이러한 기능은 LangChain이 외부 데이터를 보다 효과적으로 통합하고 활용할 수 있도록 지원합니다. 핵심 기능 모듈은 다음과 같습니다:
 
 **DeepSerp**
 
-- **Google Search**: Enables comprehensive extraction of Google SERP data across all result types.
-  - Supports selection of localized Google domains (e.g., `google.com`, `google.ad`) to retrieve region-specific search results.
-  - Pagination supported for retrieving results beyond the first page.
-  - Supports a search result filtering toggle to control whether to exclude duplicate or similar content.
-- **Google Trends**: Retrieves keyword trend data from Google, including popularity over time, regional interest, and related searches.
-  - Supports multi-keyword comparison.
-  - Supports multiple data types: `interest_over_time`, `interest_by_region`, `related_queries`, and `related_topics`.
-  - Allows filtering by specific Google properties (Web, YouTube, News, Shopping) for source-specific trend analysis.
+- **Google Search**: 모든 결과 유형에 걸쳐 Google SERP 데이터의 포괄적인 추출을 가능하게 합니다.
+  - 지역별 검색 결과를 검색하기 위해 지역화된 Google 도메인(예: `google.com`, `google.ad`) 선택을 지원합니다.
+  - 첫 페이지 이후의 결과를 검색하기 위한 페이지네이션을 지원합니다.
+  - 중복되거나 유사한 콘텐츠를 제외할지 제어하는 검색 결과 필터링 토글을 지원합니다.
+- **Google Trends**: 시간 경과에 따른 인기도, 지역별 관심도, 관련 검색어를 포함한 Google의 키워드 트렌드 데이터를 검색합니다.
+  - 다중 키워드 비교를 지원합니다.
+  - 여러 데이터 유형을 지원합니다: `interest_over_time`, `interest_by_region`, `related_queries`, `related_topics`.
+  - 소스별 트렌드 분석을 위해 특정 Google 속성(Web, YouTube, News, Shopping)별 필터링을 허용합니다.
 
 **Universal Scraping**
 
-- Designed for modern, JavaScript-heavy websites, allowing dynamic content extraction.
-  - Global premium proxy support for bypassing geo-restrictions and improving reliability.
+- JavaScript가 많이 사용되는 최신 웹사이트를 위해 설계되어 동적 콘텐츠 추출을 가능하게 합니다.
+  - 지역 제한을 우회하고 안정성을 향상시키기 위한 글로벌 프리미엄 proxy 지원.
 
 **Crawler**
 
-- **Crawl**: Recursively crawl a website and its linked pages to extract site-wide content.
-  - Supports configurable crawl depth and scoped URL targeting.
-- **Scrape**: Extract content from a single webpage with high precision.
-  - Supports "main content only" extraction to exclude ads, footers, and other non-essential elements.
-  - Allows batch scraping of multiple standalone URLs.
+- **Crawl**: 웹사이트와 연결된 페이지를 재귀적으로 크롤링하여 사이트 전체 콘텐츠를 추출합니다.
+  - 구성 가능한 크롤링 깊이와 범위가 지정된 URL 타겟팅을 지원합니다.
+- **Scrape**: 높은 정밀도로 단일 웹페이지에서 콘텐츠를 추출합니다.
+  - 광고, 푸터 및 기타 비필수 요소를 제외하는 "주요 콘텐츠만" 추출을 지원합니다.
+  - 여러 독립 URL의 일괄 스크래핑을 허용합니다.
 
 ## Overview
 
@@ -44,12 +45,12 @@ title: Scrapeless Universal Scraping
 
 ## Setup
 
-The integration lives in the `langchain-scrapeless` package.
+이 integration은 `langchain-scrapeless` 패키지에 포함되어 있습니다.
 !pip install langchain-scrapeless
 
 ### Credentials
 
-You'll need a Scrapeless API key to use this tool. You can set it as an environment variable:
+이 도구를 사용하려면 Scrapeless API key가 필요합니다. 환경 변수로 설정할 수 있습니다:
 
 ```python
 import os
@@ -59,19 +60,19 @@ os.environ["SCRAPELESS_API_KEY"] = "your-api-key"
 
 ## Instantiation
 
-Here we show how to instantiate an instance of the Scrapeless Universal Scraping Tool. This tool allows you to scrape any website using a headless browser with JavaScript rendering capabilities, customizable output types, and geo-specific proxy support.
+여기서는 Scrapeless Universal Scraping Tool의 인스턴스를 생성하는 방법을 보여줍니다. 이 도구를 사용하면 JavaScript 렌더링 기능, 커스터마이징 가능한 출력 유형, 지역별 proxy 지원을 갖춘 headless 브라우저를 사용하여 모든 웹사이트를 스크래핑할 수 있습니다.
 
-The tool accepts the following parameters during instantiation:
+이 도구는 인스턴스 생성 시 다음 매개변수를 허용합니다:
 
-- `url` (required, str): The URL of the website to scrape.
-- `headless` (optional, bool): Whether to use a headless browser. Default is True.
-- `js_render` (optional, bool): Whether to enable JavaScript rendering. Default is True.
-- `js_wait_until` (optional, str): Defines when to consider the JavaScript-rendered page ready. Default is `'domcontentloaded'`. Options include:
-  - `load`: Wait until the page is fully loaded.
-  - `domcontentloaded`: Wait until the DOM is fully loaded.
-  - `networkidle0`: Wait until the network is idle.
-  - `networkidle2`: Wait until the network is idle for 2 seconds.
-- `outputs` (optional, str): The specific type of data to extract from the page. Options include:
+- `url` (필수, str): 스크래핑할 웹사이트의 URL.
+- `headless` (선택, bool): headless 브라우저를 사용할지 여부. 기본값은 True입니다.
+- `js_render` (선택, bool): JavaScript 렌더링을 활성화할지 여부. 기본값은 True입니다.
+- `js_wait_until` (선택, str): JavaScript로 렌더링된 페이지가 준비된 것으로 간주할 시점을 정의합니다. 기본값은 `'domcontentloaded'`입니다. 옵션은 다음과 같습니다:
+  - `load`: 페이지가 완전히 로드될 때까지 대기합니다.
+  - `domcontentloaded`: DOM이 완전히 로드될 때까지 대기합니다.
+  - `networkidle0`: 네트워크가 유휴 상태가 될 때까지 대기합니다.
+  - `networkidle2`: 네트워크가 2초 동안 유휴 상태가 될 때까지 대기합니다.
+- `outputs` (선택, str): 페이지에서 추출할 특정 데이터 유형. 옵션은 다음과 같습니다:
   - `phone_numbers`
   - `headings`
   - `images`
@@ -84,15 +85,15 @@ The tool accepts the following parameters during instantiation:
   - `metadata`
   - `tables`
   - `favicon`
-- `response_type` (optional, str): Defines the format of the response. Default is `'html'`. Options include:
-  - `html`: Return the raw HTML of the page.
-  - `plaintext`: Return the plain text content.
-  - `markdown`: Return a Markdown version of the page.
-  - `png`: Return a PNG screenshot.
-  - `jpeg`: Return a JPEG screenshot.
-- `response_image_full_page` (optional, bool): Whether to capture and return a full-page image when using screenshot output (png or jpeg). Default is False.
-- `selector` (optional, str): A specific CSS selector to scope scraping within a part of the page. Default is `None`.
-- `proxy_country` (optional, str): Two-letter country code for geo-specific proxy access (e.g., `'us'`, `'gb'`, `'de'`, `'jp'`). Default is `'ANY'`.
+- `response_type` (선택, str): 응답 형식을 정의합니다. 기본값은 `'html'`입니다. 옵션은 다음과 같습니다:
+  - `html`: 페이지의 원시 HTML을 반환합니다.
+  - `plaintext`: 일반 텍스트 콘텐츠를 반환합니다.
+  - `markdown`: 페이지의 Markdown 버전을 반환합니다.
+  - `png`: PNG 스크린샷을 반환합니다.
+  - `jpeg`: JPEG 스크린샷을 반환합니다.
+- `response_image_full_page` (선택, bool): 스크린샷 출력(png 또는 jpeg)을 사용할 때 전체 페이지 이미지를 캡처하고 반환할지 여부. 기본값은 False입니다.
+- `selector` (선택, str): 페이지의 일부 내에서 스크래핑 범위를 지정하는 특정 CSS selector. 기본값은 `None`입니다.
+- `proxy_country` (선택, str): 지역별 proxy 액세스를 위한 두 글자 국가 코드(예: `'us'`, `'gb'`, `'de'`, `'jp'`). 기본값은 `'ANY'`입니다.
 
 ## Invocation
 
@@ -228,3 +229,4 @@ The h1 tag extracted from the website https://www.scrapeless.com/en is "Effortle
 
 - [Scrapeless Documentation](https://docs.scrapeless.com/en/universal-scraping-api/quickstart/introduction/)
 - [Scrapeless API Reference](https://apidocs.scrapeless.com/api-12948840)
+```

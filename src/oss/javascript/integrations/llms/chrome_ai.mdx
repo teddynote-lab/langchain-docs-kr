@@ -1,23 +1,24 @@
+```mdx
 ---
 title: ChromeAI
 ---
 
 <Info>
-**This feature is **experimental** and is subject to change.**
+**이 기능은 **실험적**이며 변경될 수 있습니다.**
 </Info>
 
 <Note>
-The `Built-in AI Early Preview Program` by Google is currently in beta. To apply for access or find more information, please visit [this link](https://developer.chrome.com/docs/ai/built-in).
+Google의 `Built-in AI Early Preview Program`은 현재 베타 버전입니다. 액세스 신청 또는 자세한 정보는 [이 링크](https://developer.chrome.com/docs/ai/built-in)를 참조하세요.
 </Note>
 
-ChromeAI leverages Gemini Nano to run LLMs directly in the browser or in a [worker](https://developer.mozilla.org/en-US/docs/Web/API/Worker),
-without the need for an internet connection. This allows for running faster and private models without ever having data leave the consumers device.
+ChromeAI는 Gemini Nano를 활용하여 인터넷 연결 없이 브라우저 또는 [worker](https://developer.mozilla.org/en-US/docs/Web/API/Worker)에서 직접 LLM을 실행합니다.
+이를 통해 데이터가 소비자의 기기를 벗어나지 않고도 더 빠르고 프라이빗한 모델을 실행할 수 있습니다.
 
-## Getting started
+## 시작하기
 
-Once you've been granted access to the program, follow Google's provided instructions to download the model.
+프로그램 액세스 권한을 받은 후, Google이 제공하는 지침에 따라 모델을 다운로드하세요.
 
-Once downloaded, you can start using `ChromeAI` in the browser as follows:
+다운로드가 완료되면 브라우저에서 다음과 같이 `ChromeAI`를 사용할 수 있습니다:
 
 ```typescript
 import { ChromeAI } from "@langchain/community/experimental/llms/chrome_ai";
@@ -49,7 +50,7 @@ const response = await model.invoke("Write me a short poem please");
 
 ### Streaming
 
-`ChromeAI` also supports streaming outputs:
+`ChromeAI`는 streaming 출력도 지원합니다:
 
 ```typescript
 import { ChromeAI } from "@langchain/community/experimental/llms/chrome_ai";
@@ -110,7 +111,8 @@ for await (const chunk of await model.stream("How are you?")) {
 */
 ```
 
-## Related
+## 관련 문서
 
 
-- [Models guide](/oss/langchain/models)
+- [Models 가이드](/oss/langchain/models)
+```

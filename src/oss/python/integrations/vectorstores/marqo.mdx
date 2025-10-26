@@ -2,13 +2,13 @@
 title: Marqo
 ---
 
-This notebook shows how to use functionality related to the Marqo vectorstore.
+이 노트북은 Marqo vectorstore와 관련된 기능을 사용하는 방법을 보여줍니다.
 
->[Marqo](https://www.marqo.ai/) is an open-source vector search engine. Marqo allows you to store and query multi-modal data such as text and images. Marqo creates the vectors for you using a huge selection of open-source models, you can also provide your own fine-tuned models and Marqo will handle the loading and inference for you.
+>[Marqo](https://www.marqo.ai/)는 오픈 소스 vector search 엔진입니다. Marqo는 텍스트와 이미지 같은 멀티모달 데이터를 저장하고 조회할 수 있게 해줍니다. Marqo는 다양한 오픈 소스 모델을 사용해 벡터를 자동으로 생성해 주며, 사용자가 직접 fine-tune한 모델을 제공할 수도 있고, 이 경우 로딩과 추론을 Marqo가 처리합니다.
 
-You'll need to install `langchain-community` with `pip install -qU langchain-community` to use this integration
+이 통합을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다
 
-To run this notebook with our docker image please run the following commands first to get Marqo:
+이 노트북을 우리의 docker image로 실행하려면, 먼저 Marqo를 받기 위해 다음 명령을 실행하세요:
 
 ```
 docker pull marqoai/marqo:latest
@@ -86,17 +86,17 @@ And I did that 4 days ago, when I nominated Circuit Court of Appeals Judge Ketan
 0.68647254
 ```
 
-## Additional features
+## 추가 기능
 
-One of the powerful features of Marqo as a vectorstore is that you can use indexes created externally. For example:
+vectorstore로서의 Marqo의 강력한 기능 중 하나는 외부에서 생성된 index를 그대로 사용할 수 있다는 점입니다. 예:
 
-+ If you had a database of image and text pairs from another application, you can simply just use it in langchain with the Marqo vectorstore. Note that bringing your own multimodal indexes will disable the `add_texts` method.
++ 다른 애플리케이션에서 생성한 이미지-텍스트 pair 데이터베이스가 있다면, Marqo vectorstore와 함께 langchain에서 그대로 사용할 수 있습니다. 단, 사용자 제공 멀티모달 index를 사용하는 경우 `add_texts` 메서드는 비활성화됩니다.
 
-+ If you had a database of text documents, you can bring it into the langchain framework and add more texts through `add_texts`.
++ 텍스트 문서 데이터베이스가 있다면, 이를 langchain 프레임워크로 가져와 `add_texts`를 통해 텍스트를 더 추가할 수 있습니다.
 
-The documents that are returned are customised by passing your own function to the `page_content_builder` callback in the search methods.
+검색 메서드의 `page_content_builder` callback에 사용자 정의 함수를 전달하여 반환되는 문서를 원하는 형태로 커스터마이즈할 수 있습니다.
 
-#### Multimodal Example
+#### 멀티모달 예시
 
 ```python
 # use a new index
@@ -162,7 +162,7 @@ Plane: https://raw.githubusercontent.com/marqo-ai/marqo/mainline/examples/ImageS
 Bus: https://raw.githubusercontent.com/marqo-ai/marqo/mainline/examples/ImageSearchGuide/data/image4.jpg
 ```
 
-#### Text only example
+#### 텍스트 전용 예시
 
 ```python
 # use a new index
@@ -249,7 +249,7 @@ This is a document that is about elephants
 
 ## Weighted Queries
 
-We also expose marqos weighted queries which are a powerful way to compose complex semantic searches.
+또한 복잡한 semantic search를 구성하는 강력한 방법인 Marqo의 weighted queries도 제공합니다.
 
 ```python
 query = {"communications devices": 1.0}
@@ -271,9 +271,9 @@ print(doc_results[0].page_content)
 A telephone is a telecommunications device that permits two or more users toconduct a conversation when they are too far apart to be easily heard directly.
 ```
 
-# Question Answering with Sources
+# 출처를 포함한 질의응답
 
-This section shows how to use Marqo as part of a `RetrievalQAWithSourcesChain`. Marqo will perform the searches for information in the sources.
+이 섹션에서는 `RetrievalQAWithSourcesChain`의 일부로 Marqo를 사용하는 방법을 보여줍니다. Marqo가 출처에서 정보를 검색합니다.
 
 ```python
 import getpass

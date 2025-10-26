@@ -4,26 +4,26 @@ title: AWSKendraRetriever
 
 ## Overview
 
-[Amazon Kendra](https://aws.amazon.com/kendra/) is an intelligent search service provided by Amazon Web Services (AWS).
-It utilizes advanced natural language processing (NLP) and machine learning algorithms to enable powerful search capabilities across various data sources within an organization.
-Kendra is designed to help users find the information they need quickly and accurately, improving productivity and decision-making.
+[Amazon Kendra](https://aws.amazon.com/kendra/)는 Amazon Web Services(AWS)에서 제공하는 지능형 검색 서비스입니다.
+고급 자연어 처리(NLP) 및 머신러닝 알고리즘을 활용하여 조직 내 다양한 데이터 소스에서 강력한 검색 기능을 제공합니다.
+Kendra는 사용자가 필요한 정보를 빠르고 정확하게 찾을 수 있도록 설계되어 생산성과 의사결정을 개선합니다.
 
-With Kendra, users can search across a wide range of content types, including documents, FAQs, knowledge bases, manuals, and websites.
-It supports multiple languages and can understand complex queries, synonyms, and contextual meanings to provide highly relevant search results.
+Kendra를 사용하면 문서, FAQ, 지식 베이스, 매뉴얼, 웹사이트 등 다양한 콘텐츠 유형을 검색할 수 있습니다.
+여러 언어를 지원하며 복잡한 쿼리, 동의어, 문맥적 의미를 이해하여 매우 관련성 높은 검색 결과를 제공합니다.
 
-This will help you getting started with the Amazon Kendra [`retriever`](/oss/langchain/retrieval). For detailed documentation of all `AWSKendraRetriever` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_aws.AmazonKendraRetriever.html).
+이 문서는 Amazon Kendra [`retriever`](/oss/langchain/retrieval) 시작하기를 도와드립니다. 모든 `AWSKendraRetriever` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_aws.AmazonKendraRetriever.html)를 참조하세요.
 
 ### Integration details
 
 | Retriever | Source | Package |
 | :--- | :--- | :---: |
-[AWSKendraRetriever](https://api.js.langchain.com/classes/langchain_aws.AmazonKendraRetriever.html) | Various AWS resources | [`@langchain/aws`](https://www.npmjs.com/package/@langchain/aws) |
+[AWSKendraRetriever](https://api.js.langchain.com/classes/langchain_aws.AmazonKendraRetriever.html) | 다양한 AWS 리소스 | [`@langchain/aws`](https://www.npmjs.com/package/@langchain/aws) |
 
 ## Setup
 
-You'll need an AWS account and an Amazon Kendra instance to get started. See this [tutorial](https://docs.aws.amazon.com/kendra/latest/dg/getting-started.html) from AWS for more information.
+시작하려면 AWS 계정과 Amazon Kendra 인스턴스가 필요합니다. 자세한 내용은 AWS의 이 [튜토리얼](https://docs.aws.amazon.com/kendra/latest/dg/getting-started.html)을 참조하세요.
 
-If you want to get automated tracing from individual queries, you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+개별 쿼리에서 자동화된 추적을 원하는 경우, 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_API_KEY = "<YOUR API KEY HERE>";
@@ -32,7 +32,7 @@ If you want to get automated tracing from individual queries, you can also set y
 
 ### Installation
 
-This retriever lives in the `@langchain/aws` package:
+이 retriever는 `@langchain/aws` 패키지에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -48,7 +48,7 @@ pnpm add @langchain/aws @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our retriever:
+이제 retriever를 인스턴스화할 수 있습니다:
 
 ```typescript
 import { AmazonKendraRetriever } from "@langchain/aws";
@@ -76,4 +76,4 @@ await retriever.invoke(query);
 
 ## API reference
 
-For detailed documentation of all `AmazonKendraRetriever` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_aws.AmazonKendraRetriever.html).
+모든 `AmazonKendraRetriever` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_aws.AmazonKendraRetriever.html)를 참조하세요.

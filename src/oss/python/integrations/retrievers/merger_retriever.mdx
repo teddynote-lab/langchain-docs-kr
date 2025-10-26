@@ -2,9 +2,9 @@
 title: LOTR (Merger Retriever)
 ---
 
->`Lord of the Retrievers (LOTR)`, also known as `MergerRetriever`, takes a list of retrievers as input and merges the results of their get_relevant_documents() methods into a single list. The merged results will be a list of documents that are relevant to the query and that have been ranked by the different retrievers.
+>`Lord of the Retrievers (LOTR)`는 `MergerRetriever`로도 알려져 있으며, retriever 목록을 입력으로 받아 각각의 get_relevant_documents() 메서드 결과를 단일 목록으로 병합합니다. 병합된 결과는 쿼리와 관련이 있고 여러 retriever에 의해 순위가 매겨진 문서 목록이 됩니다.
 
-The `MergerRetriever` class can be used to improve the accuracy of document retrieval in a number of ways. First, it can combine the results of multiple retrievers, which can help to reduce the risk of bias in the results. Second, it can rank the results of the different retrievers, which can help to ensure that the most relevant documents are returned first.
+`MergerRetriever` 클래스는 여러 방식으로 문서 검색의 정확도를 향상시킬 수 있습니다. 첫째, 여러 retriever의 결과를 결합하여 결과의 편향 위험을 줄일 수 있습니다. 둘째, 서로 다른 retriever의 결과에 순위를 매겨 가장 관련성 높은 문서가 먼저 반환되도록 할 수 있습니다.
 
 ```python
 import os
@@ -63,7 +63,7 @@ retriever_multi_qa = db_multi_qa.as_retriever(
 lotr = MergerRetriever(retrievers=[retriever_all, retriever_multi_qa])
 ```
 
-## Remove redundant results from the merged retrievers
+## 병합된 retriever에서 중복 결과 제거
 
 ```python
 # We can remove redundant results from both retrievers using yet another embedding.
@@ -75,7 +75,7 @@ compression_retriever = ContextualCompressionRetriever(
 )
 ```
 
-## Pick a representative sample of documents from the merged retrievers
+## 병합된 retriever에서 대표 문서 샘플 선택
 
 ```python
 # This filter will divide the documents vectors into clusters or "centers" of meaning.
@@ -102,11 +102,11 @@ compression_retriever = ContextualCompressionRetriever(
 )
 ```
 
-## Re-order results to avoid performance degradation
+## 성능 저하를 방지하기 위한 결과 재정렬
 
-No matter the architecture of your model, there is a substantial performance degradation when you include 10+ retrieved documents.
-In brief: When models must access relevant information  in the middle of long contexts, then tend to ignore the provided documents.
-See: [arxiv.org/abs//2307.03172](https://arxiv.org/abs//2307.03172)
+모델의 아키텍처와 관계없이, 10개 이상의 검색된 문서를 포함할 때 상당한 성능 저하가 발생합니다.
+간단히 말해: 모델이 긴 컨텍스트 중간에 있는 관련 정보에 접근해야 할 때, 제공된 문서를 무시하는 경향이 있습니다.
+참고: [arxiv.org/abs//2307.03172](https://arxiv.org/abs//2307.03172)
 
 ```python
 # You can use an additional document transformer to reorder documents after removing redundancy.

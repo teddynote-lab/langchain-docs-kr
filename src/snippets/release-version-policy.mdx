@@ -1,8 +1,8 @@
-{product} provides different support levels for different versions, which may include new features, bug fixes, or security patches.
+{product}는 다양한 버전에 대해 서로 다른 지원 수준을 제공하며, 여기에는 새로운 기능, 버그 수정 또는 보안 패치가 포함될 수 있습니다.
 
-## Support levels
+## 지원 수준
 
-There are four support levels:
+네 가지 지원 수준이 있습니다:
 
 - Active
 - Critical
@@ -11,70 +11,70 @@ There are four support levels:
 
 ### Active
 
-Where N represents the latest minor version (e.g., 0.3, 0.4, etc.).
+N은 최신 minor 버전을 나타냅니다 (예: 0.3, 0.4 등).
 
-The current minor version (N) receives full support, including:
-- New features and capabilities
-- Bug fixes and regressions
-- Security patches
-- Quality-of-life improvements
-- High confidence changes that are narrowly scoped
+현재 minor 버전 (N)은 다음을 포함한 전체 지원을 받습니다:
+- 새로운 기능 및 역량
+- 버그 수정 및 regression
+- 보안 패치
+- 품질 개선
+- 범위가 좁은 높은 신뢰도의 변경 사항
 
 ### Critical
 
-The previous minor version (N-1) receives limited support:
-- Critical security fixes
-- Installation fixes
-- No new features or general bug fixes
-- Transitioned from Active when a newer minor version is released
+이전 minor 버전 (N-1)은 제한적인 지원을 받습니다:
+- 중요한 보안 수정
+- 설치 수정
+- 새로운 기능이나 일반적인 버그 수정 없음
+- 새로운 minor 버전이 릴리스되면 Active에서 전환됨
 
 ### End of life (EOL)
 
-Versions older than N-2 (N-2, N-3, etc.) receive no support:
-- No new patch releases
-- No bug fixes, including known bugs
-- No security updates
-- Users should upgrade to a supported version
+N-2보다 오래된 버전 (N-2, N-3 등)은 지원을 받지 않습니다:
+- 새로운 patch 릴리스 없음
+- 알려진 버그를 포함한 버그 수정 없음
+- 보안 업데이트 없음
+- 사용자는 지원되는 버전으로 업그레이드해야 합니다
 
 ### Deprecated
 
-Versions that are no longer maintained:
-- All versions prior to the first stable release
-- Versions that have been explicitly deprecated
-- No support or maintenance provided
+더 이상 유지 관리되지 않는 버전:
+- 첫 번째 stable 릴리스 이전의 모든 버전
+- 명시적으로 deprecated된 버전
+- 지원이나 유지 관리가 제공되지 않음
 
-## Version support policy
+## 버전 지원 정책
 
-{product} follows an N-2 support policy for minor versions:
+{product}는 minor 버전에 대해 N-2 지원 정책을 따릅니다:
 
-- **N (Current)**: Active support
-- **N-1**: Critical support
-- **N-2 and older**: End of Life
+- **N (Current)**: Active 지원
+- **N-1**: Critical 지원
+- **N-2 및 이전 버전**: End of Life
 
-### Minor version support
+### Minor 버전 지원
 
-Minor versions include new features and capabilities and are supported according to the N-2 policy. When we refer to a minor version, such as v0.3, we always mean its latest available patch release (v0.3.x).
+Minor 버전에는 새로운 기능과 역량이 포함되며 N-2 정책에 따라 지원됩니다. v0.3과 같은 minor 버전을 언급할 때, 항상 사용 가능한 최신 patch 릴리스 (v0.3.x)를 의미합니다.
 
-### Patch releases
+### Patch 릴리스
 
-During the support window for each version:
+각 버전의 지원 기간 동안:
 
-- **Active Support**: Regular patch releases with bug fixes, regressions, and new features
-- **Critical Support**: Security-only releases for critical fixes related to security and installation
-- **End of Life**: No new patches released
+- **Active Support**: 버그 수정, regression 및 새로운 기능이 포함된 정기적인 patch 릴리스
+- **Critical Support**: 보안 및 설치와 관련된 중요한 수정을 위한 보안 전용 릴리스
+- **End of Life**: 새로운 patch가 릴리스되지 않음
 
-## Recommendations
+## 권장 사항
 
-- **Stay Current**: We recommend upgrading to the latest minor version to receive full support and access to new features
-- **Plan Upgrades**: Monitor the changelog for upcoming version changes and plan upgrades accordingly
-- **Security**: Critical security fixes are only provided for Active and Critical support versions
-- **Testing**: Test your applications with newer versions before upgrading in production
+- **최신 상태 유지**: 전체 지원을 받고 새로운 기능에 액세스하려면 최신 minor 버전으로 업그레이드하는 것을 권장합니다
+- **업그레이드 계획**: 다가오는 버전 변경 사항에 대한 changelog를 모니터링하고 그에 따라 업그레이드를 계획하세요
+- **보안**: 중요한 보안 수정은 Active 및 Critical 지원 버전에만 제공됩니다
+- **테스트**: 프로덕션에서 업그레이드하기 전에 새로운 버전으로 애플리케이션을 테스트하세요
 
-## Version compatibility
+## 버전 호환성
 
-When upgrading between minor versions:
+Minor 버전 간 업그레이드 시:
 
-- Review the changelog for breaking changes
-- Test your applications thoroughly
-- Follow the upgrade guides provided in the documentation
-- Consider the support timeline for your current version
+- 변경 사항을 확인하기 위해 changelog를 검토하세요
+- 애플리케이션을 철저히 테스트하세요
+- 문서에 제공된 업그레이드 가이드를 따르세요
+- 현재 버전의 지원 일정을 고려하세요

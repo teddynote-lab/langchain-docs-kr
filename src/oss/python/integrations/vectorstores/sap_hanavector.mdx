@@ -2,11 +2,11 @@
 title: SAP HANA Cloud Vector Engine
 ---
 
->[SAP HANA Cloud Vector Engine](https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-vector-engine-guide/sap-hana-cloud-sap-hana-database-vector-engine-guide) is a vector store fully integrated into the `SAP HANA Cloud` database.
+>[SAP HANA Cloud Vector Engine](https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-vector-engine-guide/sap-hana-cloud-sap-hana-database-vector-engine-guide)은 `SAP HANA Cloud` 데이터베이스에 완전히 통합된 vector store입니다.
 
 ## Setup
 
-Install the `langchain-hana` external integration package, as well as the other packages used throughout this notebook.
+이 노트북 전체에서 사용되는 다른 패키지들과 함께 `langchain-hana` 외부 통합 패키지를 설치하세요.
 
 ```python
 pip install -qU langchain-hana
@@ -14,7 +14,7 @@ pip install -qU langchain-hana
 
 ### Credentials
 
-Ensure your SAP HANA instance is running. Load your credentials from environment variables and create a connection:
+SAP HANA 인스턴스가 실행 중인지 확인하세요. 환경 변수에서 자격 증명을 로드하고 연결을 생성하세요:
 
 ```python
 import os
@@ -34,11 +34,11 @@ connection = dbapi.connect(
 )
 ```
 
-Learn more about SAP HANA in [What is SAP HANA?](https://www.sap.com/products/data-cloud/hana/what-is-sap-hana.html).
+SAP HANA에 대해 더 자세히 알아보려면 [What is SAP HANA?](https://www.sap.com/products/data-cloud/hana/what-is-sap-hana.html)를 참조하세요.
 
 ### Initialization
 
-To initialize a `HanaDB` vector store, you need a database connection and an embedding instance. SAP HANA Cloud Vector Engine supports both external and internal embeddings.
+`HanaDB` vector store를 초기화하려면 데이터베이스 연결과 embedding 인스턴스가 필요합니다. SAP HANA Cloud Vector Engine은 외부 및 내부 embedding을 모두 지원합니다.
 
 - #### Using External Embeddings
 
@@ -54,9 +54,9 @@ embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
 
 - #### Using Internal Embeddings
 
-Alternatively, you can compute embeddings directly in SAP HANA using its native `VECTOR_EMBEDDING()` function. To enable this, create an instance of `HanaInternalEmbeddings` with your internal model ID and pass it to `HanaDB`. Note that the `HanaInternalEmbeddings` instance is specifically designed for use with `HanaDB` and is not intended for use with other vector store implementations. For more information about internal embedding, see the [SAP HANA VECTOR_EMBEDDING Function](https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-vector-engine-guide/vector-embedding-function-vector).
+또는 SAP HANA의 네이티브 `VECTOR_EMBEDDING()` 함수를 사용하여 SAP HANA에서 직접 embedding을 계산할 수 있습니다. 이를 활성화하려면 내부 모델 ID로 `HanaInternalEmbeddings` 인스턴스를 생성하고 이를 `HanaDB`에 전달하세요. `HanaInternalEmbeddings` 인스턴스는 `HanaDB`와 함께 사용하도록 특별히 설계되었으며 다른 vector store 구현과 함께 사용하기 위한 것이 아닙니다. 내부 embedding에 대한 자세한 내용은 [SAP HANA VECTOR_EMBEDDING Function](https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-vector-engine-guide/vector-embedding-function-vector)을 참조하세요.
 
-> **Caution:** Ensure NLP is enabled in your SAP HANA Cloud instance.
+> **주의:** SAP HANA Cloud 인스턴스에서 NLP가 활성화되어 있는지 확인하세요.
 
 ```python
 from langchain_hana import HanaInternalEmbeddings
@@ -64,7 +64,7 @@ from langchain_hana import HanaInternalEmbeddings
 embeddings = HanaInternalEmbeddings(internal_embedding_model_id="SAP_NEB.20240715")
 ```
 
-Once you have your connection and embedding instance, create the vector store by passing them to `HanaDB` along with a table name for storing vectors:
+연결과 embedding 인스턴스가 준비되면 vector를 저장할 테이블 이름과 함께 `HanaDB`에 전달하여 vector store를 생성하세요:
 
 ```python
 from langchain_hana import HanaDB
@@ -76,7 +76,7 @@ db = HanaDB(
 
 ## Example
 
-Load the sample document "state_of_the_union.txt" and create chunks from it.
+샘플 문서 "state_of_the_union.txt"를 로드하고 청크를 생성합니다.
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -96,7 +96,7 @@ print(f"Number of document chunks: {len(text_chunks)}")
 Number of document chunks: 88
 ```
 
-Add the loaded document chunks to the table. For this example, we delete any previous content from the table which might exist from previous runs.
+로드된 문서 청크를 테이블에 추가합니다. 이 예제에서는 이전 실행에서 존재할 수 있는 테이블의 이전 콘텐츠를 삭제합니다.
 
 ```python
 # Delete already existing documents from the table
@@ -110,8 +110,8 @@ db.add_documents(text_chunks)
 []
 ```
 
-Perform a query to get the two best-matching document chunks from the ones that were added in the previous step.
-By default "Cosine Similarity" is used for the search.
+이전 단계에서 추가된 문서 청크 중에서 가장 일치하는 두 개의 문서 청크를 가져오는 쿼리를 수행합니다.
+기본적으로 검색에는 "Cosine Similarity"가 사용됩니다.
 
 ```python
 query = "What did the president say about Ketanji Brown Jackson"
@@ -133,7 +133,7 @@ As I said last year, especially to our younger transgender Americans, I will alw
 While it often appears that we never agree, that isn’t true. I signed 80 bipartisan bills into law last year. From preventing government shutdowns to protecting Asian-Americans from still-too-common hate crimes to reforming military justice.
 ```
 
-Query the same content with "Euclidian Distance". The results shoud be the same as with "Cosine Similarity".
+"Euclidian Distance"로 동일한 콘텐츠를 쿼리합니다. 결과는 "Cosine Similarity"와 동일해야 합니다.
 
 ```python
 from langchain_hana.utils import DistanceStrategy
@@ -165,7 +165,7 @@ While it often appears that we never agree, that isn’t true. I signed 80 bipar
 
 ## Maximal Marginal Relevance Search (MMR)
 
-`Maximal marginal relevance` optimizes for similarity to query AND diversity among selected documents. The first 20 (fetch_k) items will be retrieved from the DB. The MMR algorithm will then find the best 2 (k) matches.
+`Maximal marginal relevance`는 쿼리와의 유사성과 선택된 문서 간의 다양성을 최적화합니다. 처음 20개(fetch_k) 항목이 DB에서 검색됩니다. 그런 다음 MMR 알고리즘이 가장 일치하는 2개(k)를 찾습니다.
 
 ```python
 docs = db.max_marginal_relevance_search(query, k=2, fetch_k=20)
@@ -189,9 +189,9 @@ Let each of us here tonight in this Chamber send an unmistakable signal to Ukrai
 
 ## Creating an HNSW Vector Index
 
-A vector index can significantly speed up top-k nearest neighbor queries for vectors. Users can create a Hierarchical Navigable Small World (HNSW) vector index using the `create_hnsw_index` function.
+vector index는 vector에 대한 top-k 최근접 이웃 쿼리의 속도를 크게 향상시킬 수 있습니다. 사용자는 `create_hnsw_index` 함수를 사용하여 Hierarchical Navigable Small World (HNSW) vector index를 생성할 수 있습니다.
 
-For more information about creating an index at the database level, please refer to the [official documentation](https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-vector-engine-guide/create-vector-index-statement-data-definition).
+데이터베이스 수준에서 index를 생성하는 방법에 대한 자세한 내용은 [공식 문서](https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-vector-engine-guide/create-vector-index-statement-data-definition)를 참조하세요.
 
 ```python
 # HanaDB instance uses cosine similarity as default:
@@ -241,10 +241,10 @@ In this struggle as President Zelenskyy said in his speech to the European Parli
 Let each of us here tonight in this Chamber send an unmistakable signal to Ukraine and to the world.
 ```
 
-**Key Points**:
+**주요 사항**:
 
-- **Similarity Function**: The similarity function for the index is **cosine similarity** by default. If you want to use a different similarity function (e.g., `L2` distance), you need to specify it when initializing the `HanaDB` instance.
-- **Default Parameters**: In the `create_hnsw_index` function, if the user does not provide custom values for parameters like `m`, `ef_construction`, or `ef_search`, the default values (e.g., `m=64`, `ef_construction=128`, `ef_search=200`) will be used automatically. These values ensure the index is created with reasonable performance without requiring user intervention.
+- **Similarity Function**: index의 유사도 함수는 기본적으로 **cosine similarity**입니다. 다른 유사도 함수(예: `L2` distance)를 사용하려면 `HanaDB` 인스턴스를 초기화할 때 지정해야 합니다.
+- **Default Parameters**: `create_hnsw_index` 함수에서 사용자가 `m`, `ef_construction` 또는 `ef_search`와 같은 매개변수에 대한 사용자 정의 값을 제공하지 않으면 기본값(예: `m=64`, `ef_construction=128`, `ef_search=200`)이 자동으로 사용됩니다. 이러한 값은 사용자 개입 없이 합리적인 성능으로 index가 생성되도록 보장합니다.
 
 ## Basic Vectorstore Operations
 
@@ -261,7 +261,7 @@ db.delete(filter={})
 True
 ```
 
-We can add simple text documents to the existing table.
+기존 테이블에 간단한 텍스트 문서를 추가할 수 있습니다.
 
 ```python
 docs = [Document(page_content="Some text"), Document(page_content="Other docs")]
@@ -272,7 +272,7 @@ db.add_documents(docs)
 []
 ```
 
-Add documents with metadata.
+metadata가 포함된 문서를 추가합니다.
 
 ```python
 docs = [
@@ -292,7 +292,7 @@ db.add_documents(docs)
 []
 ```
 
-Query documents with specific metadata.
+특정 metadata가 있는 문서를 쿼리합니다.
 
 ```python
 docs = db.similarity_search("foobar", k=2, filter={"quality": "bad"})
@@ -309,7 +309,7 @@ foo
 {'start': 100, 'end': 150, 'doc_name': 'foo.txt', 'quality': 'bad'}
 ```
 
-Delete documents with specific metadata.
+특정 metadata가 있는 문서를 삭제합니다.
 
 ```python
 db.delete(filter={"quality": "bad"})
@@ -325,8 +325,8 @@ print(len(docs))
 
 ## Advanced filtering
 
-In addition to the basic value-based filtering capabilities, it is possible to use more advanced filtering.
-The table below shows the available filter operators.
+기본 값 기반 필터링 기능 외에도 더 고급 필터링을 사용할 수 있습니다.
+아래 표는 사용 가능한 필터 연산자를 보여줍니다.
 
 | Operator | Semantic                 |
 |----------|-------------------------|
@@ -380,7 +380,7 @@ def print_filter_result(result):
         print(doc.metadata)
 ```
 
-Filtering with `$ne`, `$gt`, `$gte`, `$lt`, `$lte`
+`$ne`, `$gt`, `$gte`, `$lt`, `$lte`로 필터링
 
 ```python
 advanced_filter = {"id": {"$ne": 1}}
@@ -421,7 +421,7 @@ Filter: {'id': {'$lte': 1}}
 {'name': 'Adam Smith', 'is_active': True, 'id': 1, 'height': 10.0}
 ```
 
-Filtering with `$between`, `$in`, `$nin`
+`$between`, `$in`, `$nin`으로 필터링
 
 ```python
 advanced_filter = {"id": {"$between": (1, 2)}}
@@ -448,7 +448,7 @@ Filter: {'name': {'$nin': ['Adam Smith', 'Bob Johnson']}}
 {'name': 'Jane Doe', 'is_active': True, 'id': 3, 'height': 2.4}
 ```
 
-Text filtering with `$like`
+`$like`로 텍스트 필터링
 
 ```python
 advanced_filter = {"name": {"$like": "a%"}}
@@ -468,7 +468,7 @@ Filter: {'name': {'$like': '%a%'}}
 {'name': 'Jane Doe', 'is_active': True, 'id': 3, 'height': 2.4}
 ```
 
-Text filtering with `$contains`
+`$contains`로 텍스트 필터링
 
 ```python
 advanced_filter = {"name": {"$contains": "bob"}}
@@ -499,7 +499,7 @@ Filter: {'name': {'$contains': 'Adam Smith'}}
 {'name': 'Adam Smith', 'is_active': True, 'id': 1, 'height': 10.0}
 ```
 
-Combined filtering with `$and`, `$or`
+`$and`, `$or`로 결합 필터링
 
 ```python
 advanced_filter = {"$or": [{"id": 1}, {"name": "bob"}]}
@@ -554,7 +554,7 @@ db.add_documents(text_chunks)
 retriever = db.as_retriever()
 ```
 
-Define the prompt.
+prompt를 정의합니다.
 
 ```python
 from langchain_core.prompts import PromptTemplate
@@ -576,7 +576,7 @@ PROMPT = PromptTemplate(
 chain_type_kwargs = {"prompt": PROMPT}
 ```
 
-Create the ConversationalRetrievalChain, which handles the chat history and the retrieval of similar document chunks to be added to the prompt.
+채팅 기록과 prompt에 추가할 유사한 문서 청크의 검색을 처리하는 ConversationalRetrievalChain을 생성합니다.
 
 ```python
 from langchain.chains import ConversationalRetrievalChain
@@ -597,7 +597,7 @@ qa_chain = ConversationalRetrievalChain.from_llm(
 )
 ```
 
-Ask the first question (and verify how many text chunks have been used).
+첫 번째 질문을 하고 (사용된 텍스트 청크 수를 확인합니다).
 
 ```python
 question = "What about Mexico and Guatemala?"
@@ -620,7 +620,7 @@ The United States has set up joint patrols with Mexico and Guatemala to catch mo
 Number of used source document chunks: 5
 ```
 
-Examine the used chunks of the chain in detail. Check if the best ranked chunk contains info about "Mexico and Guatemala" as mentioned in the question.
+chain에서 사용된 청크를 자세히 검토합니다. 질문에서 언급된 "Mexico and Guatemala"에 대한 정보가 최상위 순위 청크에 포함되어 있는지 확인합니다.
 
 ```python
 for doc in source_docs:
@@ -629,7 +629,7 @@ for doc in source_docs:
     print(doc.metadata)
 ```
 
-Ask another question on the same conversational chain. The answer should relate to the previous answer given.
+동일한 대화 chain에서 다른 질문을 합니다. 답변은 이전에 제공된 답변과 관련이 있어야 합니다.
 
 ```python
 question = "How many casualties were reported after that?"
@@ -648,11 +648,11 @@ Countries like Mexico and Guatemala are participating in joint patrols to catch 
 
 ## Standard tables vs. "custom" tables with vector data
 
-As default behaviour, the table for the embeddings is created with 3 columns:
+기본 동작으로 embedding을 위한 테이블은 3개의 열로 생성됩니다:
 
-- A column `VEC_TEXT`, which contains the text of the Document
-- A column `VEC_META`, which contains the metadata of the Document
-- A column `VEC_VECTOR`, which contains the embeddings-vector of the Document's text
+- Document의 텍스트를 포함하는 `VEC_TEXT` 열
+- Document의 metadata를 포함하는 `VEC_META` 열
+- Document 텍스트의 embedding vector를 포함하는 `VEC_VECTOR` 열
 
 ```python
 # Access the vector DB with a new table
@@ -677,7 +677,7 @@ db.add_documents(docs)
 []
 ```
 
-Show the columns in table "LANGCHAIN_DEMO_NEW_TABLE"
+"LANGCHAIN_DEMO_NEW_TABLE" 테이블의 열을 표시합니다
 
 ```python
 cur = connection.cursor()
@@ -696,7 +696,7 @@ cur.close()
 ('VEC_VECTOR', 'REAL_VECTOR')
 ```
 
-Show the value of the inserted document in the three columns
+세 개의 열에 삽입된 문서의 값을 표시합니다
 
 ```python
 cur = connection.cursor()
@@ -710,13 +710,13 @@ print(rows[0][2])  # The vector
 cur.close()
 ```
 
-Custom tables must have at least three columns that match the semantics of a standard table
+사용자 정의 테이블은 표준 테이블의 의미와 일치하는 최소 세 개의 열이 있어야 합니다
 
-- A column with type `NCLOB` or `NVARCHAR` for the text/context of the embeddings
-- A column with type `NCLOB` or `NVARCHAR` for the metadata
-- A column with type `REAL_VECTOR` for the embedding vector
+- embedding의 텍스트/컨텍스트를 위한 `NCLOB` 또는 `NVARCHAR` 타입의 열
+- metadata를 위한 `NCLOB` 또는 `NVARCHAR` 타입의 열
+- embedding vector를 위한 `REAL_VECTOR` 타입의 열
 
-The table can contain additional columns. When new Documents are inserted into the table, these additional columns must allow NULL values.
+테이블에는 추가 열이 포함될 수 있습니다. 새 Document가 테이블에 삽입될 때 이러한 추가 열은 NULL 값을 허용해야 합니다.
 
 ```python
 # Create a new table "MY_OWN_TABLE_ADD" with three "standard" columns and one additional column
@@ -769,7 +769,7 @@ Some other text
 <memory at 0x110f856c0>
 ```
 
-Add another document and perform a similarity search on the custom table.
+다른 문서를 추가하고 사용자 정의 테이블에서 유사성 검색을 수행합니다.
 
 ```python
 docs = [
@@ -796,7 +796,7 @@ Some other text
 
 ### Filter Performance Optimization with Custom Columns
 
-To allow flexible metadata values, all metadata is stored as JSON in the metadata column by default. If some of the used metadata keys and value types are known, they can be stored in additional columns instead by creating the target table with the key names as column names and passing them to the HanaDB constructor via the specific_metadata_columns list. Metadata keys that match those values are copied into the special column during insert. Filters use the special columns instead of the metadata JSON column for keys in the specific_metadata_columns list.
+유연한 metadata 값을 허용하기 위해 모든 metadata는 기본적으로 metadata 열에 JSON으로 저장됩니다. 사용된 metadata 키와 값 타입 중 일부가 알려진 경우, 키 이름을 열 이름으로 하는 대상 테이블을 생성하고 specific_metadata_columns 목록을 통해 HanaDB 생성자에 전달하여 대신 추가 열에 저장할 수 있습니다. 이러한 값과 일치하는 metadata 키는 삽입 중에 특수 열로 복사됩니다. 필터는 specific_metadata_columns 목록의 키에 대해 metadata JSON 열 대신 특수 열을 사용합니다.
 
 ```python
 # Create a new table "PERFORMANT_CUSTOMTEXT_FILTER" with three "standard" columns and one additional column
@@ -859,7 +859,7 @@ Some other text
 <memory at 0x110f859c0>
 ```
 
-The special columns are completely transparent to the rest of the langchain interface. Everything works as it did before, just more performant.
+특수 열은 나머지 langchain 인터페이스에 완전히 투명합니다. 모든 것이 이전과 동일하게 작동하지만 더 성능이 좋습니다.
 
 ```python
 docs = [

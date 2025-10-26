@@ -1,56 +1,56 @@
 ---
-title: Egress for subscription metrics and operational metadata
-sidebarTitle: Configure egress for subscription metrics
+title: 구독 메트릭 및 운영 메타데이터를 위한 Egress
+sidebarTitle: 구독 메트릭을 위한 egress 구성
 ---
 
 <Info>
-This section only applies to customers who are not running in offline mode and assumes you are using a self-hosted LangSmith instance serving version 0.9.0 or later. Previous versions of LangSmith did not have this feature.
+이 섹션은 오프라인 모드에서 실행하지 않는 고객에게만 적용되며, 버전 0.9.0 이상을 제공하는 자체 호스팅 LangSmith 인스턴스를 사용하고 있다고 가정합니다. 이전 버전의 LangSmith에는 이 기능이 없었습니다.
 </Info>
 
-Self-Hosted LangSmith instances store all information locally and will never send sensitive information outside of your network. We currently only track platform usage for billing purposes according to the entitlements in your order. In order to better remotely support our customers, we do require egress to `https://beacon.langchain.com`.
+자체 호스팅 LangSmith 인스턴스는 모든 정보를 로컬에 저장하며 네트워크 외부로 민감한 정보를 전송하지 않습니다. 현재 주문서의 권한에 따라 청구 목적으로만 플랫폼 사용량을 추적합니다. 고객을 더 잘 원격 지원하기 위해 `https://beacon.langchain.com`으로의 egress가 필요합니다.
 
-In the future, we will be introducing support diagnostics to help us ensure that LangSmith is running at an optimal level within your environment.
+향후 환경 내에서 LangSmith가 최적의 수준으로 실행되고 있는지 확인하는 데 도움이 되는 지원 진단 기능을 도입할 예정입니다.
 
 <Warning>
-**This will require egress to `https://beacon.langchain.com` from your network. Refer to the [allowlisting IP section](/langsmith/cloud#allowlisting-ip-addresses) for static IP addresses, if needed.**
+**네트워크에서 `https://beacon.langchain.com`으로의 egress가 필요합니다. 필요한 경우 고정 IP 주소는 [IP 허용 목록 섹션](/langsmith/cloud#allowlisting-ip-addresses)을 참조하세요.**
 </Warning>
 
-Generally, data that we send to Beacon can be categorized as follows:
+일반적으로 Beacon으로 전송하는 데이터는 다음과 같이 분류할 수 있습니다:
 
-* Subscription Metrics
+* 구독 메트릭
 
-  * Subscription metrics are used to determine level of access and utilization of LangSmith. This includes, but are not limited to:
+  * 구독 메트릭은 LangSmith의 액세스 수준 및 활용도를 결정하는 데 사용됩니다. 여기에는 다음이 포함되지만 이에 국한되지 않습니다:
 
-    * Number of traces
-    * Seats allocated per contract
-    * Seats in currently use
+    * trace 수
+    * 계약당 할당된 seat 수
+    * 현재 사용 중인 seat 수
 
-* Operational Metadata
-  * This metadata will contain and collect the above subscription metrics to assist with remote support, allowing the LangChain team to diagnose and troubleshoot performance issues more effectively and proactively.
+* 운영 메타데이터
+  * 이 메타데이터는 위의 구독 메트릭을 포함하고 수집하여 원격 지원을 지원하며, LangChain 팀이 성능 문제를 보다 효과적이고 사전에 진단하고 해결할 수 있도록 합니다.
 
 ## LangSmith Telemetry
 
-As of version ***0.11***, LangSmith deployments will by default send telemetry data back to our backend. All telemetry data is associated with an organization and deployment, but never identified with individual users. We ***do not collect PII*** (personally identifiable information) in any form.
+버전 ***0.11***부터 LangSmith 배포는 기본적으로 telemetry 데이터를 백엔드로 전송합니다. 모든 telemetry 데이터는 조직 및 배포와 연결되지만 개별 사용자와는 식별되지 않습니다. 어떤 형태로든 ***PII***(개인 식별 정보)를 수집하지 않습니다.
 
-### What we use it for
+### 사용 목적
 
-* To provide more proactive support and faster troubleshooting of self-hosted instances.
-* Assisting with performance tuning.
-* Understanding real-world usage to prioritize improvements.
+* 자체 호스팅 인스턴스에 대한 보다 사전 예방적인 지원 및 더 빠른 문제 해결을 제공합니다.
+* 성능 튜닝을 지원합니다.
+* 실제 사용 현황을 이해하여 개선 사항의 우선순위를 정합니다.
 
-### What we collect
+### 수집하는 데이터
 
-* **Request metadata**: anonymized request counts, sizes, and durations.
-* **Database metrics**: query durations, error rates, and performance counters.
-* **Distributed traces**: end-to-end traces with timing and error information for high-latency or failed requests.
+* **Request 메타데이터**: 익명화된 request 수, 크기 및 기간.
+* **Database 메트릭**: query 기간, 오류율 및 성능 카운터.
+* **Distributed traces**: 높은 지연 시간 또는 실패한 request에 대한 타이밍 및 오류 정보가 포함된 end-to-end trace.
 
 <Info>
-We do not collect actual payload contents, database records, or any data that can identify your end users or customers.
+실제 payload 내용, database 레코드 또는 최종 사용자나 고객을 식별할 수 있는 데이터는 수집하지 않습니다.
 </Info>
 
-### How to disable
+### 비활성화 방법
 
-Set the following values in your `langsmith_config.yaml` file:
+`langsmith_config.yaml` 파일에서 다음 값을 설정하세요:
 
 ```yaml
 config:
@@ -59,11 +59,11 @@ config:
     traces: false
 ```
 
-## Example payloads
+## 예제 payload
 
-In an effort to maximize transparency, we provide sample payloads here:
+투명성을 극대화하기 위해 여기에 샘플 payload를 제공합니다:
 
-### License Verification
+### License 검증
 
 **Endpoint:**
 
@@ -85,7 +85,7 @@ In an effort to maximize transparency, we provide sample payloads here:
 }
 ```
 
-### Usage Reporting
+### 사용량 보고
 
 **Endpoint:**
 
@@ -299,6 +299,6 @@ In an effort to maximize transparency, we provide sample payloads here:
 }
 ```
 
-## Our Commitment
+## 우리의 약속
 
-LangChain will not store any sensitive information in the Subscription Metrics or Operational Metadata. Any data collected will not be shared with a third party. If you have any concerns about the data being sent, please reach out to your account team.
+LangChain은 구독 메트릭 또는 운영 메타데이터에 민감한 정보를 저장하지 않습니다. 수집된 데이터는 제3자와 공유되지 않습니다. 전송되는 데이터에 대해 우려 사항이 있으시면 계정 팀에 문의하시기 바랍니다.

@@ -2,20 +2,20 @@
 title: Hyperbrowser
 ---
 
-> [Hyperbrowser](https://hyperbrowser.ai) is a platform for running and scaling headless browsers. It lets you launch and manage browser sessions at scale and provides easy to use solutions for any webscraping needs, such as scraping a single page or crawling an entire site.
+> [Hyperbrowser](https://hyperbrowser.ai)는 headless browser를 실행하고 확장하기 위한 플랫폼입니다. 대규모로 browser session을 시작하고 관리할 수 있으며, 단일 페이지 스크래핑부터 전체 사이트 크롤링까지 모든 웹 스크래핑 요구사항에 대한 사용하기 쉬운 솔루션을 제공합니다.
 >
-> Key Features:
+> 주요 기능:
 >
-> - Instant Scalability - Spin up hundreds of browser sessions in seconds without infrastructure headaches
-> - Simple Integration - Works seamlessly with popular tools like Puppeteer and Playwright
-> - Powerful APIs - Easy to use APIs for scraping/crawling any site, and much more
-> - Bypass Anti-Bot Measures - Built-in stealth mode, ad blocking, automatic CAPTCHA solving, and rotating proxies
+> - 즉각적인 확장성 - 인프라 문제 없이 수백 개의 browser session을 몇 초 만에 시작
+> - 간편한 통합 - Puppeteer 및 Playwright와 같은 인기 있는 도구와 원활하게 작동
+> - 강력한 API - 모든 사이트를 스크래핑/크롤링하기 위한 사용하기 쉬운 API 등
+> - 봇 방지 조치 우회 - 내장된 스텔스 모드, 광고 차단, 자동 CAPTCHA 해결 및 순환 프록시
 
-For more information about Hyperbrowser, please visit the [Hyperbrowser website](https://hyperbrowser.ai) or if you want to check out the docs, you can visit the [Hyperbrowser docs](https://docs.hyperbrowser.ai).
+Hyperbrowser에 대한 자세한 정보는 [Hyperbrowser 웹사이트](https://hyperbrowser.ai)를 방문하거나, 문서를 확인하려면 [Hyperbrowser 문서](https://docs.hyperbrowser.ai)를 방문하세요.
 
-## Installation and Setup
+## 설치 및 설정
 
-To get started with `langchain-hyperbrowser`, you can install the package using pip:
+`langchain-hyperbrowser`를 시작하려면 pip를 사용하여 패키지를 설치할 수 있습니다:
 
 <CodeGroup>
 ```bash pip
@@ -27,32 +27,32 @@ uv add langchain-hyperbrowser
 ```
 </CodeGroup>
 
-And you should configure credentials by setting the following environment variables:
+그리고 다음 환경 변수를 설정하여 자격 증명을 구성해야 합니다:
 
 `HYPERBROWSER_API_KEY=<your-api-key>`
 
-Make sure to get your API Key from https://app.hyperbrowser.ai/
+https://app.hyperbrowser.ai/에서 API Key를 받으세요.
 
-## Available Tools
+## 사용 가능한 도구
 
-Hyperbrowser provides two main categories of tools that are particularly useful for:
-- Web scraping and data extraction from complex websites
-- Automating repetitive web tasks
-- Interacting with web applications that require authentication
-- Performing research across multiple websites
-- Testing web applications
+Hyperbrowser는 다음과 같은 작업에 특히 유용한 두 가지 주요 도구 카테고리를 제공합니다:
+- 복잡한 웹사이트에서 웹 스크래핑 및 데이터 추출
+- 반복적인 웹 작업 자동화
+- 인증이 필요한 웹 애플리케이션과 상호작용
+- 여러 웹사이트에서 연구 수행
+- 웹 애플리케이션 테스트
 
 ### Browser Agent Tools
 
-Hyperbrowser provides a number of Browser Agents tools. Currently we supported
+Hyperbrowser는 여러 Browser Agents 도구를 제공합니다. 현재 지원되는 도구는 다음과 같습니다:
  - Claude Computer Use
  - OpenAI CUA
  - Browser Use
 
-You can see more details [here](/oss/integrations/tools/hyperbrowser_browser_agent_tools)
+자세한 내용은 [여기](/oss/integrations/tools/hyperbrowser_browser_agent_tools)에서 확인할 수 있습니다.
 
 #### Browser Use Tool
-A general-purpose browser automation tool that can handle various web tasks through natural language instructions.
+자연어 명령을 통해 다양한 웹 작업을 처리할 수 있는 범용 browser 자동화 도구입니다.
 
 ```python
 from langchain_hyperbrowser import HyperbrowserBrowserUseTool
@@ -65,7 +65,7 @@ print(result)
 ```
 
 #### OpenAI CUA Tool
-Leverages OpenAI's Computer Use Agent capabilities for advanced web interactions and information gathering.
+고급 웹 상호작용 및 정보 수집을 위해 OpenAI의 Computer Use Agent 기능을 활용합니다.
 
 ```python
 from langchain_hyperbrowser import HyperbrowserOpenAICUATool
@@ -78,7 +78,7 @@ print(result)
 ```
 
 #### Claude Computer Use Tool
-Utilizes Anthropic's Claude for sophisticated web browsing and information processing tasks.
+정교한 웹 브라우징 및 정보 처리 작업을 위해 Anthropic의 Claude를 활용합니다.
 
 ```python
 from langchain_hyperbrowser import HyperbrowserClaudeComputerUseTool
@@ -92,10 +92,10 @@ print(result)
 
 ### Web Scraping Tools
 
-Here is a brief description of the Web Scraping Tools available with Hyperbrowser. You can see more details [here](/oss/integrations/tools/hyperbrowser_web_scraping_tools)
+다음은 Hyperbrowser에서 사용 가능한 Web Scraping Tools에 대한 간략한 설명입니다. 자세한 내용은 [여기](/oss/integrations/tools/hyperbrowser_web_scraping_tools)에서 확인할 수 있습니다.
 
 #### Scrape Tool
-The Scrape Tool allows you to extract content from a single webpage in markdown, HTML, or link format.
+Scrape Tool을 사용하면 단일 웹페이지에서 markdown, HTML 또는 link 형식으로 콘텐츠를 추출할 수 있습니다.
 
 ```python
 from langchain_hyperbrowser import HyperbrowserScrapeTool
@@ -109,7 +109,7 @@ print(result)
 ```
 
 #### Crawl Tool
-The Crawl Tool enables you to traverse entire websites, starting from a given URL, with configurable page limits.
+Crawl Tool을 사용하면 주어진 URL에서 시작하여 구성 가능한 페이지 제한으로 전체 웹사이트를 탐색할 수 있습니다.
 
 ```python
 from langchain_hyperbrowser import HyperbrowserCrawlTool
@@ -124,7 +124,7 @@ print(result)
 ```
 
 #### Extract Tool
-The Extract Tool uses AI to pull structured data from web pages based on predefined schemas, making it perfect for data extraction tasks.
+Extract Tool은 AI를 사용하여 미리 정의된 schema를 기반으로 웹 페이지에서 구조화된 데이터를 추출하므로 데이터 추출 작업에 완벽합니다.
 
 ```python
 from langchain_hyperbrowser import HyperbrowserExtractTool
@@ -143,8 +143,8 @@ print(result)
 
 ## Document Loader
 
-The `HyperbrowserLoader` class in `langchain-hyperbrowser` can easily be used to load content from any single page or multiple pages as well as crawl an entire site.
-The content can be loaded as markdown or html.
+`langchain-hyperbrowser`의 `HyperbrowserLoader` class는 단일 페이지 또는 여러 페이지의 콘텐츠를 로드하거나 전체 사이트를 크롤링하는 데 쉽게 사용할 수 있습니다.
+콘텐츠는 markdown 또는 html로 로드할 수 있습니다.
 
 ```python
 from langchain_hyperbrowser import HyperbrowserLoader
@@ -155,9 +155,9 @@ docs = loader.load()
 print(docs[0])
 ```
 
-### Advanced Usage
+### 고급 사용법
 
-You can specify the operation to be performed by the loader. The default operation is `scrape`. For `scrape`, you can provide a single URL or a list of URLs to be scraped. For `crawl`, you can only provide a single URL. The `crawl` operation will crawl the provided page and subpages and return a document for each page.
+loader가 수행할 작업을 지정할 수 있습니다. 기본 작업은 `scrape`입니다. `scrape`의 경우 스크래핑할 단일 URL 또는 URL 목록을 제공할 수 있습니다. `crawl`의 경우 단일 URL만 제공할 수 있습니다. `crawl` 작업은 제공된 페이지와 하위 페이지를 크롤링하고 각 페이지에 대한 document를 반환합니다.
 
 ```python
 loader = HyperbrowserLoader(
@@ -165,7 +165,7 @@ loader = HyperbrowserLoader(
 )
 ```
 
-Optional params for the loader can also be provided in the `params` argument. For more information on the supported params, visit https://docs.hyperbrowser.ai/reference/sdks/python/scrape#start-scrape-job-and-wait or https://docs.hyperbrowser.ai/reference/sdks/python/crawl#start-crawl-job-and-wait.
+loader에 대한 선택적 매개변수는 `params` 인수에서도 제공할 수 있습니다. 지원되는 매개변수에 대한 자세한 내용은 https://docs.hyperbrowser.ai/reference/sdks/python/scrape#start-scrape-job-and-wait 또는 https://docs.hyperbrowser.ai/reference/sdks/python/crawl#start-crawl-job-and-wait를 방문하세요.
 
 ```python
 loader = HyperbrowserLoader(
@@ -176,8 +176,8 @@ loader = HyperbrowserLoader(
 )
 ```
 
-## Additional Resources
+## 추가 리소스
 
-- [Hyperbrowser Docs](https://docs.hyperbrowser.ai/)
+- [Hyperbrowser 문서](https://docs.hyperbrowser.ai/)
 - [GitHub](https://github.com/hyperbrowserai/langchain-hyperbrowser/)
 - [PyPi](https://pypi.org/project/langchain-hyperbrowser/)

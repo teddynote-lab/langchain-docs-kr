@@ -3,13 +3,13 @@ title: Reject Concurrent
 sidebarTitle: Reject
 ---
 
-This guide assumes knowledge of what double-texting is, which you can learn about in the [double-texting conceptual guide](/langsmith/double-texting).
+이 가이드는 double-texting이 무엇인지에 대한 지식을 전제로 하며, [double-texting 개념 가이드](/langsmith/double-texting)에서 이에 대해 배울 수 있습니다.
 
-The guide covers the `reject` option for double texting, which rejects the new run of the graph by throwing an error and continues with the original run until completion. Below is a quick example of using the `reject` option.
+이 가이드는 double texting에 대한 `reject` 옵션을 다루며, 이는 에러를 발생시켜 graph의 새로운 run을 거부하고 원래 run이 완료될 때까지 계속 진행합니다. 아래는 `reject` 옵션을 사용하는 간단한 예제입니다.
 
 ## Setup
 
-First, we will define a quick helper function for printing out JS and CURL model outputs (you can skip this if using Python):
+먼저, JS와 CURL model 출력을 출력하기 위한 간단한 helper function을 정의하겠습니다 (Python을 사용하는 경우 이 부분을 건너뛸 수 있습니다):
 
 <Tabs>
     <Tab title="Javascript">
@@ -49,7 +49,7 @@ First, we will define a quick helper function for printing out JS and CURL model
     </Tab>
 </Tabs>
 
-Now, let's import our required packages and instantiate our client, assistant, and thread.
+이제 필요한 package들을 import하고 client, assistant, thread를 인스턴스화하겠습니다.
 
 <Tabs>
     <Tab title="Python">
@@ -86,7 +86,7 @@ Now, let's import our required packages and instantiate our client, assistant, a
 
 ## Create runs
 
-Now we can run a thread and try to run a second one with the "reject" option, which should fail since we have already started a run:
+이제 thread를 실행하고 "reject" 옵션으로 두 번째 run을 시도할 수 있습니다. 이미 run을 시작했기 때문에 실패해야 합니다:
 
 <Tabs>
     <Tab title="Python">
@@ -151,7 +151,7 @@ Now we can run a thread and try to run a second one with the "reject" option, wh
     </Tab>
 </Tabs>
 
-Output:
+출력:
 
 ```
 Failed to start concurrent run Client error '409 Conflict' for url 'http://localhost:8123/threads/f9e7088b-8028-4e5c-88d2-9cc9a2870e50/runs'
@@ -160,7 +160,7 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
 
 ## View run results
 
-We can verify that the original thread finished executing:
+원래 thread가 실행을 완료했는지 확인할 수 있습니다:
 
 <Tabs>
     <Tab title="Python">
@@ -199,7 +199,7 @@ We can verify that the original thread finished executing:
     </Tab>
 </Tabs>
 
-Output:
+출력:
 
 ```
 ================================ Human Message =================================

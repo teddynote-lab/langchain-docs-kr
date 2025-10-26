@@ -1,21 +1,19 @@
 ---
-title: Javelin AI Gateway Tutorial
+title: Javelin AI Gateway 튜토리얼
 ---
 
-This Jupyter Notebook will explore how to interact with the Javelin AI Gateway using the Python SDK.
-The Javelin AI Gateway facilitates the utilization of large language models (LLMs) like OpenAI, Cohere, Anthropic, and others by
-providing a secure and unified endpoint. The gateway itself provides a centralized mechanism to roll out models systematically,
-provide access security, policy & cost guardrails for enterprises, etc.,
+이 Jupyter Notebook에서는 Python SDK를 사용하여 Javelin AI Gateway와 상호작용하는 방법을 살펴봅니다.
+Javelin AI Gateway는 OpenAI, Cohere, Anthropic 등과 같은 대규모 언어 모델(LLM)을 안전하고 통합된 엔드포인트를 제공하여 활용할 수 있도록 지원합니다. 게이트웨이 자체는 모델을 체계적으로 배포하고, 기업을 위한 액세스 보안, 정책 및 비용 가드레일을 제공하는 중앙 집중식 메커니즘을 제공합니다.
 
-For a complete listing of all the features & benefits of Javelin, please visit [www.getjavelin.io](https://www.getjavelin.io)
+Javelin의 모든 기능 및 이점에 대한 전체 목록은 [www.getjavelin.io](https://www.getjavelin.io)를 방문하세요.
 
-## Step 1: Introduction
+## Step 1: 소개
 
-[The Javelin AI Gateway](https://www.getjavelin.io) is an enterprise-grade API Gateway for AI applications. It integrates robust access security, ensuring secure interactions with large language models. Learn more in the [official documentation](https://docs.getjavelin.io).
+[Javelin AI Gateway](https://www.getjavelin.io)는 AI 애플리케이션을 위한 엔터프라이즈급 API Gateway입니다. 강력한 액세스 보안을 통합하여 대규모 언어 모델과의 안전한 상호작용을 보장합니다. 자세한 내용은 [공식 문서](https://docs.getjavelin.io)에서 확인하세요.
 
-## Step 2: Installation
+## Step 2: 설치
 
-Before we begin, we must install the `javelin_sdk` and set up the Javelin API key as an environment variable.
+시작하기 전에 `javelin_sdk`를 설치하고 Javelin API key를 환경 변수로 설정해야 합니다.
 
 ```python
 pip install 'javelin_sdk'
@@ -35,10 +33,10 @@ Requirement already satisfied: anyio<5.0,>=3.0 in /usr/local/Caskroom/miniconda/
 Note: you may need to restart the kernel to use updated packages.
 ```
 
-## Step 3: Completions Example
+## Step 3: Completions 예제
 
-This section will demonstrate how to interact with the Javelin AI Gateway to get completions from a large language model. Here is a Python script that demonstrates this:
-(note) assumes that you have setup a route in the gateway called 'eng_dept03'
+이 섹션에서는 Javelin AI Gateway와 상호작용하여 대규모 언어 모델로부터 completions를 얻는 방법을 보여줍니다. 다음은 이를 보여주는 Python 스크립트입니다:
+(참고) 게이트웨이에 'eng_dept03'이라는 route를 설정했다고 가정합니다.
 
 ```python
 from langchain.chains import LLMChain
@@ -78,10 +76,10 @@ Cell In[6], line 2
 ImportError: cannot import name 'JavelinAIGateway' from 'langchain.llms' (/usr/local/Caskroom/miniconda/base/lib/python3.11/site-packages/langchain/llms/__init__.py)
 ```
 
-# Step 4: Embeddings Example
+# Step 4: Embeddings 예제
 
-This section demonstrates how to use the Javelin AI Gateway to obtain embeddings for text queries and documents. Here is a Python script that illustrates this:
-(note) assumes that you have setup a route in the gateway called 'embeddings'
+이 섹션에서는 Javelin AI Gateway를 사용하여 텍스트 쿼리 및 문서에 대한 embeddings를 얻는 방법을 보여줍니다. 다음은 이를 설명하는 Python 스크립트입니다:
+(참고) 게이트웨이에 'embeddings'라는 route를 설정했다고 가정합니다.
 
 ```python
 from langchain_community.embeddings import JavelinAIGatewayEmbeddings
@@ -114,10 +112,10 @@ Cell In[9], line 1
 ImportError: cannot import name 'JavelinAIGatewayEmbeddings' from 'langchain.embeddings' (/usr/local/Caskroom/miniconda/base/lib/python3.11/site-packages/langchain/embeddings/__init__.py)
 ```
 
-# Step 5: Chat Example
+# Step 5: Chat 예제
 
-This section illustrates how to interact with the Javelin AI Gateway to facilitate a chat with a large language model. Here is a Python script that demonstrates this:
-(note) assumes that you have setup a route in the gateway called 'mychatbot_route'
+이 섹션에서는 Javelin AI Gateway와 상호작용하여 대규모 언어 모델과의 채팅을 용이하게 하는 방법을 보여줍니다. 다음은 이를 보여주는 Python 스크립트입니다:
+(참고) 게이트웨이에 'mychatbot_route'라는 route를 설정했다고 가정합니다.
 
 ```python
 from langchain_community.chat_models import ChatJavelinAIGateway
@@ -163,8 +161,8 @@ Cell In[8], line 1
 ImportError: cannot import name 'ChatJavelinAIGateway' from 'langchain.chat_models' (/usr/local/Caskroom/miniconda/base/lib/python3.11/site-packages/langchain/chat_models/__init__.py)
 ```
 
-Step 6: Conclusion
-This tutorial introduced the Javelin AI Gateway and demonstrated how to interact with it using the Python SDK.
-Remember to check the Javelin [Python SDK](https://www.github.com/getjavelin.io/javelin-python) for more examples and to explore the official documentation for additional details.
+Step 6: 결론
+이 튜토리얼에서는 Javelin AI Gateway를 소개하고 Python SDK를 사용하여 상호작용하는 방법을 보여주었습니다.
+더 많은 예제는 Javelin [Python SDK](https://www.github.com/getjavelin.io/javelin-python)를 확인하고, 추가 세부 정보는 공식 문서를 참조하세요.
 
-Happy coding!
+즐거운 코딩 되세요!

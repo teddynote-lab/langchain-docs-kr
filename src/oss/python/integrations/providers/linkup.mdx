@@ -2,12 +2,12 @@
 title: Linkup
 ---
 
-> [Linkup](https://www.linkup.so/) provides an API to connect LLMs to the web and the Linkup Premium Partner sources.
+> [Linkup](https://www.linkup.so/)은 LLM을 웹 및 Linkup Premium Partner 소스에 연결하는 API를 제공합니다.
 
 ## Installation and Setup
 
-To use the Linkup provider, you first need a valid API key, which you can find by signing-up [here](https://app.linkup.so/sign-up).
-You will also need the `langchain-linkup` package, which you can install using pip:
+Linkup provider를 사용하려면 먼저 유효한 API key가 필요하며, [여기](https://app.linkup.so/sign-up)에서 가입하여 얻을 수 있습니다.
+또한 pip를 사용하여 설치할 수 있는 `langchain-linkup` package가 필요합니다:
 
 <CodeGroup>
 ```bash pip
@@ -21,7 +21,7 @@ uv add langchain-linkup
 
 ## Retriever
 
-See a [usage example](/oss/integrations/retrievers/linkup_search).
+[사용 예제](/oss/integrations/retrievers/linkup_search)를 참조하세요.
 
 ```python
 from langchain_linkup import LinkupSearchRetriever
@@ -34,7 +34,7 @@ retriever = LinkupSearchRetriever(
 
 ## Tools
 
-See a [usage example](/oss/integrations/tools/linkup_search).
+[사용 예제](/oss/integrations/tools/linkup_search)를 참조하세요.
 
 ```python
 from langchain_linkup import LinkupSearchTool

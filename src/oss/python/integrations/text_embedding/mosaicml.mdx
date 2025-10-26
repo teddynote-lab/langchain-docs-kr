@@ -1,10 +1,11 @@
+```markdown
 ---
 title: MosaicML
 ---
 
->[MosaicML](https://docs.mosaicml.com/en/latest/inference.html) offers a managed inference service. You can either use a variety of open-source models, or deploy your own.
+>[MosaicML](https://docs.mosaicml.com/en/latest/inference.html)은 관리형 추론 서비스를 제공합니다. 다양한 오픈소스 모델을 사용하거나 자체 모델을 배포할 수 있습니다.
 
-This example goes over how to use LangChain to interact with `MosaicML` Inference for text embedding.
+이 예제는 LangChain을 사용하여 텍스트 임베딩을 위한 `MosaicML` Inference와 상호작용하는 방법을 다룹니다.
 
 ```python
 # sign up for an account: https://forms.mosaicml.com/demo?utm_source=langchain
@@ -49,4 +50,5 @@ similarity = np.dot(query_numpy, document_numpy) / (
     np.linalg.norm(query_numpy) * np.linalg.norm(document_numpy)
 )
 print(f"Cosine similarity between document and query: {similarity}")
+```
 ```

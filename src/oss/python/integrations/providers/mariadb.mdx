@@ -2,42 +2,41 @@
 title: MariaDB
 ---
 
-This page covers how to use the [MariaDB](https://github.com/mariadb/) ecosystem within LangChain.
-It is broken into two parts: installation and setup, and then references to specific PGVector wrappers.
+이 페이지는 LangChain 내에서 [MariaDB](https://github.com/mariadb/) 생태계를 사용하는 방법을 다룹니다.
+설치 및 설정, 그리고 특정 PGVector wrapper에 대한 참조, 이렇게 두 부분으로 나뉩니다.
 
 ## Installation
-- Install c/c connector
+- c/c connector 설치
 
-on Debian, Ubuntu
+Debian, Ubuntu의 경우
 ```bash
 sudo apt install libmariadb3 libmariadb-dev
 ```
 
-on CentOS, RHEL, Rocky Linux
+CentOS, RHEL, Rocky Linux의 경우
 ```bash
 sudo yum install MariaDB-shared MariaDB-devel
 ```
 
-- Install the Python connector package with `pip install mariadb`
+- `pip install mariadb`로 Python connector package를 설치합니다
 
 
 ## Setup
-1. The first step is to have a MariaDB 11.7.1 or later installed.
+1. 첫 번째 단계는 MariaDB 11.7.1 이상이 설치되어 있어야 합니다.
 
-    The docker image is the easiest way to get started.
+    docker image가 시작하기 가장 쉬운 방법입니다.
 
 ## Wrappers
 
 ### VectorStore
 
-There exists a wrapper around MariaDB vector databases, allowing you to use it as a vectorstore,
-whether for semantic search or example selection.
+MariaDB vector database를 감싸는 wrapper가 존재하며, 이를 통해 semantic search나 example selection을 위한 vectorstore로 사용할 수 있습니다.
 
-To import this vectorstore:
+이 vectorstore를 import하려면:
 ```python
 from langchain_mariadb import MariaDBStore
 ```
 
 ### Usage
 
-For a more detailed walkthrough of the MariaDB wrapper, see [this notebook](/oss/integrations/vectorstores/mariadb)
+MariaDB wrapper에 대한 더 자세한 안내는 [이 notebook](/oss/integrations/vectorstores/mariadb)을 참조하세요

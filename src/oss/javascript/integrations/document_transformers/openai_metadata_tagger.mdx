@@ -2,15 +2,15 @@
 title: OpenAI functions metadata tagger
 ---
 
-It can often be useful to tag ingested documents with structured metadata, such as the title, tone, or length of a document, to allow for more targeted similarity search later. However, for large numbers of documents, performing this labelling process manually can be tedious.
+수집된 문서에 제목, 어조 또는 문서 길이와 같은 구조화된 metadata를 태그로 추가하면 나중에 더 정확한 유사도 검색을 수행할 수 있어 유용합니다. 그러나 대량의 문서에 대해 이러한 라벨링 프로세스를 수동으로 수행하는 것은 지루할 수 있습니다.
 
-The `MetadataTagger` document transformer automates this process by extracting metadata from each provided document according to a provided schema. It uses a configurable OpenAI Functions-powered chain under the hood, so if you pass a custom LLM instance, it must be an OpenAI model with functions support.
+`MetadataTagger` document transformer는 제공된 schema에 따라 각 문서에서 metadata를 자동으로 추출하여 이 프로세스를 자동화합니다. 내부적으로 구성 가능한 OpenAI Functions 기반 chain을 사용하므로, 사용자 정의 LLM instance를 전달하는 경우 functions를 지원하는 OpenAI model이어야 합니다.
 
-**Note:** This document transformer works best with complete documents, so it's best to run it first with whole documents before doing any other splitting or processing!
+**참고:** 이 document transformer는 완전한 문서에서 가장 잘 작동하므로, 다른 분할이나 처리를 수행하기 전에 전체 문서로 먼저 실행하는 것이 좋습니다!
 
-### Usage
+### 사용법
 
-For example, let's say you wanted to index a set of movie reviews. You could initialize the document transformer as follows:
+예를 들어, 영화 리뷰 세트를 인덱싱하려는 경우 다음과 같이 document transformer를 초기화할 수 있습니다:
 
 ```typescript
 import * as z from "zod";
@@ -76,12 +76,12 @@ console.log(taggedDocuments);
 */
 ```
 
-There is an additional `createMetadataTagger` method that accepts a valid JSON Schema object as well.
+유효한 JSON Schema object를 허용하는 `createMetadataTagger` method도 추가로 제공됩니다.
 
-### Customization
+### 커스터마이징
 
-You can pass the underlying tagging chain the standard LLMChain arguments in the second options parameter.
-For example, if you wanted to ask the LLM to focus specific details in the input documents, or extract metadata in a certain style, you could pass in a custom prompt:
+두 번째 options parameter에서 기본 tagging chain에 표준 LLMChain arguments를 전달할 수 있습니다.
+예를 들어, LLM이 입력 문서의 특정 세부 정보에 집중하거나 특정 스타일로 metadata를 추출하도록 하려면 사용자 정의 prompt를 전달할 수 있습니다:
 
 ```typescript
 import * as z from "zod";

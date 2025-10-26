@@ -2,9 +2,9 @@
 title: LLMLingua Document Compressor
 ---
 
->[LLMLingua](https://github.com/microsoft/LLMLingua) utilizes a compact, well-trained language model (e.g., GPT2-small, LLaMA-7B) to identify and remove non-essential tokens in prompts. This approach enables efficient inference with large language models (LLMs), achieving up to 20x compression with minimal performance loss.
+>[LLMLingua](https://github.com/microsoft/LLMLingua)는 컴팩트하고 잘 훈련된 language model(예: GPT2-small, LLaMA-7B)을 활용하여 prompt에서 필수적이지 않은 token을 식별하고 제거합니다. 이 접근 방식은 large language model(LLM)을 사용한 효율적인 추론을 가능하게 하며, 최소한의 성능 손실로 최대 20배의 압축을 달성합니다.
 
-This notebook shows how to use LLMLingua as a document compressor.
+이 notebook은 LLMLingua를 document compressor로 사용하는 방법을 보여줍니다.
 
 ```python
 pip install -qU  llmlingua accelerate
@@ -28,9 +28,9 @@ def pretty_print_docs(docs):
     )
 ```
 
-## Set up the base vector store retriever
+## base vector store retriever 설정
 
-Let's start by initializing a simple vector store retriever and storing the 2023 State of the Union speech (in chunks). We can set up the retriever to retrieve a high number (20) of docs.
+간단한 vector store retriever를 초기화하고 2023 State of the Union 연설문을 (chunk 단위로) 저장하는 것부터 시작하겠습니다. retriever가 많은 수(20개)의 문서를 검색하도록 설정할 수 있습니다.
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -256,9 +256,9 @@ The United States of America.
 May God bless you all. May God protect our troops.
 ```
 
-## Doing compression with LLMLingua
+## LLMLingua로 압축하기
 
-Now let’s wrap our base retriever with a `ContextualCompressionRetriever`, using `LLMLinguaCompressor` as a compressor.
+이제 base retriever를 `ContextualCompressionRetriever`로 래핑하고, `LLMLinguaCompressor`를 compressor로 사용하겠습니다.
 
 ```python
 from langchain.retrievers import ContextualCompressionRetriever
@@ -297,9 +297,9 @@ Document 4:
 Danielle says Heath was a fighter to the very end.
 ```
 
-## QA generation with LLMLingua
+## LLMLingua를 사용한 QA 생성
 
-We can see what it looks like to use this in the generation step now
+이제 생성 단계에서 이것을 사용하는 것이 어떤 모습인지 확인할 수 있습니다
 
 ```python
 from langchain.chains import RetrievalQA

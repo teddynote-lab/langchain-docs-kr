@@ -1,30 +1,30 @@
 ---
-title: IBM Db2 Vector Store and Vector Search
+title: IBM Db2 Vector Store 및 Vector Search
 ---
 
-LangChain's Db2 integration (langchain-db2) provides vector store and vector search capabilities for working with IBM relational database Db2 version v12.1.2 and above, distributed under the MIT license. Users can use the provided implementations as-is or customize them for specific needs.
- Key features include:
+LangChain의 Db2 통합(langchain-db2)은 MIT 라이선스로 배포되는 IBM 관계형 데이터베이스 Db2 버전 v12.1.2 이상에서 작동하는 vector store 및 vector search 기능을 제공합니다. 사용자는 제공된 구현을 그대로 사용하거나 특정 요구 사항에 맞게 사용자 정의할 수 있습니다.
+주요 기능은 다음과 같습니다:
 
-* Vector storage with metadata
-* Vector similarity search and max marginal relevance search, with metadata filtering options
-* Support for dot production, cosine, and euclidean distance metrics
-* Performance optimization by index creation and Approximate nearest neighbors search. (Will be added shortly)
+* 메타데이터를 포함한 벡터 저장
+* 메타데이터 필터링 옵션을 사용한 벡터 유사도 검색 및 max marginal relevance 검색
+* dot production, cosine 및 euclidean 거리 메트릭 지원
+* 인덱스 생성 및 근사 최근접 이웃 검색을 통한 성능 최적화 (곧 추가 예정)
 
 ## Setup
 
-### Prerequisites for using LangChain with Db2 Vector Store and Search
+### Db2 Vector Store 및 Search와 함께 LangChain을 사용하기 위한 전제 조건
 
-Install package `langchain-db2` which is the integration package for the db2 LangChain Vector Store and Search.
+db2 LangChain Vector Store 및 Search를 위한 통합 패키지인 `langchain-db2` 패키지를 설치합니다.
 
-The installation of the package should also install its dependencies like `langchain-core` and `ibm_db`.
+패키지 설치 시 `langchain-core` 및 `ibm_db`와 같은 종속성도 함께 설치됩니다.
 
 ```python
 # pip install -U langchain-db2
 ```
 
-### Connect to Db2 Vector Store
+### Db2 Vector Store에 연결
 
-The following sample code will show how to connect to Db2 Database. Besides the dependencies above, you will need a Db2 database instance (with version v12.1.2+, which has the vector datatype support) running.
+다음 샘플 코드는 Db2 Database에 연결하는 방법을 보여줍니다. 위의 종속성 외에도 벡터 데이터 타입을 지원하는 Db2 데이터베이스 인스턴스(버전 v12.1.2 이상)가 실행 중이어야 합니다.
 
 ```python
 import ibm_db
@@ -41,7 +41,7 @@ except Exception as e:
     print("Connection failed!")
 ```
 
-### Import the required dependencies
+### 필요한 종속성 import
 
 ```python
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -53,7 +53,7 @@ from langchain_db2.db2vs import DB2VS
 
 ## Initialization
 
-### Create Documents
+### Document 생성
 
 ```python
 # Define a list of documents
@@ -92,12 +92,12 @@ for doc in documents_json_list:
     documents_langchain.append(doc_langchain)
 ```
 
-### Create Vector Stores with different distance metrics
+### 다양한 거리 메트릭을 사용하여 Vector Store 생성
 
-First we will create three vector stores each with different distance strategies.
+먼저 각각 다른 거리 전략을 사용하는 세 개의 vector store를 생성합니다.
 
-(You can manually connect to the Db2 Database and will see three tables :
-Documents_DOT, Documents_COSINE and Documents_EUCLIDEAN. )
+(Db2 Database에 수동으로 연결하면 세 개의 테이블을 볼 수 있습니다:
+Documents_DOT, Documents_COSINE 및 Documents_EUCLIDEAN.)
 
 ```python
 # Create Db2 Vector Stores using different distance strategies
@@ -133,7 +133,7 @@ vector_store_euclidean = DB2VS.from_documents(
 
 ## Manage vector store
 
-### Demonstrating add and delete operations for texts, along with basic similarity search
+### 기본 유사도 검색과 함께 텍스트에 대한 추가 및 삭제 작업 시연
 
 ```python
 def manage_texts(vector_stores):
@@ -177,9 +177,9 @@ manage_texts(vector_store_list)
 
 ## Query vector store
 
-### Demonstrate advanced searches on vector stores, with and without attribute filtering
+### 속성 필터링을 사용하거나 사용하지 않고 vector store에 대한 고급 검색 시연
 
-With filtering, we only select the document id 101 and nothing else
+필터링을 사용하면 문서 id 101만 선택하고 다른 것은 선택하지 않습니다
 
 ```python
 # Conduct advanced searches

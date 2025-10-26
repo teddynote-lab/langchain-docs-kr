@@ -1,6 +1,6 @@
-## Trace selectively
+## 선택적으로 추적하기
 
-You may opt to trace specific invocations or parts of your application using LangSmith's `tracing_context` context manager:
+LangSmith의 `tracing_context` context manager를 사용하여 특정 호출이나 애플리케이션의 일부를 추적하도록 선택할 수 있습니다:
 
 :::python
 ```python
@@ -37,20 +37,20 @@ await agent.invoke(
 ```
 :::
 
-## Log to a project
+## project에 로그 기록하기
 
-<Accordion title="Statically">
+<Accordion title="정적으로">
 
-You can set a custom project name for your entire application by setting the `LANGSMITH_PROJECT` environment variable:
+`LANGSMITH_PROJECT` environment variable을 설정하여 전체 애플리케이션에 대한 사용자 정의 project 이름을 설정할 수 있습니다:
 
 ```bash
 export LANGSMITH_PROJECT=my-agent-project
 ```
 </Accordion>
 
-<Accordion title="Dynamically">
+<Accordion title="동적으로">
 
-You can set the project name programmatically for specific operations:
+특정 작업에 대해 프로그래밍 방식으로 project 이름을 설정할 수 있습니다:
 
 :::python
 ```python
@@ -78,9 +78,9 @@ await agent.invoke(
 :::
 </Accordion>
 
-## Add metadata to traces
+## trace에 metadata 추가하기
 
-You can annotate your traces with custom metadata and tags:
+사용자 정의 metadata와 tag로 trace에 주석을 달 수 있습니다:
 
 :::python
 ```python
@@ -97,7 +97,7 @@ response = agent.invoke(
 )
 ```
 
-`tracing_context` also accepts tags and metadata for fine-grained control:
+`tracing_context`는 세밀한 제어를 위해 tag와 metadata도 허용합니다:
 
 ```python
 with ls.tracing_context(
@@ -133,9 +133,9 @@ await agent.invoke(
 ```
 :::
 
-This custom metadata and tags will be attached to the trace in LangSmith.
+이 사용자 정의 metadata와 tag는 LangSmith의 trace에 첨부됩니다.
 
 
 <Tip>
-To learn more about how to use traces to debug, evaluate, and monitor your agents, see the [LangSmith documentation](/langsmith/home).
+agent를 디버그, 평가 및 모니터링하기 위해 trace를 사용하는 방법에 대해 자세히 알아보려면 [LangSmith 문서](/langsmith/home)를 참조하세요.
 </Tip>

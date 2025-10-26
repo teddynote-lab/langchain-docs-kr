@@ -1,47 +1,47 @@
 ---
-title: A2A endpoint in LangGraph Server
-sidebarTitle: A2A endpoint in LangGraph Server
+title: LangGraph Server의 A2A endpoint
+sidebarTitle: LangGraph Server의 A2A endpoint
 ---
 
-[Agent2Agent (A2A)](https://a2a-protocol.org/latest/) is Google's protocol for enabling communication between conversational AI agents. [LangSmith implements A2A support](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html#tag/a2a/post/a2a/{assistant_id}), allowing your agents to communicate with other A2A-compatible agents through a standardized protocol.
+[Agent2Agent (A2A)](https://a2a-protocol.org/latest/)는 대화형 AI 에이전트 간의 통신을 가능하게 하는 Google의 프로토콜입니다. [LangSmith는 A2A 지원을 구현](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html#tag/a2a/post/a2a/{assistant_id})하여, 표준화된 프로토콜을 통해 에이전트가 다른 A2A 호환 에이전트와 통신할 수 있도록 합니다.
 
-The A2A endpoint is available in [LangGraph Server](/langsmith/langgraph-server) at `/a2a/{assistant_id}`.
+A2A endpoint는 [LangGraph Server](/langsmith/langgraph-server)의 `/a2a/{assistant_id}`에서 사용할 수 있습니다.
 
 ## Agent Card Discovery
 
-Each assistant automatically exposes an A2A Agent Card that describes its capabilities and provides the information needed for other agents to connect. You can retrieve the agent card for any assistant using:
+각 assistant는 자동으로 기능을 설명하고 다른 에이전트가 연결하는 데 필요한 정보를 제공하는 A2A Agent Card를 노출합니다. 다음을 사용하여 모든 assistant의 agent card를 검색할 수 있습니다:
 
 ```
 GET /.well-known/agent-card.json?assistant_id={assistant_id}
 ```
 
-The agent card includes the assistant's name, description, available skills, supported input/output modes, and the A2A endpoint URL for communication.
+agent card에는 assistant의 이름, 설명, 사용 가능한 skill, 지원되는 입출력 모드, 통신을 위한 A2A endpoint URL이 포함됩니다.
 
 ## Requirements
 
-To use A2A, ensure you have the following dependencies installed:
+A2A를 사용하려면 다음 dependency가 설치되어 있는지 확인하세요:
 
 * `langgraph-api >= 0.4.9`
 
-Install with:
+다음 명령으로 설치:
 
 ```bash
 pip install "langgraph-api>=0.4.9"
 ```
 
-## Usage overview
+## 사용 개요
 
-To enable A2A:
+A2A를 활성화하려면:
 
-* Upgrade to use langgraph-api>=0.4.9.
-* Deploy your agent with message-based state structure.
-* Connect with other A2A-compatible agents using the endpoint.
+* langgraph-api>=0.4.9를 사용하도록 업그레이드합니다.
+* 메시지 기반 state 구조로 에이전트를 배포합니다.
+* endpoint를 사용하여 다른 A2A 호환 에이전트와 연결합니다.
 
-## Creating an A2A-compatible agent
+## A2A 호환 에이전트 만들기
 
-This example creates an A2A-compatible agent that processes incoming messages using OpenAI's API and maintains conversational state. The agent defines a message-based state structure and handles the A2A protocol's message format.
+이 예제는 OpenAI의 API를 사용하여 수신 메시지를 처리하고 대화 state를 유지하는 A2A 호환 에이전트를 만듭니다. 에이전트는 메시지 기반 state 구조를 정의하고 A2A 프로토콜의 메시지 형식을 처리합니다.
 
-To be compatible with the [A2A "text" parts](https://a2a-protocol.org/dev/specification/#651-textpart-object), the agent must have a `messages` key in state. Here's an example:
+[A2A "text" parts](https://a2a-protocol.org/dev/specification/#651-textpart-object)와 호환되려면, 에이전트는 state에 `messages` key를 가져야 합니다. 다음은 예제입니다:
 
 ```python
 """LangGraph A2A conversational agent.
@@ -129,11 +129,11 @@ graph = (
 )
 ```
 
-## Agent-to-agent communication
+## Agent-to-agent 통신
 
-Once your agents are running locally via `langgraph dev` or [deployed to production](/langsmith/deployments), you can facilitate communication between them using the A2A protocol.
+에이전트가 `langgraph dev`를 통해 로컬에서 실행되거나 [프로덕션에 배포](/langsmith/deployments)되면, A2A 프로토콜을 사용하여 에이전트 간의 통신을 촉진할 수 있습니다.
 
-This example demonstrates how two agents can communicate by sending JSON-RPC messages to each other's A2A endpoints. The script simulates a multi-turn conversation where each agent processes the other's response and continues the dialogue.
+이 예제는 두 에이전트가 서로의 A2A endpoint에 JSON-RPC 메시지를 전송하여 통신하는 방법을 보여줍니다. 스크립트는 각 에이전트가 상대방의 응답을 처리하고 대화를 계속하는 다중 턴 대화를 시뮬레이션합니다.
 
 ```python
 #!/usr/bin/env python3

@@ -2,7 +2,7 @@
 title: BrightDataWebScraperAPI
 ---
 
-[Bright Data](https://brightdata.com/) provides a powerful Web Scraper API that allows you to extract structured data from 100+ ppular domains, including Amazon product details, LinkedIn profiles, and more, making it particularly useful for AI agents requiring reliable structured web data feeds.
+[Bright Data](https://brightdata.com/)는 Amazon 제품 상세 정보, LinkedIn 프로필 등 100개 이상의 인기 도메인에서 구조화된 데이터를 추출할 수 있는 강력한 Web Scraper API를 제공합니다. 이는 신뢰할 수 있는 구조화된 웹 데이터 피드가 필요한 AI agent에 특히 유용합니다.
 
 ## Overview
 
@@ -16,17 +16,17 @@ title: BrightDataWebScraperAPI
 
 |Native async|Returns artifact|Return data|Pricing|
 |:-:|:-:|:--|:-:|
-|❌|❌|Structured data from websites (Amazon products, LinkedIn profiles, etc.)|Requires Bright Data account|
+|❌|❌|웹사이트의 구조화된 데이터 (Amazon 제품, LinkedIn 프로필 등)|Bright Data 계정 필요|
 
 ## Setup
 
-The integration lives in the `langchain-brightdata` package.
+이 integration은 `langchain-brightdata` package에 포함되어 있습니다.
 
 ```python
 pip install langchain-brightdata
 ```
 
-You'll need a Bright Data API key to use this tool. You can set it as an environment variable:
+이 tool을 사용하려면 Bright Data API key가 필요합니다. 환경 변수로 설정할 수 있습니다:
 
 ```python
 import os
@@ -34,7 +34,7 @@ import os
 os.environ["BRIGHT_DATA_API_KEY"] = "your-api-key"
 ```
 
-Or pass it directly when initializing the tool:
+또는 tool을 초기화할 때 직접 전달할 수 있습니다:
 
 ```python
 from langchain_brightdata import BrightDataWebScraperAPI
@@ -44,12 +44,12 @@ scraper_tool = BrightDataWebScraperAPI(bright_data_api_key="your-api-key")
 
 ## Instantiation
 
-Here we show how to instantiate an instance of the BrightDataWebScraperAPI tool. This tool allows you to extract structured data from various websites including Amazon product details, LinkedIn profiles, and more using Bright Data's Dataset API.
+여기서는 BrightDataWebScraperAPI tool의 인스턴스를 생성하는 방법을 보여줍니다. 이 tool을 사용하면 Bright Data의 Dataset API를 통해 Amazon 제품 상세 정보, LinkedIn 프로필 등 다양한 웹사이트에서 구조화된 데이터를 추출할 수 있습니다.
 
-The tool accepts various parameters during instantiation:
+이 tool은 인스턴스 생성 시 다양한 parameter를 받습니다:
 
-- `bright_data_api_key` (required, str): Your Bright Data API key for authentication.
-- `dataset_mapping` (optional, Dict[str, str]): A dictionary mapping dataset types to their corresponding Bright Data dataset IDs. The default mapping includes:
+- `bright_data_api_key` (필수, str): 인증을 위한 Bright Data API key입니다.
+- `dataset_mapping` (선택, Dict[str, str]): dataset 유형을 해당 Bright Data dataset ID에 매핑하는 dictionary입니다. 기본 매핑에는 다음이 포함됩니다:
   - "amazon_product": "gd_l7q7dkf244hwjntr0"
   - "amazon_product_reviews": "gd_le8e811kzy4ggddlq"
   - "linkedin_person_profile": "gd_l1viktl72bvl7bjuj0"
@@ -107,24 +107,24 @@ print(linkedin_results)
 
 ## Customization Options
 
-The BrightDataWebScraperAPI tool accepts several parameters for customization:
+BrightDataWebScraperAPI tool은 커스터마이징을 위한 여러 parameter를 받습니다:
 
 |Parameter|Type|Description|
 |:--|:--|:--|
-|`url`|str|The URL to extract data from|
-|`dataset_type`|str|Type of dataset to use (e.g., "amazon_product")|
-|`zipcode`|str|Optional zipcode for location-specific data|
+|`url`|str|데이터를 추출할 URL|
+|`dataset_type`|str|사용할 dataset 유형 (예: "amazon_product")|
+|`zipcode`|str|위치별 데이터를 위한 선택적 우편번호|
 
 ## Available Dataset Types
 
-The tool supports the following dataset types for structured data extraction:
+이 tool은 구조화된 데이터 추출을 위해 다음 dataset 유형을 지원합니다:
 
 |Dataset Type|Description|
 |:--|:--|
-|`amazon_product`|Extract detailed Amazon product data|
-|`amazon_product_reviews`|Extract Amazon product reviews|
-|`linkedin_person_profile`|Extract LinkedIn person profile data|
-|`linkedin_company_profile`|Extract LinkedIn company profile data|
+|`amazon_product`|Amazon 제품의 상세 데이터 추출|
+|`amazon_product_reviews`|Amazon 제품 리뷰 추출|
+|`linkedin_person_profile`|LinkedIn 개인 프로필 데이터 추출|
+|`linkedin_company_profile`|LinkedIn 회사 프로필 데이터 추출|
 
 ## Use within an agent
 

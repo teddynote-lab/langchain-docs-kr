@@ -1,14 +1,14 @@
 ---
-title: MLflow AI Gateway for LLMs
+title: LLM을 위한 MLflow AI Gateway
 ---
 
->[The MLflow AI Gateway for LLMs](https://www.mlflow.org/docs/latest/llms/deployments/index.html) is a powerful tool designed to streamline the usage and management of various large
-> language model (LLM) providers, such as OpenAI and Anthropic, within an organization. It offers a high-level interface
-> that simplifies the interaction with these services by providing a unified endpoint to handle specific LLM related requests.
+>[LLM을 위한 MLflow AI Gateway](https://www.mlflow.org/docs/latest/llms/deployments/index.html)는 조직 내에서 OpenAI 및 Anthropic과 같은 다양한 대규모
+> 언어 모델(LLM) provider의 사용 및 관리를 간소화하도록 설계된 강력한 도구입니다. 특정 LLM 관련 요청을 처리하기 위한 통합 endpoint를 제공하여
+> 이러한 서비스와의 상호 작용을 단순화하는 high-level interface를 제공합니다.
 
-## Installation and Setup
+## Installation 및 Setup
 
-Install `mlflow` with MLflow GenAI dependencies:
+MLflow GenAI dependencies와 함께 `mlflow`를 설치합니다:
 
 <CodeGroup>
 ```bash pip
@@ -20,13 +20,13 @@ uv add mlflow[genai]
 ```
 </CodeGroup>
 
-Set the OpenAI API key as an environment variable:
+OpenAI API key를 environment variable로 설정합니다:
 
 ```sh
 export OPENAI_API_KEY=...
 ```
 
-Create a configuration file:
+configuration file을 생성합니다:
 
 ```yaml
 endpoints:
@@ -47,21 +47,21 @@ endpoints:
         openai_api_key: $OPENAI_API_KEY
 ```
 
-Start the gateway server:
+gateway server를 시작합니다:
 
 ```sh
 mlflow gateway start --config-path /path/to/config.yaml
 ```
 
-## Example provided by `MLflow`
+## `MLflow`에서 제공하는 예제
 
->The `mlflow.langchain` module provides an API for logging and loading `LangChain` models.
-> This module exports multivariate LangChain models in the langchain flavor and univariate LangChain
-> models in the pyfunc flavor.
+>`mlflow.langchain` module은 `LangChain` model을 logging하고 loading하기 위한 API를 제공합니다.
+> 이 module은 langchain flavor의 multivariate LangChain model과 pyfunc flavor의 univariate LangChain
+> model을 export합니다.
 
-See the [API documentation and examples](https://www.mlflow.org/docs/latest/llms/langchain/index.html) for more information.
+자세한 내용은 [API documentation 및 예제](https://www.mlflow.org/docs/latest/llms/langchain/index.html)를 참조하세요.
 
-## Completions Example
+## Completions 예제
 
 ```python
 import mlflow
@@ -90,7 +90,7 @@ model = mlflow.pyfunc.load_model(model_info.model_uri)
 print(model.predict([{"adjective": "funny"}]))
 ```
 
-## Embeddings Example
+## Embeddings 예제
 
 ```python
 from langchain_community.embeddings import MlflowEmbeddings
@@ -104,7 +104,7 @@ print(embeddings.embed_query("hello"))
 print(embeddings.embed_documents(["hello"]))
 ```
 
-## Chat Example
+## Chat 예제
 
 ```python
 from langchain_community.chat_models import ChatMlflow

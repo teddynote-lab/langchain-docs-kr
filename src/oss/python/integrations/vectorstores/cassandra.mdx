@@ -2,22 +2,22 @@
 title: Apache Cassandra
 ---
 
-This page provides a quickstart for using [Apache Cassandra®](https://cassandra.apache.org/) as a Vector Store.
+이 페이지는 [Apache Cassandra®](https://cassandra.apache.org/)를 Vector Store로 사용하기 위한 빠른 시작 가이드를 제공합니다.
 
-> [Cassandra](https://cassandra.apache.org/) is a NoSQL, row-oriented, highly scalable and highly available database.Starting with version 5.0, the database ships with [vector search capabilities](https://cassandra.apache.org/doc/trunk/cassandra/vector-search/overview.html).
+> [Cassandra](https://cassandra.apache.org/)는 NoSQL, row-oriented, 높은 확장성과 가용성을 가진 데이터베이스입니다. 버전 5.0부터 데이터베이스는 [vector search 기능](https://cassandra.apache.org/doc/trunk/cassandra/vector-search/overview.html)을 제공합니다.
 
-_Note: in addition to access to the database, an OpenAI API Key is required to run the full example._
+_참고: 데이터베이스 접근 외에도 전체 예제를 실행하려면 OpenAI API Key가 필요합니다._
 
-### Setup and general dependencies
+### Setup 및 일반 dependencies
 
-Use of the integration requires the following Python package.
+이 통합을 사용하려면 다음 Python package가 필요합니다.
 
 ```python
 pip install -qU langchain-community "cassio>=0.1.4"
 ```
 
-_Note: depending on your LangChain setup, you may need to install/upgrade other dependencies needed for this demo_
-_(specifically, recent versions of `datasets`, `openai`, `pypdf` and `tiktoken` are required, along with `langchain-community`)._
+_참고: LangChain 설정에 따라 이 데모에 필요한 다른 dependencies를 설치/업그레이드해야 할 수 있습니다_
+_(특히, `datasets`, `openai`, `pypdf`, `tiktoken`의 최신 버전과 `langchain-community`가 필요합니다)._
 
 ```python
 import os
@@ -44,7 +44,7 @@ if "OPENAI_API_KEY" not in os.environ:
 embe = OpenAIEmbeddings()
 ```
 
-## Import the Vector Store
+## Vector Store import
 
 ```python
 from langchain_community.vectorstores import Cassandra
@@ -52,15 +52,15 @@ from langchain_community.vectorstores import Cassandra
 
 ## Connection parameters
 
-The Vector Store integration shown in this page can be used with Cassandra as well as other derived databases, such as Astra DB, which use the CQL (Cassandra Query Language) protocol.
+이 페이지에 표시된 Vector Store 통합은 Cassandra뿐만 아니라 CQL(Cassandra Query Language) protocol을 사용하는 Astra DB와 같은 파생 데이터베이스에서도 사용할 수 있습니다.
 
-> DataStax [Astra DB](https://docs.datastax.com/en/astra-serverless/docs/vector-search/quickstart.html) is a managed serverless database built on Cassandra, offering the same interface and strengths.
+> DataStax [Astra DB](https://docs.datastax.com/en/astra-serverless/docs/vector-search/quickstart.html)는 Cassandra를 기반으로 구축된 관리형 serverless 데이터베이스로, 동일한 인터페이스와 강점을 제공합니다.
 
-Depending on whether you connect to a Cassandra cluster or to Astra DB through CQL, you will provide different parameters when creating the vector store object.
+Cassandra cluster에 연결하는지 또는 CQL을 통해 Astra DB에 연결하는지에 따라 vector store 객체를 생성할 때 다른 parameters를 제공합니다.
 
-### Connecting to a Cassandra cluster
+### Cassandra cluster에 연결
 
-You first need to create a `cassandra.cluster.Session` object, as described in the [Cassandra driver documentation](https://docs.datastax.com/en/developer/python-driver/latest/api/cassandra/cluster/#module-cassandra.cluster). The details vary (e.g. with network settings and authentication), but this might be something like:
+먼저 [Cassandra driver 문서](https://docs.datastax.com/en/developer/python-driver/latest/api/cassandra/cluster/#module-cassandra.cluster)에 설명된 대로 `cassandra.cluster.Session` 객체를 생성해야 합니다. 세부 사항은 다양하지만(예: 네트워크 설정 및 인증), 다음과 같을 수 있습니다:
 
 ```python
 from cassandra.cluster import Cluster
@@ -69,7 +69,7 @@ cluster = Cluster(["127.0.0.1"])
 session = cluster.connect()
 ```
 
-You can now set the session, along with your desired keyspace name, as a global CassIO parameter:
+이제 원하는 keyspace 이름과 함께 session을 global CassIO parameter로 설정할 수 있습니다:
 
 ```python
 import cassio
@@ -79,7 +79,7 @@ CASSANDRA_KEYSPACE = input("CASSANDRA_KEYSPACE = ")
 cassio.init(session=session, keyspace=CASSANDRA_KEYSPACE)
 ```
 
-Now you can create the vector store:
+이제 vector store를 생성할 수 있습니다:
 
 ```python
 vstore = Cassandra(
@@ -89,15 +89,15 @@ vstore = Cassandra(
 )
 ```
 
-_Note: you can also pass your session and keyspace directly as parameters when creating the vector store. Using the global `cassio.init` setting, however, comes handy if your applications uses Cassandra in several ways (for instance, for vector store, chat memory and LLM response caching), as it allows to centralize credential and DB connection management in one place._
+_참고: vector store를 생성할 때 session과 keyspace를 직접 parameters로 전달할 수도 있습니다. 그러나 global `cassio.init` 설정을 사용하면 애플리케이션이 여러 방식으로 Cassandra를 사용하는 경우(예: vector store, chat memory, LLM response caching) 자격 증명 및 DB connection 관리를 한 곳에서 중앙 집중화할 수 있어 편리합니다._
 
-### Connecting to Astra DB through CQL
+### CQL을 통해 Astra DB에 연결
 
-In this case you initialize CassIO with the following connection parameters:
+이 경우 다음 connection parameters로 CassIO를 초기화합니다:
 
-- the Database ID, e.g. `01234567-89ab-cdef-0123-456789abcdef`
-- the Token, e.g. `AstraCS:6gBhNmsk135....` (it must be a "Database Administrator" token)
-- Optionally a Keyspace name (if omitted, the default one for the database will be used)
+- Database ID, 예: `01234567-89ab-cdef-0123-456789abcdef`
+- Token, 예: `AstraCS:6gBhNmsk135....` ("Database Administrator" token이어야 함)
+- 선택적으로 Keyspace 이름 (생략하면 데이터베이스의 기본값이 사용됨)
 
 ```python
 ASTRA_DB_ID = input("ASTRA_DB_ID = ")
@@ -120,7 +120,7 @@ cassio.init(
 )
 ```
 
-Now you can create the vector store:
+이제 vector store를 생성할 수 있습니다:
 
 ```python
 vstore = Cassandra(
@@ -130,9 +130,9 @@ vstore = Cassandra(
 )
 ```
 
-## Load a dataset
+## Dataset 로드
 
-Convert each entry in the source dataset into a `Document`, then write them into the vector store:
+소스 dataset의 각 항목을 `Document`로 변환한 다음 vector store에 작성합니다:
 
 ```python
 philo_dataset = load_dataset("datastax/philosopher-quotes")["train"]
@@ -147,9 +147,9 @@ inserted_ids = vstore.add_documents(docs)
 print(f"\nInserted {len(inserted_ids)} documents.")
 ```
 
-In the above, `metadata` dictionaries are created from the source data and are part of the `Document`.
+위에서 `metadata` dictionaries는 소스 데이터에서 생성되며 `Document`의 일부입니다.
 
-Add some more entries, this time with `add_texts`:
+이번에는 `add_texts`를 사용하여 더 많은 항목을 추가합니다:
 
 ```python
 texts = ["I think, therefore I am.", "To the things themselves!"]
@@ -160,13 +160,11 @@ inserted_ids_2 = vstore.add_texts(texts=texts, metadatas=metadatas, ids=ids)
 print(f"\nInserted {len(inserted_ids_2)} documents.")
 ```
 
-_Note: you may want to speed up the execution of `add_texts` and `add_documents` by increasing the concurrency level for_
-_these bulk operations - check out the methods' `batch_size` parameter_
-_for more details. Depending on the network and the client machine specifications, your best-performing choice of parameters may vary._
+_참고: `add_texts` 및 `add_documents`의 실행 속도를 높이려면 이러한 bulk operations의 동시성 수준을 높일 수 있습니다 - 자세한 내용은 메서드의 `batch_size` parameter를 확인하세요. 네트워크 및 클라이언트 시스템 사양에 따라 최적의 parameters 선택이 달라질 수 있습니다._
 
-## Run searches
+## 검색 실행
 
-This section demonstrates metadata filtering and getting the similarity scores back:
+이 섹션에서는 metadata filtering과 similarity scores를 반환하는 방법을 보여줍니다:
 
 ```python
 results = vstore.similarity_search("Our life is what we make of it", k=3)
@@ -202,7 +200,7 @@ for res in results:
     print(f"* {res.page_content} [{res.metadata}]")
 ```
 
-## Deleting stored documents
+## 저장된 documents 삭제
 
 ```python
 delete_1 = vstore.delete(inserted_ids[:3])
@@ -214,13 +212,13 @@ delete_2 = vstore.delete(inserted_ids[2:5])
 print(f"some_succeeds={delete_2}")  # True, though some IDs were gone already
 ```
 
-## A minimal RAG chain
+## 최소한의 RAG chain
 
-The next cells will implement a simple RAG pipeline:
+다음 셀은 간단한 RAG pipeline을 구현합니다:
 
-- download a sample PDF file and load it onto the store;
-- create a RAG chain with LCEL (LangChain Expression Language), with the vector store at its heart;
-- run the question-answering chain.
+- 샘플 PDF 파일을 다운로드하고 store에 로드합니다;
+- vector store를 중심으로 LCEL(LangChain Expression Language)을 사용하여 RAG chain을 생성합니다;
+- question-answering chain을 실행합니다.
 
 ```python
 !curl -L \
@@ -270,13 +268,13 @@ chain = (
 chain.invoke("How does Russel elaborate on Peirce's idea of the security blanket?")
 ```
 
-For more, check out a complete RAG template using Astra DB through CQL [here](https://github.com/langchain-ai/langchain/tree/master/templates/cassandra-entomology-rag).
+더 자세한 내용은 CQL을 통해 Astra DB를 사용하는 완전한 RAG template을 [여기](https://github.com/langchain-ai/langchain/tree/master/templates/cassandra-entomology-rag)에서 확인하세요.
 
 ## Cleanup
 
-the following essentially retrieves the `Session` object from CassIO and runs a CQL `DROP TABLE` statement with it:
+다음은 기본적으로 CassIO에서 `Session` 객체를 검색하고 이를 사용하여 CQL `DROP TABLE` 문을 실행합니다:
 
-_(You will lose the data you stored in it.)_
+_(저장한 데이터가 손실됩니다.)_
 
 ```python
 cassio.config.resolve_session().execute(
@@ -284,10 +282,10 @@ cassio.config.resolve_session().execute(
 )
 ```
 
-### Learn more
+### 더 알아보기
 
-For more information, extended quickstarts and additional usage examples, please visit the [CassIO documentation](https://cassio.org/frameworks/langchain/about/) for more on using the LangChain `Cassandra` vector store.
+자세한 정보, 확장된 빠른 시작 가이드 및 추가 사용 예제는 LangChain `Cassandra` vector store 사용에 대한 자세한 내용을 보려면 [CassIO 문서](https://cassio.org/frameworks/langchain/about/)를 방문하세요.
 
 #### Attribution statement
 
-> Apache Cassandra, Cassandra and Apache are either registered trademarks or trademarks of the [Apache Software Foundation](http://www.apache.org/) in the United States and/or other countries.
+> Apache Cassandra, Cassandra 및 Apache는 미국 및/또는 기타 국가에서 [Apache Software Foundation](http://www.apache.org/)의 등록 상표 또는 상표입니다.

@@ -2,31 +2,31 @@
 title: Scrapeless Scraping API
 ---
 
-**Scrapeless** offers flexible and feature-rich data acquisition services with extensive parameter customization and multi-format export support. These capabilities empower LangChain to integrate and leverage external data more effectively. The core functional modules include:
+**Scrapeless**는 광범위한 parameter 커스터마이징과 다중 형식 export 지원을 통해 유연하고 기능이 풍부한 데이터 수집 서비스를 제공합니다. 이러한 기능은 LangChain이 외부 데이터를 보다 효과적으로 통합하고 활용할 수 있도록 지원합니다. 핵심 기능 모듈은 다음과 같습니다:
 
 **DeepSerp**
 
-- **Google Search**: Enables comprehensive extraction of Google SERP data across all result types.
-  - Supports selection of localized Google domains (e.g., `google.com`, `google.ad`) to retrieve region-specific search results.
-  - Pagination supported for retrieving results beyond the first page.
-  - Supports a search result filtering toggle to control whether to exclude duplicate or similar content.
-- **Google Trends**: Retrieves keyword trend data from Google, including popularity over time, regional interest, and related searches.
-  - Supports multi-keyword comparison.
-  - Supports multiple data types: `interest_over_time`, `interest_by_region`, `related_queries`, and `related_topics`.
-  - Allows filtering by specific Google properties (Web, YouTube, News, Shopping) for source-specific trend analysis.
+- **Google Search**: 모든 결과 유형에 걸쳐 Google SERP 데이터의 포괄적인 추출을 가능하게 합니다.
+  - 지역별 검색 결과를 검색하기 위해 지역화된 Google domain 선택을 지원합니다 (예: `google.com`, `google.ad`).
+  - 첫 페이지 이후의 결과를 검색하기 위한 pagination을 지원합니다.
+  - 중복되거나 유사한 콘텐츠를 제외할지 제어하는 검색 결과 필터링 토글을 지원합니다.
+- **Google Trends**: 시간 경과에 따른 인기도, 지역별 관심도, 관련 검색을 포함한 Google의 키워드 트렌드 데이터를 검색합니다.
+  - 다중 키워드 비교를 지원합니다.
+  - 여러 데이터 유형을 지원합니다: `interest_over_time`, `interest_by_region`, `related_queries`, `related_topics`.
+  - 소스별 트렌드 분석을 위해 특정 Google 속성(Web, YouTube, News, Shopping)별 필터링을 허용합니다.
 
 **Universal Scraping**
 
-- Designed for modern, JavaScript-heavy websites, allowing dynamic content extraction.
-  - Global premium proxy support for bypassing geo-restrictions and improving reliability.
+- JavaScript가 많이 사용되는 최신 웹사이트를 위해 설계되어 동적 콘텐츠 추출을 허용합니다.
+  - 지역 제한을 우회하고 안정성을 향상시키기 위한 글로벌 프리미엄 proxy 지원.
 
 **Crawler**
 
-- **Crawl**: Recursively crawl a website and its linked pages to extract site-wide content.
-  - Supports configurable crawl depth and scoped URL targeting.
-- **Scrape**: Extract content from a single webpage with high precision.
-  - Supports "main content only" extraction to exclude ads, footers, and other non-essential elements.
-  - Allows batch scraping of multiple standalone URLs.
+- **Crawl**: 웹사이트와 연결된 페이지를 재귀적으로 크롤링하여 사이트 전체 콘텐츠를 추출합니다.
+  - 구성 가능한 크롤링 깊이와 범위가 지정된 URL 타겟팅을 지원합니다.
+- **Scrape**: 높은 정밀도로 단일 웹페이지에서 콘텐츠를 추출합니다.
+  - 광고, footer 및 기타 필수적이지 않은 요소를 제외하는 "주요 콘텐츠만" 추출을 지원합니다.
+  - 여러 독립 URL의 일괄 스크래핑을 허용합니다.
 
 ## Overview
 
@@ -41,16 +41,16 @@ title: Scrapeless Scraping API
 
 |Native async|Returns artifact|Return data|
 |:-:|:-:|:-:|
-|✅|❌|Search Results Based on Tool|
+|✅|❌|Tool에 따른 검색 결과|
 
 ## Setup
 
-The integration lives in the `langchain-scrapeless` package.
+이 integration은 `langchain-scrapeless` package에 포함되어 있습니다.
 !pip install langchain-scrapeless
 
 ### Credentials
 
-You'll need a Scrapeless API key to use this tool. You can set it as an environment variable:
+이 tool을 사용하려면 Scrapeless API key가 필요합니다. 환경 변수로 설정할 수 있습니다:
 
 ```python
 import os
@@ -62,34 +62,34 @@ os.environ["SCRAPELESS_API_KEY"] = "your-api-key"
 
 ### ScrapelessDeepSerpGoogleSearchTool
 
-Here we show how to instantiate an instance of the `ScrapelessDeepSerpGoogleSearchTool`. The universal Information Search Engine allows you to retrieve any data information.
+여기서는 `ScrapelessDeepSerpGoogleSearchTool`의 instance를 인스턴스화하는 방법을 보여줍니다. 범용 정보 검색 엔진을 사용하면 모든 데이터 정보를 검색할 수 있습니다.
 
-- Retrieves any data information.
-- Handles explanatory queries (e.g., "why", "how").
-- Supports comparative analysis requests.
+- 모든 데이터 정보를 검색합니다.
+- 설명 쿼리(예: "why", "how")를 처리합니다.
+- 비교 분석 요청을 지원합니다.
 
-The tool accepts the following parameters:
+이 tool은 다음 parameter를 허용합니다:
 
-- `q`: (str) The search query string. Supports advanced Google syntax like `inurl:`, `site:`, `intitle:`, `as_eq`, etc.
-- `hl`: (str) Language code for result content, e.g., `en`, `es`, `fr`. Default: `'en'`.
-- `gl`: (str) Country code for geo-specific result targeting, e.g., `us`, `uk`, `de`. Default: `'us'`.
-- `google_domain`: (str) Which Google domain to use (e.g., `'google.com'`, `'google.co.jp'`). Default: `'google.com'`.
-- `start`: (int) Defines the result offset. It skips the given number of results. Used for pagination. Examples:
-  - `0` (default): the first page of results
-  - `10`: the second page
-  - `20`: the third page
-- `num`: (int) Defines the maximum number of results to return. Examples:
-  - `10` (default): returns 10 results
-  - `40`: returns 40 results
-  - `100`: returns 100 results
-- `ludocid`: (str) Defines the ID (CID) of the Google My Business listing you want to scrape. Also known as Google Place ID.
-- `kgmid`: (str) Defines the ID (KGMID) of the Google Knowledge Graph listing you want to scrape. Also known as Google Knowledge Graph ID. Searches with the kgmid parameter will return results for the originally encrypted search parameters. For some searches, `kgmid` may override all other parameters except `start` and `num`.
-- `ibp`: (str) Responsible for rendering layouts and expansions for some elements. Example: gwp;0,7 to expand searches with ludocid for expanded knowledge graph.
-- `cr`: (str) Defines one or multiple countries to limit the search to. Uses format `country{two-letter country code}`, separated by `|`. Example:
-  - `countryFR|countryDE` only searches French and German pages.
-- `lr`: (str) Defines one or multiple languages to limit the search to. Uses format `lang_{two-letter language code}`, separated by `|`. Example:
-  - `lang_fr|lang_de` only searches French and German pages.
-- `tbs`: (str) Defines advanced search parameters not possible in the regular query field. Examples include advanced search for:
+- `q`: (str) 검색 쿼리 문자열. `inurl:`, `site:`, `intitle:`, `as_eq` 등과 같은 고급 Google 구문을 지원합니다.
+- `hl`: (str) 결과 콘텐츠의 언어 코드, 예: `en`, `es`, `fr`. 기본값: `'en'`.
+- `gl`: (str) 지역별 결과 타겟팅을 위한 국가 코드, 예: `us`, `uk`, `de`. 기본값: `'us'`.
+- `google_domain`: (str) 사용할 Google domain (예: `'google.com'`, `'google.co.jp'`). 기본값: `'google.com'`.
+- `start`: (int) 결과 offset을 정의합니다. 주어진 수의 결과를 건너뜁니다. pagination에 사용됩니다. 예시:
+  - `0` (기본값): 첫 번째 결과 페이지
+  - `10`: 두 번째 페이지
+  - `20`: 세 번째 페이지
+- `num`: (int) 반환할 최대 결과 수를 정의합니다. 예시:
+  - `10` (기본값): 10개의 결과 반환
+  - `40`: 40개의 결과 반환
+  - `100`: 100개의 결과 반환
+- `ludocid`: (str) 스크래핑하려는 Google My Business listing의 ID (CID)를 정의합니다. Google Place ID로도 알려져 있습니다.
+- `kgmid`: (str) 스크래핑하려는 Google Knowledge Graph listing의 ID (KGMID)를 정의합니다. Google Knowledge Graph ID로도 알려져 있습니다. kgmid parameter를 사용한 검색은 원래 암호화된 검색 parameter에 대한 결과를 반환합니다. 일부 검색의 경우 `kgmid`는 `start`와 `num`을 제외한 다른 모든 parameter를 재정의할 수 있습니다.
+- `ibp`: (str) 일부 요소의 layout 및 확장 렌더링을 담당합니다. 예시: gwp;0,7은 확장된 knowledge graph를 위해 ludocid로 검색을 확장합니다.
+- `cr`: (str) 검색을 제한할 하나 이상의 국가를 정의합니다. `country{두 글자 국가 코드}` 형식을 사용하며 `|`로 구분됩니다. 예시:
+  - `countryFR|countryDE`는 프랑스어 및 독일어 페이지만 검색합니다.
+- `lr`: (str) 검색을 제한할 하나 이상의 언어를 정의합니다. `lang_{두 글자 언어 코드}` 형식을 사용하며 `|`로 구분됩니다. 예시:
+  - `lang_fr|lang_de`는 프랑스어 및 독일어 페이지만 검색합니다.
+- `tbs`: (str) 일반 쿼리 필드에서는 불가능한 고급 검색 parameter를 정의합니다. 다음에 대한 고급 검색을 포함합니다:
   - `patents`
   - `dates`
   - `news`
@@ -97,18 +97,18 @@ The tool accepts the following parameters:
   - `images`
   - `apps`
   - `text` contents
-- `safe`: (str) Defines the level of filtering for adult content. Values:
-  - `active`: blur explicit content
-  - `off`: no filtering
-- `nfpr`: (str) Defines exclusion of results from auto-corrected queries when the original query is misspelled. Values:
-  - `1`: exclude these results
-  - `0` (default): include them
-  - Note: This may not prevent Google from returning auto-corrected results if no other results are available.
-- `filter`: (str) Defines if `'Similar Results'` and `'Omitted Results'` filters are on or off. Values:
-  - `1` (default): enable filters
-  - `0`: disable filters
-- `tbm`: (str) Defines the type of search to perform. Values:
-  - `none`: regular Google Search
+- `safe`: (str) 성인 콘텐츠 필터링 수준을 정의합니다. 값:
+  - `active`: 노골적인 콘텐츠 흐리게 처리
+  - `off`: 필터링 없음
+- `nfpr`: (str) 원래 쿼리의 철자가 틀렸을 때 자동 수정된 쿼리의 결과 제외를 정의합니다. 값:
+  - `1`: 이러한 결과 제외
+  - `0` (기본값): 포함
+  - 참고: 다른 결과를 사용할 수 없는 경우 Google이 자동 수정된 결과를 반환하는 것을 방지하지 못할 수 있습니다.
+- `filter`: (str) `'Similar Results'` 및 `'Omitted Results'` 필터가 켜져 있는지 꺼져 있는지 정의합니다. 값:
+  - `1` (기본값): 필터 활성화
+  - `0`: 필터 비활성화
+- `tbm`: (str) 수행할 검색 유형을 정의합니다. 값:
+  - `none`: 일반 Google Search
   - `isch`: Google Images
   - `lcl`: Google Local
   - `vid`: Google Videos
@@ -119,34 +119,34 @@ The tool accepts the following parameters:
 
 ### ScrapelessDeepSerpGoogleTrendsTool
 
-Here we show how to instantiate an instance of the `ScrapelessDeepSerpGoogleTrendsTool`. This tool allows you to query real-time or historical trend data from Google Trends with fine control over locale, category, and result type, using the Scrapeless API.
+여기서는 `ScrapelessDeepSerpGoogleTrendsTool`의 instance를 인스턴스화하는 방법을 보여줍니다. 이 tool을 사용하면 Scrapeless API를 사용하여 locale, category 및 결과 유형에 대한 세밀한 제어를 통해 Google Trends에서 실시간 또는 과거 트렌드 데이터를 쿼리할 수 있습니다.
 
-The tool accepts the following parameters:
+이 tool은 다음 parameter를 허용합니다:
 
-- `q` (required, str): Parameter defines the query or queries you want to search. You can use anything that you would use in a regular Google Trends search. The maximum number of queries per search is **5**. (This only applies to `interest_over_time` and `compared_breakdown_by_region` data types.) Other types of data will only accept **1 query** per search.
-- `data_type` (optional, str): The type of data to retrieve. Default is `'interest_over_time'`. Options include:
+- `q` (필수, str): 검색하려는 쿼리를 정의하는 parameter입니다. 일반 Google Trends 검색에서 사용하는 모든 것을 사용할 수 있습니다. 검색당 최대 쿼리 수는 **5**개입니다. (이는 `interest_over_time` 및 `compared_breakdown_by_region` 데이터 유형에만 적용됩니다.) 다른 유형의 데이터는 검색당 **1개의 쿼리**만 허용합니다.
+- `data_type` (선택, str): 검색할 데이터 유형. 기본값은 `'interest_over_time'`입니다. 옵션은 다음과 같습니다:
   - `autocomplete`
   - `interest_over_time`
   - `compared_breakdown_by_region`
   - `interest_by_subregion`
   - `related_queries`
   - `related_topics`
-- `date` (optional, str): Defines the date range to fetch data for. Default is `'today 1-m'`. Supported formats:
-  - Relative: `'now 1-H'`, `'now 7-d'`, `'today 12-m'`, `'today 5-y'`, `'all'`
-  - Custom date ranges: `'2023-01-01 2023-12-31'`
-  - With hours: `'2023-07-01T10 2023-07-03T22'`
-- `hl` (optional, str): Language code to use in the search. Default is `'en'`. Examples:
-  - `'es'` (Spanish)
-  - `'fr'` (French)
-- `tz` (optional, str): Time zone offset. Default is `'420'` (PST).
-- `geo` (optional, str): Two-letter country code to define the geographic origin of the search. Examples include:
-  - `'US'` (United States)
-  - `'GB'` (United Kingdom)
-  - `'JP'` (Japan)
-  - Leave empty or `None` for worldwide search.
-- `cat` (optional, `CategoryEnum`): Category ID to narrow down the search context. Default is `'all_categories'` (0). Categories can include:
-  - `'0'` – All categories
-  - Others like `'3'` – News, `'29'` – Sports, etc.
+- `date` (선택, str): 데이터를 가져올 날짜 범위를 정의합니다. 기본값은 `'today 1-m'`입니다. 지원되는 형식:
+  - 상대적: `'now 1-H'`, `'now 7-d'`, `'today 12-m'`, `'today 5-y'`, `'all'`
+  - 사용자 지정 날짜 범위: `'2023-01-01 2023-12-31'`
+  - 시간 포함: `'2023-07-01T10 2023-07-03T22'`
+- `hl` (선택, str): 검색에 사용할 언어 코드. 기본값은 `'en'`입니다. 예시:
+  - `'es'` (스페인어)
+  - `'fr'` (프랑스어)
+- `tz` (선택, str): 시간대 offset. 기본값은 `'420'` (PST)입니다.
+- `geo` (선택, str): 검색의 지리적 출처를 정의하는 두 글자 국가 코드. 예시:
+  - `'US'` (미국)
+  - `'GB'` (영국)
+  - `'JP'` (일본)
+  - 전 세계 검색의 경우 비워두거나 `None`으로 설정합니다.
+- `cat` (선택, `CategoryEnum`): 검색 컨텍스트를 좁히기 위한 category ID. 기본값은 `'all_categories'` (0)입니다. category는 다음을 포함할 수 있습니다:
+  - `'0'` – 모든 category
+  - `'3'` – News, `'29'` – Sports 등
 
 ## Invocation
 

@@ -2,12 +2,12 @@
 title: Weights & Biases tracing
 ---
 
-There are two recommended ways to trace your LangChains:
+LangChain을 추적하는 두 가지 권장 방법이 있습니다:
 
-1. Setting the `LANGCHAIN_WANDB_TRACING` environment variable to "true".
-1. Using a context manager with tracing_enabled() to trace a particular block of code.
+1. `LANGCHAIN_WANDB_TRACING` environment variable을 "true"로 설정합니다.
+1. tracing_enabled() context manager를 사용하여 특정 코드 블록을 추적합니다.
 
-**Note** if the environment variable is set, all code will be traced, regardless of whether or not it's within the context manager.
+**참고** environment variable이 설정되면 context manager 내부에 있는지 여부와 관계없이 모든 코드가 추적됩니다.
 
 ```python
 import os

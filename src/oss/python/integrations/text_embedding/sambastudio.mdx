@@ -2,9 +2,9 @@
 title: SambaStudioEmbeddings
 ---
 
-This will help you get started with SambaNova's SambaStudio embedding models using LangChain. For detailed documentation on `SambaStudioEmbeddings` features and configuration options, please refer to the [API reference](https://docs.sambanova.ai/sambastudio/latest/index.html).
+이 문서는 LangChain을 사용하여 SambaNova의 SambaStudio embedding model을 시작하는 데 도움을 드립니다. `SambaStudioEmbeddings`의 기능 및 구성 옵션에 대한 자세한 문서는 [API reference](https://docs.sambanova.ai/sambastudio/latest/index.html)를 참조하세요.
 
-**[SambaNova](https://sambanova.ai/)'s** [SambaStudio](https://sambanova.ai/technology/full-stack-ai-platform) is a platform for running your own open-source models
+**[SambaNova](https://sambanova.ai/)**의 [SambaStudio](https://sambanova.ai/technology/full-stack-ai-platform)는 자체 오픈 소스 모델을 실행하기 위한 플랫폼입니다
 
 ## Overview
 
@@ -16,7 +16,7 @@ This will help you get started with SambaNova's SambaStudio embedding models usi
 
 ## Setup
 
-To access SambaStudio models you will need to [deploy an endpoint](https://docs.sambanova.ai/sambastudio/latest/language-models.html) in your SambaStudio platform, install the `langchain_sambanova` integration package.
+SambaStudio 모델에 액세스하려면 SambaStudio 플랫폼에서 [endpoint를 배포](https://docs.sambanova.ai/sambastudio/latest/language-models.html)하고 `langchain_sambanova` integration package를 설치해야 합니다.
 
 ```bash
 pip install langchain-sambanova
@@ -24,7 +24,7 @@ pip install langchain-sambanova
 
 ### Credentials
 
-Get the URL and API Key from your SambaStudio deployed endpoint and add them to your environment variables:
+SambaStudio에 배포된 endpoint에서 URL과 API Key를 가져와 환경 변수에 추가하세요:
 
 ``` bash
 export SAMBASTUDIO_URL="sambastudio-url-key-here"
@@ -46,7 +46,7 @@ if not os.getenv("SAMBASTUDIO_API_KEY"):
     )
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수 있습니다:
 
 ```python
 # os.environ["LANGCHAIN_TRACING_V2"] = "true"
@@ -55,7 +55,7 @@ If you want to get automated tracing of your model calls you can also set your [
 
 ### Installation
 
-The LangChain SambaNova integration lives in the `langchain-sambanova` package:
+LangChain SambaNova integration은 `langchain-sambanova` package에 있습니다:
 
 ```python
 pip install -qU langchain-sambanova
@@ -63,7 +63,7 @@ pip install -qU langchain-sambanova
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```python
 from langchain_sambanova import SambaStudioEmbeddings
@@ -75,9 +75,9 @@ embeddings = SambaStudioEmbeddings(
 
 ## Indexing and Retrieval
 
-Embedding models are often used in retrieval-augmented generation (RAG) flows, both as part of indexing data as well as later retrieving it. For more detailed instructions, please see our [RAG tutorials](/oss/langchain/rag).
+Embedding model은 데이터 인덱싱과 이후 검색 모두에서 retrieval-augmented generation (RAG) 플로우에 자주 사용됩니다. 자세한 지침은 [RAG tutorials](/oss/langchain/rag)를 참조하세요.
 
-Below, see how to index and retrieve data using the `embeddings` object we initialized above. In this example, we will index and retrieve a sample document in the `InMemoryVectorStore`.
+아래에서는 위에서 초기화한 `embeddings` object를 사용하여 데이터를 인덱싱하고 검색하는 방법을 확인할 수 있습니다. 이 예제에서는 `InMemoryVectorStore`에서 샘플 문서를 인덱싱하고 검색합니다.
 
 ```python
 # Create a vector store with a sample text
@@ -102,13 +102,13 @@ retrieved_documents[0].page_content
 
 ## Direct Usage
 
-Under the hood, the vectorstore and retriever implementations are calling `embeddings.embed_documents(...)` and `embeddings.embed_query(...)` to create embeddings for the text(s) used in `from_texts` and retrieval `invoke` operations, respectively.
+내부적으로 vectorstore와 retriever 구현은 `embeddings.embed_documents(...)`와 `embeddings.embed_query(...)`를 호출하여 각각 `from_texts`와 retrieval `invoke` 작업에 사용되는 텍스트에 대한 embedding을 생성합니다.
 
-You can directly call these methods to get embeddings for your own use cases.
+이러한 메서드를 직접 호출하여 자신의 사용 사례에 맞는 embedding을 얻을 수 있습니다.
 
 ### Embed single texts
 
-You can embed single texts or documents with `embed_query`:
+`embed_query`를 사용하여 단일 텍스트나 문서를 embedding할 수 있습니다:
 
 ```python
 single_vector = embeddings.embed_query(text)
@@ -117,7 +117,7 @@ print(str(single_vector)[:100])  # Show the first 100 characters of the vector
 
 ### Embed multiple texts
 
-You can embed multiple texts with `embed_documents`:
+`embed_documents`를 사용하여 여러 텍스트를 embedding할 수 있습니다:
 
 ```python
 text2 = (
@@ -130,4 +130,4 @@ for vector in two_vectors:
 
 ## API reference
 
-For detailed documentation on `SambaStudio` features and configuration options, please refer to the [API reference](https://docs.sambanova.ai/sambastudio/latest/api-ref-landing.html).
+`SambaStudio`의 기능 및 구성 옵션에 대한 자세한 문서는 [API reference](https://docs.sambanova.ai/sambastudio/latest/api-ref-landing.html)를 참조하세요.

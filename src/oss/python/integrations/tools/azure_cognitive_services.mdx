@@ -1,20 +1,21 @@
+```markdown
 ---
 title: Azure Cognitive Services Toolkit
 ---
 
-This toolkit is used to interact with the `Azure Cognitive Services API` to achieve some multimodal capabilities.
+이 toolkit은 `Azure Cognitive Services API`와 상호작용하여 일부 multimodal 기능을 구현하는 데 사용됩니다.
 
-Currently There are four tools bundled in this toolkit:
+현재 이 toolkit에는 4개의 tool이 포함되어 있습니다:
 
-- AzureCogsImageAnalysisTool: used to extract caption, objects, tags, and text from images. (Note: this tool is not available on Mac OS yet, due to the dependency on `azure-ai-vision` package, which is only supported on Windows and Linux currently.)
-- AzureCogsFormRecognizerTool: used to extract text, tables, and key-value pairs from documents.
-- AzureCogsSpeech2TextTool: used to transcribe speech to text.
-- AzureCogsText2SpeechTool: used to synthesize text to speech.
-- AzureCogsTextAnalyticsHealthTool: used to extract healthcare entities.
+- AzureCogsImageAnalysisTool: 이미지에서 caption, object, tag 및 text를 추출하는 데 사용됩니다. (참고: 이 tool은 `azure-ai-vision` package에 대한 의존성으로 인해 Mac OS에서는 아직 사용할 수 없으며, 현재 Windows와 Linux에서만 지원됩니다.)
+- AzureCogsFormRecognizerTool: 문서에서 text, table 및 key-value pair를 추출하는 데 사용됩니다.
+- AzureCogsSpeech2TextTool: 음성을 text로 변환하는 데 사용됩니다.
+- AzureCogsText2SpeechTool: text를 음성으로 합성하는 데 사용됩니다.
+- AzureCogsTextAnalyticsHealthTool: 의료 entity를 추출하는 데 사용됩니다.
 
-First, you need to set up an Azure account and create a Cognitive Services resource. You can follow the instructions [here](https://docs.microsoft.com/en-us/azure/cognitive-services/cognitive-services-apis-create-account?tabs=multiservice%2Cwindows) to create a resource.
+먼저 Azure 계정을 설정하고 Cognitive Services resource를 생성해야 합니다. resource를 생성하려면 [여기](https://docs.microsoft.com/en-us/azure/cognitive-services/cognitive-services-apis-create-account?tabs=multiservice%2Cwindows)의 지침을 따르세요.
 
-Then, you need to get the endpoint, key and region of your resource, and set them as environment variables. You can find them in the "Keys and Endpoint" page of your resource.
+그런 다음 resource의 endpoint, key 및 region을 가져와서 환경 변수로 설정해야 합니다. 이들은 resource의 "Keys and Endpoint" 페이지에서 찾을 수 있습니다.
 
 ```python
 pip install -qU  azure-ai-formrecognizer > /dev/null
@@ -38,7 +39,7 @@ os.environ["AZURE_COGS_ENDPOINT"] = ""
 os.environ["AZURE_COGS_REGION"] = ""
 ```
 
-## Create the Toolkit
+## Toolkit 생성하기
 
 ```python
 from langchain_community.agent_toolkits import AzureCognitiveServicesToolkit
@@ -57,7 +58,7 @@ toolkit = AzureCognitiveServicesToolkit()
  'Azure Cognitive Services Text2Speech']
 ```
 
-## Use within an Agent
+## Agent 내에서 사용하기
 
 ```python
 from langchain.agents import AgentType, initialize_agent
@@ -195,4 +196,5 @@ Action:
 
 ```python
 
+```
 ```

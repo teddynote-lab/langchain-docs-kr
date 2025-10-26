@@ -1,11 +1,11 @@
+```markdown
 ---
 title: Bagel
 ---
 
-> [Bagel](https://www.bagel.net/) (`Open Inference platform for AI`), is like GitHub for AI data.
-It is a collaborative platform where users can create,
-share, and manage Inference datasets. It can support private projects for independent developers,
-internal collaborations for enterprises, and public contributions for data DAOs.
+> [Bagel](https://www.bagel.net/) (`AI를 위한 Open Inference 플랫폼`)은 AI 데이터를 위한 GitHub와 같습니다.
+사용자가 Inference 데이터셋을 생성하고, 공유하며, 관리할 수 있는 협업 플랫폼입니다.
+독립 개발자를 위한 개인 프로젝트, 기업을 위한 내부 협업, 데이터 DAO를 위한 공개 기여를 지원할 수 있습니다.
 
 ### Installation and Setup
 
@@ -13,7 +13,7 @@ internal collaborations for enterprises, and public contributions for data DAOs.
 pip install bagelML langchain-community
 ```
 
-## Create VectorStore from texts
+## 텍스트로부터 VectorStore 생성하기
 
 ```python
 from langchain_community.vectorstores import Bagel
@@ -50,7 +50,7 @@ cluster.similarity_search_with_score("bagel", k=3)
 cluster.delete_cluster()
 ```
 
-## Create VectorStore from docs
+## 문서로부터 VectorStore 생성하기
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -78,7 +78,7 @@ print(docs[0].page_content[:102])
 Madam Speaker, Madam Vice President, our First Lady and Second Gentleman. Members of Congress and the
 ```
 
-## Get all text/doc from Cluster
+## Cluster에서 모든 텍스트/문서 가져오기
 
 ```python
 texts = ["hello bagel", "this is langchain"]
@@ -125,7 +125,7 @@ cluster_data
 cluster.delete_cluster()
 ```
 
-## Create cluster with metadata & filter using metadata
+## metadata로 cluster 생성하고 metadata를 사용하여 필터링하기
 
 ```python
 texts = ["hello bagel", "this is langchain"]
@@ -142,4 +142,5 @@ cluster.similarity_search_with_score("hello bagel", where={"source": "notion"})
 ```python
 # delete the cluster
 cluster.delete_cluster()
+```
 ```

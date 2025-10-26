@@ -2,9 +2,9 @@
 title: PineconeStore
 ---
 
-[Pinecone](https://www.pinecone.io/) is a vector database that helps power AI for some of the world’s best companies.
+[Pinecone](https://www.pinecone.io/)은 세계 최고의 기업들의 AI를 지원하는 벡터 데이터베이스입니다.
 
-This guide provides a quick overview for getting started with Pinecone [vector stores](/oss/integrations/vectorstores). For detailed documentation of all `PineconeStore` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_pinecone.PineconeStore.html).
+이 가이드는 Pinecone [vector store](/oss/integrations/vectorstores) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `PineconeStore` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_pinecone.PineconeStore.html)를 참조하세요.
 
 ## Overview
 
@@ -16,9 +16,9 @@ This guide provides a quick overview for getting started with Pinecone [vector s
 
 ## Setup
 
-To use Pinecone vector stores, you'll need to create a Pinecone account, initialize an index, and install the `@langchain/pinecone` integration package. You'll also want to install the [official Pinecone SDK](https://www.npmjs.com/package/@pinecone-database/pinecone) to initialize a client to pass into the `PineconeStore` instance.
+Pinecone vector store를 사용하려면 Pinecone 계정을 생성하고, index를 초기화하고, `@langchain/pinecone` integration package를 설치해야 합니다. 또한 [공식 Pinecone SDK](https://www.npmjs.com/package/@pinecone-database/pinecone)를 설치하여 `PineconeStore` instance에 전달할 client를 초기화해야 합니다.
 
-This guide will also use [OpenAI embeddings](/oss/integrations/text_embedding/openai), which require you to install the `@langchain/openai` integration package. You can also use [other supported embeddings models](/oss/integrations/text_embedding) if you wish.
+이 가이드는 [OpenAI embeddings](/oss/integrations/text_embedding/openai)도 사용하므로 `@langchain/openai` integration package를 설치해야 합니다. 원하는 경우 [다른 지원되는 embeddings model](/oss/integrations/text_embedding)을 사용할 수도 있습니다.
 
 <CodeGroup>
 ```bash npm
@@ -34,7 +34,7 @@ pnpm add @langchain/pinecone @langchain/openai @langchain/core @pinecone-databas
 
 ### Credentials
 
-Sign up for a [Pinecone](https://www.pinecone.io/) account and create an index. Make sure the dimensions match those of the embeddings you want to use (the default is 1536 for OpenAI's `text-embedding-3-small`). Once you've done this set the `PINECONE_INDEX`, `PINECONE_API_KEY`, and (optionally) `PINECONE_ENVIRONMENT` environment variables:
+[Pinecone](https://www.pinecone.io/) 계정에 가입하고 index를 생성하세요. dimension이 사용하려는 embedding의 dimension과 일치하는지 확인하세요(OpenAI의 `text-embedding-3-small`의 기본값은 1536입니다). 완료되면 `PINECONE_INDEX`, `PINECONE_API_KEY`, 그리고 (선택적으로) `PINECONE_ENVIRONMENT` 환경 변수를 설정하세요:
 
 ```typescript
 process.env.PINECONE_API_KEY = "your-pinecone-api-key";
@@ -44,13 +44,13 @@ process.env.PINECONE_INDEX = "your-pinecone-index";
 process.env.PINECONE_ENVIRONMENT = "your-pinecone-environment";
 ```
 
-If you are using OpenAI embeddings for this guide, you'll need to set your OpenAI key as well:
+이 가이드에서 OpenAI embedding을 사용하는 경우 OpenAI key도 설정해야 합니다:
 
 ```typescript
 process.env.OPENAI_API_KEY = "YOUR_API_KEY";
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+model 호출에 대한 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_TRACING="true"
@@ -121,7 +121,7 @@ await vectorStore.addDocuments(documents, { ids: ["1", "2", "3", "4"] });
 [ '1', '2', '3', '4' ]
 ```
 
-**Note:** After adding documents, there is a slight delay before they become queryable.
+**참고:** document를 추가한 후 쿼리 가능해지기까지 약간의 지연이 있습니다.
 
 ### Delete items from vector store
 
@@ -131,11 +131,11 @@ await vectorStore.delete({ ids: ["4"] });
 
 ## Query vector store
 
-Once your vector store has been created and the relevant documents have been added you will most likely wish to query it during the running of your chain or agent.
+vector store가 생성되고 관련 document가 추가되면 chain 또는 agent를 실행하는 동안 쿼리하고 싶을 것입니다.
 
 ### Query directly
 
-Performing a simple similarity search can be done as follows:
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
 
 ```typescript
 // Optional filter
@@ -153,7 +153,7 @@ for (const doc of similaritySearchResults) {
 * Mitochondria are made out of lipids [{"source":"https://example.com"}]
 ```
 
-If you want to execute a similarity search and receive the corresponding scores you can run:
+유사도 검색을 실행하고 해당 score를 받으려면 다음을 실행할 수 있습니다:
 
 ```typescript
 const similaritySearchWithScoreResults = await vectorStore.similaritySearchWithScore("biology", 2, filter)
@@ -170,7 +170,7 @@ for (const [doc, score] of similaritySearchWithScoreResults) {
 
 ### Query by turning into retriever
 
-You can also transform the vector store into a [retriever](/oss/langchain/retrieval) for easier usage in your chains.
+vector store를 [retriever](/oss/langchain/retrieval)로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
 
 ```typescript
 const retriever = vectorStore.asRetriever({
@@ -199,12 +199,12 @@ await retriever.invoke("biology");
 
 ### Usage for retrieval-augmented generation
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+retrieval-augmented generation (RAG)에 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
 
-- [Build a RAG app with LangChain](/oss/langchain/rag).
+- [LangChain으로 RAG 앱 만들기](/oss/langchain/rag)
 - [Agentic RAG](/oss/langgraph/agentic-rag)
-- [Retrieval docs](/oss/langchain/retrieval)
+- [Retrieval 문서](/oss/langchain/retrieval)
 
 ## API reference
 
-For detailed documentation of all `PineconeStore` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_pinecone.PineconeStore.html).
+모든 `PineconeStore` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_pinecone.PineconeStore.html)를 참조하세요.

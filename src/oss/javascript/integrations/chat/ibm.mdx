@@ -2,7 +2,7 @@
 title: IBM watsonx.ai
 ---
 
-This will help you getting started with IBM watsonx.ai [chat models](/oss/langchain/models). For detailed documentation of all `IBM watsonx.ai` features and configurations head to the [IBM watsonx.ai](https://api.js.langchain.com/modules/_langchain_community.chat_models_ibm.html).
+이 문서는 IBM watsonx.ai [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 `IBM watsonx.ai` 기능과 설정에 대한 자세한 문서는 [IBM watsonx.ai](https://api.js.langchain.com/modules/_langchain_community.chat_models_ibm.html)를 참조하세요.
 
 ## Overview
 
@@ -20,11 +20,11 @@ This will help you getting started with IBM watsonx.ai [chat models](/oss/langch
 
 ## Setup
 
-To access IBM watsonx.ai models you'll need to create a/an IBM watsonx.ai account, get an API key, and install the `@langchain/community` integration package.
+IBM watsonx.ai 모델에 액세스하려면 IBM watsonx.ai 계정을 생성하고 API key를 발급받은 후 `@langchain/community` integration package를 설치해야 합니다.
 
 ### Credentials
 
-Head to [IBM Cloud](https://cloud.ibm.com/login) to sign up to IBM watsonx.ai and generate an API key or provide any other authentication form as presented below.
+[IBM Cloud](https://cloud.ibm.com/login)로 이동하여 IBM watsonx.ai에 가입하고 API key를 생성하거나 아래에 제시된 다른 인증 방식을 제공하세요.
 
 #### IAM authentication
 
@@ -49,9 +49,9 @@ export WATSONX_AI_PASSWORD=<YOUR_PASSWORD>
 export WATSONX_AI_URL=<URL>
 ```
 
-Once these are places in your enviromental variables and object is initialized authentication will proceed automatically.
+이러한 값들이 환경 변수에 설정되고 객체가 초기화되면 인증이 자동으로 진행됩니다.
 
-Authentication can also be accomplished by passing these values as parameters to a new instance.
+인증은 새 인스턴스에 이러한 값들을 매개변수로 전달하여 수행할 수도 있습니다.
 
 ## IAM authentication
 
@@ -100,7 +100,7 @@ const props = {
 const instance = new WatsonxLLM(props);
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수 있습니다:
 
 ```bash
 # export LANGSMITH_TRACING="true"
@@ -109,7 +109,7 @@ If you want to get automated tracing of your model calls you can also set your [
 
 ### Installation
 
-The LangChain IBM watsonx.ai integration lives in the `@langchain/community` package:
+LangChain IBM watsonx.ai integration은 `@langchain/community` package에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -125,7 +125,7 @@ pnpm add @langchain/community @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```javascript
 import { ChatWatsonx } from "@langchain/community/chat_models/ibm";
@@ -145,10 +145,10 @@ const instance = new ChatWatsonx({
 });
 ```
 
-Note:
+참고:
 
-- You must provide `spaceId`, `projectId` or `idOrName`(deployment id) unless you use lighweight engine which works without specifying either (refer to [watsonx.ai docs](https://www.ibm.com/docs/en/cloud-paks/cp-data/5.0.x?topic=install-choosing-installation-mode))
-- Depending on the region of your provisioned service instance, use correct serviceUrl.
+- lightweight engine을 사용하지 않는 한 `spaceId`, `projectId` 또는 `idOrName`(deployment id)을 제공해야 합니다. lightweight engine은 이들을 지정하지 않고도 작동합니다([watsonx.ai docs](https://www.ibm.com/docs/en/cloud-paks/cp-data/5.0.x?topic=install-choosing-installation-mode) 참조)
+- 프로비저닝된 서비스 인스턴스의 지역에 따라 올바른 serviceUrl을 사용하세요.
 
 ### Using Model Gateway
 
@@ -168,7 +168,7 @@ const instance = new ChatWatsonx({
 });
 ```
 
-To use model gateway with Langchain, you need to previously create a provider and add model via `@ibm-cloud/watsonx-ai` SDK or `watsonx.ai` API. Follow this documentation:
+Langchain에서 model gateway를 사용하려면 `@ibm-cloud/watsonx-ai` SDK 또는 `watsonx.ai` API를 통해 provider를 생성하고 모델을 추가해야 합니다. 다음 문서를 참조하세요:
 - [API](https://cloud.ibm.com/apidocs/watsonx-ai#create-watsonxai-provider).
 - [SDK](https://ibm.github.io/watsonx-ai-node-sdk/modules/1_7_x.gateway.html).
 
@@ -334,4 +334,4 @@ AIMessage {
 
 ## API reference
 
-For detailed documentation of all `IBM watsonx.ai` features and configurations head to the API reference: [API docs](https://api.js.langchain.com/modules/_langchain_community.embeddings_ibm.html)
+모든 `IBM watsonx.ai` 기능과 설정에 대한 자세한 문서는 API reference를 참조하세요: [API docs](https://api.js.langchain.com/modules/_langchain_community.embeddings_ibm.html)

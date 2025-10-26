@@ -1,23 +1,23 @@
 ---
-title: Trace with the Vercel AI SDK (Legacy)
-sidebarTitle: Trace with the Vercel AI SDK (Legacy)
+title: Vercel AI SDK로 추적하기 (레거시)
+sidebarTitle: Vercel AI SDK로 추적하기 (레거시)
 ---
 
 <Warning>
-This page documents an older method of tracing AI SDK runs. For a simpler and more general method that does not require OTEL setup, see [the new guide](/langsmith/trace-with-vercel-ai-sdk).
+이 페이지는 AI SDK 실행을 추적하는 이전 방법을 문서화합니다. OTEL 설정이 필요하지 않은 더 간단하고 일반적인 방법은 [새로운 가이드](/langsmith/trace-with-vercel-ai-sdk)를 참조하세요.
 </Warning>
 
-You can use LangSmith to trace runs from the Vercel AI SDK using OpenTelemetry (OTEL). This guide will walk through an example.
+OpenTelemetry(OTEL)를 사용하여 Vercel AI SDK의 실행을 LangSmith로 추적할 수 있습니다. 이 가이드는 예제를 통해 설명합니다.
 
 <Note>
-Many popular [OpenTelemetry implementations](https://www.npmjs.com/package/@opentelemetry/sdk-node) in JavaScript are currently experimental,
-and may behave erratically in production, especially when instrumenting LangSmith alongside other providers. If you are on AI SDK 5,
-we strongly suggest using [our recommended approach for tracing AI SDK runs](/langsmith/trace-with-vercel-ai-sdk).
+JavaScript의 많은 인기 있는 [OpenTelemetry 구현](https://www.npmjs.com/package/@opentelemetry/sdk-node)은 현재 실험적이며,
+특히 LangSmith를 다른 provider와 함께 계측할 때 프로덕션 환경에서 불규칙하게 동작할 수 있습니다. AI SDK 5를 사용하는 경우,
+[AI SDK 실행 추적을 위한 권장 접근 방식](/langsmith/trace-with-vercel-ai-sdk)을 사용할 것을 강력히 권장합니다.
 </Note>
 
-## 0. Installation
+## 0. 설치
 
-Install the Vercel AI SDK and required OTEL packages. We use their OpenAI integration for the code snippets below, but you can use any of their other options as well.
+Vercel AI SDK와 필요한 OTEL 패키지를 설치합니다. 아래 코드 스니펫에서는 OpenAI 통합을 사용하지만, 다른 옵션도 사용할 수 있습니다.
 
 <CodeGroup>
 
@@ -52,7 +52,7 @@ pnpm add @opentelemetry/sdk-trace-base @opentelemetry/exporter-trace-otlp-proto 
 
 </CodeGroup>
 
-## 1. Configure your environment
+## 1. 환경 구성
 
 ```bash
 export LANGSMITH_TRACING=true
@@ -62,11 +62,11 @@ export LANGSMITH_OTEL_ENABLED=true
 # This example uses OpenAI, but you can use any LLM provider of choice
 export OPENAI_API_KEY=<your-openai-api-key>
 ```
-## 2. Log a trace
+## 2. 추적 로깅
 
 ### Node.js
 
-To start tracing, you will need to import and call the `initializeOTEL` method at the start of your code:
+추적을 시작하려면 코드 시작 부분에서 `initializeOTEL` 메서드를 import하고 호출해야 합니다:
 
 ```typescript
 import { initializeOTEL } from "langsmith/experimental/otel/setup";
@@ -74,10 +74,10 @@ import { initializeOTEL } from "langsmith/experimental/otel/setup";
 const { DEFAULT_LANGSMITH_SPAN_PROCESSOR } = initializeOTEL();
 ```
 
-Afterwards, add the `experimental_telemetry` argument to your AI SDK calls that you want to trace.
+그런 다음, 추적하려는 AI SDK 호출에 `experimental_telemetry` 인수를 추가합니다.
 
 <Info>
-Do not forget to call `await DEFAULT_LANGSMITH_SPAN_PROCESSOR.shutdown();` before your application shuts down in order to flush any remaining traces to LangSmith.
+애플리케이션이 종료되기 전에 남은 추적을 LangSmith로 플러시하기 위해 `await DEFAULT_LANGSMITH_SPAN_PROCESSOR.shutdown();`을 호출하는 것을 잊지 마세요.
 </Info>
 
 ```typescript
@@ -98,9 +98,9 @@ try {
 }
 ```
 
-You should see a trace in your LangSmith dashboard [like this one](https://smith.langchain.com/public/21d33490-d522-4928-a944-a09e988d539c/r).
+LangSmith 대시보드에서 [이와 같은](https://smith.langchain.com/public/21d33490-d522-4928-a944-a09e988d539c/r) 추적을 볼 수 있습니다.
 
-You can also trace runs with tool calls:
+tool 호출이 있는 실행도 추적할 수 있습니다:
 
 ```typescript
 import { generateText, tool } from "ai";
@@ -136,11 +136,11 @@ await generateText({
 });
 ```
 
-Which results in a trace like [this one](https://smith.langchain.com/public/e6122734-2762-4ae0-986b-0cbe4d68692f/r).
+결과는 [이와 같은](https://smith.langchain.com/public/e6122734-2762-4ae0-986b-0cbe4d68692f/r) 추적이 됩니다.
 
-### With `traceable`
+### `traceable`과 함께 사용
 
-You can wrap `traceable` calls around or within AI SDK tool calls. If you do so, we recommend you initialize a LangSmith `client` instance that you pass into each `traceable`, then call `client.awaitPendingTraceBatches();` to ensure all traces flush. If you do this, you do not need to manually call `shutdown()` or `forceFlush()` on the `DEFAULT_LANGSMITH_SPAN_PROCESSOR`. Here's an example:
+AI SDK tool 호출 주변이나 내부에 `traceable` 호출을 래핑할 수 있습니다. 이렇게 하는 경우, 각 `traceable`에 전달할 LangSmith `client` 인스턴스를 초기화한 다음 `client.awaitPendingTraceBatches();`를 호출하여 모든 추적이 플러시되도록 하는 것을 권장합니다. 이렇게 하면 `DEFAULT_LANGSMITH_SPAN_PROCESSOR`에서 `shutdown()` 또는 `forceFlush()`를 수동으로 호출할 필요가 없습니다. 다음은 예제입니다:
 
 ```typescript
 import { initializeOTEL } from "langsmith/experimental/otel/setup";
@@ -194,11 +194,11 @@ try {
 }
 ```
 
-The resulting trace will look [like this](https://smith.langchain.com/public/296a0134-f3d4-4e54-afc7-b18f2c190911/r).
+결과 추적은 [이와 같이](https://smith.langchain.com/public/296a0134-f3d4-4e54-afc7-b18f2c190911/r) 보입니다.
 
 ### Next.js
 
-First, install the [`@vercel/otel`](https://www.npmjs.com/package/@vercel/otel) package:
+먼저, [`@vercel/otel`](https://www.npmjs.com/package/@vercel/otel) 패키지를 설치합니다:
 
 <CodeGroup>
 
@@ -216,9 +216,9 @@ pnpm add @vercel/otel
 
 </CodeGroup>
 
-Then, set up an [`instrumentation.ts`](https://nextjs.org/docs/app/guides/instrumentation) file in your root directory.
-Call `initializeOTEL` and pass the resulting `DEFAULT_LANGSMITH_SPAN_PROCESSOR` into the `spanProcessors` field into your `registerOTEL(...)` call.
-It should look something like this:
+그런 다음, 루트 디렉토리에 [`instrumentation.ts`](https://nextjs.org/docs/app/guides/instrumentation) 파일을 설정합니다.
+`initializeOTEL`을 호출하고 결과로 나온 `DEFAULT_LANGSMITH_SPAN_PROCESSOR`를 `registerOTEL(...)` 호출의 `spanProcessors` 필드에 전달합니다.
+다음과 같이 보여야 합니다:
 
 ```typescript
 import { registerOTel } from "@vercel/otel";
@@ -234,7 +234,7 @@ export function register() {
 }
 ```
 
-And finally, in your API routes, call `initializeOTEL` as well and add an `experimental_telemetry` field to your AI SDK calls:
+마지막으로, API route에서 `initializeOTEL`을 호출하고 AI SDK 호출에 `experimental_telemetry` 필드를 추가합니다:
 
 ```typescript
 import { generateText } from "ai";
@@ -257,14 +257,14 @@ export async function GET() {
 }
 ```
 
-You can also wrap parts of your code in `traceables` for more granularity.
+더 세밀한 제어를 위해 코드의 일부를 `traceables`로 래핑할 수도 있습니다.
 
 ### Sentry
 
-If you're using Sentry, you can attach the LangSmith trace exporter to Sentry's default OpenTelemetry instrumentation as show in the example below.
+Sentry를 사용하는 경우, 아래 예제와 같이 LangSmith trace exporter를 Sentry의 기본 OpenTelemetry 계측에 연결할 수 있습니다.
 
 <Warning>
-At time of writing, Sentry only supports OTEL v1 packages. LangSmith supports both v1 and v2, but you **must** make sure you install OTEL v1 packages in order to make instrumentation work.
+작성 시점 기준으로 Sentry는 OTEL v1 패키지만 지원합니다. LangSmith는 v1과 v2를 모두 지원하지만, 계측이 작동하려면 OTEL v1 패키지를 설치해야 합니다.
 
 <CodeGroup>
 
@@ -331,9 +331,9 @@ try {
 ```
 
 
-## Add other metadata
+## 기타 메타데이터 추가
 
-You can add other metadata to your traces to help organize and filter them in the LangSmith UI:
+LangSmith UI에서 추적을 구성하고 필터링하는 데 도움이 되도록 추적에 다른 메타데이터를 추가할 수 있습니다:
 
 ```typescript {highlight={9}}
 import { generateText } from "ai";
@@ -349,12 +349,12 @@ await generateText({
 });
 ```
 
-Metadata will be visible in your LangSmith dashboard and can be used to filter and search for specific traces.
-Note that AI SDK propagates metadata on internal child spans as well.
+메타데이터는 LangSmith 대시보드에서 볼 수 있으며 특정 추적을 필터링하고 검색하는 데 사용할 수 있습니다.
+AI SDK는 내부 하위 span에도 메타데이터를 전파합니다.
 
-## Customize run name
+## 실행 이름 사용자 정의
 
-You can customize the run name by passing a metadata key named `ls_run_name` into `experimental_telemetry`.
+`experimental_telemetry`에 `ls_run_name`이라는 메타데이터 키를 전달하여 실행 이름을 사용자 정의할 수 있습니다.
 
 ```typescript
 import { generateText } from "ai";

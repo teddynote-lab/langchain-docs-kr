@@ -3,52 +3,52 @@ title: FireCrawlLoader
 ---
 
 
-This notebook provides a quick overview for getting started with [FireCrawlLoader](/oss/integrations/document_loaders/). For detailed documentation of all FireCrawlLoader features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_web_firecrawl.FireCrawlLoader.html).
+이 노트북은 [FireCrawlLoader](/oss/integrations/document_loaders/)를 시작하기 위한 간단한 개요를 제공합니다. 모든 FireCrawlLoader 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_web_firecrawl.FireCrawlLoader.html)를 참조하세요.
 
-## Overview
+## 개요
 
-### Integration details
+### Integration 세부 정보
 
 | Class | Package | Local | Serializable | [PY support](https://python.langchain.com/docs/integrations/document_loaders/firecrawl)|
 | :--- | :--- | :---: | :---: |  :---: |
-| [FireCrawlLoader](https://api.js.langchain.com/classes/langchain_community_document_loaders_web_firecrawl.FireCrawlLoader.html) | [@langchain/community](https://api.js.langchain.com/modules/langchain_community_document_loaders_web_firecrawl.html) | 🟠 (see details below) | beta | ✅ |
+| [FireCrawlLoader](https://api.js.langchain.com/classes/langchain_community_document_loaders_web_firecrawl.FireCrawlLoader.html) | [@langchain/community](https://api.js.langchain.com/modules/langchain_community_document_loaders_web_firecrawl.html) | 🟠 (아래 세부 정보 참조) | beta | ✅ |
 
-### Loader features
+### Loader 기능
 
 | Source | Web Loader | Node Envs Only
 | :---: | :---: | :---: |
 | FireCrawlLoader | ✅ | ❌ |
 
-[FireCrawl](https://firecrawl.dev) crawls and convert any website into LLM-ready data. It crawls all accessible sub-pages and give you clean markdown and metadata for each. No sitemap required.
+[FireCrawl](https://firecrawl.dev)은 모든 웹사이트를 크롤링하고 LLM에 적합한 데이터로 변환합니다. 접근 가능한 모든 하위 페이지를 크롤링하고 각 페이지에 대한 깔끔한 markdown과 metadata를 제공합니다. sitemap이 필요하지 않습니다.
 
-FireCrawl handles complex tasks such as reverse proxies, caching, rate limits, and content blocked by JavaScript. Built by the [mendable.ai](https://mendable.ai) team.
+FireCrawl은 reverse proxy, caching, rate limit, JavaScript로 차단된 콘텐츠와 같은 복잡한 작업을 처리합니다. [mendable.ai](https://mendable.ai) 팀이 개발했습니다.
 
-This guide shows how to scrap and crawl entire websites and load them using the `FireCrawlLoader` in LangChain.
+이 가이드는 전체 웹사이트를 스크랩하고 크롤링하여 LangChain의 `FireCrawlLoader`를 사용하여 로드하는 방법을 보여줍니다.
 
-## Setup
+## 설정
 
-To access `FireCrawlLoader` document loader you'll need to install the `@langchain/community` integration, and the `@mendable/firecrawl-js@0.0.36` package. Then create a **[FireCrawl](https://firecrawl.dev)** account and get an API key.
+`FireCrawlLoader` document loader에 액세스하려면 `@langchain/community` integration과 `@mendable/firecrawl-js@0.0.36` package를 설치해야 합니다. 그런 다음 **[FireCrawl](https://firecrawl.dev)** 계정을 만들고 API key를 받으세요.
 
-### Credentials
+### 자격 증명
 
-Sign up and get your free [FireCrawl API key](https://firecrawl.dev) to start. FireCrawl offers 300 free credits to get you started, and it's [open-source](https://github.com/mendableai/firecrawl) in case you want to self-host.
+시작하려면 가입하고 무료 [FireCrawl API key](https://firecrawl.dev)를 받으세요. FireCrawl은 시작할 수 있도록 300개의 무료 크레딧을 제공하며, 자체 호스팅을 원하는 경우 [오픈 소스](https://github.com/mendableai/firecrawl)입니다.
 
-Once you've done this set the `FIRECRAWL_API_KEY` environment variable:
+완료되면 `FIRECRAWL_API_KEY` 환경 변수를 설정하세요:
 
 ```bash
 export FIRECRAWL_API_KEY="your-api-key"
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```bash
 # export LANGSMITH_TRACING="true"
 # export LANGSMITH_API_KEY="your-api-key"
 ```
 
-### Installation
+### 설치
 
-The LangChain FireCrawlLoader integration lives in the `@langchain/community` package:
+LangChain FireCrawlLoader integration은 `@langchain/community` package에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -62,15 +62,15 @@ pnpm add @langchain/community @langchain/core @mendable/firecrawl-js@0.0.36
 ```
 </CodeGroup>
 
-## Instantiation
+## 인스턴스화
 
-Here's an example of how to use the `FireCrawlLoader` to load web search results:
+다음은 `FireCrawlLoader`를 사용하여 웹 검색 결과를 로드하는 방법의 예시입니다:
 
-Firecrawl offers 3 modes: `scrape`, `crawl`, and `map`. In `scrape` mode, Firecrawl will only scrape the page you provide. In `crawl` mode, Firecrawl will crawl the entire website. In `map` mode, Firecrawl will return semantic links related to the website.
+Firecrawl은 `scrape`, `crawl`, `map`의 3가지 모드를 제공합니다. `scrape` 모드에서는 제공한 페이지만 스크랩합니다. `crawl` 모드에서는 전체 웹사이트를 크롤링합니다. `map` 모드에서는 웹사이트와 관련된 의미론적 링크를 반환합니다.
 
-The `formats` (`scrapeOptions.formats` for `crawl` mode) parameter allows selection from `"markdown"`, `"html"`, or `"rawHtml"`. However, the Loaded Document will return content in only one format, prioritizing as follows: `markdown`, then `html`, and finally `rawHtml`.
+`formats` 매개변수(`crawl` 모드의 경우 `scrapeOptions.formats`)는 `"markdown"`, `"html"`, 또는 `"rawHtml"` 중에서 선택할 수 있습니다. 그러나 로드된 Document는 하나의 형식으로만 콘텐츠를 반환하며, 다음 순서로 우선순위를 지정합니다: `markdown`, `html`, 마지막으로 `rawHtml`.
 
-Now we can instantiate our model object and load documents:
+이제 model 객체를 인스턴스화하고 document를 로드할 수 있습니다:
 
 ```typescript
 import "@mendable/firecrawl-js";
@@ -87,7 +87,7 @@ const loader = new FireCrawlLoader({
 })
 ```
 
-## Load
+## 로드
 
 ```typescript
 const docs = await loader.load()
@@ -137,10 +137,10 @@ console.log(docs[0].metadata)
 }
 ```
 
-## Additional Parameters
+## 추가 매개변수
 
-For `params` you can pass any of the params according to the [Firecrawl documentation](https://docs.firecrawl.dev).
+`params`에는 [Firecrawl 문서](https://docs.firecrawl.dev)에 따라 모든 매개변수를 전달할 수 있습니다.
 
 ## API reference
 
-For detailed documentation of all FireCrawlLoader features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_web_firecrawl.FireCrawlLoader.html).
+모든 FireCrawlLoader 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_web_firecrawl.FireCrawlLoader.html)를 참조하세요.

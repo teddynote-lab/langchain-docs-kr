@@ -2,9 +2,9 @@
 title: Cohere reranker
 ---
 
->[Cohere](https://cohere.ai/about) is a Canadian startup that provides natural language processing models that help companies improve human-machine interactions.
+>[Cohere](https://cohere.ai/about)는 기업이 인간-기계 상호작용을 개선할 수 있도록 자연어 처리 모델을 제공하는 캐나다 스타트업입니다.
 
-This notebook shows how to use [Cohere's rerank endpoint](https://docs.cohere.com/docs/reranking) in a retriever.
+이 노트북은 retriever에서 [Cohere의 rerank endpoint](https://docs.cohere.com/docs/reranking)를 사용하는 방법을 보여줍니다.
 
 ```python
 pip install -qU  cohere
@@ -43,9 +43,9 @@ def pretty_print_docs(docs):
     )
 ```
 
-## Set up the base vector store retriever
+## 기본 vector store retriever 설정하기
 
-Let's start by initializing a simple vector store retriever and storing the 2023 State of the Union speech (in chunks). We can set up the retriever to retrieve a high number (20) of docs.
+간단한 vector store retriever를 초기화하고 2023년 국정연설문을 (청크 단위로) 저장하는 것부터 시작하겠습니다. retriever가 많은 수(20개)의 문서를 검색하도록 설정할 수 있습니다.
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -269,10 +269,10 @@ With a duty to one another to the American people to the Constitution.
 And with an unwavering resolve that freedom will always triumph over tyranny.
 ```
 
-## Doing reranking with CohereRerank
+## CohereRerank로 reranking 수행하기
 
-Now let's wrap our base retriever with a `ContextualCompressionRetriever`. We'll add an `CohereRerank`, uses the Cohere rerank endpoint to rerank the returned results.
-Do note that it is mandatory to specify the model name in CohereRerank!
+이제 기본 retriever를 `ContextualCompressionRetriever`로 래핑해보겠습니다. Cohere rerank endpoint를 사용하여 반환된 결과를 재순위화하는 `CohereRerank`를 추가하겠습니다.
+CohereRerank에서 model 이름을 지정하는 것이 필수라는 점에 유의하세요!
 
 ```python
 from langsmith import Client
@@ -293,7 +293,7 @@ compressed_docs = compression_retriever.invoke(
 pretty_print_docs(compressed_docs)
 ```
 
-You can of course use this retriever within a QA pipeline
+물론 이 retriever를 QA pipeline 내에서 사용할 수 있습니다
 
 
 ```python

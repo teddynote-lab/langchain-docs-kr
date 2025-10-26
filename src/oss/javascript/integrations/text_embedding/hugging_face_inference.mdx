@@ -2,14 +2,14 @@
 title: HuggingFace Inference
 ---
 
-This Embeddings integration uses the HuggingFace Inference API to generate embeddings for a given text, using the `BAAI/bge-base-en-v1.5` model by default. You can pass a different model name to the constructor to use a different model.
+이 Embeddings integration은 HuggingFace Inference API를 사용하여 주어진 텍스트에 대한 embedding을 생성하며, 기본적으로 `BAAI/bge-base-en-v1.5` model을 사용합니다. 다른 model을 사용하려면 constructor에 다른 model 이름을 전달할 수 있습니다.
 
 ## Setup
 
-You'll first need to install the [`@langchain/community`](https://www.npmjs.com/package/@langchain/community) package and the required peer dependency:
+먼저 [`@langchain/community`](https://www.npmjs.com/package/@langchain/community) package와 필요한 peer dependency를 설치해야 합니다:
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain package 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
@@ -28,13 +28,13 @@ const embeddings = new HuggingFaceInferenceEmbeddings({
 ```
 
 > **Note:**
-> If you do not provide a `model`, a warning will be logged and the default model `BAAI/bge-base-en-v1.5` will be used.
-> If you do not provide a `provider`, Hugging Face will default to `auto` selection, which will select the first provider available for the model based on your settings at https://hf.co/settings/inference-providers.
+> `model`을 제공하지 않으면 경고가 기록되고 기본 model인 `BAAI/bge-base-en-v1.5`가 사용됩니다.
+> `provider`를 제공하지 않으면 Hugging Face는 기본적으로 `auto` 선택을 사용하며, 이는 https://hf.co/settings/inference-providers의 설정에 따라 model에 사용 가능한 첫 번째 provider를 선택합니다.
 
 > **Hint:**
-> `hf-inference` is the provider name for models that are hosted directly by Hugging Face.
+> `hf-inference`는 Hugging Face에서 직접 호스팅하는 model의 provider 이름입니다.
 
 ## Related
 
-- Embedding model [conceptual guide](/oss/integrations/text_embedding)
-- Embedding model [how-to guides](/oss/integrations/text_embedding)
+- Embedding model [개념 가이드](/oss/integrations/text_embedding)
+- Embedding model [how-to 가이드](/oss/integrations/text_embedding)

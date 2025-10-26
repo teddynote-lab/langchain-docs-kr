@@ -2,17 +2,17 @@
 title: ChatGoogleGenerativeAI
 ---
 
-Access Google's Generative AI models, including the Gemini family, directly via the Gemini API or experiment rapidly using Google AI Studio. The `langchain-google-genai` package provides the LangChain integration for these models. This is often the best starting point for individual developers.
+Gemini API를 통해 직접 Google의 Generative AI 모델(Gemini 제품군 포함)에 액세스하거나 Google AI Studio를 사용하여 빠르게 실험할 수 있습니다. `langchain-google-genai` 패키지는 이러한 모델에 대한 LangChain 통합을 제공합니다. 이는 개별 개발자에게 가장 좋은 시작점인 경우가 많습니다.
 
-For information on the latest models, their features, context windows, etc. head to the [Google AI docs](https://ai.google.dev/gemini-api/docs/models/gemini). All model ids can be found in the [Gemini API docs](https://ai.google.dev/gemini-api/docs/models).
+최신 모델, 기능, context window 등에 대한 정보는 [Google AI 문서](https://ai.google.dev/gemini-api/docs/models/gemini)를 참조하세요. 모든 model id는 [Gemini API 문서](https://ai.google.dev/gemini-api/docs/models)에서 확인할 수 있습니다.
 
-### Integration details
+### Integration 세부 정보
 
 | Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/chat/google_generative_ai) | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [ChatGoogleGenerativeAI](https://python.langchain.com/api_reference/google_genai/chat_models/langchain_google_genai.chat_models.ChatGoogleGenerativeAI.html) | [langchain-google-genai](https://python.langchain.com/api_reference/google_genai/index.html) | ❌ | beta | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-google-genai?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-google-genai?style=flat-square&label=%20) |
 
-### Model features
+### Model 기능
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
@@ -20,7 +20,7 @@ For information on the latest models, their features, context windows, etc. head
 
 ### Setup
 
-To access Google AI models you'll need to create a Google Account, get a Google AI API key, and install the `langchain-google-genai` integration package.
+Google AI 모델에 액세스하려면 Google 계정을 생성하고, Google AI API key를 받고, `langchain-google-genai` integration 패키지를 설치해야 합니다.
 
 **1. Installation:**
 
@@ -30,11 +30,11 @@ pip install -U langchain-google-genai
 
 **2. Credentials:**
 
-Head to [https://ai.google.dev/gemini-api/docs/api-key](https://ai.google.dev/gemini-api/docs/api-key) (or via Google AI Studio) to generate a Google AI API key.
+[https://ai.google.dev/gemini-api/docs/api-key](https://ai.google.dev/gemini-api/docs/api-key) (또는 Google AI Studio를 통해)로 이동하여 Google AI API key를 생성하세요.
 
 ### Chat models
 
-Use the `ChatGoogleGenerativeAI` class to interact with Google's chat models. See the [API reference](https://python.langchain.com/api_reference/google_genai/chat_models/langchain_google_genai.chat_models.ChatGoogleGenerativeAI.html) for full details.
+`ChatGoogleGenerativeAI` class를 사용하여 Google의 chat model과 상호작용하세요. 전체 세부 정보는 [API reference](https://python.langchain.com/api_reference/google_genai/chat_models/langchain_google_genai.chat_models.ChatGoogleGenerativeAI.html)를 참조하세요.
 
 ```python
 import getpass
@@ -44,7 +44,7 @@ if "GOOGLE_API_KEY" not in os.environ:
     os.environ["GOOGLE_API_KEY"] = getpass.getpass("Enter your Google AI API key: ")
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+model 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -53,7 +53,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```python
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -94,13 +94,13 @@ print(ai_msg.content)
 J'adore la programmation.
 ```
 
-## Multimodal Usage
+## Multimodal 사용
 
-Gemini models can accept multimodal inputs (text, images, audio, video) and, for some models, generate multimodal outputs.
+Gemini 모델은 multimodal 입력(텍스트, 이미지, 오디오, 비디오)을 받을 수 있으며, 일부 모델의 경우 multimodal 출력을 생성할 수 있습니다.
 
 ### Image Input
 
-Provide image inputs along with text using a @[`HumanMessage`] with a list content format. Make sure to use a model that supports image input, such as `gemini-2.5-flash`.
+list content 형식의 @[`HumanMessage`]를 사용하여 텍스트와 함께 이미지 입력을 제공하세요. `gemini-2.5-flash`와 같이 이미지 입력을 지원하는 모델을 사용해야 합니다.
 
 ```python
 import base64
@@ -137,14 +137,14 @@ result_local = llm.invoke([message_local])
 print(f"Response for local image: {result_local.content}")
 ```
 
-Other supported `image_url` formats:
+지원되는 다른 `image_url` 형식:
 
-- A Google Cloud Storage URI (`gs://...`). Ensure the service account has access.
-- A PIL Image object (the library handles encoding).
+- Google Cloud Storage URI (`gs://...`). service account에 액세스 권한이 있는지 확인하세요.
+- PIL Image 객체 (라이브러리가 인코딩을 처리합니다).
 
 ### Audio Input
 
-Provide audio file inputs along with text.
+텍스트와 함께 오디오 파일 입력을 제공하세요.
 
 ```python
 import base64
@@ -175,7 +175,7 @@ print(f"Response for audio: {response.content}")
 
 ### Video Input
 
-Provide video file inputs along with text.
+텍스트와 함께 비디오 파일 입력을 제공하세요.
 
 ```python
 import base64
@@ -207,7 +207,7 @@ print(f"Response for video: {response.content}")
 
 ### Image Generation (Multimodal Output)
 
-Certain models (such as `gemini-2.0-flash-preview-image-generation`) can generate text and images inline. You need to specify the desired `response_modalities`. See more information on the [Gemini API docs](https://ai.google.dev/gemini-api/docs/image-generation) for details.
+특정 모델(예: `gemini-2.0-flash-preview-image-generation`)은 텍스트와 이미지를 인라인으로 생성할 수 있습니다. 원하는 `response_modalities`를 지정해야 합니다. 자세한 내용은 [Gemini API 문서](https://ai.google.dev/gemini-api/docs/image-generation)를 참조하세요.
 
 ```python
 import base64
@@ -244,7 +244,7 @@ display(Image(data=base64.b64decode(image_base64), width=300))
 
 ## Tool Calling
 
-You can equip the model with tools to call.
+모델에 호출할 tool을 장착할 수 있습니다.
 
 ```python
 from langchain.tools import tool
@@ -288,7 +288,7 @@ AIMessage(content="OK. It's sunny in San Francisco.", additional_kwargs={}, resp
 
 ## Structured Output
 
-Force the model to respond with a specific structure using Pydantic models.
+Pydantic model을 사용하여 모델이 특정 구조로 응답하도록 강제합니다.
 
 ```python
 from langchain_core.pydantic_v1 import BaseModel, Field
@@ -323,18 +323,18 @@ print(result)
 name='Abraham Lincoln' height_m=1.93
 ```
 
-### Structured Output Methods
+### Structured Output 방법
 
-Two methods are supported for structured output:
+structured output에 대해 두 가지 방법이 지원됩니다:
 
-- **`method="function_calling"` (default)**: Uses tool calling to extract structured data. Compatible with all Gemini models.
-- **`method="json_schema"`** or **`method="json_mode"`**: Uses Gemini's native structured output with `responseSchema`. More reliable but requires Gemini 1.5+ models. (`json_mode` is kept for backwards compatibility)
+- **`method="function_calling"` (기본값)**: tool calling을 사용하여 구조화된 데이터를 추출합니다. 모든 Gemini 모델과 호환됩니다.
+- **`method="json_schema"`** 또는 **`method="json_mode"`**: `responseSchema`와 함께 Gemini의 네이티브 structured output을 사용합니다. 더 신뢰할 수 있지만 Gemini 1.5+ 모델이 필요합니다. (`json_mode`는 하위 호환성을 위해 유지됩니다)
 
-The `json_schema` method is **recommended for better reliability** as it constrains the model's generation process directly rather than relying on post-processing tool calls.
+`json_schema` 방법은 tool call 후처리에 의존하는 대신 모델의 생성 프로세스를 직접 제약하므로 **더 나은 신뢰성을 위해 권장됩니다**.
 
-## Token Usage Tracking
+## Token Usage 추적
 
-Access token usage information from the response metadata.
+response metadata에서 token 사용 정보에 액세스하세요.
 
 ```python
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -357,7 +357,7 @@ Usage Metadata:
 
 ## Built-in tools
 
-Google Gemini supports a variety of built-in tools ([google search](https://ai.google.dev/gemini-api/docs/grounding/search-suggestions), [code execution](https://ai.google.dev/gemini-api/docs/code-execution?lang=python)), which can be bound to the model in the usual way.
+Google Gemini는 다양한 built-in tool([google search](https://ai.google.dev/gemini-api/docs/grounding/search-suggestions), [code execution](https://ai.google.dev/gemini-api/docs/code-execution?lang=python))을 지원하며, 일반적인 방식으로 모델에 바인딩할 수 있습니다.
 
 ```python
 from google.ai.generativelanguage_v1beta.types import Tool as GenAITool
@@ -414,7 +414,7 @@ Code execution result: 4
 
 ## Native Async
 
-Use asynchronous methods for non-blocking calls.
+비차단 호출을 위해 비동기 메서드를 사용하세요.
 
 ```python
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -462,7 +462,7 @@ Async Batch Results: ['1 + 1 = 2', '2 + 2 = 4']
 
 ## Safety Settings
 
-Gemini models have default safety settings that can be overridden. If you are receiving lots of "Safety Warnings" from your models, you can try tweaking the `safety_settings` attribute of the model. For example, to turn off safety blocking for dangerous content, you can construct your LLM as follows:
+Gemini 모델에는 재정의할 수 있는 기본 safety 설정이 있습니다. 모델에서 많은 "Safety Warning"을 받는 경우 모델의 `safety_settings` 속성을 조정해 볼 수 있습니다. 예를 들어, 위험한 콘텐츠에 대한 safety 차단을 끄려면 다음과 같이 LLM을 구성할 수 있습니다:
 
 ```python
 from langchain_google_genai import (
@@ -479,8 +479,8 @@ llm = ChatGoogleGenerativeAI(
 )
 ```
 
-For an enumeration of the categories and thresholds available, see Google's [safety setting types](https://ai.google.dev/api/python/google/generativeai/types/SafetySettingDict).
+사용 가능한 카테고리 및 임계값의 열거는 Google의 [safety setting types](https://ai.google.dev/api/python/google/generativeai/types/SafetySettingDict)를 참조하세요.
 
 ## API reference
 
-For detailed documentation of all ChatGoogleGenerativeAI features and configurations head to the [API reference](https://python.langchain.com/api_reference/google_genai/chat_models/langchain_google_genai.chat_models.ChatGoogleGenerativeAI.html).
+모든 ChatGoogleGenerativeAI 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/google_genai/chat_models/langchain_google_genai.chat_models.ChatGoogleGenerativeAI.html)를 참조하세요.

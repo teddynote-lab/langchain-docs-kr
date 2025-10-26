@@ -2,9 +2,9 @@
 title: ChatSambaStudio
 ---
 
-This will help you get started with SambaStudio [chat models](/oss/langchain/models). For detailed documentation of all ChatStudio features and configurations head to the [API reference](https://docs.sambanova.ai/sambastudio/latest/index.html).
+이 문서는 SambaStudio [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 ChatStudio 기능 및 구성에 대한 자세한 문서는 [API reference](https://docs.sambanova.ai/sambastudio/latest/index.html)를 참조하세요.
 
-**[SambaNova](https://sambanova.ai/)'s** [SambaStudio](https://docs.sambanova.ai/sambastudio/latest/sambastudio-intro.html) SambaStudio is a rich, GUI-based platform that provides the functionality to train, deploy, and manage models in SambaNova [DataScale](https://sambanova.ai/products/datascale) systems.
+**[SambaNova](https://sambanova.ai/)**의 [SambaStudio](https://docs.sambanova.ai/sambastudio/latest/sambastudio-intro.html)는 SambaNova [DataScale](https://sambanova.ai/products/datascale) 시스템에서 모델을 훈련, 배포 및 관리하는 기능을 제공하는 풍부한 GUI 기반 플랫폼입니다.
 
 ## Overview
 
@@ -22,7 +22,7 @@ This will help you get started with SambaStudio [chat models](/oss/langchain/mod
 
 ## Setup
 
-To access ChatSambaStudio models you will need to [deploy an endpoint](https://docs.sambanova.ai/sambastudio/latest/language-models.html) in your SambaStudio platform, install the `langchain_sambanova` integration package.
+ChatSambaStudio 모델에 액세스하려면 SambaStudio 플랫폼에서 [endpoint를 배포](https://docs.sambanova.ai/sambastudio/latest/language-models.html)하고 `langchain_sambanova` integration package를 설치해야 합니다.
 
 ```bash
 pip install langchain-sambanova
@@ -30,7 +30,7 @@ pip install langchain-sambanova
 
 ### Credentials
 
-Get the URL and API Key from your SambaStudio deployed endpoint and add them to your environment variables:
+SambaStudio 배포된 endpoint에서 URL과 API Key를 가져와 환경 변수에 추가하세요:
 
 ``` bash
 export SAMBASTUDIO_URL="sambastudio-url-key-here"
@@ -49,7 +49,7 @@ if not os.getenv("SAMBASTUDIO_API_KEY"):
     )
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```python
 os.environ["LANGSMITH_TRACING"] = "true"
@@ -58,7 +58,7 @@ os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key:
 
 ### Installation
 
-The LangChain **SambaStudio** integration lives in the `langchain_sambanova` package:
+LangChain **SambaStudio** integration은 `langchain_sambanova` package에 있습니다:
 
 ```python
 pip install -qU langchain-sambanova
@@ -66,7 +66,7 @@ pip install -qU langchain-sambanova
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```python
 from langchain_sambanova import ChatSambaStudio
@@ -267,4 +267,4 @@ Joke(setup='Why did the cat join a band?', punchline='Because it wanted to be th
 
 ## API reference
 
-For detailed documentation of all SambaStudio features and configurations head to the API reference: [docs.sambanova.ai/sambastudio/latest/api-ref-landing.html](https://docs.sambanova.ai/sambastudio/latest/api-ref-landing.html)
+모든 SambaStudio 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [docs.sambanova.ai/sambastudio/latest/api-ref-landing.html](https://docs.sambanova.ai/sambastudio/latest/api-ref-landing.html)

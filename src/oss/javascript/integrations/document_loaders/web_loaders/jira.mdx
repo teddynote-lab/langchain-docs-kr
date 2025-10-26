@@ -1,19 +1,20 @@
+```mdx
 ---
 title: Jira
 ---
 
 <Tip>
-**Compatibility**
+**호환성**
 
-Only available on Node.js.
+Node.js에서만 사용 가능합니다.
 </Tip>
 
-This covers how to load document objects from issues in a Jira projects.
+Jira 프로젝트의 이슈에서 document 객체를 로드하는 방법을 다룹니다.
 
 ## Credentials
 
-- You'll need to set up an access token and provide it along with your Jira username in order to authenticate the request
-- You'll also need the project key and host URL for the project containing the issues to load as documents.
+- 요청을 인증하기 위해 access token을 설정하고 Jira 사용자 이름과 함께 제공해야 합니다
+- 또한 document로 로드할 이슈가 포함된 프로젝트의 project key와 host URL이 필요합니다.
 
 ## Usage
 
@@ -44,4 +45,5 @@ if (username && accessToken) {
     "You must provide a username and access token to run this example."
   );
 }
+```
 ```

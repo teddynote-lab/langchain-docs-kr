@@ -2,17 +2,17 @@
 title: Chat(MODULE_NAME)
 ---
 
-How to use this Python chat model template:
+이 Python chat model 템플릿 사용 방법:
 
-- [ ] Substitute (MODULE_NAME) with the name of the module, e.g. Anthropic, OpenAI, etc. (`command + F` is your friend here)
-- [ ] Update links to point to the correct module
-- [ ] Under the details and features tables, update the ✅/❌ to reflect the actual capabilities of the chat model
-- [ ] Update the PyPi/registry package name if needed
-- [ ] Update the API key environment variable name if needed
+- [ ] (MODULE_NAME)을 모듈 이름으로 대체하세요. 예: Anthropic, OpenAI 등 (`command + F`를 활용하세요)
+- [ ] 링크를 올바른 모듈을 가리키도록 업데이트하세요
+- [ ] details 및 features 테이블 아래에서 ✅/❌를 chat model의 실제 기능을 반영하도록 업데이트하세요
+- [ ] 필요한 경우 PyPi/registry 패키지 이름을 업데이트하세요
+- [ ] 필요한 경우 API key 환경 변수 이름을 업데이트하세요
 
-The template starts below this line...
+템플릿은 이 줄 아래부터 시작됩니다...
 
-This guide provides a quick overview for getting started with the (MODULE_NAME) [chat model](/oss/langchain/models). For a detailed listing of all Chat(MODULE_NAME) features, paramaters, and configurations, head to the [Chat(MODULE_NAME) API reference](https://python.langchain.com/api_reference/(MODULE_NAME)/chat_models/langchain_(MODULE_NAME).chat_models.Chat(MODULE_NAME).html).
+이 가이드는 (MODULE_NAME) [chat model](/oss/langchain/models) 시작하기에 대한 빠른 개요를 제공합니다. 모든 Chat(MODULE_NAME) 기능, 매개변수 및 구성에 대한 자세한 목록은 [Chat(MODULE_NAME) API reference](https://python.langchain.com/api_reference/(MODULE_NAME)/chat_models/langchain_(MODULE_NAME).chat_models.Chat(MODULE_NAME).html)를 참조하세요.
 
 ## Overview
 
@@ -32,7 +32,7 @@ This guide provides a quick overview for getting started with the (MODULE_NAME) 
 
 ## Setup
 
-To access (MODULE_NAME) models, you'll need to create a/an (MODULE_NAME) account, get an API key, and install the `langchain-(MODULE_NAME)` integration package.
+(MODULE_NAME) model에 액세스하려면 (MODULE_NAME) 계정을 생성하고 API key를 받은 다음 `langchain-(MODULE_NAME)` integration package를 설치해야 합니다.
 
 ### Credentials
 
@@ -44,7 +44,7 @@ if "(MODULE_NAME)_API_KEY" not in os.environ:
     os.environ["(MODULE_NAME)_API_KEY"] = getpass.getpass("Enter your (MODULE_NAME) API key: ")
 ```
 
-To enable automated <Tooltip tip="Log each step of a model's execution to debug and improve it">tracing</Tooltip> of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동화된 <Tooltip tip="모델 실행의 각 단계를 로깅하여 디버그하고 개선합니다">tracing</Tooltip>을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python Enable tracing icon="flask"
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -53,7 +53,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-The LangChain (MODULE_NAME) integration lives in the `langchain-(MODULE_NAME)` package:
+LangChain (MODULE_NAME) integration은 `langchain-(MODULE_NAME)` package에 있습니다:
 
 <CodeGroup>
     ```python pip
@@ -68,7 +68,7 @@ The LangChain (MODULE_NAME) integration lives in the `langchain-(MODULE_NAME)` p
 
 ## Instantiation
 
-Now we can instantiate our model object and generate responses:
+이제 model object를 인스턴스화하고 응답을 생성할 수 있습니다:
 
 ```python Initialize chat model icon="robot"
 from langchain_(MODULE_NAME) import Chat(MODULE_NAME)
@@ -125,20 +125,20 @@ print(response.content_blocks)
 ```
 
 <Tip>
-    Full guides are available on [chat model invocation types](/oss/langchain/models#invocation), [message types](/oss/langchain/messages#message-types), and [content blocks](/oss/langchain/messages#standard-content-blocks).
+    [chat model invocation types](/oss/langchain/models#invocation), [message types](/oss/langchain/messages#message-types), [content blocks](/oss/langchain/messages#standard-content-blocks)에 대한 전체 가이드를 확인할 수 있습니다.
 </Tip>
 
-## TODO: Any functionality specific to this model
+## TODO: 이 모델에 특정한 기능
 
-Delete if not relevant.
+관련이 없으면 삭제하세요.
 
-Look at existing model docs for examples, e.g.:
+예시는 기존 model 문서를 참조하세요:
 
 - [ChatAnthropic](/oss/integrations/chat/anthropic)
 - [ChatOpenAI](/oss/integrations/chat/openai)
 - [ChatGenAI](/oss/integrations/chat/google_generative_ai)
 
-Examples:
+예시:
 - <Icon icon="wrench" size={16}/> Tool calling
 - <Icon icon="brain" size={16}/> Reasoning output / extended reasoning
 - <Icon icon="bullhorn" size={16}/> Verbosity
@@ -159,4 +159,4 @@ Examples:
 
 ## API reference
 
-For detailed documentation of all Chat(MODULE_NAME) features and configurations, head to the [API reference](<LINK>).
+모든 Chat(MODULE_NAME) 기능 및 구성에 대한 자세한 문서는 [API reference](<LINK>)를 참조하세요.

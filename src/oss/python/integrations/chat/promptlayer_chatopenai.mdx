@@ -2,11 +2,11 @@
 title: PromptLayerChatOpenAI
 ---
 
-This example showcases how to connect to [PromptLayer](https://www.promptlayer.com) to start recording your ChatOpenAI requests.
+이 예제는 ChatOpenAI 요청 기록을 시작하기 위해 [PromptLayer](https://www.promptlayer.com)에 연결하는 방법을 보여줍니다.
 
-## Install PromptLayer
+## PromptLayer 설치
 
-The `promptlayer` package is required to use PromptLayer with OpenAI. Install `promptlayer` using pip.
+OpenAI와 함께 PromptLayer를 사용하려면 `promptlayer` 패키지가 필요합니다. pip을 사용하여 `promptlayer`를 설치하세요.
 
 ```python
 pip install promptlayer
@@ -21,19 +21,19 @@ from langchain_community.chat_models import PromptLayerChatOpenAI
 from langchain.messages import HumanMessage
 ```
 
-## Set the Environment API Key
+## Environment API Key 설정
 
-You can create a PromptLayer API Key at [www.promptlayer.com](https://www.promptlayer.com) by clicking the settings cog in the navbar.
+[www.promptlayer.com](https://www.promptlayer.com)에서 네비게이션 바의 설정 톱니바퀴를 클릭하여 PromptLayer API Key를 생성할 수 있습니다.
 
-Set it as an environment variable called `PROMPTLAYER_API_KEY`.
+이를 `PROMPTLAYER_API_KEY`라는 환경 변수로 설정하세요.
 
 ```python
 os.environ["PROMPTLAYER_API_KEY"] = "**********"
 ```
 
-## Use the PromptLayerOpenAI LLM like normal
+## PromptLayerOpenAI LLM을 일반적인 방법으로 사용
 
-*You can optionally pass in `pl_tags` to track your requests with PromptLayer's tagging feature.*
+*PromptLayer의 태깅 기능으로 요청을 추적하기 위해 선택적으로 `pl_tags`를 전달할 수 있습니다.*
 
 ```python
 chat = PromptLayerChatOpenAI(pl_tags=["langchain"])
@@ -44,11 +44,11 @@ chat([HumanMessage(content="I am a cat and I want")])
 AIMessage(content='to take a nap in a cozy spot. I search around for a suitable place and finally settle on a soft cushion on the window sill. I curl up into a ball and close my eyes, relishing the warmth of the sun on my fur. As I drift off to sleep, I can hear the birds chirping outside and feel the gentle breeze blowing through the window. This is the life of a contented cat.', additional_kwargs={})
 ```
 
-**The above request should now appear on your [PromptLayer dashboard](https://www.promptlayer.com).**
+**위 요청은 이제 [PromptLayer 대시보드](https://www.promptlayer.com)에 나타나야 합니다.**
 
-## Using PromptLayer Track
+## PromptLayer Track 사용
 
-If you would like to use any of the [PromptLayer tracking features](https://magniv.notion.site/Track-4deee1b1f7a34c1680d085f82567dab9), you need to pass the argument `return_pl_id` when instantiating the PromptLayer LLM to get the request id.
+[PromptLayer 추적 기능](https://magniv.notion.site/Track-4deee1b1f7a34c1680d085f82567dab9) 중 하나를 사용하려면, request id를 얻기 위해 PromptLayer LLM을 인스턴스화할 때 `return_pl_id` 인수를 전달해야 합니다.
 
 ```python
 import promptlayer
@@ -61,5 +61,5 @@ for res in chat_results.generations:
     promptlayer.track.score(request_id=pl_request_id, score=100)
 ```
 
-Using this allows you to track the performance of your model in the PromptLayer dashboard. If you are using a prompt template, you can attach a template to a request as well.
-Overall, this gives you the opportunity to track the performance of different templates and models in the PromptLayer dashboard.
+이를 통해 PromptLayer 대시보드에서 모델의 성능을 추적할 수 있습니다. prompt template을 사용하는 경우, 요청에 template을 첨부할 수도 있습니다.
+전반적으로, 이를 통해 PromptLayer 대시보드에서 다양한 template과 model의 성능을 추적할 수 있는 기회를 얻게 됩니다.

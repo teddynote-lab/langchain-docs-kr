@@ -2,23 +2,23 @@
 title: Activeloop Deep Lake
 ---
 
->[Activeloop Deep Lake](https://docs.deeplake.ai/) as a Multi-Modal Vector Store that stores embeddings and their metadata including text, jsons, images, audio, video, and more. It saves the data locally, in your cloud, or on Activeloop storage. It performs hybrid search including embeddings and their attributes.
+>[Activeloop Deep Lake](https://docs.deeplake.ai/)는 embedding과 text, json, image, audio, video 등을 포함한 메타데이터를 저장하는 Multi-Modal Vector Store입니다. 데이터를 로컬, 클라우드 또는 Activeloop storage에 저장합니다. embedding과 그 속성을 포함한 hybrid search를 수행합니다.
 
-This notebook showcases basic functionality related to `Activeloop Deep Lake`. While `Deep Lake` can store embeddings, it is capable of storing any type of data. It is a serverless data lake with version control, query engine and streaming dataloaders to deep learning frameworks.
+이 notebook은 `Activeloop Deep Lake`와 관련된 기본 기능을 소개합니다. `Deep Lake`는 embedding을 저장할 수 있지만, 모든 유형의 데이터를 저장할 수 있습니다. 버전 관리, 쿼리 엔진 및 딥러닝 프레임워크를 위한 streaming dataloader를 갖춘 serverless data lake입니다.
 
-For more information, please see the Deep Lake [documentation](https://docs.deeplake.ai/)
+자세한 내용은 Deep Lake [문서](https://docs.deeplake.ai/)를 참조하세요.
 
-## Setting up
+## 설정
 
 ```python
 pip install -qU  langchain-openai langchain-deeplake tiktoken
 ```
 
-## Example provided by Activeloop
+## Activeloop에서 제공하는 예제
 
-[Integration with LangChain](https://docs.activeloop.ai/tutorials/vector-store/deep-lake-vector-store-in-langchain).
+[LangChain과의 통합](https://docs.activeloop.ai/tutorials/vector-store/deep-lake-vector-store-in-langchain).
 
-## Deep Lake locally
+## 로컬 Deep Lake
 
 ```python
 from langchain_deeplake.vectorstores import DeeplakeVectorStore
@@ -48,9 +48,9 @@ docs = text_splitter.split_documents(documents)
 embeddings = OpenAIEmbeddings()
 ```
 
-### Create a local dataset
+### 로컬 dataset 생성
 
-Create a dataset locally at `./my_deeplake/`, then run similarity search. The Deeplake+LangChain integration uses Deep Lake datasets under the hood, so `dataset` and `vector store` are used interchangeably. To create a dataset in your own cloud, or in the Deep Lake storage, [adjust the path accordingly](https://docs.deeplake.ai/latest/getting-started/storage-and-creds/storage-options/).
+`./my_deeplake/`에 로컬로 dataset을 생성한 다음 유사도 검색을 실행합니다. Deeplake+LangChain 통합은 내부적으로 Deep Lake dataset을 사용하므로 `dataset`과 `vector store`는 상호 교환적으로 사용됩니다. 자신의 클라우드 또는 Deep Lake storage에 dataset을 생성하려면 [경로를 적절히 조정](https://docs.deeplake.ai/latest/getting-started/storage-and-creds/storage-options/)하세요.
 
 ```python
 db = DeeplakeVectorStore(
@@ -61,7 +61,7 @@ db.add_documents(docs)
 # db = DeepLake.from_documents(docs, dataset_path="./my_deeplake/", embedding_function=embeddings, overwrite=True)
 ```
 
-### Query dataset
+### Dataset 쿼리
 
 ```python
 query = "What did the president say about Ketanji Brown Jackson"
@@ -72,7 +72,7 @@ docs = db.similarity_search(query)
 print(docs[0].page_content)
 ```
 
-Later, you can reload the dataset without recomputing embeddings
+나중에 embedding을 다시 계산하지 않고 dataset을 다시 로드할 수 있습니다
 
 ```python
 db = DeeplakeVectorStore(
@@ -81,7 +81,7 @@ db = DeeplakeVectorStore(
 docs = db.similarity_search(query)
 ```
 
-Setting `read_only=True` revents accidental modifications to the vector store when updates are not needed. This ensures that the data remains unchanged unless explicitly intended. It is generally a good practice to specify this argument to avoid unintended updates.
+`read_only=True`로 설정하면 업데이트가 필요하지 않을 때 vector store의 우발적인 수정을 방지합니다. 이는 명시적으로 의도하지 않는 한 데이터가 변경되지 않도록 보장합니다. 의도하지 않은 업데이트를 피하기 위해 이 인수를 지정하는 것이 일반적으로 좋은 관행입니다.
 
 ### Retrieval Question/Answering
 
@@ -101,9 +101,9 @@ query = "What did the president say about Ketanji Brown Jackson"
 qa.run(query)
 ```
 
-### Attribute based filtering in metadata
+### 메타데이터의 속성 기반 필터링
 
-Let's create another vector store containing metadata with the year the documents were created.
+문서가 생성된 연도를 포함하는 메타데이터가 있는 또 다른 vector store를 생성해 보겠습니다.
 
 ```python
 import random
@@ -123,9 +123,9 @@ db.similarity_search(
 )
 ```
 
-### Choosing distance function
+### 거리 함수 선택
 
-Distance function `L2` for Euclidean, `cos` for cosine similarity
+거리 함수 `L2`는 Euclidean, `cos`는 cosine similarity
 
 ```python
 db.similarity_search(
@@ -135,7 +135,7 @@ db.similarity_search(
 
 ### Maximal Marginal relevance
 
-Using maximal marginal relevance
+Maximal marginal relevance 사용
 
 ```python
 db.max_marginal_relevance_search(
@@ -143,15 +143,15 @@ db.max_marginal_relevance_search(
 )
 ```
 
-### Delete dataset
+### Dataset 삭제
 
 ```python
 db.delete_dataset()
 ```
 
-## Deep Lake datasets on cloud (Activeloop, AWS, GCS, etc.) or in memory
+## 클라우드(Activeloop, AWS, GCS 등) 또는 메모리의 Deep Lake dataset
 
-By default, Deep Lake datasets are stored locally. To store them in memory, in the Deep Lake Managed DB, or in any object storage, you can provide the [corresponding path and credentials when creating the vector store](https://docs.deeplake.ai/latest/getting-started/storage-and-creds/storage-options/). Some paths require registration with Activeloop and creation of an API token that can be [retrieved here](https://app.activeloop.ai/)
+기본적으로 Deep Lake dataset은 로컬에 저장됩니다. 메모리, Deep Lake Managed DB 또는 모든 object storage에 저장하려면 vector store를 생성할 때 [해당 경로와 자격 증명을 제공](https://docs.deeplake.ai/latest/getting-started/storage-and-creds/storage-options/)할 수 있습니다. 일부 경로는 Activeloop에 등록하고 [여기에서 검색](https://app.activeloop.ai/)할 수 있는 API token을 생성해야 합니다.
 
 ```python
 os.environ["ACTIVELOOP_TOKEN"] = activeloop_token
@@ -195,7 +195,7 @@ ids = db.add_documents(docs)
 
 ### TQL Search
 
-Furthermore, the execution of queries is also supported within the similarity_search method, whereby the query can be specified utilizing Deep Lake's Tensor Query Language (TQL).
+또한 similarity_search method 내에서 쿼리 실행이 지원되며, Deep Lake의 Tensor Query Language(TQL)를 사용하여 쿼리를 지정할 수 있습니다.
 
 ```python
 search_id = db.dataset["ids"][0]
@@ -212,7 +212,7 @@ docs = db.similarity_search(
 db.dataset.summary()
 ```
 
-### Creating vector stores on AWS S3
+### AWS S3에 vector store 생성
 
 ```python
 dataset_path = "s3://BUCKET/langchain_test"  # could be also ./local/path (much faster locally), hub://bucket/path/to/dataset, gcs://path/to/dataset, etc.
@@ -233,7 +233,7 @@ db = DeeplakeVectorStore.from_documents(
 
 ## Deep Lake API
 
-you can access the Deep Lake  dataset at `db.vectorstore`
+`db.vectorstore`에서 Deep Lake dataset에 액세스할 수 있습니다
 
 ```python
 # get structure of the dataset
@@ -245,9 +245,9 @@ db.dataset.summary()
 embeds = db.dataset["embeddings"][:]
 ```
 
-### Transfer local dataset to cloud
+### 로컬 dataset을 클라우드로 전송
 
-Copy already created dataset to the cloud. You can also transfer from cloud to local.
+이미 생성된 dataset을 클라우드로 복사합니다. 클라우드에서 로컬로도 전송할 수 있습니다.
 
 ```python
 import deeplake

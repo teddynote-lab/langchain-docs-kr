@@ -2,17 +2,16 @@
 title: GooseAI
 ---
 
->[GooseAI](https://goose.ai) makes deploying NLP services easier and more accessible.
-> `GooseAI` is a fully managed inference service delivered via API.
-> With feature parity to other well known APIs, `GooseAI` delivers a plug-and-play solution
-> for serving open source language models at the industry's best economics by simply
-> changing 2 lines in your code.
+>[GooseAI](https://goose.ai)는 NLP 서비스 배포를 더 쉽고 접근 가능하게 만듭니다.
+> `GooseAI`는 API를 통해 제공되는 완전 관리형 추론 서비스입니다.
+> 다른 잘 알려진 API들과 동등한 기능을 제공하는 `GooseAI`는 코드에서 단 2줄만 변경하여
+> 업계 최고의 경제성으로 오픈 소스 언어 모델을 제공하는 플러그 앤 플레이 솔루션을 제공합니다.
 
 ## Installation and Setup
 
-- Install the Python SDK with `pip install openai`
-- Get your GooseAI api key from this link [here](https://goose.ai/).
-- Set the environment variable (`GOOSEAI_API_KEY`).
+- `pip install openai`로 Python SDK를 설치합니다
+- [여기](https://goose.ai/)에서 GooseAI API key를 받으세요.
+- 환경 변수(`GOOSEAI_API_KEY`)를 설정합니다.
 
 ```python
 import os
@@ -22,7 +21,7 @@ os.environ["GOOSEAI_API_KEY"] = "YOUR_API_KEY"
 
 ## LLMs
 
-See a [usage example](/oss/integrations/llms/gooseai).
+[사용 예제](/oss/integrations/llms/gooseai)를 참조하세요.
 
 ```python
 from langchain_community.llms import GooseAI

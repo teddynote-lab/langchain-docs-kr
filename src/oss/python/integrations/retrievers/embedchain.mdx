@@ -1,28 +1,29 @@
+```mdx
 ---
 title: Embedchain
 ---
 
->[Embedchain](https://github.com/embedchain/embedchain) is a RAG framework to create data pipelines. It loads, indexes, retrieves and syncs all the data.
+>[Embedchain](https://github.com/embedchain/embedchain)은 데이터 파이프라인을 생성하는 RAG 프레임워크입니다. 데이터를 로드, 인덱싱, 검색 및 동기화합니다.
 >
->It is available as an [open source package](https://github.com/embedchain/embedchain) and as a [hosted platform solution](https://app.embedchain.ai/).
+>[오픈 소스 패키지](https://github.com/embedchain/embedchain)와 [호스팅 플랫폼 솔루션](https://app.embedchain.ai/)으로 제공됩니다.
 
-This notebook shows how to use a retriever that uses `Embedchain`.
+이 노트북은 `Embedchain`을 사용하는 retriever를 사용하는 방법을 보여줍니다.
 
-# Installation
+# 설치
 
-First you will need to install the [`embedchain` package](https://pypi.org/project/embedchain/).
+먼저 [`embedchain` 패키지](https://pypi.org/project/embedchain/)를 설치해야 합니다.
 
-You can install the package by running
+다음 명령어를 실행하여 패키지를 설치할 수 있습니다
 
 ```python
 pip install -qU  embedchain
 ```
 
-# Create New Retriever
+# 새 Retriever 생성
 
-`EmbedchainRetriever` has a static `.create()` factory method that takes the following arguments:
+`EmbedchainRetriever`는 다음 인자를 받는 정적 `.create()` 팩토리 메서드를 제공합니다:
 
-* `yaml_path: string` optional -- Path to the YAML configuration file. If not provided, a default configuration is used. You can browse the [docs](https://docs.embedchain.ai/) to explore various customization options.
+* `yaml_path: string` 선택사항 -- YAML 구성 파일 경로. 제공되지 않으면 기본 구성이 사용됩니다. 다양한 커스터마이징 옵션을 살펴보려면 [문서](https://docs.embedchain.ai/)를 참조하세요.
 
 ```python
 # Setup API Key
@@ -48,11 +49,11 @@ retriever = EmbedchainRetriever.create()
 # retriever = EmbedchainRetiever.create(yaml_path="config.yaml")
 ```
 
-# Add Data
+# 데이터 추가
 
-In embedchain, you can as many supported data types as possible. You can browse our [docs](https://docs.embedchain.ai/) to see the data types supported.
+embedchain에서는 지원되는 데이터 타입을 원하는 만큼 추가할 수 있습니다. 지원되는 데이터 타입을 확인하려면 [문서](https://docs.embedchain.ai/)를 참조하세요.
 
-Embedchain automatically deduces the types of the data. So you can add a string, URL or local file path.
+Embedchain은 자동으로 데이터 타입을 추론합니다. 따라서 문자열, URL 또는 로컬 파일 경로를 추가할 수 있습니다.
 
 ```python
 retriever.add_texts(
@@ -89,9 +90,9 @@ Successfully saved https://www.youtube.com/watch?v=RcYjXbSJBN8 (DataType.YOUTUBE
  'da3227cdbcedb018e05c47b774d625f6']
 ```
 
-# Use Retriever
+# Retriever 사용
 
-You can now use the retrieve to find relevant documents given a query
+이제 retriever를 사용하여 쿼리에 대한 관련 문서를 찾을 수 있습니다
 
 ```python
 result = retriever.invoke("How many companies does Elon Musk run and name those?")
@@ -109,4 +110,5 @@ result
 
 ```python
 
+```
 ```

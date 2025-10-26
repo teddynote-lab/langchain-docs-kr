@@ -1,12 +1,12 @@
 ---
-title: Log, Trace, and Monitor
+title: 로그, 추적 및 모니터링
 ---
 
-When building apps or agents using LangChain, you end up making multiple API calls to fulfill a single user request. However, these requests are not chained when you want to analyse them. With [**Portkey**](/oss/integrations/providers/portkey/), all the embeddings, completions, and other requests from a single user request will get logged and traced to a common ID, enabling you to gain full visibility of user interactions.
+LangChain을 사용하여 앱이나 에이전트를 구축할 때, 단일 사용자 요청을 처리하기 위해 여러 API 호출을 하게 됩니다. 그러나 이러한 요청들은 분석하려고 할 때 연결되어 있지 않습니다. [**Portkey**](/oss/integrations/providers/portkey/)를 사용하면 단일 사용자 요청에서 발생하는 모든 embedding, completion 및 기타 요청이 공통 ID로 로깅되고 추적되어 사용자 상호작용에 대한 완전한 가시성을 확보할 수 있습니다.
 
-This notebook serves as a step-by-step guide on how to log, trace, and monitor LangChain LLM calls using `Portkey` in your LangChain app.
+이 노트북은 LangChain 앱에서 `Portkey`를 사용하여 LangChain LLM 호출을 로깅, 추적 및 모니터링하는 방법에 대한 단계별 가이드입니다.
 
-First, let's import Portkey, OpenAI, and Agent tools
+먼저 Portkey, OpenAI 및 Agent 도구를 import 해봅시다
 
 ```python
 import os
@@ -16,32 +16,32 @@ from langchain_openai import ChatOpenAI
 from portkey_ai import PORTKEY_GATEWAY_URL, createHeaders
 ```
 
-Paste your OpenAI API key below. [(You can find it here)](https://platform.openai.com/account/api-keys)
+아래에 OpenAI API key를 붙여넣으세요. [(여기에서 찾을 수 있습니다)](https://platform.openai.com/account/api-keys)
 
 ```python
 os.environ["OPENAI_API_KEY"] = "..."
 ```
 
-## Get Portkey API Key
+## Portkey API Key 받기
 
-1. Sign up for [Portkey here](https://app.portkey.ai/signup)
-2. On your [dashboard](https://app.portkey.ai/), click on the profile icon on the bottom left, then click on "Copy API Key"
-3. Paste it below
+1. [여기에서 Portkey에 가입](https://app.portkey.ai/signup)하세요
+2. [대시보드](https://app.portkey.ai/)에서 왼쪽 하단의 프로필 아이콘을 클릭한 다음 "Copy API Key"를 클릭하세요
+3. 아래에 붙여넣으세요
 
 ```python
 PORTKEY_API_KEY = "..."  # Paste your Portkey API Key here
 ```
 
-## Set Trace ID
+## Trace ID 설정
 
-1. Set the trace id for your request below
-2. The Trace ID can be common for all API calls originating from a single request
+1. 아래에 요청에 대한 trace id를 설정하세요
+2. Trace ID는 단일 요청에서 발생하는 모든 API 호출에 공통으로 사용될 수 있습니다
 
 ```python
 TRACE_ID = "uuid-trace-id"  # Set trace id here
 ```
 
-## Generate Portkey Headers
+## Portkey Headers 생성
 
 ```python
 portkey_headers = createHeaders(
@@ -49,7 +49,7 @@ portkey_headers = createHeaders(
 )
 ```
 
-Define the prompts and the tools to use
+사용할 prompt와 tool을 정의합니다
 
 ```python
 from langchain_classic import hub
@@ -73,7 +73,7 @@ def exponentiate(base: int, exponent: int) -> int:
 tools = [multiply, exponentiate]
 ```
 
-Run your agent as usual. The **only** change is that we will **include the above headers** in the request now.
+평소처럼 agent를 실행하세요. **유일한** 변경 사항은 이제 요청에 **위의 header를 포함**한다는 것입니다.
 
 ```python
 model = ChatOpenAI(
@@ -117,34 +117,34 @@ Invoking: `exponentiate` with `{'base': 8748, 'exponent': 2}`
  'output': 'The result of taking 3 to the fifth power, multiplying it by 36, and then squaring the result is 76,527,504.'}
 ```
 
-## How Logging & Tracing Works on Portkey
+## Portkey에서 로깅 및 추적이 작동하는 방식
 
-**Logging**
+**로깅**
 
-- Sending your request through Portkey ensures that all of the requests are logged by default
-- Each request log contains `timestamp`, `model name`, `total cost`, `request time`, `request json`, `response json`, and additional Portkey features
+- Portkey를 통해 요청을 보내면 기본적으로 모든 요청이 로깅됩니다
+- 각 요청 로그에는 `timestamp`, `model name`, `total cost`, `request time`, `request json`, `response json` 및 추가 Portkey 기능이 포함됩니다
 
-**[Tracing](https://portkey.ai/docs/product/observability-modern-monitoring-for-llms/traces)**
+**[추적](https://portkey.ai/docs/product/observability-modern-monitoring-for-llms/traces)**
 
-- Trace id is passed along with each request and is visible on the logs on Portkey dashboard
-- You can also set a **distinct trace id** for each request if you want
-- You can append user feedback to a trace id as well. [More info on this here](https://portkey.ai/docs/product/observability-modern-monitoring-for-llms/feedback)
+- Trace id는 각 요청과 함께 전달되며 Portkey 대시보드의 로그에서 확인할 수 있습니다
+- 원하는 경우 각 요청에 대해 **고유한 trace id**를 설정할 수도 있습니다
+- trace id에 사용자 피드백을 추가할 수도 있습니다. [자세한 내용은 여기를 참조하세요](https://portkey.ai/docs/product/observability-modern-monitoring-for-llms/feedback)
 
-For the above request, you will be able to view the entire log trace like this
-![View LangChain traces on Portkey](https://assets.portkey.ai/docs/agent_tracing.gif)
+위 요청의 경우 다음과 같이 전체 로그 추적을 볼 수 있습니다
+![Portkey에서 LangChain 추적 보기](https://assets.portkey.ai/docs/agent_tracing.gif)
 
-## Advanced LLMOps Features - Caching, Tagging, Retries
+## 고급 LLMOps 기능 - 캐싱, 태깅, 재시도
 
-In addition to logging and tracing, Portkey provides more features that add production capabilities to your existing workflows:
+로깅 및 추적 외에도 Portkey는 기존 워크플로우에 프로덕션 기능을 추가하는 더 많은 기능을 제공합니다:
 
-**Caching**
+**캐싱**
 
-Respond to previously served customers queries from cache instead of sending them again to OpenAI. Match exact strings OR semantically similar strings. Cache can save costs and reduce latencies by 20x. [Docs](https://portkey.ai/docs/product/ai-gateway-streamline-llm-integrations/cache-simple-and-semantic)
+이전에 처리된 고객 쿼리에 대해 OpenAI로 다시 보내는 대신 캐시에서 응답합니다. 정확한 문자열 또는 의미적으로 유사한 문자열을 매칭합니다. 캐시는 비용을 절감하고 지연 시간을 20배까지 줄일 수 있습니다. [문서](https://portkey.ai/docs/product/ai-gateway-streamline-llm-integrations/cache-simple-and-semantic)
 
-**Retries**
+**재시도**
 
-Automatically reprocess any unsuccessful API requests **`upto 5`** times. Uses an **`exponential backoff`** strategy, which spaces out retry attempts to prevent network overload. [Docs](https://portkey.ai/docs/product/ai-gateway-streamline-llm-integrations)
+실패한 API 요청을 **`최대 5번`**까지 자동으로 재처리합니다. 네트워크 과부하를 방지하기 위해 재시도 시도 간격을 두는 **`exponential backoff`** 전략을 사용합니다. [문서](https://portkey.ai/docs/product/ai-gateway-streamline-llm-integrations)
 
-**Tagging**
+**태깅**
 
-Track and audit each user interaction in high detail with predefined tags. [Docs](https://portkey.ai/docs/product/observability-modern-monitoring-for-llms/metadata)
+사전 정의된 태그를 사용하여 각 사용자 상호작용을 세부적으로 추적하고 감사합니다. [문서](https://portkey.ai/docs/product/observability-modern-monitoring-for-llms/metadata)

@@ -1,17 +1,17 @@
 ---
-title: Test
+title: 테스트
 ---
 
 
 
-After you've prototyped your LangGraph agent, a natural next step is to add tests. This guide covers some useful patterns you can use when writing unit tests.
+LangGraph 에이전트의 프로토타입을 만든 후, 자연스러운 다음 단계는 테스트를 추가하는 것입니다. 이 가이드는 단위 테스트를 작성할 때 사용할 수 있는 유용한 패턴들을 다룹니다.
 
-Note that this guide is LangGraph-specific and covers scenarios around graphs with custom structures - if you are just getting started, check out [this section](/oss/langchain/test/) that uses LangChain's built-in @[`create_agent`] instead.
+이 가이드는 LangGraph에 특화되어 있으며 커스텀 구조를 가진 graph와 관련된 시나리오를 다룹니다 - 막 시작하는 경우, LangChain의 내장 @[`create_agent`]를 사용하는 [이 섹션](/oss/langchain/test/)을 확인하세요.
 
-## Prerequisites
+## 사전 요구사항
 
 :::python
-First, make sure you have [`pytest`](https://docs.pytest.org/) installed:
+먼저, [`pytest`](https://docs.pytest.org/)가 설치되어 있는지 확인하세요:
 
 ```bash
 $ pip install -U pytest
@@ -19,18 +19,18 @@ $ pip install -U pytest
 :::
 
 :::js
-First, make sure you have [`vitest`](https://vitest.dev/) installed:
+먼저, [`vitest`](https://vitest.dev/)가 설치되어 있는지 확인하세요:
 
 ```bash
 $ npm install -D vitest
 ```
 :::
 
-## Getting started
+## 시작하기
 
-Because many LangGraph agents depend on state, a useful pattern is to create your graph before each test where you use it, then compile it within tests with a new checkpointer instance.
+많은 LangGraph 에이전트가 state에 의존하기 때문에, 유용한 패턴은 사용하려는 각 테스트 전에 graph를 생성한 다음, 테스트 내에서 새로운 checkpointer 인스턴스로 컴파일하는 것입니다.
 
-The below example shows how this works with a simple, linear graph that progresses through `node1` and `node2`. Each node updates the single state key `my_key`:
+아래 예제는 `node1`과 `node2`를 거쳐 진행되는 간단한 선형 graph에서 이것이 어떻게 작동하는지 보여줍니다. 각 node는 단일 state key인 `my_key`를 업데이트합니다:
 
 :::python
 ```python
@@ -101,9 +101,9 @@ test('basic agent execution', async () => {
 ```
 :::
 
-## Testing individual nodes and edges
+## 개별 node와 edge 테스트하기
 
-Compiled LangGraph agents expose references to each individual node as `graph.nodes`. You can take advantage of this to test individual nodes within your agent. Note that this will bypass any checkpointers passed when compiling the graph:
+컴파일된 LangGraph 에이전트는 각 개별 node에 대한 참조를 `graph.nodes`로 노출합니다. 이를 활용하여 에이전트 내의 개별 node를 테스트할 수 있습니다. 이는 graph를 컴파일할 때 전달된 checkpointer를 우회한다는 점에 유의하세요:
 
 :::python
 ```python
@@ -176,24 +176,24 @@ test('individual node execution', async () => {
 ```
 :::
 
-## Partial execution
+## 부분 실행
 
-For agents made up of larger graphs, you may wish to test partial execution paths within your agent rather than the entire flow end-to-end. In some cases, it may make semantic sense to [restructure these sections as subgraphs](/oss/langgraph/use-subgraphs), which you can invoke in isolation as normal.
+더 큰 graph로 구성된 에이전트의 경우, 전체 플로우를 end-to-end로 테스트하는 대신 에이전트 내의 부분 실행 경로를 테스트하고 싶을 수 있습니다. 경우에 따라 [이러한 섹션을 subgraph로 재구성](/oss/langgraph/use-subgraphs)하는 것이 의미상 타당할 수 있으며, 이를 일반적으로 독립적으로 호출할 수 있습니다.
 
-However, if you do not wish to make changes to your agent graph's overall structure, you can use LangGraph's persistence mechanisms to simulate a state where your agent is paused right before the beginning of the desired section, and will pause again at the end of the desired section. The steps are as follows:
+그러나 에이전트 graph의 전체 구조를 변경하고 싶지 않다면, LangGraph의 persistence 메커니즘을 사용하여 원하는 섹션의 시작 직전에 에이전트가 일시 중지되고, 원하는 섹션의 끝에서 다시 일시 중지되는 상태를 시뮬레이션할 수 있습니다. 단계는 다음과 같습니다:
 
 :::python
-1. Compile your agent with a checkpointer (the in-memory checkpointer @[`InMemorySaver`] will suffice for testing).
-2. Call your agent's [`update_state`](/oss/langgraph/use-time-travel) method with an [`as_node`](/oss/langgraph/persistence#as-node) parameter set to the name of the node *before* the one you want to start your test.
-3. Invoke your agent with the same `thread_id` you used to update the state and an `interrupt_after` parameter set to the name of the node you want to stop at.
+1. checkpointer와 함께 에이전트를 컴파일합니다 (테스트를 위해서는 in-memory checkpointer @[`InMemorySaver`]로 충분합니다).
+2. 테스트를 시작하려는 node *이전*의 node 이름으로 설정된 [`as_node`](/oss/langgraph/persistence#as-node) 매개변수와 함께 에이전트의 [`update_state`](/oss/langgraph/use-time-travel) 메서드를 호출합니다.
+3. state를 업데이트하는 데 사용한 것과 동일한 `thread_id`와 중지하려는 node의 이름으로 설정된 `interrupt_after` 매개변수로 에이전트를 호출합니다.
 :::
 :::js
-1. Compile your agent with a checkpointer (the in-memory checkpointer [`MemorySaver`](https://reference.langchain.com/javascript/classes/_langchain_langgraph-checkpoint.MemorySaver.html) will suffice for testing).
-2. Call your agent's [`update_state`](/oss/langgraph/use-time-travel) method with an [`asNode`](/oss/langgraph/persistence#as-node) parameter set to the name of the node *before* the one you want to start your test.
-3. Invoke your agent with the same `thread_id` you used to update the state and an `interruptBefore` parameter set to the name of the node you want to stop at.
+1. checkpointer와 함께 에이전트를 컴파일합니다 (테스트를 위해서는 in-memory checkpointer [`MemorySaver`](https://reference.langchain.com/javascript/classes/_langchain_langgraph-checkpoint.MemorySaver.html)로 충분합니다).
+2. 테스트를 시작하려는 node *이전*의 node 이름으로 설정된 [`asNode`](/oss/langgraph/persistence#as-node) 매개변수와 함께 에이전트의 [`update_state`](/oss/langgraph/use-time-travel) 메서드를 호출합니다.
+3. state를 업데이트하는 데 사용한 것과 동일한 `thread_id`와 중지하려는 node의 이름으로 설정된 `interruptBefore` 매개변수로 에이전트를 호출합니다.
 :::
 
-Here's an example that executes only the second and third nodes in a linear graph:
+다음은 선형 graph에서 두 번째와 세 번째 node만 실행하는 예제입니다:
 
 :::python
 ```python

@@ -1,39 +1,39 @@
 ---
-title: Deploy an observability stack for your LangSmith deployment
-sidebarTitle: Deploy an observability stack
+title: LangSmith 배포를 위한 관측성 스택 배포하기
+sidebarTitle: 관측성 스택 배포하기
 ---
 
 <Warning>
-**This section is only applicable for Kubernetes deployments.**
+**이 섹션은 Kubernetes 배포에만 적용됩니다.**
 </Warning>
 
-LangSmith applications expose telemetry data that can be sent to the backend of your choice. If you don’t already have an observability stack, or prefer to keep LangSmith telemetry separate from your main application, you can use the LangSmith Observability Helm chart to deploy a basic observability stack.
+LangSmith 애플리케이션은 원하는 백엔드로 전송할 수 있는 텔레메트리 데이터를 노출합니다. 이미 관측성 스택이 없거나 LangSmith 텔레메트리를 메인 애플리케이션과 분리하여 유지하고 싶다면, LangSmith Observability Helm 차트를 사용하여 기본 관측성 스택을 배포할 수 있습니다.
 
 # Section 1: Prometheus Exporters
 
-Use this section if you would like to only deploy metrics exporters for the components in your self hosted deployment, which you can then scrape using your telemetry. If you would like a full observability stack deployed for you, go to the [End-to-End Deployment Section](/langsmith/observability-stack#prerequisites).
+자체 호스팅 배포의 구성 요소에 대한 metrics exporter만 배포하고 싶다면 이 섹션을 사용하세요. 그런 다음 텔레메트리를 사용하여 스크랩할 수 있습니다. 전체 관측성 스택을 배포하려면 [End-to-End Deployment Section](/langsmith/observability-stack#prerequisites)으로 이동하세요.
 
-The helm chart provides a set of Prometheus exporters to expose metrics from [Redis](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-redis-exporter), [Postgres](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-postgres-exporter), [Nginx](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-nginx-exporter), and [Kube state metrics](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics).
+helm 차트는 [Redis](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-redis-exporter), [Postgres](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-postgres-exporter), [Nginx](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-nginx-exporter), [Kube state metrics](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics)에서 메트릭을 노출하는 Prometheus exporter 세트를 제공합니다.
 
-1. Create a local file called `langsmith_obs_config.yaml`
-2. Copy over the values from this [file](https://github.com/langchain-ai/helm/blob/main/charts/langsmith-observability/examples/metric-exporters-only.yaml) into `langsmith_obs_config.yaml`, making sure to modify the values to match your LangSmith deployment.
-3. Find the latest version of the chart by running `helm search repo langchain/langsmith-observability --versions`.
-4. Grab the latest version number, and run `helm install langsmith-observability langchain/langsmith-observability --values langsmith_obs_config.yaml --version <version> -n <namespace> --wait --debug`
+1. `langsmith_obs_config.yaml`이라는 로컬 파일을 생성합니다
+2. 이 [파일](https://github.com/langchain-ai/helm/blob/main/charts/langsmith-observability/examples/metric-exporters-only.yaml)의 값을 `langsmith_obs_config.yaml`로 복사하고, LangSmith 배포에 맞게 값을 수정합니다.
+3. `helm search repo langchain/langsmith-observability --versions`를 실행하여 차트의 최신 버전을 찾습니다.
+4. 최신 버전 번호를 가져와서 `helm install langsmith-observability langchain/langsmith-observability --values langsmith_obs_config.yaml --version <version> -n <namespace> --wait --debug`를 실행합니다
 
-This will allow you to scrape metrics at the following service endpoints:
+이렇게 하면 다음 서비스 엔드포인트에서 메트릭을 스크랩할 수 있습니다:
 
 * Postgres: `langsmith-observability-postgres-exporter:9187/metrics`
 * Redis: `langsmith-observability-redis-exporter:9121/metrics`
 * Nginx: `langsmith-observability-nginx-exporter:9113/metrics`
 * KubeStateMetrics: `langsmith-observability-kube-state-metrics:8080/metrics`
 
-You should see the following if the installation went through:
+설치가 완료되면 다음과 같이 표시됩니다:
 
 ```bash
 Release "langsmith-observability" has been installed. Happy Helming!NAME: langsmith-observabilityLAST DEPLOYED: Wed Jun 25 11:17:34 2025NAMESPACE: langsmith-observabilitySTATUS: deployedREVISION: 1
 ```
 
-And if you run `kubectl get pods -n langsmith-observability`, you should see:
+그리고 `kubectl get pods -n langsmith-observability`를 실행하면 다음과 같이 표시됩니다:
 
 ```bash
 langsmith-observability-kube-state-metrics-b58bb8db4-bm4g5        1/1     Running   0          2m22slangsmith-observability-nginx-exporter-6d686d9d4b-5qw9v           1/1     Running   0          2m22slangsmith-observability-postgres-exporter-67d5db5684-tffbm        1/1     Running   0          2m22slangsmith-observability-redis-exporter-846c4d65cb-vbtwd           1/1     Running   0          2m22s
@@ -42,37 +42,37 @@ langsmith-observability-kube-state-metrics-b58bb8db4-bm4g5        1/1     Runnin
 # Section 2: Full Observability Stack
 
 <Warning>
-**This is not a production observability stack. Use this to gain quick insight into logs, metrics and traces for your deployment. This is only made to handle a few dozen GB of data per day.**
+**이것은 프로덕션 관측성 스택이 아닙니다. 배포에 대한 로그, 메트릭 및 트레이스에 대한 빠른 인사이트를 얻기 위해 사용하세요. 이것은 하루에 수십 GB의 데이터만 처리하도록 만들어졌습니다.**
 </Warning>
 
-This section will show you how to deploy the end-to-end observability stack for LangSmith, using the [Helm Chart](https://github.com/langchain-ai/helm/tree/main/charts/langsmith-observability).
+이 섹션에서는 [Helm Chart](https://github.com/langchain-ai/helm/tree/main/charts/langsmith-observability)를 사용하여 LangSmith를 위한 end-to-end 관측성 스택을 배포하는 방법을 보여줍니다.
 
-This chart is built around the open-source LGTM Stack from Grafana. It consists of:
+이 차트는 Grafana의 오픈소스 LGTM Stack을 기반으로 구축되었습니다. 다음으로 구성됩니다:
 
-* [Loki](https://grafana.com/docs/loki/latest/) for logs.
-* [Mimir](https://grafana.com/docs/mimir/latest/) for metrics + alerting.
-* [Tempo](https://grafana.com/docs/tempo/latest/) for traces.
-* [Grafana](https://grafana.com/docs/grafana/latest/) for monitoring UI.
+* 로그를 위한 [Loki](https://grafana.com/docs/loki/latest/)
+* 메트릭 + 알림을 위한 [Mimir](https://grafana.com/docs/mimir/latest/)
+* 트레이스를 위한 [Tempo](https://grafana.com/docs/tempo/latest/)
+* 모니터링 UI를 위한 [Grafana](https://grafana.com/docs/grafana/latest/)
 
-As well as [OpenTelemetry Collectors](https://opentelemetry.io/docs/collector/) for gathering the telemetry data.
+그리고 텔레메트리 데이터를 수집하기 위한 [OpenTelemetry Collectors](https://opentelemetry.io/docs/collector/)도 포함됩니다.
 
 ## Prerequisites
 
 ### 1. Compute Resources
 
-The resource requests and limits for each part of the stack can be modified in the helm chart. Here are the current allocations (request/limit):
+스택의 각 부분에 대한 리소스 요청 및 제한은 helm 차트에서 수정할 수 있습니다. 다음은 현재 할당량입니다 (요청/제한):
 
 * Loki: `2vCPU/3vCPU + 2Gi/4Gi`
 * Mimir: `1vCPU/2vCPU + 2Gi/4Gi`
 * Tempo: `1vCPU/2vCPU + 4Gi/6Gi`
 
-Make sure you have those resources allocated before bringing up the helm chart, or modify the resource values in your helm configuration file.
+helm 차트를 시작하기 전에 이러한 리소스가 할당되어 있는지 확인하거나, helm 구성 파일에서 리소스 값을 수정하세요.
 
 ### 2. Cert-Manager
 
-The helm chart uses the OpenTelemetry Operator to provision collectors. The operator require that you have [cert-manager](https://cert-manager.io/docs/installation/) installed in your Kubernetes cluster.
+helm 차트는 OpenTelemetry Operator를 사용하여 collector를 프로비저닝합니다. operator는 Kubernetes 클러스터에 [cert-manager](https://cert-manager.io/docs/installation/)가 설치되어 있어야 합니다.
 
-If you do not have it installed, you can run the following commands:
+설치되어 있지 않다면 다음 명령을 실행할 수 있습니다:
 
 ```bash
 helm repo add jetstack https://charts.jetstack.iohelm repo updatehelm install cert-manager jetstack/cert-manager -n cert-manager --create-namespace
@@ -80,7 +80,7 @@ helm repo add jetstack https://charts.jetstack.iohelm repo updatehelm install ce
 
 ### 3. OpenTelemetry Operator
 
-Use the following to install the OpenTelemetry Operator:
+다음을 사용하여 OpenTelemetry Operator를 설치합니다:
 
 ```bash
 helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-chartshelm repo updatehelm install opentelemetry-operator open-telemetry/opentelemetry-operator -n <namespace>
@@ -88,24 +88,24 @@ helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm
 
 ## Installation
 
-The following instructions will bring up OTel collectors, the LGTM stack, Grafana and Prometheus exporters.
+다음 지침은 OTel collector, LGTM 스택, Grafana 및 Prometheus exporter를 시작합니다.
 
-1. Create a local file called `langsmith_obs_config.yaml`
-2. Copy over the values from this [file](https://github.com/langchain-ai/helm/blob/main/charts/langsmith-observability/examples/e2e-stack.yaml) into `langsmith_obs_config.yaml`, making sure to modify the values to match your LangSmith deployment.
-3. Find the latest version of the chart by running `helm search repo langchain/langsmith-observability --versions`.
-4. Grab the latest version number, and run `helm install langsmith-observability langchain/langsmith-observability --values langsmith_obs_config.yaml --version <version> -n <namespace> --wait --debug`
+1. `langsmith_obs_config.yaml`이라는 로컬 파일을 생성합니다
+2. 이 [파일](https://github.com/langchain-ai/helm/blob/main/charts/langsmith-observability/examples/e2e-stack.yaml)의 값을 `langsmith_obs_config.yaml`로 복사하고, LangSmith 배포에 맞게 값을 수정합니다.
+3. `helm search repo langchain/langsmith-observability --versions`를 실행하여 차트의 최신 버전을 찾습니다.
+4. 최신 버전 번호를 가져와서 `helm install langsmith-observability langchain/langsmith-observability --values langsmith_obs_config.yaml --version <version> -n <namespace> --wait --debug`를 실행합니다
 
 <Note>
-**You can selectively collect logs, metrics or traces by modifying the boolean values under `otelCollector` in your config file. You can also selectively bring up each respective piece of the backend (Loki, Mimir, Tempo).**
+**구성 파일의 `otelCollector` 아래에 있는 boolean 값을 수정하여 로그, 메트릭 또는 트레이스를 선택적으로 수집할 수 있습니다. 또한 백엔드의 각 부분(Loki, Mimir, Tempo)을 선택적으로 시작할 수 있습니다.**
 </Note>
 
-You should see the following if the install went through:
+설치가 완료되면 다음과 같이 표시됩니다:
 
 ```bash
 Release "langsmith-observability" has been installed. Happy Helming!NAME: langsmith-observabilityLAST DEPLOYED: Wed Jun 25 11:17:34 2025NAMESPACE: langsmith-observabilitySTATUS: deployedREVISION: 1
 ```
 
-And if you run `kubectl get pods -n langsmith-observability`, you should see:
+그리고 `kubectl get pods -n langsmith-observability`를 실행하면 다음과 같이 표시됩니다:
 
 ```bash
 langsmith-observability-collector-gateway-collector-7746fb8pzbg   1/1     Running   0          5m26slangsmith-observability-grafana-7c6fc976f9-cdbvr                  1/1     Running   0          2m49slangsmith-observability-kube-state-metrics-b58bb8db4-bm4g5        1/1     Running   0          5m27slangsmith-observability-loki-0                                    2/2     Running   0          5m27slangsmith-observability-loki-chunks-cache-0                       2/2     Running   0          5m27slangsmith-observability-loki-gateway-769fb6fff8-zjsn5             1/1     Running   0          5m27slangsmith-observability-loki-results-cache-0                      2/2     Running   0          5m27slangsmith-observability-mimir-0                                   1/1     Running   0          5m26slangsmith-observability-nginx-exporter-6d686d9d4b-5qw9v           1/1     Running   0          5m27slangsmith-observability-postgres-exporter-67d5db5684-tffbm        1/1     Running   0          5m27slangsmith-observability-redis-exporter-846c4d65cb-vbtwd           1/1     Running   0          5m27slangsmith-observability-tempo-0                                   1/1     Running   0          5m27sopentelemetry-operator-756dff697-vblbn                            2/2     Running   0          12m
@@ -115,7 +115,7 @@ langsmith-observability-collector-gateway-collector-7746fb8pzbg   1/1     Runnin
 
 ### Enable Logs and Traces in LangSmith
 
-Once you have installed the observability helm chart, you need to set the following values in your *LangSmith* helm configuration file to enable collection of logs and traces.
+관측성 helm 차트를 설치한 후에는 로그 및 트레이스 수집을 활성화하기 위해 *LangSmith* helm 구성 파일에 다음 값을 설정해야 합니다.
 
 ```yaml
 commonPodAnnotations:
@@ -130,13 +130,13 @@ observability:
 ```
 
 <Info>
-1. To get `${LANGSMITH_OTEL_CRD_NAME}`, you can run `kubectl get opentelemetrycollectors -n ${LANGSMITH_OBS_NAMESPACE}` and select the name of the one with MODE = `sidecar`
-2. To get `${GATEWAY_COLLECTOR_SERVICE_NAME}` name, run `kubectl get services -n ${LANGSMITH_OBS_NAMESPACE}` and select the one with Ports 4317/4318 AND a ClusterIP set. It should be something like `langsmith-observability-collector-gateway-collector`
+1. `${LANGSMITH_OTEL_CRD_NAME}`을 얻으려면 `kubectl get opentelemetrycollectors -n ${LANGSMITH_OBS_NAMESPACE}`를 실행하고 MODE = `sidecar`인 것의 이름을 선택합니다
+2. `${GATEWAY_COLLECTOR_SERVICE_NAME}` 이름을 얻으려면 `kubectl get services -n ${LANGSMITH_OBS_NAMESPACE}`를 실행하고 Ports 4317/4318 AND ClusterIP가 설정된 것을 선택합니다. `langsmith-observability-collector-gateway-collector`와 같은 형태일 것입니다
 </Info>
 
-Now run `helm upgrade langsmith langchain/langsmith --values langsmith_config.yaml -n <langsmith-namespace> --wait --debug`
+이제 `helm upgrade langsmith langchain/langsmith --values langsmith_config.yaml -n <langsmith-namespace> --wait --debug`를 실행합니다
 
-Once upgraded, if you run `kubectl get pods -n <langsmith-namespace>` you should see the following (note the 2/2 for sidecar collectors):
+업그레이드가 완료되면 `kubectl get pods -n <langsmith-namespace>`를 실행하면 다음과 같이 표시됩니다 (sidecar collector의 2/2에 주목하세요):
 
 ```bash
 langsmith-ace-backend-7dc85f7dff-xjbkj         2/2     Running     0               7m53slangsmith-backend-566b66979c-rgcfh             2/2     Running     1               7m53slangsmith-clickhouse-0                         2/2     Running     0               7m49slangsmith-frontend-7cf8549885-vpkns            2/2     Running     0               7m53slangsmith-platform-backend-5d46db7d9d-f6gh7    2/2     Running     0               7m52slangsmith-platform-backend-5d46db7d9d-lrr4d    2/2     Running     1               7m41slangsmith-platform-backend-5d46db7d9d-pcp27    2/2     Running     0               7m28slangsmith-playground-65d4c9699c-h656r          2/2     Running     0               7m52slangsmith-postgres-0                           2/2     Running     0               7m51slangsmith-queue-bdcd45bd6-htssd                2/2     Running     0               7m52slangsmith-queue-bdcd45bd6-pwdx4                2/2     Running     0               6m31slangsmith-queue-bdcd45bd6-xqrb8                2/2     Running     0               5m11slangsmith-redis-0                              2/2     Running     0               7m51s
@@ -144,14 +144,14 @@ langsmith-ace-backend-7dc85f7dff-xjbkj         2/2     Running     0            
 
 ## Grafana Usage
 
-Once everything is installed, do the following: to get your Grafana password:
+모든 것이 설치되면 다음을 수행하여 Grafana 비밀번호를 가져옵니다:
 
 ```bash
 kubectl get secret langsmith-observability-grafana -n <langsmith_observability_namespace> -o jsonpath="{.data.admin-password}" | base64 --decode
 ```
 
-Then port-forward into the `langsmith-observability-grafana` container at port 3000, and open your browser as `localhost:3000`. Use the username `admin` and the password from the secret above to log into Grafana.
+그런 다음 포트 3000에서 `langsmith-observability-grafana` 컨테이너로 port-forward하고 브라우저를 `localhost:3000`으로 엽니다. 사용자 이름 `admin`과 위의 secret에서 가져온 비밀번호를 사용하여 Grafana에 로그인합니다.
 
-Once in Grafana, you can use the UI to monitor logs, metrics and traces. Grafana also comes pre-packaged with sets of dashboards for monitoring the main components of your deployment.
+Grafana에 들어가면 UI를 사용하여 로그, 메트릭 및 트레이스를 모니터링할 수 있습니다. Grafana는 또한 배포의 주요 구성 요소를 모니터링하기 위한 대시보드 세트가 사전 패키지되어 있습니다.
 
 ![LangSmith Grafana Dashboards](/langsmith/images/langsmith-grafana-dashboards.png)

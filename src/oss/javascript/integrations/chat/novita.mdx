@@ -2,35 +2,35 @@
 title: ChatNovita
 ---
 
-Delivers an affordable, reliable, and simple inference platform for running top LLM models.
+최고의 LLM 모델을 실행하기 위한 저렴하고 안정적이며 간단한 추론 플랫폼을 제공합니다.
 
-You can find all the models we support here: [Novita AI Featured Models](https://novita.ai/models/llm?utm_source=github_langchain&utm_medium=github_readme&utm_campaign=link) or request the [Models API](https://novita.ai/docs/guides/llm-models?utm_source=github_langchain&utm_medium=github_readme&utm_campaign=link) to get all available models.
+지원하는 모든 모델은 여기에서 확인할 수 있습니다: [Novita AI Featured Models](https://novita.ai/models/llm?utm_source=github_langchain&utm_medium=github_readme&utm_campaign=link) 또는 [Models API](https://novita.ai/docs/guides/llm-models?utm_source=github_langchain&utm_medium=github_readme&utm_campaign=link)를 요청하여 사용 가능한 모든 모델을 확인하세요.
 
-Try the [Novita AI DeepSeek R1 API Demo](https://novita.ai/models/llm/deepseek-deepseek-r1?utm_source=github_langchain&utm_medium=github_readme&utm_campaign=link) today!
+오늘 [Novita AI DeepSeek R1 API Demo](https://novita.ai/models/llm/deepseek-deepseek-r1?utm_source=github_langchain&utm_medium=github_readme&utm_campaign=link)를 사용해보세요!
 
-## Overview
+## 개요
 
-### Model features
+### 모델 기능
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
 
-## Setup
+## 설정
 
-To access Novita AI models you'll need to create a Novita account and get an API key.
+Novita AI 모델에 액세스하려면 Novita 계정을 생성하고 API key를 발급받아야 합니다.
 
-### Credentials
+### 자격 증명
 
-Head to [this page](https://novita.ai/settings#key-management?utm_source=github_langchain&utm_medium=github_readme&utm_campaign=link) to sign up to Novita AI and generate an API key. Once you've done this set the NOVITA_API_KEY environment variable:
+[이 페이지](https://novita.ai/settings#key-management?utm_source=github_langchain&utm_medium=github_readme&utm_campaign=link)로 이동하여 Novita AI에 가입하고 API key를 생성하세요. 완료한 후 NOVITA_API_KEY 환경 변수를 설정하세요:
 
 ```bash
 export NOVITA_API_KEY="your-api-key"
 ```
 
-### Installation
+### 설치
 
-The LangChain Novita integration lives in the `@langchain-community` package:
+LangChain Novita integration은 `@langchain-community` 패키지에 포함되어 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -44,9 +44,9 @@ pnpm add @langchain/community @langchain/core
 ```
 </CodeGroup>
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our model object and generate chat completions. Try the [Novita AI DeepSeek R1 API Demo](https://novita.ai/models/llm/deepseek-deepseek-r1?utm_source=github_langchain&utm_medium=github_readme&utm_campaign=link) today!
+이제 모델 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다. 오늘 [Novita AI DeepSeek R1 API Demo](https://novita.ai/models/llm/deepseek-deepseek-r1?utm_source=github_langchain&utm_medium=github_readme&utm_campaign=link)를 사용해보세요!
 
 ```python
 import { ChatNovitaAI } from "@langchain/community/chat_models/novita";
@@ -58,7 +58,7 @@ const llm = new ChatNovitaAI({
 })
 ```
 
-## Invocation
+## 호출
 
 ```python
 const aiMsg = await llm.invoke([
@@ -79,4 +79,4 @@ console.log(aiMsg.content)
 
 ## API reference
 
-For detailed documentation of Novita AI LLM APIs, head to [Novita AI LLM API reference](https://novita.ai/docs/guides/llm-api?utm_source=github_langchain&utm_medium=github_readme&utm_campaign=link)
+Novita AI LLM API에 대한 자세한 문서는 [Novita AI LLM API reference](https://novita.ai/docs/guides/llm-api?utm_source=github_langchain&utm_medium=github_readme&utm_campaign=link)를 참조하세요

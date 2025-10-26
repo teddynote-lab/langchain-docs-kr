@@ -2,23 +2,23 @@
 title: TavilySearchAPIRetriever
 ---
 
-[Tavily's Search API](https://tavily.com) is a search engine built specifically for AI agents (LLMs), delivering real-time, accurate, and factual results at speed.
+[Tavily의 Search API](https://tavily.com)는 AI 에이전트(LLM)를 위해 특별히 구축된 검색 엔진으로, 실시간으로 정확하고 사실적인 결과를 빠르게 제공합니다.
 
 ## Overview
 
-This will help you getting started with the Tavily Search API [retriever](/oss/langchain/retrieval). For detailed documentation of all `TavilySearchAPIRetriever` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_retrievers_tavily_search_api.TavilySearchAPIRetriever.html).
+이 문서는 Tavily Search API [retriever](/oss/langchain/retrieval) 시작하기를 도와줍니다. 모든 `TavilySearchAPIRetriever` 기능과 설정에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_retrievers_tavily_search_api.TavilySearchAPIRetriever.html)를 참조하세요.
 
 ### Integration details
 
 | Retriever | Source | Package |
 | :--- | :--- | :---: |
-[`TavilySearchAPIRetriever`](https://api.js.langchain.com/classes/langchain_community_retrievers_tavily_search_api.TavilySearchAPIRetriever.html) | Information on the web. | [`@langchain/community`](https://npmjs.com/@langchain/community/) |
+[`TavilySearchAPIRetriever`](https://api.js.langchain.com/classes/langchain_community_retrievers_tavily_search_api.TavilySearchAPIRetriever.html) | 웹상의 정보. | [`@langchain/community`](https://npmjs.com/@langchain/community/) |
 
 ## Setup
 
-You will need to populate a `TAVILY_API_KEY` environment variable with your Tavily API key or pass it into the constructor as `apiKey`. Obtain a key by signing up [on their website](https://tavily.com/).
+Tavily API 키를 `TAVILY_API_KEY` 환경 변수에 설정하거나 생성자에 `apiKey`로 전달해야 합니다. [웹사이트](https://tavily.com/)에서 가입하여 키를 발급받으세요.
 
-If you want to get automated tracing from individual queries, you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+개별 쿼리에서 자동 추적을 원하는 경우, 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_API_KEY = "<YOUR API KEY HERE>";
@@ -27,7 +27,7 @@ If you want to get automated tracing from individual queries, you can also set y
 
 ### Installation
 
-This retriever lives in the `@langchain/community` package:
+이 retriever는 `@langchain/community` 패키지에 포함되어 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -43,7 +43,7 @@ pnpm add @langchain/community @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our retriever:
+이제 retriever를 인스턴스화할 수 있습니다:
 
 ```typescript
 import { TavilySearchAPIRetriever } from "@langchain/community/retrievers/tavily_search_api";
@@ -53,7 +53,7 @@ const retriever = new TavilySearchAPIRetriever({
 });
 ```
 
-For a full list of allowed arguments, see [the official documentation](https://docs.tavily.com/docs/tavily-api/rest_api#parameters). You can pass any param to the SDK via a `kwargs` object.
+허용되는 인자의 전체 목록은 [공식 문서](https://docs.tavily.com/docs/tavily-api/rest_api#parameters)를 참조하세요. `kwargs` 객체를 통해 SDK에 모든 매개변수를 전달할 수 있습니다.
 
 ## Usage
 
@@ -101,4 +101,4 @@ await retriever.invoke(query);
 
 ## API reference
 
-For detailed documentation of all `TavilySearchAPIRetriever` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_retrievers_tavily_search_api.TavilySearchAPIRetriever.html).
+모든 `TavilySearchAPIRetriever` 기능과 설정에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_retrievers_tavily_search_api.TavilySearchAPIRetriever.html)를 참조하세요.

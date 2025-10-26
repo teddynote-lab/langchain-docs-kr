@@ -1,35 +1,35 @@
 ---
-title: Upload files with traces
-sidebarTitle: Upload files with traces
+title: trace와 함께 파일 업로드하기
+sidebarTitle: trace와 함께 파일 업로드하기
 ---
 
 <Check>
-Before diving into this content, it would be helpful to read the following guides:
+이 내용을 살펴보기 전에 다음 가이드를 읽어보시면 도움이 됩니다:
 
-* [Trace with LangSmith using the traceable decorator or wrapper](/langsmith/annotate-code#use-traceable--traceable)
+* [traceable decorator 또는 wrapper를 사용하여 LangSmith로 trace하기](/langsmith/annotate-code#use-traceable--traceable)
 </Check>
 
 <Note>
-The following features are available in the following SDK versions:
+다음 기능은 아래 SDK 버전에서 사용할 수 있습니다:
 
 * Python SDK: >=0.1.141
 * JS/TS SDK: >=0.2.5
 </Note>
 
-LangSmith supports uploading binary files (such as images, audio, videos, PDFs, and CSVs) with your traces. This is particularly useful when working with LLM pipelines using multimodal inputs or outputs.
+LangSmith는 trace와 함께 바이너리 파일(이미지, 오디오, 비디오, PDF, CSV 등)을 업로드하는 것을 지원합니다. 이는 multimodal 입력 또는 출력을 사용하는 LLM 파이프라인 작업 시 특히 유용합니다.
 
-In both the Python and TypeScript SDKs, attachments can be added to your traces by specifying the MIME type and binary content of each file. This guide explains how to define and trace attachments using the `Attachment` type in Python and `Uint8Array` / `ArrayBuffer` in TypeScript.
+Python과 TypeScript SDK 모두에서 각 파일의 MIME type과 바이너리 콘텐츠를 지정하여 trace에 첨부 파일을 추가할 수 있습니다. 이 가이드는 Python의 `Attachment` type과 TypeScript의 `Uint8Array` / `ArrayBuffer`를 사용하여 첨부 파일을 정의하고 trace하는 방법을 설명합니다.
 
 ### Python
 
-In the Python SDK, you can use the `Attachment` type to add files to your traces. Each `Attachment` requires:
+Python SDK에서는 `Attachment` type을 사용하여 trace에 파일을 추가할 수 있습니다. 각 `Attachment`는 다음을 필요로 합니다:
 
-* `mime_type` (str): The MIME type of the file (e.g., `"image/png"`).
-* `data` (bytes | Path): The binary content of the file, or the file path.
+* `mime_type` (str): 파일의 MIME type (예: `"image/png"`).
+* `data` (bytes | Path): 파일의 바이너리 콘텐츠 또는 파일 경로.
 
-You can also define an attachment with a tuple tuple of the form `(mime_type, data)` for convenience.
+편의를 위해 `(mime_type, data)` 형태의 tuple로 첨부 파일을 정의할 수도 있습니다.
 
-Simply decorate a function with `@traceable` and include your `Attachment` instances as arguments. Note that to use the file path instead of the raw bytes, you need to set the `dangerously_allow_filesystem` flag to `True` in your traceable decorator.
+함수를 `@traceable`로 데코레이트하고 `Attachment` 인스턴스를 인자로 포함하기만 하면 됩니다. 원시 바이트 대신 파일 경로를 사용하려면 traceable decorator에서 `dangerously_allow_filesystem` 플래그를 `True`로 설정해야 합니다.
 
 ```python Python
 from langsmith import traceable
@@ -85,16 +85,16 @@ result = trace_with_attachments(
 
 ### TypeScript
 
-In the TypeScript SDK, you can add attachments to traces by using `Uint8Array` or `ArrayBuffer` as data types. Each attachment's MIME type is specified within `extractAttachments`:
+TypeScript SDK에서는 `Uint8Array` 또는 `ArrayBuffer`를 데이터 타입으로 사용하여 trace에 첨부 파일을 추가할 수 있습니다. 각 첨부 파일의 MIME type은 `extractAttachments` 내에서 지정됩니다:
 
-* `Uint8Array`: Useful for handling binary data directly.
-* `ArrayBuffer`: Represents fixed-length binary data, which can be converted to `Uint8Array` as needed.
+* `Uint8Array`: 바이너리 데이터를 직접 처리하는 데 유용합니다.
+* `ArrayBuffer`: 고정 길이 바이너리 데이터를 나타내며, 필요에 따라 `Uint8Array`로 변환할 수 있습니다.
 
-Wrap your function with `traceable` and include your attachments within the `extractAttachments` option.
+함수를 `traceable`로 래핑하고 `extractAttachments` 옵션 내에 첨부 파일을 포함하세요.
 
-In the TypeScript SDK, the `extractAttachments` function is an optional parameter in the `traceable` configuration. When the traceable-wrapped function is invoked, it extracts binary data (e.g., images, audio files) from your inputs and logs them alongside other trace data, specifying their MIME types.
+TypeScript SDK에서 `extractAttachments` 함수는 `traceable` 구성의 선택적 매개변수입니다. traceable로 래핑된 함수가 호출되면, 입력에서 바이너리 데이터(예: 이미지, 오디오 파일)를 추출하고 MIME type을 지정하여 다른 trace 데이터와 함께 기록합니다.
 
-Note that you cannot directly pass in a file path in the TypeScript SDK, as accessing local files is not supported in all runtime environments.
+TypeScript SDK에서는 모든 런타임 환경에서 로컬 파일 접근이 지원되지 않으므로 파일 경로를 직접 전달할 수 없습니다.
 
 ```typescript TypeScript
 type AttachmentData = Uint8Array | ArrayBuffer;
@@ -161,6 +161,6 @@ const result = await traceableWithAttachments(
 );
 ```
 
-Here is how the above would look in the LangSmith UI. You can expand each attachment to view its contents.
+다음은 위 내용이 LangSmith UI에서 어떻게 보이는지 보여줍니다. 각 첨부 파일을 확장하여 내용을 볼 수 있습니다.
 
 ![](/langsmith/images/trace-with-attachments.png)

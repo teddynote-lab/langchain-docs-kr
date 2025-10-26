@@ -2,17 +2,17 @@
 title: SitemapLoader
 ---
 
-This notebook goes over how to use the [`SitemapLoader`](https://api.js.langchain.com/classes/_langchain_community.document_loaders_web_sitemap.SitemapLoader.html) class to load sitemaps into `Document`s.
+이 노트북은 [`SitemapLoader`](https://api.js.langchain.com/classes/_langchain_community.document_loaders_web_sitemap.SitemapLoader.html) 클래스를 사용하여 sitemap을 `Document`로 로드하는 방법을 설명합니다.
 
 ## Setup
 
-First, we need to install the `langchain` package:
+먼저 `langchain` 패키지를 설치해야 합니다:
 
 ```bash npm
 npm install @langchain/community @langchain/core
 ```
 
-The URL passed in must either contain the `.xml` path to the sitemap, or a default `/sitemap.xml` will be appended to the URL.
+전달된 URL은 sitemap의 `.xml` 경로를 포함하거나, 기본적으로 `/sitemap.xml`이 URL에 추가됩니다.
 
 ```typescript
 import { SitemapLoader } from "@langchain/community/document_loaders/web/sitemap";
@@ -51,7 +51,7 @@ Document {
  */
 ```
 
-Or, if you want to only load the sitemap and not the contents of each page from the sitemap, you can use the `parseSitemap` method:
+또는 sitemap의 각 페이지 내용을 로드하지 않고 sitemap만 로드하려면 `parseSitemap` 메서드를 사용할 수 있습니다:
 
 ```typescript
 import { SitemapLoader } from "@langchain/community/document_loaders/web/sitemap";

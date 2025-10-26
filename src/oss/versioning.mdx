@@ -1,110 +1,110 @@
 ---
-title: Versioning
+title: 버전 관리
 ---
 
 
 
-Each LangChain and LangGraph version number follows the format: `MAJOR.MINOR.PATCH`
+각 LangChain 및 LangGraph 버전 번호는 다음 형식을 따릅니다: `MAJOR.MINOR.PATCH`
 
-- **Major**: Breaking API updates that require code changes.
-- **Minor**: New features and improvements that maintain backward compatibility.
-- **Patch**: Bug fixes and minor improvements.
+- **Major**: 코드 변경이 필요한 Breaking API 업데이트입니다.
+- **Minor**: 하위 호환성을 유지하는 새로운 기능 및 개선 사항입니다.
+- **Patch**: 버그 수정 및 사소한 개선 사항입니다.
 
-## Version numbering
+## 버전 번호 체계
 
-LangChain and LangGraph follow [Semantic Versioning](https://semver.org/) principles:
+LangChain과 LangGraph는 [Semantic Versioning](https://semver.org/) 원칙을 따릅니다:
 
-- `1.0.0`: First stable release with production-ready APIs
-- `1.1.0`: New features added in a backward-compatible manner
-- `1.0.1`: Backward-compatible bug fixes
+- `1.0.0`: 프로덕션 준비가 완료된 API를 갖춘 첫 번째 안정 릴리스
+- `1.1.0`: 하위 호환 방식으로 추가된 새로운 기능
+- `1.0.1`: 하위 호환되는 버그 수정
 
-## API stability
+## API 안정성
 
-We communicate the stability of our APIs as follows:
+우리는 API의 안정성을 다음과 같이 전달합니다:
 
-### Stable APIs
+### Stable API
 
-All APIs without special prefixes are considered stable and ready for production use. We maintain backward compatibility for stable features and only introduce breaking changes in major releases.
+특별한 접두사가 없는 모든 API는 안정적이며 프로덕션 사용 준비가 완료된 것으로 간주됩니다. 안정적인 기능에 대해 하위 호환성을 유지하며 주요 릴리스에서만 Breaking 변경 사항을 도입합니다.
 
-### Beta APIs
+### Beta API
 
-APIs marked as `beta` are feature-complete but may undergo minor changes based on user feedback. They are safe for production use but may require small adjustments in future releases.
+`beta`로 표시된 API는 기능이 완성되었지만 사용자 피드백에 따라 사소한 변경이 있을 수 있습니다. 프로덕션 사용에 안전하지만 향후 릴리스에서 작은 조정이 필요할 수 있습니다.
 
-### Alpha APIs
+### Alpha API
 
-APIs marked as `alpha` are experimental and subject to significant changes. Use these with caution in production environments.
+`alpha`로 표시된 API는 실험적이며 상당한 변경이 있을 수 있습니다. 프로덕션 환경에서는 주의해서 사용하세요.
 
-### Deprecated APIs
+### Deprecated API
 
-APIs marked as `deprecated` will be removed in future major releases. When possible, we specify the intended version of removal. To handle deprecations:
+`deprecated`로 표시된 API는 향후 주요 릴리스에서 제거될 예정입니다. 가능한 경우 제거 예정 버전을 명시합니다. Deprecation을 처리하려면:
 
-1. Switch to the recommended alternative API
-2. Follow the migration guide (released alongside major releases)
-3. Use automated migration tools when available
+1. 권장되는 대체 API로 전환하세요
+2. 마이그레이션 가이드를 따르세요 (주요 릴리스와 함께 제공됨)
+3. 가능한 경우 자동화된 마이그레이션 도구를 사용하세요
 
-### Internal APIs
+### Internal API
 
-Certain APIs are explicitly marked as "internal" in a couple of ways:
+특정 API는 다음과 같은 방식으로 명시적으로 "internal"로 표시됩니다:
 
-- Some documentation refers to internals and mentions them as such. If the documentation says that something is internal, it may change.
-- Functions, methods, and other objects prefixed by a leading underscore (**`_`**). This is the standard Python convention of indicating that something is private; if any method starts with a single **`_`**, it's an internal API.
-    - **Exception:** Certain methods are prefixed with `_` , but do not contain an implementation. These methods are *meant* to be overridden by sub-classes that provide the implementation. Such methods are generally part of the **Public API** of LangChain.
+- 일부 문서는 내부 구현을 언급하며 그렇게 명시합니다. 문서에서 무언가가 internal이라고 말하면 변경될 수 있습니다.
+- 선행 밑줄(**`_`**)로 시작하는 함수, 메서드 및 기타 객체. 이것은 무언가가 private임을 나타내는 표준 Python 규칙입니다. 메서드가 단일 **`_`**로 시작하면 internal API입니다.
+    - **예외:** 특정 메서드는 `_`로 시작하지만 구현을 포함하지 않습니다. 이러한 메서드는 구현을 제공하는 하위 클래스에 의해 재정의되도록 *의도된* 것입니다. 이러한 메서드는 일반적으로 LangChain의 **Public API**의 일부입니다.
 
-## Release cycles
+## 릴리스 주기
 
 <AccordionGroup>
-    <Accordion title="Major releases">
-        Major releases (e.g., `1.0.0` → `2.0.0`) may include:
+    <Accordion title="Major 릴리스">
+        Major 릴리스 (예: `1.0.0` → `2.0.0`)는 다음을 포함할 수 있습니다:
 
-        - Breaking API changes
-        - Removal of deprecated features
-        - Significant architectural improvements
+        - Breaking API 변경
+        - Deprecated 기능 제거
+        - 중요한 아키텍처 개선
 
-        We provide:
+        우리는 다음을 제공합니다:
 
-        - Detailed migration guides
-        - Automated migration tools when possible
-        - Extended support period for the previous major version
+        - 상세한 마이그레이션 가이드
+        - 가능한 경우 자동화된 마이그레이션 도구
+        - 이전 주요 버전에 대한 연장된 지원 기간
     </Accordion>
 
-    <Accordion title="Minor releases">
-        Minor releases (e.g., `1.0.0` → `1.1.0`) include:
+    <Accordion title="Minor 릴리스">
+        Minor 릴리스 (예: `1.0.0` → `1.1.0`)는 다음을 포함합니다:
 
-        - New features and capabilities
-        - Performance improvements
-        - New optional parameters
-        - Backward-compatible enhancements
+        - 새로운 기능 및 역량
+        - 성능 개선
+        - 새로운 선택적 매개변수
+        - 하위 호환 가능한 개선 사항
     </Accordion>
 
-    <Accordion title="Patch releases">
-        Patch releases (e.g., `1.0.0` → `1.0.1`) include:
+    <Accordion title="Patch 릴리스">
+        Patch 릴리스 (예: `1.0.0` → `1.0.1`)는 다음을 포함합니다:
 
-        - Bug fixes
-        - Security updates
-        - Documentation improvements
-        - Performance optimizations without API changes
+        - 버그 수정
+        - 보안 업데이트
+        - 문서 개선
+        - API 변경 없는 성능 최적화
     </Accordion>
 </AccordionGroup>
 
-## Version support policy
+## 버전 지원 정책
 
-- **Latest major version**: Full support with active development (ACTIVE status)
-- **Previous major version**: Security updates and critical bug fixes for 12 months after the next major release (MAINTENANCE status)
-- **Older versions**: Community support only
+- **최신 주요 버전**: 활발한 개발과 함께 전체 지원 (ACTIVE 상태)
+- **이전 주요 버전**: 다음 주요 릴리스 이후 12개월 동안 보안 업데이트 및 중요한 버그 수정 (MAINTENANCE 상태)
+- **이전 버전**: 커뮤니티 지원만 제공
 
-### Long-term support (LTS) releases
+### Long-term support (LTS) 릴리스
 
-Both LangChain and LangGraph 1.0 are designated as LTS releases:
-- Version 1.0 will remain in ACTIVE status until version 2.0 is released
-- After version 2.0 is released, version 1.0 will enter MAINTENANCE mode for at least 1 year
-- LTS releases follow semantic versioning (semver), allowing safe upgrades between minor versions
-- Legacy versions (LangChain 0.3 and LangGraph 0.4) are in MAINTENANCE mode until December 2026
+LangChain과 LangGraph 1.0 모두 LTS 릴리스로 지정됩니다:
+- 버전 1.0은 버전 2.0이 릴리스될 때까지 ACTIVE 상태로 유지됩니다
+- 버전 2.0이 릴리스된 후 버전 1.0은 최소 1년 동안 MAINTENANCE 모드로 전환됩니다
+- LTS 릴리스는 semantic versioning (semver)을 따르므로 마이너 버전 간 안전한 업그레이드가 가능합니다
+- 레거시 버전 (LangChain 0.3 및 LangGraph 0.4)은 2026년 12월까지 MAINTENANCE 모드입니다
 
-For detailed information about release status and support timelines, see the [Release policy](/oss/release-policy).
+릴리스 상태 및 지원 일정에 대한 자세한 정보는 [Release policy](/oss/release-policy)를 참조하세요.
 
-## Check your version
+## 버전 확인
 
-To check your installed version:
+설치된 버전을 확인하려면:
 
 :::python
 <CodeGroup>
@@ -137,7 +137,7 @@ console.log(version);
 </CodeGroup>
 :::
 
-## Upgrade
+## 업그레이드
 
 :::python
 <CodeGroup>
@@ -181,15 +181,15 @@ npm install @langchain/langgraph@1.0.0
 </CodeGroup>
 :::
 
-## Pre-release versions
+## Pre-release 버전
 
-We occasionally release alpha and beta versions for early testing:
+조기 테스트를 위해 때때로 alpha 및 beta 버전을 릴리스합니다:
 
-- **Alpha** (e.g., `1.0.0a1`): Early preview, significant changes expected
-- **Beta** (e.g., `1.0.0b1`): Feature-complete, minor changes possible
-- **Release Candidate** (e.g., `1.0.0rc1`): Final testing before stable release
+- **Alpha** (예: `1.0.0a1`): 초기 프리뷰, 상당한 변경이 예상됨
+- **Beta** (예: `1.0.0b1`): 기능 완성, 사소한 변경 가능
+- **Release Candidate** (예: `1.0.0rc1`): 안정 릴리스 전 최종 테스트
 
-## See also
+## 참고 자료
 
-- [Release policy](/oss/release-policy) - Detailed release and deprecation policies
-- [Releases](/oss/releases) - Version-specific release notes and migration guides
+- [Release policy](/oss/release-policy) - 상세한 릴리스 및 deprecation 정책
+- [Releases](/oss/releases) - 버전별 릴리스 노트 및 마이그레이션 가이드

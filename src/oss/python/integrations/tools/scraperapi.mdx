@@ -2,35 +2,35 @@
 title: ScraperAPI
 ---
 
-Give your AI agent the ability to browse websites, search Google and Amazon in just two lines of code.
+AI 에이전트에게 단 두 줄의 코드로 웹사이트를 탐색하고, Google과 Amazon을 검색할 수 있는 기능을 제공하세요.
 
-The `langchain-scraperapi` package adds three ready-to-use LangChain tools backed by the [ScraperAPI](https://www.scraperapi.com/) service:
+`langchain-scraperapi` 패키지는 [ScraperAPI](https://www.scraperapi.com/) 서비스를 기반으로 하는 세 가지 즉시 사용 가능한 LangChain 도구를 추가합니다:
 
-| Tool class | Use it to |
+| Tool class | 용도 |
 |------------|------------------|
-| `ScraperAPITool` | Grab the HTML/text/markdown of any web page |
-| `ScraperAPIGoogleSearchTool` | Get structured Google Search SERP data |
-| `ScraperAPIAmazonSearchTool` | Get structured Amazon product-search data |
+| `ScraperAPITool` | 모든 웹 페이지의 HTML/텍스트/마크다운 가져오기 |
+| `ScraperAPIGoogleSearchTool` | 구조화된 Google Search SERP 데이터 가져오기 |
+| `ScraperAPIAmazonSearchTool` | 구조화된 Amazon 제품 검색 데이터 가져오기 |
 
-## Overview
+## 개요
 
-### Integration details
+### Integration 세부 정보
 
 | Package | Serializable | JS support |  Package latest |
 | :--- | :---: | :---: | :---: |
 | [langchain-scraperapi](https://pypi.org/project/langchain-scraperapi/) | ❌ | ❌ |  ![PyPI - Version](https://img.shields.io/pypi/v/langchain-scraperapi?style=flat-square&label=%20) |
 
-## Setup
+## 설정
 
-Install the `langchain-scraperapi` package:
+`langchain-scraperapi` 패키지를 설치하세요:
 
 ```python
 pip install -qU langchain-scraperapi
 ```
 
-### Credentials
+### 자격 증명
 
-Create an account at [ScraperAPI](https://www.scraperapi.com/) and get an API key:
+[ScraperAPI](https://www.scraperapi.com/)에서 계정을 생성하고 API 키를 받으세요:
 
 ```python
 import os
@@ -39,7 +39,7 @@ if not os.environ.get("SCRAPERAPI_API_KEY"):
     os.environ["SCRAPERAPI_API_KEY"] = "your-api-key"
 ```
 
-## Instantiation
+## 인스턴스화
 
 ```python
 from langchain_scraperapi.tools import ScraperAPITool
@@ -47,9 +47,9 @@ from langchain_scraperapi.tools import ScraperAPITool
 tool = ScraperAPITool()
 ```
 
-## Invocation
+## 호출
 
-### Invoke directly with args
+### 인자와 함께 직접 호출
 
 ```python
 output = tool.invoke(
@@ -62,24 +62,24 @@ output = tool.invoke(
 print(output)
 ```
 
-## Features
+## 기능
 
-### 1. `ScraperAPITool` — browse any website
+### 1. `ScraperAPITool` — 모든 웹사이트 탐색
 
-Invoke the raw ScraperAPI endpoint and get HTML, rendered DOM, text, or markdown.
+원시 ScraperAPI endpoint를 호출하고 HTML, 렌더링된 DOM, 텍스트 또는 마크다운을 가져옵니다.
 
-**Invocation arguments:**
+**호출 인자:**
 
-* **`url`** **(required)** – target page URL
-* **Optional (mirror ScraperAPI query params):**
-  * `output_format`: `"text"` | `"markdown"` (default returns raw HTML)
-  * `country_code`: e.g. `"us"`, `"de"`
+* **`url`** **(필수)** – 대상 페이지 URL
+* **선택 사항 (ScraperAPI query params 반영):**
+  * `output_format`: `"text"` | `"markdown"` (기본값은 원시 HTML 반환)
+  * `country_code`: 예: `"us"`, `"de"`
   * `device_type`: `"desktop"` | `"mobile"`
-  * `premium`: `bool` – use premium proxies
-  * `render`: `bool` – run JS before returning HTML
-  * `keep_headers`: `bool` – include response headers
+  * `premium`: `bool` – 프리미엄 프록시 사용
+  * `render`: `bool` – HTML 반환 전 JS 실행
+  * `keep_headers`: `bool` – 응답 헤더 포함
 
-For the complete set of modifiers see the [ScraperAPI request-customisation docs](https://docs.scraperapi.com/python/making-requests/customizing-requests).
+전체 수정자 목록은 [ScraperAPI request-customisation docs](https://docs.scraperapi.com/python/making-requests/customizing-requests)를 참조하세요.
 
 ```python
 from langchain_scraperapi.tools import ScraperAPITool
@@ -96,15 +96,15 @@ html_text = tool.invoke(
 print(html_text[:300], "…")
 ```
 
-### 2. `ScraperAPIGoogleSearchTool` — structured Google Search
+### 2. `ScraperAPIGoogleSearchTool` — 구조화된 Google Search
 
-Structured SERP data via `/structured/google/search`.
+`/structured/google/search`를 통한 구조화된 SERP 데이터.
 
-**Invocation arguments:**
+**호출 인자:**
 
-* **`query`** **(required)** – natural-language search string
-* **Optional:** `country_code`, `tld`, `uule`, `hl`, `gl`, `ie`, `oe`, `start`, `num`
-* `output_format`: `"json"` (default) or `"csv"`
+* **`query`** **(필수)** – 자연어 검색 문자열
+* **선택 사항:** `country_code`, `tld`, `uule`, `hl`, `gl`, `ie`, `oe`, `start`, `num`
+* `output_format`: `"json"` (기본값) 또는 `"csv"`
 
 ```python
 from langchain_scraperapi.tools import ScraperAPIGoogleSearchTool
@@ -121,15 +121,15 @@ results = google_search.invoke(
 print(results)
 ```
 
-### 3. `ScraperAPIAmazonSearchTool` — structured Amazon Search
+### 3. `ScraperAPIAmazonSearchTool` — 구조화된 Amazon Search
 
-Structured product results via `/structured/amazon/search`.
+`/structured/amazon/search`를 통한 구조화된 제품 결과.
 
-**Invocation arguments:**
+**호출 인자:**
 
-* **`query`** **(required)** – product search terms
-* **Optional:** `country_code`, `tld`, `page`
-* `output_format`: `"json"` (default) or `"csv"`
+* **`query`** **(필수)** – 제품 검색어
+* **선택 사항:** `country_code`, `tld`, `page`
+* `output_format`: `"json"` (기본값) 또는 `"csv"`
 
 ```python
 from langchain_scraperapi.tools import ScraperAPIAmazonSearchTool
@@ -146,9 +146,9 @@ products = amazon_search.invoke(
 print(products)
 ```
 
-## Use within an agent
+## 에이전트 내에서 사용
 
-Here is an example of using the tools in an AI agent. The `ScraperAPITool` gives the AI the ability to browse any website, summarize articles, and click on links to navigate between pages.
+다음은 AI 에이전트에서 도구를 사용하는 예시입니다. `ScraperAPITool`은 AI에게 모든 웹사이트를 탐색하고, 기사를 요약하며, 링크를 클릭하여 페이지 간 탐색할 수 있는 기능을 제공합니다.
 
 ```python
 pip install -qU langchain-openai langchain
@@ -182,10 +182,10 @@ print(response["messages"][-1].content)
 
 ## API reference
 
-Below you can find more information on additional parameters to the tools to customize your requests:
+아래에서 요청을 사용자 정의하기 위한 도구의 추가 매개변수에 대한 자세한 정보를 확인할 수 있습니다:
 
 * [ScraperAPITool](https://docs.scraperapi.com/python/making-requests/customizing-requests)
 * [ScraperAPIGoogleSearchTool](https://docs.scraperapi.com/python/make-requests-with-scraperapi-in-python/scraperapi-structured-data-collection-in-python/google-serp-api-structured-data-in-python)
 * [ScraperAPIAmazonSearchTool](https://docs.scraperapi.com/python/make-requests-with-scraperapi-in-python/scraperapi-structured-data-collection-in-python/amazon-search-api-structured-data-in-python)
 
-The LangChain wrappers surface these parameters directly.
+LangChain wrapper는 이러한 매개변수를 직접 노출합니다.

@@ -2,9 +2,9 @@
 title: ChatBedrockConverse
 ---
 
-[Amazon Bedrock Converse](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_Converse.html) is a fully managed service that makes Foundation Models (FMs) from leading AI startups and Amazon available via an API. You can choose from a wide range of FMs to find the model that is best suited for your use case. It provides a unified conversational interface for Bedrock models, but does not yet have feature parity for all functionality within the older [Bedrock model service](/oss/integrations/chat/bedrock).
+[Amazon Bedrock Converse](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_Converse.html)는 선도적인 AI 스타트업과 Amazon의 Foundation Model(FM)을 API를 통해 사용할 수 있도록 하는 완전 관리형 서비스입니다. 다양한 FM 중에서 사용 사례에 가장 적합한 모델을 선택할 수 있습니다. Bedrock 모델을 위한 통합된 대화형 인터페이스를 제공하지만, 이전 [Bedrock 모델 서비스](/oss/integrations/chat/bedrock)의 모든 기능과 완전히 동등한 기능을 아직 제공하지는 않습니다.
 
-This will help you getting started with Amazon Bedrock Converse [chat models](/oss/langchain/models). For detailed documentation of all `ChatBedrockConverse` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_aws.ChatBedrockConverse.html).
+이 문서는 Amazon Bedrock Converse [chat model](/oss/langchain/models) 시작하기를 도와드립니다. 모든 `ChatBedrockConverse` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_aws.ChatBedrockConverse.html)를 참조하세요.
 
 ## Overview
 
@@ -16,7 +16,7 @@ This will help you getting started with Amazon Bedrock Converse [chat models](/o
 
 ### Model features
 
-See the links in the table headers below for guides on how to use specific features.
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
@@ -24,13 +24,13 @@ See the links in the table headers below for guides on how to use specific featu
 
 ## Setup
 
-To access Bedrock models you'll need to create an AWS account, set up the Bedrock API service, get an access key ID and secret key, and install the `@langchain/community` integration package.
+Bedrock 모델에 액세스하려면 AWS 계정을 생성하고, Bedrock API 서비스를 설정하고, access key ID와 secret key를 받고, `@langchain/community` integration package를 설치해야 합니다.
 
 ### Credentials
 
-Head to the [AWS docs](https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html) to sign up for AWS and setup your credentials. You'll also need to turn on model access for your account, which you can do by [following these instructions](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
+AWS에 가입하고 자격 증명을 설정하려면 [AWS 문서](https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html)를 참조하세요. 또한 [다음 지침](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html)에 따라 계정에 대한 모델 액세스를 활성화해야 합니다.
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수 있습니다:
 
 ```bash
 # export LANGSMITH_TRACING="true"
@@ -39,7 +39,7 @@ If you want to get automated tracing of your model calls you can also set your [
 
 ### Installation
 
-The LangChain `ChatBedrockConverse` integration lives in the `@langchain/aws` package:
+LangChain `ChatBedrockConverse` integration은 `@langchain/aws` package에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -55,9 +55,9 @@ pnpm add @langchain/aws @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions.
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다.
 
-There are a few different ways to authenticate with AWS - the below examples rely on an access key, secret access key and region set in your environment variables:
+AWS 인증 방법은 여러 가지가 있습니다 - 아래 예제는 환경 변수에 설정된 access key, secret access key 및 region을 사용합니다:
 
 ```typescript
 import { ChatBedrockConverse } from "@langchain/aws";
@@ -127,8 +127,8 @@ J'adore la programmation.
 
 ## Tool calling
 
-Tool calling with Bedrock models works in a similar way to [other models](/oss/langchain/tools), but note that not all Bedrock models support tool calling. Please refer to the [AWS model documentation](https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html) for more information.
+Bedrock 모델의 tool calling은 [다른 모델](/oss/langchain/tools)과 유사한 방식으로 작동하지만, 모든 Bedrock 모델이 tool calling을 지원하는 것은 아닙니다. 자세한 내용은 [AWS 모델 문서](https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html)를 참조하세요.
 
 ## API reference
 
-For detailed documentation of all `ChatBedrockConverse` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_aws.ChatBedrockConverse.html).
+모든 `ChatBedrockConverse` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_aws.ChatBedrockConverse.html)를 참조하세요.

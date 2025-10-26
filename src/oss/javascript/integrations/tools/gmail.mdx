@@ -2,26 +2,25 @@
 title: Gmail Tool
 ---
 
-The Gmail Tool allows your agent to create and view messages from a linked email account.
+Gmail Tool은 에이전트가 연결된 이메일 계정에서 메시지를 생성하고 조회할 수 있도록 합니다.
 
 ## Setup
 
-You can authenticate via two methods:
+두 가지 방법으로 인증할 수 있습니다:
 
-1. Provide an access token, obtained via OAuth2 token exchange, to the credentials object.
-   This can be a string or a function so that token expiry and validation can be handled.
-   This can be done using an Identity Provider that supports getting access tokens from federated connections.
-   This is the most secure method as the access and scope will be limited to the specific end user.
-   This method will be more appropriate when using the tool in an application that is meant to be used by end
-   users with their own Gmail account.
-2. You will need to get an API key from [Google here](https://developers.google.com/gmail/api/guides)
-   and [enable the new Gmail API](https://console.cloud.google.com/apis/library/gmail.googleapis.com).
-   Then, set the environment variables for `GMAIL_CLIENT_EMAIL`, and either `GMAIL_PRIVATE_KEY`, or `GMAIL_KEYFILE`.
+1. OAuth2 token exchange를 통해 얻은 access token을 credentials 객체에 제공합니다.
+   이는 문자열이거나 함수일 수 있으므로 token 만료 및 유효성 검사를 처리할 수 있습니다.
+   이는 federated connection에서 access token을 가져오는 것을 지원하는 Identity Provider를 사용하여 수행할 수 있습니다.
+   이는 access와 scope가 특정 최종 사용자로 제한되므로 가장 안전한 방법입니다.
+   이 방법은 최종 사용자가 자신의 Gmail 계정으로 사용하도록 의도된 애플리케이션에서 tool을 사용할 때 더 적합합니다.
+2. [Google 여기](https://developers.google.com/gmail/api/guides)에서 API key를 받고
+   [새로운 Gmail API를 활성화](https://console.cloud.google.com/apis/library/gmail.googleapis.com)해야 합니다.
+   그런 다음 `GMAIL_CLIENT_EMAIL`과 `GMAIL_PRIVATE_KEY` 또는 `GMAIL_KEYFILE` 중 하나에 대한 환경 변수를 설정합니다.
 
-To use the Gmail Tool you need to install the following official peer dependency:
+Gmail Tool을 사용하려면 다음 공식 peer dependency를 설치해야 합니다:
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
@@ -93,5 +92,5 @@ export async function run() {
 
 ## Related
 
-- Tool [conceptual guide](/oss/langchain/tools)
-- Tool [how-to guides](/oss/langchain/tools)
+- Tool [개념 가이드](/oss/langchain/tools)
+- Tool [사용 방법 가이드](/oss/langchain/tools)

@@ -2,19 +2,19 @@
 title: Epsilla
 ---
 
->[Epsilla](https://www.epsilla.com) is an open-source vector database that leverages the advanced parallel graph traversal techniques for vector indexing. Epsilla is licensed under GPL-3.0.
+>[Epsilla](https://www.epsilla.com)는 vector indexing을 위해 고급 parallel graph traversal 기술을 활용하는 오픈소스 vector database입니다. Epsilla는 GPL-3.0 라이선스로 제공됩니다.
 
-You'll need to install `langchain-community` with `pip install -qU langchain-community` to use this integration
+이 integration을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다
 
-This notebook shows how to use the functionalities related to the `Epsilla` vector database.
+이 notebook은 `Epsilla` vector database와 관련된 기능을 사용하는 방법을 보여줍니다.
 
-As a prerequisite, you need to have a running Epsilla vector database (for example, through our docker image), and install the `pyepsilla` package. View full docs at [docs](https://epsilla-inc.gitbook.io/epsilladb/quick-start).
+사전 요구사항으로, 실행 중인 Epsilla vector database가 필요하며(예: docker image를 통해), `pyepsilla` package를 설치해야 합니다. 전체 문서는 [docs](https://epsilla-inc.gitbook.io/epsilladb/quick-start)에서 확인하세요.
 
 ```python
 !pip/pip3 install pyepsilla
 ```
 
-We want to use @[`OpenAIEmbeddings`] so we have to get the OpenAI API Key.
+@[`OpenAIEmbeddings`]를 사용하려면 OpenAI API Key를 가져와야 합니다.
 
 ```python
 import getpass
@@ -45,7 +45,7 @@ documents = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0).split_docume
 embeddings = OpenAIEmbeddings()
 ```
 
-Epsilla vectordb is running with default host "localhost" and port "8888". We have a custom db path, db name and collection name instead of the default ones.
+Epsilla vectordb는 기본 host "localhost"와 port "8888"로 실행되고 있습니다. 기본값 대신 custom db path, db name 및 collection name을 사용합니다.
 
 ```python
 from pyepsilla import vectordb
@@ -71,10 +71,10 @@ In state after state, new laws have been passed, not only to suppress the vote, 
 
 We cannot let this happen.
 
-Tonight. I call on the Senate to: Pass the Freedom to Vote Act. Pass the John Lewis Voting Rights Act. And while you’re at it, pass the Disclose Act so Americans can know who is funding our elections.
+Tonight. I call on the Senate to: Pass the Freedom to Vote Act. Pass the John Lewis Voting Rights Act. And while you're at it, pass the Disclose Act so Americans can know who is funding our elections.
 
-Tonight, I’d like to honor someone who has dedicated his life to serve this country: Justice Stephen Breyer—an Army veteran, Constitutional scholar, and retiring Justice of the United States Supreme Court. Justice Breyer, thank you for your service.
+Tonight, I'd like to honor someone who has dedicated his life to serve this country: Justice Stephen Breyer—an Army veteran, Constitutional scholar, and retiring Justice of the United States Supreme Court. Justice Breyer, thank you for your service.
 
 One of the most serious constitutional responsibilities a President has is nominating someone to serve on the United States Supreme Court.
 
-And I did that 4 days ago, when I nominated Circuit Court of Appeals Judge Ketanji Brown Jackson. One of our nation’s top legal minds, who will continue Justice Breyer’s legacy of excellence.
+And I did that 4 days ago, when I nominated Circuit Court of Appeals Judge Ketanji Brown Jackson. One of our nation's top legal minds, who will continue Justice Breyer's legacy of excellence.

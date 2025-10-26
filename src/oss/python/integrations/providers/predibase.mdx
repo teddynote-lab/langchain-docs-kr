@@ -2,17 +2,17 @@
 title: Predibase
 ---
 
-Learn how to use LangChain with models on Predibase.
+LangChain을 Predibase의 모델과 함께 사용하는 방법을 알아보세요.
 
 ## Setup
 
-- Create a [Predibase](https://predibase.com/) account and [API key](https://docs.predibase.com/sdk-guide/intro).
-- Install the Predibase Python client with `pip install predibase`
-- Use your API key to authenticate
+- [Predibase](https://predibase.com/) 계정과 [API key](https://docs.predibase.com/sdk-guide/intro)를 생성하세요.
+- `pip install predibase` 명령어로 Predibase Python client를 설치하세요
+- API key를 사용하여 인증하세요
 
 ### LLM
 
-Predibase integrates with LangChain by implementing LLM module. You can see a short example below or a full notebook under LLM > Integrations > Predibase.
+Predibase는 LLM module을 구현하여 LangChain과 통합됩니다. 아래에서 간단한 예제를 확인하거나 LLM > Integrations > Predibase에서 전체 notebook을 확인할 수 있습니다.
 
 ```python
 import os
@@ -45,7 +45,7 @@ response = model.invoke("Can you recommend me a nice dry wine?", **kwargs)
 print(response)
 ```
 
-Predibase also supports Predibase-hosted and HuggingFace-hosted adapters that are fine-tuned on the base model given by the `model` argument:
+Predibase는 `model` 인자로 제공된 base model에서 fine-tuning된 Predibase-hosted 및 HuggingFace-hosted adapter도 지원합니다:
 
 ```python
 import os
@@ -81,7 +81,7 @@ response = model.invoke("Can you recommend me a nice dry wine?", **kwargs)
 print(response)
 ```
 
-Predibase also supports adapters that are fine-tuned on the base model given by the `model` argument:
+Predibase는 `model` 인자로 제공된 base model에서 fine-tuning된 adapter도 지원합니다:
 
 ```python
 import os

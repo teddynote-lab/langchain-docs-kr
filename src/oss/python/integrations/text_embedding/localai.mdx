@@ -1,15 +1,16 @@
+```mdx
 ---
 title: LocalAI
 ---
 
 <Info>
-**`langchain-localai` is a 3rd party integration package for LocalAI. It provides a simple way to use LocalAI services in LangChain.**
+**`langchain-localai`는 LocalAI를 위한 서드파티 통합 패키지입니다. LangChain에서 LocalAI 서비스를 사용할 수 있는 간단한 방법을 제공합니다.**
 
-The source code is available on [Github](https://github.com/mkhludnev/langchain-localai)
+소스 코드는 [Github](https://github.com/mkhludnev/langchain-localai)에서 확인할 수 있습니다.
 
 </Info>
 
-Let's load the LocalAI Embedding class. In order to use the LocalAI Embedding class, you need to have the LocalAI service hosted somewhere and configure the embedding models. See the documentation at [localai.io/basics/getting_started/index.html](https://localai.io/basics/getting_started/index.html) and [localai.io/features/embeddings/index.html](https://localai.io/features/embeddings/index.html).
+LocalAI Embedding class를 로드해보겠습니다. LocalAI Embedding class를 사용하려면 LocalAI 서비스가 어딘가에 호스팅되어 있어야 하며 embedding model을 구성해야 합니다. [localai.io/basics/getting_started/index.html](https://localai.io/basics/getting_started/index.html)과 [localai.io/features/embeddings/index.html](https://localai.io/features/embeddings/index.html)의 문서를 참조하세요.
 
 ```python
 pip install -U langchain-localai
@@ -37,7 +38,7 @@ query_result = embeddings.embed_query(text)
 doc_result = embeddings.embed_documents([text])
 ```
 
-Let's load the LocalAI Embedding class with first generation models (e.g. text-search-ada-doc-001/text-search-ada-query-001). Note: These are not recommended models - see [here](https://platform.openai.com/docs/guides/embeddings/what-are-embeddings)
+1세대 model(예: text-search-ada-doc-001/text-search-ada-query-001)로 LocalAI Embedding class를 로드해보겠습니다. 참고: 이러한 model은 권장되지 않습니다 - [여기](https://platform.openai.com/docs/guides/embeddings/what-are-embeddings)를 참조하세요
 
 ```python
 from langchain_community.embeddings import LocalAIEmbeddings
@@ -66,4 +67,5 @@ import os
 
 # if you are behind an explicit proxy, you can use the OPENAI_PROXY environment variable to pass through
 os.environ["OPENAI_PROXY"] = "http://proxy.yourcompany.com:8080"
+```
 ```

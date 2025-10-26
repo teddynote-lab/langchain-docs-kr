@@ -2,20 +2,20 @@
 title: Modal
 ---
 
-This page covers how to use the Modal ecosystem to run LangChain custom LLMs.
-It is broken into two parts:
+이 페이지는 Modal 생태계를 사용하여 LangChain 커스텀 LLM을 실행하는 방법을 다룹니다.
+두 부분으로 나뉩니다:
 
-1. Modal installation and web endpoint deployment
-2. Using deployed web endpoint with `LLM` wrapper class.
+1. Modal 설치 및 웹 엔드포인트 배포
+2. `LLM` wrapper class로 배포된 웹 엔드포인트 사용하기
 
-## Installation and Setup
+## 설치 및 설정
 
-- Install with `pip install modal`
-- Run `modal token new`
+- `pip install modal`로 설치
+- `modal token new` 실행
 
-## Define your Modal Functions and Webhooks
+## Modal Function과 Webhook 정의하기
 
-You must include a prompt. There is a rigid response structure:
+prompt를 반드시 포함해야 합니다. 엄격한 response 구조가 있습니다:
 
 ```python
 class Item(BaseModel):
@@ -27,7 +27,7 @@ def get_text(item: Item):
     return {"prompt": run_gpt2.call(item.prompt)}
 ```
 
-The following is an example with the GPT2 model:
+다음은 GPT2 모델을 사용한 예시입니다:
 
 ```python
 from pydantic import BaseModel
@@ -73,14 +73,14 @@ def get_text(item: Item):
     return {"prompt": run_gpt2.call(item.prompt)}
 ```
 
-### Deploy the web endpoint
+### 웹 엔드포인트 배포
 
-Deploy the web endpoint to Modal cloud with the [`modal deploy`](https://modal.com/docs/reference/cli/deploy) CLI command.
-Your web endpoint will acquire a persistent URL under the `modal.run` domain.
+[`modal deploy`](https://modal.com/docs/reference/cli/deploy) CLI 명령어를 사용하여 웹 엔드포인트를 Modal 클라우드에 배포합니다.
+웹 엔드포인트는 `modal.run` 도메인 하에 영구적인 URL을 획득합니다.
 
-## LLM wrapper around Modal web endpoint
+## Modal 웹 엔드포인트를 감싸는 LLM wrapper
 
-The  `Modal` LLM wrapper class which will accept your deployed web endpoint's URL.
+배포된 웹 엔드포인트의 URL을 받는 `Modal` LLM wrapper class입니다.
 
 ```python
 from langchain_community.llms import Modal

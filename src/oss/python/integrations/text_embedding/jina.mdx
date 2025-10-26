@@ -2,17 +2,17 @@
 title: Jina
 ---
 
-You can check the list of available models from [here](https://jina.ai/embeddings/).
+사용 가능한 모델 목록은 [여기](https://jina.ai/embeddings/)에서 확인할 수 있습니다.
 
-## Installation and setup
+## Installation 및 setup
 
-Install requirements
+requirements 설치
 
 ```python
 pip install -U langchain-community
 ```
 
-Import libraries
+library import
 
 ```python
 import requests
@@ -22,7 +22,7 @@ from numpy.linalg import norm
 from PIL import Image
 ```
 
-## Embed text and queries with Jina embedding models through JinaAI API
+## JinaAI API를 통해 Jina embedding model로 텍스트 및 쿼리 embed하기
 
 ```python
 text_embeddings = JinaEmbeddings(
@@ -50,7 +50,7 @@ doc_result = text_embeddings.embed_documents([text])
 print(doc_result)
 ```
 
-## Embed images and queries with Jina CLIP through JinaAI API
+## JinaAI API를 통해 Jina CLIP으로 이미지 및 쿼리 embed하기
 
 ```python
 multimodal_embeddings = JinaEmbeddings(jina_api_key="jina_*", model_name="jina-clip-v1")

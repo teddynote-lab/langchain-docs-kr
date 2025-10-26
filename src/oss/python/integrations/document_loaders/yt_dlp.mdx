@@ -2,27 +2,27 @@
 title: YoutubeLoaderDL
 ---
 
-Loader for Youtube leveraging the `yt-dlp` library.
+`yt-dlp` 라이브러리를 활용하는 Youtube용 Loader입니다.
 
-This package implements a [document loader](/oss/integrations/document_loaders/) for Youtube. In contrast to the [YoutubeLoader](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.youtube.YoutubeLoader.html) of `langchain-community`, which relies on `pytube`, `YoutubeLoaderDL` is able to fetch YouTube metadata. `langchain-yt-dlp` leverages the robust `yt-dlp` library, providing a more reliable and feature-rich YouTube document loader.
+이 패키지는 Youtube용 [document loader](/oss/integrations/document_loaders/)를 구현합니다. `pytube`에 의존하는 `langchain-community`의 [YoutubeLoader](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.youtube.YoutubeLoader.html)와 달리, `YoutubeLoaderDL`은 YouTube 메타데이터를 가져올 수 있습니다. `langchain-yt-dlp`는 강력한 `yt-dlp` 라이브러리를 활용하여 더 안정적이고 기능이 풍부한 YouTube document loader를 제공합니다.
 
-## Overview
+## 개요
 
-### Integration details
+### Integration 세부 정보
 
 | Class | Package | Local | Serializable | JS Support |
 | :--- | :--- | :---: | :---: | :---: |
 | YoutubeLoader | langchain-yt-dlp | ✅ | ✅ | ❌ |
 
-## Setup
+## 설정
 
-### Installation
+### 설치
 
 ```bash
 pip install langchain-yt-dlp
 ```
 
-### Initialization
+### 초기화
 
 ```python
 from langchain_yt_dlp.youtube_loader import YoutubeLoaderDL
@@ -33,7 +33,7 @@ loader = YoutubeLoaderDL.from_youtube_url(
 )
 ```
 
-### Load
+### 로드
 
 ```python
 documents = loader.load()
@@ -57,7 +57,7 @@ documents[0].metadata
 
 ## Lazy Load
 
-- No lazy loading is implemented
+- lazy loading은 구현되지 않았습니다
 
 ## API reference
 

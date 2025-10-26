@@ -1,24 +1,25 @@
+```mdx
 ---
 title: ChatYandexGPT
 ---
 
-LangChain.js supports calling [YandexGPT](https://cloud.yandex.com/en/services/yandexgpt) chat models.
+LangChain.js는 [YandexGPT](https://cloud.yandex.com/en/services/yandexgpt) chat model 호출을 지원합니다.
 
 ## Setup
 
-First, you should [create a service account](https://cloud.yandex.com/en/docs/iam/operations/sa/create) with the `ai.languageModels.user` role.
+먼저, `ai.languageModels.user` role을 가진 [service account를 생성](https://cloud.yandex.com/en/docs/iam/operations/sa/create)해야 합니다.
 
-Next, you have two authentication options:
+다음으로, 두 가지 인증 옵션이 있습니다:
 
 - [IAM token](https://cloud.yandex.com/en/docs/iam/operations/iam-token/create-for-sa).
-  You can specify the token in a constructor parameter as `iam_token` or in an environment variable `YC_IAM_TOKEN`.
+  constructor parameter에서 `iam_token`으로 token을 지정하거나 환경 변수 `YC_IAM_TOKEN`에 지정할 수 있습니다.
 - [API key](https://cloud.yandex.com/en/docs/iam/operations/api-key/create)
-  You can specify the key in a constructor parameter as `api_key` or in an environment variable `YC_API_KEY`.
+  constructor parameter에서 `api_key`로 key를 지정하거나 환경 변수 `YC_API_KEY`에 지정할 수 있습니다.
 
 ## Usage
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain package 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
@@ -53,5 +54,6 @@ AIMessage {
 
 ## Related
 
-- Chat model [conceptual guide](/oss/langchain/models)
-- Chat model [how-to guides](/oss/langchain/models)
+- Chat model [개념 가이드](/oss/langchain/models)
+- Chat model [사용 방법 가이드](/oss/langchain/models)
+```

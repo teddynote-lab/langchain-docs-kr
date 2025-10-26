@@ -2,11 +2,11 @@
 title: vlite
 ---
 
-This page covers how to use [vlite](https://github.com/sdan/vlite) within LangChain. vlite is a simple and fast vector database for storing and retrieving embeddings.
+이 페이지는 LangChain에서 [vlite](https://github.com/sdan/vlite)를 사용하는 방법을 다룹니다. vlite는 임베딩을 저장하고 검색하기 위한 간단하고 빠른 vector database입니다.
 
 ## Installation and Setup
 
-To install vlite, run the following command:
+vlite를 설치하려면 다음 명령어를 실행하세요:
 
 <CodeGroup>
 ```bash pip
@@ -18,7 +18,7 @@ uv add vlite
 ```
 </CodeGroup>
 
-For PDF OCR support, install the `vlite[ocr]` extra:
+PDF OCR 지원을 위해서는 `vlite[ocr]` extra를 설치하세요:
 
 <CodeGroup>
 ```bash pip
@@ -32,9 +32,9 @@ uv add vlite[ocr]
 
 ## VectorStore
 
-vlite provides a wrapper around its vector database, allowing you to use it as a vectorstore for semantic search and example selection.
+vlite는 vector database에 대한 wrapper를 제공하여, semantic search 및 example selection을 위한 vectorstore로 사용할 수 있습니다.
 
-To import the vlite vectorstore:
+vlite vectorstore를 import하려면:
 
 ```python
 from langchain_community.vectorstores import vlite
@@ -42,4 +42,4 @@ from langchain_community.vectorstores import vlite
 
 ### Usage
 
-For a more detailed walkthrough of the vlite wrapper, see [this notebook](/oss/integrations/vectorstores/vlite).
+vlite wrapper에 대한 더 자세한 안내는 [이 notebook](/oss/integrations/vectorstores/vlite)을 참조하세요.

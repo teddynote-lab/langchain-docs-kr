@@ -2,19 +2,19 @@
 title: PlayWright Browser Toolkit
 ---
 
->[Playwright](https://github.com/microsoft/playwright) is an open-source automation tool developed by `Microsoft` that allows you to programmatically control and automate web browsers. It is designed for end-to-end testing, scraping, and automating tasks across various web browsers such as `Chromium`, `Firefox`, and `WebKit`.
+>[Playwright](https://github.com/microsoft/playwright)는 `Microsoft`에서 개발한 오픈소스 자동화 도구로, 웹 브라우저를 프로그래밍 방식으로 제어하고 자동화할 수 있게 해줍니다. `Chromium`, `Firefox`, `WebKit`과 같은 다양한 웹 브라우저에서 엔드투엔드 테스트, 스크래핑, 작업 자동화를 위해 설계되었습니다.
 
-This toolkit is used to interact with the browser. While other tools (like the `Requests` tools) are fine for static sites, `PlayWright Browser` toolkits let your agent navigate the web and interact with dynamically rendered sites.
+이 toolkit은 브라우저와 상호작용하는 데 사용됩니다. 다른 도구들(예: `Requests` 도구)은 정적 사이트에는 적합하지만, `PlayWright Browser` toolkit을 사용하면 에이전트가 웹을 탐색하고 동적으로 렌더링되는 사이트와 상호작용할 수 있습니다.
 
-Some tools bundled within the `PlayWright Browser` toolkit include:
+`PlayWright Browser` toolkit에 포함된 일부 도구는 다음과 같습니다:
 
-- `NavigateTool` (navigate_browser) - navigate to a URL
-- `NavigateBackTool` (previous_page) - wait for an element to appear
-- `ClickTool` (click_element) - click on an element (specified by selector)
-- `ExtractTextTool` (extract_text) - use beautiful soup to extract text from the current web page
-- `ExtractHyperlinksTool` (extract_hyperlinks) - use beautiful soup to extract hyperlinks from the current web page
-- `GetElementsTool` (get_elements) - select elements by CSS selector
-- `CurrentPageTool` (current_page) - get the current page URL
+- `NavigateTool` (navigate_browser) - URL로 이동
+- `NavigateBackTool` (previous_page) - 요소가 나타날 때까지 대기
+- `ClickTool` (click_element) - 요소 클릭 (selector로 지정)
+- `ExtractTextTool` (extract_text) - beautiful soup을 사용하여 현재 웹 페이지에서 텍스트 추출
+- `ExtractHyperlinksTool` (extract_hyperlinks) - beautiful soup을 사용하여 현재 웹 페이지에서 하이퍼링크 추출
+- `GetElementsTool` (get_elements) - CSS selector로 요소 선택
+- `CurrentPageTool` (current_page) - 현재 페이지 URL 가져오기
 
 ```python
 pip install -qU  playwright > /dev/null
@@ -39,7 +39,7 @@ Note: you may need to restart the kernel to use updated packages.
 from langchain_community.agent_toolkits import PlayWrightBrowserToolkit
 ```
 
-Async function to create context and launch browser:
+context를 생성하고 브라우저를 실행하는 비동기 함수:
 
 ```python
 from langchain_community.tools.playwright.utils import (
@@ -54,9 +54,9 @@ import nest_asyncio
 nest_asyncio.apply()
 ```
 
-## Instantiating a Browser Toolkit
+## Browser Toolkit 인스턴스화
 
-It's always recommended to instantiate using the from_browser method so that the browser context is properly initialized and managed, ensuring seamless interaction and resource optimization.
+브라우저 컨텍스트가 적절하게 초기화되고 관리되어 원활한 상호작용과 리소스 최적화를 보장하기 위해 항상 from_browser 메서드를 사용하여 인스턴스화하는 것이 권장됩니다.
 
 ```python
 async_browser = create_async_playwright_browser()
@@ -111,9 +111,9 @@ await tools_by_name["current_webpage"].arun({})
 'https://web.archive.org/web/20230428133211/https://cnn.com/world'
 ```
 
-## Use within an Agent
+## Agent 내에서 사용
 
-Several of the browser tools are `StructuredTool`'s, meaning they expect multiple arguments. These aren't compatible (out of the box) with agents older than the `STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION`
+여러 브라우저 도구들은 `StructuredTool`로, 여러 인수를 필요로 합니다. 이들은 `STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION`보다 오래된 에이전트와는 (기본적으로) 호환되지 않습니다.
 
 ```python
 from langchain_anthropic import ChatAnthropic

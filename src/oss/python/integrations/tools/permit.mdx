@@ -2,19 +2,19 @@
 title: Permit
 ---
 
-Permit is an access control platform that provides fine-grained, real-time permission management using various models such as RBAC, ABAC, and ReBAC. It enables organizations to enforce dynamic policies across their applications, ensuring that only authorized users can access specific resources.
+Permit은 RBAC, ABAC, ReBAC와 같은 다양한 모델을 사용하여 세밀하고 실시간 권한 관리를 제공하는 접근 제어 플랫폼입니다. 조직이 애플리케이션 전반에 걸쳐 동적 정책을 적용하여 승인된 사용자만 특정 리소스에 액세스할 수 있도록 보장합니다.
 
 ## Overview
 
-This package provides two LangChain tools for JWT validation and permission checking using Permit:
+이 패키지는 Permit을 사용한 JWT 검증 및 권한 확인을 위한 두 가지 LangChain 도구를 제공합니다:
 
-* LangchainJWTValidationTool: Validates JWT tokens against a JWKS endpoint
+* LangchainJWTValidationTool: JWKS endpoint에 대해 JWT token을 검증합니다
 
-* LangchainPermissionsCheckTool: Checks user permissions using Permit
+* LangchainPermissionsCheckTool: Permit을 사용하여 사용자 권한을 확인합니다
 
 ## Setup
 
-Set up the following environment variables:
+다음 환경 변수를 설정하세요:
 
 ```bash
 PERMIT_API_KEY=your_permit_api_key
@@ -22,8 +22,8 @@ JWKS_URL=your_jwks_endpoint_url
 PERMIT_PDP_URL=your_permit_pdp_url  # Usually http://localhost:7766 for local development or your real deployment
 ```
 
-Make sure your PDP (Policy Decision Point) is running at PERMIT_PDP_URL.
-See [Permit docs](https://docs.permit.io/concepts/pdp/overview/) for details on policy setup and how to launch the PDP container.
+PERMIT_PDP_URL에서 PDP(Policy Decision Point)가 실행 중인지 확인하세요.
+정책 설정 및 PDP container 실행 방법에 대한 자세한 내용은 [Permit docs](https://docs.permit.io/concepts/pdp/overview/)를 참조하세요.
 
 ### Credentials
 
@@ -34,13 +34,13 @@ PERMIT_PDP_URL=your_pdp_url # or your deployed url
 TEST_JWT_TOKEN= # for quick test purposes
 ```
 
-It's also helpful (but not needed) to set up [LangSmith](https://smith.langchain.com/) for best-in-class observability:
+최고 수준의 관찰 가능성을 위해 [LangSmith](https://smith.langchain.com/)를 설정하는 것도 유용합니다(필수는 아님):
 
 ## Instantiation
 
 ### JWT Validation Tool
 
-The JWT Validation tool verifies JWT tokens against a JWKS (JSON Web Key Set) endpoint.
+JWT Validation tool은 JWKS(JSON Web Key Set) endpoint에 대해 JWT token을 검증합니다.
 
 ```python
 from langchain_permit.tools import LangchainJWTValidationTool
@@ -53,11 +53,11 @@ jwt_validator = LangchainJWTValidationTool(
 
 ### Configuration Options
 
-You can initialize the tool with either:
+다음 중 하나로 도구를 초기화할 수 있습니다:
 
-* A JWKS URL
-* Direct JWKS JSON data
-* Environment variable (JWKS_URL)
+* JWKS URL
+* 직접 JWKS JSON 데이터
+* 환경 변수(JWKS_URL)
 
 ```python
 # Using direct JWKS JSON
@@ -76,7 +76,7 @@ jwt_validator = LangchainJWTValidationTool(
 
 ### Permissions Check Tool
 
-The Permissions Check tool integrates with Permit.io to verify user permissions against resources.
+Permissions Check tool은 Permit.io와 통합하여 리소스에 대한 사용자 권한을 확인합니다.
 
 ```python
 from permit import Permit
@@ -94,7 +94,7 @@ permissions_checker = LangchainPermissionsCheckTool(
 )
 ```
 
-This documentation demonstrates the key features and usage patterns of both tools.
+이 문서는 두 도구의 주요 기능과 사용 패턴을 보여줍니다.
 
 ## Invocation
 
@@ -132,9 +132,9 @@ async def check_user_permission():
 
 #### Input Formats
 
-The permissions checker accepts different input formats:
+permissions checker는 다양한 입력 형식을 허용합니다:
 
-1. Simple string for user (converts to user key):
+1. 사용자를 위한 간단한 문자열(user key로 변환):
 
 ```python
 result = await permissions_checker._arun(
@@ -144,7 +144,7 @@ result = await permissions_checker._arun(
 )
 ```
 
-2. Full user object:
+2. 전체 user object:
 
 ```python
 result = await permissions_checker._arun(
@@ -173,20 +173,20 @@ result = await permissions_checker._arun(
 
 * TODO: Add user question and run cells
 
-We can use our tool in a chain by first binding it to a [tool-calling model](https://docs.permit.io/) and then calling it:
+먼저 [tool-calling model](https://docs.permit.io/)에 도구를 바인딩한 다음 호출하여 chain에서 도구를 사용할 수 있습니다:
 
 <ChatModelTabs customVarName="llm" />
 
 ### Additional Demo Scripts
 
-For fully runnable demos, check out the `/langchain_permit/examples/demo_scripts` folder in this [repository](https://github.com/permitio/langchain-permit). You’ll find:
+완전히 실행 가능한 데모는 이 [repository](https://github.com/permitio/langchain-permit)의 `/langchain_permit/examples/demo_scripts` 폴더를 확인하세요. 다음을 찾을 수 있습니다:
 
-* demo_jwt_validation.py – A quick script showing how to validate JWTs using LangchainJWTValidationTool.
+* demo_jwt_validation.py – LangchainJWTValidationTool을 사용하여 JWT를 검증하는 방법을 보여주는 간단한 스크립트입니다.
 
-* demo_permissions_check.py – A script that performs Permit.io permission checks using LangchainPermissionsCheckTool.
+* demo_permissions_check.py – LangchainPermissionsCheckTool을 사용하여 Permit.io 권한 확인을 수행하는 스크립트입니다.
 
-Just run `python demo_jwt_validation.py` or `python demo_permissions_check.py` (after setting your environment variables) to see these tools in action.
+환경 변수를 설정한 후 `python demo_jwt_validation.py` 또는 `python demo_permissions_check.py`를 실행하여 이러한 도구가 작동하는 것을 확인하세요.
 
 ## API reference
 
-For detailed documentation of all Permit features and configurations head to the API reference: [docs.permit.io/](https://docs.permit.io/)
+모든 Permit 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [docs.permit.io/](https://docs.permit.io/)

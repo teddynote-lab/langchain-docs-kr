@@ -2,32 +2,32 @@
 title: TrueFoundry
 ---
 
-TrueFoundry provides an enterprise-ready [AI Gateway](https://www.truefoundry.com/ai-gateway) to provide governance and observability to agentic frameworks like LangChain. TrueFoundry AI Gateway serves as a unified interface for LLM access, providing:
+TrueFoundry는 LangChain과 같은 에이전트 프레임워크에 거버넌스와 관찰성을 제공하는 엔터프라이즈급 [AI Gateway](https://www.truefoundry.com/ai-gateway)를 제공합니다. TrueFoundry AI Gateway는 LLM 액세스를 위한 통합 인터페이스 역할을 하며 다음을 제공합니다:
 
-- **Unified API Access**: Connect to 250+ LLMs (OpenAI, Claude, Gemini, Groq, Mistral) through one API
-- **Low Latency**: Sub-3ms internal latency with intelligent routing and load balancing
-- **Enterprise Security**: SOC 2, HIPAA, GDPR compliance with RBAC and audit logging
-- **Quota and cost management**: Token-based quotas, rate limiting, and comprehensive usage tracking
-- **Observability**: Full request/response logging, metrics, and traces with customizable retention
-
-
-## Prerequisites
-
-Before integrating LangChain with TrueFoundry, ensure you have:
-
-1. **TrueFoundry Account**: A [TrueFoundry account](https://www.truefoundry.com/register) with at least one model provider configured. Follow quick start guide [here](https://docs.truefoundry.com/gateway/quick-start)
-2. **Personal Access Token**: Generate a token by following the [TrueFoundry token generation guide](https://docs.truefoundry.com/gateway/authentication)
-
-## Quickstart
-
-You can connect to TrueFoundry's unified LLM gateway through the @[`ChatOpenAI`] interface.
-
-- Set the `base_url` to your TrueFoundry endpoint (explained below)
-- Set the `api_key` to your TrueFoundry [PAT (Personal Access Token)](https://docs.truefoundry.com/gateway/authentication#personal-access-token-pat)
-- Use the same `model-name` as shown in the unified code snippet
+- **통합 API 액세스**: 하나의 API를 통해 250개 이상의 LLM(OpenAI, Claude, Gemini, Groq, Mistral)에 연결
+- **낮은 지연 시간**: 지능형 라우팅 및 로드 밸런싱으로 3ms 미만의 내부 지연 시간
+- **엔터프라이즈 보안**: RBAC 및 감사 로깅을 갖춘 SOC 2, HIPAA, GDPR 규정 준수
+- **할당량 및 비용 관리**: 토큰 기반 할당량, 속도 제한 및 포괄적인 사용량 추적
+- **관찰성**: 사용자 정의 가능한 보존 기간을 가진 전체 요청/응답 로깅, 메트릭 및 추적
 
 
-### Installation
+## 사전 요구 사항
+
+LangChain을 TrueFoundry와 통합하기 전에 다음을 확인하세요:
+
+1. **TrueFoundry 계정**: 최소 하나의 모델 제공자가 구성된 [TrueFoundry 계정](https://www.truefoundry.com/register). [여기](https://docs.truefoundry.com/gateway/quick-start)에서 빠른 시작 가이드를 따르세요
+2. **Personal Access Token**: [TrueFoundry 토큰 생성 가이드](https://docs.truefoundry.com/gateway/authentication)를 따라 토큰을 생성하세요
+
+## 빠른 시작
+
+@[`ChatOpenAI`] 인터페이스를 통해 TrueFoundry의 통합 LLM gateway에 연결할 수 있습니다.
+
+- `base_url`을 TrueFoundry endpoint로 설정하세요 (아래 설명)
+- `api_key`를 TrueFoundry [PAT (Personal Access Token)](https://docs.truefoundry.com/gateway/authentication#personal-access-token-pat)로 설정하세요
+- 통합 코드 스니펫에 표시된 것과 동일한 `model-name`을 사용하세요
+
+
+### 설치
 
 <CodeGroup>
 ```bash pip
@@ -39,9 +39,9 @@ uv add langchain-openai
 ```
 </CodeGroup>
 
-### Basic Setup
+### 기본 설정
 
-Connect to TrueFoundry by updating the @[`ChatOpenAI`] model in LangChain:
+LangChain에서 @[`ChatOpenAI`] 모델을 업데이트하여 TrueFoundry에 연결하세요:
 
 ```python
 from langchain_openai import ChatOpenAI
@@ -55,9 +55,9 @@ llm = ChatOpenAI(
 llm.invoke("What is the meaning of life, universe and everything?")
 ```
 
-The request is routed through your TrueFoundry gateway to the specified model provider. TrueFoundry automatically handles rate limiting, load balancing, and observability.
+요청은 TrueFoundry gateway를 통해 지정된 모델 제공자로 라우팅됩니다. TrueFoundry는 속도 제한, 로드 밸런싱 및 관찰성을 자동으로 처리합니다.
 
-### LangGraph Integration
+### LangGraph 통합
 
 
 ```python
@@ -89,18 +89,18 @@ result = app.invoke({"messages": [HumanMessage(content="Hello!")]})
 ```
 
 
-## Observability and Governance
+## 관찰성 및 거버넌스
 
-With the Metrics Dashboard, you can monitor and analyze:
+Metrics Dashboard를 통해 다음을 모니터링하고 분석할 수 있습니다:
 
-- **Performance Metrics**: Track key latency metrics like Request Latency, Time to First Token (TTFS), and Inter-Token Latency (ITL) with P99, P90, and P50 percentiles
-- **Cost and Token Usage**: Gain visibility into your application's costs with detailed breakdowns of input/output tokens and the associated expenses for each model
-- **Usage Patterns**: Understand how your application is being used with detailed analytics on user activity, model distribution, and team-based usage
-- **Rate Limiting & Load Balancing**: Configure limits, distribute traffic across models, and set up fallbacks
+- **성능 메트릭**: Request Latency, Time to First Token (TTFS), Inter-Token Latency (ITL)와 같은 주요 지연 시간 메트릭을 P99, P90, P50 백분위수로 추적
+- **비용 및 토큰 사용량**: 각 모델에 대한 입력/출력 토큰 및 관련 비용의 상세한 분석을 통해 애플리케이션 비용에 대한 가시성 확보
+- **사용 패턴**: 사용자 활동, 모델 분포 및 팀 기반 사용량에 대한 상세한 분석을 통해 애플리케이션 사용 방식 이해
+- **속도 제한 및 로드 밸런싱**: 제한 구성, 모델 간 트래픽 분산 및 폴백 설정
 
-## Support
+## 지원
 
-For questions, issues, or support:
+질문, 문제 또는 지원이 필요한 경우:
 
-- **Email**: [support@truefoundry.com](mailto:support@truefoundry.com)
-- **Documentation**: [https://docs.truefoundry.com/](https://docs.truefoundry.com/)
+- **이메일**: [support@truefoundry.com](mailto:support@truefoundry.com)
+- **문서**: [https://docs.truefoundry.com/](https://docs.truefoundry.com/)

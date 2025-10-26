@@ -2,40 +2,40 @@
 title: Contextual AI Reranker
 ---
 
-Contextual AI's Instruction-Following Reranker is the world's first reranker designed to follow custom instructions about how to prioritize documents based on specific criteria like recency, source, and metadata. With superior performance on the BEIR benchmark (scoring 61.2 and outperforming competitors by significant margins), it delivers unprecedented control and accuracy for enterprise RAG applications.
+Contextual AI의 Instruction-Following Reranker는 최신성, 출처, 메타데이터와 같은 특정 기준에 따라 문서의 우선순위를 지정하는 방법에 대한 맞춤 지침을 따르도록 설계된 세계 최초의 reranker입니다. BEIR 벤치마크에서 우수한 성능(61.2점을 기록하며 경쟁사를 큰 폭으로 앞섬)을 보이며, 엔터프라이즈 RAG 애플리케이션에 전례 없는 제어력과 정확도를 제공합니다.
 
-## Key Capabilities
+## 주요 기능
 
-- **Instruction Following**: Dynamically control document ranking through natural language commands
-- **Conflict Resolution**: Intelligently handle contradictory information from multiple knowledge sources
-- **Superior Accuracy**: Achieve state-of-the-art performance on industry benchmarks
-- **Seamless Integration**: Drop-in replacement for existing rerankers in your RAG pipeline
+- **Instruction Following**: 자연어 명령을 통해 문서 순위를 동적으로 제어
+- **Conflict Resolution**: 여러 지식 소스의 모순된 정보를 지능적으로 처리
+- **Superior Accuracy**: 업계 벤치마크에서 최첨단 성능 달성
+- **Seamless Integration**: RAG 파이프라인의 기존 reranker를 즉시 대체 가능
 
-The reranker excels at resolving real-world challenges in enterprise knowledge bases, such as prioritizing recent documents over outdated ones or favoring internal documentation over external sources.
+이 reranker는 오래된 문서보다 최신 문서를 우선시하거나 외부 소스보다 내부 문서를 선호하는 등 엔터프라이즈 지식 베이스의 실제 과제를 해결하는 데 탁월합니다.
 
-To learn more about our instruction-following reranker and see examples of it in action, visit our [product overview](https://contextual.ai/blog/introducing-instruction-following-reranker/).
+instruction-following reranker에 대해 자세히 알아보고 실제 사례를 보려면 [제품 개요](https://contextual.ai/blog/introducing-instruction-following-reranker/)를 방문하세요.
 
-For comprehensive documentation on Contextual AI's products, please visit our [developer portal](https://docs.contextual.ai/).
+Contextual AI 제품에 대한 포괄적인 문서는 [개발자 포털](https://docs.contextual.ai/)을 방문하세요.
 
-This integration requires the `contextual-client` Python SDK. Learn more about it [here](https://github.com/ContextualAI/contextual-client-python).
+이 통합에는 `contextual-client` Python SDK가 필요합니다. 자세한 내용은 [여기](https://github.com/ContextualAI/contextual-client-python)에서 확인하세요.
 
-## Overview
+## 개요
 
-This integration invokes Contextual AI's Grounded Language Model.
+이 통합은 Contextual AI의 Grounded Language Model을 호출합니다.
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | JS support | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [ContextualRerank](https://python.langchain.com/api_reference/en/latest/chat_models/langchain_contextual.rerank.ContextualRerank.html) | [langchain-contextual](https://python.langchain.com/api_reference/en/latest/contextual_api_reference.html) | ❌ | beta | ❌ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-contextual?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-contextual?style=flat-square&label=%20) |
 
-## Setup
+## 설정
 
-To access Contextual's reranker models you'll need to create a/an Contextual AI account, get an API key, and install the `langchain-contextual` integration package.
+Contextual의 reranker 모델에 액세스하려면 Contextual AI 계정을 생성하고 API 키를 받은 다음 `langchain-contextual` 통합 패키지를 설치해야 합니다.
 
-### Credentials
+### 자격 증명
 
-Head to [app.contextual.ai](https://app.contextual.ai) to sign up to Contextual and generate an API key. Once you've done this set the CONTEXTUAL_AI_API_KEY environment variable:
+[app.contextual.ai](https://app.contextual.ai)로 이동하여 Contextual에 가입하고 API 키를 생성하세요. 완료되면 CONTEXTUAL_AI_API_KEY 환경 변수를 설정하세요:
 
 ```python
 import getpass
@@ -47,26 +47,26 @@ if not os.getenv("CONTEXTUAL_AI_API_KEY"):
     )
 ```
 
-## Installation
+## 설치
 
-The LangChain Contextual integration lives in the `langchain-contextual` package:
+LangChain Contextual 통합은 `langchain-contextual` 패키지에 있습니다:
 
 ```python
 pip install -qU langchain-contextual
 ```
 
-## Instantiation
+## 인스턴스화
 
-The Contextual Reranker arguments are:
+Contextual Reranker 인수는 다음과 같습니다:
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| documents | list[Document] | A sequence of documents to rerank. Any metadata contained in the documents will also be used for reranking. |
-| query | str | The query to use for reranking. |
-| model | str | The version of the reranker to use. Currently, we just have "ctxl-rerank-en-v1-instruct". |
-| top_n | Optional[int] | The number of results to return. If None returns all results. Defaults to self.top_n. |
-| instruction | Optional[str] | The instruction to be used for the reranker. |
-| callbacks | Optional[Callbacks] | Callbacks to run during the compression process. |
+| documents | list[Document] | 재순위를 매길 문서 시퀀스. 문서에 포함된 모든 메타데이터도 재순위 지정에 사용됩니다. |
+| query | str | 재순위 지정에 사용할 쿼리. |
+| model | str | 사용할 reranker 버전. 현재는 "ctxl-rerank-en-v1-instruct"만 있습니다. |
+| top_n | Optional[int] | 반환할 결과 수. None이면 모든 결과를 반환합니다. 기본값은 self.top_n입니다. |
+| instruction | Optional[str] | reranker에 사용할 지침. |
+| callbacks | Optional[Callbacks] | 압축 프로세스 중에 실행할 콜백. |
 
 ```python
 from langchain_contextual import ContextualRerank
@@ -80,9 +80,9 @@ compressor = ContextualRerank(
 )
 ```
 
-## Usage
+## 사용법
 
-First, we will set up the global variables and examples we'll use, and instantiate our reranker client.
+먼저 사용할 전역 변수와 예제를 설정하고 reranker 클라이언트를 인스턴스화합니다.
 
 ```python
 from langchain_core.documents import Document
@@ -121,10 +121,10 @@ reranked_documents = compressor.compress_documents(
 )
 ```
 
-## Use within a chain
+## 체인 내에서 사용
 
-Examples coming soon.
+예제가 곧 제공될 예정입니다.
 
 ## API reference
 
-For detailed documentation of all ChatContextual features and configurations head to the Github page: [github.com/ContextualAI//langchain-contextual](https://github.com/ContextualAI//langchain-contextual)
+모든 ChatContextual 기능 및 구성에 대한 자세한 문서는 Github 페이지를 참조하세요: [github.com/ContextualAI//langchain-contextual](https://github.com/ContextualAI//langchain-contextual)

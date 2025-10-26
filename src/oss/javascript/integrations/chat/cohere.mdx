@@ -2,9 +2,9 @@
 title: ChatCohere
 ---
 
-[Cohere](https://cohere.com/) is a Canadian startup that provides natural language processing models that help companies improve human-machine interactions.
+[Cohere](https://cohere.com/)는 기업이 인간-기계 상호작용을 개선할 수 있도록 자연어 처리 모델을 제공하는 캐나다 스타트업입니다.
 
-This will help you getting started with Cohere [chat models](/oss/langchain/models). For detailed documentation of all `ChatCohere` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_cohere.ChatCohere.html).
+이 문서는 Cohere [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 `ChatCohere` 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_cohere.ChatCohere.html)를 참조하세요.
 
 ## Overview
 
@@ -16,7 +16,7 @@ This will help you getting started with Cohere [chat models](/oss/langchain/mode
 
 ### Model features
 
-See the links in the table headers below for guides on how to use specific features.
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
@@ -24,20 +24,20 @@ See the links in the table headers below for guides on how to use specific featu
 
 ## Setup
 
-In order to use the LangChain.js Cohere integration you'll need an API key.
-You can sign up for a Cohere account and create an API key [here](https://dashboard.cohere.com/welcome/register).
+LangChain.js Cohere integration을 사용하려면 API key가 필요합니다.
+Cohere 계정에 가입하고 API key를 생성하려면 [여기](https://dashboard.cohere.com/welcome/register)를 방문하세요.
 
-You'll first need to install the [`@langchain/cohere`](https://www.npmjs.com/package/@langchain/cohere) package.
+먼저 [`@langchain/cohere`](https://www.npmjs.com/package/@langchain/cohere) package를 설치해야 합니다.
 
 ### Credentials
 
-Head to [Cohere's website](https://dashboard.cohere.com/welcome/register) to sign up to Cohere and generate an API key. Once you've done this set the `COHERE_API_KEY` environment variable:
+[Cohere 웹사이트](https://dashboard.cohere.com/welcome/register)로 이동하여 Cohere에 가입하고 API key를 생성하세요. 완료되면 `COHERE_API_KEY` environment variable을 설정하세요:
 
 ```bash
 export COHERE_API_KEY="your-api-key"
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```bash
 # export LANGSMITH_TRACING="true"
@@ -46,7 +46,7 @@ If you want to get automated tracing of your model calls you can also set your [
 
 ### Installation
 
-The LangChain ChatCohere integration lives in the `@langchain/cohere` package:
+LangChain ChatCohere integration은 `@langchain/cohere` package에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -62,7 +62,7 @@ pnpm add @langchain/cohere @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```typescript
 import { ChatCohere } from "@langchain/cohere"
@@ -77,9 +77,9 @@ const llm = new ChatCohere({
 
 ### Custom client for Cohere on Azure, Cohere on AWS Bedrock, and Standalone Cohere Instance
 
-We can instantiate a custom `CohereClient` and pass it to the ChatCohere constructor.
+커스텀 `CohereClient`를 인스턴스화하여 ChatCohere constructor에 전달할 수 있습니다.
 
-**Note:** If a custom client is provided both `COHERE_API_KEY` environment variable and `apiKey` parameter in the constructor will be ignored.
+**참고:** 커스텀 client가 제공되면 `COHERE_API_KEY` environment variable과 constructor의 `apiKey` parameter는 모두 무시됩니다.
 
 ```typescript
 import { ChatCohere } from "@langchain/cohere";
@@ -202,8 +202,8 @@ J'adore programmer.
 
 ## RAG
 
-Cohere also comes out of the box with RAG support.
-You can pass in documents as context to the API request and Cohere's models will use them when generating responses.
+Cohere는 기본적으로 RAG 지원을 제공합니다.
+문서를 context로 API 요청에 전달할 수 있으며, Cohere의 모델은 응답 생성 시 이를 사용합니다.
 
 ```typescript
 import { ChatCohere } from "@langchain/cohere";
@@ -244,9 +244,9 @@ Harrison worked at Kensho as an engineer for 3 years.
 
 ## Connectors
 
-The API also allows for other connections which are not static documents.
-An example of this is their `web-search` connector which allows you to pass in a query and the API will search the web for relevant documents.
-The example below demonstrates how to use this feature.
+API는 정적 문서가 아닌 다른 연결도 허용합니다.
+예를 들어 `web-search` connector는 쿼리를 전달하면 API가 관련 문서를 웹에서 검색합니다.
+아래 예제는 이 기능을 사용하는 방법을 보여줍니다.
 
 ```typescript
 import { ChatCohere } from "@langchain/cohere";
@@ -1393,13 +1393,13 @@ AIMessage {
 }
 ```
 
-We can see in the `additional_kwargs` object that the API request did a few things:
+`additional_kwargs` object에서 API 요청이 몇 가지 작업을 수행한 것을 볼 수 있습니다:
 
-- Performed a search query, storing the result data in the `searchQueries` and `searchResults` fields. In the `searchQueries` field we see they rephrased our query for better results.
-- Generated three documents from the search query.
-- Generated a list of citations
-- Generated a final response based on the above actions & content.
+- 검색 쿼리를 수행하고 결과 데이터를 `searchQueries`와 `searchResults` 필드에 저장했습니다. `searchQueries` 필드에서 더 나은 결과를 위해 쿼리를 재구성한 것을 볼 수 있습니다.
+- 검색 쿼리에서 세 개의 문서를 생성했습니다.
+- citation 목록을 생성했습니다.
+- 위의 작업과 콘텐츠를 기반으로 최종 응답을 생성했습니다.
 
 ## API reference
 
-For detailed documentation of all ChatCohere features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_cohere.ChatCohere.html).
+모든 ChatCohere 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_cohere.ChatCohere.html)를 참조하세요.

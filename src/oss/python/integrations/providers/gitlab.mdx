@@ -2,23 +2,18 @@
 title: GitLab
 ---
 
->[GitLab Inc.](https://about.gitlab.com/) is an open-core company
-> that operates `GitLab`, a DevOps software package that can develop,
-> secure, and operate software. `GitLab` includes a distributed version
-> control based on Git, including features such as access control, bug tracking,
-> software feature requests, task management, and wikis for every project,
-> as well as snippets.
+>[GitLab Inc.](https://about.gitlab.com/)는 소프트웨어를 개발, 보안 및 운영할 수 있는 DevOps 소프트웨어 패키지인 `GitLab`을 운영하는 오픈 코어 회사입니다. `GitLab`은 Git 기반의 분산 버전 관리 시스템을 포함하며, 접근 제어, 버그 추적, 소프트웨어 기능 요청, 작업 관리, 모든 프로젝트를 위한 위키, 그리고 스니펫과 같은 기능을 제공합니다.
 
 
 ## Tools/Toolkits
 
 ### GitLabToolkit
 
-The `Gitlab` toolkit contains tools that enable an LLM agent to interact with a gitlab repository.
+`Gitlab` toolkit은 LLM agent가 gitlab repository와 상호작용할 수 있도록 하는 tool들을 포함합니다.
 
-The toolkit is a wrapper for the `python-gitlab` library.
+이 toolkit은 `python-gitlab` 라이브러리의 wrapper입니다.
 
-See a [usage example](/oss/integrations/tools/gitlab).
+[사용 예제](/oss/integrations/tools/gitlab)를 참조하세요.
 
 ```python
 from langchain_community.agent_toolkits.gitlab.toolkit import GitLabToolkit
@@ -26,7 +21,7 @@ from langchain_community.agent_toolkits.gitlab.toolkit import GitLabToolkit
 
 ### GitLabAction
 
-Tool for interacting with the GitLab API.
+GitLab API와 상호작용하기 위한 Tool입니다.
 
 ```python
 from langchain_community.tools.gitlab.tool import GitLabAction

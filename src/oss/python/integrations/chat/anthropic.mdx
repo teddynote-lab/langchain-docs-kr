@@ -2,27 +2,27 @@
 title: ChatAnthropic
 ---
 
-This guide provides a quick overview for getting started with Anthropic (Claude) [chat models](/oss/langchain/models).
+이 가이드는 Anthropic (Claude) [chat models](/oss/langchain/models) 시작하기에 대한 간단한 개요를 제공합니다.
 
-You can find information about Anthropic's latest models, their costs, context windows, and supported input types in the [Claude](https://docs.claude.com/en/docs/about-claude/models/overview) docs.
+Anthropic의 최신 모델, 비용, context window, 지원되는 입력 타입에 대한 정보는 [Claude](https://docs.claude.com/en/docs/about-claude/models/overview) 문서에서 확인할 수 있습니다.
 
 <Tip>
     **API Reference**
 
-    For detailed documentation of all features and configuration options, head to the @[`ChatAnthropic`] API reference.
+    모든 기능과 구성 옵션에 대한 자세한 문서는 @[`ChatAnthropic`] API reference를 참조하세요.
 </Tip>
 
 <Info>
-    **AWS Bedrock and Google VertexAI**
+    **AWS Bedrock과 Google VertexAI**
 
-    Note that certain Anthropic models can also be accessed via AWS Bedrock and Google VertexAI. See the [`ChatBedrock`](/oss/integrations/chat/bedrock/) and [`ChatVertexAI`](/oss/integrations/chat/google_vertex_ai_palm/) integrations to use Anthropic models via these services.
+    특정 Anthropic 모델은 AWS Bedrock과 Google VertexAI를 통해서도 액세스할 수 있습니다. 이러한 서비스를 통해 Anthropic 모델을 사용하려면 [`ChatBedrock`](/oss/integrations/chat/bedrock/) 및 [`ChatVertexAI`](/oss/integrations/chat/google_vertex_ai_palm/) integration을 참조하세요.
 </Info>
 
 ## Overview
 
 ### Integration details
 
-| Class | Package | <Tooltip tip="Can run on local hardware" cta="Learn more" href="/oss/langchain/models#local-models">Local</Tooltip> | Serializable | JS/TS Support | Downloads | Latest Version |
+| Class | Package | <Tooltip tip="로컬 하드웨어에서 실행 가능" cta="자세히 알아보기" href="/oss/langchain/models#local-models">Local</Tooltip> | Serializable | JS/TS Support | Downloads | Latest Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | @[`ChatAnthropic`] | @[`langchain-anthropic`] | ❌ | beta | ✅ [(npm)](https://js.langchain.com/docs/integrations/chat/anthropic) | <a href="https://pypi.org/project/langchain-anthropic/" target="_blank"><img src="https://static.pepy.tech/badge/langchain-anthropic/month" alt="Downloads per month" noZoom height="100" class="rounded" /></a> | <a href="https://pypi.org/project/langchain-anthropic/" target="_blank"><img src="https://img.shields.io/pypi/v/langchain-anthropic?style=flat-square&label=%20&color=orange" alt="PyPI - Latest version" noZoom height="100" class="rounded" /></a> |
 
@@ -34,7 +34,7 @@ You can find information about Anthropic's latest models, their costs, context w
 
 ## Setup
 
-To access Anthropic (Claude) models you'll need to install the `langchain-anthropic` integration package and acquire a [Claude](https://docs.claude.com/en/docs/get-started#prerequisites) API key.
+Anthropic (Claude) 모델에 액세스하려면 `langchain-anthropic` integration package를 설치하고 [Claude](https://docs.claude.com/en/docs/get-started#prerequisites) API key를 획득해야 합니다.
 
 ### Installation
 
@@ -49,7 +49,7 @@ To access Anthropic (Claude) models you'll need to install the `langchain-anthro
 
 ### Credentials
 
-Head to [console.anthropic.com/](https://console.anthropic.com/) to sign up for Anthropic and generate an API key. Once you've done this set the `ANTHROPIC_API_KEY` environment variable:
+[console.anthropic.com/](https://console.anthropic.com/)으로 이동하여 Anthropic에 가입하고 API key를 생성하세요. 완료되면 `ANTHROPIC_API_KEY` environment variable을 설정하세요:
 
 ```python
 import getpass
@@ -59,7 +59,7 @@ if "ANTHROPIC_API_KEY" not in os.environ:
     os.environ["ANTHROPIC_API_KEY"] = getpass.getpass("Enter your Anthropic API key: ")
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -68,7 +68,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```python
 from langchain_anthropic import ChatAnthropic
@@ -111,7 +111,7 @@ J'adore la programmation.
 
 ## Content blocks
 
-When using tools, [extended thinking](#extended-thinking), and other features, content from a single Anthropic @[`AIMessage`] can either be a single string or a list of content blocks. For example, when an Anthropic model invokes a tool, the tool invocation is part of the message content (as well as being exposed in the standardized `AIMessage.tool_calls`):
+tool, [extended thinking](#extended-thinking) 및 기타 기능을 사용할 때, 단일 Anthropic @[`AIMessage`]의 content는 단일 문자열이거나 content block 목록일 수 있습니다. 예를 들어, Anthropic 모델이 tool을 호출할 때, tool invocation은 message content의 일부입니다(표준화된 `AIMessage.tool_calls`에도 노출됨):
 
 ```python
 from langchain_anthropic import ChatAnthropic
@@ -145,8 +145,7 @@ response.content
   'type': 'tool_use'}]
 ```
 
-Using `content_blocks` will render the content in a standard format that is
-consistent across providers:
+`content_blocks`를 사용하면 provider 간에 일관된 표준 형식으로 content가 렌더링됩니다:
 
 ```python
 response.content_blocks
@@ -165,8 +164,7 @@ response.content_blocks
   'id': 'toolu_01SKaTBk9wHjsBTw5mrPVSQf'}]
 ```
 
-You can also access tool calls specifically in a standard format using the
-`.tool_calls` attribute:
+`.tool_calls` attribute를 사용하여 표준 형식으로 tool call에 특별히 액세스할 수도 있습니다:
 
 ```python
 ai_msg.tool_calls
@@ -183,13 +181,13 @@ ai_msg.tool_calls
 
 ## Multimodal
 
-Claude supports image and PDF inputs as content blocks, both in Anthropic's native format (see docs for [vision](https://docs.claude.com/en/docs/build-with-claude/vision#base64-encoded-image-example) and [PDF support](https://docs.claude.com/en/docs/build-with-claude/pdf-support)) as well as LangChain's [standard format](/oss/langchain/messages#multimodal).
+Claude는 Anthropic의 native format([vision](https://docs.claude.com/en/docs/build-with-claude/vision#base64-encoded-image-example) 및 [PDF support](https://docs.claude.com/en/docs/build-with-claude/pdf-support) 문서 참조)과 LangChain의 [표준 형식](/oss/langchain/messages#multimodal) 모두에서 image 및 PDF 입력을 content block으로 지원합니다.
 
 ### Files API
 
-Claude also supports interactions with files through its managed [Files API](https://docs.claude.com/en/docs/build-with-claude/files). See examples below.
+Claude는 관리되는 [Files API](https://docs.claude.com/en/docs/build-with-claude/files)를 통한 파일 상호작용도 지원합니다. 아래 예제를 참조하세요.
 
-The Files API can also be used to upload files to a container for use with Claude's built-in code-execution tools. See the [code execution](#code-execution) section below, for details.
+Files API는 Claude의 내장 code-execution tool과 함께 사용할 container에 파일을 업로드하는 데에도 사용할 수 있습니다. 자세한 내용은 아래 [code execution](#code-execution) 섹션을 참조하세요.
 
 <Accordion title="Images">
 
@@ -268,13 +266,13 @@ model.invoke([input_message])
 
 ## Extended thinking
 
-Some Claude models support an [extended thinking](https://docs.claude.com/en/docs/build-with-claude/extended-thinking) feature, which will output the step-by-step reasoning process that led to its final answer.
+일부 Claude 모델은 [extended thinking](https://docs.claude.com/en/docs/build-with-claude/extended-thinking) 기능을 지원하며, 최종 답변에 도달한 단계별 추론 과정을 출력합니다.
 
-See applicable models in the Anthropic guide [here](https://docs.claude.com/en/docs/build-with-claude/extended-thinking).
+적용 가능한 모델은 Anthropic 가이드 [여기](https://docs.claude.com/en/docs/build-with-claude/extended-thinking)를 참조하세요.
 
-To use extended thinking, specify the `thinking` parameter when initializing @[`ChatAnthropic`]. It can also be passed in as a `kwarg` during invocation.
+extended thinking을 사용하려면 @[`ChatAnthropic`]을 초기화할 때 `thinking` parameter를 지정하세요. invocation 중에 `kwarg`로 전달할 수도 있습니다.
 
-You will need to specify a token budget to use this feature. See usage example below:
+이 기능을 사용하려면 token budget을 지정해야 합니다. 아래 사용 예제를 참조하세요:
 
 ```python
 import json
@@ -307,9 +305,9 @@ print(json.dumps(response.content_blocks, indent=2))
 
 ## Prompt caching
 
-Anthropic supports [caching](https://docs.claude.com/en/docs/build-with-claude/prompt-caching) of [elements of your prompts](https://docs.claude.com/en/docs/build-with-claude/prompt-caching#what-can-be-cached), including messages, tool definitions, tool results, images and documents. This allows you to re-use large documents, instructions, [few-shot documents](/langsmith/create-few-shot-evaluators), and other data to reduce latency and costs.
+Anthropic은 message, tool definition, tool result, image 및 document를 포함한 [prompt의 요소](https://docs.claude.com/en/docs/build-with-claude/prompt-caching#what-can-be-cached)의 [caching](https://docs.claude.com/en/docs/build-with-claude/prompt-caching)을 지원합니다. 이를 통해 대용량 문서, instruction, [few-shot document](/langsmith/create-few-shot-evaluators) 및 기타 데이터를 재사용하여 지연 시간과 비용을 줄일 수 있습니다.
 
-To enable caching on an element of a prompt, mark its associated content block using the `cache_control` key. See examples below:
+prompt의 요소에 caching을 활성화하려면 `cache_control` key를 사용하여 관련 content block을 표시하세요. 아래 예제를 참조하세요:
 
 ### Messages
 
@@ -367,7 +365,7 @@ Second:
 <Tip>
 **Extended caching**
 
-    The cache lifetime is 5 minutes by default. If this is too short, you can apply one hour caching by enabling the `"extended-cache-ttl-2025-04-11"` beta header:
+    cache lifetime은 기본적으로 5분입니다. 이것이 너무 짧으면 `"extended-cache-ttl-2025-04-11"` beta header를 활성화하여 1시간 caching을 적용할 수 있습니다:
 
     ```python
     model = ChatAnthropic(
@@ -375,9 +373,9 @@ Second:
         betas=["extended-cache-ttl-2025-04-11"],  # [!code highlight]
     )
     ```
-    and specifying `"cache_control": {"type": "ephemeral", "ttl": "1h"}`.
+    그리고 `"cache_control": {"type": "ephemeral", "ttl": "1h"}`를 지정하세요.
 
-    Details of cached token counts will be included on the `InputTokenDetails` of response's `usage_metadata`:
+    cached token count의 세부 정보는 response의 `usage_metadata`의 `InputTokenDetails`에 포함됩니다:
 
     ```python
     response = model.invoke(messages)
@@ -445,11 +443,11 @@ Second:
 
 ### Incremental caching in conversational applications
 
-Prompt caching can be used in [multi-turn conversations](https://docs.claude.com/en/docs/build-with-claude/prompt-caching#continuing-a-multi-turn-conversation) to maintain context from earlier messages without redundant processing.
+Prompt caching은 [multi-turn conversation](https://docs.claude.com/en/docs/build-with-claude/prompt-caching#continuing-a-multi-turn-conversation)에서 중복 처리 없이 이전 message의 context를 유지하는 데 사용할 수 있습니다.
 
-We can enable incremental caching by marking the final message with `cache_control`. Claude will automatically use the longest previously-cached prefix for follow-up messages.
+최종 message를 `cache_control`로 표시하여 incremental caching을 활성화할 수 있습니다. Claude는 후속 message에 대해 가장 긴 이전 캐시된 prefix를 자동으로 사용합니다.
 
-Below, we implement a simple chatbot that incorporates this feature. We follow the LangChain [chatbot tutorial](/oss/langchain/quickstart), but add a custom [reducer](/oss/langgraph/graph-api#reducers) that automatically marks the last content block in each user message with `cache_control`. See below:
+아래에서는 이 기능을 통합한 간단한 chatbot을 구현합니다. LangChain [chatbot tutorial](/oss/langchain/quickstart)을 따르지만, 각 user message의 마지막 content block을 `cache_control`로 자동으로 표시하는 custom [reducer](/oss/langgraph/graph-api#reducers)를 추가합니다. 아래를 참조하세요:
 
 ```python
 import requests
@@ -573,11 +571,11 @@ Your name is Bob. You introduced yourself at the beginning of our conversation.
 {'cache_read': 1498, 'cache_creation': 269}
 ```
 
-In the [LangSmith trace](https://smith.langchain.com/public/4d0584d8-5f9e-4b91-8704-93ba2ccf416a/r), toggling "raw output" will show exactly what messages are sent to the chat model, including `cache_control` keys.
+[LangSmith trace](https://smith.langchain.com/public/4d0584d8-5f9e-4b91-8704-93ba2ccf416a/r)에서 "raw output"을 토글하면 `cache_control` key를 포함하여 chat model에 전송되는 정확한 message가 표시됩니다.
 
 ## Token-efficient tool use
 
-Anthropic supports a (beta) [token-efficient tool use](https://docs.claude.com/en/docs/agents-and-tools/tool-use/token-efficient-tool-use) feature. To use it, specify the relevant beta-headers when instantiating the model.
+Anthropic은 (beta) [token-efficient tool use](https://docs.claude.com/en/docs/agents-and-tools/tool-use/token-efficient-tool-use) 기능을 지원합니다. 이를 사용하려면 model을 인스턴스화할 때 관련 beta-header를 지정하세요.
 
 ```python
 from langchain_anthropic import ChatAnthropic
@@ -609,11 +607,11 @@ Total tokens: 408
 
 ## Citations
 
-Anthropic supports a [citations](https://docs.claude.com/en/docs/build-with-claude/citations) feature that lets Claude attach context to its answers based on source documents supplied by the user. When [document](https://docs.claude.com/en/docs/build-with-claude/citations#document-types) or `search result` content blocks with `"citations": {"enabled": True}` are included in a query, Claude may generate citations in its response.
+Anthropic은 Claude가 사용자가 제공한 source document를 기반으로 답변에 context를 첨부할 수 있는 [citations](https://docs.claude.com/en/docs/build-with-claude/citations) 기능을 지원합니다. `"citations": {"enabled": True}`가 포함된 [document](https://docs.claude.com/en/docs/build-with-claude/citations#document-types) 또는 `search result` content block이 query에 포함되면 Claude는 response에서 citation을 생성할 수 있습니다.
 
 ### Simple example
 
-In this example we pass a [plain text document](https://docs.claude.com/en/docs/build-with-claude/citations#plain-text-documents). In the background, Claude [automatically chunks](https://docs.claude.com/en/docs/build-with-claude/citations#plain-text-documents) the input text into sentences, which are used when generating citations.
+이 예제에서는 [plain text document](https://docs.claude.com/en/docs/build-with-claude/citations#plain-text-documents)를 전달합니다. 백그라운드에서 Claude는 입력 텍스트를 문장으로 [자동으로 chunk](https://docs.claude.com/en/docs/build-with-claude/citations#plain-text-documents)하며, 이는 citation을 생성할 때 사용됩니다.
 
 ```python
 from langchain_anthropic import ChatAnthropic
@@ -668,12 +666,12 @@ response.content
 ### In tool results (agentic RAG)
 
 <Info>
-    **Requires `langchain-anthropic>=0.3.17`**
+    **`langchain-anthropic>=0.3.17` 필요**
 </Info>
 
-Claude supports a [search_result](https://docs.claude.com/en/docs/build-with-claude/search-results) content block representing citable results from queries against a knowledge base or other custom source. These content blocks can be passed to claude both top-line (as in the above example) and within a tool result. This allows Claude to cite elements of its response using the result of a tool call.
+Claude는 knowledge base 또는 기타 custom source에 대한 query의 인용 가능한 결과를 나타내는 [search_result](https://docs.claude.com/en/docs/build-with-claude/search-results) content block을 지원합니다. 이러한 content block은 claude에 top-line(위 예제와 같이)과 tool result 내에서 모두 전달될 수 있습니다. 이를 통해 Claude는 tool call의 결과를 사용하여 response의 요소를 인용할 수 있습니다.
 
-To pass search results in response to tool calls, define a tool that returns a list of `search_result` content blocks in Anthropic's native format. For example:
+tool call에 대한 응답으로 search result를 전달하려면 Anthropic의 native format으로 `search_result` content block 목록을 반환하는 tool을 정의하세요. 예를 들어:
 
 ```python
 def retrieval_tool(query: str) -> list[dict]:
@@ -696,10 +694,10 @@ def retrieval_tool(query: str) -> list[dict]:
     ]
 ```
 
-<Accordion title="End to end example with LangGraph">
+<Accordion title="LangGraph를 사용한 end to end 예제">
 
-Here we demonstrate an end-to-end example in which we populate a LangChain [vector store](/oss/integrations/vectorstores/) with sample documents and equip Claude with a tool that queries those documents.
-The tool here takes a search query and a `category` string literal, but any valid tool signature can be used.
+여기서는 샘플 문서로 LangChain [vector store](/oss/integrations/vectorstores/)를 채우고 해당 문서를 query하는 tool을 Claude에 장착하는 end-to-end 예제를 보여줍니다.
+여기서 tool은 search query와 `category` string literal을 받지만, 유효한 모든 tool signature를 사용할 수 있습니다.
 
 ```python
 from typing import Literal
@@ -806,7 +804,7 @@ async for step in agent.astream(
 
 ### Using with text splitters
 
-Anthropic also lets you specify your own splits using [custom document](https://docs.claude.com/en/docs/build-with-claude/citations#custom-content-documents) types. LangChain [text splitters](/oss/integrations/splitters/) can be used to generate meaningful splits for this purpose. See the below example, where we split the LangChain README (a markdown document) and pass it to Claude as context:
+Anthropic은 [custom document](https://docs.claude.com/en/docs/build-with-claude/citations#custom-content-documents) type을 사용하여 자체 split을 지정할 수도 있습니다. LangChain [text splitter](/oss/integrations/splitters/)를 사용하여 이 목적을 위한 의미 있는 split을 생성할 수 있습니다. 아래 예제를 참조하세요. 여기서는 LangChain README(markdown 문서)를 split하고 context로 Claude에 전달합니다:
 
 ```python
 import requests
@@ -854,12 +852,12 @@ response = model.invoke([message])
 
 ## Context management
 
-Anthropic supports a context editing feature that will automatically manage the model's context window (e.g., by clearing tool results).
+Anthropic은 모델의 context window를 자동으로 관리하는(예: tool result 지우기) context editing 기능을 지원합니다.
 
-See [Anthropic documentation](https://docs.claude.com/en/docs/build-with-claude/context-editing) for details and configuration options.
+자세한 내용과 구성 옵션은 [Anthropic documentation](https://docs.claude.com/en/docs/build-with-claude/context-editing)을 참조하세요.
 
 <Info>
-    **Context management is supported since `langchain-anthropic>=0.3.21`**
+    **Context management는 `langchain-anthropic>=0.3.21`부터 지원됩니다**
 </Info>
 
 ```python
@@ -876,14 +874,14 @@ response = model_with_tools.invoke("Search for recent developments in AI")
 
 ## Built-in tools
 
-Anthropic supports a variety of [built-in tools](https://docs.claude.com/en/docs/agents-and-tools/tool-use/text-editor-tool), which can be bound to the model in the [usual way](/oss/langchain/tools/). Claude will generate tool calls adhering to its internal schema for the tool:
+Anthropic은 다양한 [built-in tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/text-editor-tool)을 지원하며, [일반적인 방법](/oss/langchain/tools/)으로 model에 bind할 수 있습니다. Claude는 tool에 대한 내부 schema를 준수하는 tool call을 생성합니다:
 
 ### Web search
 
-Claude can use a [web search tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-search-tool) to run searches and ground its responses with citations.
+Claude는 [web search tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-search-tool)을 사용하여 검색을 실행하고 citation으로 response를 근거할 수 있습니다.
 
 <Info>
-    **Web search tool is supported since `langchain-anthropic>=0.3.13`**
+    **Web search tool은 `langchain-anthropic>=0.3.13`부터 지원됩니다**
 </Info>
 
 ```python
@@ -899,7 +897,7 @@ response = model_with_tools.invoke("How do I update a web app to TypeScript 5.5?
 
 ### Web fetching
 
-Claude can use a [web fetching tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-fetch-tool) to run searches and ground its responses with citations.
+Claude는 [web fetching tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-fetch-tool)을 사용하여 검색을 실행하고 citation으로 response를 근거할 수 있습니다.
 
 from langchain_anthropic import ChatAnthropic
 
@@ -918,15 +916,15 @@ response = model_with_tools.invoke(
 ```
 
 <Warning>
-    You must add the `'web-fetch-2025-09-10'` beta header to use web fetching.
+    web fetching을 사용하려면 `'web-fetch-2025-09-10'` beta header를 추가해야 합니다.
 </Warning>
 
 ### Code execution
 
-Claude can use a [code execution tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/code-execution-tool) to execute Python code in a sandboxed environment.
+Claude는 [code execution tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/code-execution-tool)을 사용하여 sandboxed environment에서 Python code를 실행할 수 있습니다.
 
 <Info>
-    **Code execution is supported since `langchain-anthropic>=0.3.14`**
+    **Code execution은 `langchain-anthropic>=0.3.14`부터 지원됩니다**
 </Info>
 
 ```python
@@ -945,9 +943,9 @@ response = model_with_tools.invoke(
 )
 ```
 
-<Accordion title="Use with Files API">
+<Accordion title="Files API와 함께 사용">
 
-Using the Files API, Claude can write code to access files for data analysis and other purposes. See example below:
+Files API를 사용하여 Claude는 데이터 분석 및 기타 목적으로 파일에 액세스하는 code를 작성할 수 있습니다. 아래 예제를 참조하세요:
 
 ```python
 # Upload file
@@ -988,7 +986,7 @@ input_message = {
 model_with_tools.invoke([input_message])
 ```
 
-Note that Claude may generate files as part of its code execution. You can access these files using the Files API:
+Claude는 code execution의 일부로 파일을 생성할 수 있습니다. Files API를 사용하여 이러한 파일에 액세스할 수 있습니다:
 
 ```python
 # Take all file outputs for demonstration purposes
@@ -1010,10 +1008,10 @@ for i, file_id in enumerate(file_ids):
 
 ### Memory tool
 
-Claude supports a memory tool for client-side storage and retrieval of context across conversational threads. See docs [here](https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool) for details.
+Claude는 conversational thread 간에 context의 client-side storage 및 retrieval을 위한 memory tool을 지원합니다. 자세한 내용은 [여기](https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool) 문서를 참조하세요.
 
 <Info>
-    **Anthropic's built-in memory tool is supported since `langchain-anthropic>=0.3.21`**
+    **Anthropic의 built-in memory tool은 `langchain-anthropic>=0.3.21`부터 지원됩니다**
 </Info>
 
 ```python
@@ -1030,10 +1028,10 @@ response = model_with_tools.invoke("What are my interests?")
 
 ### Remote MCP
 
-Claude can use a [MCP connector tool](https://docs.claude.com/en/docs/agents-and-tools/mcp-connector) for model-generated calls to remote MCP servers.
+Claude는 remote MCP server에 대한 model-generated call을 위해 [MCP connector tool](https://docs.claude.com/en/docs/agents-and-tools/mcp-connector)을 사용할 수 있습니다.
 
 <Info>
-    **Remote MCP is supported since `langchain-anthropic>=0.3.14`**
+    **Remote MCP는 `langchain-anthropic>=0.3.14`부터 지원됩니다**
 </Info>
 
 ```python
@@ -1066,7 +1064,7 @@ response = model.invoke(
 
 ### Text editor
 
-The text editor tool can be used to view and modify text files. See docs [here](https://docs.claude.com/en/docs/agents-and-tools/tool-use/text-editor-tool) for details.
+text editor tool은 텍스트 파일을 보고 수정하는 데 사용할 수 있습니다. 자세한 내용은 [여기](https://docs.claude.com/en/docs/agents-and-tools/tool-use/text-editor-tool) 문서를 참조하세요.
 
 ```python
 from langchain_anthropic import ChatAnthropic
@@ -1096,4 +1094,4 @@ I'd be happy to help you fix the syntax error in your primes.py file. First, let
 
 ## API reference
 
-For detailed documentation of all features and configuration options, head to the @[`ChatAnthropic`] API reference.
+모든 기능과 구성 옵션에 대한 자세한 문서는 @[`ChatAnthropic`] API reference를 참조하세요.

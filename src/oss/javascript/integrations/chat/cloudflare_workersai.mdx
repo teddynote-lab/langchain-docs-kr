@@ -2,9 +2,9 @@
 title: ChatCloudflareWorkersAI
 ---
 
-[Workers AI](https://developers.cloudflare.com/workers-ai/) allows you to run machine learning models, on the Cloudflare network, from your own code.
+[Workers AI](https://developers.cloudflare.com/workers-ai/)를 사용하면 Cloudflare 네트워크에서 자신의 코드로 머신러닝 모델을 실행할 수 있습니다.
 
-This will help you getting started with Cloudflare Workers AI [chat models](/oss/langchain/models). For detailed documentation of all `ChatCloudflareWorkersAI` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_cloudflare.ChatCloudflareWorkersAI.html).
+이 문서는 Cloudflare Workers AI [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 `ChatCloudflareWorkersAI` 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_cloudflare.ChatCloudflareWorkersAI.html)를 참조하세요.
 
 ## Overview
 
@@ -16,7 +16,7 @@ This will help you getting started with Cloudflare Workers AI [chat models](/oss
 
 ### Model features
 
-See the links in the table headers below for guides on how to use specific features.
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
@@ -24,17 +24,17 @@ See the links in the table headers below for guides on how to use specific featu
 
 ## Setup
 
-To access Cloudflare Workers AI models you'll need to create a Cloudflare account, get an API key, and install the `@langchain/cloudflare` integration package.
+Cloudflare Workers AI 모델에 액세스하려면 Cloudflare 계정을 생성하고 API 키를 받은 다음 `@langchain/cloudflare` integration package를 설치해야 합니다.
 
 ### Credentials
 
-Head [to this page](https://developers.cloudflare.com/workers-ai/) to sign up to Cloudflare and generate an API key. Once you've done this, note your `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`.
+[이 페이지](https://developers.cloudflare.com/workers-ai/)로 이동하여 Cloudflare에 가입하고 API 키를 생성하세요. 완료되면 `CLOUDFLARE_ACCOUNT_ID`와 `CLOUDFLARE_API_TOKEN`을 기록해 두세요.
 
-Passing a binding within a Cloudflare Worker is not yet supported.
+Cloudflare Worker 내에서 binding을 전달하는 것은 아직 지원되지 않습니다.
 
 ### Installation
 
-The LangChain ChatCloudflareWorkersAI integration lives in the `@langchain/cloudflare` package:
+LangChain ChatCloudflareWorkersAI integration은 `@langchain/cloudflare` package에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -50,7 +50,7 @@ pnpm add @langchain/cloudflare @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```typescript
 // @lc-docs-hide-cell
@@ -122,4 +122,4 @@ I can help with that! The translation of "I love programming" in French is:
 
 ## API reference
 
-For detailed documentation of all `ChatCloudflareWorkersAI` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_cloudflare.ChatCloudflareWorkersAI.html).
+모든 `ChatCloudflareWorkersAI` 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_cloudflare.ChatCloudflareWorkersAI.html)를 참조하세요.

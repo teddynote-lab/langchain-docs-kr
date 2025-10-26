@@ -2,18 +2,18 @@
 title: Baseten
 ---
 
-[Baseten](https://baseten.co) is a [Provider](/oss/integrations/providers/baseten) in the LangChain ecosystem that implements the LLMs component.
+[Baseten](https://baseten.co)은 LLMs component를 구현하는 LangChain 생태계의 [Provider](/oss/integrations/providers/baseten)입니다.
 
-This example demonstrates using an LLM — Mistral 7B hosted on Baseten — with LangChain.
+이 예제는 Baseten에서 호스팅되는 LLM인 Mistral 7B를 LangChain과 함께 사용하는 방법을 보여줍니다.
 
 # Setup
 
-To run this example, you'll need:
+이 예제를 실행하려면 다음이 필요합니다:
 
-* A [Baseten account](https://baseten.co)
-* An [API key](https://docs.baseten.co/observability/api-keys)
+* [Baseten 계정](https://baseten.co)
+* [API key](https://docs.baseten.co/observability/api-keys)
 
-Export your API key to your as an environment variable called `BASETEN_API_KEY`.
+API key를 `BASETEN_API_KEY`라는 환경 변수로 내보내세요.
 
 ```sh
 export BASETEN_API_KEY="paste_your_api_key_here"
@@ -21,11 +21,11 @@ export BASETEN_API_KEY="paste_your_api_key_here"
 
 # Single model call
 
-First, you'll need to deploy a model to Baseten.
+먼저, Baseten에 모델을 배포해야 합니다.
 
-You can deploy foundation models like Mistral and Llama 2 with one click from the [Baseten model library](https://app.baseten.co/explore/) or if you have your own model, [deploy it with Truss](https://truss.baseten.co/welcome).
+[Baseten model library](https://app.baseten.co/explore/)에서 Mistral 및 Llama 2와 같은 foundation model을 원클릭으로 배포하거나, 자체 모델이 있는 경우 [Truss로 배포](https://truss.baseten.co/welcome)할 수 있습니다.
 
-In this example, we'll work with Mistral 7B. [Deploy Mistral 7B here](https://app.baseten.co/explore/mistral_7b_instruct) and follow along with the deployed model's ID, found in the model dashboard.
+이 예제에서는 Mistral 7B를 사용합니다. [여기에서 Mistral 7B를 배포](https://app.baseten.co/explore/mistral_7b_instruct)하고 model dashboard에서 찾을 수 있는 배포된 모델의 ID를 확인하세요.
 
 ```python
 ##Installing the langchain packages needed to use the integration
@@ -48,9 +48,9 @@ mistral("What is the Mistral wind?")
 
 # Chained model calls
 
-We can chain together multiple calls to one or multiple models, which is the whole point of LangChain!
+하나 또는 여러 모델에 대한 여러 호출을 연결할 수 있으며, 이것이 바로 LangChain의 핵심입니다!
 
-For example, we can replace GPT with Mistral in this demo of terminal emulation.
+예를 들어, 터미널 에뮬레이션 데모에서 GPT를 Mistral로 교체할 수 있습니다.
 
 ```python
 from langchain.chains import LLMChain
@@ -103,4 +103,4 @@ output = chatgpt_chain.predict(
 print(output)
 ```
 
-As we can see from the final example, which outputs a number that may or may not be correct, the model is only approximating likely terminal output, not actually executing provided commands. Still, the example demonstrates Mistral's ample context window, code generation capabilities, and ability to stay on-topic even in conversational sequences.
+마지막 예제에서 볼 수 있듯이, 정확할 수도 있고 아닐 수도 있는 숫자를 출력하는데, 모델은 실제로 제공된 명령을 실행하는 것이 아니라 가능성 있는 터미널 출력을 근사하는 것입니다. 그럼에도 불구하고, 이 예제는 Mistral의 충분한 context window, 코드 생성 기능, 그리고 대화 시퀀스에서도 주제를 유지하는 능력을 보여줍니다.

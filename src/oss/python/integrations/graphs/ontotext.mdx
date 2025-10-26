@@ -2,28 +2,28 @@
 title: Ontotext GraphDB
 ---
 
->[Ontotext GraphDB](https://graphdb.ontotext.com/) is a graph database and knowledge discovery tool compliant with [RDF](https://www.w3.org/RDF/) and [SPARQL](https://www.w3.org/TR/sparql11-query/).
+>[Ontotext GraphDB](https://graphdb.ontotext.com/)는 [RDF](https://www.w3.org/RDF/) 및 [SPARQL](https://www.w3.org/TR/sparql11-query/)을 준수하는 그래프 데이터베이스이자 지식 발견 도구입니다.
 
->This notebook shows how to use LLMs to provide natural language querying (NLQ to SPARQL, also called `text2sparql`) for `Ontotext GraphDB`.
+>이 노트북은 LLM을 사용하여 `Ontotext GraphDB`에 대한 자연어 쿼리(NLQ to SPARQL, `text2sparql`이라고도 함)를 제공하는 방법을 보여줍니다.
 
-## GraphDB LLM Functionalities
+## GraphDB LLM 기능
 
-`GraphDB` supports some LLM integration functionalities as described [here](https://github.com/w3c/sparql-dev/issues/193):
+`GraphDB`는 [여기](https://github.com/w3c/sparql-dev/issues/193)에 설명된 일부 LLM 통합 기능을 지원합니다:
 
 [gpt-queries](https://graphdb.ontotext.com/documentation/10.5/gpt-queries.html)
 
-* magic predicates to ask an LLM for text, list or table using data from your knowledge graph (KG)
-* query explanation
-* result explanation, summarization, rephrasing, translation
+* 지식 그래프(KG)의 데이터를 사용하여 텍스트, 목록 또는 테이블을 LLM에 요청하는 magic predicates
+* 쿼리 설명
+* 결과 설명, 요약, 재구성, 번역
 
 [retrieval-graphdb-connector](https://graphdb.ontotext.com/documentation/10.5/retrieval-graphdb-connector.html)
 
-* Indexing of KG entities in a vector database
-* Supports any text embedding algorithm and vector database
-* Uses the same powerful connector (indexing) language that GraphDB uses for Elastic, Solr, Lucene
-* Automatic synchronization of changes in RDF data to the KG entity index
-* Supports nested objects (no UI support in GraphDB version 10.5)
-* Serializes KG entities to text like this (e.g. for a Wines dataset):
+* 벡터 데이터베이스에서 KG 엔티티 인덱싱
+* 모든 텍스트 임베딩 알고리즘 및 벡터 데이터베이스 지원
+* GraphDB가 Elastic, Solr, Lucene에 사용하는 것과 동일한 강력한 connector(인덱싱) 언어 사용
+* RDF 데이터의 변경 사항을 KG 엔티티 인덱스에 자동 동기화
+* 중첩 객체 지원 (GraphDB 버전 10.5에서는 UI 지원 없음)
+* KG 엔티티를 다음과 같이 텍스트로 직렬화 (예: Wines 데이터셋의 경우):
 
 ```
 Franvino:
@@ -36,35 +36,35 @@ Franvino:
 
 [talk-to-graph](https://graphdb.ontotext.com/documentation/10.5/talk-to-graph.html)
 
-* A simple chatbot using a defined KG entity index
+* 정의된 KG 엔티티 인덱스를 사용하는 간단한 챗봇
 
-For this tutorial, we won't use the GraphDB LLM integration, but `SPARQL` generation from NLQ. We'll use the `Star Wars API` (`SWAPI`) ontology and dataset that you can examine [here](https://github.com/Ontotext-AD/langchain-graphdb-qa-chain-demo/blob/main/starwars-data.trig).
+이 튜토리얼에서는 GraphDB LLM 통합을 사용하지 않고 NLQ에서 `SPARQL` 생성을 사용합니다. [여기](https://github.com/Ontotext-AD/langchain-graphdb-qa-chain-demo/blob/main/starwars-data.trig)에서 확인할 수 있는 `Star Wars API`(`SWAPI`) 온톨로지와 데이터셋을 사용합니다.
 
-## Setting up
+## 설정하기
 
-You need a running GraphDB instance. This tutorial shows how to run the database locally using the [GraphDB Docker image](https://hub.docker.com/r/ontotext/graphdb). It provides a docker compose set-up, which populates GraphDB with the Star Wars dataset. All necessary files including this notebook can be downloaded from [the GitHub repository langchain-graphdb-qa-chain-demo](https://github.com/Ontotext-AD/langchain-graphdb-qa-chain-demo).
+실행 중인 GraphDB 인스턴스가 필요합니다. 이 튜토리얼은 [GraphDB Docker 이미지](https://hub.docker.com/r/ontotext/graphdb)를 사용하여 데이터베이스를 로컬에서 실행하는 방법을 보여줍니다. Star Wars 데이터셋으로 GraphDB를 채우는 docker compose 설정을 제공합니다. 이 노트북을 포함한 모든 필요한 파일은 [GitHub 저장소 langchain-graphdb-qa-chain-demo](https://github.com/Ontotext-AD/langchain-graphdb-qa-chain-demo)에서 다운로드할 수 있습니다.
 
-* Install [Docker](https://docs.docker.com/get-docker/). This tutorial is created using Docker version `24.0.7` which bundles [Docker Compose](https://docs.docker.com/compose/). For earlier Docker versions you may need to install Docker Compose separately.
-* Clone [the GitHub repository langchain-graphdb-qa-chain-demo](https://github.com/Ontotext-AD/langchain-graphdb-qa-chain-demo) in a local folder on your machine.
-* Start GraphDB with the following script executed from the same folder
+* [Docker](https://docs.docker.com/get-docker/)를 설치합니다. 이 튜토리얼은 [Docker Compose](https://docs.docker.com/compose/)가 번들로 제공되는 Docker 버전 `24.0.7`을 사용하여 작성되었습니다. 이전 Docker 버전의 경우 Docker Compose를 별도로 설치해야 할 수 있습니다.
+* [GitHub 저장소 langchain-graphdb-qa-chain-demo](https://github.com/Ontotext-AD/langchain-graphdb-qa-chain-demo)를 로컬 머신의 폴더에 클론합니다.
+* 동일한 폴더에서 다음 스크립트를 실행하여 GraphDB를 시작합니다
 
 ```
 docker build --tag graphdb .
 docker compose up -d graphdb
 ```
 
-  You need to wait a couple of seconds for the database to start on `http://localhost:7200/`. The Star Wars dataset `starwars-data.trig` is automatically loaded into the `langchain` repository. The local SPARQL endpoint `http://localhost:7200/repositories/langchain` can be used to run queries against. You can also open the GraphDB Workbench from your favourite web browser `http://localhost:7200/sparql` where you can make queries interactively.
+  데이터베이스가 `http://localhost:7200/`에서 시작되기까지 몇 초 정도 기다려야 합니다. Star Wars 데이터셋 `starwars-data.trig`가 자동으로 `langchain` 저장소에 로드됩니다. 로컬 SPARQL 엔드포인트 `http://localhost:7200/repositories/langchain`을 사용하여 쿼리를 실행할 수 있습니다. 또한 선호하는 웹 브라우저에서 GraphDB Workbench `http://localhost:7200/sparql`을 열어 대화형으로 쿼리를 수행할 수 있습니다.
 
-* Set up working environment
+* 작업 환경 설정
 
-If you use `conda`, create and activate a new conda environment, e.g.:
+`conda`를 사용하는 경우 새로운 conda 환경을 생성하고 활성화합니다. 예:
 
 ```
 conda create -n graph_ontotext_graphdb_qa python=3.12
 conda activate graph_ontotext_graphdb_qa
 ```
 
-Install the following libraries:
+다음 라이브러리를 설치합니다:
 
 ```
 pip install jupyter==1.1.1
@@ -73,23 +73,23 @@ pip install langchain-community==0.3.4
 pip install langchain-openai==0.2.4
 ```
 
-Run Jupyter with
+다음 명령으로 Jupyter를 실행합니다
 
 ```
 jupyter notebook
 ```
 
-## Specifying the ontology
+## 온톨로지 지정
 
-In order for the LLM to be able to generate SPARQL, it needs to know the knowledge graph schema (the ontology). It can be provided using one of two parameters on the `OntotextGraphDBGraph` class:
+LLM이 SPARQL을 생성할 수 있으려면 지식 그래프 스키마(온톨로지)를 알아야 합니다. `OntotextGraphDBGraph` 클래스의 두 가지 매개변수 중 하나를 사용하여 제공할 수 있습니다:
 
-* `query_ontology`: a `CONSTRUCT` query that is executed on the SPARQL endpoint and returns the KG schema statements. We recommend that you store the ontology in its own named graph, which will make it easier to get only the relevant statements (as the example below). `DESCRIBE` queries are not supported, because `DESCRIBE` returns the Symmetric Concise Bounded Description (SCBD), i.e. also the incoming class links. In case of large graphs with a million of instances, this is not efficient. Check [github.com/eclipse-rdf4j/rdf4j/issues/4857](https://github.com/eclipse-rdf4j/rdf4j/issues/4857)
-* `local_file`: a local RDF ontology file. Supported RDF formats are `Turtle`, `RDF/XML`, `JSON-LD`, `N-Triples`, `Notation-3`, `Trig`, `Trix`, `N-Quads`.
+* `query_ontology`: SPARQL 엔드포인트에서 실행되어 KG 스키마 문장을 반환하는 `CONSTRUCT` 쿼리입니다. 온톨로지를 자체 named graph에 저장하는 것을 권장하며, 이렇게 하면 관련 문장만 더 쉽게 가져올 수 있습니다(아래 예시 참조). `DESCRIBE` 쿼리는 지원되지 않습니다. `DESCRIBE`는 Symmetric Concise Bounded Description(SCBD), 즉 들어오는 클래스 링크도 반환하기 때문입니다. 수백만 개의 인스턴스가 있는 대규모 그래프의 경우 효율적이지 않습니다. [github.com/eclipse-rdf4j/rdf4j/issues/4857](https://github.com/eclipse-rdf4j/rdf4j/issues/4857)을 확인하세요
+* `local_file`: 로컬 RDF 온톨로지 파일입니다. 지원되는 RDF 형식은 `Turtle`, `RDF/XML`, `JSON-LD`, `N-Triples`, `Notation-3`, `Trig`, `Trix`, `N-Quads`입니다.
 
-In either case, the ontology dump should:
+어느 경우든 온톨로지 덤프는 다음을 포함해야 합니다:
 
-* Include enough information about classes, properties, property attachment to classes (using rdfs:domain, schema:domainIncludes or OWL restrictions), and taxonomies (important individuals).
-* Not include overly verbose and irrelevant definitions and examples that do not help SPARQL construction.
+* 클래스, 속성, 클래스에 대한 속성 연결(rdfs:domain, schema:domainIncludes 또는 OWL 제약 사용), 분류 체계(중요한 개체)에 대한 충분한 정보를 포함합니다.
+* SPARQL 구성에 도움이 되지 않는 지나치게 장황하고 관련 없는 정의 및 예제는 포함하지 않습니다.
 
 ```python
 from langchain_community.graphs import OntotextGraphDBGraph
@@ -111,9 +111,9 @@ graph = OntotextGraphDBGraph(
 )
 ```
 
-Either way, the ontology (schema) is fed to the LLM as `Turtle` since `Turtle` with appropriate prefixes is most compact and easiest for the LLM to remember.
+어느 방법이든 온톨로지(스키마)는 `Turtle`로 LLM에 제공됩니다. 적절한 접두사가 있는 `Turtle`이 가장 간결하고 LLM이 기억하기 가장 쉽기 때문입니다.
 
-The Star Wars ontology is a bit unusual in that it includes a lot of specific triples about classes, e.g. that the species `:Aleena` live on `<planet/38>`, they are a subclass of `:Reptile`, have certain typical characteristics (average height, average lifespan, skinColor), and specific individuals (characters) are representatives of that class:
+Star Wars 온톨로지는 클래스에 대한 많은 특정 트리플을 포함한다는 점에서 다소 특이합니다. 예를 들어 종족 `:Aleena`는 `<planet/38>`에 살고, `:Reptile`의 하위 클래스이며, 특정 전형적인 특성(평균 키, 평균 수명, 피부색)을 가지고 있으며, 특정 개체(캐릭터)가 해당 클래스의 대표입니다:
 
 ```
 @prefix : [swapi.co/vocabulary/](https://swapi.co/vocabulary/) .
@@ -137,7 +137,7 @@ The Star Wars ontology is a bit unusual in that it includes a lot of specific tr
 
  ```
 
-In order to keep this tutorial simple, we use un-secured GraphDB. If GraphDB is secured, you should set the environment variables 'GRAPHDB_USERNAME' and 'GRAPHDB_PASSWORD' before the initialization of `OntotextGraphDBGraph`.
+이 튜토리얼을 간단하게 유지하기 위해 보안되지 않은 GraphDB를 사용합니다. GraphDB가 보안된 경우 `OntotextGraphDBGraph` 초기화 전에 환경 변수 'GRAPHDB_USERNAME'과 'GRAPHDB_PASSWORD'를 설정해야 합니다.
 
 ```python
 os.environ["GRAPHDB_USERNAME"] = "graphdb-user"
@@ -149,9 +149,9 @@ graph = OntotextGraphDBGraph(
 )
 ```
 
-## Question Answering against the StarWars dataset
+## StarWars 데이터셋에 대한 질의응답
 
-We can now use the `OntotextGraphDBQAChain` to ask some questions.
+이제 `OntotextGraphDBQAChain`을 사용하여 몇 가지 질문을 할 수 있습니다.
 
 ```python
 import os
@@ -179,7 +179,7 @@ chain = OntotextGraphDBQAChain.from_llm(
 )
 ```
 
-Let's ask a simple one.
+간단한 질문을 해봅시다.
 
 ```python
 chain.invoke({chain.input_key: "What is the climate on Tatooine?"})[chain.output_key]
@@ -206,7 +206,7 @@ WHERE {
 'The climate on Tatooine is arid.'
 ```
 
-And a bit more complicated one.
+그리고 조금 더 복잡한 질문입니다.
 
 ```python
 chain.invoke({chain.input_key: "What is the climate on Luke Skywalker's home planet?"})[
@@ -236,7 +236,7 @@ WHERE {
 "The climate on Luke Skywalker's home planet is arid."
 ```
 
-We can also ask more complicated questions like
+다음과 같이 더 복잡한 질문도 할 수 있습니다
 
 ```python
 chain.invoke(
@@ -267,17 +267,17 @@ WHERE {
 'The average box office revenue for all the Star Wars movies is approximately 754.1 million dollars.'
 ```
 
-## Chain modifiers
+## Chain 수정자
 
-The Ontotext GraphDB QA chain allows prompt refinement for further improvement of your QA chain and enhancing the overall user experience of your app.
+Ontotext GraphDB QA chain은 QA chain의 추가 개선과 앱의 전반적인 사용자 경험 향상을 위한 프롬프트 개선을 허용합니다.
 
-### "SPARQL Generation" prompt
+### "SPARQL Generation" 프롬프트
 
-The prompt is used for the SPARQL query generation based on the user question and the KG schema.
+이 프롬프트는 사용자 질문과 KG 스키마를 기반으로 SPARQL 쿼리 생성에 사용됩니다.
 
 * `sparql_generation_prompt`
 
-    Default value:
+    기본값:
 
   ```python
     GRAPHDB_SPARQL_GENERATION_TEMPLATE = """
@@ -303,13 +303,13 @@ The prompt is used for the SPARQL query generation based on the user question an
     )
   ```
 
-### "SPARQL Fix" prompt
+### "SPARQL Fix" 프롬프트
 
-Sometimes, the LLM may generate a SPARQL query with syntactic errors or missing prefixes, etc. The chain will try to amend this by prompting the LLM to correct it a certain number of times.
+때때로 LLM이 구문 오류나 누락된 접두사 등이 있는 SPARQL 쿼리를 생성할 수 있습니다. chain은 LLM에게 일정 횟수만큼 수정하도록 프롬프트하여 이를 수정하려고 시도합니다.
 
 * `sparql_fix_prompt`
 
-    Default value:
+    기본값:
 
   ```python
     GRAPHDB_SPARQL_FIX_TEMPLATE = """
@@ -341,15 +341,15 @@ Sometimes, the LLM may generate a SPARQL query with syntactic errors or missing 
 
 * `max_fix_retries`
 
-    Default value: `5`
+    기본값: `5`
 
-### "Answering" prompt
+### "Answering" 프롬프트
 
-The prompt is used for answering the question based on the results returned from the database and the initial user question. By default, the LLM is instructed to only use the information from the returned result(s). If the result set is empty, the LLM should inform that it can't answer the question.
+이 프롬프트는 데이터베이스에서 반환된 결과와 초기 사용자 질문을 기반으로 질문에 답변하는 데 사용됩니다. 기본적으로 LLM은 반환된 결과의 정보만 사용하도록 지시받습니다. 결과 집합이 비어 있으면 LLM은 질문에 답할 수 없다고 알려야 합니다.
 
 * `qa_prompt`
 
-  Default value:
+  기본값:
 
   ```python
     GRAPHDB_QA_TEMPLATE = """Task: Generate a natural language response from the results of a SPARQL query.
@@ -368,8 +368,8 @@ The prompt is used for answering the question based on the results returned from
     )
   ```
 
-Once you're finished playing with QA with GraphDB, you can shut down the Docker environment by running
+GraphDB를 사용한 QA 작업을 마치면 Docker compose 파일이 있는 디렉토리에서
 ``
 docker compose down -v --remove-orphans
 ``
-from the directory with the Docker compose file.
+를 실행하여 Docker 환경을 종료할 수 있습니다.

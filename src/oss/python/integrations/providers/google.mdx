@@ -2,18 +2,18 @@
 title: Google
 ---
 
-All LangChain integrations with [Google Cloud](https://cloud.google.com/), [Google Gemini](https://ai.google.dev/gemini-api/docs) and other Google products.
+[Google Cloud](https://cloud.google.com/), [Google Gemini](https://ai.google.dev/gemini-api/docs) 및 기타 Google 제품과의 모든 LangChain 통합입니다.
 
-1. **Google Generative AI (Gemini API & AI Studio)**: Access Google Gemini models directly via the Gemini API. Use [Google AI Studio](https://aistudio.google.com/) for rapid prototyping and get started quickly with the `langchain-google-genai` package. This is often the best starting point for individual developers.
-2. **Google Cloud (Vertex AI & other services)**: Access Gemini models, Vertex AI Model Garden and a wide range of cloud services (databases, storage, document AI, etc.) via the [Google Cloud Platform](https://cloud.google.com/). Use the `langchain-google-vertexai` package for Vertex AI models and specific packages (e.g., `langchain-google-cloud-sql-pg`, `langchain-google-community`) for other cloud services. This is ideal for developers already using Google Cloud or needing enterprise features like MLOps, specific model tuning or enterprise support.
+1. **Google Generative AI (Gemini API & AI Studio)**: Gemini API를 통해 Google Gemini 모델에 직접 액세스합니다. 빠른 프로토타이핑을 위해 [Google AI Studio](https://aistudio.google.com/)를 사용하고 `langchain-google-genai` 패키지로 빠르게 시작하세요. 개인 개발자에게는 이것이 가장 좋은 시작점입니다.
+2. **Google Cloud (Vertex AI & 기타 서비스)**: [Google Cloud Platform](https://cloud.google.com/)을 통해 Gemini 모델, Vertex AI Model Garden 및 다양한 클라우드 서비스(데이터베이스, 스토리지, 문서 AI 등)에 액세스합니다. Vertex AI 모델에는 `langchain-google-vertexai` 패키지를, 기타 클라우드 서비스에는 특정 패키지(예: `langchain-google-cloud-sql-pg`, `langchain-google-community`)를 사용하세요. 이미 Google Cloud를 사용하고 있거나 MLOps, 특정 모델 튜닝 또는 엔터프라이즈 지원과 같은 엔터프라이즈 기능이 필요한 개발자에게 이상적입니다.
 
-See Google's guide on [migrating from the Gemini API to Vertex AI](https://ai.google.dev/gemini-api/docs/migrate-to-cloud) for more details on the differences.
+차이점에 대한 자세한 내용은 [Gemini API에서 Vertex AI로 마이그레이션](https://ai.google.dev/gemini-api/docs/migrate-to-cloud)에 대한 Google 가이드를 참조하세요.
 
-Integration packages for Gemini models and the Vertex AI platform are maintained in the [`langchain-google`](https://github.com/langchain-ai/langchain-google) repository. You can find a host of LangChain integrations with other Google APIs and services in the [googleapis](https://github.com/googleapis?q=langchain-&type=all&language=&sort=)Github organization and the `langchain-google-community` package.
+Gemini 모델 및 Vertex AI 플랫폼용 통합 패키지는 [`langchain-google`](https://github.com/langchain-ai/langchain-google) 저장소에서 유지 관리됩니다. 다른 Google API 및 서비스와의 다양한 LangChain 통합은 [googleapis](https://github.com/googleapis?q=langchain-&type=all&language=&sort=) Github 조직 및 `langchain-google-community` 패키지에서 찾을 수 있습니다.
 
 ## Google Generative AI (Gemini API & AI Studio)
 
-Access Google Gemini models directly using the Gemini API, best suited for rapid development and experimentation. Gemini models are available in [Google AI Studio](https://aistudio.google.com/).
+빠른 개발 및 실험에 가장 적합한 Gemini API를 사용하여 Google Gemini 모델에 직접 액세스합니다. Gemini 모델은 [Google AI Studio](https://aistudio.google.com/)에서 사용할 수 있습니다.
 
 <CodeGroup>
     ```bash pip
@@ -25,7 +25,7 @@ Access Google Gemini models directly using the Gemini API, best suited for rapid
     ```
 </CodeGroup>
 
-Start for free and get your API key from [Google AI Studio](https://aistudio.google.com/app/apikey).
+무료로 시작하고 [Google AI Studio](https://aistudio.google.com/app/apikey)에서 API 키를 받으세요.
 
 ```bash
 export GOOGLE_API_KEY="YOUR_API_KEY"
@@ -33,8 +33,7 @@ export GOOGLE_API_KEY="YOUR_API_KEY"
 
 ### Chat models
 
-Use the `ChatGoogleGenerativeAI` class to interact with Gemini models. See
-details in [this guide](/oss/integrations/chat/google_generative_ai).
+`ChatGoogleGenerativeAI` 클래스를 사용하여 Gemini 모델과 상호 작용합니다. 자세한 내용은 [이 가이드](/oss/integrations/chat/google_generative_ai)를 참조하세요.
 
 ```python
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -60,14 +59,14 @@ result = llm.invoke([message])
 print(result.content)
 ```
 
-The `image_url` can be a public URL, a GCS URI (`gs://...`), a local file path, a base64 encoded image string (`data:image/png;base64,...`), or a PIL Image object.
+`image_url`은 공개 URL, GCS URI(`gs://...`), 로컬 파일 경로, base64로 인코딩된 이미지 문자열(`data:image/png;base64,...`) 또는 PIL Image 객체일 수 있습니다.
 
 
 ### Embedding Models
 
-Generate text embeddings using models like `gemini-embedding-001` with the `GoogleGenerativeAIEmbeddings` class.
+`GoogleGenerativeAIEmbeddings` 클래스를 사용하여 `gemini-embedding-001`과 같은 모델로 텍스트 임베딩을 생성합니다.
 
-See a [usage example](/oss/integrations/text_embedding/google_generative_ai).
+[사용 예제](/oss/integrations/text_embedding/google_generative_ai)를 참조하세요.
 
 ```python
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
@@ -79,10 +78,9 @@ print(vector[:5])
 
 ### LLMs
 
-Access the same Gemini models using the (legacy) LLM
-interface with the `GoogleGenerativeAI` class.
+`GoogleGenerativeAI` 클래스를 사용하여 (레거시) LLM 인터페이스로 동일한 Gemini 모델에 액세스합니다.
 
-See a [usage example](/oss/integrations/llms/google_ai).
+[사용 예제](/oss/integrations/llms/google_ai)를 참조하세요.
 
 ```python
 from langchain_google_genai import GoogleGenerativeAI
@@ -94,9 +92,9 @@ print(result)
 
 ## Google Cloud
 
-Access Gemini models, Vertex AI Model Garden and other Google Cloud services via Vertex AI and specific cloud integrations.
+Vertex AI 및 특정 클라우드 통합을 통해 Gemini 모델, Vertex AI Model Garden 및 기타 Google Cloud 서비스에 액세스합니다.
 
-Vertex AI models require the `langchain-google-vertexai` package. Other services might require additional packages like `langchain-google-community`, `langchain-google-cloud-sql-pg`, etc.
+Vertex AI 모델에는 `langchain-google-vertexai` 패키지가 필요합니다. 다른 서비스에는 `langchain-google-community`, `langchain-google-cloud-sql-pg` 등과 같은 추가 패키지가 필요할 수 있습니다.
 
 <CodeGroup>
     ```bash pip
@@ -110,15 +108,15 @@ Vertex AI models require the `langchain-google-vertexai` package. Other services
     ```
 </CodeGroup>
 
-Google Cloud integrations typically use Application Default Credentials (ADC). Refer to the [Google Cloud authentication documentation](https://cloud.google.com/docs/authentication) for setup instructions (e.g., using `gcloud auth application-default login`).
+Google Cloud 통합은 일반적으로 Application Default Credentials (ADC)를 사용합니다. 설정 지침은 [Google Cloud 인증 문서](https://cloud.google.com/docs/authentication)를 참조하세요(예: `gcloud auth application-default login` 사용).
 
 ### Chat models
 
 #### Vertex AI
 
-Access chat models like Gemini via the Vertex AI platform.
+Vertex AI 플랫폼을 통해 Gemini와 같은 채팅 모델에 액세스합니다.
 
-See a [usage example](/oss/integrations/chat/google_vertex_ai_palm).
+[사용 예제](/oss/integrations/chat/google_vertex_ai_palm)를 참조하세요.
 
 ```python
 from langchain_google_vertexai import ChatVertexAI
@@ -126,7 +124,7 @@ from langchain_google_vertexai import ChatVertexAI
 
 #### Anthropic on Vertex AI Model Garden
 
-See a [usage example](/oss/integrations/llms/google_vertex_ai_palm).
+[사용 예제](/oss/integrations/llms/google_vertex_ai_palm)를 참조하세요.
 
 ```python
 from langchain_google_vertexai.model_garden import ChatAnthropicVertex
@@ -146,7 +144,7 @@ from langchain_google_vertexai.model_garden_maas.mistral import VertexModelGarde
 
 #### Gemma local from Hugging Face
 
->Local Gemma model loaded from HuggingFace. Requires `langchain-google-vertexai`.
+>HuggingFace에서 로드된 로컬 Gemma 모델입니다. `langchain-google-vertexai`가 필요합니다.
 
 ```python
 from langchain_google_vertexai.gemma import GemmaChatLocalHF
@@ -154,7 +152,7 @@ from langchain_google_vertexai.gemma import GemmaChatLocalHF
 
 #### Gemma local from Kaggle
 
->Local Gemma model loaded from Kaggle. Requires `langchain-google-vertexai`.
+>Kaggle에서 로드된 로컬 Gemma 모델입니다. `langchain-google-vertexai`가 필요합니다.
 
 ```python
 from langchain_google_vertexai.gemma import GemmaChatLocalKaggle
@@ -162,7 +160,7 @@ from langchain_google_vertexai.gemma import GemmaChatLocalKaggle
 
 #### Gemma on Vertex AI Model Garden
 
->Requires `langchain-google-vertexai`.
+>`langchain-google-vertexai`가 필요합니다.
 
 ```python
 from langchain_google_vertexai.gemma import GemmaChatVertexAIModelGarden
@@ -170,7 +168,7 @@ from langchain_google_vertexai.gemma import GemmaChatVertexAIModelGarden
 
 #### Vertex AI image captioning
 
->Implementation of the Image Captioning model as a chat. Requires `langchain-google-vertexai`.
+>채팅으로 구현된 Image Captioning 모델입니다. `langchain-google-vertexai`가 필요합니다.
 
 ```python
 from langchain_google_vertexai.vision_models import VertexAIImageCaptioningChat
@@ -178,7 +176,7 @@ from langchain_google_vertexai.vision_models import VertexAIImageCaptioningChat
 
 #### Vertex AI image editor
 
->Given an image and a prompt, edit the image. Currently only supports mask-free editing. Requires `langchain-google-vertexai`.
+>이미지와 프롬프트가 주어지면 이미지를 편집합니다. 현재 마스크 없는 편집만 지원합니다. `langchain-google-vertexai`가 필요합니다.
 
 ```python
 from langchain_google_vertexai.vision_models import VertexAIImageEditorChat
@@ -186,7 +184,7 @@ from langchain_google_vertexai.vision_models import VertexAIImageEditorChat
 
 #### Vertex AI image generator
 
->Generates an image from a prompt. Requires `langchain-google-vertexai`.
+>프롬프트에서 이미지를 생성합니다. `langchain-google-vertexai`가 필요합니다.
 
 ```python
 from langchain_google_vertexai.vision_models import VertexAIImageGeneratorChat
@@ -194,7 +192,7 @@ from langchain_google_vertexai.vision_models import VertexAIImageGeneratorChat
 
 #### Vertex AI visual QnA
 
->Chat implementation of a visual QnA model. Requires `langchain-google-vertexai`.
+>visual QnA 모델의 채팅 구현입니다. `langchain-google-vertexai`가 필요합니다.
 
 ```python
 from langchain_google_vertexai.vision_models import VertexAIVisualQnAChat
@@ -202,14 +200,13 @@ from langchain_google_vertexai.vision_models import VertexAIVisualQnAChat
 
 ### LLMs
 
-You can also use the (legacy) string-in, string-out LLM
-interface.
+(레거시) 문자열 입력, 문자열 출력 LLM 인터페이스를 사용할 수도 있습니다.
 
 #### Vertex AI Model Garden
 
-Access Gemini, and hundreds of OSS models via Vertex AI Model Garden service. Requires `langchain-google-vertexai`.
+Vertex AI Model Garden 서비스를 통해 Gemini 및 수백 개의 OSS 모델에 액세스합니다. `langchain-google-vertexai`가 필요합니다.
 
-See a [usage example](/oss/integrations/llms/google_vertex_ai_palm#vertex-model-garden).
+[사용 예제](/oss/integrations/llms/google_vertex_ai_palm#vertex-model-garden)를 참조하세요.
 
 ```python
 from langchain_google_vertexai import VertexAIModelGarden
@@ -217,7 +214,7 @@ from langchain_google_vertexai import VertexAIModelGarden
 
 #### Gemma local from Hugging Face
 
->Local Gemma model loaded from HuggingFace. Requires `langchain-google-vertexai`.
+>HuggingFace에서 로드된 로컬 Gemma 모델입니다. `langchain-google-vertexai`가 필요합니다.
 
 ```python
 from langchain_google_vertexai.gemma import GemmaLocalHF
@@ -225,7 +222,7 @@ from langchain_google_vertexai.gemma import GemmaLocalHF
 
 #### Gemma local from Kaggle
 
->Local Gemma model loaded from Kaggle. Requires `langchain-google-vertexai`.
+>Kaggle에서 로드된 로컬 Gemma 모델입니다. `langchain-google-vertexai`가 필요합니다.
 
 ```python
 from langchain_google_vertexai.gemma import GemmaLocalKaggle
@@ -233,7 +230,7 @@ from langchain_google_vertexai.gemma import GemmaLocalKaggle
 
 #### Gemma on Vertex AI Model Garden
 
->Requires `langchain-google-vertexai`.
+>`langchain-google-vertexai`가 필요합니다.
 
 ```python
 from langchain_google_vertexai.gemma import GemmaVertexAIModelGarden
@@ -241,7 +238,7 @@ from langchain_google_vertexai.gemma import GemmaVertexAIModelGarden
 
 #### Vertex AI image captioning
 
->Implementation of the Image Captioning model as an LLM. Requires `langchain-google-vertexai`.
+>LLM으로 구현된 Image Captioning 모델입니다. `langchain-google-vertexai`가 필요합니다.
 
 ```python
 from langchain_google_vertexai.vision_models import VertexAIImageCaptioning
@@ -251,9 +248,9 @@ from langchain_google_vertexai.vision_models import VertexAIImageCaptioning
 
 #### Vertex AI
 
-Generate embeddings using models deployed on Vertex AI. Requires `langchain-google-vertexai`.
+Vertex AI에 배포된 모델을 사용하여 임베딩을 생성합니다. `langchain-google-vertexai`가 필요합니다.
 
-See a [usage example](/oss/integrations/text_embedding/google_vertex_ai_palm).
+[사용 예제](/oss/integrations/text_embedding/google_vertex_ai_palm)를 참조하세요.
 
 ```python
 from langchain_google_vertexai import VertexAIEmbeddings
@@ -262,12 +259,12 @@ from langchain_google_vertexai import VertexAIEmbeddings
 
 ### Document loaders
 
-Load documents from various Google Cloud sources.
+다양한 Google Cloud 소스에서 문서를 로드합니다.
 #### AlloyDB for PostgreSQL
 
-> [Google Cloud AlloyDB](https://cloud.google.com/alloydb) is a fully managed PostgreSQL-compatible database service.
+> [Google Cloud AlloyDB](https://cloud.google.com/alloydb)는 완전 관리형 PostgreSQL 호환 데이터베이스 서비스입니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -279,7 +276,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/document_loaders/google_alloydb).
+[사용 예제](/oss/integrations/document_loaders/google_alloydb)를 참조하세요.
 
 ```python
 from langchain_google_alloydb_pg import AlloyDBLoader # AlloyDBEngine also available
@@ -287,9 +284,9 @@ from langchain_google_alloydb_pg import AlloyDBLoader # AlloyDBEngine also avail
 
 #### BigQuery
 
-> [Google Cloud BigQuery](https://cloud.google.com/bigquery) is a serverless data warehouse.
+> [Google Cloud BigQuery](https://cloud.google.com/bigquery)는 서버리스 데이터 웨어하우스입니다.
 
-Install with BigQuery dependencies:
+BigQuery 종속성과 함께 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -301,7 +298,7 @@ Install with BigQuery dependencies:
     ```
 </CodeGroup>
 
-See a [usage example](/oss/integrations/document_loaders/google_bigquery).
+[사용 예제](/oss/integrations/document_loaders/google_bigquery)를 참조하세요.
 
 ```python
 from langchain_google_community import BigQueryLoader
@@ -309,9 +306,9 @@ from langchain_google_community import BigQueryLoader
 
 #### Bigtable
 
-> [Google Cloud Bigtable](https://cloud.google.com/bigtable/docs) is a fully managed NoSQL Big Data database service.
+> [Google Cloud Bigtable](https://cloud.google.com/bigtable/docs)은 완전 관리형 NoSQL Big Data 데이터베이스 서비스입니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -323,7 +320,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/document_loaders/google_bigtable).
+[사용 예제](/oss/integrations/document_loaders/google_bigtable)를 참조하세요.
 
 ```python
 from langchain_google_bigtable import BigtableLoader
@@ -331,9 +328,9 @@ from langchain_google_bigtable import BigtableLoader
 
 #### Cloud SQL for MySQL
 
-> [Google Cloud SQL for MySQL](https://cloud.google.com/sql) is a fully-managed MySQL database service.
+> [Google Cloud SQL for MySQL](https://cloud.google.com/sql)은 완전 관리형 MySQL 데이터베이스 서비스입니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -345,7 +342,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/document_loaders/google_cloud_sql_mysql).
+[사용 예제](/oss/integrations/document_loaders/google_cloud_sql_mysql)를 참조하세요.
 
 ```python
 from langchain_google_cloud_sql_mysql import MySQLLoader # MySQLEngine also available
@@ -353,9 +350,9 @@ from langchain_google_cloud_sql_mysql import MySQLLoader # MySQLEngine also avai
 
 #### Cloud SQL for SQL Server
 
-> [Google Cloud SQL for SQL Server](https://cloud.google.com/sql) is a fully-managed SQL Server database service.
+> [Google Cloud SQL for SQL Server](https://cloud.google.com/sql)는 완전 관리형 SQL Server 데이터베이스 서비스입니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -367,7 +364,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/document_loaders/google_cloud_sql_mssql).
+[사용 예제](/oss/integrations/document_loaders/google_cloud_sql_mssql)를 참조하세요.
 
 ```python
 from langchain_google_cloud_sql_mssql import MSSQLLoader # MSSQLEngine also available
@@ -375,9 +372,9 @@ from langchain_google_cloud_sql_mssql import MSSQLLoader # MSSQLEngine also avai
 
 #### Cloud SQL for PostgreSQL
 
-> [Google Cloud SQL for PostgreSQL](https://cloud.google.com/sql) is a fully-managed PostgreSQL database service.
+> [Google Cloud SQL for PostgreSQL](https://cloud.google.com/sql)은 완전 관리형 PostgreSQL 데이터베이스 서비스입니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -389,7 +386,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/document_loaders/google_cloud_sql_pg).
+[사용 예제](/oss/integrations/document_loaders/google_cloud_sql_pg)를 참조하세요.
 
 ```python
 from langchain_google_cloud_sql_pg import PostgresLoader # PostgresEngine also available
@@ -397,9 +394,9 @@ from langchain_google_cloud_sql_pg import PostgresLoader # PostgresEngine also a
 
 #### Cloud Storage
 
->[Cloud Storage](https://en.wikipedia.org/wiki/Google_Cloud_Storage) is a managed service for storing unstructured data.
+>[Cloud Storage](https://en.wikipedia.org/wiki/Google_Cloud_Storage)는 비구조화 데이터를 저장하기 위한 관리형 서비스입니다.
 
-Install with GCS dependencies:
+GCS 종속성과 함께 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -411,23 +408,23 @@ Install with GCS dependencies:
     ```
 </CodeGroup>
 
-Load from a directory or a specific file:
+디렉토리 또는 특정 파일에서 로드합니다:
 
-See [directory usage example](/oss/integrations/document_loaders/google_cloud_storage_directory).
+[디렉토리 사용 예제](/oss/integrations/document_loaders/google_cloud_storage_directory)를 참조하세요.
 ```python
 from langchain_google_community import GCSDirectoryLoader
 ```
 
-See [file usage example](/oss/integrations/document_loaders/google_cloud_storage_file).
+[파일 사용 예제](/oss/integrations/document_loaders/google_cloud_storage_file)를 참조하세요.
 ```python
 from langchain_google_community import GCSFileLoader
 ```
 
 #### Cloud Vision loader
 
-Load data using Google Cloud Vision API.
+Google Cloud Vision API를 사용하여 데이터를 로드합니다.
 
-Install with Vision dependencies:
+Vision 종속성과 함께 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -445,9 +442,9 @@ from langchain_google_community.vision import CloudVisionLoader
 
 #### El Carro for Oracle Workloads
 
-> Google [El Carro Oracle Operator](https://github.com/GoogleCloudPlatform/elcarro-oracle-operator) runs Oracle databases in Kubernetes.
+> Google [El Carro Oracle Operator](https://github.com/GoogleCloudPlatform/elcarro-oracle-operator)는 Kubernetes에서 Oracle 데이터베이스를 실행합니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -459,7 +456,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/document_loaders/google_el_carro).
+[사용 예제](/oss/integrations/document_loaders/google_el_carro)를 참조하세요.
 
 ```python
 from langchain_google_el_carro import ElCarroLoader
@@ -467,9 +464,9 @@ from langchain_google_el_carro import ElCarroLoader
 
 #### Firestore (Native Mode)
 
-> [Google Cloud Firestore](https://cloud.google.com/firestore/docs/) is a NoSQL document database.
+> [Google Cloud Firestore](https://cloud.google.com/firestore/docs/)는 NoSQL 문서 데이터베이스입니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -481,7 +478,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/document_loaders/google_firestore).
+[사용 예제](/oss/integrations/document_loaders/google_firestore)를 참조하세요.
 
 ```python
 from langchain_google_firestore import FirestoreLoader
@@ -491,7 +488,7 @@ from langchain_google_firestore import FirestoreLoader
 
 > [Google Cloud Firestore in Datastore mode](https://cloud.google.com/datastore/docs).
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -503,7 +500,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/document_loaders/google_datastore).
+[사용 예제](/oss/integrations/document_loaders/google_datastore)를 참조하세요.
 
 ```python
 from langchain_google_datastore import DatastoreLoader
@@ -511,9 +508,9 @@ from langchain_google_datastore import DatastoreLoader
 
 #### Memorystore for Redis
 
-> [Google Cloud Memorystore for Redis](https://cloud.google.com/memorystore/docs/redis) is a fully managed Redis service.
+> [Google Cloud Memorystore for Redis](https://cloud.google.com/memorystore/docs/redis)는 완전 관리형 Redis 서비스입니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -525,7 +522,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/document_loaders/google_memorystore_redis).
+[사용 예제](/oss/integrations/document_loaders/google_memorystore_redis)를 참조하세요.
 
 ```python
 from langchain_google_memorystore_redis import MemorystoreDocumentLoader
@@ -533,9 +530,9 @@ from langchain_google_memorystore_redis import MemorystoreDocumentLoader
 
 #### Spanner
 
-> [Google Cloud Spanner](https://cloud.google.com/spanner/docs) is a fully managed, globally distributed relational database service.
+> [Google Cloud Spanner](https://cloud.google.com/spanner/docs)는 완전 관리형 전역 분산 관계형 데이터베이스 서비스입니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -547,7 +544,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/document_loaders/google_spanner).
+[사용 예제](/oss/integrations/document_loaders/google_spanner)를 참조하세요.
 
 ```python
 from langchain_google_spanner import SpannerLoader
@@ -555,9 +552,9 @@ from langchain_google_spanner import SpannerLoader
 
 #### Speech-to-Text
 
-> [Google Cloud Speech-to-Text](https://cloud.google.com/speech-to-text) transcribes audio files.
+> [Google Cloud Speech-to-Text](https://cloud.google.com/speech-to-text)는 오디오 파일을 텍스트로 변환합니다.
 
-Install with Speech-to-Text dependencies:
+Speech-to-Text 종속성과 함께 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -569,7 +566,7 @@ Install with Speech-to-Text dependencies:
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/document_loaders/google_speech_to_text).
+[사용 예제 및 인증 지침](/oss/integrations/document_loaders/google_speech_to_text)을 참조하세요.
 
 ```python
 from langchain_google_community import SpeechToTextLoader
@@ -577,19 +574,16 @@ from langchain_google_community import SpeechToTextLoader
 
 ### Document Transformers
 
-Transform documents using Google Cloud services.
+Google Cloud 서비스를 사용하여 문서를 변환합니다.
 
 #### Document AI
 
->[Google Cloud Document AI](https://cloud.google.com/document-ai/docs/overview) is a Google Cloud
-> service that transforms unstructured data from documents into structured data, making it easier
-> to understand, analyze, and consume.
+>[Google Cloud Document AI](https://cloud.google.com/document-ai/docs/overview)는 문서의 비구조화 데이터를 구조화된 데이터로 변환하여 이해, 분석 및 소비를 더 쉽게 만드는 Google Cloud 서비스입니다.
 
-We need to set up a [`GCS` bucket and create your own OCR processor](https://cloud.google.com/document-ai/docs/create-processor)
-The `GCS_OUTPUT_PATH` should be a path to a folder on GCS (starting with `gs://`)
-and a processor name should look like `projects/PROJECT_NUMBER/locations/LOCATION/processors/PROCESSOR_ID`.
-We can get it either programmatically or copy from the `Prediction endpoint` section of the `Processor details`
-tab in the Google Cloud Console.
+[`GCS` 버킷을 설정하고 자체 OCR 프로세서를 생성](https://cloud.google.com/document-ai/docs/create-processor)해야 합니다.
+`GCS_OUTPUT_PATH`는 GCS의 폴더 경로(`gs://`로 시작)여야 하며
+프로세서 이름은 `projects/PROJECT_NUMBER/locations/LOCATION/processors/PROCESSOR_ID`와 같아야 합니다.
+프로그래밍 방식으로 가져오거나 Google Cloud Console의 `Processor details` 탭의 `Prediction endpoint` 섹션에서 복사할 수 있습니다.
 
 <CodeGroup>
     ```bash pip
@@ -601,7 +595,7 @@ tab in the Google Cloud Console.
     ```
 </CodeGroup>
 
-See a [usage example](/oss/integrations/document_transformers/google_docai).
+[사용 예제](/oss/integrations/document_transformers/google_docai)를 참조하세요.
 
 ```python
 from langchain_core.document_loaders.blob_loaders import Blob
@@ -610,13 +604,11 @@ from langchain_google_community import DocAIParser
 
 #### Google Translate
 
-> [Google Translate](https://translate.google.com/) is a multilingual neural machine
-> translation service developed by Google to translate text, documents and websites
-> from one language into another.
+> [Google Translate](https://translate.google.com/)는 Google이 개발한 다국어 신경망 기계 번역 서비스로, 텍스트, 문서 및 웹사이트를 한 언어에서 다른 언어로 번역합니다.
 
-The `GoogleTranslateTransformer` allows you to translate text and HTML with the [Google Cloud Translation API](https://cloud.google.com/translate).
+`GoogleTranslateTransformer`를 사용하면 [Google Cloud Translation API](https://cloud.google.com/translate)로 텍스트와 HTML을 번역할 수 있습니다.
 
-First, we need to install the `langchain-google-community` with translate dependencies.
+먼저 translate 종속성과 함께 `langchain-google-community`를 설치해야 합니다.
 
 <CodeGroup>
     ```bash pip
@@ -628,7 +620,7 @@ First, we need to install the `langchain-google-community` with translate depend
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/document_transformers/google_translate).
+[사용 예제 및 인증 지침](/oss/integrations/document_transformers/google_translate)을 참조하세요.
 
 ```python
 from langchain_google_community import GoogleTranslateTransformer
@@ -636,13 +628,13 @@ from langchain_google_community import GoogleTranslateTransformer
 
 ### Vector Stores
 
-Store and search vectors using Google Cloud databases and Vertex AI Vector Search.
+Google Cloud 데이터베이스 및 Vertex AI Vector Search를 사용하여 벡터를 저장하고 검색합니다.
 
 #### AlloyDB for PostgreSQL
 
-> [Google Cloud AlloyDB](https://cloud.google.com/alloydb) is a fully managed relational database service that offers high performance, seamless integration, and impressive scalability on Google Cloud. AlloyDB is 100% compatible with PostgreSQL.
+> [Google Cloud AlloyDB](https://cloud.google.com/alloydb)는 Google Cloud에서 고성능, 원활한 통합 및 인상적인 확장성을 제공하는 완전 관리형 관계형 데이터베이스 서비스입니다. AlloyDB는 PostgreSQL과 100% 호환됩니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -654,7 +646,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/vectorstores/google_alloydb).
+[사용 예제](/oss/integrations/vectorstores/google_alloydb)를 참조하세요.
 
 ```python
 from langchain_google_alloydb_pg import AlloyDBVectorStore # AlloyDBEngine also available
@@ -663,14 +655,14 @@ from langchain_google_alloydb_pg import AlloyDBVectorStore # AlloyDBEngine also 
 #### BigQuery Vector Search
 
 > [Google Cloud BigQuery](https://cloud.google.com/bigquery),
-> BigQuery is a serverless and cost-effective enterprise data warehouse in Google Cloud.
+> BigQuery는 Google Cloud의 서버리스이고 비용 효율적인 엔터프라이즈 데이터 웨어하우스입니다.
 >
 > [Google Cloud BigQuery Vector Search](https://cloud.google.com/bigquery/docs/vector-search-intro)
-> BigQuery vector search lets you use GoogleSQL to do semantic search, using vector indexes for fast but approximate results, or using brute force for exact results.
+> BigQuery 벡터 검색을 사용하면 GoogleSQL을 사용하여 의미론적 검색을 수행할 수 있으며, 빠르지만 근사치 결과를 위해 벡터 인덱스를 사용하거나 정확한 결과를 위해 무차별 대입을 사용할 수 있습니다.
 
-> It can calculate Euclidean or Cosine distance. With LangChain, we default to use Euclidean distance.
+> 유클리드 또는 코사인 거리를 계산할 수 있습니다. LangChain에서는 기본적으로 유클리드 거리를 사용합니다.
 
-We need to install several python packages.
+여러 python 패키지를 설치해야 합니다.
 
 <CodeGroup>
     ```bash pip
@@ -682,7 +674,7 @@ We need to install several python packages.
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/vectorstores/google_bigquery_vector_search).
+[사용 예제](/oss/integrations/vectorstores/google_bigquery_vector_search)를 참조하세요.
 
 ```python
 # Note: BigQueryVectorSearch might be in langchain or langchain_community depending on version
@@ -692,9 +684,9 @@ from langchain.vectorstores import BigQueryVectorSearch # Or langchain_community
 
 #### Memorystore for Redis
 
-> Vector store using [Memorystore for Redis](https://cloud.google.com/memorystore/docs/redis).
+> [Memorystore for Redis](https://cloud.google.com/memorystore/docs/redis)를 사용하는 벡터 저장소입니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -706,7 +698,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/vectorstores/google_memorystore_redis).
+[사용 예제](/oss/integrations/vectorstores/google_memorystore_redis)를 참조하세요.
 
 ```python
 from langchain_google_memorystore_redis import RedisVectorStore
@@ -714,9 +706,9 @@ from langchain_google_memorystore_redis import RedisVectorStore
 
 #### Spanner
 
-> Vector store using [Cloud Spanner](https://cloud.google.com/spanner/docs).
+> [Cloud Spanner](https://cloud.google.com/spanner/docs)를 사용하는 벡터 저장소입니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -728,7 +720,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/vectorstores/google_spanner).
+[사용 예제](/oss/integrations/vectorstores/google_spanner)를 참조하세요.
 
 ```python
 from langchain_google_spanner import SpannerVectorStore
@@ -736,9 +728,9 @@ from langchain_google_spanner import SpannerVectorStore
 
 #### Firestore (Native Mode)
 
-> Vector store using [Firestore](https://cloud.google.com/firestore/docs/).
+> [Firestore](https://cloud.google.com/firestore/docs/)를 사용하는 벡터 저장소입니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -750,7 +742,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/vectorstores/google_firestore).
+[사용 예제](/oss/integrations/vectorstores/google_firestore)를 참조하세요.
 
 ```python
 from langchain_google_firestore import FirestoreVectorStore
@@ -758,9 +750,9 @@ from langchain_google_firestore import FirestoreVectorStore
 
 #### Cloud SQL for MySQL
 
-> Vector store using [Cloud SQL for MySQL](https://cloud.google.com/sql).
+> [Cloud SQL for MySQL](https://cloud.google.com/sql)을 사용하는 벡터 저장소입니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -772,7 +764,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/vectorstores/google_cloud_sql_mysql).
+[사용 예제](/oss/integrations/vectorstores/google_cloud_sql_mysql)를 참조하세요.
 
 ```python
 from langchain_google_cloud_sql_mysql import MySQLVectorStore # MySQLEngine also available
@@ -780,9 +772,9 @@ from langchain_google_cloud_sql_mysql import MySQLVectorStore # MySQLEngine also
 
 #### Cloud SQL for PostgreSQL
 
-> Vector store using [Cloud SQL for PostgreSQL](https://cloud.google.com/sql).
+> [Cloud SQL for PostgreSQL](https://cloud.google.com/sql)을 사용하는 벡터 저장소입니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -794,7 +786,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See [usage example](/oss/integrations/vectorstores/google_cloud_sql_pg).
+[사용 예제](/oss/integrations/vectorstores/google_cloud_sql_pg)를 참조하세요.
 
 ```python
 from langchain_google_cloud_sql_pg import PostgresVectorStore # PostgresEngine also available
@@ -802,12 +794,9 @@ from langchain_google_cloud_sql_pg import PostgresVectorStore # PostgresEngine a
 
 #### Vertex AI Vector Search
 
-> [Google Cloud Vertex AI Vector Search](https://cloud.google.com/vertex-ai/docs/vector-search/overview) from Google Cloud,
-> formerly known as `Vertex AI Matching Engine`, provides the industry's leading high-scale
-> low latency vector database. These vector databases are commonly
-> referred to as vector similarity-matching or an approximate nearest neighbor (ANN) service.
+> Google Cloud의 [Google Cloud Vertex AI Vector Search](https://cloud.google.com/vertex-ai/docs/vector-search/overview)는 이전에 `Vertex AI Matching Engine`으로 알려졌으며, 업계 최고의 대규모 저지연 벡터 데이터베이스를 제공합니다. 이러한 벡터 데이터베이스는 일반적으로 벡터 유사성 매칭 또는 근사 최근접 이웃(ANN) 서비스라고 합니다.
 
-Install the python package:
+python 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -819,7 +808,7 @@ Install the python package:
     ```
 </CodeGroup>
 
-See a [usage example](/oss/integrations/vectorstores/google_vertex_ai_vector_search).
+[사용 예제](/oss/integrations/vectorstores/google_vertex_ai_vector_search)를 참조하세요.
 
 ```python
 from langchain_google_vertexai import VectorSearchVectorStore
@@ -827,9 +816,9 @@ from langchain_google_vertexai import VectorSearchVectorStore
 
 ##### With DataStore Backend
 
-> Vector search using Datastore for document storage.
+> 문서 저장을 위해 Datastore를 사용하는 벡터 검색입니다.
 
-See [usage example](/oss/integrations/vectorstores/google_vertex_ai_vector_search/#optional--you-can-also-create-vectore-and-store-chunks-in-a-datastore).
+[사용 예제](/oss/integrations/vectorstores/google_vertex_ai_vector_search/#optional--you-can-also-create-vectore-and-store-chunks-in-a-datastore)를 참조하세요.
 
 ```python
 from langchain_google_vertexai import VectorSearchVectorStoreDatastore
@@ -837,7 +826,7 @@ from langchain_google_vertexai import VectorSearchVectorStoreDatastore
 
 ##### With GCS Backend
 
-> Alias for `VectorSearchVectorStore` storing documents/index in GCS.
+> GCS에 문서/인덱스를 저장하는 `VectorSearchVectorStore`의 별칭입니다.
 
 ```python
 from langchain_google_vertexai import VectorSearchVectorStoreGCS
@@ -845,18 +834,18 @@ from langchain_google_vertexai import VectorSearchVectorStoreGCS
 
 ### Retrievers
 
-Retrieve information using Google Cloud services.
+Google Cloud 서비스를 사용하여 정보를 검색합니다.
 
 #### Vertex AI Search
 
-> Build generative AI powered search engines using [Vertex AI Search](https://cloud.google.com/generative-ai-app-builder/docs/introduction).
-> from Google Cloud allows developers to quickly build generative AI powered search engines for customers and employees.
+> Google Cloud의 [Vertex AI Search](https://cloud.google.com/generative-ai-app-builder/docs/introduction)를 사용하여 생성형 AI 기반 검색 엔진을 구축합니다.
+> 개발자가 고객과 직원을 위한 생성형 AI 기반 검색 엔진을 빠르게 구축할 수 있습니다.
 
-See a [usage example](/oss/integrations/retrievers/google_vertex_ai_search).
+[사용 예제](/oss/integrations/retrievers/google_vertex_ai_search)를 참조하세요.
 
-Note: `GoogleVertexAISearchRetriever` is deprecated. Use the components below from `langchain-google-community`.
+참고: `GoogleVertexAISearchRetriever`는 더 이상 사용되지 않습니다. `langchain-google-community`의 아래 구성 요소를 사용하세요.
 
-Install the `google-cloud-discoveryengine` package for underlying access.
+기본 액세스를 위해 `google-cloud-discoveryengine` 패키지를 설치합니다.
 
 <CodeGroup>
     ```bash pip
@@ -890,11 +879,11 @@ from langchain_google_community import VertexAISearchSummaryTool
 
 #### Document AI Warehouse
 
-> Search, store, and manage documents using [Document AI Warehouse](https://cloud.google.com/document-ai-warehouse).
+> [Document AI Warehouse](https://cloud.google.com/document-ai-warehouse)를 사용하여 문서를 검색, 저장 및 관리합니다.
 
-Note: `GoogleDocumentAIWarehouseRetriever` (from `langchain`) is deprecated. Use `DocumentAIWarehouseRetriever` from `langchain-google-community`.
+참고: `GoogleDocumentAIWarehouseRetriever`(`langchain`에서)는 더 이상 사용되지 않습니다. `langchain-google-community`의 `DocumentAIWarehouseRetriever`를 사용하세요.
 
-Requires installation of relevant Document AI packages (check specific docs).
+관련 Document AI 패키지 설치가 필요합니다(특정 문서 확인).
 
 <CodeGroup>
     ```bash pip
@@ -912,16 +901,14 @@ from langchain_google_community.documentai_warehouse import DocumentAIWarehouseR
 
 ### Tools
 
-Integrate agents with various Google services.
+다양한 Google 서비스와 에이전트를 통합합니다.
 
 #### Text-to-Speech
 
->[Google Cloud Text-to-Speech](https://cloud.google.com/text-to-speech) is a Google Cloud service that enables developers to
-> synthesize natural-sounding speech with 100+ voices, available in multiple languages and variants.
-> It applies DeepMind's groundbreaking research in WaveNet and Google's powerful neural networks
-> to deliver the highest fidelity possible.
+>[Google Cloud Text-to-Speech](https://cloud.google.com/text-to-speech)는 개발자가 여러 언어와 변형으로 제공되는 100개 이상의 음성으로 자연스러운 음성을 합성할 수 있게 하는 Google Cloud 서비스입니다.
+> WaveNet에 대한 DeepMind의 획기적인 연구와 Google의 강력한 신경망을 적용하여 가능한 최고의 충실도를 제공합니다.
 
-Install required packages:
+필요한 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -933,7 +920,7 @@ Install required packages:
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_cloud_texttospeech).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_cloud_texttospeech)을 참조하세요.
 
 ```python
 from langchain_google_community import TextToSpeechTool
@@ -941,9 +928,9 @@ from langchain_google_community import TextToSpeechTool
 
 #### Google Drive
 
-Tools for interacting with Google Drive.
+Google Drive와 상호 작용하기 위한 도구입니다.
 
-Install required packages:
+필요한 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -955,7 +942,7 @@ Install required packages:
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_drive).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_drive)을 참조하세요.
 
 ```python
 from langchain_googledrive.utilities.google_drive import GoogleDriveAPIWrapper
@@ -964,7 +951,7 @@ from langchain_googledrive.tools.google_drive.tool import GoogleDriveSearchTool
 
 #### Google Finance
 
-Query financial data. Requires `google-search-results` package and SerpApi key.
+금융 데이터를 쿼리합니다. `google-search-results` 패키지와 SerpApi 키가 필요합니다.
 
 <CodeGroup>
     ```bash pip
@@ -976,7 +963,7 @@ Query financial data. Requires `google-search-results` package and SerpApi key.
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_finance).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_finance)을 참조하세요.
 
 ```python
 from langchain_community.tools.google_finance import GoogleFinanceQueryRun
@@ -985,7 +972,7 @@ from langchain_community.utilities.google_finance import GoogleFinanceAPIWrapper
 
 #### Google Jobs
 
-Query job listings. Requires `google-search-results` package and SerpApi key.
+채용 정보를 쿼리합니다. `google-search-results` 패키지와 SerpApi 키가 필요합니다.
 
 <CodeGroup>
     ```bash pip
@@ -997,7 +984,7 @@ Query job listings. Requires `google-search-results` package and SerpApi key.
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_jobs).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_jobs)을 참조하세요.
 
 ```python
 from langchain_community.tools.google_jobs import GoogleJobsQueryRun
@@ -1007,7 +994,7 @@ from langchain_community.tools.google_jobs import GoogleJobsQueryRun
 
 #### Google Lens
 
-Perform visual searches. Requires `google-search-results` package and SerpApi key.
+시각적 검색을 수행합니다. `google-search-results` 패키지와 SerpApi 키가 필요합니다.
 
 <CodeGroup>
     ```bash pip
@@ -1019,7 +1006,7 @@ Perform visual searches. Requires `google-search-results` package and SerpApi ke
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_lens).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_lens)을 참조하세요.
 
 ```python
 from langchain_community.tools.google_lens import GoogleLensQueryRun
@@ -1028,7 +1015,7 @@ from langchain_community.utilities.google_lens import GoogleLensAPIWrapper
 
 #### Google Places
 
-Search for places information. Requires `googlemaps` package and a Google Maps API key.
+장소 정보를 검색합니다. `googlemaps` 패키지와 Google Maps API 키가 필요합니다.
 
 <CodeGroup>
     ```bash pip
@@ -1040,7 +1027,7 @@ Search for places information. Requires `googlemaps` package and a Google Maps A
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_places).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_places)을 참조하세요.
 
 ```python
 # Note: GooglePlacesTool might be in langchain or langchain_community depending on version
@@ -1049,7 +1036,7 @@ from langchain.tools import GooglePlacesTool # Or langchain_community.tools
 
 #### Google Scholar
 
-Search academic papers. Requires `google-search-results` package and SerpApi key.
+학술 논문을 검색합니다. `google-search-results` 패키지와 SerpApi 키가 필요합니다.
 
 <CodeGroup>
     ```bash pip
@@ -1061,7 +1048,7 @@ Search academic papers. Requires `google-search-results` package and SerpApi key
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_scholar).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_scholar)을 참조하세요.
 
 ```python
 from langchain_community.tools.google_scholar import GoogleScholarQueryRun
@@ -1070,9 +1057,9 @@ from langchain_community.utilities.google_scholar import GoogleScholarAPIWrapper
 
 #### Google Search
 
-Perform web searches using Google Custom Search Engine (CSE). Requires `GOOGLE_API_KEY` and `GOOGLE_CSE_ID`.
+Google Custom Search Engine (CSE)을 사용하여 웹 검색을 수행합니다. `GOOGLE_API_KEY`와 `GOOGLE_CSE_ID`가 필요합니다.
 
-Install `langchain-google-community`:
+`langchain-google-community`를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -1100,11 +1087,11 @@ from langchain_community.agent_toolkits.load_tools import load_tools
 tools = load_tools(["google-search"])
 ```
 
-See [detailed notebook](/oss/integrations/tools/google_search).
+[자세한 노트북](/oss/integrations/tools/google_search)을 참조하세요.
 
 #### Google Trends
 
-Query Google Trends data. Requires `google-search-results` package and SerpApi key.
+Google Trends 데이터를 쿼리합니다. `google-search-results` 패키지와 SerpApi 키가 필요합니다.
 
 <CodeGroup>
     ```bash pip
@@ -1116,7 +1103,7 @@ Query Google Trends data. Requires `google-search-results` package and SerpApi k
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_trends).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_trends)을 참조하세요.
 
 ```python
 from langchain_community.tools.google_trends import GoogleTrendsQueryRun
@@ -1125,13 +1112,13 @@ from langchain_community.utilities.google_trends import GoogleTrendsAPIWrapper
 
 ### Toolkits
 
-Collections of tools for specific Google services.
+특정 Google 서비스를 위한 도구 모음입니다.
 
 #### Gmail
 
 
-> [Google Gmail](https://en.wikipedia.org/wiki/Gmail) is a free email service provided by Google.
-This toolkit works with emails through the `Gmail API`.
+> [Google Gmail](https://en.wikipedia.org/wiki/Gmail)은 Google이 제공하는 무료 이메일 서비스입니다.
+이 툴킷은 `Gmail API`를 통해 이메일과 함께 작동합니다.
 
 <CodeGroup>
     ```bash pip
@@ -1143,7 +1130,7 @@ This toolkit works with emails through the `Gmail API`.
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/gmail).
+[사용 예제 및 인증 지침](/oss/integrations/tools/gmail)을 참조하세요.
 
 ```python
 # Load the whole toolkit
@@ -1159,19 +1146,19 @@ from langchain_google_community.gmail.send_message import GmailSendMessage
 
 ### MCP Toolbox
 
-[MCP Toolbox](https://github.com/googleapis/genai-toolbox) provides a simple and efficient way to connect to your databases, including those on Google Cloud like [Cloud SQL](https://cloud.google.com/sql/docs) and [AlloyDB](https://cloud.google.com/alloydb/docs/overview). With MCP Toolbox, you can seamlessly integrate your database with LangChain to build powerful, data-driven applications.
+[MCP Toolbox](https://github.com/googleapis/genai-toolbox)는 [Cloud SQL](https://cloud.google.com/sql/docs) 및 [AlloyDB](https://cloud.google.com/alloydb/docs/overview)와 같은 Google Cloud의 데이터베이스를 포함하여 데이터베이스에 연결하는 간단하고 효율적인 방법을 제공합니다. MCP Toolbox를 사용하면 데이터베이스를 LangChain과 원활하게 통합하여 강력한 데이터 기반 애플리케이션을 구축할 수 있습니다.
 
 #### Installation
 
-To get started, [install the Toolbox server and client](https://github.com/googleapis/genai-toolbox/releases/).
+시작하려면 [Toolbox 서버 및 클라이언트를 설치](https://github.com/googleapis/genai-toolbox/releases/)하세요.
 
-[Configure](https://googleapis.github.io/genai-toolbox/getting-started/configure/) a `tools.yaml` to define your tools, and then execute toolbox to start the server:
+도구를 정의하기 위해 `tools.yaml`을 [구성](https://googleapis.github.io/genai-toolbox/getting-started/configure/)한 다음 toolbox를 실행하여 서버를 시작합니다:
 
 ```bash
 toolbox --tools-file "tools.yaml"
 ```
 
-Then, install the Toolbox client:
+그런 다음 Toolbox 클라이언트를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -1185,7 +1172,7 @@ Then, install the Toolbox client:
 
 #### Getting Started
 
-Here is a quick example of how to use MCP Toolbox to connect to your database:
+다음은 MCP Toolbox를 사용하여 데이터베이스에 연결하는 방법에 대한 간단한 예제입니다:
 
 ```python
 from toolbox_langchain import ToolboxClient
@@ -1195,17 +1182,17 @@ async with ToolboxClient("http://127.0.0.1:5000") as client:
     tools = client.load_toolset()
 ```
 
-See [usage example and setup instructions](/oss/integrations/tools/toolbox).
+[사용 예제 및 설정 지침](/oss/integrations/tools/toolbox)을 참조하세요.
 
 ### Callbacks
 
-Track LLM/Chat model usage.
+LLM/Chat 모델 사용량을 추적합니다.
 
 #### Vertex AI callback handler
 
->Callback Handler that tracks `VertexAI` usage info.
+>`VertexAI` 사용 정보를 추적하는 Callback Handler입니다.
 
-Requires `langchain-google-vertexai`.
+`langchain-google-vertexai`가 필요합니다.
 
 ```python
 from langchain_google_vertexai.callbacks import VertexAICallbackHandler
@@ -1213,13 +1200,13 @@ from langchain_google_vertexai.callbacks import VertexAICallbackHandler
 
 ### Evaluators
 
-Evaluate model outputs using Vertex AI.
+Vertex AI를 사용하여 모델 출력을 평가합니다.
 
-Requires `langchain-google-vertexai`.
+`langchain-google-vertexai`가 필요합니다.
 
 #### VertexPairWiseStringEvaluator
 
->Pair-wise evaluation using Vertex AI models.
+>Vertex AI 모델을 사용한 쌍별 평가입니다.
 
 ```python
 from langchain_google_vertexai.evaluators.evaluation import VertexPairWiseStringEvaluator
@@ -1227,7 +1214,7 @@ from langchain_google_vertexai.evaluators.evaluation import VertexPairWiseString
 
 #### VertexStringEvaluator
 
->Evaluate a single prediction string using Vertex AI models.
+>Vertex AI 모델을 사용하여 단일 예측 문자열을 평가합니다.
 
 ```python
 # Note: Original doc listed VertexPairWiseStringEvaluator twice. Assuming this class exists.
@@ -1236,15 +1223,15 @@ from langchain_google_vertexai.evaluators.evaluation import VertexStringEvaluato
 
 ## Other Google Products
 
-Integrations with various Google services beyond the core Cloud Platform.
+핵심 Cloud Platform을 넘어선 다양한 Google 서비스와의 통합입니다.
 
 ### Document loaders
 
 #### Google Drive
 
->[Google Drive](https://en.wikipedia.org/wiki/Google_Drive) file storage. Currently supports Google Docs.
+>[Google Drive](https://en.wikipedia.org/wiki/Google_Drive) 파일 저장소입니다. 현재 Google Docs를 지원합니다.
 
-Install with Drive dependencies:
+Drive 종속성과 함께 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -1256,7 +1243,7 @@ Install with Drive dependencies:
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/document_loaders/google_drive).
+[사용 예제 및 인증 지침](/oss/integrations/document_loaders/google_drive)을 참조하세요.
 
 ```python
 from langchain_google_community import GoogleDriveLoader
@@ -1267,17 +1254,13 @@ from langchain_google_community import GoogleDriveLoader
 #### ScaNN (Local Index)
 
 >[Google ScaNN](https://github.com/google-research/google-research/tree/master/scann)
-> (Scalable Nearest Neighbors) is a python package.
+> (Scalable Nearest Neighbors)은 python 패키지입니다.
 >
->`ScaNN` is a method for efficient vector similarity search at scale.
+>`ScaNN`은 대규모 효율적인 벡터 유사성 검색을 위한 방법입니다.
 
->`ScaNN` includes search space pruning and quantization for Maximum Inner
-> Product Search and also supports other distance functions such as
-> Euclidean distance. The implementation is optimized for x86 processors
-> with AVX2 support. See its [Google Research github](https://github.com/google-research/google-research/tree/master/scann)
-> for more details.
+>`ScaNN`은 Maximum Inner Product Search를 위한 검색 공간 가지치기 및 양자화를 포함하며 유클리드 거리와 같은 다른 거리 함수도 지원합니다. 구현은 AVX2를 지원하는 x86 프로세서에 최적화되어 있습니다. 자세한 내용은 [Google Research github](https://github.com/google-research/google-research/tree/master/scann)를 참조하세요.
 
-Install the `scann` package:
+`scann` 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -1289,7 +1272,7 @@ Install the `scann` package:
     ```
 </CodeGroup>
 
-See a [usage example](/oss/integrations/vectorstores/scann).
+[사용 예제](/oss/integrations/vectorstores/scann)를 참조하세요.
 
 ```python
 from langchain_community.vectorstores import ScaNN
@@ -1299,9 +1282,9 @@ from langchain_community.vectorstores import ScaNN
 
 #### Google Drive
 
-Retrieve documents from Google Drive.
+Google Drive에서 문서를 검색합니다.
 
-Install required packages:
+필요한 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -1313,7 +1296,7 @@ Install required packages:
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/retrievers/google_drive).
+[사용 예제 및 인증 지침](/oss/integrations/retrievers/google_drive)을 참조하세요.
 
 ```python
 from langchain_googledrive.retrievers import GoogleDriveRetriever
@@ -1323,9 +1306,9 @@ from langchain_googledrive.retrievers import GoogleDriveRetriever
 
 #### Google Drive
 
-Tools for interacting with Google Drive.
+Google Drive와 상호 작용하기 위한 도구입니다.
 
-Install required packages:
+필요한 패키지를 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -1337,7 +1320,7 @@ Install required packages:
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_drive).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_drive)을 참조하세요.
 
 ```python
 from langchain_googledrive.utilities.google_drive import GoogleDriveAPIWrapper
@@ -1345,7 +1328,7 @@ from langchain_googledrive.tools.google_drive.tool import GoogleDriveSearchTool
 ```
 
 #### Google Finance
-Query financial data. Requires `google-search-results` package and SerpApi key.
+금융 데이터를 쿼리합니다. `google-search-results` 패키지와 SerpApi 키가 필요합니다.
 
 <CodeGroup>
     ```bash pip
@@ -1357,7 +1340,7 @@ Query financial data. Requires `google-search-results` package and SerpApi key.
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_finance).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_finance)을 참조하세요.
 
 ```python
 from langchain_community.tools.google_finance import GoogleFinanceQueryRun
@@ -1366,7 +1349,7 @@ from langchain_community.utilities.google_finance import GoogleFinanceAPIWrapper
 
 #### Google Jobs
 
-Query job listings. Requires `google-search-results` package and SerpApi key.
+채용 정보를 쿼리합니다. `google-search-results` 패키지와 SerpApi 키가 필요합니다.
 
 <CodeGroup>
     ```bash pip
@@ -1378,7 +1361,7 @@ Query job listings. Requires `google-search-results` package and SerpApi key.
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_jobs).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_jobs)을 참조하세요.
 
 ```python
 from langchain_community.tools.google_jobs import GoogleJobsQueryRun
@@ -1388,7 +1371,7 @@ from langchain_community.tools.google_jobs import GoogleJobsQueryRun
 
 #### Google Lens
 
-Perform visual searches. Requires `google-search-results` package and SerpApi key.
+시각적 검색을 수행합니다. `google-search-results` 패키지와 SerpApi 키가 필요합니다.
 
 <CodeGroup>
     ```bash
@@ -1400,7 +1383,7 @@ Perform visual searches. Requires `google-search-results` package and SerpApi ke
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_lens).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_lens)을 참조하세요.
 
 ```python
 from langchain_community.tools.google_lens import GoogleLensQueryRun
@@ -1409,7 +1392,7 @@ from langchain_community.utilities.google_lens import GoogleLensAPIWrapper
 
 #### Google Places
 
-Search for places information. Requires `googlemaps` package and a Google Maps API key.
+장소 정보를 검색합니다. `googlemaps` 패키지와 Google Maps API 키가 필요합니다.
 
 <CodeGroup>
     ```bash pip
@@ -1421,7 +1404,7 @@ Search for places information. Requires `googlemaps` package and a Google Maps A
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_places).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_places)을 참조하세요.
 
 ```python
 # Note: GooglePlacesTool might be in langchain or langchain_community depending on version
@@ -1430,7 +1413,7 @@ from langchain.tools import GooglePlacesTool # Or langchain_community.tools
 
 #### Google Scholar
 
-Search academic papers. Requires `google-search-results` package and SerpApi key.
+학술 논문을 검색합니다. `google-search-results` 패키지와 SerpApi 키가 필요합니다.
 
 <CodeGroup>
     ```bash
@@ -1442,7 +1425,7 @@ Search academic papers. Requires `google-search-results` package and SerpApi key
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_scholar).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_scholar)을 참조하세요.
 
 ```python
 from langchain_community.tools.google_scholar import GoogleScholarQueryRun
@@ -1451,9 +1434,9 @@ from langchain_community.utilities.google_scholar import GoogleScholarAPIWrapper
 
 #### Google Search
 
-Perform web searches using Google Custom Search Engine (CSE). Requires `GOOGLE_API_KEY` and `GOOGLE_CSE_ID`.
+Google Custom Search Engine (CSE)을 사용하여 웹 검색을 수행합니다. `GOOGLE_API_KEY`와 `GOOGLE_CSE_ID`가 필요합니다.
 
-Install `langchain-google-community`:
+`langchain-google-community`를 설치합니다:
 <CodeGroup>
     ```bash pip
     pip install langchain-google-community
@@ -1480,11 +1463,11 @@ from langchain_community.agent_toolkits.load_tools import load_tools
 tools = load_tools(["google-search"])
 ```
 
-See [detailed notebook](/oss/integrations/tools/google_search).
+[자세한 노트북](/oss/integrations/tools/google_search)을 참조하세요.
 
 #### Google Trends
 
-Query Google Trends data. Requires `google-search-results` package and SerpApi key.
+Google Trends 데이터를 쿼리합니다. `google-search-results` 패키지와 SerpApi 키가 필요합니다.
 
 <CodeGroup>
     ```bash pip
@@ -1496,7 +1479,7 @@ Query Google Trends data. Requires `google-search-results` package and SerpApi k
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/google_trends).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_trends)을 참조하세요.
 
 ```python
 from langchain_community.tools.google_trends import GoogleTrendsQueryRun
@@ -1507,8 +1490,8 @@ from langchain_community.utilities.google_trends import GoogleTrendsAPIWrapper
 
 #### Gmail
 
-> [Google Gmail](https://en.wikipedia.org/wiki/Gmail) is a free email service provided by Google.
-This toolkit works with emails through the `Gmail API`.
+> [Google Gmail](https://en.wikipedia.org/wiki/Gmail)은 Google이 제공하는 무료 이메일 서비스입니다.
+이 툴킷은 `Gmail API`를 통해 이메일과 함께 작동합니다.
 
 <CodeGroup>
     ```bash pip
@@ -1520,7 +1503,7 @@ This toolkit works with emails through the `Gmail API`.
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/tools/gmail).
+[사용 예제 및 인증 지침](/oss/integrations/tools/gmail)을 참조하세요.
 
 ```python
 # Load the whole toolkit
@@ -1538,9 +1521,9 @@ from langchain_google_community.gmail.send_message import GmailSendMessage
 
 #### Gmail
 
-> Load chat history from Gmail threads.
+> Gmail 스레드에서 채팅 기록을 로드합니다.
 
-Install with Gmail dependencies:
+Gmail 종속성과 함께 설치합니다:
 
 <CodeGroup>
     ```bash pip
@@ -1552,7 +1535,7 @@ Install with Gmail dependencies:
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/chat_loaders/gmail).
+[사용 예제 및 인증 지침](/oss/integrations/chat_loaders/gmail)을 참조하세요.
 
 ```python
 from langchain_google_community import GMailLoader
@@ -1560,13 +1543,13 @@ from langchain_google_community import GMailLoader
 
 ## 3rd Party Integrations
 
-Access Google services via third-party APIs.
+타사 API를 통해 Google 서비스에 액세스합니다.
 
 ### SearchApi
 
->[SearchApi](https://www.searchapi.io/) provides API access to Google search, YouTube, etc. Requires `langchain-community`.
+>[SearchApi](https://www.searchapi.io/)는 Google 검색, YouTube 등에 대한 API 액세스를 제공합니다. `langchain-community`가 필요합니다.
 
-See [usage examples and authorization instructions](/oss/integrations/tools/searchapi).
+[사용 예제 및 인증 지침](/oss/integrations/tools/searchapi)을 참조하세요.
 
 ```python
 from langchain_community.utilities import SearchApiAPIWrapper
@@ -1574,9 +1557,9 @@ from langchain_community.utilities import SearchApiAPIWrapper
 
 ### SerpApi
 
->[SerpApi](https://serpapi.com/) provides API access to Google search results. Requires `langchain-community`.
+>[SerpApi](https://serpapi.com/)는 Google 검색 결과에 대한 API 액세스를 제공합니다. `langchain-community`가 필요합니다.
 
-See a [usage example and authorization instructions](/oss/integrations/tools/serpapi).
+[사용 예제 및 인증 지침](/oss/integrations/tools/serpapi)을 참조하세요.
 
 ```python
 from langchain_community.utilities import SerpAPIWrapper
@@ -1584,9 +1567,9 @@ from langchain_community.utilities import SerpAPIWrapper
 
 ### Serper.dev
 
->[Google Serper](https://serper.dev/) provides API access to Google search results. Requires `langchain-community`.
+>[Google Serper](https://serper.dev/)는 Google 검색 결과에 대한 API 액세스를 제공합니다. `langchain-community`가 필요합니다.
 
-See a [usage example and authorization instructions](/oss/integrations/tools/google_serper).
+[사용 예제 및 인증 지침](/oss/integrations/tools/google_serper)을 참조하세요.
 
 ```python
 from langchain_community.utilities import GoogleSerperAPIWrapper
@@ -1596,7 +1579,7 @@ from langchain_community.utilities import GoogleSerperAPIWrapper
 
 #### YouTube Search Tool
 
->Search YouTube videos without the official API. Requires `youtube_search` package.
+>공식 API 없이 YouTube 동영상을 검색합니다. `youtube_search` 패키지가 필요합니다.
 
 <CodeGroup>
     ```bash pip
@@ -1608,7 +1591,7 @@ from langchain_community.utilities import GoogleSerperAPIWrapper
     ```
 </CodeGroup>
 
-See a [usage example](/oss/integrations/tools/youtube).
+[사용 예제](/oss/integrations/tools/youtube)를 참조하세요.
 
 ```python
 # Note: YouTubeSearchTool might be in langchain or langchain_community
@@ -1617,7 +1600,7 @@ from langchain.tools import YouTubeSearchTool # Or langchain_community.tools
 
 #### YouTube Audio Loader
 
-Download audio from YouTube videos. Requires `yt_dlp`, `pydub`, `librosa`.
+YouTube 동영상에서 오디오를 다운로드합니다. `yt_dlp`, `pydub`, `librosa`가 필요합니다.
 
 <CodeGroup>
     ```bash
@@ -1629,7 +1612,7 @@ Download audio from YouTube videos. Requires `yt_dlp`, `pydub`, `librosa`.
     ```
 </CodeGroup>
 
-See [usage example and authorization instructions](/oss/integrations/document_loaders/youtube_audio).
+[사용 예제 및 인증 지침](/oss/integrations/document_loaders/youtube_audio)을 참조하세요.
 
 ```python
 from langchain_community.document_loaders.blob_loaders.youtube_audio import YoutubeAudioLoader
@@ -1639,7 +1622,7 @@ from langchain_community.document_loaders.blob_loaders.youtube_audio import Yout
 
 #### YouTube Transcripts Loader
 
-Load video transcripts. Requires `youtube-transcript-api`.
+동영상 자막을 로드합니다. `youtube-transcript-api`가 필요합니다.
 
 <CodeGroup>
     ```bash
@@ -1651,7 +1634,7 @@ Load video transcripts. Requires `youtube-transcript-api`.
     ```
 </CodeGroup>
 
-See a [usage example](/oss/integrations/document_loaders/youtube_transcript).
+[사용 예제](/oss/integrations/document_loaders/youtube_transcript)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import YoutubeLoader

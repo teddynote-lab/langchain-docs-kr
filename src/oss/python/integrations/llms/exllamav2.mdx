@@ -2,33 +2,33 @@
 title: ExLlamaV2
 ---
 
-[ExLlamav2](https://github.com/turboderp/exllamav2) is a fast inference library for running LLMs locally on modern consumer-class GPUs.
+[ExLlamav2](https://github.com/turboderp/exllamav2)는 최신 소비자급 GPU에서 LLM을 로컬로 실행하기 위한 빠른 추론 라이브러리입니다.
 
-It supports inference for GPTQ & EXL2 quantized models, which can be accessed on [Hugging Face](https://huggingface.co/TheBloke).
+GPTQ 및 EXL2 양자화 모델에 대한 추론을 지원하며, [Hugging Face](https://huggingface.co/TheBloke)에서 액세스할 수 있습니다.
 
-This notebook goes over how to run `exllamav2` within LangChain.
+이 노트북은 LangChain 내에서 `exllamav2`를 실행하는 방법을 다룹니다.
 
-Additional information:
-[ExLlamav2 examples](https://github.com/turboderp/exllamav2/tree/master/examples)
+추가 정보:
+[ExLlamav2 예제](https://github.com/turboderp/exllamav2/tree/master/examples)
 
 ## Installation
 
-Refer to the official [doc](https://github.com/turboderp/exllamav2)
-For this notebook, the requirements are :
+공식 [문서](https://github.com/turboderp/exllamav2)를 참조하세요.
+이 노트북의 요구사항은 다음과 같습니다:
 
 - python 3.11
 - langchain 0.1.7
-- CUDA: 12.1.0 (see bellow)
+- CUDA: 12.1.0 (아래 참조)
 - torch==2.1.1+cu121
 - exllamav2 (0.0.12+cu121)
 
-If you want to install the same exllamav2 version :
+동일한 exllamav2 버전을 설치하려면:
 
 ```shell
 pip install https://github.com/turboderp/exllamav2/releases/download/v0.0.12/exllamav2-0.0.12+cu121-cp311-cp311-linux_x86_64.whl
 ```
 
-if you use conda, the dependencies are :
+conda를 사용하는 경우, 종속성은 다음과 같습니다:
 
 ```
   - conda-forge::ninja
@@ -39,11 +39,11 @@ if you use conda, the dependencies are :
 
 ## Usage
 
-You don't need an `API_TOKEN` as you will run the LLM locally.
+LLM을 로컬로 실행하므로 `API_TOKEN`이 필요하지 않습니다.
 
-It is worth understanding which models are suitable to be used on the desired machine.
+원하는 머신에서 사용하기에 적합한 모델이 무엇인지 이해하는 것이 중요합니다.
 
-[TheBloke's](https://huggingface.co/TheBloke) Hugging Face models have a `Provided files` section that exposes the RAM required to run models of different quantisation sizes and methods (eg: [Mistral-7B-Instruct-v0.2-GPTQ](https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GPTQ)).
+[TheBloke](https://huggingface.co/TheBloke)의 Hugging Face 모델에는 `Provided files` 섹션이 있어 다양한 양자화 크기 및 방법의 모델을 실행하는 데 필요한 RAM을 보여줍니다(예: [Mistral-7B-Instruct-v0.2-GPTQ](https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GPTQ)).
 
 ```python
 import os

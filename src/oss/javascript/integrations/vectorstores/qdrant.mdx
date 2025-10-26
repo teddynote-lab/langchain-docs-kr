@@ -3,12 +3,12 @@ title: QdrantVectorStore
 ---
 
 <Tip>
-**Compatibility**: Only available on Node.js.
+**호환성**: Node.js에서만 사용 가능합니다.
 </Tip>
 
-[Qdrant](https://qdrant.tech/) is a vector similarity search engine. It provides a production-ready service with a convenient API to store, search, and manage points - vectors with an additional payload.
+[Qdrant](https://qdrant.tech/)는 벡터 유사도 검색 엔진입니다. 추가 페이로드가 있는 벡터인 포인트를 저장, 검색 및 관리할 수 있는 편리한 API를 갖춘 프로덕션 준비 서비스를 제공합니다.
 
-This guide provides a quick overview for getting started with Qdrant [vector stores](/oss/integrations/vectorstores). For detailed documentation of all `QdrantVectorStore` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_qdrant.QdrantVectorStore.html).
+이 가이드는 Qdrant [vector store](/oss/integrations/vectorstores) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `QdrantVectorStore` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_qdrant.QdrantVectorStore.html)를 참조하세요.
 
 ## Overview
 
@@ -20,9 +20,9 @@ This guide provides a quick overview for getting started with Qdrant [vector sto
 
 ## Setup
 
-To use Qdrant vector stores, you'll need to set up a Qdrant instance and install the `@langchain/qdrant` integration package.
+Qdrant vector store를 사용하려면 Qdrant 인스턴스를 설정하고 `@langchain/qdrant` integration package를 설치해야 합니다.
 
-This guide will also use [OpenAI embeddings](/oss/integrations/text_embedding/openai), which require you to install the `@langchain/openai` integration package. You can also use [other supported embeddings models](/oss/integrations/text_embedding) if you wish.
+이 가이드는 [OpenAI embeddings](/oss/integrations/text_embedding/openai)도 사용하므로 `@langchain/openai` integration package를 설치해야 합니다. 원하는 경우 [다른 지원되는 embeddings 모델](/oss/integrations/text_embedding)을 사용할 수도 있습니다.
 
 <CodeGroup>
 ```bash npm
@@ -36,24 +36,24 @@ pnpm add @langchain/qdrant @langchain/core @langchain/openai
 ```
 </CodeGroup>
 
-After installing the required dependencies, run a Qdrant instance with Docker on your computer by following the [Qdrant setup instructions](https://qdrant.tech/documentation/quickstart/). Note the URL your container runs on.
+필요한 종속성을 설치한 후 [Qdrant 설정 지침](https://qdrant.tech/documentation/quickstart/)에 따라 컴퓨터에서 Docker로 Qdrant 인스턴스를 실행하세요. 컨테이너가 실행되는 URL을 기록해 두세요.
 
 ### Credentials
 
-Once you've done this set a `QDRANT_URL` environment variable:
+이 작업을 완료한 후 `QDRANT_URL` 환경 변수를 설정하세요:
 
 ```typescript
 // e.g. http://localhost:6333
 process.env.QDRANT_URL = "your-qdrant-url"
 ```
 
-If you are using OpenAI embeddings for this guide, you'll need to set your OpenAI key as well:
+이 가이드에서 OpenAI embeddings를 사용하는 경우 OpenAI key도 설정해야 합니다:
 
 ```typescript
 process.env.OPENAI_API_KEY = "YOUR_API_KEY";
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_TRACING="true"
@@ -108,15 +108,15 @@ const documents = [document1, document2, document3, document4];
 await vectorStore.addDocuments(documents);
 ```
 
-Top-level document ids and deletion are currently not supported.
+최상위 document id 및 삭제는 현재 지원되지 않습니다.
 
 ## Query vector store
 
-Once your vector store has been created and the relevant documents have been added you will most likely wish to query it during the running of your chain or agent.
+vector store가 생성되고 관련 문서가 추가되면 chain 또는 agent를 실행하는 동안 쿼리하고 싶을 것입니다.
 
 ### Query directly
 
-Performing a simple similarity search can be done as follows:
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
 
 ```typescript
 const filter = {
@@ -137,9 +137,9 @@ for (const doc of similaritySearchResults) {
 * Mitochondria are made out of lipids [{"source":"https://example.com"}]
 ```
 
-See [this page](https://qdrant.tech/documentation/concepts/filtering/) for more on Qdrant filter syntax. Note that all values must be prefixed with `metadata.`
+Qdrant filter 구문에 대한 자세한 내용은 [이 페이지](https://qdrant.tech/documentation/concepts/filtering/)를 참조하세요. 모든 값은 `metadata.` 접두사를 붙여야 합니다.
 
-If you want to execute a similarity search and receive the corresponding scores you can run:
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
 
 ```typescript
 const similaritySearchWithScoreResults = await vectorStore.similaritySearchWithScore("biology", 2, filter)
@@ -156,7 +156,7 @@ for (const [doc, score] of similaritySearchWithScoreResults) {
 
 ### Query by turning into retriever
 
-You can also transform the vector store into a [retriever](/oss/langchain/retrieval) for easier usage in your chains.
+vector store를 [retriever](/oss/langchain/retrieval)로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
 
 ```typescript
 const retriever = vectorStore.asRetriever({
@@ -184,12 +184,12 @@ await retriever.invoke("biology");
 
 ### Usage for retrieval-augmented generation
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+retrieval-augmented generation (RAG)에 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
 
-- [Build a RAG app with LangChain](/oss/langchain/rag).
+- [LangChain으로 RAG 앱 만들기](/oss/langchain/rag)
 - [Agentic RAG](/oss/langgraph/agentic-rag)
-- [Retrieval docs](/oss/langchain/retrieval)
+- [Retrieval 문서](/oss/langchain/retrieval)
 
 ## API reference
 
-For detailed documentation of all `QdrantVectorStore` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_qdrant.QdrantVectorStore.html).
+모든 `QdrantVectorStore` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_qdrant.QdrantVectorStore.html)를 참조하세요.

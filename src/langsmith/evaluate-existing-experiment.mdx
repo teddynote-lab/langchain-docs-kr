@@ -1,11 +1,12 @@
+```mdx
 ---
-title: "How to evaluate an existing experiment (Python only)"
-sidebarTitle: Evaluate an existing experiment (Python)
+title: "기존 experiment를 평가하는 방법 (Python 전용)"
+sidebarTitle: 기존 experiment 평가하기 (Python)
 ---
 
-Evaluation of existing experiments is currently only supported in the Python SDK.
+기존 experiment의 평가는 현재 Python SDK에서만 지원됩니다.
 
-If you have already run an experiment and want to add additional evaluation metrics, you can apply any evaluators to the experiment using the `evaluate()` / `aevaluate()` methods as before. Just pass in the experiment name / ID instead of a target function:
+이미 experiment를 실행했고 추가 평가 지표를 추가하려는 경우, 이전과 같이 `evaluate()` / `aevaluate()` 메서드를 사용하여 experiment에 evaluator를 적용할 수 있습니다. 대상 함수 대신 experiment 이름 / ID를 전달하면 됩니다:
 
 ```python
 from langsmith import evaluate
@@ -17,4 +18,4 @@ experiment_name = "my-experiment:abc"  # Replace with an actual experiment name 
 
 evaluate(experiment_name, evaluators=[always_half])
 ```
-
+```

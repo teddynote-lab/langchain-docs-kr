@@ -2,25 +2,25 @@
 title: ChatPredictionGuard
 ---
 
->[Prediction Guard](https://predictionguard.com) is a secure, scalable GenAI platform that safeguards sensitive data, prevents common AI malfunctions, and runs on affordable hardware.
+>[Prediction Guard](https://predictionguard.com)는 민감한 데이터를 보호하고, 일반적인 AI 오작동을 방지하며, 저렴한 하드웨어에서 실행되는 안전하고 확장 가능한 GenAI 플랫폼입니다.
 
 ## Overview
 
 ### Integration details
 
-This integration utilizes the Prediction Guard API, which includes various safeguards and security features.
+이 integration은 다양한 보호 장치와 보안 기능을 포함하는 Prediction Guard API를 활용합니다.
 
 ### Model features
 
-The models supported by this integration only feature text-generation currently, along with the input and output checks described here.
+이 integration에서 지원하는 model들은 현재 text-generation 기능만 제공하며, 여기에 설명된 입력 및 출력 검사 기능을 포함합니다.
 
 ## Setup
 
-To access Prediction Guard models, contact us [here](https://predictionguard.com/get-started) to get a Prediction Guard API key and get started.
+Prediction Guard model에 액세스하려면 [여기](https://predictionguard.com/get-started)에서 문의하여 Prediction Guard API key를 받고 시작하세요.
 
 ### Credentials
 
-Once you have a key, you can set it with
+key를 받으면 다음과 같이 설정할 수 있습니다
 
 ```python
 import os
@@ -31,7 +31,7 @@ if "PREDICTIONGUARD_API_KEY" not in os.environ:
 
 ### Installation
 
-Install the Prediction Guard LangChain integration with
+다음 명령으로 Prediction Guard LangChain integration을 설치하세요
 
 ```python
 pip install -qU langchain-predictionguard
@@ -93,11 +93,11 @@ Because they make up everything!
 
 ## Tool Calling
 
-Prediction Guard has a tool calling API that lets you describe tools and their arguments, which enables the model to return a JSON object with a tool to call and the inputs to that tool. Tool-calling is very useful for building tool-using chains and agents, and for getting structured outputs from models more generally.
+Prediction Guard는 tool과 그 argument를 설명할 수 있는 tool calling API를 제공하며, 이를 통해 model이 호출할 tool과 해당 tool의 입력값을 포함하는 JSON object를 반환할 수 있습니다. Tool-calling은 tool을 사용하는 chain과 agent를 구축하고, 보다 일반적으로 model에서 구조화된 출력을 얻는 데 매우 유용합니다.
 
 ### ChatPredictionGuard.bind_tools()
 
-Using `ChatPredictionGuard.bind_tools()`, you can pass in Pydantic classes, dict schemas, and LangChain tools as tools to the model, which are then reformatted to allow for use by the model.
+`ChatPredictionGuard.bind_tools()`를 사용하면 Pydantic class, dict schema, LangChain tool을 model의 tool로 전달할 수 있으며, 이들은 model에서 사용할 수 있도록 재구성됩니다.
 
 ```python
 from pydantic import BaseModel, Field
@@ -134,7 +134,7 @@ AIMessage(content='', additional_kwargs={'tool_calls': [{'id': 'chatcmpl-tool-b1
 
 ### AIMessage.tool_calls
 
-Notice that the AIMessage has a tool_calls attribute. This contains in a standardized ToolCall format that is model-provider agnostic.
+AIMessage에 tool_calls attribute가 있음을 주목하세요. 이는 model-provider에 구애받지 않는 표준화된 ToolCall 형식을 포함합니다.
 
 ```python
 ai_msg.tool_calls
@@ -161,7 +161,7 @@ ai_msg.tool_calls
 
 ## Process Input
 
-With Prediction Guard, you can guard your model inputs for PII or prompt injections using one of our input checks. See the [Prediction Guard docs](https://docs.predictionguard.com/docs/process-llm-input/) for more information.
+Prediction Guard를 사용하면 입력 검사 중 하나를 사용하여 PII 또는 prompt injection에 대해 model 입력을 보호할 수 있습니다. 자세한 내용은 [Prediction Guard docs](https://docs.predictionguard.com/docs/process-llm-input/)를 참조하세요.
 
 ### PII
 
@@ -202,7 +202,7 @@ Could not make prediction. prompt injection detected
 
 ## Output Validation
 
-With Prediction Guard, you can check validate the model outputs using factuality to guard against hallucinations and incorrect info, and toxicity to guard against toxic responses (e.g. profanity, hate speech). See the [Prediction Guard docs](https://docs.predictionguard.com/docs/validating-llm-output) for more information.
+Prediction Guard를 사용하면 factuality를 사용하여 환각(hallucination)과 잘못된 정보를 방지하고, toxicity를 사용하여 유해한 응답(예: 욕설, 혐오 발언)을 방지하여 model 출력을 검증할 수 있습니다. 자세한 내용은 [Prediction Guard docs](https://docs.predictionguard.com/docs/validating-llm-output)를 참조하세요.
 
 ### Toxicity
 
@@ -261,7 +261,7 @@ AIMessage(content='Step 1: Determine the year Justin Bieber was born.\nJustin Bi
 
 ## API reference
 
-For detailed documentation of all ChatPredictionGuard features and configurations, check out the API reference: [python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.predictionguard.ChatPredictionGuard.html](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.predictionguard.ChatPredictionGuard.html)
+모든 ChatPredictionGuard 기능 및 구성에 대한 자세한 문서는 API reference를 확인하세요: [python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.predictionguard.ChatPredictionGuard.html](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.predictionguard.ChatPredictionGuard.html)
 
 ```python
 

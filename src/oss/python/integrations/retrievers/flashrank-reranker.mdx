@@ -2,9 +2,9 @@
 title: FlashRank reranker
 ---
 
->[FlashRank](https://github.com/PrithivirajDamodaran/FlashRank) is the Ultra-lite & Super-fast Python library to add re-ranking to your existing search & retrieval pipelines. It is based on SoTA cross-encoders, with gratitude to all the model owners.
+>[FlashRank](https://github.com/PrithivirajDamodaran/FlashRank)는 기존 검색 및 retrieval pipeline에 reranking을 추가할 수 있는 초경량 및 초고속 Python 라이브러리입니다. 최신(SoTA) cross-encoder를 기반으로 하며, 모든 모델 소유자에게 감사를 표합니다.
 
-This notebook shows how to use [flashrank](https://github.com/PrithivirajDamodaran/FlashRank) for document compression and retrieval.
+이 노트북은 문서 압축 및 retrieval을 위해 [flashrank](https://github.com/PrithivirajDamodaran/FlashRank)를 사용하는 방법을 보여줍니다.
 
 ```python
 pip install -qU  flashrank
@@ -30,9 +30,9 @@ def pretty_print_docs(docs):
     )
 ```
 
-## Set up the base vector store retriever
+## 기본 vector store retriever 설정
 
-Let's start by initializing a simple vector store retriever and storing the 2023 State of the Union speech (in chunks). We can set up the retriever to retrieve a high number (20) of docs.
+간단한 vector store retriever를 초기화하고 2023년 국정연설(청크 단위)을 저장하는 것부터 시작하겠습니다. retriever가 많은 수(20개)의 문서를 검색하도록 설정할 수 있습니다.
 
 ```python
 import getpass
@@ -266,9 +266,9 @@ The United States of America.
 May God bless you all. May God protect our troops.
 ```
 
-## Doing reranking with FlashRank
+## FlashRank로 reranking 수행하기
 
-Now let's wrap our base retriever with a `ContextualCompressionRetriever`, using `FlashrankRerank` as a compressor.
+이제 기본 retriever를 `ContextualCompressionRetriever`로 래핑하고, `FlashrankRerank`를 compressor로 사용하겠습니다.
 
 ```python
 from langchain.retrievers import ContextualCompressionRetriever
@@ -292,7 +292,7 @@ print([doc.metadata["id"] for doc in compressed_docs])
 [0, 5, 3]
 ```
 
-After reranking, the top 3 documents are different from the top 3 documents retrieved by the base retriever.
+reranking 후, 상위 3개 문서는 기본 retriever가 검색한 상위 3개 문서와 다릅니다.
 
 ```python
 pretty_print_docs(compressed_docs)
@@ -330,7 +330,7 @@ I’m a capitalist, but capitalism without competition isn’t capitalism.
 It’s exploitation—and it drives up prices.
 ```
 
-## QA reranking with FlashRank
+## FlashRank를 사용한 QA reranking
 
 ```python
 from langchain.chains import RetrievalQA

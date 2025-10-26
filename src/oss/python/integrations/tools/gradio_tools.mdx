@@ -2,17 +2,17 @@
 title: Gradio
 ---
 
-There are many 1000s of `Gradio` apps on `Hugging Face Spaces`. This library puts them at the tips of your LLM's fingers 🦾
+`Hugging Face Spaces`에는 수천 개의 `Gradio` 앱이 있습니다. 이 라이브러리는 이러한 앱들을 LLM의 손끝에 가져다 놓습니다 🦾
 
-Specifically, `gradio-tools` is a Python library for converting `Gradio` apps into tools that can be leveraged by a large language model (LLM)-based agent to complete its task. For example, an LLM could use a `Gradio` tool to transcribe a voice recording it finds online and then summarize it for you. Or it could use a different `Gradio` tool to apply OCR to a document on your Google Drive and then answer questions about it.
+구체적으로, `gradio-tools`는 `Gradio` 앱을 대규모 언어 모델(LLM) 기반 agent가 작업을 완료하는 데 활용할 수 있는 tool로 변환하는 Python 라이브러리입니다. 예를 들어, LLM은 `Gradio` tool을 사용하여 온라인에서 찾은 음성 녹음을 전사하고 요약할 수 있습니다. 또는 다른 `Gradio` tool을 사용하여 Google Drive의 문서에 OCR을 적용하고 이에 대한 질문에 답변할 수 있습니다.
 
-It's very easy to create you own tool if you want to use a space that's not one of the pre-built tools. Please see this section of the gradio-tools documentation for information on how to do that. All contributions are welcome!
+사전 구축된 tool이 아닌 space를 사용하고 싶다면 자신만의 tool을 만드는 것은 매우 쉽습니다. 이를 수행하는 방법에 대한 정보는 gradio-tools 문서의 해당 섹션을 참조하세요. 모든 기여를 환영합니다!
 
 ```python
 pip install -qU  gradio_tools langchain-community
 ```
 
-## Using a tool
+## tool 사용하기
 
 ```python
 from gradio_tools.tools import StableDiffusionTool
@@ -49,7 +49,7 @@ from IPython.display import display
 display(im)
 ```
 
-## Using within an agent
+## agent 내에서 사용하기
 
 ```python
 from gradio_tools.tools import (

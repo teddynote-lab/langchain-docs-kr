@@ -2,17 +2,17 @@
 title: Perigon
 ---
 
-The Perigon API suite provides fast, structured access to global news and events, helping you build real-time, data-driven products. Whether you're tracking emerging risks, surfacing relevant articles, or uncovering key insights, Perigon gives you the tools to do it programmatically.
+Perigon API suite는 글로벌 뉴스와 이벤트에 대한 빠르고 구조화된 액세스를 제공하여 실시간 데이터 기반 제품을 구축할 수 있도록 도와줍니다. 새로운 위험을 추적하거나, 관련 기사를 표시하거나, 핵심 인사이트를 발견하는 등 Perigon은 이를 프로그래밍 방식으로 수행할 수 있는 도구를 제공합니다.
 
-Unlike traditional keyword-based search, Perigon's semantic search capabilities allow it to understand queries contextually and return relevant documents.
+기존의 키워드 기반 검색과 달리 Perigon의 semantic search 기능은 쿼리를 맥락적으로 이해하고 관련 문서를 반환할 수 있습니다.
 
-This notebook demonstrates how to use Perigon's retrievers with LangChain for both news articles and Wikipedia content.
+이 노트북은 뉴스 기사와 Wikipedia 콘텐츠 모두에 대해 LangChain과 함께 Perigon의 retriever를 사용하는 방법을 보여줍니다.
 
 ## Setup
 
 ### Installation
 
-Install the LangChain Perigon integration package:
+LangChain Perigon integration package를 설치합니다:
 
 ```python
 pip install -qU langchain-perigon
@@ -23,7 +23,7 @@ pip install -qU langchain langchain-openai langchain-community
 
 ### Credentials
 
-You'll need a Perigon API key to use this integration. Sign up at [Perigon.io](https://perigon.io/) for your API key.
+이 integration을 사용하려면 Perigon API key가 필요합니다. [Perigon.io](https://perigon.io/)에서 가입하여 API key를 받으세요.
 
 ```python
 import getpass
@@ -33,11 +33,11 @@ if not os.environ.get("PERIGON_API_KEY"):
     os.environ["PERIGON_API_KEY"] = getpass.getpass("Perigon API key:\n")
 ```
 
-## Using ArticlesRetriever
+## ArticlesRetriever 사용하기
 
-The ArticlesRetriever allows you to search through news articles using semantic search capabilities:
+ArticlesRetriever를 사용하면 semantic search 기능을 사용하여 뉴스 기사를 검색할 수 있습니다:
 
-### Basic Usage
+### 기본 사용법
 
 ```python
 from langchain_perigon import ArticlesRetriever
@@ -68,9 +68,9 @@ except Exception as e:
     print(f"Error retrieving articles: {e}")
 ```
 
-### Advanced Features with Filtering
+### 필터링을 사용한 고급 기능
 
-You can use advanced filtering options to narrow down your search results:
+고급 필터링 옵션을 사용하여 검색 결과를 좁힐 수 있습니다:
 
 ```python
 from langchain_perigon import ArticlesRetriever, ArticlesFilter
@@ -113,9 +113,9 @@ except Exception as e:
     print(f"Error retrieving filtered articles: {e}")
 ```
 
-### Location-Based Filtering
+### 위치 기반 필터링
 
-You can filter articles by geographic relevance:
+지리적 관련성으로 기사를 필터링할 수 있습니다:
 
 ```python
 from langchain_perigon.types import ArticlesFilter
@@ -137,11 +137,11 @@ for doc in documents:
     print("-" * 60)
 ```
 
-## Using WikipediaRetriever
+## WikipediaRetriever 사용하기
 
-The WikipediaRetriever provides semantic search capabilities over Wikipedia content with rich metadata:
+WikipediaRetriever는 풍부한 메타데이터와 함께 Wikipedia 콘텐츠에 대한 semantic search 기능을 제공합니다:
 
-### Basic Usage
+### 기본 사용법
 
 ```python
 from langchain_perigon import WikipediaRetriever
@@ -172,9 +172,9 @@ except Exception as e:
     print(f"Error retrieving Wikipedia articles: {e}")
 ```
 
-### Advanced Wikipedia Search
+### 고급 Wikipedia 검색
 
-You can filter Wikipedia results by popularity, categories, and other metadata:
+인기도, 카테고리 및 기타 메타데이터로 Wikipedia 결과를 필터링할 수 있습니다:
 
 ```python
 from langchain_perigon import WikipediaRetriever, WikipediaOptions
@@ -205,9 +205,9 @@ for doc in documents:
     print("-" * 80)
 ```
 
-### Time-Based Wikipedia Filtering
+### 시간 기반 Wikipedia 필터링
 
-Filter Wikipedia articles by revision dates:
+수정 날짜로 Wikipedia 기사를 필터링합니다:
 
 ```python
 from langchain_perigon import WikipediaRetriever, WikipediaOptions
@@ -232,9 +232,9 @@ for doc in documents:
 
 ```
 
-## Async Usage
+## Async 사용법
 
-Both retrievers support asynchronous operations for better performance:
+두 retriever 모두 더 나은 성능을 위해 비동기 작업을 지원합니다:
 
 ```python
 import asyncio
@@ -322,4 +322,4 @@ except Exception as e:
 
 ## API reference
 
-For detailed documentation of all Perigon API features and configurations, visit the [Perigon API documentation](https://dev.perigon.io/docs).
+모든 Perigon API 기능 및 구성에 대한 자세한 문서는 [Perigon API documentation](https://dev.perigon.io/docs)을 참조하세요.

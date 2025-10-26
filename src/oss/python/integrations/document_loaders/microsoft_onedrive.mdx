@@ -2,37 +2,37 @@
 title: Microsoft OneDrive
 ---
 
->[Microsoft OneDrive](https://en.wikipedia.org/wiki/OneDrive) (formerly `SkyDrive`) is a file hosting service operated by Microsoft.
+>[Microsoft OneDrive](https://en.wikipedia.org/wiki/OneDrive) (이전 명칭 `SkyDrive`)는 Microsoft에서 운영하는 파일 호스팅 서비스입니다.
 
-This notebook covers how to load documents from `OneDrive`. By default the document loader loads `pdf`, `doc`, `docx` and `txt` files. You can load other file types by providing appropriate parsers (see more below).
+이 노트북은 `OneDrive`에서 문서를 로드하는 방법을 다룹니다. 기본적으로 document loader는 `pdf`, `doc`, `docx`, `txt` 파일을 로드합니다. 적절한 parser를 제공하여 다른 파일 형식을 로드할 수 있습니다(아래 참조).
 
 ## Prerequisites
 
-1. Register an application with the [Microsoft identity platform](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app) instructions.
-2. When registration finishes, the Azure portal displays the app registration's Overview pane. You see the Application (client) ID. Also called the `client ID`, this value uniquely identifies your application in the Microsoft identity platform.
-3. During the steps you will be following at **item 1**, you can set the redirect URI as `http://localhost:8000/callback`
-4. During the steps you will be following at **item 1**, generate a new password (`client_secret`) under Application Secrets section.
-5. Follow the instructions at this [document](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis#add-a-scope) to add the following `SCOPES` (`offline_access` and `Files.Read.All`) to your application.
-6. Visit the [Graph Explorer Playground](https://developer.microsoft.com/en-us/graph/graph-explorer) to obtain your `OneDrive ID`. The first step is to ensure you are logged in with the account associated your OneDrive account. Then you need to make a request to `https://graph.microsoft.com/v1.0/me/drive` and the response will return a payload with a field `id` that holds the ID of your OneDrive account.
-7. You need to install the o365 package using the command `pip install o365`.
-8. At the end of the steps you must have the following values:
+1. [Microsoft identity platform](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app) 지침에 따라 애플리케이션을 등록합니다.
+2. 등록이 완료되면 Azure portal에 앱 등록의 Overview 창이 표시됩니다. Application (client) ID가 표시됩니다. `client ID`라고도 하는 이 값은 Microsoft identity platform에서 애플리케이션을 고유하게 식별합니다.
+3. **항목 1**에서 수행할 단계 중에 redirect URI를 `http://localhost:8000/callback`으로 설정할 수 있습니다.
+4. **항목 1**에서 수행할 단계 중에 Application Secrets 섹션에서 새 password(`client_secret`)를 생성합니다.
+5. 이 [문서](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis#add-a-scope)의 지침에 따라 애플리케이션에 다음 `SCOPES`(`offline_access` 및 `Files.Read.All`)를 추가합니다.
+6. [Graph Explorer Playground](https://developer.microsoft.com/en-us/graph/graph-explorer)를 방문하여 `OneDrive ID`를 얻습니다. 첫 번째 단계는 OneDrive 계정과 연결된 계정으로 로그인했는지 확인하는 것입니다. 그런 다음 `https://graph.microsoft.com/v1.0/me/drive`에 요청을 보내야 하며, 응답은 OneDrive 계정의 ID를 포함하는 `id` 필드가 있는 payload를 반환합니다.
+7. `pip install o365` 명령을 사용하여 o365 package를 설치해야 합니다.
+8. 단계가 끝나면 다음 값들을 가지고 있어야 합니다:
 
 - `CLIENT_ID`
 - `CLIENT_SECRET`
 - `DRIVE_ID`
 
-## 🧑 Instructions for ingesting your documents from OneDrive
+## 🧑 OneDrive에서 문서를 수집하기 위한 지침
 
 ### 🔑 Authentication
 
-By default, the `OneDriveLoader` expects that the values of `CLIENT_ID` and `CLIENT_SECRET` must be stored as environment variables named `O365_CLIENT_ID` and `O365_CLIENT_SECRET` respectively. You could pass those environment variables through a `.env` file at the root of your application or using the following command in your script.
+기본적으로 `OneDriveLoader`는 `CLIENT_ID`와 `CLIENT_SECRET` 값이 각각 `O365_CLIENT_ID`와 `O365_CLIENT_SECRET`라는 이름의 environment variable로 저장되어 있어야 합니다. 애플리케이션 루트에 있는 `.env` 파일을 통해 또는 스크립트에서 다음 명령을 사용하여 이러한 environment variable을 전달할 수 있습니다.
 
 ```python
 os.environ['O365_CLIENT_ID'] = "YOUR CLIENT ID"
 os.environ['O365_CLIENT_SECRET'] = "YOUR CLIENT SECRET"
 ```
 
-This loader uses an authentication called [*on behalf of a user*](https://learn.microsoft.com/en-us/graph/auth-v2-user?context=graph%2Fapi%2F1.0&view=graph-rest-1.0). It is a 2 step authentication with user consent. When you instantiate the loader, it will call will print a url that the user must visit to give consent to the app on the required permissions. The user must then visit this url and give consent to the application. Then the user must copy the resulting page url and paste it back on the console. The method will then return True if the login attempt was successful.
+이 loader는 [*on behalf of a user*](https://learn.microsoft.com/en-us/graph/auth-v2-user?context=graph%2Fapi%2F1.0&view=graph-rest-1.0)라는 authentication을 사용합니다. 사용자 동의가 필요한 2단계 authentication입니다. loader를 인스턴스화하면 사용자가 필요한 권한에 대해 앱에 동의하기 위해 방문해야 하는 url을 출력합니다. 그런 다음 사용자는 이 url을 방문하여 애플리케이션에 동의해야 합니다. 그런 다음 사용자는 결과 페이지 url을 복사하여 콘솔에 다시 붙여넣어야 합니다. 그러면 메서드는 로그인 시도가 성공했을 경우 True를 반환합니다.
 
 ```python
 from langchain_community.document_loaders.onedrive import OneDriveLoader
@@ -40,7 +40,7 @@ from langchain_community.document_loaders.onedrive import OneDriveLoader
 loader = OneDriveLoader(drive_id="YOUR DRIVE ID")
 ```
 
-Once the authentication has been done, the loader will store a token (`o365_token.txt`) at `~/.credentials/` folder. This token could be used later to authenticate without the copy/paste steps explained earlier. To use this token for authentication, you need to change the `auth_with_token` parameter to True in the instantiation of the loader.
+authentication이 완료되면 loader는 `~/.credentials/` 폴더에 token(`o365_token.txt`)을 저장합니다. 이 token은 나중에 앞서 설명한 복사/붙여넣기 단계 없이 authentication하는 데 사용할 수 있습니다. 이 token을 authentication에 사용하려면 loader를 인스턴스화할 때 `auth_with_token` parameter를 True로 변경해야 합니다.
 
 ```python
 from langchain_community.document_loaders.onedrive import OneDriveLoader
@@ -50,9 +50,9 @@ loader = OneDriveLoader(drive_id="YOUR DRIVE ID", auth_with_token=True)
 
 ### 🗂️ Documents loader
 
-#### 📑 Loading documents from a OneDrive Directory
+#### 📑 OneDrive Directory에서 문서 로드하기
 
-`OneDriveLoader` can load documents from a specific folder within your OneDrive. For instance, you want to load all documents that are stored at `Documents/clients` folder within your OneDrive.
+`OneDriveLoader`는 OneDrive 내의 특정 폴더에서 문서를 로드할 수 있습니다. 예를 들어, OneDrive 내의 `Documents/clients` 폴더에 저장된 모든 문서를 로드하려고 합니다.
 
 ```python
 from langchain_community.document_loaders.onedrive import OneDriveLoader
@@ -61,11 +61,11 @@ loader = OneDriveLoader(drive_id="YOUR DRIVE ID", folder_path="Documents/clients
 documents = loader.load()
 ```
 
-#### 📑 Loading documents from a list of Documents IDs
+#### 📑 Documents ID 목록에서 문서 로드하기
 
-Another possibility is to provide a list of `object_id` for each document you want to load. For that, you will need to query the [Microsoft Graph API](https://developer.microsoft.com/en-us/graph/graph-explorer) to find all the documents ID that you are interested in. This [link](https://learn.microsoft.com/en-us/graph/api/resources/onedrive?view=graph-rest-1.0#commonly-accessed-resources) provides a list of endpoints that will be helpful to retrieve the documents ID.
+또 다른 방법은 로드하려는 각 문서에 대한 `object_id` 목록을 제공하는 것입니다. 이를 위해서는 [Microsoft Graph API](https://developer.microsoft.com/en-us/graph/graph-explorer)를 쿼리하여 관심 있는 모든 문서 ID를 찾아야 합니다. 이 [링크](https://learn.microsoft.com/en-us/graph/api/resources/onedrive?view=graph-rest-1.0#commonly-accessed-resources)는 문서 ID를 검색하는 데 도움이 되는 endpoint 목록을 제공합니다.
 
-For instance, to retrieve information about all objects that are stored at the root of the Documents folder, you need make a request to: `https://graph.microsoft.com/v1.0/drives/{YOUR DRIVE ID}/root/children`. Once you have the list of IDs that you are interested in, then you can instantiate the loader with the following parameters.
+예를 들어, Documents 폴더의 루트에 저장된 모든 객체에 대한 정보를 검색하려면 `https://graph.microsoft.com/v1.0/drives/{YOUR DRIVE ID}/root/children`에 요청을 보내야 합니다. 관심 있는 ID 목록을 얻으면 다음 parameter로 loader를 인스턴스화할 수 있습니다.
 
 ```python
 from langchain_community.document_loaders.onedrive import OneDriveLoader
@@ -74,9 +74,9 @@ loader = OneDriveLoader(drive_id="YOUR DRIVE ID", object_ids=["ID_1", "ID_2"], a
 documents = loader.load()
 ```
 
-#### 📑 Choosing supported file types and preffered parsers
+#### 📑 지원되는 파일 형식 및 선호하는 parser 선택하기
 
-By default `OneDriveLoader` loads file types defined in [`document_loaders/parsers/registry`](https://github.com/langchain-ai/langchain/blob/master/libs/community/langchain_community/document_loaders/parsers/registry.py#L10-L22) using the default parsers (see below).
+기본적으로 `OneDriveLoader`는 기본 parser를 사용하여 [`document_loaders/parsers/registry`](https://github.com/langchain-ai/langchain/blob/master/libs/community/langchain_community/document_loaders/parsers/registry.py#L10-L22)에 정의된 파일 형식을 로드합니다(아래 참조).
 
 ```python
 def _get_default_parser() -> BaseBlobParser:
@@ -94,13 +94,12 @@ def _get_default_parser() -> BaseBlobParser:
     )
 ```
 
-You can override this behavior by passing `handlers` argument to `OneDriveLoader`.
-Pass a dictionary mapping either file extensions (like `"doc"`, `"pdf"`, etc.)
-or MIME types (like `"application/pdf"`, `"text/plain"`, etc.) to parsers.
-Note that you must use either file extensions or MIME types exclusively and
-cannot mix them.
+`OneDriveLoader`에 `handlers` argument를 전달하여 이 동작을 재정의할 수 있습니다.
+파일 확장자(`"doc"`, `"pdf"` 등) 또는 MIME type(`"application/pdf"`, `"text/plain"` 등)을 parser에 매핑하는 dictionary를 전달합니다.
+파일 확장자 또는 MIME type 중 하나만 사용해야 하며
+혼합할 수 없습니다.
 
-Do not include the leading dot for file extensions.
+파일 확장자에는 앞의 점을 포함하지 마세요.
 
 ```python
 # using file extensions:
@@ -122,9 +121,9 @@ loader = OneDriveLoader(document_library_id="...",
                             )
 ```
 
-In case multiple file extensions map to the same MIME type, the last dictionary item will
-apply.
-Example:
+여러 파일 확장자가 동일한 MIME type에 매핑되는 경우 마지막 dictionary 항목이
+적용됩니다.
+예시:
 
 ```python
 # 'jpg' and 'jpeg' both map to 'image/jpeg' MIME type. SecondParser() will be used

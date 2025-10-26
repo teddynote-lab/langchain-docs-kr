@@ -2,13 +2,13 @@
 title: Docugami
 ---
 
-This notebook covers how to load documents from `Docugami`. It provides the advantages of using this system over alternative data loaders.
+이 노트북은 `Docugami`에서 문서를 로드하는 방법을 다룹니다. 대체 데이터 로더에 비해 이 시스템을 사용할 때의 장점을 제공합니다.
 
 ## Prerequisites
 
-1. Install necessary python packages.
-2. Grab an access token for your workspace, and make sure it is set as the `DOCUGAMI_API_KEY` environment variable.
-3. Grab some docset and document IDs for your processed documents, as described here: [help.docugami.com/home/docugami-api](https://help.docugami.com/home/docugami-api)
+1. 필요한 python 패키지를 설치합니다.
+2. 워크스페이스에 대한 access token을 가져와서 `DOCUGAMI_API_KEY` 환경 변수로 설정되어 있는지 확인합니다.
+3. 처리된 문서에 대한 docset 및 document ID를 가져옵니다. 자세한 내용은 다음을 참조하세요: [help.docugami.com/home/docugami-api](https://help.docugami.com/home/docugami-api)
 
 ```python
 # You need the dgml-utils package to use the DocugamiLoader (run pip install directly without "poetry run" if you are not using poetry)
@@ -17,21 +17,21 @@ This notebook covers how to load documents from `Docugami`. It provides the adva
 
 ## Quick start
 
-1. Create a [Docugami workspace](http://www.docugami.com) (free trials available)
-2. Add your documents (PDF, DOCX or DOC) and allow Docugami to ingest and cluster them into sets of similar documents, e.g. NDAs, Lease Agreements, and Service Agreements. There is no fixed set of document types supported by the system, the clusters created depend on your particular documents, and you can [change the docset assignments](https://help.docugami.com/home/working-with-the-doc-sets-view) later.
-3. Create an access token via the Developer Playground for your workspace. [Detailed instructions](https://help.docugami.com/home/docugami-api)
-4. Explore the [Docugami API](https://api-docs.docugami.com) to get a list of your processed docset IDs, or just the document IDs for a particular docset.
-6. Use the DocugamiLoader as detailed below, to get rich semantic chunks for your documents.
-7. Optionally, build and publish one or more [reports or abstracts](https://help.docugami.com/home/reports). This helps Docugami improve the semantic XML with better tags based on your preferences, which are then added to the DocugamiLoader output as metadata. Use techniques like self-querying retriever to do high accuracy Document QA.
+1. [Docugami workspace](http://www.docugami.com)를 생성합니다 (무료 체험 가능)
+2. 문서(PDF, DOCX 또는 DOC)를 추가하고 Docugami가 이를 수집하여 유사한 문서 세트(예: NDA, 임대 계약서, 서비스 계약서)로 클러스터링하도록 합니다. 시스템에서 지원하는 고정된 문서 유형 세트는 없으며, 생성되는 클러스터는 특정 문서에 따라 달라지고, 나중에 [docset 할당을 변경](https://help.docugami.com/home/working-with-the-doc-sets-view)할 수 있습니다.
+3. Developer Playground를 통해 워크스페이스에 대한 access token을 생성합니다. [자세한 지침](https://help.docugami.com/home/docugami-api)
+4. [Docugami API](https://api-docs.docugami.com)를 탐색하여 처리된 docset ID 목록 또는 특정 docset에 대한 document ID를 가져옵니다.
+6. 아래에 설명된 대로 DocugamiLoader를 사용하여 문서에 대한 풍부한 의미론적 청크를 가져옵니다.
+7. 선택적으로 하나 이상의 [reports 또는 abstracts](https://help.docugami.com/home/reports)를 빌드하고 게시합니다. 이를 통해 Docugami는 사용자의 선호도에 따라 더 나은 태그로 의미론적 XML을 개선하며, 이는 metadata로 DocugamiLoader 출력에 추가됩니다. self-querying retriever와 같은 기술을 사용하여 높은 정확도의 Document QA를 수행합니다.
 
 ## Advantages vs Other Chunking Techniques
 
-Appropriate chunking of your documents is critical for retrieval from documents. Many chunking techniques exist, including simple ones that rely on whitespace and recursive chunk splitting based on character length. Docugami offers a different approach:
+문서에서 검색하기 위해서는 문서의 적절한 청킹이 중요합니다. 공백에 의존하는 간단한 기술과 문자 길이를 기반으로 한 재귀적 청크 분할을 포함하여 많은 청킹 기술이 존재합니다. Docugami는 다른 접근 방식을 제공합니다:
 
-1. **Intelligent Chunking:** Docugami breaks down every document into a hierarchical semantic XML tree of chunks of varying sizes, from single words or numerical values to entire sections. These chunks follow the semantic contours of the document, providing a more meaningful representation than arbitrary length or simple whitespace-based chunking.
-2. **Semantic Annotations:** Chunks are annotated with semantic tags that are coherent across the document set, facilitating consistent hierarchical queries across multiple documents, even if they are written and formatted differently. For example, in set of lease agreements, you can easily identify key provisions like the Landlord, Tenant, or Renewal Date, as well as more complex information such as the wording of any sub-lease provision or whether a specific jurisdiction has an exception section within a Termination Clause.
-3. **Structured Representation:** In addition, the XML tree indicates the structural contours of every document, using attributes denoting headings, paragraphs, lists, tables, and other common elements, and does that consistently across all supported document formats, such as scanned PDFs or DOCX files. It appropriately handles long-form document characteristics like page headers/footers or multi-column flows for clean text extraction.
-4. **Additional Metadata:** Chunks are also annotated with additional metadata, if a user has been using Docugami. This additional metadata can be used for high-accuracy Document QA without context window restrictions. See detailed code walk-through below.
+1. **Intelligent Chunking:** Docugami는 모든 문서를 단일 단어나 숫자 값에서 전체 섹션에 이르기까지 다양한 크기의 청크로 구성된 계층적 의미론적 XML 트리로 분해합니다. 이러한 청크는 문서의 의미론적 윤곽을 따르므로 임의의 길이나 단순한 공백 기반 청킹보다 더 의미 있는 표현을 제공합니다.
+2. **Semantic Annotations:** 청크는 문서 세트 전체에서 일관된 의미론적 태그로 주석이 달려 있어, 작성 및 형식이 다르더라도 여러 문서에 걸쳐 일관된 계층적 쿼리를 용이하게 합니다. 예를 들어, 임대 계약서 세트에서 Landlord, Tenant 또는 Renewal Date와 같은 주요 조항뿐만 아니라 전대 조항의 문구나 특정 관할권이 Termination Clause 내에 예외 섹션이 있는지와 같은 더 복잡한 정보를 쉽게 식별할 수 있습니다.
+3. **Structured Representation:** 또한 XML 트리는 제목, 단락, 목록, 표 및 기타 일반적인 요소를 나타내는 속성을 사용하여 모든 문서의 구조적 윤곽을 나타내며, 스캔된 PDF 또는 DOCX 파일과 같은 모든 지원되는 문서 형식에서 일관되게 수행합니다. 깨끗한 텍스트 추출을 위해 페이지 머리글/바닥글 또는 다중 열 흐름과 같은 장문 문서 특성을 적절하게 처리합니다.
+4. **Additional Metadata:** 사용자가 Docugami를 사용하고 있는 경우 청크에는 추가 metadata도 주석으로 달립니다. 이 추가 metadata는 context window 제한 없이 높은 정확도의 Document QA에 사용할 수 있습니다. 아래의 자세한 코드 워크스루를 참조하세요.
 
 ```python
 import os
@@ -41,7 +41,7 @@ from docugami_langchain.document_loaders import DocugamiLoader
 
 ## Load Documents
 
-If the DOCUGAMI_API_KEY environment variable is set, there is no need to pass it in to the loader explicitly otherwise you can pass it in as the `access_token` parameter.
+DOCUGAMI_API_KEY 환경 변수가 설정되어 있으면 로더에 명시적으로 전달할 필요가 없으며, 그렇지 않으면 `access_token` 매개변수로 전달할 수 있습니다.
 
 ```python
 DOCUGAMI_API_KEY = os.environ.get("DOCUGAMI_API_KEY")
@@ -61,18 +61,18 @@ len(chunks)
 120
 ```
 
-The `metadata` for each @[`Document`] (really, a chunk of an actual PDF, DOC or DOCX) contains some useful additional information:
+각 @[`Document`]의 `metadata`(실제로는 실제 PDF, DOC 또는 DOCX의 청크)에는 유용한 추가 정보가 포함되어 있습니다:
 
-1. **id and source:** ID and Name of the file (PDF, DOC or DOCX) the chunk is sourced from within Docugami.
-2. **xpath:** XPath inside the XML representation of the document, for the chunk. Useful for source citations directly to the actual chunk inside the document XML.
-3. **structure:** Structural attributes of the chunk, e.g. h1, h2, div, table, td, etc. Useful to filter out certain kinds of chunks if needed by the caller.
-4. **tag:** Semantic tag for the chunk, using various generative and extractive techniques. More details here: [github.com/docugami/DFM-benchmarks](https://github.com/docugami/DFM-benchmarks)
+1. **id and source:** Docugami 내에서 청크가 소싱된 파일(PDF, DOC 또는 DOCX)의 ID 및 이름.
+2. **xpath:** 청크에 대한 문서의 XML 표현 내부의 XPath. 문서 XML 내부의 실제 청크에 대한 소스 인용에 유용합니다.
+3. **structure:** 청크의 구조적 속성(예: h1, h2, div, table, td 등). 필요한 경우 호출자가 특정 종류의 청크를 필터링하는 데 유용합니다.
+4. **tag:** 다양한 생성 및 추출 기술을 사용한 청크의 의미론적 태그. 자세한 내용은 다음을 참조하세요: [github.com/docugami/DFM-benchmarks](https://github.com/docugami/DFM-benchmarks)
 
-You can control chunking behavior by setting the following properties on the `DocugamiLoader` instance:
+`DocugamiLoader` 인스턴스에서 다음 속성을 설정하여 청킹 동작을 제어할 수 있습니다:
 
-1. You can set min and max chunk size, which the system tries to adhere to with minimal truncation. You can set `loader.min_text_length` and `loader.max_text_length` to control these.
-2. By default, only the text for chunks is returned. However, Docugami's XML knowledge graph has additional rich information including semantic tags for entities inside the chunk. Set `loader.include_xml_tags = True` if you want the additional xml metadata on the returned chunks.
-3. In addition, you can set `loader.parent_hierarchy_levels` if you want Docugami to return parent chunks in the chunks it returns. The child chunks point to the parent chunks via the `loader.parent_id_key` value. This is useful e.g. with the MultiVector Retriever for [small-to-big](https://www.youtube.com/watch?v=ihSiRrOUwmg) retrieval. See detailed example later in this notebook.
+1. 최소 및 최대 청크 크기를 설정할 수 있으며, 시스템은 최소한의 잘림으로 이를 준수하려고 시도합니다. `loader.min_text_length` 및 `loader.max_text_length`를 설정하여 이를 제어할 수 있습니다.
+2. 기본적으로 청크의 텍스트만 반환됩니다. 그러나 Docugami의 XML knowledge graph에는 청크 내부의 엔티티에 대한 의미론적 태그를 포함한 추가적인 풍부한 정보가 있습니다. 반환된 청크에 추가 xml metadata를 원하면 `loader.include_xml_tags = True`를 설정하세요.
+3. 또한 Docugami가 반환하는 청크에 부모 청크를 반환하도록 하려면 `loader.parent_hierarchy_levels`를 설정할 수 있습니다. 자식 청크는 `loader.parent_id_key` 값을 통해 부모 청크를 가리킵니다. 이는 [small-to-big](https://www.youtube.com/watch?v=ihSiRrOUwmg) 검색을 위한 MultiVector Retriever와 함께 사용하는 데 유용합니다. 이 노트북의 뒷부분에서 자세한 예제를 참조하세요.
 
 ```python
 loader.min_text_length = 64
@@ -93,7 +93,7 @@ page_content='2.3 <RegularWorkingHours>All work will be executed during regular 
 
 ## Basic Use: Docugami Loader for Document QA
 
-You can use the Docugami Loader like a standard loader for Document QA over multiple docs, albeit with much better chunks that follow the natural contours of the document. There are many great tutorials on how to do this, e.g. [this one](https://www.youtube.com/watch?v=3yPBVii7Ct0). We can just use the same code, but use the `DocugamiLoader` for better chunking, instead of loading text or PDF files directly with basic splitting techniques.
+Docugami Loader를 여러 문서에 대한 Document QA를 위한 표준 로더처럼 사용할 수 있지만, 문서의 자연스러운 윤곽을 따르는 훨씬 더 나은 청크를 사용합니다. 이를 수행하는 방법에 대한 훌륭한 튜토리얼이 많이 있습니다. 예를 들어 [이 튜토리얼](https://www.youtube.com/watch?v=3yPBVii7Ct0)을 참조하세요. 동일한 코드를 사용할 수 있지만 기본 분할 기술로 텍스트 또는 PDF 파일을 직접 로드하는 대신 더 나은 청킹을 위해 `DocugamiLoader`를 사용합니다.
 
 ```python
 !poetry run pip install -U langchain-openai tiktoken langchain-chroma hnswlib
@@ -120,9 +120,9 @@ print(len(chunks))
 4674
 ```
 
-The documents returned by the loader are already split, so we don't need to use a text splitter. Optionally, we can use the metadata on each document, for example the structure or tag attributes, to do any post-processing we want.
+로더에서 반환된 문서는 이미 분할되어 있으므로 text splitter를 사용할 필요가 없습니다. 선택적으로 각 문서의 metadata(예: structure 또는 tag 속성)를 사용하여 원하는 후처리를 수행할 수 있습니다.
 
-We will just use the output of the `DocugamiLoader` as-is to set up a retrieval QA chain the usual way.
+일반적인 방법으로 retrieval QA chain을 설정하기 위해 `DocugamiLoader`의 출력을 그대로 사용합니다.
 
 ```python
 from langchain.chains import RetrievalQA
@@ -153,9 +153,9 @@ qa_chain("What can tenants do with signage on their properties?")
 
 ## Using Docugami Knowledge Graph for High Accuracy Document QA
 
-One issue with large documents is that the correct answer to your question may depend on chunks that are far apart in the document. Typical chunking techniques, even with overlap, will struggle with providing the LLM sufficent context to answer such questions. With upcoming very large context LLMs, it may be possible to stuff a lot of tokens, perhaps even entire documents, inside the context but this will still hit limits at some point with very long documents, or a lot of documents.
+대용량 문서의 한 가지 문제는 질문에 대한 올바른 답변이 문서에서 멀리 떨어진 청크에 의존할 수 있다는 것입니다. 중복이 있더라도 일반적인 청킹 기술은 LLM에 이러한 질문에 답변하기에 충분한 컨텍스트를 제공하는 데 어려움을 겪습니다. 곧 출시될 매우 큰 컨텍스트 LLM을 사용하면 많은 토큰, 심지어 전체 문서를 컨텍스트 내에 넣을 수 있지만, 매우 긴 문서나 많은 문서의 경우 어느 시점에서 여전히 한계에 도달할 것입니다.
 
-For example, if we ask a more complex question that requires the LLM to draw on chunks from different parts of the document, even OpenAI's powerful LLM is unable to answer correctly.
+예를 들어, LLM이 문서의 다른 부분에서 청크를 가져와야 하는 더 복잡한 질문을 하면 OpenAI의 강력한 LLM조차도 올바르게 답변할 수 없습니다.
 
 ```python
 chain_response = qa_chain("What is rentable area for the property owned by DHA Group?")
@@ -177,11 +177,11 @@ chain_response["source_documents"]
  Document(page_content='1.6 Rentable Area of the Premises.', metadata={'id': '5b39a1ae84d51682328dca1467be211f', 'name': 'Sample Commercial Leases/Shorebucks LLC_TX.pdf', 'structure': 'lim h1', 'xpath': '/docset:OFFICELEASE-section/docset:OFFICELEASE/docset:WITNESSETH-section/docset:WITNESSETH/dg:chunk/dg:chunk/docset:BasicLeaseInformation/docset:BASICLEASEINFORMATIONANDDEFINEDTERMS-section/docset:BASICLEASEINFORMATIONANDDEFINEDTERMS/docset:LandmarkLlc/dg:chunk[6]/dg:chunk'})]
 ```
 
-At first glance the answer may seem reasonable, but it is incorrect. If you review the source chunks carefully for this answer, you will see that the chunking of the document did not end up putting the Landlord name and the rentable area in the same context, and produced irrelevant chunks therefore the answer is incorrect (should be **13,500 sq ft**)
+언뜻 보면 답변이 합리적으로 보일 수 있지만 올바르지 않습니다. 이 답변의 소스 청크를 주의 깊게 검토하면 문서의 청킹이 Landlord 이름과 임대 가능 면적을 동일한 컨텍스트에 넣지 못했고 따라서 관련 없는 청크를 생성했으므로 답변이 올바르지 않습니다(**13,500 sq ft**이어야 함)
 
-Docugami can help here. Chunks are annotated with additional metadata created using different techniques if a user has been [using Docugami](https://help.docugami.com/home/reports). More technical approaches will be added later.
+Docugami가 여기서 도움이 될 수 있습니다. 사용자가 [Docugami를 사용](https://help.docugami.com/home/reports)하고 있는 경우 다양한 기술을 사용하여 생성된 추가 metadata로 청크에 주석이 달립니다. 더 기술적인 접근 방식은 나중에 추가될 예정입니다.
 
-Specifically, let's ask Docugami to return XML tags on its output, as well as additional metadata:
+구체적으로 Docugami에 출력에 XML 태그와 추가 metadata를 반환하도록 요청해 보겠습니다:
 
 ```python
 loader = DocugamiLoader(docset_id="zo954yqy53wp")
@@ -196,7 +196,7 @@ print(chunks[0].metadata)
 {'xpath': '/docset:OFFICELEASE-section/dg:chunk', 'id': '47297e277e556f3ce8b570047304560b', 'name': 'Sample Commercial Leases/Shorebucks LLC_AZ.pdf', 'source': 'Sample Commercial Leases/Shorebucks LLC_AZ.pdf', 'structure': 'h1 h1 p', 'tag': 'chunk Lease', 'Lease Date': 'March  29th , 2019', 'Landlord': 'Menlo Group', 'Tenant': 'Shorebucks LLC', 'Premises Address': '1564  E Broadway Rd ,  Tempe ,  Arizona  85282', 'Term of Lease': '96  full calendar months', 'Square Feet': '16,159'}
 ```
 
-We can use a self-querying retriever to improve our query accuracy, using this additional metadata:
+이 추가 metadata를 사용하여 self-querying retriever를 사용하여 쿼리 정확도를 향상시킬 수 있습니다:
 
 ```python
 !poetry run pip install -U lark --quiet
@@ -234,7 +234,7 @@ qa_chain = RetrievalQA.from_chain_type(
 )
 ```
 
-Let's run the same question again. It returns the correct result since all the chunks have metadata key/value pairs on them carrying key information about the document even if this information is physically very far away from the source chunk used to generate the answer.
+동일한 질문을 다시 실행해 보겠습니다. 모든 청크에 문서에 대한 주요 정보를 전달하는 metadata key/value 쌍이 있으므로 이 정보가 답변을 생성하는 데 사용된 소스 청크에서 물리적으로 매우 멀리 떨어져 있더라도 올바른 결과를 반환합니다.
 
 ```python
 qa_chain(
@@ -257,13 +257,13 @@ qa_chain(
   Document(page_content='1.11 Percentage Rent.\n (a) <GrossRevenue><Percent>55% </Percent>of Gross Revenue to Landlord until Landlord receives Percentage Rent in an amount equal to the Annual Market Rent Hurdle (as escalated); and </GrossRevenue>', metadata={'Landlord': 'DHA Group', 'Lease Date': 'March  29th , 2019', 'Premises Address': '111  Bauer Dr ,  Oakland ,  New Jersey ,  07436', 'Square Feet': '13,500', 'Tenant': 'Shorebucks LLC', 'Term of Lease': '84  full calendar  months', 'id': 'c8bb9cbedf65a578d9db3f25f519dd3d', 'name': 'Sample Commercial Leases/Shorebucks LLC_NJ.pdf', 'source': 'Sample Commercial Leases/Shorebucks LLC_NJ.pdf', 'structure': 'lim h1 lim p', 'tag': 'chunk GrossRevenue', 'xpath': '/docset:OFFICELEASE-section/docset:OFFICELEASE-section/docset:OFFICELEASE/docset:WITNESSETH-section/docset:WITNESSETH/docset:GrossRentCredit-section/docset:GrossRentCredit/dg:chunk/dg:chunk/dg:chunk/docset:PercentageRent/dg:chunk[1]/dg:chunk[1]'})]}
 ```
 
-This time the answer is correct, since the self-querying retriever created a filter on the landlord attribute of the metadata, correctly filtering to document that specifically is about the DHA Group landlord. The resulting source chunks are all relevant to this landlord, and this improves answer accuracy even though the landlord is not directly mentioned in the specific chunk that contains the correct answer.
+이번에는 답변이 정확합니다. self-querying retriever가 metadata의 landlord 속성에 대한 필터를 생성하여 DHA Group landlord에 대한 문서로 올바르게 필터링했기 때문입니다. 결과 소스 청크는 모두 이 landlord와 관련이 있으며, landlord가 올바른 답변을 포함하는 특정 청크에 직접 언급되지 않았더라도 답변 정확도가 향상됩니다.
 
 # Advanced Topic: Small-to-Big Retrieval with Document Knowledge Graph Hierarchy
 
-Documents are inherently semi-structured and the DocugamiLoader is able to navigate the semantic and structural contours of the document to provide parent chunk references on the chunks it returns. This is useful e.g. with the MultiVector Retriever for [small-to-big](https://www.youtube.com/watch?v=ihSiRrOUwmg) retrieval.
+문서는 본질적으로 반구조화되어 있으며 DocugamiLoader는 문서의 의미론적 및 구조적 윤곽을 탐색하여 반환하는 청크에 부모 청크 참조를 제공할 수 있습니다. 이는 [small-to-big](https://www.youtube.com/watch?v=ihSiRrOUwmg) 검색을 위한 MultiVector Retriever와 함께 사용하는 데 유용합니다.
 
-To get parent chunk references, you can set `loader.parent_hierarchy_levels` to a non-zero value.
+부모 청크 참조를 가져오려면 `loader.parent_hierarchy_levels`를 0이 아닌 값으로 설정할 수 있습니다.
 
 ```python
 from typing import Dict, List

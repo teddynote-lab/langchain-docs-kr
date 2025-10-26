@@ -2,9 +2,9 @@
 title: SitemapLoader
 ---
 
-Extends from the `WebBaseLoader`, `SitemapLoader` loads a sitemap from a given URL, and then scrapes and loads all pages in the sitemap, returning each page as a Document.
+`WebBaseLoader`를 확장한 `SitemapLoader`는 주어진 URL에서 sitemap을 로드한 다음, sitemap의 모든 페이지를 스크래핑하고 로드하여 각 페이지를 Document로 반환합니다.
 
-The scraping is done concurrently. There are reasonable limits to concurrent requests, defaulting to 2 per second.  If you aren't concerned about being a good citizen, or you control the scrapped server, or don't care about load you can increase this limit. Note, while this will speed up the scraping process, it may cause the server to block you. Be careful!
+스크래핑은 동시에 수행됩니다. 동시 요청에는 합리적인 제한이 있으며, 기본값은 초당 2개입니다. 좋은 시민이 되는 것에 관심이 없거나, 스크래핑하는 서버를 제어하거나, 부하에 신경 쓰지 않는다면 이 제한을 늘릴 수 있습니다. 참고로, 이렇게 하면 스크래핑 프로세스의 속도가 빨라지지만 서버가 귀하를 차단할 수 있습니다. 주의하세요!
 
 ## Overview
 
@@ -22,13 +22,13 @@ The scraping is done concurrently. There are reasonable limits to concurrent req
 
 ## Setup
 
-To access SiteMap document loader you'll need to install the `langchain-community` integration package.
+SiteMap document loader에 액세스하려면 `langchain-community` integration package를 설치해야 합니다.
 
 ### Credentials
 
-No credentials are needed to run this.
+이를 실행하는 데 필요한 자격 증명은 없습니다.
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -37,7 +37,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-Install **langchain-community**.
+**langchain-community**를 설치합니다.
 
 ```python
 pip install -qU langchain-community
@@ -53,7 +53,7 @@ nest_asyncio.apply()
 
 ## Initialization
 
-Now we can instantiate our model object and load documents:
+이제 model object를 인스턴스화하고 document를 로드할 수 있습니다:
 
 ```python
 from langchain_community.document_loaders.sitemap import SitemapLoader
@@ -86,7 +86,7 @@ print(docs[0].metadata)
 {'source': 'https://api.python.langchain.com/en/stable/', 'loc': 'https://api.python.langchain.com/en/stable/', 'lastmod': '2024-05-15T00:29:42.163001+00:00', 'changefreq': 'weekly', 'priority': '1'}
 ```
 
-You can change the `requests_per_second` parameter to increase the max concurrent requests. and use `requests_kwargs` to pass kwargs when send requests.
+`requests_per_second` parameter를 변경하여 최대 동시 요청 수를 늘릴 수 있으며, `requests_kwargs`를 사용하여 요청을 보낼 때 kwargs를 전달할 수 있습니다.
 
 ```python
 sitemap_loader.requests_per_second = 2
@@ -96,7 +96,7 @@ sitemap_loader.requests_kwargs = {"verify": False}
 
 ## Lazy Load
 
-You can also load the pages lazily in order to minimize the memory load.
+메모리 부하를 최소화하기 위해 페이지를 lazy하게 로드할 수도 있습니다.
 
 ```python
 page = []
@@ -115,7 +115,7 @@ Fetching pages: 100%|##########| 28/28 [00:01<00:00, 19.06it/s]
 
 ## Filtering sitemap URLs
 
-Sitemaps can be massive files, with thousands of URLs.  Often you don't need every single one of them.  You can filter the URLs by passing a list of strings or regex patterns to the `filter_urls` parameter.  Only URLs that match one of the patterns will be loaded.
+Sitemap은 수천 개의 URL이 포함된 대용량 파일일 수 있습니다. 종종 모든 URL이 필요하지 않을 수 있습니다. `filter_urls` parameter에 문자열 목록이나 정규식 패턴을 전달하여 URL을 필터링할 수 있습니다. 패턴 중 하나와 일치하는 URL만 로드됩니다.
 
 ```python
 loader = SitemapLoader(
@@ -135,11 +135,11 @@ Document(page_content='\n\n\n\n\n\n\n\n\n\nLangChain Python API Reference Docume
 
 ## Add custom scraping rules
 
-The `SitemapLoader` uses `beautifulsoup4` for the scraping process, and it scrapes every element on the page by default. The `SitemapLoader` constructor accepts a custom scraping function. This feature can be helpful to tailor the scraping process to your specific needs; for example, you might want to avoid scraping headers or navigation elements.
+`SitemapLoader`는 스크래핑 프로세스에 `beautifulsoup4`를 사용하며, 기본적으로 페이지의 모든 요소를 스크래핑합니다. `SitemapLoader` constructor는 custom scraping function을 허용합니다. 이 기능은 특정 요구 사항에 맞게 스크래핑 프로세스를 조정하는 데 유용할 수 있습니다. 예를 들어, header나 navigation 요소의 스크래핑을 피하고 싶을 수 있습니다.
 
- The following example shows how to develop and use a custom function to avoid navigation and header elements.
+다음 예제는 navigation 및 header 요소를 피하기 위해 custom function을 개발하고 사용하는 방법을 보여줍니다.
 
-Import the `beautifulsoup4` library and define the custom function.
+`beautifulsoup4` library를 import하고 custom function을 정의합니다.
 
 ```python
 pip install beautifulsoup4
@@ -161,7 +161,7 @@ def remove_nav_and_header_elements(content: BeautifulSoup) -> str:
     return str(content.get_text())
 ```
 
-Add your custom function to the `SitemapLoader` object.
+custom function을 `SitemapLoader` object에 추가합니다.
 
 ```python
 loader = SitemapLoader(
@@ -173,7 +173,7 @@ loader = SitemapLoader(
 
 ## Local Sitemap
 
-The sitemap loader can also be used to load local files.
+sitemap loader는 local file을 로드하는 데에도 사용할 수 있습니다.
 
 ```python
 sitemap_loader = SitemapLoader(web_path="example_data/sitemap.xml", is_local=True)
@@ -183,4 +183,4 @@ docs = sitemap_loader.load()
 
 ## API reference
 
-For detailed documentation of all SiteMapLoader features and configurations head to the API reference: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.sitemap.SitemapLoader.html#langchain_community.document_loaders.sitemap.SitemapLoader](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.sitemap.SitemapLoader.html#langchain_community.document_loaders.sitemap.SitemapLoader)
+모든 SiteMapLoader feature 및 configuration에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.sitemap.SitemapLoader.html#langchain_community.document_loaders.sitemap.SitemapLoader](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.sitemap.SitemapLoader.html#langchain_community.document_loaders.sitemap.SitemapLoader)

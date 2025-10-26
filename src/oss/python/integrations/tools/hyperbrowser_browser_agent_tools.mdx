@@ -2,36 +2,36 @@
 title: Hyperbrowser Browser Agent Tools
 ---
 
-[Hyperbrowser](https://hyperbrowser.ai) is a platform for running, running browser agents, and scaling headless browsers. It lets you launch and manage browser sessions at scale and provides easy to use solutions for any webscraping needs, such as scraping a single page or crawling an entire site.
+[Hyperbrowser](https://hyperbrowser.ai)는 브라우저 에이전트를 실행하고 headless 브라우저를 확장하기 위한 플랫폼입니다. 대규모로 브라우저 세션을 시작하고 관리할 수 있으며, 단일 페이지 스크래핑이나 전체 사이트 크롤링과 같은 모든 웹 스크래핑 요구사항에 대해 사용하기 쉬운 솔루션을 제공합니다.
 
-Key Features:
+주요 기능:
 
-- Instant Scalability - Spin up hundreds of browser sessions in seconds without infrastructure headaches
-- Simple Integration - Works seamlessly with popular tools like Puppeteer and Playwright
-- Powerful APIs - Easy to use APIs for scraping/crawling any site, and much more
-- Bypass Anti-Bot Measures - Built-in stealth mode, ad blocking, automatic CAPTCHA solving, and rotating proxies
+- 즉각적인 확장성 - 인프라 문제 없이 수백 개의 브라우저 세션을 몇 초 만에 시작
+- 간편한 통합 - Puppeteer 및 Playwright와 같은 인기 있는 도구와 원활하게 작동
+- 강력한 API - 모든 사이트를 스크래핑/크롤링하기 위한 사용하기 쉬운 API 등
+- 안티봇 조치 우회 - 내장된 스텔스 모드, 광고 차단, 자동 CAPTCHA 해결 및 순환 프록시
 
-This guide provides a quick overview for getting started with Hyperbrowser tools.
+이 가이드는 Hyperbrowser 도구를 시작하기 위한 빠른 개요를 제공합니다.
 
-For more information about Hyperbrowser, please visit the [Hyperbrowser website](https://hyperbrowser.ai) or if you want to check out the docs, you can visit the [Hyperbrowser docs](https://docs.hyperbrowser.ai).
+Hyperbrowser에 대한 자세한 내용은 [Hyperbrowser 웹사이트](https://hyperbrowser.ai)를 방문하거나, 문서를 확인하려면 [Hyperbrowser 문서](https://docs.hyperbrowser.ai)를 방문하세요.
 
 ## Browser Agents
 
-Hyperbrowser provides powerful browser agent tools that enable AI models to interact with web browsers programmatically. These browser agents can navigate websites, fill forms, click buttons, extract data, and perform complex web automation tasks.
+Hyperbrowser는 AI 모델이 프로그래밍 방식으로 웹 브라우저와 상호작용할 수 있도록 하는 강력한 브라우저 에이전트 도구를 제공합니다. 이러한 브라우저 에이전트는 웹사이트를 탐색하고, 양식을 작성하고, 버튼을 클릭하고, 데이터를 추출하고, 복잡한 웹 자동화 작업을 수행할 수 있습니다.
 
-Browser agents are particularly useful for:
+브라우저 에이전트는 다음과 같은 경우에 특히 유용합니다:
 
-- Web scraping and data extraction from complex websites
-- Automating repetitive web tasks
-- Interacting with web applications that require authentication
-- Performing research across multiple websites
-- Testing web applications
+- 복잡한 웹사이트에서 웹 스크래핑 및 데이터 추출
+- 반복적인 웹 작업 자동화
+- 인증이 필요한 웹 애플리케이션과 상호작용
+- 여러 웹사이트에서 리서치 수행
+- 웹 애플리케이션 테스트
 
-Hyperbrowser offers three types of browser agent tools:
+Hyperbrowser는 세 가지 유형의 브라우저 에이전트 도구를 제공합니다:
 
-- **Browser Use Tool**: A general-purpose browser automation tool
-- **OpenAI CUA Tool**: Integration with OpenAI's Computer Use Agent
-- **Claude Computer Use Tool**: Integration with Anthropic's Claude for computer use
+- **Browser Use Tool**: 범용 브라우저 자동화 도구
+- **OpenAI CUA Tool**: OpenAI의 Computer Use Agent와의 통합
+- **Claude Computer Use Tool**: Anthropic의 Claude와의 컴퓨터 사용 통합
 
 ## Overview
 
@@ -45,11 +45,11 @@ Hyperbrowser offers three types of browser agent tools:
 
 ## Setup
 
-To access the Hyperbrowser tools you'll need to install the `langchain-hyperbrowser` integration package, and create a Hyperbrowser account and get an API key.
+Hyperbrowser 도구에 액세스하려면 `langchain-hyperbrowser` 통합 패키지를 설치하고, Hyperbrowser 계정을 생성하고 API 키를 받아야 합니다.
 
 ### Credentials
 
-Head to [Hyperbrowser](https://app.hyperbrowser.ai/) to sign up and generate an API key. Once you've done this set the HYPERBROWSER_API_KEY environment variable:
+[Hyperbrowser](https://app.hyperbrowser.ai/)로 이동하여 가입하고 API 키를 생성하세요. 완료되면 HYPERBROWSER_API_KEY 환경 변수를 설정하세요:
 
 ```bash
 export HYPERBROWSER_API_KEY=<your-api-key>
@@ -57,7 +57,7 @@ export HYPERBROWSER_API_KEY=<your-api-key>
 
 ### Installation
 
-Install **langchain-hyperbrowser**.
+**langchain-hyperbrowser**를 설치하세요.
 
 ```python
 pip install -qU langchain-hyperbrowser
@@ -67,7 +67,7 @@ pip install -qU langchain-hyperbrowser
 
 ### Browser Use Tool
 
-The `HyperbrowserBrowserUseTool` is a tool to perform web automation tasks using a browser agent, specifically the Browser-Use agent.
+`HyperbrowserBrowserUseTool`은 브라우저 에이전트, 특히 Browser-Use 에이전트를 사용하여 웹 자동화 작업을 수행하는 도구입니다.
 
 ```python
 from langchain_hyperbrowser import HyperbrowserBrowserUseTool
@@ -76,7 +76,7 @@ tool = HyperbrowserBrowserUseTool()
 
 ### OpenAI CUA Tool
 
-The `HyperbrowserOpenAICUATool` is a specialized tool that leverages OpenAI's Computer Use Agent (CUA) capabilities through Hyperbrowser.
+`HyperbrowserOpenAICUATool`은 Hyperbrowser를 통해 OpenAI의 Computer Use Agent (CUA) 기능을 활용하는 특수 도구입니다.
 
 ```python
 from langchain_hyperbrowser import HyperbrowserOpenAICUATool
@@ -85,7 +85,7 @@ tool = HyperbrowserOpenAICUATool()
 
 ### Claude Computer Use Tool
 
-The `HyperbrowserClaudeComputerUseTool` is a specialized tool that leverages Claude's computer use capabilities through Hyperbrowser.
+`HyperbrowserClaudeComputerUseTool`은 Hyperbrowser를 통해 Claude의 컴퓨터 사용 기능을 활용하는 특수 도구입니다.
 
 ```python
 from langchain_hyperbrowser import HyperbrowserClaudeComputerUseTool
@@ -142,7 +142,7 @@ print(result)
 
 ### With Custom Session Options
 
-All tools support custom session options:
+모든 도구는 사용자 정의 세션 옵션을 지원합니다:
 
 ```python
 result = tool.run(
@@ -162,7 +162,7 @@ print(result)
 
 ### Async Usage
 
-All tools support async usage:
+모든 도구는 비동기 사용을 지원합니다:
 
 ```python
 async def browse_website():
@@ -184,7 +184,7 @@ result = await browse_website()
 
 ## Use within an agent
 
-Here's how to use any of the Hyperbrowser tools within an agent:
+다음은 에이전트 내에서 Hyperbrowser 도구를 사용하는 방법입니다:
 
 ```python
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -229,13 +229,13 @@ The React package was last updated a day ago.
 
 ## Configuration Options
 
-Claude Computer Use, OpenAI CUA, and Browser Use have the following params available:
+Claude Computer Use, OpenAI CUA 및 Browser Use는 다음 매개변수를 사용할 수 있습니다:
 
-- `task`: The task to execute using the agent
-- `max_steps`: The maximum number of interaction steps the agent can take to complete the task
-- `session_options`: Browser session configuration
+- `task`: 에이전트를 사용하여 실행할 작업
+- `max_steps`: 에이전트가 작업을 완료하기 위해 수행할 수 있는 최대 상호작용 단계 수
+- `session_options`: 브라우저 세션 구성
 
-For more details, see the respective API references:
+자세한 내용은 각 API 참조를 확인하세요:
 
 - [Browser Use API Reference](https://docs.hyperbrowser.ai/reference/api-reference/agents/browser-use)
 - [OpenAI CUA API Reference](https://docs.hyperbrowser.ai/reference/api-reference/agents/openai-cua)

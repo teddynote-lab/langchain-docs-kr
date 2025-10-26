@@ -2,14 +2,14 @@
 title: Oracle Cloud Infrastructure Generative AI
 ---
 
-Oracle Cloud Infrastructure (OCI) Generative AI is a fully managed service that provides a set of state-of-the-art, customizable large language models (LLMs) that cover a wide range of use cases, and which is available through a single API.
-Using the OCI Generative AI service you can access ready-to-use pretrained models, or create and host your own fine-tuned custom models based on your own data on dedicated AI clusters. Detailed documentation of the service and API is available __[here](https://docs.oracle.com/en-us/iaas/Content/generative-ai/home.htm)__ and __[here](https://docs.oracle.com/en-us/iaas/api/#/en/generative-ai/20231130/)__.
+Oracle Cloud Infrastructure (OCI) Generative AI는 다양한 사용 사례를 다루는 최첨단의 커스터마이징 가능한 대규모 언어 모델(LLM) 세트를 제공하는 완전 관리형 서비스이며, 단일 API를 통해 사용할 수 있습니다.
+OCI Generative AI 서비스를 사용하면 바로 사용 가능한 사전 학습된 모델에 액세스하거나, 전용 AI 클러스터에서 자체 데이터를 기반으로 파인튜닝된 커스텀 모델을 생성하고 호스팅할 수 있습니다. 서비스 및 API에 대한 자세한 문서는 __[여기](https://docs.oracle.com/en-us/iaas/Content/generative-ai/home.htm)__와 __[여기](https://docs.oracle.com/en-us/iaas/api/#/en/generative-ai/20231130/)__에서 확인할 수 있습니다.
 
-This notebook explains how to use OCI's Generative AI complete models with LangChain.
+이 노트북은 LangChain과 함께 OCI의 Generative AI complete 모델을 사용하는 방법을 설명합니다.
 
 ## Setup
 
-Ensure that the oci sdk and the langchain-community package are installed
+oci sdk와 langchain-community 패키지가 설치되어 있는지 확인하세요
 
 ```python
 !pip install -U oci langchain-community
@@ -66,9 +66,9 @@ for chunk in llm.stream("Write me a song about sparkling water."):
 
 ## Authentication
 
-The authentication methods supported for LlamaIndex are equivalent to those used with other OCI services and follow the __[standard SDK authentication](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/sdk_authentication_methods.htm)__ methods, specifically API Key, session token, instance principal, and resource principal.
+LlamaIndex에서 지원되는 인증 방법은 다른 OCI 서비스에서 사용되는 방법과 동일하며, __[표준 SDK 인증](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/sdk_authentication_methods.htm)__ 방법, 특히 API Key, session token, instance principal, resource principal을 따릅니다.
 
-API key is the default authentication method used in the examples above. The following example demonstrates how to use a different authentication method (session token)
+API key는 위 예제에서 사용된 기본 인증 방법입니다. 다음 예제는 다른 인증 방법(session token)을 사용하는 방법을 보여줍니다
 
 ```python
 llm = OCIGenAI(
@@ -83,9 +83,9 @@ llm = OCIGenAI(
 
 ## Dedicated AI Cluster
 
-To access models hosted in a dedicated AI cluster __[create an endpoint](https://docs.oracle.com/en-us/iaas/api/#/en/generative-ai-inference/20231130/)__ whose assigned OCID (currently prefixed by ‘ocid1.generativeaiendpoint.oc1.us-chicago-1’) is used as your model ID.
+전용 AI 클러스터에서 호스팅되는 모델에 액세스하려면 __[endpoint를 생성](https://docs.oracle.com/en-us/iaas/api/#/en/generative-ai-inference/20231130/)__하고, 할당된 OCID(현재 'ocid1.generativeaiendpoint.oc1.us-chicago-1'로 시작)를 모델 ID로 사용합니다.
 
-When accessing models hosted in a dedicated AI cluster you will need to initialize the OCIGenAI interface with two extra required params ("provider" and "context_size").
+전용 AI 클러스터에서 호스팅되는 모델에 액세스할 때는 두 개의 추가 필수 매개변수("provider"와 "context_size")로 OCIGenAI 인터페이스를 초기화해야 합니다.
 
 ```python
 llm = OCIGenAI(

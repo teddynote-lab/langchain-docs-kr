@@ -2,7 +2,7 @@
 title: PDFPlumber
 ---
 
-Like PyMuPDF, the output Documents contain detailed metadata about the PDF and its pages, and returns one document per page.
+PyMuPDF와 마찬가지로, 출력 Document는 PDF와 해당 페이지에 대한 상세한 메타데이터를 포함하며, 페이지당 하나의 document를 반환합니다.
 
 ## Overview
 
@@ -22,9 +22,9 @@ Like PyMuPDF, the output Documents contain detailed metadata about the PDF and i
 
 ### Credentials
 
-No credentials are needed to use this loader.
+이 loader를 사용하는 데 필요한 자격 증명은 없습니다.
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출에 대한 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -33,7 +33,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-Install **langchain-community**.
+**langchain-community**를 설치합니다.
 
 ```python
 pip install -qU langchain-community
@@ -41,7 +41,7 @@ pip install -qU langchain-community
 
 ## Initialization
 
-Now we can instantiate our model object and load documents:
+이제 model 객체를 인스턴스화하고 document를 로드할 수 있습니다:
 
 ```python
 from langchain_community.document_loaders import PDFPlumberLoader
@@ -83,4 +83,4 @@ for doc in loader.lazy_load():
 
 ## API reference
 
-For detailed documentation of all PDFPlumberLoader features and configurations head to the API reference: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PDFPlumberLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PDFPlumberLoader.html)
+모든 PDFPlumberLoader 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PDFPlumberLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PDFPlumberLoader.html)

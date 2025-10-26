@@ -2,9 +2,9 @@
 title: Anyscale
 ---
 
-[Anyscale](https://www.anyscale.com/) is a fully-managed [Ray](https://www.ray.io/) platform, on which you can build, deploy, and manage scalable AI and Python applications
+[Anyscale](https://www.anyscale.com/)은 확장 가능한 AI 및 Python 애플리케이션을 구축, 배포 및 관리할 수 있는 완전 관리형 [Ray](https://www.ray.io/) 플랫폼입니다.
 
-This example goes over how to use LangChain to interact with [Anyscale Endpoint](https://app.endpoints.anyscale.com/).
+이 예제는 LangChain을 사용하여 [Anyscale Endpoint](https://app.endpoints.anyscale.com/)와 상호작용하는 방법을 다룹니다.
 
 ```python
 ##Installing the langchain packages needed to use the integration
@@ -52,7 +52,7 @@ question = "When was George Washington president?"
 llm_chain.invoke({"question": question})
 ```
 
-With Ray, we can distribute the queries without asynchronized implementation. This not only applies to Anyscale LLM model, but to any other LangChain LLM models which do not have `_acall` or `_agenerate` implemented
+Ray를 사용하면 비동기 구현 없이도 쿼리를 분산할 수 있습니다. 이는 Anyscale LLM 모델뿐만 아니라 `_acall` 또는 `_agenerate`가 구현되지 않은 다른 LangChain LLM 모델에도 적용됩니다.
 
 ```python
 prompt_list = [

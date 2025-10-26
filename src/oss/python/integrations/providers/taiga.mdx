@@ -1,12 +1,13 @@
+```mdx
 ---
 title: Taiga
 ---
 
-> [Taiga](https://docs.taiga.io/) is an open-source project management platform designed for agile teams, offering features like Kanban, Scrum, and issue tracking.
+> [Taiga](https://docs.taiga.io/)는 애자일 팀을 위해 설계된 오픈소스 프로젝트 관리 플랫폼으로, Kanban, Scrum, 이슈 추적과 같은 기능을 제공합니다.
 
 ## Installation and Setup
 
-Install the `langchain-taiga` package:
+`langchain-taiga` package를 설치하세요:
 
 <CodeGroup>
 ```bash pip
@@ -18,7 +19,7 @@ uv add langchain-taiga
 ```
 </CodeGroup>
 
-You must provide a logins via environment variable so the tools can authenticate.
+tool이 인증할 수 있도록 환경 변수를 통해 로그인 정보를 제공해야 합니다.
 
 ```bash
 export TAIGA_URL="https://taiga.xyz.org/"
@@ -33,13 +34,13 @@ export OPENAI_API_KEY="OPENAI_API_KEY"
 
 ## Tools
 
-See a [usage example](/oss/integrations/tools/taiga)
+[사용 예제](/oss/integrations/tools/taiga)를 참조하세요
 
 ---
 
 ## Toolkit
 
-`TaigaToolkit` groups multiple Taiga-related tools into a single interface.
+`TaigaToolkit`은 여러 Taiga 관련 tool을 단일 인터페이스로 그룹화합니다.
 
 ```python
 from langchain_taiga.toolkits import TaigaToolkit
@@ -54,4 +55,5 @@ tools = toolkit.get_tools()
 ## Future Integrations
 
 
-Check the [Taiga Developer Docs](https://docs.taiga.io/) for more information, and watch for updates or advanced usage examples in the [langchain_taiga GitHub repo](https://github.com/Shikenso-Analytics/langchain-taiga).
+자세한 정보는 [Taiga Developer Docs](https://docs.taiga.io/)를 확인하고, [langchain_taiga GitHub repo](https://github.com/Shikenso-Analytics/langchain-taiga)에서 업데이트나 고급 사용 예제를 확인하세요.
+```

@@ -3,9 +3,9 @@ title: ChatTogether
 ---
 
 
-This page will help you get started with Together AI [chat models](/oss/langchain/models). For detailed documentation of all ChatTogether features and configurations, head to the [API reference](https://python.langchain.com/api_reference/together/chat_models/langchain_together.chat_models.ChatTogether.html).
+이 페이지는 Together AI [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 ChatTogether 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/together/chat_models/langchain_together.chat_models.ChatTogether.html)를 참조하세요.
 
-[Together AI](https://www.together.ai/) offers an API to query [50+ leading open-source models](https://docs.together.ai/docs/chat-models)
+[Together AI](https://www.together.ai/)는 [50개 이상의 주요 오픈소스 모델](https://docs.together.ai/docs/chat-models)을 쿼리할 수 있는 API를 제공합니다.
 
 ## Overview
 
@@ -23,11 +23,11 @@ This page will help you get started with Together AI [chat models](/oss/langchai
 
 ## Setup
 
-To access Together models you'll need to create a/an Together account, get an API key, and install the `langchain-together` integration package.
+Together 모델에 액세스하려면 Together 계정을 생성하고, API key를 발급받고, `langchain-together` integration package를 설치해야 합니다.
 
 ### Credentials
 
-Head to [this page](https://api.together.ai) to sign up to Together and generate an API key. Once you've done this, set the TOGETHER_API_KEY environment variable:
+[이 페이지](https://api.together.ai)로 이동하여 Together에 가입하고 API key를 생성하세요. 완료되면 TOGETHER_API_KEY environment variable을 설정하세요:
 
 ```python
 import getpass
@@ -37,7 +37,7 @@ if "TOGETHER_API_KEY" not in os.environ:
     os.environ["TOGETHER_API_KEY"] = getpass.getpass("Enter your Together API key: ")
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -46,7 +46,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-The LangChain Together integration is included in the `langchain-together` package:
+LangChain Together integration은 `langchain-together` package에 포함되어 있습니다:
 
 ```python
 pip install -qU langchain-together
@@ -54,7 +54,7 @@ pip install -qU langchain-together
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```python
 from langchain_together import ChatTogether
@@ -97,4 +97,4 @@ J'adore la programmation.
 
 ## API reference
 
-For detailed documentation of all ChatTogether features and configurations, head to the API reference: [python.langchain.com/api_reference/together/chat_models/langchain_together.chat_models.ChatTogether.html](https://python.langchain.com/api_reference/together/chat_models/langchain_together.chat_models.ChatTogether.html)
+모든 ChatTogether 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/together/chat_models/langchain_together.chat_models.ChatTogether.html](https://python.langchain.com/api_reference/together/chat_models/langchain_together.chat_models.ChatTogether.html)

@@ -4,27 +4,27 @@ title: ExaRetriever
 
 ## Overview
 
-[Exa](https://exa.ai/) is a search engine that retrieves relevant content from the web given some input query.
+[Exa](https://exa.ai/)는 입력 쿼리를 기반으로 웹에서 관련 콘텐츠를 검색하는 검색 엔진입니다.
 
-This guide will help you getting started with the Exa [retriever](/oss/langchain/retrieval). For detailed documentation of all `ExaRetriever` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_exa.ExaRetriever.html).
+이 가이드는 Exa [retriever](/oss/langchain/retrieval) 시작하기를 도와드립니다. 모든 `ExaRetriever` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_exa.ExaRetriever.html)를 참조하세요.
 
 ### Integration details
 
 | Retriever | Source | Package |
 | :--- | :--- | :---: |
-[ExaRetriever](https://api.js.langchain.com/classes/langchain_exa.ExaRetriever.html) | Information on the web. | [`@langchain/exa`](https://www.npmjs.com/package/@langchain/exa) |
+[ExaRetriever](https://api.js.langchain.com/classes/langchain_exa.ExaRetriever.html) | 웹상의 정보. | [`@langchain/exa`](https://www.npmjs.com/package/@langchain/exa) |
 
 ## Setup
 
-You'll need to set your API key as an environment variable.
+API key를 환경 변수로 설정해야 합니다.
 
-The `Exa` class defaults to `EXASEARCH_API_KEY` when searching for your API key.
+`Exa` 클래스는 API key를 검색할 때 기본적으로 `EXASEARCH_API_KEY`를 사용합니다.
 
 ```typescript
 process.env.EXASEARCH_API_KEY="<YOUR API KEY>";
 ```
 
-If you want to get automated tracing from individual queries, you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+개별 쿼리에서 자동화된 추적을 원하시면, 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_API_KEY = "<YOUR API KEY HERE>";
@@ -33,7 +33,7 @@ If you want to get automated tracing from individual queries, you can also set y
 
 ### Installation
 
-This retriever lives in the `@langchain/exa` package:
+이 retriever는 `@langchain/exa` 패키지에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -49,7 +49,7 @@ pnpm add @langchain/exa @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our retriever:
+이제 retriever를 인스턴스화할 수 있습니다:
 
 ```typescript
 import { ExaRetriever } from "@langchain/exa";
@@ -187,4 +187,4 @@ await retriever.invoke(query);
 
 ## API reference
 
-For detailed documentation of all ExaRetriever features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_exa.ExaRetriever.html).
+모든 ExaRetriever 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_exa.ExaRetriever.html)를 참조하세요.

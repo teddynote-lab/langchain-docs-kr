@@ -3,7 +3,7 @@ title: ChatPerplexity
 ---
 
 
-This page will help you get started with Perplexity [chat models](/oss/langchain/models). For detailed documentation of all `ChatPerplexity` features and configurations head to the [API reference](https://python.langchain.com/api_reference/perplexity/chat_models/langchain_perplexity.chat_models.ChatPerplexity.html).
+이 페이지는 Perplexity [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 `ChatPerplexity` 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/perplexity/chat_models/langchain_perplexity.chat_models.ChatPerplexity.html)를 참조하세요.
 
 ## Overview
 
@@ -21,11 +21,11 @@ This page will help you get started with Perplexity [chat models](/oss/langchain
 
 ## Setup
 
-To access Perplexity models you'll need to create a Perplexity account, get an API key, and install the `langchain-perplexity` integration package.
+Perplexity 모델에 액세스하려면 Perplexity 계정을 생성하고 API 키를 받은 다음 `langchain-perplexity` integration package를 설치해야 합니다.
 
 ### Credentials
 
-Head to [this page](https://www.perplexity.ai/) to sign up for Perplexity and generate an API key. Once you've done this set the `PPLX_API_KEY` environment variable:
+[이 페이지](https://www.perplexity.ai/)로 이동하여 Perplexity에 가입하고 API 키를 생성하세요. 완료한 후 `PPLX_API_KEY` environment variable을 설정하세요:
 
 ```python
 import getpass
@@ -35,7 +35,7 @@ if "PPLX_API_KEY" not in os.environ:
     os.environ["PPLX_API_KEY"] = getpass.getpass("Enter your Perplexity API key: ")
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -47,13 +47,13 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_perplexity import ChatPerplexity
 ```
 
-The code provided assumes that your PPLX_API_KEY is set in your environment variables. If you would like to manually specify your API key and also choose a different model, you can use the following code:
+제공된 코드는 PPLX_API_KEY가 environment variables에 설정되어 있다고 가정합니다. API 키를 수동으로 지정하고 다른 모델을 선택하려면 다음 코드를 사용할 수 있습니다:
 
 ```python
 chat = ChatPerplexity(temperature=0, pplx_api_key="YOUR_API_KEY", model="sonar")
 ```
 
-You can check a list of available models [here](https://docs.perplexity.ai/docs/model-cards). For reproducibility, we can set the API key dynamically by taking it as an input in this notebook.
+사용 가능한 모델 목록은 [여기](https://docs.perplexity.ai/docs/model-cards)에서 확인할 수 있습니다. 재현성을 위해 이 notebook에서 입력으로 받아 API 키를 동적으로 설정할 수 있습니다.
 
 ```python
 chat = ChatPerplexity(temperature=0, model="sonar")
@@ -73,7 +73,7 @@ response.content
 'The Higgs Boson is an elementary subatomic particle that plays a crucial role in the Standard Model of particle physics, which accounts for three of the four fundamental forces governing the behavior of our universe: the strong and weak nuclear forces, electromagnetism, and gravity. The Higgs Boson is important for several reasons:\n\n1. **Final Elementary Particle**: The Higgs Boson is the last elementary particle waiting to be discovered under the Standard Model. Its detection helps complete the Standard Model and further our understanding of the fundamental forces in the universe.\n\n2. **Mass Generation**: The Higgs Boson is responsible for giving mass to other particles, a process that occurs through its interaction with the Higgs field. This mass generation is essential for the formation of atoms, molecules, and the visible matter we observe in the universe.\n\n3. **Implications for New Physics**: While the detection of the Higgs Boson has confirmed many aspects of the Standard Model, it also opens up new possibilities for discoveries beyond the Standard Model. Further research on the Higgs Boson could reveal insights into the nature of dark matter, supersymmetry, and other exotic phenomena.\n\n4. **Advancements in Technology**: The search for the Higgs Boson has led to significant advancements in technology, such as the development of artificial intelligence and machine learning algorithms used in particle accelerators like the Large Hadron Collider (LHC). These advancements have not only contributed to the discovery of the Higgs Boson but also have potential applications in various other fields.\n\nIn summary, the Higgs Boson is important because it completes the Standard Model, plays a crucial role in mass generation, hints at new physics phenomena beyond the Standard Model, and drives advancements in technology.\n'
 ```
 
-You can format and structure the prompts like you would typically. In the following example, we ask the model to tell us a joke about cats.
+일반적으로 하는 것처럼 prompt를 포맷하고 구조화할 수 있습니다. 다음 예제에서는 모델에게 고양이에 관한 농담을 해달라고 요청합니다.
 
 ```python
 chat = ChatPerplexity(temperature=0, model="sonar")
@@ -87,9 +87,9 @@ response.content
 'Here\'s a joke about cats:\n\nWhy did the cat want math lessons from a mermaid?\n\nBecause it couldn\'t find its "core purpose" in life!\n\nRemember, cats are unique and fascinating creatures, and each one has its own special traits and abilities. While some may see them as mysterious or even a bit aloof, they are still beloved pets that bring joy and companionship to their owners. So, if your cat ever seeks guidance from a mermaid, just remember that they are on their own journey to self-discovery!\n'
 ```
 
-## Using Perplexity-specific parameters through `ChatPerplexity`
+## `ChatPerplexity`를 통해 Perplexity 전용 parameter 사용하기
 
-You can also use Perplexity-specific parameters through the ChatPerplexity class. For example, parameters like search_domain_filter, return_images, return_related_questions or search_recency_filter using the extra_body parameter as shown below:
+ChatPerplexity class를 통해 Perplexity 전용 parameter를 사용할 수도 있습니다. 예를 들어, 아래와 같이 extra_body parameter를 사용하여 search_domain_filter, return_images, return_related_questions 또는 search_recency_filter와 같은 parameter를 사용할 수 있습니다:
 
 ```python
 chat = ChatPerplexity(temperature=0.7, model="sonar")
@@ -103,11 +103,10 @@ response.content
 "Sure, here's a cat joke for you:\n\nWhy are cats bad storytellers?\n\nBecause they only have one tale. (Pun alert!)\n\nSource: OneLineFun.com [4]"
 ```
 
-### Accessing the search results metadata
+### 검색 결과 metadata 액세스하기
 
-Perplexity often provides a list of the web pages it consulted (“search_results”).
-You don't need to pass any special parameter — the list is placed in
-`response.additional_kwargs["search_results"]`.
+Perplexity는 종종 참조한 웹 페이지 목록("search_results")을 제공합니다.
+특별한 parameter를 전달할 필요가 없으며, 목록은 `response.additional_kwargs["search_results"]`에 배치됩니다.
 
 ```python
 chat = ChatPerplexity(temperature=0, model="sonar")
@@ -140,7 +139,7 @@ In summary, Aconcagua stands as the tallest mountain in South America at about 6
   'date': '2023-07-05'}]
 ```
 
-## `ChatPerplexity` also supports streaming functionality
+## `ChatPerplexity`는 streaming 기능도 지원합니다
 
 ```python
 chat = ChatPerplexity(temperature=0.7, model="sonar")
@@ -166,7 +165,7 @@ Here is a list of some famous tourist attractions in Pakistan:
 These attractions showcase the rich history, diverse culture, and natural beauty of Pakistan, making them popular destinations for both local and international tourists.
 ```
 
-## `ChatPerplexity` Supports Structured Outputs for Tier 3+ Users
+## `ChatPerplexity`는 Tier 3+ 사용자를 위한 Structured Outputs를 지원합니다
 
 ```python
 from pydantic import BaseModel
@@ -192,3 +191,6 @@ response
 ```output
 AnswerFormat(first_name='Michael', last_name='Jordan', year_of_birth=1963, num_seasons_in_nba=15)
 ```
+
+
+CRITICAL: Provide ONLY the translated MDX content without any additional explanation, comments, or questions. If the content is empty or contains only frontmatter, return it exactly as provided.

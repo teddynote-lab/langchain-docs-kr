@@ -2,15 +2,15 @@
 title: DashVector
 ---
 
-> [DashVector](https://help.aliyun.com/document_detail/2510225.html) is a fully-managed vectorDB service that supports high-dimension dense and sparse vectors, real-time insertion and filtered search. It is built to scale automatically and can adapt to different application requirements.
+> [DashVector](https://help.aliyun.com/document_detail/2510225.html)는 고차원 dense 및 sparse vector를 지원하는 완전 관리형 vectorDB 서비스로, 실시간 삽입 및 필터링 검색을 지원합니다. 자동으로 확장되도록 구축되었으며 다양한 애플리케이션 요구사항에 적응할 수 있습니다.
 
-This document demonstrates to leverage DashVector within the LangChain ecosystem. In particular, it shows how to install DashVector, and how to use it as a VectorStore plugin in LangChain.
-It is broken into two parts: installation and setup, and then references to specific DashVector wrappers.
+이 문서는 LangChain 생태계 내에서 DashVector를 활용하는 방법을 보여줍니다. 특히 DashVector를 설치하는 방법과 LangChain에서 VectorStore plugin으로 사용하는 방법을 보여줍니다.
+이 문서는 두 부분으로 나뉩니다: 설치 및 설정, 그리고 특정 DashVector wrapper에 대한 참조입니다.
 
-## Installation and Setup
+## 설치 및 설정
 
 
-Install the Python SDK:
+Python SDK를 설치합니다:
 
 <CodeGroup>
 ```bash pip
@@ -22,7 +22,7 @@ uv add dashvector
 ```
 </CodeGroup>
 
-You must have an API key. Here are the [installation instructions](https://help.aliyun.com/document_detail/2510223.html).
+API key가 필요합니다. [설치 지침](https://help.aliyun.com/document_detail/2510223.html)을 참조하세요.
 
 
 ## Embedding models
@@ -31,17 +31,17 @@ You must have an API key. Here are the [installation instructions](https://help.
 from langchain_community.embeddings import DashScopeEmbeddings
 ```
 
-See the [use example](/oss/integrations/vectorstores/dashvector).
+[사용 예제](/oss/integrations/vectorstores/dashvector)를 참조하세요.
 
 
 ## Vector Store
 
-A DashVector Collection is wrapped as a familiar VectorStore for native usage within LangChain,
-which allows it to be readily used for various scenarios, such as semantic search or example selection.
+DashVector Collection은 LangChain 내에서 네이티브로 사용할 수 있도록 익숙한 VectorStore로 래핑되어 있으며,
+이를 통해 의미론적 검색이나 예제 선택과 같은 다양한 시나리오에 쉽게 사용할 수 있습니다.
 
-You may import the vectorstore by:
+다음과 같이 vectorstore를 import할 수 있습니다:
 ```python
 from langchain_community.vectorstores import DashVector
 ```
 
-For a detailed walkthrough of the DashVector wrapper, please refer to [this notebook](/oss/integrations/vectorstores/dashvector)
+DashVector wrapper에 대한 자세한 안내는 [이 notebook](/oss/integrations/vectorstores/dashvector)을 참조하세요.

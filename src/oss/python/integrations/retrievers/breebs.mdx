@@ -2,22 +2,22 @@
 title: Breebs
 ---
 
->[BREEBS](https://www.breebs.com/) is an open collaborative knowledge platform.
-Anybody can create a Breeb, a knowledge capsule, based on PDFs stored on a Google Drive folder.
-A breeb can be used by any LLM/chatbot to improve its expertise, reduce hallucinations and give access to sources.
-Behind the scenes, Breebs implements several Retrieval Augmented Generation (RAG) models to seamlessly provide useful context at each iteration.
+>[BREEBS](https://www.breebs.com/)는 오픈 협업 지식 플랫폼입니다.
+누구나 Google Drive 폴더에 저장된 PDF를 기반으로 지식 캡슐인 Breeb을 만들 수 있습니다.
+Breeb은 모든 LLM/챗봇이 전문성을 향상시키고, 환각(hallucination)을 줄이며, 출처에 대한 접근을 제공하는 데 사용할 수 있습니다.
+내부적으로 Breebs는 여러 Retrieval Augmented Generation (RAG) 모델을 구현하여 각 반복마다 유용한 컨텍스트를 원활하게 제공합니다.
 
-## List of available Breebs
+## 사용 가능한 Breebs 목록
 
-To get the full list of Breebs, including their key (breeb_key) and description :
+breeb_key와 설명을 포함한 전체 Breebs 목록을 확인하려면:
 [breebs.promptbreeders.com/web/listbreebs](https://breebs.promptbreeders.com/web/listbreebs).
-Dozens of Breebs have already been created by the community and are freely available for use. They cover a wide range of expertise, from organic chemistry to mythology, as well as tips on seduction and decentralized finance.
+커뮤니티에서 이미 수십 개의 Breebs를 만들었으며 무료로 사용할 수 있습니다. 유기 화학부터 신화, 연애 팁, 탈중앙화 금융에 이르기까지 광범위한 전문 분야를 다룹니다.
 
-## Creating a new Breeb
+## 새로운 Breeb 만들기
 
-To generate a new Breeb, simply compile PDF files in a publicly shared Google Drive folder and initiate the creation process on the [BREEBS website](https://www.breebs.com/) by clicking the "Create Breeb" button. You can currently include up to 120 files, with a total character limit of 15 million.
+새로운 Breeb을 생성하려면 공개 공유된 Google Drive 폴더에 PDF 파일을 모아두고 [BREEBS 웹사이트](https://www.breebs.com/)에서 "Create Breeb" 버튼을 클릭하여 생성 프로세스를 시작하면 됩니다. 현재 최대 120개의 파일을 포함할 수 있으며, 총 문자 제한은 1,500만 자입니다.
 
-## Retriever example
+## Retriever 예제
 
 ```python
 from langchain_community.retrievers import BreebsRetriever

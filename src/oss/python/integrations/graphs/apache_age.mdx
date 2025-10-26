@@ -2,16 +2,16 @@
 title: Apache AGE
 ---
 
->[Apache AGE](https://age.apache.org/) is a PostgreSQL extension that provides graph database functionality. AGE is an acronym for A Graph Extension, and is inspired by Bitnine’s fork of PostgreSQL 10, AgensGraph, which is a multi-model database. The goal of the project is to create single storage that can handle both relational and graph model data so that users can use standard ANSI SQL along with openCypher, the Graph query language. The data elements `Apache AGE` stores are nodes, edges connecting them, and attributes of nodes and edges.
+>[Apache AGE](https://age.apache.org/)는 graph database 기능을 제공하는 PostgreSQL extension입니다. AGE는 A Graph Extension의 약자이며, Bitnine의 PostgreSQL 10 fork인 AgensGraph에서 영감을 받았습니다. AgensGraph는 multi-model database입니다. 이 프로젝트의 목표는 relational 및 graph model 데이터를 모두 처리할 수 있는 단일 storage를 만들어 사용자가 표준 ANSI SQL과 함께 Graph query language인 openCypher를 사용할 수 있도록 하는 것입니다. `Apache AGE`가 저장하는 데이터 요소는 node, 이들을 연결하는 edge, 그리고 node와 edge의 attribute입니다.
 
->This notebook shows how to use LLMs to provide a natural language interface to a graph database you can query with the `Cypher` query language.
+>이 notebook은 LLM을 사용하여 `Cypher` query language로 쿼리할 수 있는 graph database에 자연어 interface를 제공하는 방법을 보여줍니다.
 
->[Cypher](https://en.wikipedia.org/wiki/Cypher_(query_language)) is a declarative graph query language that allows for expressive and efficient data querying in a property graph.
+>[Cypher](https://en.wikipedia.org/wiki/Cypher_(query_language))는 property graph에서 표현력 있고 효율적인 데이터 쿼리를 가능하게 하는 선언적 graph query language입니다.
 
-## Setting up
+## 설정하기
 
-You will need to have a running `Postgre` instance with the AGE extension installed. One option for testing is to run a docker container using the official AGE docker image.
-You can run a local docker container by running the executing the following script:
+AGE extension이 설치된 `Postgre` instance가 실행 중이어야 합니다. 테스트를 위한 한 가지 옵션은 공식 AGE docker image를 사용하여 docker container를 실행하는 것입니다.
+다음 스크립트를 실행하여 로컬 docker container를 실행할 수 있습니다:
 
 ```
 docker run \
@@ -24,7 +24,7 @@ docker run \
     apache/age
 ```
 
-Additional instructions on running in docker can be found [here](https://hub.docker.com/r/apache/age).
+docker에서 실행하는 방법에 대한 추가 지침은 [여기](https://hub.docker.com/r/apache/age)에서 확인할 수 있습니다.
 
 ```python
 from langchain_community.graphs.age_graph import AGEGraph
@@ -44,9 +44,9 @@ conf = {
 graph = AGEGraph(graph_name="age_test", conf=conf)
 ```
 
-## Seeding the database
+## 데이터베이스 시드하기
 
-Assuming your database is empty, you can populate it using Cypher query language. The following Cypher statement is idempotent, which means the database information will be the same if you run it one or multiple times.
+데이터베이스가 비어 있다고 가정하면 Cypher query language를 사용하여 데이터를 채울 수 있습니다. 다음 Cypher statement는 멱등성(idempotent)을 가지므로, 한 번 또는 여러 번 실행하더라도 데이터베이스 정보는 동일합니다.
 
 ```python
 graph.query(
@@ -64,9 +64,9 @@ MERGE (a)-[:ACTED_IN]->(m)
 []
 ```
 
-## Refresh graph schema information
+## Graph schema 정보 새로고침
 
-If the schema of database changes, you can refresh the schema information needed to generate Cypher statements.
+데이터베이스의 schema가 변경되면 Cypher statement를 생성하는 데 필요한 schema 정보를 새로고침할 수 있습니다.
 
 ```python
 graph.refresh_schema()
@@ -85,9 +85,9 @@ print(graph.schema)
         ['(:`Actor`)-[:`ACTED_IN`]->(:`Movie`)', '(:`LabelA`)-[:`REL_TYPE`]->(:`LabelB`)', '(:`LabelA`)-[:`REL_TYPE`]->(:`LabelC`)']
 ```
 
-## Querying the graph
+## Graph 쿼리하기
 
-We can now use the graph cypher QA chain to ask question of the graph
+이제 graph cypher QA chain을 사용하여 graph에 질문할 수 있습니다
 
 ```python
 chain = GraphCypherQAChain.from_llm(
@@ -118,10 +118,10 @@ Full Context:
  'result': 'Tom Cruise, Val Kilmer, Anthony Edwards, Meg Ryan played in Top Gun.'}
 ```
 
-## Limit the number of results
+## 결과 수 제한하기
 
-You can limit the number of results from the Cypher QA Chain using the `top_k` parameter.
-The default is 10.
+`top_k` parameter를 사용하여 Cypher QA Chain의 결과 수를 제한할 수 있습니다.
+기본값은 10입니다.
 
 ```python
 chain = GraphCypherQAChain.from_llm(
@@ -153,9 +153,9 @@ Full Context:
  'result': 'Tom Cruise, Val Kilmer played in Top Gun.'}
 ```
 
-## Return intermediate results
+## 중간 결과 반환하기
 
-You can return intermediate steps from the Cypher QA Chain using the `return_intermediate_steps` parameter
+`return_intermediate_steps` parameter를 사용하여 Cypher QA Chain의 중간 단계를 반환할 수 있습니다
 
 ```python
 chain = GraphCypherQAChain.from_llm(
@@ -187,9 +187,9 @@ Intermediate steps: [{'query': "MATCH (a:Actor)-[:ACTED_IN]->(m:Movie)\nWHERE m.
 Final answer: Tom Cruise, Val Kilmer, Anthony Edwards, Meg Ryan played in Top Gun.
 ```
 
-## Return direct results
+## 직접 결과 반환하기
 
-You can return direct results from the Cypher QA Chain using the `return_direct` parameter
+`return_direct` parameter를 사용하여 Cypher QA Chain의 직접 결과를 반환할 수 있습니다
 
 ```python
 chain = GraphCypherQAChain.from_llm(
@@ -222,9 +222,9 @@ RETURN a.name
   {'name': 'Meg Ryan'}]}
 ```
 
-## Add examples in the Cypher generation prompt
+## Cypher 생성 prompt에 예제 추가하기
 
-You can define the Cypher statement you want the LLM to generate for particular questions
+특정 질문에 대해 LLM이 생성하기를 원하는 Cypher statement를 정의할 수 있습니다
 
 ```python
 from langchain_core.prompts.prompt import PromptTemplate
@@ -281,9 +281,9 @@ Full Context:
  'result': "I don't know the answer."}
 ```
 
-## Use separate LLMs for Cypher and answer generation
+## Cypher 및 답변 생성에 별도의 LLM 사용하기
 
-You can use the `cypher_llm` and `qa_llm` parameters to define different llms
+`cypher_llm` 및 `qa_llm` parameter를 사용하여 서로 다른 llm을 정의할 수 있습니다
 
 ```python
 chain = GraphCypherQAChain.from_llm(
@@ -318,9 +318,9 @@ Full Context:
  'result': 'Tom Cruise, Val Kilmer, Anthony Edwards, and Meg Ryan played in Top Gun.'}
 ```
 
-## Ignore specified node and relationship types
+## 특정 node 및 relationship type 무시하기
 
-You can use `include_types` or `exclude_types` to ignore parts of the graph schema when generating Cypher statements.
+`include_types` 또는 `exclude_types`를 사용하여 Cypher statement를 생성할 때 graph schema의 일부를 무시할 수 있습니다.
 
 ```python
 chain = GraphCypherQAChain.from_llm(
@@ -347,9 +347,9 @@ The relationships are the following:
 (:LabelA)-[:REL_TYPE]->(:LabelB),(:LabelA)-[:REL_TYPE]->(:LabelC)
 ```
 
-## Validate generated Cypher statements
+## 생성된 Cypher statement 검증하기
 
-You can use the `validate_cypher` parameter to validate and correct relationship directions in generated Cypher statements
+`validate_cypher` parameter를 사용하여 생성된 Cypher statement의 relationship 방향을 검증하고 수정할 수 있습니다
 
 ```python
 chain = GraphCypherQAChain.from_llm(

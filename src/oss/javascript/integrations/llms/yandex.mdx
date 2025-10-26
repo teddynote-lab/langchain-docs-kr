@@ -2,23 +2,23 @@
 title: YandexGPT
 ---
 
-LangChain.js supports calling [YandexGPT](https://cloud.yandex.com/en/services/yandexgpt) LLMs.
+LangChain.js는 [YandexGPT](https://cloud.yandex.com/en/services/yandexgpt) LLM 호출을 지원합니다.
 
 ## Setup
 
-First, you should [create service account](https://cloud.yandex.com/en/docs/iam/operations/sa/create) with the `ai.languageModels.user` role.
+먼저, `ai.languageModels.user` 역할을 가진 [서비스 계정을 생성](https://cloud.yandex.com/en/docs/iam/operations/sa/create)해야 합니다.
 
-Next, you have two authentication options:
+다음으로, 두 가지 인증 옵션이 있습니다:
 
 - [IAM token](https://cloud.yandex.com/en/docs/iam/operations/iam-token/create-for-sa).
-  You can specify the token in a constructor parameter `iam_token` or in an environment variable `YC_IAM_TOKEN`.
+  생성자 매개변수 `iam_token` 또는 환경 변수 `YC_IAM_TOKEN`에 토큰을 지정할 수 있습니다.
 - [API key](https://cloud.yandex.com/en/docs/iam/operations/api-key/create)
-  You can specify the key in a constructor parameter `api_key` or in an environment variable `YC_API_KEY`.
+  생성자 매개변수 `api_key` 또는 환경 변수 `YC_API_KEY`에 키를 지정할 수 있습니다.
 
 ## Usage
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
@@ -36,4 +36,4 @@ console.log({ res });
 ## Related
 
 
-- [Models guide](/oss/langchain/models)
+- [Models 가이드](/oss/langchain/models)

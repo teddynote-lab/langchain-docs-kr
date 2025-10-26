@@ -2,15 +2,15 @@
 title: DocArray HnswSearch
 ---
 
->[DocArrayHnswSearch](https://docs.docarray.org/user_guide/storing/index_hnswlib/) is a lightweight Document Index implementation provided by [Docarray](https://github.com/docarray/docarray) that runs fully locally and is best suited for small- to medium-sized datasets. It stores vectors on disk in [hnswlib](https://github.com/nmslib/hnswlib), and stores all other data in [SQLite](https://www.sqlite.org/index.html).
+>[DocArrayHnswSearch](https://docs.docarray.org/user_guide/storing/index_hnswlib/)는 [Docarray](https://github.com/docarray/docarray)에서 제공하는 경량 Document Index 구현으로, 완전히 로컬에서 실행되며 소규모에서 중규모 데이터셋에 가장 적합합니다. 벡터는 [hnswlib](https://github.com/nmslib/hnswlib)에 디스크에 저장하고, 다른 모든 데이터는 [SQLite](https://www.sqlite.org/index.html)에 저장합니다.
 
-You'll need to install `langchain-community` with `pip install -qU langchain-community` to use this integration
+이 integration을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다
 
-This notebook shows how to use functionality related to the `DocArrayHnswSearch`.
+이 notebook은 `DocArrayHnswSearch`와 관련된 기능을 사용하는 방법을 보여줍니다.
 
 ## Setup
 
-Uncomment the below cells to install docarray and get/set your OpenAI api key if you haven't already done so.
+아직 설치하지 않았다면 아래 셀의 주석을 해제하여 docarray를 설치하고 OpenAI api key를 가져오거나 설정하세요.
 
 ```python
 pip install -qU  "docarray[hnswlib]"
@@ -27,7 +27,7 @@ pip install -qU  "docarray[hnswlib]"
 # os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 ```
 
-## Using DocArrayHnswSearch
+## DocArrayHnswSearch 사용하기
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -71,7 +71,7 @@ And I did that 4 days ago, when I nominated Circuit Court of Appeals Judge Ketan
 
 ### Similarity search with score
 
-The returned distance score is cosine distance. Therefore, a lower score is better.
+반환되는 distance score는 cosine distance입니다. 따라서 낮은 score가 더 좋습니다.
 
 ```python
 docs = db.similarity_search_with_score(query)

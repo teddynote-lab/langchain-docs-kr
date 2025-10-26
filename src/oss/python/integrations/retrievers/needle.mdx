@@ -2,33 +2,33 @@
 title: Needle
 ---
 
-[Needle](https://needle-ai.com) makes it easy to create your RAG pipelines with minimal effort.
+[Needle](https://needle-ai.com)을 사용하면 최소한의 노력으로 RAG 파이프라인을 쉽게 생성할 수 있습니다.
 
-For more details, refer to our [API documentation](https://docs.needle-ai.com/docs/api-reference/needle-api)
+자세한 내용은 [API 문서](https://docs.needle-ai.com/docs/api-reference/needle-api)를 참조하세요.
 
-## Overview
+## 개요
 
-The Needle Document Loader is a utility for integrating Needle collections with LangChain. It enables seamless storage, retrieval, and utilization of documents for Retrieval-Augmented Generation (RAG) workflows.
+Needle Document Loader는 Needle collection을 LangChain과 통합하기 위한 유틸리티입니다. Retrieval-Augmented Generation (RAG) 워크플로우를 위한 문서의 저장, 검색 및 활용을 원활하게 수행할 수 있습니다.
 
-This example demonstrates:
+이 예제는 다음을 보여줍니다:
 
-* Storing documents into a Needle collection.
-* Setting up a retriever to fetch documents.
-* Building a Retrieval-Augmented Generation (RAG) pipeline.
+* Needle collection에 문서 저장하기
+* 문서를 가져오기 위한 retriever 설정하기
+* Retrieval-Augmented Generation (RAG) 파이프라인 구축하기
 
-### Setup
+### 설정
 
-Before starting, ensure you have the following environment variables set:
+시작하기 전에 다음 환경 변수가 설정되어 있는지 확인하세요:
 
-* NEEDLE_API_KEY: Your API key for authenticating with Needle.
-* OPENAI_API_KEY: Your OpenAI API key for language model operations.
+* NEEDLE_API_KEY: Needle 인증을 위한 API 키
+* OPENAI_API_KEY: 언어 모델 작업을 위한 OpenAI API 키
 
-## Initialization
+## 초기화
 
-To initialize the NeedleLoader, you need the following parameters:
+NeedleLoader를 초기화하려면 다음 매개변수가 필요합니다:
 
-* needle_api_key: Your Needle API key (or set it as an environment variable).
-* collection_id: The ID of the Needle collection to work with.
+* needle_api_key: Needle API 키 (또는 환경 변수로 설정)
+* collection_id: 작업할 Needle collection의 ID
 
 ```python
 import os
@@ -42,7 +42,7 @@ os.environ["NEEDLE_API_KEY"] = ""
 os.environ["OPENAI_API_KEY"] = ""
 ```
 
-## Instantiation
+## 인스턴스화
 
 ```python
 from langchain_community.document_loaders.needle import NeedleLoader
@@ -56,9 +56,9 @@ document_loader = NeedleLoader(
 )
 ```
 
-## Load
+## 로드
 
-To add files to the Needle collection:
+Needle collection에 파일을 추가하려면:
 
 ```python
 files = {
@@ -73,11 +73,11 @@ document_loader.add_files(files=files)
 # collections_documents = document_loader.load()
 ```
 
-## Usage
+## 사용법
 
-### Use within a chain
+### chain 내에서 사용하기
 
-Below is a complete example of setting up a RAG pipeline with Needle within a chain:
+다음은 chain 내에서 Needle을 사용하여 RAG 파이프라인을 설정하는 완전한 예제입니다:
 
 ```python
 import os
@@ -133,4 +133,4 @@ response
 
 ## API reference
 
-For detailed documentation of all `Needle` features and configurations head to the API reference: [docs.needle-ai.com](https://docs.needle-ai.com)
+모든 `Needle` 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [docs.needle-ai.com](https://docs.needle-ai.com)

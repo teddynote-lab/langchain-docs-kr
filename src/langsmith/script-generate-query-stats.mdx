@@ -1,52 +1,52 @@
 ---
-title: Generate query stats
-sidebarTitle: Generate query stats
+title: 쿼리 통계 생성
+sidebarTitle: 쿼리 통계 생성
 ---
 
-As part of troubleshooting your self-hosted instance of LangSmith, the LangChain team may ask you to generate LangSmith query statistics that will help us understand the performance of various queries that drive the LangSmith product experience.
+자체 호스팅 LangSmith 인스턴스의 문제 해결 과정에서 LangChain 팀은 LangSmith 제품 경험을 구동하는 다양한 쿼리의 성능을 이해하는 데 도움이 되는 LangSmith 쿼리 통계를 생성하도록 요청할 수 있습니다.
 
-This command will generate a CSV that can be shared with the LangChain team.
+이 명령은 LangChain 팀과 공유할 수 있는 CSV를 생성합니다.
 
-### Prerequisites
+### 사전 요구 사항
 
-Ensure you have the following tools/items ready.
+다음 도구/항목을 준비했는지 확인하세요.
 
 1. kubectl
 
    * [https://kubernetes.io/docs/tasks/tools/](https://kubernetes.io/docs/tasks/tools/)
 
-2. Clickhouse database credentials
+2. Clickhouse 데이터베이스 자격 증명
 
    * Host
    * Port
    * Username
-     * If using the bundled version, this is `default`
+     * 번들 버전을 사용하는 경우 `default`입니다
    * Password
-     * If using the bundled version, this is `password`
+     * 번들 버전을 사용하는 경우 `password`입니다
    * Database name
-     * If using the bundled version, this is `default`
+     * 번들 버전을 사용하는 경우 `default`입니다
 
-3. Connectivity to the Clickhouse database from the machine you will be running the `get_query_stats` script on.
+3. `get_query_stats` 스크립트를 실행할 머신에서 Clickhouse 데이터베이스로의 연결
 
-   * If you are using the bundled version, you may need to port forward the clickhouse service to your local machine.
-   * Run `kubectl port-forward svc/langsmith-clickhouse 8123:8123` to port forward the clickhouse service to your local machine.
+   * 번들 버전을 사용하는 경우 clickhouse 서비스를 로컬 머신으로 포트 포워딩해야 할 수 있습니다.
+   * `kubectl port-forward svc/langsmith-clickhouse 8123:8123`을 실행하여 clickhouse 서비스를 로컬 머신으로 포트 포워딩하세요.
 
-4. The script to generate query stats
+4. 쿼리 통계를 생성하는 스크립트
 
-   * You can download the script from [here](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/scripts/get_query_stats.sh)
+   * [여기](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/scripts/get_query_stats.sh)에서 스크립트를 다운로드할 수 있습니다
 
-### Running the query stats generation script
+### 쿼리 통계 생성 스크립트 실행
 
-Run the following command to run the stats generation script:
+다음 명령을 실행하여 통계 생성 스크립트를 실행하세요:
 
 ```bash
 sh get_query_stats.sh <clickhouse_url> --output path/to/file.csv
 ```
 
-For example, if you are using the bundled version with port-forwarding, the command would look like:
+예를 들어, 포트 포워딩과 함께 번들 버전을 사용하는 경우 명령은 다음과 같습니다:
 
 ```bash
 sh get_query_stats.sh "clickhouse://default:password@localhost:8123/default" --output query_stats.csv
 ```
 
-and after running this command you should see a file, query\_stats.csv, has been created with LangSmith query statistics.
+이 명령을 실행한 후 LangSmith 쿼리 통계가 포함된 query\_stats.csv 파일이 생성된 것을 확인할 수 있습니다.

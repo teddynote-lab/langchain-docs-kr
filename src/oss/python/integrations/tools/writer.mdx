@@ -2,7 +2,7 @@
 title: WRITER Tools
 ---
 
-This guide provides an overview for getting started with WRITER [tools](/oss/langchain/tools). For detailed documentation of all WRITER features and configurations, head to the [WRITER docs](https://dev.writer.com/home).
+이 가이드는 WRITER [tools](/oss/langchain/tools) 시작하기에 대한 개요를 제공합니다. 모든 WRITER 기능 및 구성에 대한 자세한 문서는 [WRITER docs](https://dev.writer.com/home)를 참조하세요.
 
 ## Overview
 
@@ -16,29 +16,29 @@ This guide provides an overview for getting started with WRITER [tools](/oss/lan
 
 ### Features
 
-`ChatWriter` supports several tool types: `function`, `graph`, `translation`, and `web_search`.
+`ChatWriter`는 여러 tool 유형을 지원합니다: `function`, `graph`, `translation`, `web_search`.
 
-> **Important limitation**: You can only use one WRITER tool (translation, graph, web_search, llm, image, vision) at a time. While you can't combine multiple WRITER tools, you can use one WRITER tool alongside multiple custom function tools.
+> **중요한 제한사항**: 한 번에 하나의 WRITER tool(translation, graph, web_search, llm, image, vision)만 사용할 수 있습니다. 여러 WRITER tool을 결합할 수는 없지만, 하나의 WRITER tool과 여러 custom function tool을 함께 사용할 수 있습니다.
 
 #### Function
 
-Functions are the most common type of tool, which allows the LLM to call external APIs, fetch data from databases, and generally perform any external action you want to do. Visit WRITER's [tool calling docs](https://dev.writer.com/home/tool-calling) for additional information.
+Function은 가장 일반적인 tool 유형으로, LLM이 외부 API를 호출하고, 데이터베이스에서 데이터를 가져오며, 일반적으로 원하는 모든 외부 작업을 수행할 수 있게 합니다. 추가 정보는 WRITER의 [tool calling docs](https://dev.writer.com/home/tool-calling)를 참조하세요.
 
 #### Graph
 
-The `Graph` tool uses WRITER's Knowledge Graph, which is a graph-based retrieval-augmented generation (RAG) system. When using this tool, developers provide a graph ID that references their specific Knowledge Graph. The model then uses this graph to find relevant information and generate accurate answers to questions in the prompt. This allows the model to access and utilize custom knowledge bases during conversations. For more details, see WRITER's [Knowledge Graph API docs](https://dev.writer.com/home/knowledge-graph).
+`Graph` tool은 WRITER의 Knowledge Graph를 사용하며, 이는 그래프 기반 retrieval-augmented generation(RAG) 시스템입니다. 이 tool을 사용할 때 개발자는 특정 Knowledge Graph를 참조하는 graph ID를 제공합니다. 그러면 모델이 이 그래프를 사용하여 관련 정보를 찾고 프롬프트의 질문에 대한 정확한 답변을 생성합니다. 이를 통해 모델이 대화 중에 사용자 정의 지식 베이스에 액세스하고 활용할 수 있습니다. 자세한 내용은 WRITER의 [Knowledge Graph API docs](https://dev.writer.com/home/knowledge-graph)를 참조하세요.
 
 #### Translation
 
-The translation tool allows you to translate text during a conversation with a Palmyra model. While Palmyra X models can perform translation tasks, they are not optimized for these tasks and may not perform well without correct prompting. See WRITER's [translation API docs](https://dev.writer.com/home/translation-tool#translate-text-in-a-chat) for more information.
+translation tool을 사용하면 Palmyra 모델과의 대화 중에 텍스트를 번역할 수 있습니다. Palmyra X 모델은 번역 작업을 수행할 수 있지만, 이러한 작업에 최적화되어 있지 않으며 올바른 프롬프팅 없이는 제대로 작동하지 않을 수 있습니다. 자세한 내용은 WRITER의 [translation API docs](https://dev.writer.com/home/translation-tool#translate-text-in-a-chat)를 참조하세요.
 
 #### Web Search
 
-The web search tool allows you to search the web for current information during a conversation with a Palmyra model. While Palmyra models have extensive knowledge, they may not have access to the most current information or real-time data. The web search tool enables your AI assistant to find up-to-date information, news, and facts from the web. See WRITER's [web search API docs](https://dev.writer.com/home/web-search-tool#web-search-in-a-chat) for more information.
+web search tool을 사용하면 Palmyra 모델과의 대화 중에 웹에서 최신 정보를 검색할 수 있습니다. Palmyra 모델은 광범위한 지식을 가지고 있지만 최신 정보나 실시간 데이터에 액세스하지 못할 수 있습니다. web search tool을 사용하면 AI 어시스턴트가 웹에서 최신 정보, 뉴스 및 사실을 찾을 수 있습니다. 자세한 내용은 WRITER의 [web search API docs](https://dev.writer.com/home/web-search-tool#web-search-in-a-chat)를 참조하세요.
 
 ## Setup
 
-Sign up for [WRITER AI Studio](https://app.writer.com/aistudio/signup?utm_campaign=devrel) to generate an API key (you can follow this [Quickstart](https://dev.writer.com/home/quickstart)). Then, set the `WRITER_API_KEY` environment variable:
+[WRITER AI Studio](https://app.writer.com/aistudio/signup?utm_campaign=devrel)에 가입하여 API key를 생성하세요([Quickstart](https://dev.writer.com/home/quickstart) 참조). 그런 다음 `WRITER_API_KEY` 환경 변수를 설정하세요:
 
 ```python
 import getpass
@@ -50,11 +50,11 @@ if not os.getenv("WRITER_API_KEY"):
 
 ## Usage
 
-You can bind graph or function tools to `ChatWriter`.
+graph 또는 function tool을 `ChatWriter`에 바인딩할 수 있습니다.
 
 ### Graph Tools
 
-To bind graph tools, first create and initialize a `GraphTool` instance with the `graph_ids` you want to use as sources:
+graph tool을 바인딩하려면 먼저 소스로 사용할 `graph_ids`로 `GraphTool` 인스턴스를 생성하고 초기화하세요:
 
 ```python
 from langchain_writer.chat_models import ChatWriter
@@ -68,9 +68,9 @@ graph_tool = GraphTool(graph_ids=[graph_id])
 
 ### Translation Tools
 
-The translation tool allows you to translate text during a conversation with a Palmyra model. While Palmyra X models can perform translation tasks, they are not optimized for these tasks and may not perform well without correct prompting.
+translation tool을 사용하면 Palmyra 모델과의 대화 중에 텍스트를 번역할 수 있습니다. Palmyra X 모델은 번역 작업을 수행할 수 있지만, 이러한 작업에 최적화되어 있지 않으며 올바른 프롬프팅 없이는 제대로 작동하지 않을 수 있습니다.
 
-To use the translation tool, import and initialize the built-in `TranslationTool`:
+translation tool을 사용하려면 내장된 `TranslationTool`을 import하고 초기화하세요:
 
 ```python
 from langchain_writer.tools import TranslationTool
@@ -81,9 +81,9 @@ translation_tool = TranslationTool()
 
 ### Web Search Tools
 
-The web search tool allows you to search the web for current information during a conversation with a Palmyra model. While Palmyra models have extensive knowledge, they may not have access to the most current information or real-time data. The web search tool enables your AI assistant to find up-to-date information, news, and facts from the web.
+web search tool을 사용하면 Palmyra 모델과의 대화 중에 웹에서 최신 정보를 검색할 수 있습니다. Palmyra 모델은 광범위한 지식을 가지고 있지만 최신 정보나 실시간 데이터에 액세스하지 못할 수 있습니다. web search tool을 사용하면 AI 어시스턴트가 웹에서 최신 정보, 뉴스 및 사실을 찾을 수 있습니다.
 
-To use the web search tool, import and initialize the built-in `WebSearchTool`:
+web search tool을 사용하려면 내장된 `WebSearchTool`을 import하고 초기화하세요:
 
 ```python
 from langchain_writer.tools import WebSearchTool
@@ -150,7 +150,7 @@ get_product_info = {
 
 ### Binding tools
 
-**Important note**: WRITER only allows a single WRITER tool (translation, graph, web_search, llm, image, vision) to be bound at a time. You cannot bind multiple WRITER tools simultaneously. However, you can bind multiple custom function tools along with one WRITER tool.
+**중요 참고사항**: WRITER는 한 번에 하나의 WRITER tool(translation, graph, web_search, llm, image, vision)만 바인딩할 수 있습니다. 여러 WRITER tool을 동시에 바인딩할 수 없습니다. 그러나 하나의 WRITER tool과 함께 여러 custom function tool을 바인딩할 수 있습니다.
 
 ```python
 # ✅ Correct: One WRITER tool + multiple function tools
@@ -169,9 +169,9 @@ llm_with_tools = chat.bind_tools(
 )
 ```
 
-If you need to use different WRITER tools, you have several options:
+다른 WRITER tool을 사용해야 하는 경우 몇 가지 옵션이 있습니다:
 
-**Option 1: Rebind tools for each conversation**:
+**옵션 1: 각 대화마다 tool을 다시 바인딩**:
 
 ```python
 # Use graph tool for one conversation
@@ -183,7 +183,7 @@ llm_with_tools = chat.bind_tools([translation_tool, get_supercopa_trophies_count
 response2 = llm_with_tools.invoke([HumanMessage("Translate this text...")])
 ```
 
-**Option 2: Use separate ChatWriter instances**:
+**옵션 2: 별도의 ChatWriter 인스턴스 사용**:
 
 ```python
 # Create separate ChatWriter instances for different tools
@@ -196,7 +196,7 @@ llm_with_translation_tool = chat_with_translation.bind_tools([translation_tool])
 
 ## Invocation
 
-The model will automatically choose the tool during invocation with all modes (streaming/non-streaming, sync/async).
+모델은 모든 모드(streaming/non-streaming, sync/async)에서 호출 중에 자동으로 tool을 선택합니다.
 
 ```python
 from langchain.messages import HumanMessage
@@ -231,13 +231,13 @@ search_response = llm_with_search.invoke(search_messages)
 print(search_response.content)  # Output: Current AI developments based on web search
 ```
 
-In the case of function tools, you will receive an assistant message with the tool call request.
+function tool의 경우 tool call 요청이 포함된 assistant 메시지를 받게 됩니다.
 
 ```python
 print(response.tool_calls)
 ```
 
-Then you can manually handle tool call request, send to model and receive final response:
+그런 다음 tool call 요청을 수동으로 처리하고 모델에 전송하여 최종 응답을 받을 수 있습니다:
 
 ```python
 for tool_call in response.tool_calls:
@@ -251,13 +251,13 @@ response = llm_with_tools.invoke(messages)
 print(response.content)
 ```
 
-With a `GraphTool`, the model will call it remotely and return usage info in the `additional_kwargs` under the `graph_data` key:
+`GraphTool`의 경우 모델이 원격으로 호출하고 `graph_data` 키 아래의 `additional_kwargs`에 사용 정보를 반환합니다:
 
 ```python
 print(response.additional_kwargs["graph_data"])
 ```
 
-The `content` attribute contains the final response:
+`content` 속성에는 최종 응답이 포함됩니다:
 
 ```python
 print(response.content)
@@ -265,8 +265,8 @@ print(response.content)
 
 ## Chaining
 
-The WRITER Graph tool works differently from other tools; when used, the WRITER server automatically handles calling the Knowledge Graph and generating responses using RAG. Because of this automated server-side handling, you cannot invoke the `GraphTool` independently or use it as part of a LangChain chain. You must use the `GraphTool` directly with a `ChatWriter` instance as shown in the examples above.
+WRITER Graph tool은 다른 tool과 다르게 작동합니다. 사용될 때 WRITER 서버가 자동으로 Knowledge Graph 호출 및 RAG를 사용한 응답 생성을 처리합니다. 이러한 자동화된 서버 측 처리로 인해 `GraphTool`을 독립적으로 호출하거나 LangChain chain의 일부로 사용할 수 없습니다. 위의 예제에서 보여준 것처럼 `GraphTool`을 `ChatWriter` 인스턴스와 직접 사용해야 합니다.
 
 ## API reference
 
-For detailed documentation of all `GraphTool` features and configurations, head to the [API reference](https://python.langchain.com/api_reference/writer/tools/langchain_writer.tools.GraphTool.html#langchain_writer.tools.GraphTool).
+모든 `GraphTool` 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/writer/tools/langchain_writer.tools.GraphTool.html#langchain_writer.tools.GraphTool)를 참조하세요.

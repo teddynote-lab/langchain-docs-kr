@@ -2,15 +2,15 @@
 title: MongoDB Atlas
 ---
 
->[MongoDB Atlas](https://www.mongodb.com/docs/atlas/) is a fully-managed cloud
-> database available in AWS, Azure, and GCP.  It now has support for native
-> Vector Search on the MongoDB document data.
+>[MongoDB Atlas](https://www.mongodb.com/docs/atlas/)는 AWS, Azure, GCP에서 사용 가능한 완전 관리형 클라우드
+> 데이터베이스입니다. 이제 MongoDB 문서 데이터에 대한 네이티브
+> Vector Search를 지원합니다.
 
 ## Installation and Setup
 
-See [detail configuration instructions](/oss/integrations/vectorstores/mongodb_atlas).
+[상세 구성 지침](/oss/integrations/vectorstores/mongodb_atlas)을 참조하세요.
 
-We need to install `langchain-mongodb` python package.
+`langchain-mongodb` python package를 설치해야 합니다.
 
 <CodeGroup>
 ```bash pip
@@ -24,7 +24,7 @@ uv add langchain-mongodb
 
 ## Vector Store
 
-See a [usage example](/oss/integrations/vectorstores/mongodb_atlas).
+[사용 예제](/oss/integrations/vectorstores/mongodb_atlas)를 참조하세요.
 
 ```python
 from langchain_mongodb import MongoDBAtlasVectorSearch
@@ -34,8 +34,8 @@ from langchain_mongodb import MongoDBAtlasVectorSearch
 
 ### Full Text Search Retriever
 
->`Hybrid Search Retriever` performs full-text searches using
-> Lucene’s standard (`BM25`) analyzer.
+>`Hybrid Search Retriever`는 Lucene의 표준(`BM25`) analyzer를 사용하여
+> 전체 텍스트 검색을 수행합니다.
 
 ```python
 from langchain_mongodb.retrievers import MongoDBAtlasFullTextSearchRetriever
@@ -43,8 +43,8 @@ from langchain_mongodb.retrievers import MongoDBAtlasFullTextSearchRetriever
 
 ### Hybrid Search Retriever
 
->`Hybrid Search Retriever` combines vector and full-text searches weighting
-> them the via `Reciprocal Rank Fusion` (`RRF`) algorithm.
+>`Hybrid Search Retriever`는 vector 검색과 전체 텍스트 검색을 결합하여
+> `Reciprocal Rank Fusion`(`RRF`) 알고리즘을 통해 가중치를 부여합니다.
 
 ```python
 from langchain_mongodb.retrievers import MongoDBAtlasHybridSearchRetriever
@@ -54,14 +54,14 @@ from langchain_mongodb.retrievers import MongoDBAtlasHybridSearchRetriever
 
 ### MongoDBCache
 
-An abstraction to store a simple cache in MongoDB. This does not use Semantic Caching, nor does it require an index to be made on the collection before generation.
+MongoDB에 간단한 cache를 저장하기 위한 추상화입니다. 이것은 Semantic Caching을 사용하지 않으며, 생성 전에 collection에 index를 만들 필요도 없습니다.
 
-To import this cache:
+이 cache를 import하려면:
 ```python
 from langchain_mongodb.cache import MongoDBCache
 ```
 
-To use this cache with your LLMs:
+LLM에서 이 cache를 사용하려면:
 ```python
 from langchain_core.globals import set_llm_cache
 
@@ -81,15 +81,15 @@ set_llm_cache(MongoDBCache(
 
 
 ### MongoDBAtlasSemanticCache
-Semantic caching allows users to retrieve cached prompts based on semantic similarity between the user input and previously cached results. Under the hood it blends MongoDBAtlas as both a cache and a vectorstore.
-The MongoDBAtlasSemanticCache inherits from `MongoDBAtlasVectorSearch` and needs an Atlas Vector Search Index defined to work. Please look at the [usage example](/oss/integrations/vectorstores/mongodb_atlas) on how to set up the index.
+Semantic caching을 사용하면 사용자 입력과 이전에 캐시된 결과 간의 의미적 유사성을 기반으로 캐시된 prompt를 검색할 수 있습니다. 내부적으로 MongoDBAtlas를 cache와 vectorstore로 모두 사용합니다.
+MongoDBAtlasSemanticCache는 `MongoDBAtlasVectorSearch`를 상속하며 작동하려면 Atlas Vector Search Index가 정의되어 있어야 합니다. index 설정 방법은 [사용 예제](/oss/integrations/vectorstores/mongodb_atlas)를 참조하세요.
 
-To import this cache:
+이 cache를 import하려면:
 ```python
 from langchain_mongodb.cache import MongoDBAtlasSemanticCache
 ```
 
-To use this cache with your LLMs:
+LLM에서 이 cache를 사용하려면:
 ```python
 from langchain_core.globals import set_llm_cache
 

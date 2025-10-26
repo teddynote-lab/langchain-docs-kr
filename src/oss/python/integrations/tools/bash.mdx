@@ -2,11 +2,11 @@
 title: Shell (bash)
 ---
 
-Giving agents access to the shell is powerful (though risky outside a sandboxed environment).
+agent에게 shell 접근 권한을 부여하는 것은 강력하지만 (샌드박스 환경 외부에서는 위험할 수 있습니다), 
 
-The LLM can use it to execute any shell commands. A common use case for this is letting the LLM interact with your local file system.
+LLM이 이를 사용하여 모든 shell 명령을 실행할 수 있습니다. 일반적인 사용 사례는 LLM이 로컬 파일 시스템과 상호작용할 수 있도록 하는 것입니다.
 
-**Note:** Shell tool does not work with Windows OS.
+**참고:** Shell tool은 Windows OS에서 작동하지 않습니다.
 
 ```python
 pip install -qU langchain-community
@@ -34,9 +34,9 @@ sys 0m0.000s
   warnings.warn(
 ```
 
-### Use with Agents
+### Agent와 함께 사용하기
 
-As with all tools, these can be given to an agent to accomplish more complex tasks. Let's have the agent fetch some links from a web page.
+모든 tool과 마찬가지로, 이러한 tool들은 더 복잡한 작업을 수행하기 위해 agent에게 제공될 수 있습니다. agent가 웹 페이지에서 일부 링크를 가져오도록 해봅시다.
 
 ```python
 from langchain.agents import create_agent

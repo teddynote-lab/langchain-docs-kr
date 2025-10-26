@@ -2,20 +2,18 @@
 title: Javelin AI Gateway
 ---
 
-[The Javelin AI Gateway](https://www.getjavelin.io) service is a high-performance, enterprise grade API Gateway for AI applications.
-It is designed to streamline the usage and access of various large language model (LLM) providers,
-such as OpenAI, Cohere, Anthropic and custom large language models within an organization by incorporating
-robust access security for all interactions with LLMs.
+[Javelin AI Gateway](https://www.getjavelin.io) 서비스는 AI 애플리케이션을 위한 고성능 엔터프라이즈급 API Gateway입니다.
+이는 조직 내에서 OpenAI, Cohere, Anthropic 및 커스텀 large language model과 같은 다양한 large language model (LLM) 제공업체의 사용 및 액세스를 간소화하도록 설계되었으며,
+모든 LLM 상호작용에 대한 강력한 액세스 보안을 통합합니다.
 
-Javelin offers a high-level interface that simplifies the interaction with LLMs by providing a unified endpoint
-to handle specific LLM related requests.
+Javelin은 특정 LLM 관련 요청을 처리하기 위한 통합 endpoint를 제공하여 LLM과의 상호작용을 단순화하는 high-level interface를 제공합니다.
 
-See the Javelin AI Gateway [documentation](https://docs.getjavelin.io) for more details.
-[Javelin Python SDK](https://www.github.com/getjavelin/javelin-python) is an easy to use client library meant to be embedded into AI Applications
+자세한 내용은 Javelin AI Gateway [문서](https://docs.getjavelin.io)를 참조하세요.
+[Javelin Python SDK](https://www.github.com/getjavelin/javelin-python)는 AI 애플리케이션에 쉽게 임베드할 수 있는 사용하기 쉬운 client library입니다.
 
-## Installation and Setup
+## Installation 및 Setup
 
-Install `javelin_sdk` to interact with Javelin AI Gateway:
+Javelin AI Gateway와 상호작용하기 위해 `javelin_sdk`를 설치하세요:
 
 <CodeGroup>
 ```bash pip
@@ -27,13 +25,13 @@ uv add javelin_sdk
 ```
 </CodeGroup>
 
-Set the Javelin's API key as an environment variable:
+Javelin의 API key를 environment variable로 설정하세요:
 
 ```sh
 export JAVELIN_API_KEY=...
 ```
 
-## Completions Example
+## Completions 예제
 
 ```python
 from langchain.chains import LLMChain
@@ -55,7 +53,7 @@ print(result)
 
 ```
 
-## Embeddings Example
+## Embeddings 예제
 
 ```python
 from langchain_community.embeddings import JavelinAIGatewayEmbeddings
@@ -70,7 +68,7 @@ print(embeddings.embed_query("hello"))
 print(embeddings.embed_documents(["hello"]))
 ```
 
-## Chat Example
+## Chat 예제
 ```python
 from langchain_community.chat_models import ChatJavelinAIGateway
 from langchain.messages import HumanMessage, SystemMessage

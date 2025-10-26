@@ -2,7 +2,7 @@
 title: ChatHuggingFace
 ---
 
-This will help you get started with `langchain_huggingface` [chat models](/oss/langchain/models). For detailed documentation of all `ChatHuggingFace` features and configurations head to the [API reference](https://python.langchain.com/api_reference/huggingface/chat_models/langchain_huggingface.chat_models.huggingface.ChatHuggingFace.html). For a list of models supported by Hugging Face check out [this page](https://huggingface.co/models).
+이 문서는 `langchain_huggingface` [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 `ChatHuggingFace` 기능과 설정에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/huggingface/chat_models/langchain_huggingface.chat_models.huggingface.ChatHuggingFace.html)를 참조하세요. Hugging Face에서 지원하는 모델 목록은 [이 페이지](https://huggingface.co/models)를 확인하세요.
 
 ## Overview
 
@@ -22,11 +22,11 @@ This will help you get started with `langchain_huggingface` [chat models](/oss/l
 
 ## Setup
 
-To access Hugging Face models you'll need to create a Hugging Face account, get an API key, and install the `langchain-huggingface` integration package.
+Hugging Face 모델에 액세스하려면 Hugging Face 계정을 생성하고, API 키를 받고, `langchain-huggingface` integration package를 설치해야 합니다.
 
 ### Credentials
 
-Generate a [Hugging Face Access Token](https://huggingface.co/docs/hub/security-tokens) and store it as an environment variable: `HUGGINGFACEHUB_API_TOKEN`.
+[Hugging Face Access Token](https://huggingface.co/docs/hub/security-tokens)을 생성하고 환경 변수 `HUGGINGFACEHUB_API_TOKEN`으로 저장하세요.
 
 ```python
 import getpass
@@ -50,11 +50,11 @@ if not os.getenv("HUGGINGFACEHUB_API_TOKEN"):
 
 ## Setup
 
-To access `langchain_huggingface` models you'll need to create a `Hugging Face` account, get an API key, and install the `langchain-huggingface` integration package.
+`langchain_huggingface` 모델에 액세스하려면 `Hugging Face` 계정을 생성하고, API 키를 받고, `langchain-huggingface` integration package를 설치해야 합니다.
 
 ### Credentials
 
-You'll need to have a [Hugging Face Access Token](https://huggingface.co/docs/hub/security-tokens) saved as an environment variable: `HUGGINGFACEHUB_API_TOKEN`.
+[Hugging Face Access Token](https://huggingface.co/docs/hub/security-tokens)을 환경 변수 `HUGGINGFACEHUB_API_TOKEN`으로 저장해야 합니다.
 
 ```python
 import getpass
@@ -77,7 +77,7 @@ Note: you may need to restart the kernel to use updated packages.
 
 ## Instantiation
 
-You can instantiate a `ChatHuggingFace` model in two different ways, either from a `HuggingFaceEndpoint` or from a `HuggingFacePipeline`.
+`ChatHuggingFace` 모델은 `HuggingFaceEndpoint` 또는 `HuggingFacePipeline` 두 가지 방법으로 인스턴스화할 수 있습니다.
 
 ### `HuggingFaceEndpoint`
 
@@ -103,7 +103,7 @@ Your token has been saved to /Users/isaachershenson/.cache/huggingface/token
 Login successful
 ```
 
-Now let's take advantage of [Inference Providers](https://huggingface.co/docs/inference-providers) to run the model on specific third-party providers
+이제 [Inference Providers](https://huggingface.co/docs/inference-providers)를 활용하여 특정 타사 제공업체에서 모델을 실행해 보겠습니다
 
 ```python
 llm = HuggingFaceEndpoint(
@@ -189,7 +189,7 @@ generation_config.json:   0%|          | 0.00/111 [00:00<?, ?B/s]
 
 ### Instatiating with Quantization
 
-To run a quantized version of your model, you can specify a `bitsandbytes` quantization config as follows:
+모델의 양자화된 버전을 실행하려면 다음과 같이 `bitsandbytes` quantization config를 지정할 수 있습니다:
 
 ```python
 from transformers import BitsAndBytesConfig
@@ -202,7 +202,7 @@ quantization_config = BitsAndBytesConfig(
 )
 ```
 
-and pass it to the `HuggingFacePipeline` as a part of its `model_kwargs`:
+그리고 이를 `HuggingFacePipeline`의 `model_kwargs`의 일부로 전달합니다:
 
 ```python
 llm = HuggingFacePipeline.from_model_id(
@@ -250,5 +250,4 @@ In this scenario, it is un
 
 ## API reference
 
-For detailed documentation of all `ChatHuggingFace` features and configurations head to the API reference: [python.langchain.com/api_reference/huggingface/chat_models/langchain_huggingface.chat_models.huggingface.ChatHuggingFace.html](https://python.langchain.com/api_reference/huggingface/chat_models/langchain_huggingface.chat_models.huggingface.ChatHuggingFace.html)
-
+모든 `ChatHuggingFace` 기능과 설정에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/huggingface/chat_models/langchain_huggingface.chat_models.huggingface.ChatHuggingFace.html](https://python.langchain.com/api_reference/huggingface/chat_models/langchain_huggingface.chat_models.huggingface.ChatHuggingFace.html)

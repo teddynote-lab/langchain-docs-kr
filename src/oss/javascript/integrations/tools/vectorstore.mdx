@@ -2,13 +2,13 @@
 title: VectorStoreToolkit
 ---
 
-This will help you getting started with the [VectorStoreToolkit](/oss/langchain/tools#toolkits). For detailed documentation of all VectorStoreToolkit features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain.agents.VectorStoreToolkit.html).
+이 문서는 [VectorStoreToolkit](/oss/langchain/tools#toolkits) 시작하기를 도와드립니다. VectorStoreToolkit의 모든 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain.agents.VectorStoreToolkit.html)를 참조하세요.
 
-The `VectorStoreToolkit` is a toolkit which takes in a vector store, and converts it to a tool which can then be invoked, passed to LLMs, agents and more.
+`VectorStoreToolkit`은 vector store를 입력으로 받아 tool로 변환하는 toolkit입니다. 이렇게 변환된 tool은 호출하거나 LLM, agent 등에 전달할 수 있습니다.
 
 ## Setup
 
-If you want to get automated tracing from runs of individual tools, you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+개별 tool 실행에서 자동화된 추적을 원하시면, 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수 있습니다:
 
 ```typescript
 process.env.LANGSMITH_TRACING="true"
@@ -17,7 +17,7 @@ process.env.LANGSMITH_API_KEY="your-api-key"
 
 ### Installation
 
-This toolkit lives in the `langchain` package:
+이 toolkit은 `langchain` 패키지에 포함되어 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -33,7 +33,7 @@ pnpm add langchain @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our toolkit. First, we need to define the LLM we'll use in the toolkit.
+이제 toolkit을 인스턴스화할 수 있습니다. 먼저, toolkit에서 사용할 LLM을 정의해야 합니다.
 
 ```typescript
 // @lc-docs-hide-cell
@@ -73,7 +73,7 @@ const toolkit = new VectorStoreToolkit(vectorStoreInfo, llm);
 
 ## Tools
 
-Here, we can see it converts our vector store into a tool:
+여기서 vector store가 tool로 변환되는 것을 확인할 수 있습니다:
 
 ```typescript
 const tools = toolkit.getTools();
@@ -95,7 +95,7 @@ console.log(tools.map((tool) => ({
 
 ## Use within an agent
 
-First, ensure you have LangGraph installed:
+먼저, LangGraph가 설치되어 있는지 확인하세요:
 
 
 <CodeGroup>
@@ -111,7 +111,7 @@ pnpm add @langchain/langgraph
 </CodeGroup>
 
 
-Then, instantiate the agent:
+그런 다음, agent를 인스턴스화합니다:
 
 ```typescript
 import { createAgent } from "@langchain/classic"
@@ -154,4 +154,4 @@ In the State of the Union address, President Biden spoke about Ketanji Brown Jac
 
 ## API reference
 
-For detailed documentation of all VectorStoreToolkit features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain.agents.VectorStoreToolkit.html).
+VectorStoreToolkit의 모든 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain.agents.VectorStoreToolkit.html)를 참조하세요.

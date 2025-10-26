@@ -2,26 +2,25 @@
 title: Couchbase
 ---
 
-[Couchbase](http://couchbase.com/) is an award-winning distributed NoSQL cloud database that delivers unmatched versatility, performance, scalability, and financial value for all of your cloud, mobile,
-AI, and edge computing applications. Couchbase embraces AI with coding assistance for developers and vector search for their applications.
+[Couchbase](http://couchbase.com/)는 수상 경력이 있는 분산 NoSQL 클라우드 데이터베이스로, 모든 클라우드, 모바일, AI 및 엣지 컴퓨팅 애플리케이션에 비할 데 없는 다양성, 성능, 확장성 및 경제적 가치를 제공합니다. Couchbase는 개발자를 위한 코딩 지원과 애플리케이션을 위한 vector search를 통해 AI를 수용합니다.
 
-Vector Search is a part of the [Full Text Search Service](https://docs.couchbase.com/server/current/learn/services-and-indexes/services/search-service.html) (Search Service) in Couchbase.
+Vector Search는 Couchbase의 [Full Text Search Service](https://docs.couchbase.com/server/current/learn/services-and-indexes/services/search-service.html) (Search Service)의 일부입니다.
 
-This tutorial explains how to use Vector Search in Couchbase. You can work with both [Couchbase Capella](https://www.couchbase.com/products/capella/) and your self-managed Couchbase Server.
+이 튜토리얼은 Couchbase에서 Vector Search를 사용하는 방법을 설명합니다. [Couchbase Capella](https://www.couchbase.com/products/capella/)와 자체 관리형 Couchbase Server 모두에서 작업할 수 있습니다.
 
 ## Installation
 
-You will need couchbase and langchain community to use couchbase vector store. For this tutorial, we will use OpenAI embeddings
+Couchbase vector store를 사용하려면 couchbase와 langchain community가 필요합니다. 이 튜토리얼에서는 OpenAI embeddings를 사용합니다.
 
 ```bash npm
 npm install couchbase @langchain/openai @langchain/community @langchain/core
 ```
 ## Create Couchbase Connection Object
 
-We create a connection to the Couchbase cluster initially and then pass the cluster object to the Vector Store. Here, we are connecting using the username and password.
-You can also connect using any other supported way to your cluster.
+먼저 Couchbase 클러스터에 대한 연결을 생성한 다음 cluster object를 Vector Store에 전달합니다. 여기서는 username과 password를 사용하여 연결합니다.
+클러스터에 연결하는 다른 지원되는 방법을 사용할 수도 있습니다.
 
-For more information on connecting to the Couchbase cluster, please check the [Node SDK documentation](https://docs.couchbase.com/nodejs-sdk/current/hello-world/start-using-sdk.html#connect).
+Couchbase 클러스터 연결에 대한 자세한 내용은 [Node SDK documentation](https://docs.couchbase.com/nodejs-sdk/current/hello-world/start-using-sdk.html#connect)을 확인하세요.
 
 ```typescript
 import { Cluster } from "couchbase";
@@ -38,24 +37,24 @@ const couchbaseClient = await Cluster.connect(connectionString, {
 ```
 ## Create the Search Index
 
-Currently, the Search index needs to be created from the Couchbase Capella or Server UI or using the REST interface.
+현재 Search index는 Couchbase Capella 또는 Server UI에서 생성하거나 REST interface를 사용하여 생성해야 합니다.
 
-For this example, let us use the Import Index feature on the Search Service on the UI.
+이 예제에서는 UI의 Search Service에서 Import Index 기능을 사용하겠습니다.
 
-Let us define a Search index with the name `vector-index` on the testing bucket.
-We are defining an index on the `testing` bucket's `_default` scope on the `_default` collection with the vector field set to `embedding` with 1536 dimensions and the text field set to `text`.
-We are also indexing and storing all the fields under `metadata` in the document as a dynamic mapping to account for varying document structures. The similarity metric is set to `dot_product`.
+testing bucket에 `vector-index`라는 이름의 Search index를 정의하겠습니다.
+`testing` bucket의 `_default` scope의 `_default` collection에 index를 정의하며, vector field는 `embedding`으로 1536 차원으로 설정하고 text field는 `text`로 설정합니다.
+또한 문서의 `metadata` 아래의 모든 field를 dynamic mapping으로 indexing하고 저장하여 다양한 문서 구조를 처리합니다. similarity metric은 `dot_product`로 설정됩니다.
 
-### How to Import an Index to the Full Text Search service?
+### Full Text Search service에 Index를 Import하는 방법
 
 - [Couchbase Server](https://docs.couchbase.com/server/current/search/import-search-index.html)
-  - Click on Search -> Add Index -> Import
-  - Copy the following Index definition in the Import screen
-  - Click on Create Index to create the index.
+  - Search -> Add Index -> Import 클릭
+  - Import 화면에 다음 Index definition을 복사
+  - Create Index를 클릭하여 index 생성
 - [Couchbase Capella](https://docs.couchbase.com/cloud/search/import-search-index.html)
-  - Copy the following index definition to a new file `index.json`
-  - Import the file in Capella using the instructions in the documentation.
-  - Click on Create Index to create the index.
+  - 다음 index definition을 새 파일 `index.json`에 복사
+  - 문서의 지침에 따라 Capella에서 파일 import
+  - Create Index를 클릭하여 index 생성
 
 ### Index Definition
 
@@ -131,13 +130,13 @@ We are also indexing and storing all the fields under `metadata` in the document
   }
 }
 ```
-For more details on how to create a search index with support for Vector fields, please refer to the documentation:
+Vector field를 지원하는 search index 생성 방법에 대한 자세한 내용은 다음 문서를 참조하세요:
 
 - [Couchbase Capella](https://docs.couchbase.com/cloud/search/create-search-indexes.html)
 - [Couchbase Server](https://docs.couchbase.com/server/current/search/create-search-indexes.html)
 
-For using this vector store, CouchbaseVectorStoreArgs needs to be configured.
-textKey and embeddingKey are optional fields, required if you want to use specific keys
+이 vector store를 사용하려면 CouchbaseVectorStoreArgs를 구성해야 합니다.
+textKey와 embeddingKey는 선택적 field이며, 특정 key를 사용하려는 경우 필요합니다.
 
 ```typescript
 const couchbaseConfig: CouchbaseVectorStoreArgs = {
@@ -152,7 +151,7 @@ const couchbaseConfig: CouchbaseVectorStoreArgs = {
 ```
 ## Create Vector Store
 
-We create the vector store object with the cluster information and the search index name.
+클러스터 정보와 search index 이름으로 vector store object를 생성합니다.
 
 ```typescript
 const store = await CouchbaseVectorStore.initialize(
@@ -162,13 +161,12 @@ const store = await CouchbaseVectorStore.initialize(
 ```
 ## Basic Vector Search Example
 
-The following example showcases how to use couchbase vector search and perform similarity search.
-For this example, we are going to load the "state_of_the_union.txt" file via the TextLoader,
-chunk the text into 500 character chunks with no overlaps and index all these chunks into Couchbase.
+다음 예제는 couchbase vector search를 사용하고 similarity search를 수행하는 방법을 보여줍니다.
+이 예제에서는 TextLoader를 통해 "state_of_the_union.txt" 파일을 로드하고,
+텍스트를 overlap 없이 500자 chunk로 나누고 이 모든 chunk를 Couchbase에 indexing합니다.
 
-After the data is indexed, we perform a simple query to find the top 4 chunks that are similar to the
-query "What did president say about Ketanji Brown Jackson".
-At the end, it also shows how to get similarity score
+데이터가 indexing된 후, "What did president say about Ketanji Brown Jackson" 쿼리와 유사한 상위 4개의 chunk를 찾기 위해 간단한 쿼리를 수행합니다.
+마지막에는 similarity score를 얻는 방법도 보여줍니다.
 
 ```ts
 import { OpenAIEmbeddings } from "@langchain/openai";
@@ -241,14 +239,14 @@ console.log(result[0]);
 ```
 ## Specifying Fields to Return
 
-You can specify the fields to return from the document using `fields` parameter in the filter during searches.
-These fields are returned as part of the `metadata` object. You can fetch any field that is stored in the index.
-The `textKey` of the document is returned as part of the document's `pageContent`.
+검색 중 filter의 `fields` parameter를 사용하여 문서에서 반환할 field를 지정할 수 있습니다.
+이러한 field는 `metadata` object의 일부로 반환됩니다. index에 저장된 모든 field를 가져올 수 있습니다.
+문서의 `textKey`는 문서의 `pageContent`의 일부로 반환됩니다.
 
-If you do not specify any fields to be fetched, all the fields stored in the index are returned.
+가져올 field를 지정하지 않으면 index에 저장된 모든 field가 반환됩니다.
 
-If you want to fetch one of the fields in the metadata, you need to specify it using `.`
-For example, to fetch the `source` field in the metadata, you need to use `metadata.source`.
+metadata의 field 중 하나를 가져오려면 `.`을 사용하여 지정해야 합니다.
+예를 들어, metadata의 `source` field를 가져오려면 `metadata.source`를 사용해야 합니다.
 
 ```typescript
 const result = await store.similaritySearch(query, 1, {
@@ -258,19 +256,19 @@ console.log(result[0]);
 ```
 ## Hybrid Search
 
-Couchbase allows you to do hybrid searches by combining vector search results with searches on non-vector fields of the document like the `metadata` object.
+Couchbase를 사용하면 vector search 결과를 `metadata` object와 같은 문서의 non-vector field에 대한 검색과 결합하여 hybrid search를 수행할 수 있습니다.
 
-The results will be based on the combination of the results from both vector search and the searches supported by full text search service.
-The scores of each of the component searches are added up to get the total score of the result.
+결과는 vector search와 full text search service에서 지원하는 검색의 결과 조합을 기반으로 합니다.
+각 component search의 score가 합산되어 결과의 총 score가 됩니다.
 
-To perform hybrid searches, there is an optional key, `searchOptions` in `fields` parameter that can be passed to all the similarity searches.
-The different search/query possibilities for the `searchOptions` can be found [here](https://docs.couchbase.com/server/current/search/search-request-params.html#query-object).
+hybrid search를 수행하려면 모든 similarity search에 전달할 수 있는 `fields` parameter의 선택적 key인 `searchOptions`가 있습니다.
+`searchOptions`에 대한 다양한 search/query 가능성은 [여기](https://docs.couchbase.com/server/current/search/search-request-params.html#query-object)에서 찾을 수 있습니다.
 
 ### Create Diverse Metadata for Hybrid Search
 
-In order to simulate hybrid search, let us create some random metadata from the existing documents.
-We uniformly add three fields to the metadata, `date` between 2010 & 2020, `rating` between 1 & 5 and `author` set to either John Doe or Jane Doe.
-We will also declare few sample queries.
+hybrid search를 시뮬레이션하기 위해 기존 문서에서 일부 무작위 metadata를 생성하겠습니다.
+metadata에 세 개의 field를 균일하게 추가합니다: 2010년과 2020년 사이의 `date`, 1과 5 사이의 `rating`, John Doe 또는 Jane Doe로 설정된 `author`.
+또한 몇 가지 샘플 쿼리를 선언합니다.
 
 ```typescript
 for (let i = 0; i < docs.length; i += 1) {
@@ -290,7 +288,7 @@ const independenceQuery = "Any mention about independence?";
 ```
 ### Example: Search by Exact Value
 
-We can search for exact matches on a textual field like the author in the `metadata` object.
+`metadata` object의 author와 같은 텍스트 field에서 정확히 일치하는 항목을 검색할 수 있습니다.
 
 ```typescript
 const exactValueResult = await store.similaritySearch(query, 4, {
@@ -303,9 +301,9 @@ console.log(exactValueResult[0]);
 ```
 ### Example: Search by Partial Match
 
-We can search for partial matches by specifying a fuzziness for the search. This is useful when you want to search for slight variations or misspellings of a search query.
+검색에 대한 fuzziness를 지정하여 부분 일치를 검색할 수 있습니다. 이는 검색 쿼리의 약간의 변형이나 철자 오류를 검색하려는 경우 유용합니다.
 
-Here, "Johny" is close (fuzziness of 1) to "John Doe".
+여기서 "Johny"는 "John Doe"에 가깝습니다(fuzziness 1).
 
 ```typescript
 const partialMatchResult = await store.similaritySearch(query, 4, {
@@ -318,7 +316,7 @@ console.log(partialMatchResult[0]);
 ```
 ### Example: Search by Date Range Query
 
-We can search for documents that are within a date range query on a date field like `metadata.date`.
+`metadata.date`와 같은 date field에서 날짜 범위 쿼리 내에 있는 문서를 검색할 수 있습니다.
 
 ```typescript
 const dateRangeResult = await store.similaritySearch(independenceQuery, 4, {
@@ -337,7 +335,7 @@ console.log(dateRangeResult[0]);
 ```
 ### Example: Search by Numeric Range Query
 
-We can search for documents that are within a range for a numeric field like `metadata.rating`.
+`metadata.rating`과 같은 numeric field에 대해 범위 내에 있는 문서를 검색할 수 있습니다.
 
 ```typescript
 const ratingRangeResult = await store.similaritySearch(independenceQuery, 4, {
@@ -356,9 +354,9 @@ console.log(ratingRangeResult[0]);
 ```
 ### Example: Combining Multiple Search Conditions
 
-Different queries can by combined using AND (conjuncts) or OR (disjuncts) operators.
+AND (conjuncts) 또는 OR (disjuncts) operator를 사용하여 다양한 쿼리를 결합할 수 있습니다.
 
-In this example, we are checking for documents with a rating between 3 & 4 and dated between 2015 & 2018.
+이 예제에서는 rating이 3과 4 사이이고 날짜가 2015년과 2018년 사이인 문서를 확인합니다.
 
 ```typescript
 const multipleConditionsResult = await store.similaritySearch(texts[0], 4, {
@@ -377,8 +375,8 @@ console.log(multipleConditionsResult[0]);
 
 ### Other Queries
 
-Similarly, you can use any of the supported Query methods like Geo Distance, Polygon Search, Wildcard, Regular Expressions, etc in the `searchOptions` Key of `filter` parameter.
-Please refer to the documentation for more details on the available query methods and their syntax.
+마찬가지로 `filter` parameter의 `searchOptions` Key에서 Geo Distance, Polygon Search, Wildcard, Regular Expressions 등과 같은 지원되는 Query method를 사용할 수 있습니다.
+사용 가능한 query method와 구문에 대한 자세한 내용은 문서를 참조하세요.
 
 - [Couchbase Capella](https://docs.couchbase.com/cloud/search/search-request-params.html#query-object)
 - [Couchbase Server](https://docs.couchbase.com/server/current/search/search-request-params.html#query-object)
@@ -388,31 +386,31 @@ Please refer to the documentation for more details on the available query method
 
 # Frequently Asked Questions
 
-## Question: Should I create the Search index before creating the CouchbaseVectorStore object?
+## Question: CouchbaseVectorStore object를 생성하기 전에 Search index를 생성해야 하나요?
 
-Yes, currently you need to create the Search index before creating the `CouchbaseVectorStore` object.
+예, 현재 `CouchbaseVectorStore` object를 생성하기 전에 Search index를 생성해야 합니다.
 
-## Question: I am not seeing all the fields that I specified in my search results.
+## Question: 검색 결과에서 지정한 모든 field가 표시되지 않습니다.
 
-In Couchbase, we can only return the fields stored in the Search index. Please ensure that the field that you are trying to access in the search results is part of the Search index.
+Couchbase에서는 Search index에 저장된 field만 반환할 수 있습니다. 검색 결과에서 액세스하려는 field가 Search index의 일부인지 확인하세요.
 
-One way to handle this is to index and store a document's fields dynamically in the index.
+이를 처리하는 한 가지 방법은 index에서 문서의 field를 동적으로 indexing하고 저장하는 것입니다.
 
-- In Capella, you need to go to "Advanced Mode" then under the chevron "General Settings" you can check "[X] Store Dynamic Fields" or "[X] Index Dynamic Fields"
-- In Couchbase Server, in the Index Editor (not Quick Editor) under the chevron "Advanced" you can check "[X] Store Dynamic Fields" or "[X] Index Dynamic Fields"
+- Capella에서는 "Advanced Mode"로 이동한 다음 "General Settings" 펼침 메뉴에서 "[X] Store Dynamic Fields" 또는 "[X] Index Dynamic Fields"를 선택할 수 있습니다.
+- Couchbase Server에서는 Index Editor(Quick Editor가 아님)의 "Advanced" 펼침 메뉴에서 "[X] Store Dynamic Fields" 또는 "[X] Index Dynamic Fields"를 선택할 수 있습니다.
 
-Note that these options will increase the size of the index.
+이러한 옵션은 index의 크기를 증가시킵니다.
 
-For more details on dynamic mappings, please refer to the [documentation](https://docs.couchbase.com/cloud/search/customize-index.html).
+dynamic mapping에 대한 자세한 내용은 [문서](https://docs.couchbase.com/cloud/search/customize-index.html)를 참조하세요.
 
-## Question: I am unable to see the metadata object in my search results.
+## Question: 검색 결과에서 metadata object를 볼 수 없습니다.
 
-This is most likely due to the `metadata` field in the document not being indexed and/or stored by the Couchbase Search index. In order to index the `metadata` field in the document, you need to add it to the index as a child mapping.
+이는 문서의 `metadata` field가 Couchbase Search index에 의해 indexing 및/또는 저장되지 않았기 때문일 가능성이 높습니다. 문서의 `metadata` field를 indexing하려면 child mapping으로 index에 추가해야 합니다.
 
-If you select to map all the fields in the mapping, you will be able to search by all metadata fields. Alternatively, to optimize the index, you can select the specific fields inside `metadata` object to be indexed.
-You can refer to the [docs](https://docs.couchbase.com/cloud/search/customize-index.html) to learn more about indexing child mappings.
+mapping에서 모든 field를 매핑하도록 선택하면 모든 metadata field로 검색할 수 있습니다. 또는 index를 최적화하기 위해 indexing할 `metadata` object 내의 특정 field를 선택할 수 있습니다.
+child mapping indexing에 대한 자세한 내용은 [문서](https://docs.couchbase.com/cloud/search/customize-index.html)를 참조하세요.
 
-To create Child Mappings, you can refer to the following docs -
+Child Mapping을 생성하려면 다음 문서를 참조하세요 -
 
 - [Couchbase Capella](https://docs.couchbase.com/cloud/search/create-child-mapping.html)
 - [Couchbase Server](https://docs.couchbase.com/server/current/fts/fts-creating-index-from-UI-classic-editor-dynamic.html)

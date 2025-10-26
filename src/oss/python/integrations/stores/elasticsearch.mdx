@@ -2,11 +2,11 @@
 title: ElasticsearchEmbeddingsCache
 ---
 
-This will help you get started with Elasticsearch [key-value stores](/oss/integrations/stores). For detailed documentation of all `ElasticsearchEmbeddingsCache` features and configurations head to the [API reference](https://python.langchain.com/api_reference/elasticsearch/cache/langchain_elasticsearch.cache.ElasticsearchEmbeddingsCache.html).
+이 문서는 Elasticsearch [key-value stores](/oss/integrations/stores)를 시작하는 데 도움이 됩니다. 모든 `ElasticsearchEmbeddingsCache` 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/elasticsearch/cache/langchain_elasticsearch.cache.ElasticsearchEmbeddingsCache.html)를 참조하세요.
 
 ## Overview
 
-The `ElasticsearchEmbeddingsCache` is a `ByteStore` implementation that uses your Elasticsearch instance for efficient storage and retrieval of embeddings.
+`ElasticsearchEmbeddingsCache`는 Elasticsearch 인스턴스를 사용하여 임베딩을 효율적으로 저장하고 검색하는 `ByteStore` 구현입니다.
 
 ### Integration details
 
@@ -16,11 +16,11 @@ The `ElasticsearchEmbeddingsCache` is a `ByteStore` implementation that uses you
 
 ## Setup
 
-To create a `ElasticsearchEmbeddingsCache` byte store, you'll need an Elasticsearch cluster. You can [set one up locally](https://www.elastic.co/downloads/elasticsearch) or create an [Elastic account](https://www.elastic.co/elasticsearch).
+`ElasticsearchEmbeddingsCache` byte store를 생성하려면 Elasticsearch 클러스터가 필요합니다. [로컬에서 설정](https://www.elastic.co/downloads/elasticsearch)하거나 [Elastic 계정](https://www.elastic.co/elasticsearch)을 생성할 수 있습니다.
 
 ### Installation
 
-The LangChain `ElasticsearchEmbeddingsCache` integration lives in the `langchain-elasticsearch` package:
+LangChain `ElasticsearchEmbeddingsCache` integration은 `langchain-elasticsearch` 패키지에 있습니다:
 
 ```python
 pip install -qU langchain-elasticsearch
@@ -28,7 +28,7 @@ pip install -qU langchain-elasticsearch
 
 ## Instantiation
 
-Now we can instantiate our byte store:
+이제 byte store를 인스턴스화할 수 있습니다:
 
 ```python
 from langchain_elasticsearch import ElasticsearchEmbeddingsCache
@@ -49,7 +49,7 @@ kv_store = ElasticsearchEmbeddingsCache(
 
 ## Usage
 
-You can set data under keys like this using the `mset` method:
+`mset` 메서드를 사용하여 다음과 같이 키 아래에 데이터를 설정할 수 있습니다:
 
 ```python
 kv_store.mset(
@@ -71,7 +71,7 @@ kv_store.mget(
 [b'value1', b'value2']
 ```
 
-And you can delete data using the `mdelete` method:
+그리고 `mdelete` 메서드를 사용하여 데이터를 삭제할 수 있습니다:
 
 ```python
 kv_store.mdelete(
@@ -95,11 +95,11 @@ kv_store.mget(
 
 ## Use as an embeddings cache
 
-Like other `ByteStores`, you can use an `ElasticsearchEmbeddingsCache` instance for [persistent caching in document ingestion](/oss/integrations/text_embedding#caching) for RAG.
+다른 `ByteStores`와 마찬가지로, RAG를 위한 [문서 수집 시 영구 캐싱](/oss/integrations/text_embedding#caching)에 `ElasticsearchEmbeddingsCache` 인스턴스를 사용할 수 있습니다.
 
-However, cached vectors won't be searchable by default. The developer can customize the building of the Elasticsearch document in order to add indexed vector field.
+그러나 캐시된 벡터는 기본적으로 검색할 수 없습니다. 개발자는 인덱싱된 벡터 필드를 추가하기 위해 Elasticsearch 문서 빌드를 커스터마이징할 수 있습니다.
 
-This can be done by subclassing and overriding methods:
+이는 서브클래싱하고 메서드를 오버라이딩하여 수행할 수 있습니다:
 
 ```python
 from typing import Any, Dict, List
@@ -123,8 +123,8 @@ class SearchableElasticsearchStore(ElasticsearchEmbeddingsCache):
         return body
 ```
 
-When overriding the mapping and the document building, please only make additive modifications, keeping the base mapping intact.
+매핑과 문서 빌드를 오버라이딩할 때는 기본 매핑을 그대로 유지하면서 추가적인 수정만 하시기 바랍니다.
 
 ## API reference
 
-For detailed documentation of all `ElasticsearchEmbeddingsCache` features and configurations, head to the API reference: [python.langchain.com/api_reference/elasticsearch/cache/langchain_elasticsearch.cache.ElasticsearchEmbeddingsCache.html](https://python.langchain.com/api_reference/elasticsearch/cache/langchain_elasticsearch.cache.ElasticsearchEmbeddingsCache.html)
+모든 `ElasticsearchEmbeddingsCache` 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/elasticsearch/cache/langchain_elasticsearch.cache.ElasticsearchEmbeddingsCache.html](https://python.langchain.com/api_reference/elasticsearch/cache/langchain_elasticsearch.cache.ElasticsearchEmbeddingsCache.html)

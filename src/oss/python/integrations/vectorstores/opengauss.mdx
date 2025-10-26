@@ -2,12 +2,11 @@
 title: openGauss VectorStore
 ---
 
-This notebook covers how to get started with the openGauss VectorStore. [openGauss](https://opengauss.org/en/) is a high-performance relational database with native vector storage and retrieval capabilities. This integration enables ACID-compliant vector operations within LangChain applications, combining traditional SQL functionality with modern AI-driven similarity search.
- vector store.
+이 노트북은 openGauss VectorStore를 시작하는 방법을 다룹니다. [openGauss](https://opengauss.org/en/)는 네이티브 벡터 저장 및 검색 기능을 갖춘 고성능 관계형 데이터베이스입니다. 이 통합은 LangChain 애플리케이션 내에서 ACID 호환 벡터 작업을 가능하게 하며, 전통적인 SQL 기능과 현대적인 AI 기반 유사도 검색을 결합합니다.
 
 ## Setup
 
-### Launch openGauss Container
+### openGauss Container 실행
 
 ```bash
 docker run --name opengauss \
@@ -17,13 +16,13 @@ docker run --name opengauss \
   opengauss/opengauss-server:latest
 ```
 
-### Install langchain-opengauss
+### langchain-opengauss 설치
 
 ```bash
 pip install langchain-opengauss
 ```
 
-**System Requirements**:
+**시스템 요구사항**:
 
 - openGauss ≥ 7.0.0
 - Python ≥ 3.8
@@ -31,7 +30,7 @@ pip install langchain-opengauss
 
 ### Credentials
 
-Using your openGauss Credentials
+openGauss Credentials 사용
 
 ## Initialization
 
@@ -52,7 +51,7 @@ vector_store = OpenGauss(embedding=embeddings, config=config)
 
 ## Manage vector store
 
-### Add items to vector store
+### vector store에 항목 추가
 
 ```python
 from langchain_core.documents import Document
@@ -68,7 +67,7 @@ documents = [document_1, document_2, document_3]
 vector_store.add_documents(documents=documents, ids=["1", "2", "3"])
 ```
 
-### Update items in vector store
+### vector store의 항목 업데이트
 
 ```python
 updated_document = Document(
@@ -79,7 +78,7 @@ updated_document = Document(
 vector_store.add_documents(document_id="1", document=updated_document)
 ```
 
-### Delete items from vector store
+### vector store에서 항목 삭제
 
 ```python
 vector_store.delete(ids=["3"])
@@ -87,11 +86,11 @@ vector_store.delete(ids=["3"])
 
 ## Query vector store
 
-Once your vector store has been created and the relevant documents have been added you will most likely wish to query it during the running of your chain or agent.
+vector store가 생성되고 관련 문서가 추가되면, 체인이나 에이전트를 실행하는 동안 이를 쿼리하고 싶을 것입니다.
 
-### Query directly
+### 직접 쿼리
 
-Performing a simple similarity search can be done as follows:
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
 
 - TODO: Edit and then run code cell to generate output
 
@@ -103,7 +102,7 @@ for doc in results:
     print(f"* {doc.page_content} [{doc.metadata}]")
 ```
 
-If you want to execute a similarity search and receive the corresponding scores you can run:
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
 
 ```python
 results = vector_store.similarity_search_with_score(
@@ -113,9 +112,9 @@ for doc, score in results:
     print(f"* [SIM={score:3f}] {doc.page_content} [{doc.metadata}]")
 ```
 
-### Query by turning into retriever
+### retriever로 변환하여 쿼리
 
-You can also transform the vector store into a retriever for easier usage in your chains.
+체인에서 더 쉽게 사용하기 위해 vector store를 retriever로 변환할 수도 있습니다.
 
 - TODO: Edit and then run code cell to generate output
 
@@ -126,7 +125,7 @@ retriever.invoke("thud")
 
 ## Usage for retrieval-augmented generation
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+retrieval-augmented generation (RAG)을 위해 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
 
 - [Tutorials](/oss/langchain/rag)
 - [How-to: Question and answer with RAG](https://python.langchain.com/docs/how_to/#qa-with-rag)
@@ -138,20 +137,20 @@ For guides on how to use this vector store for retrieval-augmented generation (R
 
 | Parameter           | Default                 | Description                                            |
 |---------------------|-------------------------|--------------------------------------------------------|
-| `host`              | localhost               | Database server address                                |
-| `port`              | 8888                    | Database connection port                               |
-| `user`              | gaussdb                 | Database username                                      |
-| `password`          | -                       | Complex password string                                |
-| `database`          | postgres                | Default database name                                  |
-| `min_connections`   | 1                       | Connection pool minimum size                           |
-| `max_connections`   | 5                       | Connection pool maximum size                           |
-| `table_name`        | langchain_docs          | Name of the table for storing vector data and metadata |
-| `index_type`        | IndexType.HNSW          |Vector index algorithm type. Options: HNSW or IVFFLAT\nDefault is HNSW.|
-| `vector_type`       | VectorType.vector       |Type of vector representation to use. Default is Vector.|
-| `distance_strategy` | DistanceStrategy.COSINE |Vector similarity metric to use for retrieval. Options: euclidean (L2 distance), cosine (angular distance, ideal for text embeddings), manhattan (L1 distance for sparse data), negative_inner_product (dot product for normalized vectors).\n Default is cosine.|
-|`embedding_dimension`| 1536                    |Dimensionality of the vector embeddings.|
+| `host`              | localhost               | 데이터베이스 서버 주소                                |
+| `port`              | 8888                    | 데이터베이스 연결 포트                                |
+| `user`              | gaussdb                 | 데이터베이스 사용자 이름                              |
+| `password`          | -                       | 복잡한 비밀번호 문자열                                |
+| `database`          | postgres                | 기본 데이터베이스 이름                                |
+| `min_connections`   | 1                       | 연결 풀 최소 크기                                     |
+| `max_connections`   | 5                       | 연결 풀 최대 크기                                     |
+| `table_name`        | langchain_docs          | 벡터 데이터와 메타데이터를 저장하는 테이블 이름       |
+| `index_type`        | IndexType.HNSW          |벡터 인덱스 알고리즘 유형. 옵션: HNSW 또는 IVFFLAT\n기본값은 HNSW입니다.|
+| `vector_type`       | VectorType.vector       |사용할 벡터 표현 유형. 기본값은 Vector입니다.|
+| `distance_strategy` | DistanceStrategy.COSINE |검색에 사용할 벡터 유사도 메트릭. 옵션: euclidean (L2 거리), cosine (각도 거리, 텍스트 임베딩에 이상적), manhattan (희소 데이터용 L1 거리), negative_inner_product (정규화된 벡터용 내적).\n 기본값은 cosine입니다.|
+|`embedding_dimension`| 1536                    |벡터 임베딩의 차원.|
 
-### Supported Combinations
+### 지원되는 조합
 
 | Vector Type | Dimensions | Index Types  | Supported Distance Strategies         |
 |-------------|------------|--------------|---------------------------------------|
@@ -159,14 +158,14 @@ For guides on how to use this vector store for retrieval-augmented generation (R
 
 ## Performance Optimization
 
-### Index Tuning Guidelines
+### Index 튜닝 가이드라인
 
 **HNSW Parameters**:
 
-- `m`: 16-100 (balance between recall and memory)
-- `ef_construction`: 64-1000 (must be > 2*m)
+- `m`: 16-100 (재현율과 메모리 간의 균형)
+- `ef_construction`: 64-1000 (2*m보다 커야 함)
 
-**IVFFLAT Recommendations**:
+**IVFFLAT 권장사항**:
 
 ```python
 import math
@@ -185,9 +184,9 @@ OpenGaussSettings(min_connections=3, max_connections=20)
 
 ## Limitations
 
-- `bit` and `sparsevec` vector types currently in development
-- Maximum vector dimensions: 2000 for `vector` type
+- `bit` 및 `sparsevec` 벡터 타입은 현재 개발 중
+- 최대 벡터 차원: `vector` 타입의 경우 2000
 
 ## API reference
 
-For detailed documentation of all __ModuleName__VectorStore features and configurations head to the API reference: [python.langchain.com/api_reference/en/latest/vectorstores/opengauss.OpenGuass.html](https://python.langchain.com/api_reference/en/latest/vectorstores/opengauss.OpenGuass.html)
+모든 __ModuleName__VectorStore 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/en/latest/vectorstores/opengauss.OpenGuass.html](https://python.langchain.com/api_reference/en/latest/vectorstores/opengauss.OpenGuass.html)

@@ -2,15 +2,15 @@
 title: Vectara
 ---
 
-Vectara is a platform for building GenAI applications. It provides an easy-to-use API for document indexing and querying that is managed by Vectara and is optimized for performance and accuracy.
+Vectara는 GenAI 애플리케이션을 구축하기 위한 플랫폼입니다. Vectara가 관리하며 성능과 정확도에 최적화된 문서 인덱싱 및 쿼리를 위한 사용하기 쉬운 API를 제공합니다.
 
-You can use Vectara as a vector store with LangChain.js.
+LangChain.js와 함께 Vectara를 vector store로 사용할 수 있습니다.
 
-## 👉 Embeddings Included
+## 👉 Embeddings 포함
 
-Vectara uses its own embeddings under the hood, so you don't have to provide any yourself or call another service to obtain embeddings.
+Vectara는 내부적으로 자체 embeddings를 사용하므로, 직접 제공하거나 embeddings를 얻기 위해 다른 서비스를 호출할 필요가 없습니다.
 
-This also means that if you provide your own embeddings, they'll be a no-op.
+이는 또한 자체 embeddings를 제공하더라도 아무 작업도 수행되지 않음을 의미합니다.
 
 ```typescript
 const store = await VectaraStore.fromTexts(
@@ -24,13 +24,13 @@ const store = await VectaraStore.fromTexts(
 
 ## Setup
 
-You'll need to:
+다음이 필요합니다:
 
-- Create a [free Vectara account](https://vectara.com/integrations/langchain).
-- Create a [corpus](https://docs.vectara.com/docs/console-ui/creating-a-corpus) to store your data
-- Create an [API key](https://docs.vectara.com/docs/common-use-cases/app-authn-authz/api-keys) with QueryService and IndexService access so you can access this corpus
+- [무료 Vectara 계정](https://vectara.com/integrations/langchain) 생성
+- 데이터를 저장할 [corpus](https://docs.vectara.com/docs/console-ui/creating-a-corpus) 생성
+- 이 corpus에 액세스할 수 있도록 QueryService 및 IndexService 권한이 있는 [API key](https://docs.vectara.com/docs/common-use-cases/app-authn-authz/api-keys) 생성
 
-Configure your `.env` file or provide args to connect LangChain to your Vectara corpus:
+`.env` 파일을 구성하거나 LangChain을 Vectara corpus에 연결하기 위한 인자를 제공하세요:
 
 ```
 VECTARA_CUSTOMER_ID=your_customer_id
@@ -38,8 +38,8 @@ VECTARA_CORPUS_ID=your_corpus_id
 VECTARA_API_KEY=your-vectara-api-key
 ```
 
-Note that you can provide multiple corpus IDs separated by commas for querying multiple corpora at once. For example: `VECTARA_CORPUS_ID=3,8,9,43`.
-For indexing multiple corpora, you'll need to create a separate VectaraStore instance for each corpus.
+여러 corpus를 동시에 쿼리하기 위해 쉼표로 구분된 여러 corpus ID를 제공할 수 있습니다. 예: `VECTARA_CORPUS_ID=3,8,9,43`.
+여러 corpus를 인덱싱하려면 각 corpus에 대해 별도의 VectaraStore 인스턴스를 생성해야 합니다.
 
 ## Usage
 
@@ -140,16 +140,16 @@ console.log(JSON.stringify(documents, null, 2));
 await store.deleteDocuments(doc_ids);
 ```
 
-Note that `lambda` is a parameter related to Vectara's hybrid search capbility, providing a tradeoff between neural search and boolean/exact match as described [here](https://docs.vectara.com/docs/api-reference/search-apis/lexical-matching). We recommend the value of 0.025 as a default, while providing a way for advanced users to customize this value if needed.
+`lambda`는 Vectara의 hybrid search 기능과 관련된 매개변수로, [여기](https://docs.vectara.com/docs/api-reference/search-apis/lexical-matching)에 설명된 대로 neural search와 boolean/exact match 간의 균형을 제공합니다. 기본값으로 0.025를 권장하며, 고급 사용자가 필요에 따라 이 값을 사용자 정의할 수 있는 방법을 제공합니다.
 
 ## APIs
 
-Vectara's LangChain vector store consumes Vectara's core APIs:
+Vectara의 LangChain vector store는 Vectara의 핵심 API를 사용합니다:
 
-- [Indexing API](https://docs.vectara.com/docs/indexing-apis/indexing) for storing documents in a Vectara corpus.
-- [Search API](https://docs.vectara.com/docs/search-apis/search) for querying this data. This API supports hybrid search.
+- [Indexing API](https://docs.vectara.com/docs/indexing-apis/indexing) - Vectara corpus에 문서를 저장합니다.
+- [Search API](https://docs.vectara.com/docs/search-apis/search) - 이 데이터를 쿼리합니다. 이 API는 hybrid search를 지원합니다.
 
 ## Related
 
-- Vector store [conceptual guide](/oss/integrations/vectorstores)
-- Vector store [how-to guides](/oss/integrations/vectorstores)
+- Vector store [개념 가이드](/oss/integrations/vectorstores)
+- Vector store [사용 방법 가이드](/oss/integrations/vectorstores)

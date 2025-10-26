@@ -1,42 +1,43 @@
+```mdx
 ---
 title: ChatDeepSeek
 ---
 
 
-This will help you getting started with DeepSeek [chat models](/oss/langchain/models). For detailed documentation of all `ChatDeepSeek` features and configurations head to the [API reference](https://api.js.langchain.com/classes/_langchain_deepseek.ChatDeepSeek.html).
+이 문서는 DeepSeek [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 `ChatDeepSeek` 기능과 설정에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/_langchain_deepseek.ChatDeepSeek.html)를 참조하세요.
 
 ## Overview
 ### Integration details
 
 | Class | Package | Local | Serializable | [PY support](https://python.langchain.com/docs/integrations/chat/deepseek) | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
-| [`ChatDeepSeek`](https://api.js.langchain.com/classes/_langchain_deepseek.ChatDeepSeek.html) | [`@langchain/deepseek`](https://npmjs.com/@langchain/deepseek) | ❌ (see [Ollama](/oss/integrations/chat/ollama)) | beta | ✅ | <img src="https://img.shields.io/npm/dm/@langchain/deepseek?style=flat-square&label=%20&" alt="NPM - Downloads" /> | <img src="https://img.shields.io/npm/v/@langchain/deepseek?style=flat-square&label=%20&" alt="NPM - Version" /> |
+| [`ChatDeepSeek`](https://api.js.langchain.com/classes/_langchain_deepseek.ChatDeepSeek.html) | [`@langchain/deepseek`](https://npmjs.com/@langchain/deepseek) | ❌ ([Ollama](/oss/integrations/chat/ollama) 참조) | beta | ✅ | <img src="https://img.shields.io/npm/dm/@langchain/deepseek?style=flat-square&label=%20&" alt="NPM - Downloads" /> | <img src="https://img.shields.io/npm/v/@langchain/deepseek?style=flat-square&label=%20&" alt="NPM - Version" /> |
 
 ### Model features
 
-See the links in the table headers below for guides on how to use specific features.
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
 
-Note that as of 1/27/25, tool calling and structured output are not currently supported for `deepseek-reasoner`.
+참고: 25년 1월 27일 기준, `deepseek-reasoner`는 현재 tool calling과 structured output을 지원하지 않습니다.
 
 ## Setup
 
-To access DeepSeek models you'll need to create a DeepSeek account, get an API key, and install the `@langchain/deepseek` integration package.
+DeepSeek 모델에 액세스하려면 DeepSeek 계정을 생성하고 API 키를 받은 다음 `@langchain/deepseek` integration package를 설치해야 합니다.
 
-You can also access the DeepSeek API through providers like [Together AI](/oss/integrations/chat/togetherai) or [Ollama](/oss/integrations/chat/ollama).
+[Together AI](/oss/integrations/chat/togetherai) 또는 [Ollama](/oss/integrations/chat/ollama)와 같은 provider를 통해 DeepSeek API에 액세스할 수도 있습니다.
 
 ### Credentials
 
-Head to https://deepseek.com/ to sign up to DeepSeek and generate an API key. Once you've done this set the `DEEPSEEK_API_KEY` environment variable:
+https://deepseek.com/ 에 접속하여 DeepSeek에 가입하고 API 키를 생성하세요. 완료한 후 `DEEPSEEK_API_KEY` environment variable을 설정하세요:
 
 ```bash
 export DEEPSEEK_API_KEY="your-api-key"
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](/langsmith/home) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](/langsmith/home) API 키를 설정할 수도 있습니다:
 
 ```bash
 # export LANGSMITH_TRACING="true"
@@ -45,7 +46,7 @@ If you want to get automated tracing of your model calls you can also set your [
 
 ### Installation
 
-The LangChain ChatDeepSeek integration lives in the `@langchain/deepseek` package:
+LangChain ChatDeepSeek integration은 `@langchain/deepseek` package에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -61,7 +62,7 @@ pnpm add @langchain/deepseek @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 
 ```typescript
@@ -135,4 +136,5 @@ J'adore la programmation.
 
 ## API reference
 
-For detailed documentation of all ChatDeepSeek features and configurations head to the API reference: https://api.js.langchain.com/classes/_langchain_deepseek.ChatDeepSeek.html
+모든 ChatDeepSeek 기능과 설정에 대한 자세한 문서는 API reference를 참조하세요: https://api.js.langchain.com/classes/_langchain_deepseek.ChatDeepSeek.html
+```

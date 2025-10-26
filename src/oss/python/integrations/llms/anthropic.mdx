@@ -1,15 +1,16 @@
+```markdown
 ---
 title: AnthropicLLM
 ---
 
 
 <Warning>
-**You are currently on a page documenting the use of Anthropic legacy Claude 2 models as text completion models. The latest and most popular Anthropic models are [chat completion models](/oss/langchain/models), and the text completion models have been deprecated.**
+**현재 Anthropic의 레거시 Claude 2 모델을 text completion 모델로 사용하는 방법을 설명하는 페이지를 보고 계십니다. 최신이자 가장 인기 있는 Anthropic 모델은 [chat completion 모델](/oss/langchain/models)이며, text completion 모델은 더 이상 사용되지 않습니다.**
 
-You are probably looking for [this page instead](/oss/integrations/chat/anthropic/).
+아마도 [이 페이지](/oss/integrations/chat/anthropic/)를 찾고 계실 것입니다.
 </Warning>
 
-This example goes over how to use LangChain to interact with `Anthropic` models.
+이 예제는 LangChain을 사용하여 `Anthropic` 모델과 상호작용하는 방법을 다룹니다.
 
 ## Installation
 
@@ -19,7 +20,7 @@ pip install -qU langchain-anthropic
 
 ## Environment Setup
 
-We'll need to get an [Anthropic](https://console.anthropic.com/settings/keys) API key and set the `ANTHROPIC_API_KEY` environment variable:
+[Anthropic](https://console.anthropic.com/settings/keys) API key를 발급받고 `ANTHROPIC_API_KEY` environment variable을 설정해야 합니다:
 
 ```python
 import os
@@ -50,4 +51,5 @@ chain.invoke({"question": "What is LangChain?"})
 
 ```output
 '\nLangChain is a decentralized blockchain network that leverages AI and machine learning to provide language translation services.'
+```
 ```

@@ -3,7 +3,7 @@ title: Hugging Face
 sidebarTitle: HuggingFaceEmbeddings
 ---
 
-Let's load the Hugging Face Embedding class.
+Hugging Face Embedding class를 로드해보겠습니다.
 
 ```python
 pip install -qU  langchain langchain-huggingface sentence_transformers
@@ -39,9 +39,9 @@ doc_result = embeddings.embed_documents([text])
 
 ## Hugging Face Inference Providers
 
-We can also access embedding models via the [Inference Providers](https://huggingface.co/docs/inference-providers), which let's us use open source models on scalable serverless infrastructure.
+[Inference Providers](https://huggingface.co/docs/inference-providers)를 통해 embedding model에 접근할 수도 있습니다. 이를 통해 확장 가능한 서버리스 인프라에서 오픈 소스 모델을 사용할 수 있습니다.
 
-First, we need to get a read-only API key from [Hugging Face](https://huggingface.co/settings/tokens).
+먼저, [Hugging Face](https://huggingface.co/settings/tokens)에서 읽기 전용 API key를 받아야 합니다.
 
 ```python
 from getpass import getpass
@@ -49,7 +49,7 @@ from getpass import getpass
 huggingfacehub_api_token = getpass()
 ```
 
-Now we can use the `HuggingFaceInferenceAPIEmbeddings` class to run open source embedding models via [Inference Providers](https://huggingface.co/docs/inference-providers).
+이제 `HuggingFaceInferenceAPIEmbeddings` class를 사용하여 [Inference Providers](https://huggingface.co/docs/inference-providers)를 통해 오픈 소스 embedding model을 실행할 수 있습니다.
 
 ```python
 from langchain_huggingface import HuggingFaceInferenceAPIEmbeddings
@@ -69,7 +69,7 @@ query_result[:3]
 
 ## Hugging Face Hub
 
-We can also generate embeddings locally via the Hugging Face Hub package, which requires us to install `huggingface_hub`
+Hugging Face Hub package를 통해 로컬에서 embedding을 생성할 수도 있습니다. 이를 위해서는 `huggingface_hub`를 설치해야 합니다.
 
 ```python
 !pip install huggingface_hub

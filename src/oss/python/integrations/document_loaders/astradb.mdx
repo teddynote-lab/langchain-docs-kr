@@ -2,26 +2,25 @@
 title: AstraDB
 ---
 
-> [DataStax Astra DB](https://docs.datastax.com/en/astra-db-serverless/index.html) is a serverless
-> AI-ready database built on `Apache Cassandra®` and made conveniently available
-> through an easy-to-use JSON API.
+> [DataStax Astra DB](https://docs.datastax.com/en/astra-db-serverless/index.html)는 `Apache Cassandra®` 기반으로 구축된 서버리스
+> AI 지원 데이터베이스로, 사용하기 쉬운 JSON API를 통해 편리하게 사용할 수 있습니다.
 
 ## Overview
 
-The Astra DB Document Loader returns a list of LangChain @[`Document`] objects read from an Astra DB collection.
+Astra DB Document Loader는 Astra DB collection에서 읽은 LangChain @[`Document`] 객체 목록을 반환합니다.
 
-The loader takes the following parameters:
+loader는 다음 매개변수를 사용합니다:
 
-* `api_endpoint`: Astra DB API endpoint. Looks like `https://01234567-89ab-cdef-0123-456789abcdef-us-east1.apps.astra.datastax.com`
-* `token`: Astra DB token. Looks like `AstraCS:aBcD0123...`
-* `collection_name` : AstraDB collection name
-* `namespace`: (Optional) AstraDB namespace (called _keyspace_ in Astra DB)
-* `filter_criteria`: (Optional) Filter used in the find query
-* `projection`: (Optional) Projection used in the find query
-* `limit`: (Optional) Maximum number of documents to retrieve
-* `extraction_function`: (Optional) A function to convert the AstraDB document to the LangChain `page_content` string. Defaults to `json.dumps`
+* `api_endpoint`: Astra DB API endpoint. `https://01234567-89ab-cdef-0123-456789abcdef-us-east1.apps.astra.datastax.com`와 같은 형식입니다
+* `token`: Astra DB token. `AstraCS:aBcD0123...`와 같은 형식입니다
+* `collection_name` : AstraDB collection 이름
+* `namespace`: (선택사항) AstraDB namespace (Astra DB에서는 _keyspace_라고 함)
+* `filter_criteria`: (선택사항) find query에 사용되는 필터
+* `projection`: (선택사항) find query에 사용되는 projection
+* `limit`: (선택사항) 검색할 최대 document 수
+* `extraction_function`: (선택사항) AstraDB document를 LangChain `page_content` 문자열로 변환하는 함수. 기본값은 `json.dumps`입니다
 
-The loader sets the following metadata for the documents it reads:
+loader는 읽은 document에 대해 다음 metadata를 설정합니다:
 
 ```python
 metadata={
@@ -37,7 +36,7 @@ metadata={
 !pip install "langchain-astradb>=0.6,<0.7"
 ```
 
-## Load documents with the Document Loader
+## Document Loader로 문서 로드하기
 
 ```python
 from langchain_astradb import AstraDBLoader

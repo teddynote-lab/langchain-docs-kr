@@ -2,11 +2,11 @@
 title: Google Cloud Vertex AI Reranker
 ---
 
-> The [Vertex Search Ranking API](https://cloud.google.com/generative-ai-app-builder/docs/ranking) is one of the standalone APIs in [Vertex AI Agent Builder](https://cloud.google.com/generative-ai-app-builder/docs/builder-apis). It takes a list of documents and reranks those documents based on how relevant the documents are to a query. Compared to embeddings, which look only at the semantic similarity of a document and a query, the ranking API can give you precise scores for how well a document answers a given query. The ranking API can be used to improve the quality of search results after retrieving an initial set of candidate documents.
+> [Vertex Search Ranking API](https://cloud.google.com/generative-ai-app-builder/docs/ranking)는 [Vertex AI Agent Builder](https://cloud.google.com/generative-ai-app-builder/docs/builder-apis)의 독립형 API 중 하나입니다. 이 API는 문서 목록을 받아 쿼리와의 관련성을 기반으로 문서를 재순위화합니다. 문서와 쿼리의 의미적 유사성만 고려하는 embedding과 비교하여, ranking API는 문서가 주어진 쿼리에 얼마나 잘 답변하는지에 대한 정확한 점수를 제공할 수 있습니다. ranking API는 초기 후보 문서 세트를 검색한 후 검색 결과의 품질을 향상시키는 데 사용할 수 있습니다.
 
->The ranking API is stateless so there's no need to index documents before calling the API. All you need to do is pass in the query and documents. This makes the API well suited for reranking documents from any document retrievers.
+>ranking API는 stateless이므로 API를 호출하기 전에 문서를 인덱싱할 필요가 없습니다. 쿼리와 문서를 전달하기만 하면 됩니다. 이는 API를 모든 문서 retriever의 문서를 재순위화하는 데 적합하게 만듭니다.
 
->For more information, see [Rank and rerank documents](https://cloud.google.com/generative-ai-app-builder/docs/ranking).
+>자세한 내용은 [Rank and rerank documents](https://cloud.google.com/generative-ai-app-builder/docs/ranking)를 참조하세요.
 
 ```python
 pip install -qU langchain langchain-community langchain-google-community langchain-google-community[vertexaisearch] langchain-google-vertexai langchain-chroma langchain-text-splitters beautifulsoup4
@@ -25,13 +25,13 @@ from google.cloud import aiplatform
 aiplatform.init(project=PROJECT_ID, location=REGION)
 ```
 
-### Load and Prepare data
+### 데이터 로드 및 준비
 
-For this example, we will be using the [Google Wiki page](https://en.wikipedia.org/wiki/Google)to demonstrate how the Vertex Ranking API works.
+이 예제에서는 Vertex Ranking API가 어떻게 작동하는지 보여주기 위해 [Google Wiki 페이지](https://en.wikipedia.org/wiki/Google)를 사용합니다.
 
-We use a standard pipeline of `load -> split -> embed data`.
+`load -> split -> embed data`의 표준 파이프라인을 사용합니다.
 
-The embeddings are created using the [Vertex Embeddings API](https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings#supported_models) model - `textembedding-gecko@003`
+embedding은 [Vertex Embeddings API](https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings#supported_models) 모델인 `textembedding-gecko@003`을 사용하여 생성됩니다.
 
 ```python
 from langchain_chroma import Chroma
@@ -84,15 +84,15 @@ retriever_with_reranker = ContextualCompressionRetriever(
 )
 ```
 
-### Testing out the Vertex Ranking API
+### Vertex Ranking API 테스트하기
 
-Let's query both the `basic_retriever` and `retriever_with_reranker` with the same query and compare the retrieved documents.
+동일한 쿼리로 `basic_retriever`와 `retriever_with_reranker`를 모두 쿼리하고 검색된 문서를 비교해 보겠습니다.
 
-The Ranking API takes in the input from the `basic_retriever` and passes it to the Ranking API.
+Ranking API는 `basic_retriever`의 입력을 받아 Ranking API로 전달합니다.
 
-The ranking API is used to improve the quality of the ranking and determine a score that indicates the relevance of each record to the query.
+ranking API는 순위의 품질을 향상시키고 각 레코드가 쿼리와 얼마나 관련이 있는지를 나타내는 점수를 결정하는 데 사용됩니다.
 
-You can see the difference between the Unranked and the Ranked Documents. The Ranking API moves the most semantically relevant documents to the top of the context window of the LLM thus helping it form a better answer with reasoning.
+Unranked 문서와 Ranked 문서의 차이를 확인할 수 있습니다. Ranking API는 의미적으로 가장 관련성이 높은 문서를 LLM의 context window 상단으로 이동시켜 더 나은 추론을 통해 답변을 형성하는 데 도움을 줍니다.
 
 ```python
 import pandas as pd
@@ -437,7 +437,7 @@ comparison_df
 
 ```
 
-Let's inspect a couple of reranked documents. We observe that the retriever still returns the relevant LangChain type [documents](https://python.langchain.com/api_reference/core/documents/langchain_core.documents.base.Document.html) but as part of the metadata field, we also receive the `relevance_score` from the Ranking API.
+재순위화된 문서 몇 개를 살펴보겠습니다. retriever가 여전히 관련 LangChain 타입 [documents](https://python.langchain.com/api_reference/core/documents/langchain_core.documents.base.Document.html)를 반환하지만 metadata 필드의 일부로 Ranking API의 `relevance_score`도 받는 것을 확인할 수 있습니다.
 
 ```python
 for i in range(2):
@@ -465,9 +465,9 @@ page_content='Eventually, they changed the name to Google; the name of the searc
 ----------------------------------------------------------
 ```
 
-### Putting it all together
+### 모두 통합하기
 
-This shows an example of a complete RAG chain with a simple prompt template on how you can perform reranking using the Vertex Ranking API.
+이것은 Vertex Ranking API를 사용하여 재순위화를 수행하는 방법에 대한 간단한 prompt template이 포함된 완전한 RAG chain의 예제를 보여줍니다.
 
 ```python
 from langchain.chains import LLMChain

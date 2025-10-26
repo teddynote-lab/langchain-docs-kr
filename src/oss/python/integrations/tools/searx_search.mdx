@@ -2,9 +2,9 @@
 title: SearxNG Search
 ---
 
-This notebook goes over how to use a self hosted `SearxNG` search API to search the web.
+이 노트북은 자체 호스팅된 `SearxNG` search API를 사용하여 웹을 검색하는 방법을 다룹니다.
 
-You can [check this link](https://docs.searxng.org/dev/search_api.html) for more informations about `Searx API` parameters.
+`Searx API` 매개변수에 대한 자세한 정보는 [이 링크를 확인](https://docs.searxng.org/dev/search_api.html)할 수 있습니다.
 
 ```python
 import pprint
@@ -16,7 +16,7 @@ from langchain_community.utilities import SearxSearchWrapper
 search = SearxSearchWrapper(searx_host="http://127.0.0.1:8888")
 ```
 
-For some engines, if a direct `answer` is available the warpper will print the answer instead of the full list of search results. You can use the `results` method of the wrapper if you want to obtain all the results.
+일부 엔진의 경우, 직접적인 `answer`를 사용할 수 있으면 wrapper는 전체 검색 결과 목록 대신 답변을 출력합니다. 모든 결과를 얻으려면 wrapper의 `results` 메서드를 사용할 수 있습니다.
 
 ```python
 search.run("What is the capital of France")
@@ -28,9 +28,9 @@ search.run("What is the capital of France")
 
 ## Custom Parameters
 
-SearxNG supports [135 search engines](https://docs.searxng.org/user/configured_engines.html). You can also customize the Searx wrapper with arbitrary named parameters that will be passed to the Searx search API . In the below example we will making a more interesting use of custom search parameters from searx search api.
+SearxNG는 [135개의 검색 엔진](https://docs.searxng.org/user/configured_engines.html)을 지원합니다. Searx search API에 전달될 임의의 명명된 매개변수로 Searx wrapper를 사용자 정의할 수도 있습니다. 아래 예제에서는 searx search api의 custom search 매개변수를 더 흥미롭게 사용할 것입니다.
 
-In this example we will be using the `engines` parameters to query wikipedia
+이 예제에서는 wikipedia를 쿼리하기 위해 `engines` 매개변수를 사용할 것입니다
 
 ```python
 search = SearxSearchWrapper(
@@ -46,7 +46,7 @@ search.run("large language model ", engines=["wiki"])
 'Large language models (LLMs) represent a major advancement in AI, with the promise of transforming domains through learned knowledge. LLM sizes have been increasing 10X every year for the last few years, and as these models grow in complexity and size, so do their capabilities.\n\nGPT-3 can translate language, write essays, generate computer code, and more — all with limited to no supervision. In July 2020, OpenAI unveiled GPT-3, a language model that was easily the largest known at the time. Put simply, GPT-3 is trained to predict the next word in a sentence, much like how a text message autocomplete feature works.\n\nA large language model, or LLM, is a deep learning algorithm that can recognize, summarize, translate, predict and generate text and other content based on knowledge gained from massive datasets. Large language models are among the most successful applications of transformer models.\n\nAll of today’s well-known language models—e.g., GPT-3 from OpenAI, PaLM or LaMDA from Google, Galactica or OPT from Meta, Megatron-Turing from Nvidia/Microsoft, Jurassic-1 from AI21 Labs—are...\n\nLarge language models (LLMs) such as GPT-3are increasingly being used to generate text. These tools should be used with care, since they can generate content that is biased, non-verifiable, constitutes original research, or violates copyrights.'
 ```
 
-Passing other Searx parameters for searx like `language`
+`language`와 같은 searx의 다른 Searx 매개변수 전달하기
 
 ```python
 search = SearxSearchWrapper(searx_host="http://127.0.0.1:8888", k=1)
@@ -57,11 +57,11 @@ search.run("deep learning", language="es", engines=["wiki"])
 'Aprendizaje profundo (en inglés, deep learning) es un conjunto de algoritmos de aprendizaje automático (en inglés, machine learning) que intenta modelar abstracciones de alto nivel en datos usando arquitecturas computacionales que admiten transformaciones no lineales múltiples e iterativas de datos expresados en forma matricial o tensorial. 1'
 ```
 
-## Obtaining results with metadata
+## 메타데이터와 함께 결과 얻기
 
-In this example we will be looking for scientific paper using the `categories` parameter and limiting the results to a `time_range` (not all engines support the time range option).
+이 예제에서는 `categories` 매개변수를 사용하여 과학 논문을 검색하고 결과를 `time_range`로 제한할 것입니다(모든 엔진이 time range 옵션을 지원하는 것은 아닙니다).
 
-We also would like to obtain the results in a structured way including metadata. For this we will be using the `results` method of the wrapper.
+또한 메타데이터를 포함한 구조화된 방식으로 결과를 얻고자 합니다. 이를 위해 wrapper의 `results` 메서드를 사용할 것입니다.
 
 ```python
 search = SearxSearchWrapper(searx_host="http://127.0.0.1:8888")
@@ -120,7 +120,7 @@ pprint.pp(results)
   'category': 'science'}]
 ```
 
-Get papers from arxiv
+arxiv에서 논문 가져오기
 
 ```python
 results = search.results(
@@ -243,7 +243,7 @@ pprint.pp(results)
   'category': 'science'}]
 ```
 
-In this example we query for `large language models` under the `it` category. We then filter the results that come from github.
+이 예제에서는 `it` 카테고리에서 `large language models`를 쿼리합니다. 그런 다음 github에서 나온 결과를 필터링합니다.
 
 ```python
 results = search.results("large language model", num_results=20, categories="it")
@@ -264,7 +264,7 @@ pprint.pp(list(filter(lambda r: r["engines"][0] == "github", results)))
   'category': 'it'}]
 ```
 
-We could also directly query for results from `github` and other source forges.
+`github` 및 기타 source forge의 결과를 직접 쿼리할 수도 있습니다.
 
 ```python
 results = search.results(

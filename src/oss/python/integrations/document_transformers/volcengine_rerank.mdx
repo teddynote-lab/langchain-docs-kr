@@ -2,9 +2,9 @@
 title: Volcengine Reranker
 ---
 
-This notebook shows how to use Volcengine Reranker for document compression and retrieval. [Volcengine](https://www.volcengine.com/) is a cloud service platform developed by ByteDance, the parent company of TikTok.
+이 노트북은 문서 압축 및 검색을 위해 Volcengine Reranker를 사용하는 방법을 보여줍니다. [Volcengine](https://www.volcengine.com/)은 TikTok의 모회사인 ByteDance가 개발한 클라우드 서비스 플랫폼입니다.
 
-Volcengine's Rerank Service supports reranking up to 50 documents with a maximum of 4000 tokens. For more, please visit [here](https://www.volcengine.com/docs/84313/1254474) and [here](https://www.volcengine.com/docs/84313/1254605).
+Volcengine의 Rerank Service는 최대 4000개의 token으로 최대 50개의 문서를 reranking하는 것을 지원합니다. 자세한 내용은 [여기](https://www.volcengine.com/docs/84313/1254474)와 [여기](https://www.volcengine.com/docs/84313/1254605)를 참조하세요.
 
 ```python
 pip install -qU  volcengine
@@ -40,9 +40,9 @@ def pretty_print_docs(docs):
     )
 ```
 
-## Set up the base vector store retriever
+## 기본 vector store retriever 설정
 
-Let's start by initializing a simple vector store retriever and storing the 2023 State of the Union speech (in chunks). We can set up the retriever to retrieve a high number (20) of docs.
+간단한 vector store retriever를 초기화하고 2023년 국정연설문을 (청크로) 저장하는 것부터 시작하겠습니다. retriever가 많은 수(20개)의 문서를 검색하도록 설정할 수 있습니다.
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -290,9 +290,9 @@ To disable this warning, you can either:
  - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
 ```
 
-## Reranking with VolcengineRerank
+## VolcengineRerank로 Reranking하기
 
-Now let's wrap our base retriever with a `ContextualCompressionRetriever`. We'll use the `VolcengineRerank` to rerank the returned results.
+이제 기본 retriever를 `ContextualCompressionRetriever`로 래핑해보겠습니다. `VolcengineRerank`를 사용하여 반환된 결과를 rerank합니다.
 
 ```python
 from langchain.retrievers import ContextualCompressionRetriever

@@ -2,11 +2,11 @@
 title: CassandraByteStore
 ---
 
-This will help you get started with Cassandra [key-value stores](/oss/integrations/stores). For detailed documentation of all `CassandraByteStore` features and configurations head to the [API reference](https://python.langchain.com/api_reference/community/storage/langchain_community.storage.cassandra.CassandraByteStore.html).
+이 문서는 Cassandra [key-value stores](/oss/integrations/stores) 시작하기를 도와드립니다. 모든 `CassandraByteStore` 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/storage/langchain_community.storage.cassandra.CassandraByteStore.html)를 참조하세요.
 
 ## Overview
 
-[Cassandra](https://cassandra.apache.org/) is a NoSQL, row-oriented, highly scalable and highly available database.
+[Cassandra](https://cassandra.apache.org/)는 NoSQL, row-oriented, 높은 확장성과 가용성을 제공하는 데이터베이스입니다.
 
 ### Integration details
 
@@ -16,13 +16,13 @@ This will help you get started with Cassandra [key-value stores](/oss/integratio
 
 ## Setup
 
-The `CassandraByteStore` is an implementation of `ByteStore` that stores the data in your Cassandra instance.
-The store keys must be strings and will be mapped to the `row_id` column of the Cassandra table.
-The store `bytes` values are mapped to the `body_blob` column of the Cassandra table.
+`CassandraByteStore`는 Cassandra 인스턴스에 데이터를 저장하는 `ByteStore`의 구현체입니다.
+store key는 문자열이어야 하며 Cassandra 테이블의 `row_id` 컬럼에 매핑됩니다.
+store `bytes` 값은 Cassandra 테이블의 `body_blob` 컬럼에 매핑됩니다.
 
 ### Installation
 
-The LangChain `CassandraByteStore` integration lives in the `langchain-community` package. You'll also need to install the `cassio` package or the `cassandra-driver` package as a peer dependency depending on which initialization method you're using:
+LangChain `CassandraByteStore` integration은 `langchain-community` 패키지에 포함되어 있습니다. 사용하는 초기화 방법에 따라 peer dependency로 `cassio` 패키지 또는 `cassandra-driver` 패키지도 설치해야 합니다:
 
 ```python
 pip install -qU langchain-community
@@ -30,11 +30,11 @@ pip install -qU cassandra-driver
 pip install -qU cassio
 ```
 
-You'll also need to create a `cassandra.cluster.Session` object, as described in the [Cassandra driver documentation](https://docs.datastax.com/en/developer/python-driver/latest/api/cassandra/cluster/#module-cassandra.cluster). The details vary (e.g. with network settings and authentication), but this might be something like:
+또한 [Cassandra driver documentation](https://docs.datastax.com/en/developer/python-driver/latest/api/cassandra/cluster/#module-cassandra.cluster)에 설명된 대로 `cassandra.cluster.Session` 객체를 생성해야 합니다. 세부 사항은 (예: 네트워크 설정 및 인증과 함께) 다양하지만, 다음과 같을 수 있습니다:
 
 ## Instantiation
 
-You'll first need to create a `cassandra.cluster.Session` object, as described in the [Cassandra driver documentation](https://docs.datastax.com/en/developer/python-driver/latest/api/cassandra/cluster/#module-cassandra.cluster). The details vary (e.g. with network settings and authentication), but this might be something like:
+먼저 [Cassandra driver documentation](https://docs.datastax.com/en/developer/python-driver/latest/api/cassandra/cluster/#module-cassandra.cluster)에 설명된 대로 `cassandra.cluster.Session` 객체를 생성해야 합니다. 세부 사항은 (예: 네트워크 설정 및 인증과 함께) 다양하지만, 다음과 같을 수 있습니다:
 
 ```python
 from cassandra.cluster import Cluster
@@ -43,7 +43,7 @@ cluster = Cluster()
 session = cluster.connect()
 ```
 
-Then you can create your store! You'll also need to provide the name of an existing keyspace of the Cassandra instance:
+그런 다음 store를 생성할 수 있습니다! Cassandra 인스턴스의 기존 keyspace 이름도 제공해야 합니다:
 
 ```python
 from langchain_community.storage import CassandraByteStore
@@ -57,7 +57,7 @@ kv_store = CassandraByteStore(
 
 ## Usage
 
-You can set data under keys like this using the `mset` method:
+`mset` 메서드를 사용하여 다음과 같이 key 아래에 데이터를 설정할 수 있습니다:
 
 ```python
 kv_store.mset(
@@ -75,7 +75,7 @@ kv_store.mget(
 )
 ```
 
-And you can delete data using the `mdelete` method:
+그리고 `mdelete` 메서드를 사용하여 데이터를 삭제할 수 있습니다:
 
 ```python
 kv_store.mdelete(
@@ -95,7 +95,7 @@ kv_store.mget(
 
 ## Init using `cassio`
 
-It's also possible to use cassio to configure the session and keyspace.
+cassio를 사용하여 session과 keyspace를 구성하는 것도 가능합니다.
 
 ```python
 import cassio
@@ -112,4 +112,4 @@ print(store.mget(["k1", "k2"]))
 
 ## API reference
 
-For detailed documentation of all `CassandraByteStore` features and configurations, head to the API reference: [python.langchain.com/api_reference/community/storage/langchain_community.storage.cassandra.CassandraByteStore.html](https://python.langchain.com/api_reference/community/storage/langchain_community.storage.cassandra.CassandraByteStore.html)
+모든 `CassandraByteStore` 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/storage/langchain_community.storage.cassandra.CassandraByteStore.html](https://python.langchain.com/api_reference/community/storage/langchain_community.storage.cassandra.CassandraByteStore.html)

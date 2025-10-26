@@ -2,7 +2,7 @@
 title: Alibaba Cloud PAI EAS
 ---
 
->[Machine Learning Platform for AI of Alibaba Cloud](https://www.alibabacloud.com/help/en/pai) is a machine learning or deep learning engineering platform intended for enterprises and developers. It provides easy-to-use, cost-effective, high-performance, and easy-to-scale plug-ins that can be applied to various industry scenarios. With over 140 built-in optimization algorithms, `Machine Learning Platform for AI` provides whole-process AI engineering capabilities including data labeling (`PAI-iTAG`), model building (`PAI-Designer` and `PAI-DSW`), model training (`PAI-DLC`), compilation optimization, and inference deployment (`PAI-EAS`). `PAI-EAS` supports different types of hardware resources, including CPUs and GPUs, and features high throughput and low latency. It allows you to deploy large-scale complex models with a few clicks and perform elastic scale-ins and scale-outs in real time. It also provides a comprehensive O&M and monitoring system.
+>[Alibaba Cloud의 Machine Learning Platform for AI](https://www.alibabacloud.com/help/en/pai)는 기업과 개발자를 위한 머신러닝 또는 딥러닝 엔지니어링 플랫폼입니다. 다양한 산업 시나리오에 적용할 수 있는 사용하기 쉽고, 비용 효율적이며, 고성능이고, 확장하기 쉬운 플러그인을 제공합니다. 140개 이상의 내장 최적화 알고리즘을 통해 `Machine Learning Platform for AI`는 데이터 라벨링(`PAI-iTAG`), 모델 구축(`PAI-Designer` 및 `PAI-DSW`), 모델 학습(`PAI-DLC`), 컴파일 최적화, 추론 배포(`PAI-EAS`)를 포함한 전체 프로세스 AI 엔지니어링 기능을 제공합니다. `PAI-EAS`는 CPU와 GPU를 포함한 다양한 유형의 하드웨어 리소스를 지원하며, 높은 처리량과 낮은 지연 시간을 특징으로 합니다. 몇 번의 클릭만으로 대규모 복잡한 모델을 배포하고 실시간으로 탄력적인 스케일 인/아웃을 수행할 수 있습니다. 또한 포괄적인 운영 및 모니터링 시스템을 제공합니다.
 
 ```python
 ##Installing the langchain packages needed to use the integration
@@ -21,7 +21,7 @@ Answer: Let's think step by step."""
 prompt = PromptTemplate.from_template(template)
 ```
 
-One who wants to use EAS LLMs must set up EAS service first. When the EAS service is launched, `EAS_SERVICE_URL` and `EAS_SERVICE_TOKEN` can be obtained. Users can refer to [www.alibabacloud.com/help/en/pai/user-guide/service-deployment/](https://www.alibabacloud.com/help/en/pai/user-guide/service-deployment/) for more information,
+EAS LLM을 사용하려면 먼저 EAS 서비스를 설정해야 합니다. EAS 서비스가 시작되면 `EAS_SERVICE_URL`과 `EAS_SERVICE_TOKEN`을 얻을 수 있습니다. 자세한 내용은 [www.alibabacloud.com/help/en/pai/user-guide/service-deployment/](https://www.alibabacloud.com/help/en/pai/user-guide/service-deployment/)를 참조하세요.
 
 ```python
 import os

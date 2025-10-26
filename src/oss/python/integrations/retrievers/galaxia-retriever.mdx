@@ -2,38 +2,38 @@
 title: Galaxia
 ---
 
-Galaxia is GraphRAG solution, which automates document processing, knowledge base (Graph Language Model) creation and retrieval:
+Galaxia는 문서 처리, 지식 베이스(Graph Language Model) 생성 및 검색을 자동화하는 GraphRAG 솔루션입니다:
 [galaxia-rag](https://smabbler.gitbook.io/smabbler/api-rag/smabblers-api-rag)
 
-To use Galaxia first upload your texts and create a Graph Language Model here: [smabbler-cloud](https://beta.cloud.smabbler.com)
+Galaxia를 사용하려면 먼저 텍스트를 업로드하고 여기에서 Graph Language Model을 생성하세요: [smabbler-cloud](https://beta.cloud.smabbler.com)
 
-After the model is built and activated, you will be able to use this integration to retrieve what you need.
+모델이 구축되고 활성화되면 이 통합을 사용하여 필요한 것을 검색할 수 있습니다.
 
-The module repository is located here: [github](https://github.com/rrozanski-smabbler/galaxia-langchain)
+모듈 저장소는 여기에 있습니다: [github](https://github.com/rrozanski-smabbler/galaxia-langchain)
 
-### Integration details
+### 통합 세부 정보
 
 | Retriever | Self-host | Cloud offering | Package |
 | :--- | :--- | :---: | :---: |
 [Galaxia Retriever](https://github.com/rrozanski-smabbler/galaxia-langchain) | ❌ | ✅ | __langchain-galaxia-retriever__ |
 
-## Setup
+## 설정
 
-Before you can retrieve anything you need to create your Graph Language Model here: [smabbler-cloud](https://beta.cloud.smabbler.com)
+무언가를 검색하기 전에 여기에서 Graph Language Model을 생성해야 합니다: [smabbler-cloud](https://beta.cloud.smabbler.com)
 
-following these 3 simple steps: [rag-instruction](https://smabbler.gitbook.io/smabbler/api-rag/build-rag-model-in-3-steps)
+다음 3가지 간단한 단계를 따르세요: [rag-instruction](https://smabbler.gitbook.io/smabbler/api-rag/build-rag-model-in-3-steps)
 
-Don't forget to activate the model after building it!
+모델을 구축한 후 활성화하는 것을 잊지 마세요!
 
-### Installation
+### 설치
 
-The retriever is implemented in the following package: [pypi](https://pypi.org/project/langchain-galaxia-retriever/)
+retriever는 다음 패키지에 구현되어 있습니다: [pypi](https://pypi.org/project/langchain-galaxia-retriever/)
 
 ```python
 pip install -qU langchain-galaxia-retriever
 ```
 
-## Instantiation
+## 인스턴스화
 
 ```python
 from langchain_galaxia_retriever.retriever import GalaxiaRetriever
@@ -47,14 +47,14 @@ gr = GalaxiaRetriever(
 )
 ```
 
-## Usage
+## 사용법
 
 ```python
 result = gr.invoke("<test question>")
 print(result)
 ```
 
-## Use within a chain
+## chain 내에서 사용
 
 ```python
 # | output: false
@@ -97,4 +97,4 @@ chain.invoke("<test question>")
 
 ## API reference
 
-For more information about Galaxia Retriever check its implementation on github [github](https://github.com/rrozanski-smabbler/galaxia-langchain)
+Galaxia Retriever에 대한 자세한 정보는 github의 구현을 확인하세요 [github](https://github.com/rrozanski-smabbler/galaxia-langchain)

@@ -4,14 +4,14 @@ title: DirectoryLoader
 
 
 <Tip>
-**Compatibility**: Only available on Node.js.
+**호환성**: Node.js에서만 사용 가능합니다.
 </Tip>
 
-This notebook provides a quick overview for getting started with `DirectoryLoader` [document loaders](/oss/integrations/document_loaders). For detailed documentation of all `DirectoryLoader` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain.document_loaders_fs_directory.DirectoryLoader.html).
+이 노트북은 `DirectoryLoader` [document loaders](/oss/integrations/document_loaders) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `DirectoryLoader` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain.document_loaders_fs_directory.DirectoryLoader.html)를 참조하세요.
 
-This example goes over how to load data from folders with multiple files. The second argument is a map of file extensions to loader factories. Each file will be passed to the matching loader, and the resulting documents will be concatenated together.
+이 예제는 여러 파일이 있는 폴더에서 데이터를 로드하는 방법을 다룹니다. 두 번째 인수는 파일 확장자와 loader factory의 매핑입니다. 각 파일은 일치하는 loader로 전달되며, 결과 document들은 함께 연결됩니다.
 
-Example folder:
+예제 폴더:
 
 ```text
 src/document_loaders/example_data/example/
@@ -31,11 +31,11 @@ src/document_loaders/example_data/example/
 
 ## Setup
 
-To access `DirectoryLoader` document loader you'll need to install the `langchain` package.
+`DirectoryLoader` document loader에 액세스하려면 `langchain` 패키지를 설치해야 합니다.
 
 ### Installation
 
-The LangChain DirectoryLoader integration lives in the `langchain` package:
+LangChain DirectoryLoader integration은 `langchain` 패키지에 포함되어 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -51,7 +51,7 @@ pnpm add langchain @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our model object and load documents:
+이제 model 객체를 인스턴스화하고 document를 로드할 수 있습니다:
 
 ```typescript
 import { DirectoryLoader } from "@langchain/classic/document_loaders/fs/directory";
@@ -104,4 +104,4 @@ console.log(docs[0].metadata)
 
 ## API reference
 
-For detailed documentation of all DirectoryLoader features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain.document_loaders_fs_directory.DirectoryLoader.html).
+모든 DirectoryLoader 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain.document_loaders_fs_directory.DirectoryLoader.html)를 참조하세요.

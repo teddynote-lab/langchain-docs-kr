@@ -1,23 +1,23 @@
 ---
-title: What's new in v1
-sidebarTitle: Release notes
+title: v1의 새로운 기능
+sidebarTitle: 릴리스 노트
 ---
 
-**LangChain v1 is a focused, production-ready foundation for building agents.** We've streamlined the framework around three core improvements:
+**LangChain v1은 에이전트 구축을 위한 집중적이고 프로덕션 준비가 완료된 기반입니다.** 세 가지 핵심 개선 사항을 중심으로 프레임워크를 간소화했습니다:
 
 <CardGroup cols={1}>
     <Card title="createAgent" icon="robot" href="#create-agent" arrow>
-        A new standard way to build agents in LangChain, replacing `createReactAgent` from LangGraph with a cleaner, more powerful API.
+        LangChain에서 에이전트를 구축하는 새로운 표준 방식으로, LangGraph의 `createReactAgent`를 더 깔끔하고 강력한 API로 대체합니다.
     </Card>
-    <Card title="Standard content blocks" icon="cube" href="#standard-content-blocks" arrow>
-        A new `contentBlocks` property that provides unified access to modern LLM features across all providers.
+    <Card title="표준 content block" icon="cube" href="#standard-content-blocks" arrow>
+        모든 provider에서 최신 LLM 기능에 대한 통합 액세스를 제공하는 새로운 `contentBlocks` 속성입니다.
     </Card>
-    <Card title="Simplified package" icon="sitemap" href="#simplified-package" arrow>
-        The `langchain` package has been streamlined to focus on essential building blocks for agents, with legacy functionality moved to `@langchain/classic`.
+    <Card title="간소화된 패키지" icon="sitemap" href="#simplified-package" arrow>
+        `langchain` 패키지는 에이전트를 위한 필수 구성 요소에 집중하도록 간소화되었으며, 레거시 기능은 `@langchain/classic`으로 이동되었습니다.
     </Card>
 </CardGroup>
 
-To upgrade,
+업그레이드하려면,
 
 <CodeGroup>
 ```bash npm
@@ -34,11 +34,11 @@ bun add langchain @langchain/core
 ```
 </CodeGroup>
 
-For a complete list of changes, see the [migration guide](/oss/migrate/langchain-v1).
+전체 변경 사항 목록은 [마이그레이션 가이드](/oss/migrate/langchain-v1)를 참조하세요.
 
 ## `createAgent`
 
-`createAgent` is the standard way to build agents in LangChain 1.0. It provides a simpler interface than the prebuilt `createReactAgent` exported from LangGraph while offering greater customization potential by using middleware.
+`createAgent`는 LangChain 1.0에서 에이전트를 구축하는 표준 방식입니다. LangGraph에서 내보낸 사전 구축된 `createReactAgent`보다 더 간단한 인터페이스를 제공하면서 middleware를 사용하여 더 큰 커스터마이징 가능성을 제공합니다.
 
 ```ts
 import { createAgent } from "langchain";
@@ -58,31 +58,31 @@ const result = await agent.invoke({
 console.log(result.content);
 ```
 
-Under the hood, `createAgent` is built on the basic agent loop -- calling a model, letting it choose tools to execute, and then finishing when it calls no more tools:
+내부적으로 `createAgent`는 기본 에이전트 루프를 기반으로 구축됩니다 -- model을 호출하고, 실행할 tool을 선택하게 한 다음, 더 이상 tool을 호출하지 않으면 종료합니다:
 
 <div style={{ display: "flex", justifyContent: "center" }}>
   <img
     src="/oss/images/core_agent_loop.png"
-    alt="Core agent loop diagram"
+    alt="핵심 에이전트 루프 다이어그램"
     className="rounded-lg"
   />
 </div>
 
-For more information, see [Agents](/oss/langchain/agents).
+자세한 내용은 [Agents](/oss/langchain/agents)를 참조하세요.
 
 ### Middleware
 
-Middleware is the defining feature of `createAgent`. It makes `createAgent` highly customizable, raising the ceiling for what you can build.
+Middleware는 `createAgent`의 핵심 기능입니다. `createAgent`를 매우 커스터마이징 가능하게 만들어 구축할 수 있는 것의 한계를 높입니다.
 
-Great agents require [context engineering](/oss/langchain/context-engineering): getting the right information to the model at the right time. Middleware helps you control dynamic prompts, conversation summarization, selective tool access, state management, and guardrails through a composable abstraction.
+훌륭한 에이전트는 [context engineering](/oss/langchain/context-engineering)이 필요합니다: 적절한 시기에 model에 올바른 정보를 제공하는 것입니다. Middleware는 구성 가능한 추상화를 통해 동적 prompt, 대화 요약, 선택적 tool 액세스, 상태 관리 및 guardrail을 제어하는 데 도움이 됩니다.
 
-#### Prebuilt middleware
+#### 사전 구축된 middleware
 
-LangChain provides a few [prebuilt middlewares](/oss/langchain/middleware#built-in-middleware) for common patterns, including:
+LangChain은 일반적인 패턴을 위한 몇 가지 [사전 구축된 middleware](/oss/langchain/middleware#built-in-middleware)를 제공합니다:
 
-- `summarizationMiddleware`: Condense conversation history when it gets too long
-- `humanInTheLoopMiddleware`: Require approval for sensitive tool calls
-- `piiRedactionMiddleware`: Redact sensitive information before sending to the model
+- `summarizationMiddleware`: 대화 기록이 너무 길어지면 압축
+- `humanInTheLoopMiddleware`: 민감한 tool 호출에 대한 승인 요구
+- `piiRedactionMiddleware`: model로 전송하기 전에 민감한 정보 삭제
 
 ```ts
 import {
@@ -112,32 +112,32 @@ const agent = createAgent({
 });
 ```
 
-#### Custom middleware
+#### 커스텀 middleware
 
-You can also build custom middleware to fit your specific needs.
+특정 요구 사항에 맞게 커스텀 middleware를 구축할 수도 있습니다.
 
-Build custom middleware by implementing any of these hooks using the `createMiddleware` function:
+`createMiddleware` 함수를 사용하여 다음 hook 중 하나를 구현하여 커스텀 middleware를 구축하세요:
 
-| Hook              | When it runs             | Use cases                               |
+| Hook              | 실행 시점             | 사용 사례                               |
 |-------------------|--------------------------|-----------------------------------------|
-| `beforeAgent`     | Before calling the agent | Load memory, validate input             |
-| `beforeModel`     | Before each LLM call     | Update prompts, trim messages           |
-| `wrapModelCall`   | Around each LLM call     | Intercept and modify requests/responses |
-| `wrapToolCall`    | Around each tool call    | Intercept and modify tool execution     |
-| `afterModel`      | After each LLM response  | Validate output, apply guardrails       |
-| `afterAgent`      | After agent completes    | Save results, cleanup                   |
+| `beforeAgent`     | 에이전트 호출 전 | 메모리 로드, 입력 검증             |
+| `beforeModel`     | 각 LLM 호출 전     | prompt 업데이트, 메시지 정리           |
+| `wrapModelCall`   | 각 LLM 호출 전후     | 요청/응답 가로채기 및 수정 |
+| `wrapToolCall`    | 각 tool 호출 전후    | tool 실행 가로채기 및 수정     |
+| `afterModel`      | 각 LLM 응답 후  | 출력 검증, guardrail 적용       |
+| `afterAgent`      | 에이전트 완료 후    | 결과 저장, 정리                   |
 
 
 <div style={{ display: "flex", justifyContent: "center" }}>
   <img
     src="/oss/images/middleware_final.png"
-    alt="Middleware flow diagram"
+    alt="Middleware 흐름 다이어그램"
     className="rounded-lg"
   />
 </div>
 
 
-Example custom middleware:
+커스텀 middleware 예제:
 
 ```ts
 import { createMiddleware } from "langchain";
@@ -170,36 +170,36 @@ const agent = createAgent({
 });
 ```
 
-For more information, see [the complete middleware guide](/oss/langchain/middleware).
+자세한 내용은 [전체 middleware 가이드](/oss/langchain/middleware)를 참조하세요.
 
-### Built on LangGraph
+### LangGraph 기반
 
-Because `createAgent` is built on LangGraph, you automatically get built in support for long running and reliable agents via:
+`createAgent`는 LangGraph를 기반으로 구축되었기 때문에 다음을 통해 장기 실행 및 안정적인 에이전트에 대한 기본 지원을 자동으로 받습니다:
 
 <CardGroup cols={2}>
     <Card title="Persistence" icon="database">
-        Conversations automatically persist across sessions with built-in checkpointing
+        내장된 checkpointing으로 세션 간에 대화가 자동으로 유지됩니다
     </Card>
     <Card title="Streaming" icon="water">
-        Stream tokens, tool calls, and reasoning traces in real-time
+        실시간으로 token, tool 호출 및 추론 trace를 스트리밍합니다
     </Card>
     <Card title="Human-in-the-loop" icon="hand">
-        Pause agent execution for human approval before sensitive actions
+        민감한 작업 전에 사람의 승인을 위해 에이전트 실행을 일시 중지합니다
     </Card>
     <Card title="Time travel" icon="clock-rotate-left">
-        Rewind conversations to any point and explore alternate paths and prompts
+        대화를 임의의 시점으로 되돌리고 대체 경로와 prompt를 탐색합니다
     </Card>
 </CardGroup>
 
-You don't need to learn LangGraph to use these features—they work out of the box.
+이러한 기능을 사용하기 위해 LangGraph를 배울 필요가 없습니다—기본적으로 작동합니다.
 
 ### Structured output
 
-`createAgent` has improved structured output generation:
+`createAgent`는 structured output 생성을 개선했습니다:
 
-- **Main loop integration**: Structured output is now generated in the main loop instead of requiring an additional LLM call
-- **Structured output strategy**: Models can choose between calling tools or using provider-side structured output generation
-- **Cost reduction**: Eliminates extra expense from additional LLM calls
+- **Main loop 통합**: Structured output은 이제 추가 LLM 호출이 필요하지 않고 main loop에서 생성됩니다
+- **Structured output 전략**: Model은 tool 호출과 provider 측 structured output 생성 중에서 선택할 수 있습니다
+- **비용 절감**: 추가 LLM 호출로 인한 추가 비용을 제거합니다
 
 ```ts
 import { createAgent } from "langchain";
@@ -225,55 +225,55 @@ const result = await agent.invoke({
 console.log(result.structuredResponse);
 ```
 
-**Error handling**: Control error handling via the `handleErrors` parameter to `ToolStrategy`:
-- **Parsing errors**: Model generates data that doesn't match desired structure
-- **Multiple tool calls**: Model generates 2+ tool calls for structured output schemas
+**오류 처리**: `ToolStrategy`의 `handleErrors` 매개변수를 통해 오류 처리를 제어합니다:
+- **파싱 오류**: Model이 원하는 구조와 일치하지 않는 데이터를 생성
+- **다중 tool 호출**: Model이 structured output schema에 대해 2개 이상의 tool 호출을 생성
 
 ---
 
-## Standard content blocks
+## 표준 content block
 
 <Note>
-    1.0 releases are available for most packages. Only the following currently support new content blocks:
+    1.0 릴리스는 대부분의 패키지에서 사용할 수 있습니다. 현재 새로운 content block을 지원하는 패키지는 다음과 같습니다:
 
     - `langchain`
     - `@langchain/core`
     - `@langchain/anthropic`
     - `@langchain/openai`
 
-    Broader support for content blocks is planned.
+    content block에 대한 더 광범위한 지원이 계획되어 있습니다.
 </Note>
 
-### Benefits
+### 이점
 
-- **Provider agnostic**: Access reasoning traces, citations, built-in tools (web search, code interpreters, etc.), and other features using the same API regardless of provider
-- **Type safe**: Full type hints for all content block types
-- **Backward compatible**: Standard content can be [loaded lazily](/oss/langchain/messages#standard-content-blocks), so there are no associated breaking changes
+- **Provider 독립적**: provider에 관계없이 동일한 API를 사용하여 추론 trace, 인용, 내장 tool(웹 검색, 코드 인터프리터 등) 및 기타 기능에 액세스합니다
+- **Type safe**: 모든 content block 유형에 대한 전체 type hint
+- **하위 호환성**: 표준 content는 [지연 로드](/oss/langchain/messages#standard-content-blocks)될 수 있으므로 관련된 breaking change가 없습니다
 
-For more information, see our guide on [content blocks](/oss/langchain/messages#message-content)
+자세한 내용은 [content block](/oss/langchain/messages#message-content)에 대한 가이드를 참조하세요
 
 ---
 
-## Simplified package
+## 간소화된 패키지
 
-LangChain v1 streamlines the `langchain` package namespace to focus on essential building blocks for agents. The package exposes only the most useful and relevant functionality:
+LangChain v1은 에이전트를 위한 필수 구성 요소에 집중하도록 `langchain` 패키지 namespace를 간소화합니다. 패키지는 가장 유용하고 관련성 높은 기능만 노출합니다:
 
-Most of these are re-exported from `@langchain/core` for convenience, which gives you a focused API surface for building agents.
+이들 대부분은 편의를 위해 `@langchain/core`에서 재내보내기되어 에이전트 구축을 위한 집중된 API 표면을 제공합니다.
 
 
 ### `@langchain/classic`
 
-Legacy functionality has moved to [`@langchain/classic`](https://www.npmjs.com/package/@langchain/classic) to keep the core package lean and focused.
+레거시 기능은 핵심 패키지를 간결하고 집중적으로 유지하기 위해 [`@langchain/classic`](https://www.npmjs.com/package/@langchain/classic)으로 이동되었습니다.
 
-#### What's in `@langchain/classic`
+#### `@langchain/classic`에 포함된 내용
 
-- Legacy chains and chain implementations
-- Retrievers
-- The indexing API
-- [`@langchain/community`](https://www.npmjs.com/package/@langchain/community) exports
-- Other deprecated functionality
+- 레거시 chain 및 chain 구현
+- Retriever
+- indexing API
+- [`@langchain/community`](https://www.npmjs.com/package/@langchain/community) export
+- 기타 deprecated 기능
 
-If you use any of this functionality, install [`@langchain/classic`](https://www.npmjs.com/package/@langchain/classic):
+이러한 기능을 사용하는 경우 [`@langchain/classic`](https://www.npmjs.com/package/@langchain/classic)을 설치하세요:
 
 <CodeGroup>
 ```bash npm
@@ -290,7 +290,7 @@ bun add @langchain/classic
 ```
 </CodeGroup>
 
-Then update your imports:
+그런 다음 import를 업데이트하세요:
 
 ```typescript
 import { ... } from "langchain"; // [!code --]
@@ -300,34 +300,34 @@ import { ... } from "langchain/chains"; // [!code --]
 import { ... } from "@langchain/classic/chains"; // [!code ++]
 ```
 
-## Reporting issues
+## 이슈 보고
 
-Please report any issues discovered with 1.0 on [GitHub](https://github.com/langchain-ai/langchainjs/issues) using the [`'v1'` label](https://github.com/langchain-ai/langchainjs/issues?q=state%3Aopen%20label%3Av1).
+1.0에서 발견된 이슈는 [`'v1'` label](https://github.com/langchain-ai/langchainjs/issues?q=state%3Aopen%20label%3Av1)을 사용하여 [GitHub](https://github.com/langchain-ai/langchainjs/issues)에 보고해 주세요.
 
-## Additional resources
+## 추가 리소스
 
 <CardGroup cols={3}>
     <Card title="LangChain 1.0" icon="rocket" href="https://blog.langchain.com/langchain-langchain-1-0-alpha-releases/">
-        Read the announcement
+        공지사항 읽기
     </Card>
-    <Card title="Middleware Guide" icon="puzzle-piece" href="https://blog.langchain.com/agent-middleware/">
-        Deep dive into middleware
+    <Card title="Middleware 가이드" icon="puzzle-piece" href="https://blog.langchain.com/agent-middleware/">
+        middleware 심층 분석
     </Card>
-    <Card title="Agents Documentation" icon="book" href="/oss/langchain/agents" arrow>
-        Full agent documentation
+    <Card title="Agents 문서" icon="book" href="/oss/langchain/agents" arrow>
+        전체 에이전트 문서
     </Card>
     <Card title="Message Content" icon="message" href="/oss/langchain/messages#message-content" arrow>
-        New content blocks API
+        새로운 content block API
     </Card>
-    <Card title="Migration guide" icon="arrow-right-arrow-left" href="/oss/migrate/langchain-v1" arrow>
-        How to migrate to LangChain v1
+    <Card title="마이그레이션 가이드" icon="arrow-right-arrow-left" href="/oss/migrate/langchain-v1" arrow>
+        LangChain v1으로 마이그레이션하는 방법
     </Card>
     <Card title="GitHub" icon="github" href="https://github.com/langchain-ai/langchainjs">
-        Report issues or contribute
+        이슈 보고 또는 기여
     </Card>
 </CardGroup>
 
-## See also
+## 참고
 
-- [Versioning](/oss/versioning) - Understanding version numbers
-- [Release policy](/oss/release-policy) - Detailed release policies
+- [Versioning](/oss/versioning) - 버전 번호 이해하기
+- [Release policy](/oss/release-policy) - 상세한 릴리스 정책

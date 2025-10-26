@@ -4,17 +4,17 @@ title: ChatPrem
 
 ## Setup
 
-1. Create a Prem AI account and get your API key [here](https://studio.premai.io/sign-up).
-2. Export or set your API key inline. The ChatPrem class defaults to `process.env.PREM_API_KEY`.
+1. Prem AI 계정을 생성하고 [여기](https://studio.premai.io/sign-up)에서 API key를 받으세요.
+2. API key를 export하거나 인라인으로 설정하세요. ChatPrem class는 기본적으로 `process.env.PREM_API_KEY`를 사용합니다.
 
 ```bash
 export PREM_API_KEY=your-api-key
 ```
 
-You can use models provided by Prem AI as follows:
+다음과 같이 Prem AI에서 제공하는 model을 사용할 수 있습니다:
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain package 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
@@ -37,5 +37,5 @@ console.log(await model.invoke([new HumanMessage("Hello there!")]));
 
 ## Related
 
-- Chat model [conceptual guide](/oss/langchain/models)
-- Chat model [how-to guides](/oss/langchain/models)
+- Chat model [개념 가이드](/oss/langchain/models)
+- Chat model [사용 방법 가이드](/oss/langchain/models)

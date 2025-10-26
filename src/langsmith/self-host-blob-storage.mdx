@@ -1,42 +1,42 @@
 ---
-title: Enable blob storage
-sidebarTitle: Enable blob storage
+title: Blob storage 활성화
+sidebarTitle: Blob storage 활성화
 ---
 
-By default, LangSmith stores run inputs, outputs, errors, manifests, extras, and events in ClickHouse. If you so choose, you can instead store this information in blob storage, which has a couple of notable benefits. For the best results in production deployments, we **strongly** recommend using blob storage, which offers the following benefits:
+기본적으로 LangSmith는 run의 입력, 출력, 오류, manifest, extra, 이벤트를 ClickHouse에 저장합니다. 원하는 경우 이 정보를 blob storage에 저장할 수 있으며, 이는 몇 가지 주목할 만한 이점이 있습니다. 프로덕션 배포에서 최상의 결과를 얻으려면 blob storage 사용을 **강력히** 권장하며, 다음과 같은 이점을 제공합니다:
 
-1. In high trace environments, inputs, outputs, errors, manifests, extras, and events may balloon the size of your databases.
-2. If using LangSmith Managed ClickHouse, you may want sensitive information in blob storage that resides in your environment. To alleviate this, LangSmith supports storing run inputs, outputs, errors, manifests, extras, events, and attachments in an external blob storage system.
+1. 높은 trace 환경에서 입력, 출력, 오류, manifest, extra, 이벤트가 데이터베이스 크기를 급격히 증가시킬 수 있습니다.
+2. LangSmith Managed ClickHouse를 사용하는 경우, 사용자 환경에 있는 blob storage에 민감한 정보를 저장하고 싶을 수 있습니다. 이를 해결하기 위해 LangSmith는 run 입력, 출력, 오류, manifest, extra, 이벤트, 첨부 파일을 외부 blob storage 시스템에 저장하는 것을 지원합니다.
 
-## Requirements
+## 요구사항
 
 <Note>
-Azure blob storage is available in Helm chart versions 0.8.9 and greater. [Deleting trace projects](/langsmith/observability-concepts#deleting-traces-from-langsmith) is supported in Azure starting in Helm chart version 0.10.43.
+Azure blob storage는 Helm chart 버전 0.8.9 이상에서 사용할 수 있습니다. [trace 프로젝트 삭제](/langsmith/observability-concepts#deleting-traces-from-langsmith)는 Helm chart 버전 0.10.43부터 Azure에서 지원됩니다.
 </Note>
 
-* Access to a valid blob storage service
+* 유효한 blob storage 서비스에 대한 액세스
 
   * [Amazon S3](https://aws.amazon.com/s3/)
     * [Google Cloud Storage (GCS)](https://cloud.google.com/storage?hl=en)
   * [Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs)
 
-* A bucket/directory in your blob storage to store the data. We highly recommend creating a separate bucket/directory for LangSmith data.
-  * **If you are using TTLs**, you will need to set up a lifecycle policy to delete old data. You can find more information on configuring TTLs [here](/langsmith/self-host-ttl). These policies should mirror the TTLs you have set in your LangSmith configuration, or you may experience data loss. See [here](#ttl-configuration) on how to setup the lifecycle rules for TTLs for blob storage.
+* 데이터를 저장할 blob storage의 bucket/directory. LangSmith 데이터를 위한 별도의 bucket/directory를 생성하는 것을 강력히 권장합니다.
+  * **TTL을 사용하는 경우**, 오래된 데이터를 삭제하기 위한 lifecycle 정책을 설정해야 합니다. TTL 구성에 대한 자세한 정보는 [여기](/langsmith/self-host-ttl)에서 확인할 수 있습니다. 이러한 정책은 LangSmith 구성에서 설정한 TTL과 일치해야 하며, 그렇지 않으면 데이터 손실이 발생할 수 있습니다. blob storage의 TTL에 대한 lifecycle 규칙 설정 방법은 [여기](#ttl-configuration)를 참조하세요.
 
-* Credentials to permit LangSmith Services to access the bucket/directory
-  * You will need to provide your LangSmith instance with the necessary credentials to access the bucket/directory. Read the authentication [section](#authentication) below for more information.
+* LangSmith Services가 bucket/directory에 액세스할 수 있도록 허용하는 자격 증명
+  * LangSmith 인스턴스에 bucket/directory에 액세스하는 데 필요한 자격 증명을 제공해야 합니다. 자세한 내용은 아래 인증 [섹션](#authentication)을 참조하세요.
 
-* If using S3 or GCS, an API url for your blob storage service
+* S3 또는 GCS를 사용하는 경우, blob storage 서비스의 API url
 
-  * This will be the URL that LangSmith uses to access your blob storage system
-  * For Amazon S3, this will be the URL of the S3 endpoint. Something like: `https://s3.amazonaws.com` or `https://s3.us-west-1.amazonaws.com` if using a regional endpoint.
-  * For Google Cloud Storage, this will be the URL of the GCS endpoint. Something like: `https://storage.googleapis.com`
+  * LangSmith가 blob storage 시스템에 액세스하는 데 사용할 URL입니다
+  * Amazon S3의 경우, S3 endpoint의 URL입니다. 예: `https://s3.amazonaws.com` 또는 리전별 endpoint를 사용하는 경우 `https://s3.us-west-1.amazonaws.com`
+  * Google Cloud Storage의 경우, GCS endpoint의 URL입니다. 예: `https://storage.googleapis.com`
 
-## Authentication
+## 인증
 
 ### Amazon S3
 
-To authenticate to [Amazon S3](https://aws.amazon.com/s3/), you will need to create an IAM policy granting the following permissions on your bucket.
+[Amazon S3](https://aws.amazon.com/s3/)에 인증하려면 bucket에 다음 권한을 부여하는 IAM 정책을 생성해야 합니다.
 
 ```json
 {
@@ -59,27 +59,27 @@ To authenticate to [Amazon S3](https://aws.amazon.com/s3/), you will need to cre
 }
 ```
 
-Once you have the correct policy, there are three ways to authenticate with Amazon S3:
+올바른 정책을 갖추면 Amazon S3에 인증하는 세 가지 방법이 있습니다:
 
-1. [**(Recommended) IAM Role for Service Account**](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html): You can create an IAM role for your LangSmith instance and attach the policy to that role. You can then provide the role to LangSmith. This is the recommended way to authenticate with Amazon S3 in production.
+1. [**(권장) IAM Role for Service Account**](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html): LangSmith 인스턴스에 대한 IAM role을 생성하고 해당 role에 정책을 연결할 수 있습니다. 그런 다음 LangSmith에 role을 제공할 수 있습니다. 이것이 프로덕션에서 Amazon S3에 인증하는 권장 방법입니다.
 
-   1. You will need to create an IAM role with the policy attached.
-   2. You will need to allow LangSmith service accounts to assume the role. The `langsmith-queue`, `langsmith-backend`, and `langsmith-platform-backend` service accounts will need to be able to assume the role.
+   1. 정책이 연결된 IAM role을 생성해야 합니다.
+   2. LangSmith service account가 role을 assume할 수 있도록 허용해야 합니다. `langsmith-queue`, `langsmith-backend`, `langsmith-platform-backend` service account가 role을 assume할 수 있어야 합니다.
             <Warning>
-            The service account names will be different if you are using a custom release name. You can find the service account names by running `kubectl get serviceaccounts` in your cluster.
+            사용자 정의 release 이름을 사용하는 경우 service account 이름이 다를 수 있습니다. 클러스터에서 `kubectl get serviceaccounts`를 실행하여 service account 이름을 확인할 수 있습니다.
             </Warning>
-   3. You will need to provide the role ARN to LangSmith. You can do this by adding the `eks.amazonaws.com/role-arn: "<role_arn>"` annotation to the `queue`, `backend`, and `platform-backend` services in your Helm Chart installation.
+   3. LangSmith에 role ARN을 제공해야 합니다. Helm Chart 설치에서 `queue`, `backend`, `platform-backend` 서비스에 `eks.amazonaws.com/role-arn: "<role_arn>"` annotation을 추가하여 이를 수행할 수 있습니다.
 
-2. [**Access Key and Secret Key**](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html): You can provide LangSmith with an access key and secret key. This is the simplest way to authenticate with Amazon S3. However, it is not recommended for production use as it is less secure.
-   1. You will need to create a user with the policy attached. Then you can provision an access key and secret key for that user.
+2. [**Access Key와 Secret Key**](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html): LangSmith에 access key와 secret key를 제공할 수 있습니다. 이것이 Amazon S3에 인증하는 가장 간단한 방법입니다. 그러나 보안성이 낮기 때문에 프로덕션 사용에는 권장되지 않습니다.
+   1. 정책이 연결된 사용자를 생성해야 합니다. 그런 다음 해당 사용자에 대한 access key와 secret key를 프로비저닝할 수 있습니다.
 
-3. [**VPC Endpoint Access**](https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-s3.html): You can enable access to your S3 bucket via a VPC endpoint, which allows traffic to flow securely from your VPC to your S3 bucket.
+3. [**VPC Endpoint Access**](https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-s3.html): VPC endpoint를 통해 S3 bucket에 대한 액세스를 활성화할 수 있으며, 이를 통해 VPC에서 S3 bucket으로 트래픽이 안전하게 흐를 수 있습니다.
 
-   1. You'll need to provision a VPC endpoint and configure it to allow access to your S3 bucket.
-   2. You can refer to our [public Terraform modules](https://github.com/langchain-ai/terraform/blob/main/modules/aws/s3/main.tf#L12) for guidance and an example of configuring this.
+   1. VPC endpoint를 프로비저닝하고 S3 bucket에 대한 액세스를 허용하도록 구성해야 합니다.
+   2. 이를 구성하는 방법에 대한 지침과 예제는 [공개 Terraform 모듈](https://github.com/langchain-ai/terraform/blob/main/modules/aws/s3/main.tf#L12)을 참조할 수 있습니다.
 
-#### KMS encryption header support for S3
-Starting with LangSmith Helm chart version **0.11.24**, you can pass a KMS encryption key header and enforce a specific KMS key for writes by providing its ARN. To enable this, set the following values in your Helm chart:
+#### S3용 KMS 암호화 헤더 지원
+LangSmith Helm chart 버전 **0.11.24**부터 KMS 암호화 키 헤더를 전달하고 ARN을 제공하여 쓰기에 특정 KMS 키를 강제할 수 있습니다. 이를 활성화하려면 Helm chart에서 다음 값을 설정하세요:
 ```yaml Helm
 config:
   blobStorage:
@@ -89,32 +89,32 @@ config:
 
 ### Google Cloud Storage
 
-To authenticate with [Google Cloud Storage](https://cloud.google.com/storage?hl=en), you will need to create a [`service account`](https://cloud.google.com/iam/docs/service-account-overview) with the necessary permissions to access your bucket.
+[Google Cloud Storage](https://cloud.google.com/storage?hl=en)에 인증하려면 bucket에 액세스하는 데 필요한 권한이 있는 [`service account`](https://cloud.google.com/iam/docs/service-account-overview)를 생성해야 합니다.
 
-Your service account will need the `Storage Admin` role or a custom role with equivalent permissions. This can be scoped to the bucket that LangSmith will be using.
+service account에는 `Storage Admin` role 또는 동등한 권한이 있는 사용자 정의 role이 필요합니다. 이는 LangSmith가 사용할 bucket으로 범위를 지정할 수 있습니다.
 
-Once you have a provisioned service account, you will need to generate a [`HMAC key`](https://cloud.google.com/storage/docs/authentication/hmackeys) for that service account. This key and secret will be used to authenticate with Google Cloud Storage.
+프로비저닝된 service account가 있으면 해당 service account에 대한 [`HMAC key`](https://cloud.google.com/storage/docs/authentication/hmackeys)를 생성해야 합니다. 이 key와 secret은 Google Cloud Storage에 인증하는 데 사용됩니다.
 
 ### Azure Blob Storage
 
-To authenticate with [Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs), you will need to use one of the following methods to grant LangSmith workloads permission to access your [container](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction#containers) (listed in order of precedence):
+[Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs)에 인증하려면 다음 방법 중 하나를 사용하여 LangSmith workload가 [container](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction#containers)에 액세스할 수 있는 권한을 부여해야 합니다(우선순위 순서로 나열):
 
-1. [Storage account and access key](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage)
+1. [Storage account와 access key](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage)
 2. [Connection string](https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string)
-3. [Workload identity](https://azure.github.io/azure-workload-identity/docs/introduction.html) (recommended), managed identity, or environment variables supported by [`DefaultAzureCredential`](https://learn.microsoft.com/en-us/azure/developer/go/azure-sdk-authentication?tabs=bash#2-authenticate-with-azure). This is the default authentication method when configuration for either option above is not present.
-   1. To use workload identity, add the label `azure.workload.identity/use: true` to the `queue`, `backend`, and `platform-backend` deployments. Additionally, add the `azure.workload.identity/client-id` annotation to the corresponding service accounts, which should be an existing Azure AD Application's client ID or user-assigned managed identity's client ID. See [Azure's documentation](https://azure.github.io/azure-workload-identity/docs/topics/service-account-labels-and-annotations.html) for additional details.
+3. [Workload identity](https://azure.github.io/azure-workload-identity/docs/introduction.html) (권장), managed identity 또는 [`DefaultAzureCredential`](https://learn.microsoft.com/en-us/azure/developer/go/azure-sdk-authentication?tabs=bash#2-authenticate-with-azure)에서 지원하는 환경 변수. 이는 위의 두 옵션에 대한 구성이 없을 때 기본 인증 방법입니다.
+   1. workload identity를 사용하려면 `queue`, `backend`, `platform-backend` deployment에 `azure.workload.identity/use: true` label을 추가하세요. 또한 해당 service account에 `azure.workload.identity/client-id` annotation을 추가해야 하며, 이는 기존 Azure AD Application의 client ID 또는 user-assigned managed identity의 client ID여야 합니다. 자세한 내용은 [Azure 문서](https://azure.github.io/azure-workload-identity/docs/topics/service-account-labels-and-annotations.html)를 참조하세요.
 
 <Note>
-Some deployments may need further customization of the connection configuration using a Service URL Override instead of the default service URL (`https://<storage_account_name>.blob.core.windows.net/`). For example, this override is necessary in order to use a different blob storage domain (e.g. government or china).
+일부 배포에서는 기본 service URL(`https://<storage_account_name>.blob.core.windows.net/`) 대신 Service URL Override를 사용하여 연결 구성을 추가로 사용자 정의해야 할 수 있습니다. 예를 들어, 다른 blob storage 도메인(예: government 또는 china)을 사용하려면 이 override가 필요합니다.
 </Note>
 
 ## CH Search
 
-By default, LangSmith will still store tokens for search in ClickHouse. If you are using LangSmith Managed Clickhouse, you may want to disable this feature to avoid sending potentially sensitive information to ClickHouse. You can do this in your blob storage configuration.
+기본적으로 LangSmith는 검색을 위한 token을 여전히 ClickHouse에 저장합니다. LangSmith Managed Clickhouse를 사용하는 경우, 잠재적으로 민감한 정보가 ClickHouse로 전송되는 것을 방지하기 위해 이 기능을 비활성화할 수 있습니다. blob storage 구성에서 이를 수행할 수 있습니다.
 
-## Configuration
+## 구성
 
-After creating your bucket and obtaining the necessary credentials, you can configure LangSmith to use your blob storage system.
+bucket을 생성하고 필요한 자격 증명을 얻은 후 blob storage 시스템을 사용하도록 LangSmith를 구성할 수 있습니다.
 
 <CodeGroup>
 
@@ -178,25 +178,25 @@ AZURE_STORAGE_SERVICE_URL_OVERRIDE=https://your.override.domain.net # Optional
 </CodeGroup>
 
 <Note>
-If using an access key and secret, you can also provide an existing Kubernetes secret that contains the authentication information. This is recommended over providing the access key and secret key directly in your config. See the [generated secret template](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/templates/secrets.yaml) for the expected secret keys.
+access key와 secret을 사용하는 경우, 인증 정보가 포함된 기존 Kubernetes secret을 제공할 수도 있습니다. 이는 구성에서 access key와 secret key를 직접 제공하는 것보다 권장됩니다. 예상되는 secret key는 [생성된 secret 템플릿](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/templates/secrets.yaml)을 참조하세요.
 </Note>
 
-## TTL Configuration
+## TTL 구성
 
-If using the [TTL](/langsmith/self-host-ttl) feature with LangSmith, you'll also have to configure TTL rules for your blob storage. Trace information stored on blob storage is stored on a particular prefix path, which determines the TTL for the data. When a trace's retention is extended, its corresponding blob storage path changes to ensure that it matches the new extended retention.
+LangSmith와 함께 [TTL](/langsmith/self-host-ttl) 기능을 사용하는 경우, blob storage에 대한 TTL 규칙도 구성해야 합니다. blob storage에 저장된 trace 정보는 특정 prefix 경로에 저장되며, 이는 데이터의 TTL을 결정합니다. trace의 보존 기간이 연장되면 새로운 연장된 보존 기간과 일치하도록 해당 blob storage 경로가 변경됩니다.
 
-The following TTL prefix are used:
+다음 TTL prefix가 사용됩니다:
 
-* `ttl_s/`: Short term TTL, configured for 14 days.
-* `ttl_l/`: Long term TTL, configured for 400 days.
+* `ttl_s/`: 단기 TTL, 14일로 구성됩니다.
+* `ttl_l/`: 장기 TTL, 400일로 구성됩니다.
 
-If you have customized the TTLs in your LangSmith configuration, you will need to adjust the TTLs in your blob storage configuration to match.
+LangSmith 구성에서 TTL을 사용자 정의한 경우, blob storage 구성의 TTL을 일치하도록 조정해야 합니다.
 
 ### Amazon S3
 
-If using S3 for your blob storage, you will need to setup a filter lifecycle configuration that matches the prefixes above. You can find information for this [in the Amazon Documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/intro-lifecycle-rules.html#intro-lifecycle-rules-filter).
+blob storage로 S3를 사용하는 경우, 위의 prefix와 일치하는 filter lifecycle 구성을 설정해야 합니다. 이에 대한 정보는 [Amazon 문서](https://docs.aws.amazon.com/AmazonS3/latest/userguide/intro-lifecycle-rules.html#intro-lifecycle-rules-filter)에서 찾을 수 있습니다.
 
-As an example, if you are using Terraform to manage your S3 bucket, you would setup something like this:
+예를 들어, Terraform을 사용하여 S3 bucket을 관리하는 경우 다음과 같이 설정합니다:
 
 ```hcl
   rule {
@@ -219,9 +219,9 @@ As an example, if you are using Terraform to manage your S3 bucket, you would se
 
 ### Google Cloud Storage
 
-You will need to setup lifecycle conditions for your GCS buckets that you are using. You can find information for this [in the Google Documentation](https://cloud.google.com/storage/docs/lifecycle#conditions), specifically using matchesPrefix.
+사용 중인 GCS bucket에 대한 lifecycle 조건을 설정해야 합니다. 이에 대한 정보는 [Google 문서](https://cloud.google.com/storage/docs/lifecycle#conditions), 특히 matchesPrefix 사용에서 찾을 수 있습니다.
 
-As an example, if you are using Terraform to manage your GCS bucket, you would setup something like this:
+예를 들어, Terraform을 사용하여 GCS bucket을 관리하는 경우 다음과 같이 설정합니다:
 
 ```hcl
   lifecycle_rule {
@@ -246,9 +246,9 @@ As an example, if you are using Terraform to manage your GCS bucket, you would s
 
 ### Azure blob storage
 
-You will need to configure a [lifecycle management policy](https://learn.microsoft.com/en-us/azure/storage/blobs/lifecycle-management-policy-configure) on the container in order to expire objects matching the prefixes above.
+위의 prefix와 일치하는 객체를 만료시키기 위해 container에 [lifecycle 관리 정책](https://learn.microsoft.com/en-us/azure/storage/blobs/lifecycle-management-policy-configure)을 구성해야 합니다.
 
-As an example, if you are [using Terraform to manage your blob storage container](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_management_policy), you would setup something like this:
+예를 들어, [Terraform을 사용하여 blob storage container를 관리하는 경우](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_management_policy) 다음과 같이 설정합니다:
 
 ```hcl
 resource "azurerm_storage_management_policy" "example" {

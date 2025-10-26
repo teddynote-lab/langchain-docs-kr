@@ -1,36 +1,36 @@
 ---
-title: Observability in Studio
-sidebarTitle: Traces, datasets, prompts
+title: Studio에서의 관찰 가능성
+sidebarTitle: Trace, dataset, prompt
 ---
 
-LangSmith [Studio](/langsmith/studio) provides tools to inspect, debug, and improve your app beyond execution. By working with traces, datasets, and prompts, you can see how your application behaves in detail, measure its performance, and refine its outputs:
+LangSmith [Studio](/langsmith/studio)는 실행을 넘어 앱을 검사하고, 디버그하고, 개선할 수 있는 도구를 제공합니다. trace, dataset, prompt를 활용하여 애플리케이션의 동작을 세부적으로 확인하고, 성능을 측정하며, 출력을 개선할 수 있습니다:
 
-- [Iterate on prompts](#iterate-on-prompts): Modify prompts inside graph nodes directly or with the LangSmith playground.
-- [Run experiments over a dataset](#run-experiments-over-a-dataset): Execute your assistant over a LangSmith dataset to score and compare results.
-- [Debug LangSmith traces](#debug-langsmith-traces): Import traced runs into Studio and optionally clone them into your local agent.
-- [Add a node to a dataset](#add-node-to-dataset): Turn parts of thread history into dataset examples for evaluation or further analysis.
+- [Prompt 반복 작업](#iterate-on-prompts): Graph node 내부의 prompt를 직접 수정하거나 LangSmith playground를 사용하여 수정합니다.
+- [Dataset에 대한 실험 실행](#run-experiments-over-a-dataset): LangSmith dataset에 대해 assistant를 실행하여 결과를 점수화하고 비교합니다.
+- [LangSmith trace 디버그](#debug-langsmith-traces): 추적된 실행을 Studio로 가져오고 선택적으로 로컬 agent로 복제합니다.
+- [Dataset에 node 추가](#add-node-to-dataset): Thread 기록의 일부를 평가 또는 추가 분석을 위한 dataset 예제로 변환합니다.
 
-## Iterate on prompts
+## Prompt 반복 작업
 
-Studio supports the following methods for modifying prompts in your graph:
+Studio는 graph의 prompt를 수정하기 위한 다음 방법을 지원합니다:
 
-- [Direct node editing](#direct-node-editing)
-- [Playground interface](#playground)
+- [직접 node 편집](#direct-node-editing)
+- [Playground 인터페이스](#playground)
 
-### Direct node editing
+### 직접 node 편집
 
-Studio allows you to edit prompts used inside individual nodes, directly from the graph interface.
+Studio를 사용하면 graph 인터페이스에서 직접 개별 node 내부에서 사용되는 prompt를 편집할 수 있습니다.
 
 #### Graph Configuration
 
-Define your [configuration](/oss/langgraph/use-graph-api#add-runtime-configuration) to specify prompt fields and their associated nodes using `langgraph_nodes` and `langgraph_type` keys.
+`langgraph_nodes` 및 `langgraph_type` 키를 사용하여 prompt 필드와 관련 node를 지정하도록 [configuration](/oss/langgraph/use-graph-api#add-runtime-configuration)을 정의합니다.
 
 ##### `langgraph_nodes`
 
-- **Description**: Specifies which nodes of the graph a configuration field is associated with.
-- **Value Type**: Array of strings, where each string is the name of a node in your graph.
-- **Usage Context**: Include in the `json_schema_extra` dictionary for Pydantic models or the `metadata["json_schema_extra"]` dictionary for dataclasses.
-- **Example**:
+- **설명**: Configuration 필드가 연결된 graph의 node를 지정합니다.
+- **값 타입**: 문자열 배열, 각 문자열은 graph의 node 이름입니다.
+- **사용 컨텍스트**: Pydantic model의 `json_schema_extra` 딕셔너리 또는 dataclass의 `metadata["json_schema_extra"]` 딕셔너리에 포함합니다.
+- **예제**:
   ```python
   system_prompt: str = Field(
       default="You are a helpful AI assistant.",
@@ -40,12 +40,12 @@ Define your [configuration](/oss/langgraph/use-graph-api#add-runtime-configurati
 
 ##### `langgraph_type`
 
-- **Description**: Specifies the type of configuration field, which determines how it's handled in the UI.
-- **Value Type**: String
-- **Supported Values**:
-  * `"prompt"`: Indicates the field contains prompt text that should be treated specially in the UI.
-- **Usage Context**: Include in the `json_schema_extra` dictionary for Pydantic models or the `metadata["json_schema_extra"]` dictionary for dataclasses.
-- **Example**:
+- **설명**: Configuration 필드의 타입을 지정하며, UI에서 처리되는 방식을 결정합니다.
+- **값 타입**: 문자열
+- **지원되는 값**:
+  * `"prompt"`: 필드에 UI에서 특별히 처리되어야 하는 prompt 텍스트가 포함되어 있음을 나타냅니다.
+- **사용 컨텍스트**: Pydantic model의 `json_schema_extra` 딕셔너리 또는 dataclass의 `metadata["json_schema_extra"]` 딕셔너리에 포함합니다.
+- **예제**:
   ```python
   system_prompt: str = Field(
       default="You are a helpful AI assistant.",
@@ -56,7 +56,7 @@ Define your [configuration](/oss/langgraph/use-graph-api#add-runtime-configurati
   )
   ```
 
-<Accordion title="Full example configuration">
+<Accordion title="전체 예제 configuration">
 
 ```python
 ## Using Pydantic
@@ -122,92 +122,92 @@ class Configuration:
 
 </Accordion>
 
-#### Editing prompts in the UI
+#### UI에서 prompt 편집
 
-1. Locate the gear icon on nodes with associated configuration fields.
-1. Click to open the configuration modal.
-1. Edit the values.
-1. Save to update the current assistant version or create a new one.
+1. 관련 configuration 필드가 있는 node에서 톱니바퀴 아이콘을 찾습니다.
+1. 클릭하여 configuration 모달을 엽니다.
+1. 값을 편집합니다.
+1. 저장하여 현재 assistant 버전을 업데이트하거나 새 버전을 생성합니다.
 
 ### Playground
 
-The [playground](/langsmith/create-a-prompt) interface allows testing individual LLM calls without running the full graph:
+[Playground](/langsmith/create-a-prompt) 인터페이스를 사용하면 전체 graph를 실행하지 않고 개별 LLM 호출을 테스트할 수 있습니다:
 
-1. Select a thread.
-1. Click **View LLM Runs** on a node. This lists all the LLM calls (if any) made inside the node.
-1. Select an LLM run to open in the playground.
-1. Modify prompts and test different model and tool settings.
-1. Copy updated prompts back to your graph.
+1. Thread를 선택합니다.
+1. Node에서 **View LLM Runs**를 클릭합니다. 이렇게 하면 node 내부에서 수행된 모든 LLM 호출(있는 경우)이 나열됩니다.
+1. LLM 실행을 선택하여 playground에서 엽니다.
+1. Prompt를 수정하고 다양한 model 및 tool 설정을 테스트합니다.
+1. 업데이트된 prompt를 graph로 다시 복사합니다.
 
-## Run experiments over a dataset
+## Dataset에 대한 실험 실행
 
-Studio lets you run [evaluations](/langsmith/evaluation-concepts) by executing your assistant against a predefined LangSmith [dataset](/langsmith/evaluation-concepts#datasets). This allows you to test performance across a variety of inputs, compare outputs to reference answers, and score results with configured [evaluators](/langsmith/evaluation-concepts#evaluators).
+Studio를 사용하면 미리 정의된 LangSmith [dataset](/langsmith/evaluation-concepts#datasets)에 대해 assistant를 실행하여 [평가](/langsmith/evaluation-concepts)를 실행할 수 있습니다. 이를 통해 다양한 입력에 대한 성능을 테스트하고, 출력을 참조 답변과 비교하며, 구성된 [evaluator](/langsmith/evaluation-concepts#evaluators)로 결과를 점수화할 수 있습니다.
 
-This guide shows you how to run a full end-to-end experiment directly from Studio.
+이 가이드는 Studio에서 직접 전체 end-to-end 실험을 실행하는 방법을 보여줍니다.
 
-### Prerequisites
+### 전제 조건
 
-Before running an experiment, ensure you have the following:
+실험을 실행하기 전에 다음 사항을 확인하세요:
 
-- **A LangSmith dataset**: Your dataset should contain the inputs you want to test and optionally, reference outputs for comparison. The schema for the inputs must match the required input schema for the assistant. For more information on schemas, see [here](/oss/langgraph/use-graph-api#schema). For more on creating datasets, refer to [How to Manage Datasets](/langsmith/manage-datasets-in-application#set-up-your-dataset).
-- **(Optional) Evaluators**: You can attach evaluators (e.g., LLM-as-a-Judge, heuristics, or custom functions) to your dataset in LangSmith. These will run automatically after the graph has processed all inputs.
-- **A running application**: The experiment can be run against:
-  - An application deployed on [LangSmith](/langsmith/deployments).
-  - A locally running application started via the [langgraph-cli](/langsmith/local-server).
+- **LangSmith dataset**: Dataset에는 테스트하려는 입력과 선택적으로 비교를 위한 참조 출력이 포함되어야 합니다. 입력의 schema는 assistant에 필요한 입력 schema와 일치해야 합니다. Schema에 대한 자세한 내용은 [여기](/oss/langgraph/use-graph-api#schema)를 참조하세요. Dataset 생성에 대한 자세한 내용은 [How to Manage Datasets](/langsmith/manage-datasets-in-application#set-up-your-dataset)를 참조하세요.
+- **(선택 사항) Evaluator**: LangSmith의 dataset에 evaluator(예: LLM-as-a-Judge, heuristic 또는 custom function)를 연결할 수 있습니다. 이들은 graph가 모든 입력을 처리한 후 자동으로 실행됩니다.
+- **실행 중인 애플리케이션**: 실험은 다음에 대해 실행할 수 있습니다:
+  - [LangSmith](/langsmith/deployments)에 배포된 애플리케이션.
+  - [langgraph-cli](/langsmith/local-server)를 통해 시작된 로컬에서 실행 중인 애플리케이션.
 
-### Experiment setup
+### 실험 설정
 
-1. Launch the experiment. Click the **Run experiment** button in the top right corner of the Studio page.
-1. Select your dataset. In the modal that appears, select the dataset (or a specific dataset split) to use for the experiment and click **Start**.
-1. Monitor the progress. All of the inputs in the dataset will now be run against the active assistant. Monitor the experiment's progress via the badge in the top right corner.
-1. You can continue to work in Studio while the experiment runs in the background. Click the arrow icon button at any time to navigate to LangSmith and view the detailed experiment results.
+1. 실험을 시작합니다. Studio 페이지의 오른쪽 상단에 있는 **Run experiment** 버튼을 클릭합니다.
+1. Dataset을 선택합니다. 나타나는 모달에서 실험에 사용할 dataset(또는 특정 dataset split)을 선택하고 **Start**를 클릭합니다.
+1. 진행 상황을 모니터링합니다. Dataset의 모든 입력이 이제 활성 assistant에 대해 실행됩니다. 오른쪽 상단의 배지를 통해 실험 진행 상황을 모니터링합니다.
+1. 실험이 백그라운드에서 실행되는 동안 Studio에서 계속 작업할 수 있습니다. 언제든지 화살표 아이콘 버튼을 클릭하여 LangSmith로 이동하고 자세한 실험 결과를 확인할 수 있습니다.
 
-## Debug LangSmith traces
+## LangSmith trace 디버그
 
-This guide explains how to open LangSmith traces in Studio for interactive investigation and debugging.
+이 가이드는 대화형 조사 및 디버깅을 위해 Studio에서 LangSmith trace를 여는 방법을 설명합니다.
 
-### Open deployed threads
+### 배포된 thread 열기
 
-1. Open the LangSmith trace, selecting the root run.
-1. Click **Run in Studio**.
+1. LangSmith trace를 열고 root run을 선택합니다.
+1. **Run in Studio**를 클릭합니다.
 
-This will open Studio connected to the associated deployment with the trace's parent thread selected.
+이렇게 하면 trace의 parent thread가 선택된 상태로 관련 deployment에 연결된 Studio가 열립니다.
 
-### Testing local agents with remote traces
+### 원격 trace로 로컬 agent 테스트
 
-This section explains how to test a local agent against remote traces from LangSmith. This enables you to use production traces as input for local testing, allowing you to debug and verify agent modifications in your development environment.
+이 섹션에서는 LangSmith의 원격 trace에 대해 로컬 agent를 테스트하는 방법을 설명합니다. 이를 통해 프로덕션 trace를 로컬 테스트의 입력으로 사용할 수 있으며, 개발 환경에서 agent 수정 사항을 디버그하고 검증할 수 있습니다.
 
-#### Prerequisites
+#### 전제 조건
 
-- A LangSmith traced thread
-- A [locally running agent](/langsmith/local-server#local-development-server).
+- LangSmith로 추적된 thread
+- [로컬에서 실행 중인 agent](/langsmith/local-server#local-development-server).
 
 <Info>
-**Local agent requirements**
+**로컬 agent 요구 사항**
 * langgraph>=0.3.18
 * langgraph-api>=0.0.32
-* Contains the same set of nodes present in the remote trace
+* 원격 trace에 있는 것과 동일한 node 세트 포함
 </Info>
 
-#### Clone thread
+#### Thread 복제
 
-1. Open the LangSmith trace, selecting the root run.
-2. Click the dropdown next to **Run in Studio**.
-3. Enter your local agent's URL.
-4. Select **Clone thread locally**.
-5. If multiple graphs exist, select the target graph.
+1. LangSmith trace를 열고 root run을 선택합니다.
+2. **Run in Studio** 옆의 드롭다운을 클릭합니다.
+3. 로컬 agent의 URL을 입력합니다.
+4. **Clone thread locally**를 선택합니다.
+5. 여러 graph가 있는 경우 대상 graph를 선택합니다.
 
-A new thread will be created in your local agent with the thread history inferred and copied from the remote thread, and you will be navigated to Studio for your locally running application.
+원격 thread에서 추론되고 복사된 thread 기록과 함께 로컬 agent에 새 thread가 생성되며, 로컬에서 실행 중인 애플리케이션의 Studio로 이동합니다.
 
-## Add node to dataset
+## Dataset에 node 추가
 
-Add [examples](/langsmith/evaluation-concepts#examples) to [LangSmith datasets](/langsmith/manage-datasets) from nodes in the thread log. This is useful to evaluate individual steps of the agent.
+Thread log의 node에서 [LangSmith dataset](/langsmith/manage-datasets)에 [예제](/langsmith/evaluation-concepts#examples)를 추가합니다. 이는 agent의 개별 단계를 평가하는 데 유용합니다.
 
-1. Select a thread.
-1. Click **Add to Dataset**.
-1. Select nodes whose input/output you want to add to a dataset.
-1. For each selected node, select the target dataset to create the example in. By default a dataset for the specific assistant and node will be selected. If this dataset does not yet exist, it will be created.
-1. Edit the example's input/output as needed before adding it to the dataset.
-1. Select **Add to dataset** at the bottom of the page to add all selected nodes to their respective datasets.
+1. Thread를 선택합니다.
+1. **Add to Dataset**을 클릭합니다.
+1. Dataset에 추가하려는 입력/출력이 있는 node를 선택합니다.
+1. 선택한 각 node에 대해 예제를 생성할 대상 dataset을 선택합니다. 기본적으로 특정 assistant 및 node에 대한 dataset이 선택됩니다. 이 dataset이 아직 존재하지 않으면 생성됩니다.
+1. Dataset에 추가하기 전에 필요에 따라 예제의 입력/출력을 편집합니다.
+1. 페이지 하단의 **Add to dataset**을 선택하여 선택한 모든 node를 각각의 dataset에 추가합니다.
 
-For more details, refer to [How to evaluate an application's intermediate steps](/langsmith/evaluate-on-intermediate-steps).
+자세한 내용은 [How to evaluate an application's intermediate steps](/langsmith/evaluate-on-intermediate-steps)를 참조하세요.

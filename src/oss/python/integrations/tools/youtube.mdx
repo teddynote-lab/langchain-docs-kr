@@ -2,13 +2,13 @@
 title: YouTube
 ---
 
->[YouTube Search](https://github.com/joetats/youtube_search) package searches `YouTube` videos avoiding using their heavily rate-limited API.
+>[YouTube Search](https://github.com/joetats/youtube_search) 패키지는 `YouTube` 비디오를 검색하며, 속도 제한이 심한 API 사용을 피합니다.
 >
->It uses the form on the `YouTube` homepage and scrapes the resulting page.
+>`YouTube` 홈페이지의 form을 사용하고 결과 페이지를 스크래핑합니다.
 
-This notebook shows how to use a tool to search YouTube.
+이 노트북은 YouTube를 검색하는 도구를 사용하는 방법을 보여줍니다.
 
-Adapted from [https://github.com/venuv/langchain_yt_tools](https://github.com/venuv/langchain_yt_tools)
+[https://github.com/venuv/langchain_yt_tools](https://github.com/venuv/langchain_yt_tools)에서 수정됨
 
 ```python
 pip install -qU  youtube_search
@@ -30,7 +30,7 @@ tool.run("lex fridman")
 "['/watch?v=VcVfceTsD0A&pp=ygUMbGV4IGZyaWVkbWFu', '/watch?v=gPfriiHBBek&pp=ygUMbGV4IGZyaWVkbWFu']"
 ```
 
-You can also specify the number of results that are returned
+반환되는 결과의 수를 지정할 수도 있습니다
 
 ```python
 tool.run("lex friedman,5")

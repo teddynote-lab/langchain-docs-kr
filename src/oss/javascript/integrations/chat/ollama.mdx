@@ -2,19 +2,19 @@
 title: ChatOllama
 ---
 
-[Ollama](https://ollama.ai/) allows you to run open-source large language models, such as Llama 3.1, locally.
+[Ollama](https://ollama.ai/)를 사용하면 Llama 3.1과 같은 오픈 소스 대규모 언어 모델을 로컬에서 실행할 수 있습니다.
 
-Ollama bundles model weights, configuration, and data into a single package, defined by a Modelfile. It optimizes setup and configuration details, including GPU usage.
+Ollama는 모델 가중치, 구성 및 데이터를 Modelfile로 정의된 단일 패키지로 번들링합니다. GPU 사용을 포함한 설정 및 구성 세부 사항을 최적화합니다.
 
-This guide will help you getting started with `ChatOllama` [chat models](/oss/langchain/models). For detailed documentation of all `ChatOllama` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_ollama.ChatOllama.html).
+이 가이드는 `ChatOllama` [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 `ChatOllama` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_ollama.ChatOllama.html)를 참조하세요.
 
 ## Overview
 
 ### Integration details
 
-Ollama allows you to use a wide range of models with different capabilities. Some of the fields in the details table below only apply to a subset of models that Ollama offers.
+Ollama를 사용하면 다양한 기능을 가진 광범위한 모델을 사용할 수 있습니다. 아래 세부 정보 표의 일부 필드는 Ollama가 제공하는 모델의 일부에만 적용됩니다.
 
-For a complete list of supported models and model variants, see the [Ollama model library](https://ollama.com/search) and search by tag.
+지원되는 모델 및 모델 변형의 전체 목록은 [Ollama model library](https://ollama.com/search)를 참조하고 태그로 검색하세요.
 
 | Class | Package | Local | Serializable | [PY support](https://python.langchain.com/docs/integrations/chat/ollama) | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
@@ -22,7 +22,7 @@ For a complete list of supported models and model variants, see the [Ollama mode
 
 ### Model features
 
-See the links in the table headers below for guides on how to use specific features.
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
@@ -30,11 +30,11 @@ See the links in the table headers below for guides on how to use specific featu
 
 ## Setup
 
-Follow [these instructions](https://github.com/ollama/ollama) to set up and run a local Ollama instance. Then, download the `@langchain/ollama` package.
+로컬 Ollama 인스턴스를 설정하고 실행하려면 [이 지침](https://github.com/ollama/ollama)을 따르세요. 그런 다음 `@langchain/ollama` 패키지를 다운로드하세요.
 
 ### Credentials
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수 있습니다:
 
 ```bash
 # export LANGSMITH_TRACING="true"
@@ -43,7 +43,7 @@ If you want to get automated tracing of your model calls you can also set your [
 
 ### Installation
 
-The LangChain ChatOllama integration lives in the `@langchain/ollama` package:
+LangChain ChatOllama integration은 `@langchain/ollama` 패키지에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -59,7 +59,7 @@ pnpm add @langchain/ollama @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```typescript
 import { ChatOllama } from "@langchain/ollama"
@@ -123,7 +123,7 @@ Je adore le programmation.
 
 ## Tools
 
-Ollama now offers support for native tool calling [for a subset of their available models](https://ollama.com/search?c=tools). The example below demonstrates how you can invoke a tool from an Ollama model.
+Ollama는 이제 [사용 가능한 모델의 일부](https://ollama.com/search?c=tools)에 대해 네이티브 tool calling 지원을 제공합니다. 아래 예제는 Ollama 모델에서 tool을 호출하는 방법을 보여줍니다.
 
 ```typescript
 import { tool } from "@langchain/core/tools";
@@ -190,7 +190,7 @@ AIMessage {
 
 ### `.withStructuredOutput`
 
-For [models that support tool calling](https://ollama.com/search?c=tools), you can also call `.withStructuredOutput()` to get a structured output from the tool.
+[tool calling을 지원하는 모델](https://ollama.com/search?c=tools)의 경우 `.withStructuredOutput()`을 호출하여 tool에서 구조화된 출력을 얻을 수도 있습니다.
 
 ```typescript
 import { ChatOllama } from "@langchain/ollama";
@@ -223,7 +223,7 @@ console.log(resultFromWSO);
 
 ### JSON mode
 
-Ollama also supports a JSON mode for all chat models that coerces model outputs to only return JSON. Here's an example of how this can be useful for extraction:
+Ollama는 또한 모델 출력을 JSON만 반환하도록 강제하는 모든 chat model에 대해 JSON mode를 지원합니다. 다음은 추출에 유용하게 사용할 수 있는 예제입니다:
 
 ```typescript
 import { ChatOllama } from "@langchain/ollama";
@@ -281,8 +281,8 @@ AIMessage {
 
 ## Multimodal models
 
-Ollama supports open source multimodal models like [LLaVA](https://ollama.ai/library/llava) in versions 0.1.15 and up.
-You can pass images as part of a message's `content` field to [multimodal-capable](/oss/langchain/messages#multimodal) models like this:
+Ollama는 버전 0.1.15 이상에서 [LLaVA](https://ollama.ai/library/llava)와 같은 오픈 소스 multimodal 모델을 지원합니다.
+다음과 같이 [multimodal 지원](/oss/langchain/messages#multimodal) 모델에 메시지의 `content` 필드의 일부로 이미지를 전달할 수 있습니다:
 
 ```typescript
 import { ChatOllama } from "@langchain/ollama";
@@ -339,4 +339,4 @@ AIMessage {
 
 ## API reference
 
-For detailed documentation of all ChatOllama features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_ollama.ChatOllama.html).
+모든 ChatOllama 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_ollama.ChatOllama.html)를 참조하세요.

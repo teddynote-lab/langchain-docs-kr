@@ -1,10 +1,10 @@
 ---
-title: Multiple individual files
+title: 여러 개별 파일
 ---
 
-This example goes over how to load data from multiple file paths. The second argument is a map of file extensions to loader factories. Each file will be passed to the matching loader, and the resulting documents will be concatenated together.
+이 예제는 여러 파일 경로에서 데이터를 로드하는 방법을 다룹니다. 두 번째 인자는 파일 확장자와 loader factory의 매핑입니다. 각 파일은 일치하는 loader에 전달되며, 결과 document들은 함께 연결됩니다.
 
-Example files:
+예제 파일:
 
 ```text
 src/document_loaders/example_data/example/
@@ -16,7 +16,7 @@ src/document_loaders/example_data/example2/
 └── example.jsonl
 ```
 
-Example code:
+예제 코드:
 
 ```typescript
 import { MultiFileLoader } from "@langchain/classic/document_loaders/fs/multi_file";

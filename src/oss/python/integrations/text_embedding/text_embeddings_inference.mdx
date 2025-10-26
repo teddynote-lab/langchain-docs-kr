@@ -1,18 +1,17 @@
+```markdown
 ---
 title: Text Embeddings Inference
 ---
 
->[Hugging Face Text Embeddings Inference (TEI)](https://huggingface.co/docs/text-embeddings-inference/index) is a toolkit for deploying and serving open-source
-> text embeddings and sequence classification models. `TEI` enables high-performance extraction for the most popular models,
->including `FlagEmbedding`, `Ember`, `GTE` and `E5`.
+>[Hugging Face Text Embeddings Inference (TEI)](https://huggingface.co/docs/text-embeddings-inference/index)는 오픈소스 텍스트 임베딩 및 시퀀스 분류 모델을 배포하고 제공하기 위한 툴킷입니다. `TEI`는 `FlagEmbedding`, `Ember`, `GTE`, `E5`를 포함한 가장 인기 있는 모델들에 대해 고성능 추출을 가능하게 합니다.
 
-To use it within langchain, first install `huggingface-hub`.
+langchain에서 사용하려면 먼저 `huggingface-hub`를 설치하세요.
 
 ```python
 pip install -U huggingface-hub
 ```
 
-Then expose an embedding model using TEI. For instance, using Docker, you can serve `BAAI/bge-large-en-v1.5` as follows:
+그런 다음 TEI를 사용하여 임베딩 모델을 노출합니다. 예를 들어, Docker를 사용하여 다음과 같이 `BAAI/bge-large-en-v1.5`를 제공할 수 있습니다:
 
 ```bash
 model=BAAI/bge-large-en-v1.5
@@ -22,9 +21,9 @@ volume=$PWD/data # share a volume with the Docker container to avoid downloading
 docker run --gpus all -p 8080:80 -v $volume:/data --pull always ghcr.io/huggingface/text-embeddings-inference:0.6 --model-id $model --revision $revision
 ```
 
-Specifics on Docker usage might vary with the underlying hardware. For example, to serve the model on Intel Gaudi/Gaudi2 hardware, refer to the [tei-gaudi repository](https://github.com/huggingface/tei-gaudi) for the relevant docker run command.
+Docker 사용법의 세부 사항은 기본 하드웨어에 따라 다를 수 있습니다. 예를 들어, Intel Gaudi/Gaudi2 하드웨어에서 모델을 제공하려면 관련 docker run 명령어는 [tei-gaudi repository](https://github.com/huggingface/tei-gaudi)를 참조하세요.
 
-Finally, instantiate the client and embed your texts.
+마지막으로 클라이언트를 인스턴스화하고 텍스트를 임베딩합니다.
 
 ```python
 from langchain_huggingface.embeddings import HuggingFaceEndpointEmbeddings
@@ -57,4 +56,5 @@ doc_result[0][:3]
 
 ```output
 [0.018113142, 0.00302585, -0.049911194]
+```
 ```

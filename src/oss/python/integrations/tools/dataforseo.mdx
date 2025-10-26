@@ -2,11 +2,11 @@
 title: DataForSEO
 ---
 
->[DataForSeo](https://dataforseo.com/) provides comprehensive SEO and digital marketing data solutions via API.
+>[DataForSeo](https://dataforseo.com/)는 API를 통해 포괄적인 SEO 및 디지털 마케팅 데이터 솔루션을 제공합니다.
 >
->The `DataForSeo API` retrieves `SERP` from the most popular search engines like `Google`, `Bing`, `Yahoo`. It also allows to >get SERPs from different search engine types like `Maps`, `News`, `Events`, etc.
+>`DataForSeo API`는 `Google`, `Bing`, `Yahoo`와 같은 가장 인기 있는 검색 엔진에서 `SERP`를 검색합니다. 또한 `Maps`, `News`, `Events` 등과 같은 다양한 검색 엔진 유형에서 SERP를 가져올 수 있습니다.
 
-This notebook demonstrates how to use the [DataForSeo API](https://dataforseo.com/apis) to obtain search engine results.
+이 노트북은 [DataForSeo API](https://dataforseo.com/apis)를 사용하여 검색 엔진 결과를 얻는 방법을 보여줍니다.
 
 ```python
 pip install -qU langchain-community
@@ -16,9 +16,9 @@ pip install -qU langchain-community
 from langchain_community.utilities.dataforseo_api_search import DataForSeoAPIWrapper
 ```
 
-## Setting up the API credentials
+## API 자격 증명 설정
 
-You can obtain your API credentials by registering on the `DataForSeo` website.
+`DataForSeo` 웹사이트에 등록하여 API 자격 증명을 얻을 수 있습니다.
 
 ```python
 import os
@@ -29,23 +29,23 @@ os.environ["DATAFORSEO_PASSWORD"] = "your_api_access_password"
 wrapper = DataForSeoAPIWrapper()
 ```
 
-The run method will return the first result snippet from one of the following elements: answer_box, knowledge_graph, featured_snippet, shopping, organic.
+run 메서드는 answer_box, knowledge_graph, featured_snippet, shopping, organic 중 하나의 요소에서 첫 번째 결과 스니펫을 반환합니다.
 
 ```python
 wrapper.run("Weather in Los Angeles")
 ```
 
-## The Difference Between `run` and `results`
+## `run`과 `results`의 차이점
 
-`run` and `results` are two methods provided by the `DataForSeoAPIWrapper` class.
+`run`과 `results`는 `DataForSeoAPIWrapper` 클래스에서 제공하는 두 가지 메서드입니다.
 
-The `run` method executes the search and returns the first result snippet from the answer box, knowledge graph, featured snippet, shopping, or organic results. These elements are sorted by priority from highest to lowest.
+`run` 메서드는 검색을 실행하고 answer box, knowledge graph, featured snippet, shopping 또는 organic 결과에서 첫 번째 결과 스니펫을 반환합니다. 이러한 요소들은 우선순위가 높은 것부터 낮은 것 순으로 정렬됩니다.
 
-The `results` method returns a JSON response configured according to the parameters set in the wrapper. This allows for more flexibility in terms of what data you want to return from the API.
+`results` 메서드는 wrapper에 설정된 매개변수에 따라 구성된 JSON 응답을 반환합니다. 이를 통해 API에서 반환하려는 데이터에 대한 더 많은 유연성을 제공합니다.
 
-## Getting Results as JSON
+## JSON으로 결과 가져오기
 
-You can customize the result types and fields you want to return in the JSON response. You can also set a maximum count for the number of top results to return.
+JSON 응답에서 반환하려는 결과 유형과 필드를 사용자 정의할 수 있습니다. 또한 반환할 상위 결과 수에 대한 최대 개수를 설정할 수 있습니다.
 
 ```python
 json_wrapper = DataForSeoAPIWrapper(
@@ -59,9 +59,9 @@ json_wrapper = DataForSeoAPIWrapper(
 json_wrapper.results("Bill Gates")
 ```
 
-## Customizing Location and Language
+## 위치 및 언어 사용자 정의
 
-You can specify the location and language of your search results by passing additional parameters to the API wrapper.
+API wrapper에 추가 매개변수를 전달하여 검색 결과의 위치와 언어를 지정할 수 있습니다.
 
 ```python
 customized_wrapper = DataForSeoAPIWrapper(
@@ -73,9 +73,9 @@ customized_wrapper = DataForSeoAPIWrapper(
 customized_wrapper.results("coffee near me")
 ```
 
-## Customizing the Search Engine
+## 검색 엔진 사용자 정의
 
-You can also specify the search engine you want to use.
+사용하려는 검색 엔진을 지정할 수도 있습니다.
 
 ```python
 customized_wrapper = DataForSeoAPIWrapper(
@@ -87,9 +87,9 @@ customized_wrapper = DataForSeoAPIWrapper(
 customized_wrapper.results("coffee near me")
 ```
 
-## Customizing the Search Type
+## 검색 유형 사용자 정의
 
-The API wrapper also allows you to specify the type of search you want to perform. For example, you can perform a maps search.
+API wrapper를 사용하면 수행하려는 검색 유형을 지정할 수도 있습니다. 예를 들어, 지도 검색을 수행할 수 있습니다.
 
 ```python
 maps_search = DataForSeoAPIWrapper(
@@ -104,9 +104,9 @@ maps_search = DataForSeoAPIWrapper(
 maps_search.results("coffee near me")
 ```
 
-## Integration with LangChain Agents
+## LangChain Agent와의 통합
 
-You can use the `Tool` class from the `langchain.agents` module to integrate the `DataForSeoAPIWrapper` with a langchain agent. The `Tool` class encapsulates a function that the agent can call.
+`langchain.agents` 모듈의 `Tool` 클래스를 사용하여 `DataForSeoAPIWrapper`를 langchain agent와 통합할 수 있습니다. `Tool` 클래스는 agent가 호출할 수 있는 함수를 캡슐화합니다.
 
 ```python
 from langchain.tools import Tool

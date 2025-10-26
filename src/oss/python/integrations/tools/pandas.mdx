@@ -2,11 +2,11 @@
 title: Pandas Dataframe
 ---
 
-This notebook shows how to use agents to interact with a `Pandas DataFrame`. It is mostly optimized for question answering.
+이 노트북은 agent를 사용하여 `Pandas DataFrame`과 상호작용하는 방법을 보여줍니다. 주로 질문 답변에 최적화되어 있습니다.
 
-**NOTE: this agent calls the `Python` agent under the hood, which executes LLM generated Python code - this can be bad if the LLM generated Python code is harmful. Use cautiously.**
+**주의: 이 agent는 내부적으로 `Python` agent를 호출하며, LLM이 생성한 Python 코드를 실행합니다 - LLM이 생성한 Python 코드가 유해할 수 있으므로 주의해서 사용하세요.**
 
-**NOTE: Since langchain migrated to v0.3 you should upgrade langchain_openai and langchain.   This would avoid import errors.**
+**주의: langchain이 v0.3으로 마이그레이션되었으므로 langchain_openai와 langchain을 업그레이드해야 합니다. 이렇게 하면 import 오류를 방지할 수 있습니다.**
 
 pip install -U langchain_openai
 pip install -U langchain
@@ -26,17 +26,17 @@ df = pd.read_csv(
 )
 ```
 
-## Using `ZERO_SHOT_REACT_DESCRIPTION`
+## `ZERO_SHOT_REACT_DESCRIPTION` 사용하기
 
-This shows how to initialize the agent using the `ZERO_SHOT_REACT_DESCRIPTION` agent type.
+`ZERO_SHOT_REACT_DESCRIPTION` agent type을 사용하여 agent를 초기화하는 방법을 보여줍니다.
 
 ```python
 agent = create_pandas_dataframe_agent(OpenAI(temperature=0), df, verbose=True)
 ```
 
-## Using OpenAI Functions
+## OpenAI Functions 사용하기
 
-This shows how to initialize the agent using the OPENAI_FUNCTIONS agent type. Note that this is an alternative to the above.
+OPENAI_FUNCTIONS agent type을 사용하여 agent를 초기화하는 방법을 보여줍니다. 이것은 위의 방법에 대한 대안입니다.
 
 ```python
 agent = create_pandas_dataframe_agent(
@@ -118,9 +118,9 @@ Final Answer: The square root of the average age is 5.449689683556195.
 'The square root of the average age is 5.449689683556195.'
 ```
 
-## Multi DataFrame Example
+## Multi DataFrame 예제
 
-This next part shows how the agent can interact with multiple dataframes passed in as a list.
+다음 부분은 agent가 list로 전달된 여러 dataframe과 상호작용하는 방법을 보여줍니다.
 
 ```python
 df1 = df.copy()

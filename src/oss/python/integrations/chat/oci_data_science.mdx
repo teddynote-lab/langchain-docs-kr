@@ -2,11 +2,11 @@
 title: ChatOCIModelDeployment
 ---
 
-This will help you get started with OCIModelDeployment [chat models](/oss/langchain/models). For detailed documentation of all ChatOCIModelDeployment features and configurations head to the [API reference](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.oci_data_science.ChatOCIModelDeployment.html).
+이 문서는 OCIModelDeployment [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 ChatOCIModelDeployment 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.oci_data_science.ChatOCIModelDeployment.html)를 참조하세요.
 
-[OCI Data Science](https://docs.oracle.com/en-us/iaas/data-science/using/home.htm) is a fully managed and serverless platform for data science teams to build, train, and manage machine learning models in the Oracle Cloud Infrastructure. You can use [AI Quick Actions](https://blogs.oracle.com/ai-and-datascience/post/ai-quick-actions-in-oci-data-science) to easily deploy LLMs on [OCI Data Science Model Deployment Service](https://docs.oracle.com/en-us/iaas/data-science/using/model-dep-about.htm). You may choose to deploy the model with popular inference frameworks such as vLLM or TGI. By default, the model deployment endpoint mimics the OpenAI API protocol.
+[OCI Data Science](https://docs.oracle.com/en-us/iaas/data-science/using/home.htm)는 데이터 과학 팀이 Oracle Cloud Infrastructure에서 머신러닝 모델을 구축, 훈련 및 관리할 수 있는 완전 관리형 서버리스 플랫폼입니다. [AI Quick Actions](https://blogs.oracle.com/ai-and-datascience/post/ai-quick-actions-in-oci-data-science)를 사용하여 [OCI Data Science Model Deployment Service](https://docs.oracle.com/en-us/iaas/data-science/using/model-dep-about.htm)에 LLM을 쉽게 배포할 수 있습니다. vLLM 또는 TGI와 같은 인기 있는 추론 프레임워크로 모델을 배포할 수 있습니다. 기본적으로 모델 배포 endpoint는 OpenAI API protocol을 모방합니다.
 
-> For the latest updates, examples and experimental features, please see [ADS LangChain Integration](https://accelerated-data-science.readthedocs.io/en/latest/user_guide/large_language_model/langchain_models.html).
+> 최신 업데이트, 예제 및 실험적 기능은 [ADS LangChain Integration](https://accelerated-data-science.readthedocs.io/en/latest/user_guide/large_language_model/langchain_models.html)을 참조하세요.
 
 ## Overview
 
@@ -22,21 +22,21 @@ This will help you get started with OCIModelDeployment [chat models](/oss/langch
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | depends | depends | depends | depends | depends | depends | ✅ | ✅ | ✅ | ✅ |
 
-Some model features, including tool calling, structured output, JSON mode and multi-modal inputs, are depending on deployed model.
+tool calling, structured output, JSON mode 및 multi-modal inputs를 포함한 일부 모델 기능은 배포된 모델에 따라 달라집니다.
 
 ## Setup
 
-To use ChatOCIModelDeployment you'll need to deploy a chat model with chat completion endpoint and install the `langchain-community`, `langchain-openai` and `oracle-ads` integration packages.
+ChatOCIModelDeployment를 사용하려면 chat completion endpoint가 있는 chat model을 배포하고 `langchain-community`, `langchain-openai` 및 `oracle-ads` integration package를 설치해야 합니다.
 
-You can easily deploy foundation models using the [AI Quick Actions](https://github.com/oracle-samples/oci-data-science-ai-samples/blob/main/ai-quick-actions/model-deployment-tips.md) on OCI Data Science Model deployment. For additional deployment examples, please visit the [Oracle GitHub samples repository](https://github.com/oracle-samples/oci-data-science-ai-samples/tree/main/ai-quick-actions).
+OCI Data Science Model deployment에서 [AI Quick Actions](https://github.com/oracle-samples/oci-data-science-ai-samples/blob/main/ai-quick-actions/model-deployment-tips.md)를 사용하여 foundation model을 쉽게 배포할 수 있습니다. 추가 배포 예제는 [Oracle GitHub samples repository](https://github.com/oracle-samples/oci-data-science-ai-samples/tree/main/ai-quick-actions)를 참조하세요.
 
 ### Policies
 
-Make sure to have the required [policies](https://docs.oracle.com/en-us/iaas/data-science/using/model-dep-policies-auth.htm#model_dep_policies_auth__predict-endpoint) to access the OCI Data Science Model Deployment endpoint.
+OCI Data Science Model Deployment endpoint에 액세스하는 데 필요한 [policies](https://docs.oracle.com/en-us/iaas/data-science/using/model-dep-policies-auth.htm#model_dep_policies_auth__predict-endpoint)가 있는지 확인하세요.
 
 ### Credentials
 
-You can set authentication through Oracle ADS. When you are working in OCI Data Science Notebook Session, you can leverage resource principal to access other OCI resources.
+Oracle ADS를 통해 인증을 설정할 수 있습니다. OCI Data Science Notebook Session에서 작업할 때 resource principal을 활용하여 다른 OCI 리소스에 액세스할 수 있습니다.
 
 ```python
 import ads
@@ -48,7 +48,7 @@ import ads
 ads.set_auth("resource_principal")
 ```
 
-Alternatively, you can configure the credentials using the following environment variables. For example, to use API key with specific profile:
+또는 다음 환경 변수를 사용하여 credentials를 구성할 수 있습니다. 예를 들어, 특정 profile과 함께 API key를 사용하려면:
 
 ```python
 import os
@@ -62,11 +62,11 @@ os.environ["OCI_CONFIG_PROFILE"] = "default"
 os.environ["OCI_CONFIG_LOCATION"] = "~/.oci"
 ```
 
-Check out [Oracle ADS docs](https://accelerated-data-science.readthedocs.io/en/latest/user_guide/cli/authentication.html) to see more options.
+더 많은 옵션은 [Oracle ADS docs](https://accelerated-data-science.readthedocs.io/en/latest/user_guide/cli/authentication.html)를 참조하세요.
 
 ### Installation
 
-The LangChain OCIModelDeployment integration lives in the `langchain-community` package. The following command will install `langchain-community` and the required dependencies.
+LangChain OCIModelDeployment integration은 `langchain-community` package에 있습니다. 다음 명령은 `langchain-community`와 필요한 dependencies를 설치합니다.
 
 ```python
 pip install -qU langchain-community langchain-openai oracle-ads
@@ -74,9 +74,9 @@ pip install -qU langchain-community langchain-openai oracle-ads
 
 ## Instantiation
 
-You may instantiate the model with the generic `ChatOCIModelDeployment` or framework specific class like `ChatOCIModelDeploymentVLLM`.
+generic `ChatOCIModelDeployment` 또는 `ChatOCIModelDeploymentVLLM`과 같은 framework 특정 class로 모델을 인스턴스화할 수 있습니다.
 
-* Using `ChatOCIModelDeployment` when you need a generic entry point for deploying models. You can pass model parameters through `model_kwargs` during the instantiation of this class. This allows for flexibility and ease of configuration without needing to rely on framework-specific details.
+* `ChatOCIModelDeployment` 사용: 모델 배포를 위한 generic entry point가 필요할 때 사용합니다. 이 class를 인스턴스화하는 동안 `model_kwargs`를 통해 model parameter를 전달할 수 있습니다. 이를 통해 framework별 세부 사항에 의존하지 않고도 유연하고 쉽게 구성할 수 있습니다.
 
 ```python
 from langchain_community.chat_models import ChatOCIModelDeployment
@@ -101,7 +101,7 @@ chat = ChatOCIModelDeployment(
 )
 ```
 
-* Using framework specific class like `ChatOCIModelDeploymentVLLM`: This is suitable when you are working with a specific framework (e.g. `vLLM`) and need to pass model parameters directly through the constructor, streamlining the setup process.
+* `ChatOCIModelDeploymentVLLM`과 같은 framework 특정 class 사용: 특정 framework(예: `vLLM`)로 작업하고 constructor를 통해 model parameter를 직접 전달하여 설정 프로세스를 간소화해야 할 때 적합합니다.
 
 ```python
 from langchain_community.chat_models import ChatOCIModelDeploymentVLLM
@@ -262,7 +262,7 @@ output.dict()
 
 ## API reference
 
-For comprehensive details on all features and configurations, please refer to the API reference documentation for each class:
+모든 기능 및 구성에 대한 포괄적인 세부 정보는 각 class의 API reference 문서를 참조하세요:
 
 * [ChatOCIModelDeployment](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.oci_data_science.ChatOCIModelDeployment.html)
 * [ChatOCIModelDeploymentVLLM](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.oci_data_science.ChatOCIModelDeploymentVLLM.html)

@@ -2,20 +2,20 @@
 title: Weights & Biases tracking
 ---
 
-This notebook goes over how to track your LangChain experiments into one centralized `Weights and Biases` dashboard.
+이 노트북은 LangChain 실험을 하나의 중앙 집중식 `Weights and Biases` 대시보드로 추적하는 방법을 다룹니다.
 
-To learn more about prompt engineering and the callback please refer to this notebook which explains both alongside the resultant dashboards you can expect to see:
+prompt engineering과 callback에 대해 자세히 알아보려면 다음 노트북을 참조하세요. 이 노트북은 두 가지 모두를 설명하고 예상할 수 있는 대시보드를 보여줍니다:
 
 <a href="https://colab.research.google.com/drive/1DXH4beT4HFaRKy_Vm4PoxhXVDRf7Ym8L?usp=sharing" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
-View a detailed description and examples in the [W&B article](https://wandb.ai/a-sh0ts/langchain_callback_demo/reports/Prompt-Engineering-LLMs-with-LangChain-and-W-B--VmlldzozNjk1NTUw#👋-how-to-build-a-callback-in-langchain-for-better-prompt-engineering
-).
+자세한 설명과 예제는 [W&B article](https://wandb.ai/a-sh0ts/langchain_callback_demo/reports/Prompt-Engineering-LLMs-with-LangChain-and-W-B--VmlldzozNjk1NTUw#👋-how-to-build-a-callback-in-langchain-for-better-prompt-engineering
+)에서 확인하세요.
 
-**Note**: _the `WandbCallbackHandler` is being deprecated in favour of the `WandbTracer`_ . In future please use the `WandbTracer` as it is more flexible and allows for more granular logging.
+**참고**: _`WandbCallbackHandler`는 `WandbTracer`를 위해 더 이상 사용되지 않습니다_. 향후에는 더 유연하고 세밀한 로깅이 가능한 `WandbTracer`를 사용하세요.
 
-To know more about the `WandbTracer` refer to the [agent_with_wandb_tracing](/oss/integrations/providers/wandb_tracing) notebook or use the following [colab notebook](http://wandb.me/prompts-quickstart).
+`WandbTracer`에 대해 자세히 알아보려면 [agent_with_wandb_tracing](/oss/integrations/providers/wandb_tracing) 노트북을 참조하거나 다음 [colab notebook](http://wandb.me/prompts-quickstart)을 사용하세요.
 
-To know more about Weights & Biases Prompts refer to the following [prompts documentation](https://docs.wandb.ai/guides/prompts).
+Weights & Biases Prompts에 대해 자세히 알아보려면 다음 [prompts documentation](https://docs.wandb.ai/guides/prompts)을 참조하세요.
 
 ```python
 pip install -qU  wandb
@@ -65,7 +65,7 @@ complexity_metrics: bool = False,
 stream_logs: bool = False,
 ```
 
-NOTE: For beta workflows we have made the default analysis based on textstat and the visualizations based on spacy
+참고: 베타 워크플로우의 경우 textstat 기반의 기본 분석과 spacy 기반의 시각화를 제공합니다
 
 ```python
 """Main function.
@@ -123,11 +123,11 @@ reset: bool = True,
 finish: bool = False,
 ```
 
-The `flush_tracker` function is used to log LangChain sessions to Weights & Biases. It takes in the LangChain module or agent, and logs at minimum the prompts and generations alongside the serialized form of the LangChain module to the specified Weights & Biases project. By default we reset the session as opposed to concluding the session outright.
+`flush_tracker` function은 LangChain session을 Weights & Biases에 로깅하는 데 사용됩니다. 이 함수는 LangChain module 또는 agent를 받아서 최소한 prompt와 generation을 LangChain module의 직렬화된 형태와 함께 지정된 Weights & Biases project에 로깅합니다. 기본적으로 session을 완전히 종료하는 대신 재설정합니다.
 
-## Usage Scenarios
+## 사용 시나리오
 
-### With LLM
+### LLM과 함께 사용
 
 ```python
 # SCENARIO 1 - LLM
@@ -171,7 +171,7 @@ View project at <a href='https://wandb.ai/harrison-chase/langchain_callback_demo
 View run at <a href='https://wandb.ai/harrison-chase/langchain_callback_demo/runs/jyxma7hu' target="_blank">https://wandb.ai/harrison-chase/langchain_callback_demo/runs/jyxma7hu</a>
 ```
 
-### Within Chains
+### Chain 내에서 사용
 
 ```python
 from langchain.chains import LLMChain
@@ -233,7 +233,7 @@ View project at <a href='https://wandb.ai/harrison-chase/langchain_callback_demo
 View run at <a href='https://wandb.ai/harrison-chase/langchain_callback_demo/runs/wzy59zjq' target="_blank">https://wandb.ai/harrison-chase/langchain_callback_demo/runs/wzy59zjq</a>
 ```
 
-### With Agents
+### Agent와 함께 사용
 
 ```python
 from langchain.agents import AgentType, initialize_agent, load_tools

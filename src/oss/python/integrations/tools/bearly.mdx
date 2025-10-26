@@ -2,15 +2,15 @@
 title: Bearly Code Interpreter
 ---
 
-> Bearly Code Interpreter allows for remote execution of code. This makes it perfect for a code sandbox for agents, to allow for safe implementation of things like Code Interpreter
+> Bearly Code Interpreter는 코드의 원격 실행을 허용합니다. 이는 에이전트를 위한 코드 샌드박스로 완벽하며, Code Interpreter와 같은 기능을 안전하게 구현할 수 있습니다.
 
-Get your api key here: [bearly.ai/dashboard/developers](https://bearly.ai/dashboard/developers)
+API 키는 여기에서 받으세요: [bearly.ai/dashboard/developers](https://bearly.ai/dashboard/developers)
 
 ```python
 pip install -qU langchain-community
 ```
 
-In this notebook, we will create an example of an agent that uses Bearly to interact with data
+이 노트북에서는 Bearly를 사용하여 데이터와 상호작용하는 에이전트의 예제를 만들어 보겠습니다.
 
 ```python
 from langchain_community.tools import BearlyInterpreterTool
@@ -21,13 +21,13 @@ from langchain.agents import AgentType, initialize_agent
 from langchain_openai import ChatOpenAI
 ```
 
-Initialize the interpreter
+interpreter를 초기화합니다
 
 ```python
 bearly_tool = BearlyInterpreterTool(api_key="...")
 ```
 
-Let's add some files to the sandbox
+샌드박스에 파일을 추가해 봅시다
 
 ```python
 bearly_tool.add_file(
@@ -38,7 +38,7 @@ bearly_tool.add_file(
 )
 ```
 
-Create a `Tool` object now. This is necessary, because we added the files, and we want the tool description to reflect that
+이제 `Tool` 객체를 생성합니다. 파일을 추가했으므로 tool description이 이를 반영하도록 하기 위해 필요합니다.
 
 ```python
 tools = [bearly_tool.as_tool()]
@@ -70,7 +70,7 @@ The following files available in the evaluation environment:
  description: ``
 ```
 
-Initialize an agent
+에이전트를 초기화합니다
 
 ```python
 llm = ChatOpenAI(model="gpt-4", temperature=0)

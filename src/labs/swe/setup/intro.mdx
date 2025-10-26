@@ -1,15 +1,15 @@
 ---
-title: "Introduction"
-description: "How to set up Open SWE for development"
+title: "소개"
+description: "개발을 위한 Open SWE 설정 방법"
 ---
 
-# Development Setup Overview
+# Development Setup 개요
 
-Welcome to the Open SWE development setup guide. This section will walk you through everything you need to know to get Open SWE running locally for development.
+Open SWE development setup 가이드에 오신 것을 환영합니다. 이 섹션에서는 개발을 위해 Open SWE를 로컬에서 실행하는 데 필요한 모든 것을 안내합니다.
 
-## Setup Sections
+## Setup 섹션
 
-The setup process is organized into focused sections to help you get up and running efficiently:
+setup 프로세스는 효율적으로 시작하고 실행할 수 있도록 집중된 섹션으로 구성되어 있습니다:
 
 <CardGroup cols={2}>
   <Card
@@ -17,57 +17,54 @@ The setup process is organized into focused sections to help you get up and runn
     icon="code"
     href="/labs/swe/setup/development"
   >
-    Complete guide to cloning the repository, installing dependencies,
-    configuring environment variables, and starting the development servers.
+    repository 복제, dependency 설치, environment variable 구성 및 development server 시작에 대한 완전한 가이드입니다.
   </Card>
   <Card
     title="Authentication"
     icon="shield-check"
     href="/labs/swe/setup/authentication"
   >
-    Understanding the authentication flow, GitHub App configuration, and
-    security mechanisms used throughout Open SWE.
+    Open SWE 전반에 걸쳐 사용되는 authentication flow, GitHub App 구성 및 보안 메커니즘을 이해합니다.
   </Card>
 </CardGroup>
 
 ## Technology Stack
 
-Open SWE is built with modern technologies designed for scalability and developer experience:
+Open SWE는 확장성과 개발자 경험을 위해 설계된 최신 기술로 구축되었습니다:
 
 ### Core Technologies
 
-- **TypeScript** - Strict type safety across the entire codebase
-- **Yarn** - Package manager with workspace support (v3.5.1)
-- **Turbo** - Monorepo build orchestration and task running
+- **TypeScript** - 전체 codebase에 걸친 엄격한 type safety
+- **Yarn** - workspace 지원이 있는 package manager (v3.5.1)
+- **Turbo** - Monorepo build orchestration 및 task running
 
 ### Agent Infrastructure
 
-- **LangGraph** - Multi-agent orchestration framework with three specialized graphs:
-  - Manager graph for user interaction orchestration
-  - Planner graph for execution plan creation
-  - Programmer graph for code change execution
-- **Daytona** - Sandboxed development environments for safe code execution
+- **LangGraph** - 세 가지 특화된 graph를 가진 multi-agent orchestration framework:
+  - 사용자 상호작용 orchestration을 위한 Manager graph
+  - 실행 계획 생성을 위한 Planner graph
+  - 코드 변경 실행을 위한 Programmer graph
+- **Daytona** - 안전한 코드 실행을 위한 sandboxed development environment
 
 ### Web Application
 
-- **Next.js** - React framework with App Router
-- **Shadcn UI** - Component library built on Radix UI primitives
+- **Next.js** - App Router를 사용하는 React framework
+- **Shadcn UI** - Radix UI primitive 기반으로 구축된 component library
 - **Tailwind CSS** - Utility-first CSS framework
 
 ### Documentation
 
-- **Mintlify** - Documentation platform with MDX support
+- **Mintlify** - MDX 지원이 있는 documentation platform
 
 ## Monorepo Structure
 
 <Note>
-  Open SWE uses a Yarn workspace monorepo with three main applications and a
-  shared package for common utilities and types.
+  Open SWE는 세 개의 주요 application과 공통 utility 및 type을 위한 공유 package가 있는 Yarn workspace monorepo를 사용합니다.
 </Note>
 
 - **`apps/open-swe`** - LangGraph agent application
 - **`apps/web`** - Next.js web interface
 - **`apps/docs`** - Mintlify documentation site
-- **`packages/shared`** - Shared utilities, types, and constants
+- **`packages/shared`** - 공유 utility, type 및 constant
 
-The monorepo is orchestrated by Turbo, which handles build dependencies and parallel task execution across packages.
+monorepo는 Turbo에 의해 orchestration되며, package 간 build dependency 및 병렬 task 실행을 처리합니다.

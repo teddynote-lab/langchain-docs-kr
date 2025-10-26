@@ -2,14 +2,14 @@
 title: FinancialDatasets Toolkit
 ---
 
-The [financial datasets](https://financialdatasets.ai/) stock market API provides REST endpoints that let you get financial data for 16,000+ tickers spanning 30+ years.
+[financial datasets](https://financialdatasets.ai/) 주식 시장 API는 30년 이상에 걸친 16,000개 이상의 ticker에 대한 금융 데이터를 가져올 수 있는 REST endpoint를 제공합니다.
 
 ## Setup
 
-To use this toolkit, you need two API keys:
+이 toolkit을 사용하려면 두 개의 API key가 필요합니다:
 
-`FINANCIAL_DATASETS_API_KEY`: Get it from [financialdatasets.ai](https://financialdatasets.ai/).
-`OPENAI_API_KEY`: Get it from [OpenAI](https://platform.openai.com/).
+`FINANCIAL_DATASETS_API_KEY`: [financialdatasets.ai](https://financialdatasets.ai/)에서 발급받으세요.
+`OPENAI_API_KEY`: [OpenAI](https://platform.openai.com/)에서 발급받으세요.
 
 ```python
 import getpass
@@ -24,7 +24,7 @@ os.environ["OPENAI_API_KEY"] = getpass.getpass()
 
 ### Installation
 
-This toolkit lives in the `langchain-community` package.
+이 toolkit은 `langchain-community` package에 포함되어 있습니다.
 
 ```python
 pip install -qU langchain-community
@@ -32,7 +32,7 @@ pip install -qU langchain-community
 
 ## Instantiation
 
-Now we can instantiate our toolkit:
+이제 toolkit을 인스턴스화할 수 있습니다:
 
 ```python
 from langchain_community.agent_toolkits.financial_datasets.toolkit import (
@@ -48,7 +48,7 @@ toolkit = FinancialDatasetsToolkit(api_wrapper=api_wrapper)
 
 ## Tools
 
-View available tools:
+사용 가능한 tool을 확인합니다:
 
 ```python
 tools = toolkit.get_tools()
@@ -56,7 +56,7 @@ tools = toolkit.get_tools()
 
 ## Use within an agent
 
-Let's equip our agent with the FinancialDatasetsToolkit and ask financial questions.
+agent에 FinancialDatasetsToolkit을 장착하고 금융 관련 질문을 해봅시다.
 
 ```python
 system_prompt = """
@@ -93,7 +93,7 @@ help users make informed decisions. Always maintain a professional and objective
 """
 ```
 
-Instantiate the LLM.
+LLM을 인스턴스화합니다.
 
 ```python
 from langchain.tools import tool
@@ -102,13 +102,13 @@ from langchain_openai import ChatOpenAI
 model = ChatOpenAI(model="gpt-4o")
 ```
 
-Define a user query.
+사용자 query를 정의합니다.
 
 ```python
 query = "What was AAPL's revenue in 2023? What about it's total debt in Q1 2024?"
 ```
 
-Create the agent.
+agent를 생성합니다.
 
 ```python
 from langchain.agents import AgentExecutor, create_tool_calling_agent
@@ -128,7 +128,7 @@ agent = create_tool_calling_agent(model, tools, prompt)
 agent_executor = AgentExecutor(agent=agent, tools=tools)
 ```
 
-Query the agent.
+agent에 query를 실행합니다.
 
 ```python
 agent_executor.invoke({"input": query})
@@ -136,4 +136,4 @@ agent_executor.invoke({"input": query})
 
 ## API reference
 
-For detailed documentation of all `FinancialDatasetsToolkit` features and configurations head to the [API reference](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.financial_datasets.toolkit.FinancialDatasetsToolkit.html).
+모든 `FinancialDatasetsToolkit` 기능 및 설정에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.financial_datasets.toolkit.FinancialDatasetsToolkit.html)를 참조하세요.

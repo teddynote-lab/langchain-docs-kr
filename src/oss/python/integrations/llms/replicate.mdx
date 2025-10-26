@@ -2,9 +2,9 @@
 title: Replicate
 ---
 
->[Replicate](https://replicate.com/blog/machine-learning-needs-better-tools) runs machine learning models in the cloud. We have a library of open-source models that you can run with a few lines of code. If you're building your own machine learning models, Replicate makes it easy to deploy them at scale.
+>[Replicate](https://replicate.com/blog/machine-learning-needs-better-tools)는 클라우드에서 머신러닝 모델을 실행합니다. 몇 줄의 코드로 실행할 수 있는 오픈소스 모델 라이브러리를 제공합니다. 자체 머신러닝 모델을 구축하는 경우, Replicate를 사용하면 대규모로 쉽게 배포할 수 있습니다.
 
-This example goes over how to use LangChain to interact with `Replicate` [models](https://replicate.com/explore)
+이 예제는 LangChain을 사용하여 `Replicate` [models](https://replicate.com/explore)와 상호작용하는 방법을 다룹니다.
 
 ## Setup
 
@@ -14,7 +14,7 @@ This example goes over how to use LangChain to interact with `Replicate` [models
 %autoreload 2
 ```
 
-To run this notebook, you'll need to create a [replicate](https://replicate.com) account and install the [replicate python client](https://github.com/replicate/replicate-python).
+이 노트북을 실행하려면 [replicate](https://replicate.com) 계정을 생성하고 [replicate python client](https://github.com/replicate/replicate-python)를 설치해야 합니다.
 
 ```python
 !poetry run pip install replicate
@@ -61,9 +61,9 @@ from langchain_core.prompts import PromptTemplate
 
 ## Calling a model
 
-Find a model on the [replicate explore page](https://replicate.com/explore), and then paste in the model name and version in this format: model_name/version.
+[replicate explore page](https://replicate.com/explore)에서 모델을 찾은 다음, model_name/version 형식으로 모델 이름과 버전을 붙여넣으세요.
 
-For example, here is [`Meta Llama 3`](https://replicate.com/meta/meta-llama-3-8b-instruct).
+예를 들어, 여기 [`Meta Llama 3`](https://replicate.com/meta/meta-llama-3-8b-instruct)가 있습니다.
 
 ```python
 llm = Replicate(
@@ -81,17 +81,17 @@ llm(prompt)
 "Let's break this down step by step:\n\n1. A dog is a living being, specifically a mammal.\n2. Dogs do not possess the cognitive abilities or physical characteristics necessary to operate a vehicle, such as a car.\n3. Operating a car requires complex mental and physical abilities, including:\n\t* Understanding of traffic laws and rules\n\t* Ability to read and comprehend road signs\n\t* Ability to make decisions quickly and accurately\n\t* Ability to physically manipulate the vehicle's controls (e.g., steering wheel, pedals)\n4. Dogs do not possess any of these abilities. They are unable to read or comprehend written language, let alone complex traffic laws.\n5. Dogs also lack the physical dexterity and coordination to operate a vehicle's controls. Their paws and claws are not adapted for grasping or manipulating small, precise objects like a steering wheel or pedals.\n6. Therefore, it is not possible for a dog to drive a car.\n\nAnswer: No."
 ```
 
-As another example, for this [dolly model](https://replicate.com/replicate/dolly-v2-12b), click on the API tab. The model name/version would be: `replicate/dolly-v2-12b:ef0e1aefc61f8e096ebe4db6b2bacc297daf2ef6899f0f7e001ec445893500e5`
+다른 예로, 이 [dolly model](https://replicate.com/replicate/dolly-v2-12b)의 경우 API 탭을 클릭하세요. 모델 이름/버전은 다음과 같습니다: `replicate/dolly-v2-12b:ef0e1aefc61f8e096ebe4db6b2bacc297daf2ef6899f0f7e001ec445893500e5`
 
-Only the `model` param is required, but we can add other model params when initializing.
+`model` 파라미터만 필수이지만, 초기화할 때 다른 모델 파라미터를 추가할 수 있습니다.
 
-For example, if we were running stable diffusion and wanted to change the image dimensions:
+예를 들어, stable diffusion을 실행하고 이미지 크기를 변경하려는 경우:
 
 ```
 Replicate(model="stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf", input={'image_dimensions': '512x512'})
 ```
 
-*Note that only the first output of a model will be returned.*
+*참고: 모델의 첫 번째 출력만 반환됩니다.*
 
 ```python
 llm = Replicate(
@@ -111,7 +111,7 @@ llm(prompt)
 'No, dogs lack some of the brain functions required to operate a motor vehicle. They cannot focus and react in time to accelerate or brake correctly. Additionally, they do not have enough muscle control to properly operate a steering wheel.\n\n'
 ```
 
-We can call any replicate model using this syntax. For example, we can call stable diffusion.
+이 구문을 사용하여 모든 replicate 모델을 호출할 수 있습니다. 예를 들어, stable diffusion을 호출할 수 있습니다.
 
 ```python
 text2image = Replicate(
@@ -129,7 +129,7 @@ image_output
 'https://pbxt.replicate.delivery/bqQq4KtzwrrYL9Bub9e7NvMTDeEMm5E9VZueTXkLE7kWumIjA/out-0.png'
 ```
 
-The model spits out a URL. Let's render it.
+모델이 URL을 출력합니다. 렌더링해 봅시다.
 
 ```python
 !poetry run pip install Pillow
@@ -156,7 +156,7 @@ img
 
 ## Streaming Response
 
-You can optionally stream the response as it is produced, which is helpful to show interactivity to users for time-consuming generations. See detailed docs on [Streaming](/oss/langchain/streaming) for more information.
+생성되는 동안 응답을 선택적으로 스트리밍할 수 있으며, 이는 시간이 오래 걸리는 생성에 대해 사용자에게 상호작용성을 보여주는 데 유용합니다. 자세한 내용은 [Streaming](/oss/langchain/streaming)에 대한 상세 문서를 참조하세요.
 
 ```python
 from langchain_core.callbacks import StreamingStdOutCallbackHandler
@@ -180,7 +180,7 @@ _ = llm.invoke(prompt)
 
 # Stop Sequences
 
-You can also specify stop sequences. If you have a definite stop sequence for the generation that you are going to parse with anyway, it is better (cheaper and faster!) to just cancel the generation once one or more stop sequences are reached, rather than letting the model ramble on till the specified `max_length`. Stop sequences work regardless of whether you are in streaming mode or not, and Replicate only charges you for the generation up until the stop sequence.
+stop sequence를 지정할 수도 있습니다. 파싱할 명확한 stop sequence가 있는 경우, 모델이 지정된 `max_length`까지 계속 생성하도록 하는 것보다 하나 이상의 stop sequence에 도달하면 생성을 취소하는 것이 더 좋습니다(더 저렴하고 빠릅니다!). Stop sequence는 스트리밍 모드 여부와 관계없이 작동하며, Replicate는 stop sequence까지의 생성에 대해서만 요금을 청구합니다.
 
 ```python
 import time
@@ -229,13 +229,13 @@ Stopped output runtime: 25.77039254200008 seconds
 
 ## Chaining Calls
 
-The whole point of langchain is to... chain! Here's an example of how do that.
+langchain의 핵심은... chain입니다! 다음은 이를 수행하는 방법의 예입니다.
 
 ```python
 from langchain.chains import SimpleSequentialChain
 ```
 
-First, let's define the LLM for this model as a flan-5, and text2image as a stable diffusion model.
+먼저, 이 모델의 LLM을 flan-5로 정의하고, text2image를 stable diffusion 모델로 정의합시다.
 
 ```python
 dolly_llm = Replicate(
@@ -246,7 +246,7 @@ text2image = Replicate(
 )
 ```
 
-First prompt in the chain
+chain의 첫 번째 prompt
 
 ```python
 prompt = PromptTemplate(
@@ -257,7 +257,7 @@ prompt = PromptTemplate(
 chain = LLMChain(llm=dolly_llm, prompt=prompt)
 ```
 
-Second prompt to get the logo for company description
+회사 설명에 대한 로고를 얻기 위한 두 번째 prompt
 
 ```python
 second_prompt = PromptTemplate(
@@ -267,7 +267,7 @@ second_prompt = PromptTemplate(
 chain_two = LLMChain(llm=dolly_llm, prompt=second_prompt)
 ```
 
-Third prompt, let's create the image based on the description output from prompt 2
+세 번째 prompt, prompt 2의 설명 출력을 기반으로 이미지를 생성합시다
 
 ```python
 third_prompt = PromptTemplate(
@@ -277,7 +277,7 @@ third_prompt = PromptTemplate(
 chain_three = LLMChain(llm=text2image, prompt=third_prompt)
 ```
 
-Now let's run it!
+이제 실행해 봅시다!
 
 ```python
 # Run the chain specifying only the input variable for the first chain.

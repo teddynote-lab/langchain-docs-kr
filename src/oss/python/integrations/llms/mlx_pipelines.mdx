@@ -2,13 +2,13 @@
 title: MLX Local Pipelines
 ---
 
-MLX models can be run locally through the `MLXPipeline` class.
+MLX 모델은 `MLXPipeline` 클래스를 통해 로컬에서 실행할 수 있습니다.
 
-The [MLX Community](https://huggingface.co/mlx-community) hosts over 150 models, all open source and publicly available on Hugging Face Model Hub a online platform where people can easily collaborate and build ML together.
+[MLX Community](https://huggingface.co/mlx-community)는 150개 이상의 모델을 호스팅하고 있으며, 모두 오픈 소스이고 Hugging Face Model Hub(사람들이 쉽게 협업하고 함께 ML을 구축할 수 있는 온라인 플랫폼)에서 공개적으로 사용할 수 있습니다.
 
-These can be called from LangChain either through this local pipeline wrapper or by calling their hosted inference endpoints through the MlXPipeline class. For more information on mlx, see the [examples repo](https://github.com/ml-explore/mlx-examples/tree/main/llms) notebook.
+이러한 모델들은 이 로컬 pipeline wrapper를 통해 또는 MlXPipeline 클래스를 통해 호스팅된 inference endpoint를 호출하여 LangChain에서 호출할 수 있습니다. mlx에 대한 자세한 내용은 [examples repo](https://github.com/ml-explore/mlx-examples/tree/main/llms) notebook을 참조하세요.
 
-To use, you should have the `mlx-lm` python [package installed](https://pypi.org/project/mlx-lm/), as well as [transformers](https://pypi.org/project/transformers/). You can also install `huggingface_hub`.
+사용하려면 `mlx-lm` python [package installed](https://pypi.org/project/mlx-lm/)와 [transformers](https://pypi.org/project/transformers/)가 설치되어 있어야 합니다. `huggingface_hub`도 설치할 수 있습니다.
 
 ```python
 pip install -qU  mlx-lm transformers huggingface_hub
@@ -16,7 +16,7 @@ pip install -qU  mlx-lm transformers huggingface_hub
 
 ### Model Loading
 
-Models can be loaded by specifying the model parameters using the `from_model_id` method.
+모델은 `from_model_id` 메서드를 사용하여 model parameter를 지정하여 로드할 수 있습니다.
 
 ```python
 from langchain_community.llms.mlx_pipeline import MLXPipeline
@@ -27,7 +27,7 @@ pipe = MLXPipeline.from_model_id(
 )
 ```
 
-They can also be loaded by passing in an existing `transformers` pipeline directly
+기존 `transformers` pipeline을 직접 전달하여 로드할 수도 있습니다.
 
 ```python
 from mlx_lm import load
@@ -38,8 +38,7 @@ pipe = MLXPipeline(model=model, tokenizer=tokenizer)
 
 ### Create Chain
 
-With the model loaded into memory, you can compose it with a prompt to
-form a chain.
+모델이 메모리에 로드되면 prompt와 결합하여 chain을 구성할 수 있습니다.
 
 ```python
 from langchain_core.prompts import PromptTemplate

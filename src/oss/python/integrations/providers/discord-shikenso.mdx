@@ -2,11 +2,11 @@
 title: Discord
 ---
 
-> [Discord](https://discord.com/) is an instant messaging, voice, and video communication platform widely used by communities of all types.
+> [Discord](https://discord.com/)는 모든 유형의 커뮤니티에서 널리 사용되는 인스턴트 메시징, 음성 및 비디오 통신 플랫폼입니다.
 
 ## Installation and Setup
 
-Install the `langchain-discord-shikenso` package:
+`langchain-discord-shikenso` package를 설치하세요:
 
 <CodeGroup>
 ```bash pip
@@ -18,19 +18,19 @@ uv add langchain-discord-shikenso
 ```
 </CodeGroup>
 
-You must provide a bot token via environment variable so the tools can authenticate with the Discord API:
+tool이 Discord API와 인증할 수 있도록 환경 변수를 통해 bot token을 제공해야 합니다:
 
 ```bash
 export DISCORD_BOT_TOKEN="your-discord-bot-token"
 ```
 
-If `DISCORD_BOT_TOKEN` is not set, the tools will raise a `ValueError` when instantiated.
+`DISCORD_BOT_TOKEN`이 설정되지 않은 경우, tool은 인스턴스화될 때 `ValueError`를 발생시킵니다.
 
 ---
 
 ## Tools
 
-Below is a snippet showing how you can read and send messages in Discord. For more details, see the [documentation for Discord tools](/oss/integrations/tools/discord).
+다음은 Discord에서 메시지를 읽고 보내는 방법을 보여주는 코드 스니펫입니다. 자세한 내용은 [Discord tools 문서](/oss/integrations/tools/discord)를 참조하세요.
 
 ```python
 from langchain_discord.tools.discord_read_messages import DiscordReadMessages
@@ -53,7 +53,7 @@ print(send_result)
 
 ## Toolkit
 
-`DiscordToolkit` groups multiple Discord-related tools into a single interface. For a usage example, see [the Discord toolkit docs](/oss/integrations/tools/discord).
+`DiscordToolkit`은 여러 Discord 관련 tool을 단일 인터페이스로 그룹화합니다. 사용 예제는 [Discord toolkit 문서](/oss/integrations/tools/discord)를 참조하세요.
 
 ```python
 from langchain_discord.toolkits import DiscordToolkit
@@ -69,5 +69,5 @@ send_tool = tools[1]  # DiscordSendMessage
 
 ## Future Integrations
 
-Additional integrations (e.g., document loaders, chat loaders) could be added for Discord.
-Check the [Discord Developer Docs](https://discord.com/developers/docs/intro) for more information, and watch for updates or advanced usage examples in the [langchain_discord GitHub repo](https://github.com/Shikenso-Analytics/langchain-discord).
+Discord에 대한 추가 integration(예: document loader, chat loader)이 추가될 수 있습니다.
+자세한 정보는 [Discord Developer Docs](https://discord.com/developers/docs/intro)를 확인하고, [langchain_discord GitHub repo](https://github.com/Shikenso-Analytics/langchain-discord)에서 업데이트나 고급 사용 예제를 확인하세요.

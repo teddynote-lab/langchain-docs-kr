@@ -1,83 +1,81 @@
 ---
-title: Best Practices
-description: Guidelines for effective use of Open SWE
+title: 모범 사례
+description: Open SWE의 효과적인 사용을 위한 가이드라인
 ---
 
-# Best Practices
+# 모범 사례
 
-Follow these guidelines to get the best results from Open SWE.
+Open SWE에서 최상의 결과를 얻기 위해 다음 가이드라인을 따르세요.
 
-## Prompting Tips
+## 프롬프트 작성 팁
 
-### Be Clear and Direct
+### 명확하고 직접적으로 작성하기
 
-- Include specific file paths and function names in your requests. Open SWE preforms best when its given a clear starting point.
-- Provide concrete examples of what you want to achieve. Describe the end state you want to reach so Open SWE knows what it's working towards.
+- 요청에 구체적인 파일 경로와 함수 이름을 포함하세요. Open SWE는 명확한 시작점이 주어졌을 때 가장 좋은 성능을 발휘합니다.
+- 달성하고자 하는 것에 대한 구체적인 예시를 제공하세요. Open SWE가 무엇을 향해 작업하고 있는지 알 수 있도록 도달하고자 하는 최종 상태를 설명하세요.
 
-### Create Custom Rules
+### Custom Rule 생성하기
 
-Create an `AGENTS.md` file in your repository root to provide project-specific context. This helps Open SWE understand your codebase conventions and requirements.
+프로젝트별 컨텍스트를 제공하기 위해 리포지토리 루트에 `AGENTS.md` 파일을 생성하세요. 이는 Open SWE가 코드베이스의 규칙과 요구사항을 이해하는 데 도움이 됩니다.
 
 <Tip>
-  See the [Custom Rules](/labs/swe/usage/custom-rules) page for detailed guidance on
-  setting up your `AGENTS.md` file.
+  `AGENTS.md` 파일 설정에 대한 자세한 가이드는 [Custom Rules](/labs/swe/usage/custom-rules) 페이지를 참조하세요.
 </Tip>
 
-### Keep Tasks Well-Scoped
+### 작업 범위를 적절하게 유지하기
 
-- Focus on one specific feature or fix per request
-- Break large changes into smaller, manageable tasks
-- Avoid combining multiple unrelated changes in a single request
+- 요청당 하나의 특정 기능 또는 수정에 집중하세요
+- 큰 변경사항을 더 작고 관리 가능한 작업으로 나누세요
+- 단일 요청에 여러 관련 없는 변경사항을 결합하지 마세요
 
-### Avoid Multiple Tasks
+### 여러 작업 피하기
 
-Submit separate requests for different features or fixes. This allows Open SWE to:
+서로 다른 기능이나 수정에 대해서는 별도의 요청을 제출하세요. 이를 통해 Open SWE는 다음을 수행할 수 있습니다:
 
-- Generate more focused plans
-- Provide better error handling
-- Make changes easier to review
+- 더 집중된 계획 생성
+- 더 나은 오류 처리 제공
+- 변경사항을 더 쉽게 검토 가능
 
-## Model Selection
+## Model 선택
 
-- **Claude Sonnet 4 (Default)**: The default model for planning, writing code, and reviewing changes. This model offers the best balance of performance, speed and cost.
-- **Claude Opus 4.1**: A larger, more powerful model for difficult, or open-ended tasks. Opus 4.1 is more expensive and slower, but will provide better results for complex tasks.
+- **Claude Sonnet 4 (기본값)**: 계획 수립, 코드 작성 및 변경사항 검토를 위한 기본 모델입니다. 이 모델은 성능, 속도 및 비용의 최적 균형을 제공합니다.
+- **Claude Opus 4.1**: 어렵거나 개방형 작업을 위한 더 크고 강력한 모델입니다. Opus 4.1은 더 비싸고 느리지만, 복잡한 작업에 대해 더 나은 결과를 제공합니다.
 
-### Avoid Other Models
+### 다른 Model 사용 피하기
 
-Although Open SWE allows you to select any model from Anthropic, OpenAI and Google, its prompts are tuned specifically for Anthropic models, and other providers will not preform as well.
+Open SWE는 Anthropic, OpenAI 및 Google의 모든 모델을 선택할 수 있지만, 프롬프트는 Anthropic 모델에 특별히 최적화되어 있으며 다른 제공업체는 성능이 좋지 않습니다.
 
-## Mode Selection
+## Mode 선택
 
 ### `open-swe` vs `open-swe-max`
 
-**`open-swe`**: Uses Claude Sonnet 4
+**`open-swe`**: Claude Sonnet 4 사용
 
-- Suitable for most development tasks
-- Faster execution
-- Cost-effective
+- 대부분의 개발 작업에 적합
+- 더 빠른 실행
+- 비용 효율적
 
-**`open-swe-max`**: Uses Claude Opus 4 (only for the planning and code writing agents)
+**`open-swe-max`**: Claude Opus 4 사용 (계획 수립 및 코드 작성 agent에만 해당)
 
-- For complex tasks requiring advanced reasoning
-- Higher quality output for challenging problems
-- More expensive but better for difficult tasks
+- 고급 추론이 필요한 복잡한 작업용
+- 어려운 문제에 대한 더 높은 품질의 출력
+- 더 비싸지만 어려운 작업에 더 적합
 
-### Auto vs Manual Labels
+### Auto vs Manual Label
 
-**Auto Mode (`-auto` labels)**
+**Auto Mode (`-auto` label)**
 
-It's recommended to use the auto mode for most tasks. Open SWE is very good at planning, and in most cases it does not need a manual review before execution.
+대부분의 작업에는 auto mode를 사용하는 것이 권장됩니다. Open SWE는 계획 수립에 매우 뛰어나며, 대부분의 경우 실행 전에 수동 검토가 필요하지 않습니다.
 
-If you're running Open SWE against an open-ended or very complex task, you may want to use manual mode to review the plan before execution.
+개방형이거나 매우 복잡한 작업에 대해 Open SWE를 실행하는 경우, 실행 전에 계획을 검토하기 위해 manual mode를 사용할 수 있습니다.
 
-## Label Reference
+## Label 참조
 
-- `open-swe`: Manual mode with Sonnet 4
-- `open-swe-auto`: Auto mode with Sonnet 4
-- `open-swe-max`: Manual mode with Opus 4.1
-- `open-swe-max-auto`: Auto mode with Opus 4.1
+- `open-swe`: Sonnet 4를 사용하는 Manual mode
+- `open-swe-auto`: Sonnet 4를 사용하는 Auto mode
+- `open-swe-max`: Opus 4.1을 사용하는 Manual mode
+- `open-swe-max-auto`: Opus 4.1을 사용하는 Auto mode
 
 <Note>
-  In development environments, append `-dev` to all labels (e.g.,
-  `open-swe-dev`, `open-swe-auto-dev`).
+  개발 환경에서는 모든 label에 `-dev`를 추가하세요 (예: `open-swe-dev`, `open-swe-auto-dev`).
 </Note>

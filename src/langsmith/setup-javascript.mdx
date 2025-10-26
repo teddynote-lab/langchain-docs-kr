@@ -1,16 +1,16 @@
 ---
-title: How to set up a JavaScript application
-sidebarTitle: Set up a JavaScript application
+title: JavaScript 애플리케이션 설정 방법
+sidebarTitle: JavaScript 애플리케이션 설정하기
 ---
 
 import FrameworkAgnosticPy from '/snippets/langsmith/framework-agnostic-py.mdx';
 import FrameworkAgnosticJS from '/snippets/langsmith/framework-agnostic-js.mdx';
 
-An application must be configured with a [configuration file](/langsmith/cli#configuration-file) in order to be deployed to LangSmith (or to be self-hosted). This how-to guide discusses the basic steps to set up a JavaScript application for deployment using `package.json` to specify project dependencies.
+LangSmith에 배포하거나 자체 호스팅하려면 애플리케이션이 [configuration file](/langsmith/cli#configuration-file)로 구성되어야 합니다. 이 가이드에서는 `package.json`을 사용하여 프로젝트 종속성을 지정하고 JavaScript 애플리케이션을 배포용으로 설정하는 기본 단계를 설명합니다.
 
-This walkthrough is based on [this repository](https://github.com/langchain-ai/langgraphjs-studio-starter), which you can play around with to learn more about how to set up your application for deployment.
+이 가이드는 [이 repository](https://github.com/langchain-ai/langgraphjs-studio-starter)를 기반으로 하며, 배포를 위한 애플리케이션 설정 방법에 대해 자세히 알아보려면 이 repository를 살펴보실 수 있습니다.
 
-The final repository structure will look something like this:
+최종 repository 구조는 다음과 같습니다:
 
 ```bash
 my-app/
@@ -34,13 +34,13 @@ my-app/
 :::
 </Tip>
 
-After each step, an example file directory is provided to demonstrate how code can be organized.
+각 단계 후에 코드를 구성하는 방법을 보여주는 예제 파일 디렉토리가 제공됩니다.
 
-## Specify Dependencies
+## 종속성 지정
 
-Dependencies can be specified in a `package.json`. If none of these files is created, then dependencies can be specified later in the [configuration file](#create-the-api-config).
+종속성은 `package.json`에 지정할 수 있습니다. 이러한 파일이 생성되지 않은 경우, 나중에 [configuration file](#create-the-api-config)에서 종속성을 지정할 수 있습니다.
 
-Example `package.json` file:
+예제 `package.json` 파일:
 
 ```json
 {
@@ -55,7 +55,7 @@ Example `package.json` file:
 }
 ```
 
-When deploying your app, the dependencies will be installed using the package manager of your choice, provided they adhere to the compatible version ranges listed below:
+앱을 배포할 때, 아래 나열된 호환 가능한 버전 범위를 준수하는 경우 선택한 package manager를 사용하여 종속성이 설치됩니다:
 
 ```
 "@langchain/core": "^0.3.42",
@@ -63,18 +63,18 @@ When deploying your app, the dependencies will be installed using the package ma
 "@langchain/langgraph-checkpoint": "~0.0.16",
 ```
 
-Example file directory:
+예제 파일 디렉토리:
 
 ```bash
 my-app/
 └── package.json # package dependencies
 ```
 
-## Specify Environment Variables
+## 환경 변수 지정
 
-Environment variables can optionally be specified in a file (e.g. `.env`). See the [Environment Variables reference](/langsmith/env-var) to configure additional variables for a deployment.
+환경 변수는 선택적으로 파일(예: `.env`)에 지정할 수 있습니다. 배포를 위한 추가 변수를 구성하려면 [Environment Variables reference](/langsmith/env-var)를 참조하세요.
 
-Example `.env` file:
+예제 `.env` 파일:
 
 ```
 MY_ENV_VAR_1=foo
@@ -83,7 +83,7 @@ OPENAI_API_KEY=key
 TAVILY_API_KEY=key_2
 ```
 
-Example file directory:
+예제 파일 디렉토리:
 
 ```bash
 my-app/
@@ -91,11 +91,11 @@ my-app/
 └── .env # environment variables
 ```
 
-## Define Graphs
+## Graph 정의
 
-Implement your graphs. Graphs can be defined in a single file or multiple files. Make note of the variable names of each compiled graph to be included in the application. The variable names will be used later when creating the [configuration file](/langsmith/cli#configuration-file).
+graph를 구현합니다. Graph는 단일 파일 또는 여러 파일에 정의할 수 있습니다. 애플리케이션에 포함될 각 compiled graph의 변수 이름을 기록해 두세요. 변수 이름은 나중에 [configuration file](/langsmith/cli#configuration-file)을 생성할 때 사용됩니다.
 
-Here is an example `agent.ts`:
+다음은 예제 `agent.ts`입니다:
 
 ```ts
 import type { AIMessage } from "@langchain/core/messages";
@@ -170,7 +170,7 @@ const workflow = new StateGraph(MessagesAnnotation)
 export const graph = workflow.compile();
 ```
 
-Example file directory:
+예제 파일 디렉토리:
 
 ```bash
 my-app/
@@ -185,11 +185,11 @@ my-app/
 └── langgraph.json # configuration file for LangGraph
 ```
 
-## Create the API Config
+## API Config 생성
 
-Create a [configuration file](/langsmith/cli#configuration-file) called `langgraph.json`. See the [configuration file reference](/langsmith/cli#configuration-file) for detailed explanations of each key in the JSON object of the configuration file.
+`langgraph.json`이라는 [configuration file](/langsmith/cli#configuration-file)을 생성합니다. configuration file의 JSON 객체에 있는 각 키에 대한 자세한 설명은 [configuration file reference](/langsmith/cli#configuration-file)를 참조하세요.
 
-Example `langgraph.json` file:
+예제 `langgraph.json` 파일:
 
 ```json
 {
@@ -203,13 +203,13 @@ Example `langgraph.json` file:
 }
 ```
 
-Note that the variable name of the `CompiledGraph` appears at the end of the value of each subkey in the top-level `graphs` key (i.e. `:<variable_name>`).
+`CompiledGraph`의 변수 이름이 최상위 `graphs` 키의 각 하위 키 값 끝에 나타납니다(즉, `:<variable_name>`).
 
 <Info>
-**Configuration Location**
-The configuration file must be placed in a directory that is at the same level or higher than the TypeScript files that contain compiled graphs and associated dependencies.
+**Configuration 위치**
+configuration file은 compiled graph와 관련 종속성을 포함하는 TypeScript 파일과 같은 수준이거나 더 높은 수준의 디렉토리에 배치되어야 합니다.
 </Info>
 
-## Next
+## 다음 단계
 
-After you setup your project and place it in a GitHub repository, it's time to [deploy your app](/langsmith/deployment-quickstart).
+프로젝트를 설정하고 GitHub repository에 배치한 후에는 [앱을 배포](/langsmith/deployment-quickstart)할 차례입니다.

@@ -1,32 +1,32 @@
 ---
-title: Basic authentication with email and password
-sidebarTitle: Set up basic authentication
+title: 이메일과 비밀번호를 사용한 기본 인증
+sidebarTitle: 기본 인증 설정하기
 ---
 
-LangSmith supports login via username/password with a few limitations:
+LangSmith는 몇 가지 제한 사항과 함께 사용자 이름/비밀번호를 통한 로그인을 지원합니다:
 
-* You cannot change an existing installation from basic auth mode to OAuth with PKCE (deprecated) or vice versa - installations must be either one or the other. **A basic auth installation requires a completely fresh installation including a separate PostgreSQL database/schema, unless migrating from an existing `None` type installation (see below).**
-* Users must be given their initial auto-generated password once they are invited. This password may be changed later by any Organization Admin.
-* You cannot use both basic auth and OAuth with client secret at the same time.
+* 기존 설치를 기본 인증 모드에서 PKCE를 사용한 OAuth(더 이상 사용되지 않음)로 변경하거나 그 반대로 변경할 수 없습니다 - 설치는 둘 중 하나여야 합니다. **기본 인증 설치는 별도의 PostgreSQL 데이터베이스/스키마를 포함한 완전히 새로운 설치가 필요합니다. 단, 기존 `None` 타입 설치에서 마이그레이션하는 경우는 예외입니다(아래 참조).**
+* 사용자는 초대될 때 자동 생성된 초기 비밀번호를 받아야 합니다. 이 비밀번호는 나중에 Organization Admin이 변경할 수 있습니다.
+* 기본 인증과 client secret을 사용한 OAuth를 동시에 사용할 수 없습니다.
 
-## Requirements and features
+## 요구 사항 및 기능
 
-* There is a single `Default` organization that is provisioned during initial installation, and creating additional organizations is not supported
-* Your initial password (configured below) must be least 12 characters long and have at least one lowercase, uppercase, and symbol
-* There are no strict requirements for the secret used for signing JWTs, but we recommend securely generating a string of at least 32 characters. For example: `openssl rand -base64 32`
+* 초기 설치 중에 프로비저닝되는 단일 `Default` organization이 있으며, 추가 organization 생성은 지원되지 않습니다
+* 초기 비밀번호(아래에서 구성)는 최소 12자 이상이어야 하며 소문자, 대문자, 기호가 각각 하나 이상 포함되어야 합니다
+* JWT 서명에 사용되는 secret에 대한 엄격한 요구 사항은 없지만, 최소 32자 이상의 문자열을 안전하게 생성하는 것을 권장합니다. 예: `openssl rand -base64 32`
 
-### Migrating from None auth
+### None 인증에서 마이그레이션
 
-**Only supported in versions 0.7 and above.**
+**버전 0.7 이상에서만 지원됩니다.**
 
-Migrating an installation from [None](/langsmith/authentication-methods#none) auth mode replaces the single "default" user with a user with the configured credentials and keeps all existing resources. The single pre-existing workspace ID post-migration remains `00000000-0000-0000-0000-000000000000`, but everything else about the migrated installation is standard for a basic auth installation.
+[None](/langsmith/authentication-methods#none) 인증 모드에서 설치를 마이그레이션하면 단일 "default" 사용자가 구성된 자격 증명을 가진 사용자로 대체되고 기존의 모든 리소스가 유지됩니다. 마이그레이션 후 기존의 단일 workspace ID는 `00000000-0000-0000-0000-000000000000`으로 유지되지만, 마이그레이션된 설치의 다른 모든 것은 기본 인증 설치의 표준입니다.
 
-To migrate, simply update your configuration as shown below and run `helm upgrade` (or `docker-compose up`) as usual.
+마이그레이션하려면 아래와 같이 구성을 업데이트하고 평소처럼 `helm upgrade`(또는 `docker-compose up`)를 실행하면 됩니다.
 
-### Configuration
+### 구성
 
 <Note>
-Changing the JWT secret will log out your users
+JWT secret을 변경하면 사용자가 로그아웃됩니다
 </Note>
 
 <CodeGroup>
@@ -52,12 +52,12 @@ BASIC_AUTH_JWT_SECRET=<SECRET>
 
 </CodeGroup>
 
-Additionally, in docker-compose you will need to run the bootstrap command to create the initial organization and user:
+또한 docker-compose에서는 초기 organization과 사용자를 생성하기 위해 bootstrap 명령을 실행해야 합니다:
 
 ```bash
 docker-compose exec langchain-backend python hooks/auth_bootstrap.pyc
 ```
 
-Once configured, you will see a login screen like the one below. You should be able to login with the `initialOrgAdminEmail` and `initialOrgAdminPassword` values, and your user will be auto-provisioned with role `Organization Admin`. See the [admin guide](/langsmith/administration-overview#organization-roles) for more details on organization roles.
+구성이 완료되면 아래와 같은 로그인 화면이 표시됩니다. `initialOrgAdminEmail`과 `initialOrgAdminPassword` 값으로 로그인할 수 있으며, 사용자는 `Organization Admin` 역할로 자동 프로비저닝됩니다. organization 역할에 대한 자세한 내용은 [관리자 가이드](/langsmith/administration-overview#organization-roles)를 참조하세요.
 
-![LangSmith UI with basic auth](/langsmith/images/langsmith-ui-basic-auth.png)
+![기본 인증이 적용된 LangSmith UI](/langsmith/images/langsmith-ui-basic-auth.png)

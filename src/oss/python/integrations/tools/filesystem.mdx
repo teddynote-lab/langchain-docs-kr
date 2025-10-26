@@ -2,15 +2,15 @@
 title: File System
 ---
 
-LangChain provides tools for interacting with a local file system out of the box. This notebook walks through some of them.
+LangChain은 로컬 파일 시스템과 상호작용하기 위한 도구를 기본적으로 제공합니다. 이 노트북에서는 그 중 일부를 살펴봅니다.
 
-**Note:** these tools are not recommended for use outside a sandboxed environment!
+**참고:** 이러한 도구는 샌드박스 환경 외부에서 사용하는 것을 권장하지 않습니다!
 
 ```python
 pip install -qU langchain-community
 ```
 
-First, we'll import the tools.
+먼저 도구를 import합니다.
 
 ```python
 from tempfile import TemporaryDirectory
@@ -21,12 +21,11 @@ from langchain_community.agent_toolkits import FileManagementToolkit
 working_directory = TemporaryDirectory()
 ```
 
-## The FileManagementToolkit
+## FileManagementToolkit
 
-If you want to provide all the file tooling to your agent, it's easy to do so with the toolkit. We'll pass the temporary directory in as a root directory as a workspace for the LLM.
+에이전트에 모든 파일 도구를 제공하려면 toolkit을 사용하여 쉽게 수행할 수 있습니다. LLM의 작업 공간으로 임시 디렉토리를 root 디렉토리로 전달합니다.
 
-It's recommended to always pass in a root directory, since without one, it's easy for the LLM to pollute the working directory, and without one, there isn't any validation against
-straightforward prompt injection.
+항상 root 디렉토리를 전달하는 것이 권장됩니다. root 디렉토리가 없으면 LLM이 작업 디렉토리를 오염시키기 쉽고, 간단한 프롬프트 인젝션에 대한 검증이 이루어지지 않습니다.
 
 ```python
 toolkit = FileManagementToolkit(
@@ -45,9 +44,9 @@ toolkit.get_tools()
  ListDirectoryTool(root_dir='/tmp/tmprdvsw3tg')]
 ```
 
-### Selecting File System Tools
+### File System Tools 선택하기
 
-If you only want to select certain tools, you can pass them in as arguments when initializing the toolkit, or you can individually initialize the desired tools.
+특정 도구만 선택하려면 toolkit을 초기화할 때 인수로 전달하거나, 원하는 도구를 개별적으로 초기화할 수 있습니다.
 
 ```python
 tools = FileManagementToolkit(

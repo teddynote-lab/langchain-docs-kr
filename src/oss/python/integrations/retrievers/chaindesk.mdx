@@ -2,19 +2,19 @@
 title: Chaindesk
 ---
 
->[Chaindesk platform](https://docs.chaindesk.ai/introduction) brings data from anywhere (Datsources: Text, PDF, Word, PowerPpoint, Excel, Notion, Airtable, Google Sheets, etc..) into Datastores (container of multiple Datasources).
-Then your Datastores can be connected to ChatGPT via Plugins or any other Large Langue Model (LLM) via the `Chaindesk API`.
+>[Chaindesk platform](https://docs.chaindesk.ai/introduction)은 다양한 소스(Datasources: Text, PDF, Word, PowerPoint, Excel, Notion, Airtable, Google Sheets 등)의 데이터를 Datastores(여러 Datasources의 컨테이너)로 가져옵니다.
+그런 다음 Datastores를 Plugins를 통해 ChatGPT에 연결하거나 `Chaindesk API`를 통해 다른 Large Language Model (LLM)에 연결할 수 있습니다.
 
-This notebook shows how to use [Chaindesk's](https://www.chaindesk.ai/) retriever.
+이 노트북은 [Chaindesk](https://www.chaindesk.ai/)의 retriever를 사용하는 방법을 보여줍니다.
 
-First, you will need to sign up for Chaindesk, create a datastore, add some data and get your datastore api endpoint url. You need the [API Key](https://docs.chaindesk.ai/api-reference/authentication).
+먼저 Chaindesk에 가입하고, datastore를 생성하고, 일부 데이터를 추가한 다음 datastore api endpoint url을 가져와야 합니다. [API Key](https://docs.chaindesk.ai/api-reference/authentication)가 필요합니다.
 
 ```python
 ```
 
 ## Query
 
-Now that our index is set up, we can set up a retriever and start querying it.
+이제 index가 설정되었으므로 retriever를 설정하고 쿼리를 시작할 수 있습니다.
 
 ```python
 from langchain_community.retrievers import ChaindeskRetriever

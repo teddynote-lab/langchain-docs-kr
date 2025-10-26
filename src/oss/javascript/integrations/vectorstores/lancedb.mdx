@@ -2,19 +2,19 @@
 title: LanceDB
 ---
 
-LanceDB is an embedded vector database for AI applications. It is open source and distributed with an Apache-2.0 license.
+LanceDB는 AI 애플리케이션을 위한 임베디드 vector database입니다. Apache-2.0 라이선스로 배포되는 오픈 소스입니다.
 
-LanceDB datasets are persisted to disk and can be shared between Node.js and Python.
+LanceDB dataset은 디스크에 영구 저장되며 Node.js와 Python 간에 공유할 수 있습니다.
 
 ## Setup
 
-Install the [LanceDB](https://github.com/lancedb/lancedb) [Node.js bindings](https://www.npmjs.com/package/@lancedb/lancedb):
+[LanceDB](https://github.com/lancedb/lancedb) [Node.js bindings](https://www.npmjs.com/package/@lancedb/lancedb)를 설치하세요:
 
 ```bash npm
 npm install -S @lancedb/lancedb
 ```
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
@@ -23,7 +23,7 @@ npm install @langchain/openai @langchain/community @langchain/core
 
 ## Usage
 
-### Create a new index from texts
+### 텍스트로부터 새로운 index 생성하기
 
 ```typescript
 import { LanceDB } from "@langchain/community/vectorstores/lancedb";
@@ -58,7 +58,7 @@ export const run_with_existing_table = async () => {
 };
 ```
 
-### Create a new index from a loader
+### loader로부터 새로운 index 생성하기
 
 ```typescript
 import { LanceDB } from "@langchain/community/vectorstores/lancedb";
@@ -103,7 +103,7 @@ export const run_with_existing_table = async () => {
 };
 ```
 
-### Open an existing dataset
+### 기존 dataset 열기
 
 ```typescript
 import { LanceDB } from "@langchain/community/vectorstores/lancedb";
@@ -143,5 +143,5 @@ async function createdTestDb(): Promise<string> {
 
 ## Related
 
-- Vector store [conceptual guide](/oss/integrations/vectorstores)
-- Vector store [how-to guides](/oss/integrations/vectorstores)
+- Vector store [개념 가이드](/oss/integrations/vectorstores)
+- Vector store [how-to 가이드](/oss/integrations/vectorstores)

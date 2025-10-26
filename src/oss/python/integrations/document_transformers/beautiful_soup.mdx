@@ -2,24 +2,24 @@
 title: Beautiful Soup
 ---
 
->[Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/) is a Python package for parsing
-> HTML and XML documents (including having malformed markup, i.e. non-closed tags, so named after tag soup).
-> It creates a parse tree for parsed pages that can be used to extract data from HTML,[3] which
-> is useful for web scraping.
+>[Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/)은 HTML 및 XML 문서를 파싱하기 위한 Python 패키지입니다
+> (잘못된 마크업, 즉 닫히지 않은 태그를 포함하며, 태그 수프(tag soup)의 이름을 따서 명명되었습니다).
+> 파싱된 페이지에 대한 파스 트리를 생성하여 HTML에서 데이터를 추출하는 데 사용할 수 있으며,[3] 이는
+> 웹 스크래핑에 유용합니다.
 
-`Beautiful Soup` offers fine-grained control over HTML content, enabling specific tag extraction, removal, and content cleaning.
+`Beautiful Soup`은 HTML 콘텐츠에 대한 세밀한 제어를 제공하여 특정 태그 추출, 제거 및 콘텐츠 정리를 가능하게 합니다.
 
-It's suited for cases where you want to extract specific information and clean up the HTML content according to your needs.
+특정 정보를 추출하고 필요에 따라 HTML 콘텐츠를 정리하려는 경우에 적합합니다.
 
-For example, we can scrape text content within `<p>, <li>, <div>, and <a>` tags from the HTML content:
+예를 들어, HTML 콘텐츠에서 `<p>, <li>, <div>, <a>` 태그 내의 텍스트 콘텐츠를 스크래핑할 수 있습니다:
 
-* `<p>`: The paragraph tag. It defines a paragraph in HTML and is used to group together related sentences and/or phrases.
+* `<p>`: paragraph 태그입니다. HTML에서 단락을 정의하며 관련된 문장 및/또는 구문을 그룹화하는 데 사용됩니다.
 
-* `<li>`: The list item tag. It is used within ordered (`<ol>`) and unordered (`<ul>`) lists to define individual items within the list.
+* `<li>`: list item 태그입니다. 순서가 있는(`<ol>`) 목록과 순서가 없는(`<ul>`) 목록 내에서 개별 항목을 정의하는 데 사용됩니다.
 
-* `<div>`: The division tag. It is a block-level element used to group other inline or block-level elements.
+* `<div>`: division 태그입니다. 다른 inline 또는 block-level 요소를 그룹화하는 데 사용되는 block-level 요소입니다.
 
-* `<a>`: The anchor tag. It is used to define hyperlinks.
+* `<a>`: anchor 태그입니다. 하이퍼링크를 정의하는 데 사용됩니다.
 
 ```python
 from langchain_community.document_loaders import AsyncChromiumLoader

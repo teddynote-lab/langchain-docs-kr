@@ -1,25 +1,25 @@
 ---
-title: How to integrate LangGraph into your React application
-sidebarTitle: Integrate LangGraph into your React application
+title: React 애플리케이션에 LangGraph를 통합하는 방법
+sidebarTitle: React 애플리케이션에 LangGraph 통합하기
 ---
 <Info>
-**Prerequisites**
+**사전 요구사항**
 * [LangSmith](/langsmith/home)
 * [LangGraph Server](/langsmith/langgraph-server)
 </Info>
 
-The [`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) React hook provides a seamless way to integrate LangGraph into your React applications. It handles all the complexities of streaming, state management, and branching logic, letting you focus on building great chat experiences.
+[`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) React hook은 LangGraph를 React 애플리케이션에 통합하는 원활한 방법을 제공합니다. 스트리밍, 상태 관리 및 분기 로직의 모든 복잡성을 처리하여 훌륭한 채팅 경험을 구축하는 데 집중할 수 있도록 합니다.
 
-Key features:
+주요 기능:
 
-* Messages streaming: Handle a stream of message chunks to form a complete message
-* Automatic state management for messages, interrupts, loading states, and errors
-* Conversation branching: Create alternate conversation paths from any point in the chat history
-* UI-agnostic design: bring your own components and styling
+* Messages 스트리밍: 메시지 청크 스트림을 처리하여 완전한 메시지 형성
+* 메시지, 인터럽트, 로딩 상태 및 오류에 대한 자동 상태 관리
+* 대화 분기: 채팅 기록의 모든 지점에서 대체 대화 경로 생성
+* UI 독립적 설계: 자체 컴포넌트 및 스타일링 사용 가능
 
-Let's explore how to use [`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) in your React application.
+React 애플리케이션에서 [`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html)을 사용하는 방법을 살펴보겠습니다.
 
-The [`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) provides a solid foundation for creating bespoke chat experiences. For pre-built chat components and interfaces, we also recommend checking out [CopilotKit](https://docs.copilotkit.ai/coagents/quickstart/langgraph) and [assistant-ui](https://www.assistant-ui.com/docs/runtimes/langgraph).
+[`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html)은 맞춤형 채팅 경험을 만들기 위한 견고한 기반을 제공합니다. 사전 구축된 채팅 컴포넌트 및 인터페이스를 원하신다면 [CopilotKit](https://docs.copilotkit.ai/coagents/quickstart/langgraph) 및 [assistant-ui](https://www.assistant-ui.com/docs/runtimes/langgraph)도 확인해보시기 바랍니다.
 
 ## Installation
 
@@ -76,25 +76,25 @@ export default function App() {
 }
 ```
 
-## Customizing Your UI
+## UI 커스터마이징
 
-The [`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) hook takes care of all the complex state management behind the scenes, providing you with simple interfaces to build your UI. Here's what you get out of the box:
+[`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) hook은 복잡한 상태 관리를 백그라운드에서 처리하여 UI를 구축할 수 있는 간단한 인터페이스를 제공합니다. 기본적으로 제공되는 기능은 다음과 같습니다:
 
-* Thread state management
-* Loading and error states
+* Thread 상태 관리
+* 로딩 및 오류 상태
 * Interrupts
-* Message handling and updates
-* Branching support
+* 메시지 처리 및 업데이트
+* 분기 지원
 
-Here are some examples on how to use these features effectively:
+다음은 이러한 기능을 효과적으로 사용하는 몇 가지 예시입니다:
 
-### Loading States
+### 로딩 상태
 
-The `isLoading` property tells you when a stream is active, enabling you to:
+`isLoading` 속성은 스트림이 활성화되어 있는지 알려주며, 다음과 같은 작업을 수행할 수 있습니다:
 
-* Show a loading indicator
-* Disable input fields during processing
-* Display a cancel button
+* 로딩 인디케이터 표시
+* 처리 중 입력 필드 비활성화
+* 취소 버튼 표시
 
 ```tsx
 export default function App() {
@@ -116,9 +116,9 @@ export default function App() {
 }
 ```
 
-### Resume a stream after page refresh
+### 페이지 새로고침 후 스트림 재개
 
-The [`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) hook can automatically resume an ongoing run upon mounting by setting `reconnectOnMount: true`. This is useful for continuing a stream after a page refresh, ensuring no messages and events generated during the downtime are lost.
+[`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) hook은 `reconnectOnMount: true`를 설정하여 마운트 시 진행 중인 run을 자동으로 재개할 수 있습니다. 이는 페이지 새로고침 후 스트림을 계속하는 데 유용하며, 다운타임 동안 생성된 메시지와 이벤트가 손실되지 않도록 보장합니다.
 
 ```tsx
 const thread = useStream<{ messages: Message[] }>({
@@ -128,7 +128,7 @@ const thread = useStream<{ messages: Message[] }>({
 });
 ```
 
-By default the ID of the created run is stored in `window.sessionStorage`, which can be swapped by passing a custom storage in `reconnectOnMount` instead. The storage is used to persist the in-flight run ID for a thread (under `lg:stream:${threadId}` key).
+기본적으로 생성된 run의 ID는 `window.sessionStorage`에 저장되며, `reconnectOnMount`에 커스텀 storage를 전달하여 교체할 수 있습니다. storage는 thread에 대한 진행 중인 run ID를 유지하는 데 사용됩니다(`lg:stream:${threadId}` 키 아래).
 
 ```tsx
 const thread = useStream<{ messages: Message[] }>({
@@ -138,7 +138,7 @@ const thread = useStream<{ messages: Message[] }>({
 });
 ```
 
-You can also manually manage the resuming process by using the run callbacks to persist the run metadata and the `joinStream` function to resume the stream. Make sure to pass `streamResumable: true` when creating the run; otherwise some events might be lost.
+run callbacks를 사용하여 run 메타데이터를 유지하고 `joinStream` 함수를 사용하여 스트림을 재개함으로써 수동으로 재개 프로세스를 관리할 수도 있습니다. run을 생성할 때 `streamResumable: true`를 전달해야 합니다. 그렇지 않으면 일부 이벤트가 손실될 수 있습니다.
 
 ```tsx
 import type { Message } from "@langchain/langgraph-sdk";
@@ -225,9 +225,9 @@ function useSearchParam(key: string) {
 }
 ```
 
-### Thread Management
+### Thread 관리
 
-Keep track of conversations with built-in thread management. You can access the current thread ID and get notified when new threads are created:
+내장된 thread 관리로 대화를 추적할 수 있습니다. 현재 thread ID에 액세스하고 새 thread가 생성될 때 알림을 받을 수 있습니다:
 
 ```tsx
 const [threadId, setThreadId] = useState<string | null>(null);
@@ -241,13 +241,13 @@ const thread = useStream<{ messages: Message[] }>({
 });
 ```
 
-We recommend storing the `threadId` in your URL's query parameters to let users resume conversations after page refreshes.
+사용자가 페이지 새로고침 후 대화를 재개할 수 있도록 URL의 query parameter에 `threadId`를 저장하는 것을 권장합니다.
 
-### Messages Handling
+### 메시지 처리
 
-The [`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) hook will keep track of the message chunks received from the server and concatenate them together to form a complete message. The completed message chunks can be retrieved via the `messages` property.
+[`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) hook은 서버로부터 받은 메시지 청크를 추적하고 이를 연결하여 완전한 메시지를 형성합니다. 완성된 메시지 청크는 `messages` 속성을 통해 검색할 수 있습니다.
 
-By default, the `messagesKey` is set to `messages`, where it will append the new messages chunks to `values["messages"]`. If you store messages in a different key, you can change the value of `messagesKey`.
+기본적으로 `messagesKey`는 `messages`로 설정되어 있으며, 새 메시지 청크를 `values["messages"]`에 추가합니다. 메시지를 다른 키에 저장하는 경우 `messagesKey`의 값을 변경할 수 있습니다.
 
 ```tsx
 import type { Message } from "@langchain/langgraph-sdk";
@@ -270,16 +270,16 @@ export default function HomePage() {
 }
 ```
 
-Under the hood, the [`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) hook will use the `streamMode: "messages-tuple"` to receive a stream of messages (i.e. individual LLM tokens) from any LangChain chat model invocations inside your graph nodes. Learn more about messages streaming in the [streaming](/langsmith/streaming#messages) guide.
+내부적으로 [`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) hook은 `streamMode: "messages-tuple"`을 사용하여 그래프 노드 내의 모든 LangChain chat model 호출로부터 메시지 스트림(즉, 개별 LLM 토큰)을 수신합니다. 메시지 스트리밍에 대한 자세한 내용은 [streaming](/langsmith/streaming#messages) 가이드를 참조하세요.
 
 ### Interrupts
 
-The [`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) hook exposes the `interrupt` property, which will be filled with the last interrupt from the thread. You can use interrupts to:
+[`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) hook은 `interrupt` 속성을 노출하며, 이는 thread의 마지막 interrupt로 채워집니다. interrupt를 사용하여 다음을 수행할 수 있습니다:
 
-* Render a confirmation UI before executing a node
-* Wait for human input, allowing agent to ask the user with clarifying questions
+* 노드를 실행하기 전에 확인 UI 렌더링
+* 사용자 입력 대기, 에이전트가 사용자에게 명확한 질문을 할 수 있도록 허용
 
-Learn more about interrupts in the [How to handle interrupts](/oss/langgraph/interrupts#pause-using-interrupt) guide.
+interrupt에 대한 자세한 내용은 [How to handle interrupts](/oss/langgraph/interrupts#pause-using-interrupt) 가이드를 참조하세요.
 
 ```tsx
 const thread = useStream<{ messages: Message[] }, { InterruptType: string }>({
@@ -306,14 +306,14 @@ if (thread.interrupt) {
 }
 ```
 
-### Branching
+### 분기
 
-For each message, you can use `getMessagesMetadata()` to get the first checkpoint from which the message has been first seen. You can then create a new run from the checkpoint preceding the first seen checkpoint to create a new branch in a thread.
+각 메시지에 대해 `getMessagesMetadata()`를 사용하여 메시지가 처음 표시된 첫 번째 checkpoint를 가져올 수 있습니다. 그런 다음 첫 번째 표시된 checkpoint 이전의 checkpoint에서 새 run을 생성하여 thread에 새 분기를 만들 수 있습니다.
 
-A branch can be created in following ways:
+분기는 다음과 같은 방법으로 생성할 수 있습니다:
 
-1. Edit a previous user message.
-2. Request a regeneration of a previous assistant message.
+1. 이전 사용자 메시지 편집.
+2. 이전 assistant 메시지의 재생성 요청.
 
 ```tsx
 "use client";
@@ -477,11 +477,11 @@ export default function App() {
 }
 ```
 
-For advanced use cases you can use the `experimental_branchTree` property to get the tree representation of the thread, which can be used to render branching controls for non-message based graphs.
+고급 사용 사례의 경우 `experimental_branchTree` 속성을 사용하여 thread의 트리 표현을 가져올 수 있으며, 이는 메시지 기반이 아닌 그래프에 대한 분기 컨트롤을 렌더링하는 데 사용할 수 있습니다.
 
 ### Optimistic Updates
 
-You can optimistically update the client state before performing a network request to the agent, allowing you to provide immediate feedback to the user, such as showing the user message immediately before the agent has seen the request.
+에이전트에 네트워크 요청을 수행하기 전에 클라이언트 상태를 낙관적으로 업데이트하여 에이전트가 요청을 보기 전에 사용자 메시지를 즉시 표시하는 등 사용자에게 즉각적인 피드백을 제공할 수 있습니다.
 
 ```tsx
 const stream = useStream({
@@ -506,9 +506,9 @@ const handleSubmit = (text: string) => {
 };
 ```
 
-### Cached Thread Display
+### 캐시된 Thread 표시
 
-Use the `initialValues` option to display cached thread data immediately while the history is being loaded from the server. This improves user experience by showing cached data instantly when navigating to existing threads.
+`initialValues` 옵션을 사용하여 서버에서 기록을 로드하는 동안 캐시된 thread 데이터를 즉시 표시할 수 있습니다. 이는 기존 thread로 이동할 때 캐시된 데이터를 즉시 표시하여 사용자 경험을 개선합니다.
 
 ```tsx
 import { useStream } from "@langchain/langgraph-sdk/react";
@@ -533,9 +533,9 @@ const CachedThreadExample = ({ threadId, cachedThreadData }) => {
 };
 ```
 
-### Optimistic Thread Creation
+### Optimistic Thread 생성
 
-Use the `threadId` option in `submit` function to enable optimistic UI patterns where you need to know the thread ID before the thread is actually created.
+`submit` 함수의 `threadId` 옵션을 사용하여 thread가 실제로 생성되기 전에 thread ID를 알아야 하는 optimistic UI 패턴을 활성화할 수 있습니다.
 
 ```tsx
 import { useState } from "react";
@@ -576,7 +576,7 @@ const OptimisticThreadExample = () => {
 
 ### TypeScript
 
-The [`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) hook is friendly for apps written in TypeScript and you can specify types for the state to get better type safety and IDE support.
+[`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) hook은 TypeScript로 작성된 앱에 친화적이며 상태에 대한 타입을 지정하여 더 나은 타입 안전성과 IDE 지원을 받을 수 있습니다.
 
 ```tsx
 // Define your types
@@ -593,12 +593,12 @@ const thread = useStream<State>({
 });
 ```
 
-You can also optionally specify types for different scenarios, such as:
+다음과 같은 다양한 시나리오에 대한 타입을 선택적으로 지정할 수도 있습니다:
 
-* `ConfigurableType`: Type for the `config.configurable` property (default: `Record<string, unknown>`)
-* `InterruptType`: Type for the interrupt value - i.e. contents of `interrupt(...)` function (default: `unknown`)
-* `CustomEventType`: Type for the custom events (default: `unknown`)
-* `UpdateType`: Type for the submit function (default: `Partial<State>`)
+* `ConfigurableType`: `config.configurable` 속성의 타입 (기본값: `Record<string, unknown>`)
+* `InterruptType`: interrupt 값의 타입 - 즉, `interrupt(...)` 함수의 내용 (기본값: `unknown`)
+* `CustomEventType`: 커스텀 이벤트의 타입 (기본값: `unknown`)
+* `UpdateType`: submit 함수의 타입 (기본값: `Partial<State>`)
 
 ```tsx
 const thread = useStream<
@@ -624,7 +624,7 @@ const thread = useStream<
 });
 ```
 
-If you're using LangGraph.js, you can also reuse your graph's annotation types. However, make sure to only import the types of the annotation schema in order to avoid importing the entire LangGraph.js runtime (i.e. via `import type { ... }` directive).
+LangGraph.js를 사용하는 경우 그래프의 annotation 타입을 재사용할 수도 있습니다. 그러나 전체 LangGraph.js 런타임을 가져오지 않도록 annotation schema의 타입만 가져와야 합니다(즉, `import type { ... }` 지시문을 통해).
 
 ```tsx
 import {
@@ -649,16 +649,16 @@ const thread = useStream<
 });
 ```
 
-## Event Handling
+## Event 처리
 
-The [`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) hook provides several callback options to help you respond to different events:
+[`useStream()`](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html) hook은 다양한 이벤트에 응답하는 데 도움이 되는 여러 callback 옵션을 제공합니다:
 
-* `onError`: Called when an error occurs.
-* `onFinish`: Called when the stream is finished.
-* `onUpdateEvent`: Called when an update event is received.
-* `onCustomEvent`: Called when a custom event is received. See the [streaming](/oss/langgraph/streaming#stream-custom-data) guide to learn how to stream custom events.
-* `onMetadataEvent`: Called when a metadata event is received, which contains the Run ID and Thread ID.
+* `onError`: 오류가 발생할 때 호출됩니다.
+* `onFinish`: 스트림이 완료될 때 호출됩니다.
+* `onUpdateEvent`: update 이벤트가 수신될 때 호출됩니다.
+* `onCustomEvent`: 커스텀 이벤트가 수신될 때 호출됩니다. 커스텀 이벤트를 스트리밍하는 방법은 [streaming](/oss/langgraph/streaming#stream-custom-data) 가이드를 참조하세요.
+* `onMetadataEvent`: Run ID와 Thread ID를 포함하는 metadata 이벤트가 수신될 때 호출됩니다.
 
-## Learn More
+## 더 알아보기
 
 * [JS/TS SDK Reference](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html)

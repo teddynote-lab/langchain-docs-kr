@@ -2,19 +2,19 @@
 title: SQLServer
 ---
 
->Azure SQL provides a dedicated [Vector data type](https:\learn.microsoft.com\sql\t-sql\data-types\vector-data-type?view=azuresqldb-current&viewFallbackFrom=sql-server-ver16&tabs=csharp-sample) that simplifies the creation, storage, and querying of vector embeddings directly within a relational database. This eliminates the need for separate vector databases and related integrations, increasing the security of your solutions while reducing the overall complexity.
+>Azure SQL은 관계형 데이터베이스 내에서 직접 벡터 임베딩의 생성, 저장 및 쿼리를 간소화하는 전용 [Vector data type](https:\learn.microsoft.com\sql\t-sql\data-types\vector-data-type?view=azuresqldb-current&viewFallbackFrom=sql-server-ver16&tabs=csharp-sample)을 제공합니다. 이를 통해 별도의 벡터 데이터베이스와 관련 통합이 필요 없어지며, 솔루션의 보안을 강화하면서 전체적인 복잡성을 줄일 수 있습니다.
 
-Azure SQL is a robust service that combines scalability, security, and high availability, providing all the benefits of a modern database solution. It leverages a sophisticated query optimizer and enterprise features to perform vector similarity searches alongside traditional SQL queries, enhancing data analysis and decision-making.
+Azure SQL은 확장성, 보안성 및 고가용성을 결합한 강력한 서비스로, 현대적인 데이터베이스 솔루션의 모든 이점을 제공합니다. 정교한 쿼리 최적화 도구와 엔터프라이즈 기능을 활용하여 기존 SQL 쿼리와 함께 벡터 유사도 검색을 수행하여 데이터 분석 및 의사 결정을 향상시킵니다.
 
-Read more on using [Intelligent applications with Azure SQL Database](https://learn.microsoft.com/azure/azure-sql/database/ai-artificial-intelligence-intelligent-applications?view=azuresql)
+[Azure SQL Database를 사용한 지능형 애플리케이션](https://learn.microsoft.com/azure/azure-sql/database/ai-artificial-intelligence-intelligent-applications?view=azuresql)에 대해 자세히 알아보세요
 
-This notebook shows you how to leverage this integrated SQL [vector database](https://devblogs.microsoft.com/azure-sql/exciting-announcement-public-preview-of-native-vector-support-in-azure-sql-database/) to store documents and perform vector search queries using Cosine (cosine distance), L2 (Euclidean distance), and IP (inner product) to locate documents close to the query vectors
+이 노트북은 통합된 SQL [vector database](https://devblogs.microsoft.com/azure-sql/exciting-announcement-public-preview-of-native-vector-support-in-azure-sql-database/)를 활용하여 문서를 저장하고 Cosine(코사인 거리), L2(유클리드 거리), IP(내적)를 사용하여 쿼리 벡터에 가까운 문서를 찾는 벡터 검색 쿼리를 수행하는 방법을 보여줍니다
 
 ## Setup
 
-Install the `langchain-sqlserver` python package.
+`langchain-sqlserver` python 패키지를 설치합니다.
 
-The code lives in an integration package called:[langchain-sqlserver](https:\github.com\langchain-ai\langchain-azure\tree\main\libs\sqlserver).
+코드는 다음 통합 패키지에 있습니다:[langchain-sqlserver](https:\github.com\langchain-ai\langchain-azure\tree\main\libs\sqlserver).
 
 ```python
 !pip install langchain-sqlserver==0.1.1
@@ -22,8 +22,8 @@ The code lives in an integration package called:[langchain-sqlserver](https:\git
 
 ## Credentials
 
-There are no credentials needed to run this notebook, just make sure you downloaded the `langchain-sqlserver` package
-If you want to get best in-class automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+이 노트북을 실행하는 데 필요한 자격 증명은 없으며, `langchain-sqlserver` 패키지를 다운로드했는지 확인하기만 하면 됩니다
+모델 호출에 대한 최고 수준의 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -36,9 +36,9 @@ os.environ["LANGSMITH_TRACING"] = "true"
 from langchain_sqlserver import SQLServer_VectorStore
 ```
 
-Find your Azure SQL DB connection string in the Azure portal under your database settings
+Azure 포털의 데이터베이스 설정에서 Azure SQL DB 연결 문자열을 찾으세요
 
-For more info: [Connect to Azure SQL DB - Python](https:\learn.microsoft.com\en-us\azure\azure-sql\database\connect-query-python?view=azuresql)
+자세한 정보: [Connect to Azure SQL DB - Python](https:\learn.microsoft.com\en-us\azure\azure-sql\database\connect-query-python?view=azuresql)
 
 ```python
 import os
@@ -62,9 +62,9 @@ _CONNECTION_STRING = (
 # "mssql+pyodbc://<servername>/<dbname>?driver=ODBC+Driver+18+for+SQL+Server&Trusted_connection=no" -> Uses EntraID connection
 ```
 
-In this example we use Azure OpenAI to generate embeddings , however you can use different embeddings provided in LangChain.
+이 예제에서는 Azure OpenAI를 사용하여 임베딩을 생성하지만, LangChain에서 제공하는 다른 임베딩을 사용할 수도 있습니다.
 
-You can deploy a version of Azure OpenAI instance on Azure Portal following this [guide](https:\learn.microsoft.com\en-us\azure\ai-services\openai\how-to\create-resource?pivots=web-portal). Once you have your instance running, make sure you have the name of your instance and key. You can find the key in the Azure Portal, under the "Keys and Endpoint" section of your instance.
+이 [가이드](https:\learn.microsoft.com\en-us\azure\ai-services\openai\how-to\create-resource?pivots=web-portal)에 따라 Azure Portal에서 Azure OpenAI 인스턴스 버전을 배포할 수 있습니다. 인스턴스가 실행되면 인스턴스 이름과 키가 있는지 확인하세요. 키는 Azure Portal의 인스턴스 "Keys and Endpoint" 섹션에서 찾을 수 있습니다.
 
 ```python
 !pip install langchain-openai
@@ -159,9 +159,9 @@ vector_store.add_texts(texts=query, metadatas=query_metadata)
 
 ## Query vector store
 
-Once your vector store has been created and the relevant documents have been added you will most likely wish to query it during the running of your chain or agent.
+벡터 저장소가 생성되고 관련 문서가 추가되면 체인이나 에이전트를 실행하는 동안 쿼리하고 싶을 것입니다.
 
-Performing a simple similarity search can be done as follows:
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
 
 ```python
 # Perform a similarity search between the embedding of the query and the embeddings of the documents
@@ -175,7 +175,7 @@ print(simsearch_result)
 
 ### Filtering Support
 
-The vectorstore supports a set of filters that can be applied against the metadata fields of the documents.This feature enables developers and data analysts to refine their queries, ensuring that the search results are accurately aligned with their needs. By applying filters based on specific metadata attributes, users can limit the scope of their searches, concentrating only on the most relevant data subsets.
+벡터 저장소는 문서의 메타데이터 필드에 적용할 수 있는 필터 세트를 지원합니다. 이 기능을 통해 개발자와 데이터 분석가는 쿼리를 세밀하게 조정하여 검색 결과가 필요에 정확하게 부합하도록 할 수 있습니다. 특정 메타데이터 속성을 기반으로 필터를 적용함으로써 사용자는 검색 범위를 제한하여 가장 관련성 높은 데이터 하위 집합에만 집중할 수 있습니다.
 
 ```python
 # hybrid search -> filter for cases where id not equal to 1.
@@ -191,7 +191,7 @@ print(hybrid_simsearch_result)
 
 ### Similarity Search with Score
 
-If you want to execute a similarity search and receive the corresponding scores you can run:
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
 
 ```python
 simsearch_with_score_result = vector_store.similarity_search_with_score(
@@ -204,7 +204,7 @@ print(simsearch_with_score_result)
 [(Document(metadata={'id': 3, 'summary': 'Taste is neutral, quantity is DECEITFUL!'}, page_content='The taste of these white cheddar flat breads is like a regular cracker - which is not bad, except that I bought them because I wanted a cheese taste.<br /><br />What was a HUGE disappointment? How misleading the packaging of the box is. The photo on the box (I bought these in store) makes it look like it is full of long flatbreads (expanding the length and width of the box). Wrong! The plastic tray that holds the crackers is about 2 smaller all around - leaving you with about 15 or so small flatbreads.<br /><br />What is also bad about this is that the company states they use biodegradable and eco-friendly packaging. FAIL! They used a HUGE box for a ridiculously small amount of crackers. Not ecofriendly at all.<br /><br />Would I buy these again? No - I feel ripped off. The other crackers (like Sesame Tarragon) give you a little<br />more bang for your buck and have more flavor.'), 0.651870006770711), (Document(metadata={'id': 8, 'summary': 'Nasty No flavor'}, page_content='The candy is just red , No flavor . Just  plan and chewy .  I would never buy them again'), 0.6908952973052638), (Document(metadata={'id': 4, 'summary': 'stale product'}, page_content='Arrived in 6 days and were so stale i could not eat any of the 6 bags!!'), 0.7360955776468822), (Document(metadata={'id': 1, 'summary': 'Good Quality Dog Food'}, page_content='I have bought several of the Vitality canned dog food products and have found them all to be of good quality. The product looks more like a stew than a processed meat and it smells better. My Labrador is finicky and she appreciates this product better than  most.'), 0.7408823529514486), (Document(metadata={'id': 9, 'summary': 'Nearly killed the cats'}, page_content="Too much of a good thing? We worked this kibble in over time, slowly shifting the percentage of Felidae to national junk-food brand until the bowl was all natural. By this time, the cats couldn't keep it in or down. What a mess. We've moved on."), 0.782995248991772), (Document(metadata={'id': 7, 'summary': 'This stuff is great'}, page_content='I have used this product in smoothies for my son and he loves it. Additionally, I use this oil in the shower as a skin conditioner and it has made my skin look great. Some of the stretch marks on my belly has disappeared quickly. Highly recommend!!!'), 0.7912681479906212), (Document(metadata={'id': 2, 'summary': 'yum falafel'}, page_content='We had trouble finding this locally - delivery was fast, no more hunting up and down the flour aisle at our local grocery stores.'), 0.809213468778896), (Document(metadata={'id': 10, 'summary': "The reviews don't lie"}, page_content='Been taking Coconut Oil for YEARS.  This is the best on the retail market.  I wish it was in glass, but this is the one.'), 0.8281482301097155), (Document(metadata={'id': 5, 'summary': 'Great for the kids!'}, page_content="If you are looking for a less messy version of licorice for the children, then be sure to try these!  They're soft, easy to chew, and they don't get your hands all sticky and gross in the car, in the summer, at the beach, etc. We love all the flavos and sometimes mix these in with the chocolate to have a very nice snack! Great item, great price too, highly recommend!"), 0.8283754326400574), (Document(metadata={'id': 6, 'summary': 'Price cannot be correct'}, page_content='Hey, the description says 360 grams - that is roughly 13 ounces at under $4.00 per can. No way - that is the approximate price for a 100 gram can.'), 0.8323967822635847), (Document(metadata={'id': 11, 'summary': 'Great value and convenient ramen'}, page_content="Got these on sale for roughly 25 cents per cup, which is half the price of my local grocery stores, plus they rarely stock the spicy flavors. These things are a GREAT snack for my office where time is constantly crunched and sometimes you can't escape for a real meal. This is one of my favorite flavors of Instant Lunch and will be back to buy every time it goes on sale."), 0.8387189489406939)]
 ```
 
-For a full list of the different searches you can execute on a Azure SQL vector store, please refer to the [API reference](https://python.langchain.com/api_reference/sqlserver/index.html).
+Azure SQL 벡터 저장소에서 실행할 수 있는 다양한 검색의 전체 목록은 [API reference](https://python.langchain.com/api_reference/sqlserver/index.html)를 참조하세요.
 
 ### Similarity Search when you already have embeddings you want to search on
 
@@ -254,8 +254,8 @@ vector_store.drop()
 
 ## Load a Document from Azure Blob Storage
 
-Below is example of loading a file from Azure Blob Storage container into the SQL Vector store after splitting the document into chunks.
-[Azure Blog Storage](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction) is Microsoft's object storage solution for the cloud. Blob Storage is optimized for storing massive amounts of unstructured data.
+다음은 Azure Blob Storage 컨테이너에서 파일을 로드하여 문서를 청크로 분할한 후 SQL Vector 저장소에 로드하는 예제입니다.
+[Azure Blog Storage](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction)는 클라우드를 위한 Microsoft의 객체 스토리지 솔루션입니다. Blob Storage는 대량의 비구조화 데이터를 저장하는 데 최적화되어 있습니다.
 
 ```python
 pip install azure-storage-blob
@@ -363,15 +363,15 @@ But at that moment, Hagrid leapt from the sofa and drew a battered pink umbrella
 
 ## Usage for retrieval-augmented generation
 
-#### Use Case 1: Q&A System based on the Story Book
+#### Use Case 1: 스토리 북 기반 Q&A 시스템
 
-The Q&A function allows users to ask specific questions about the story, characters, and events, and get concise, context-rich answers. This not only enhances their understanding of the books but also makes them feel like they're part of the magical universe.
+Q&A 기능을 통해 사용자는 스토리, 캐릭터 및 이벤트에 대한 구체적인 질문을 하고 간결하고 맥락이 풍부한 답변을 얻을 수 있습니다. 이는 책에 대한 이해를 향상시킬 뿐만 아니라 마법의 세계의 일부가 된 것처럼 느끼게 합니다.
 
 ## Query by turning into retriever
 
-The LangChain Vector store simplifies building sophisticated Q&A systems by enabling efficient similarity searches to find the top 10 relevant documents based on the user's query. The **retriever** is created from the **vector\_store,** and the question-answer chain is built using the **create\_stuff\_documents\_chain** function. A prompt template is crafted using the **ChatPromptTemplate** class, ensuring structured and context-rich responses. Often in Q&A applications it's important to show users the sources that were used to generate the answer. LangChain's built-in **create\_retrieval\_chain** will propagate retrieved source documents to the output under the "context" key:
+LangChain Vector 저장소는 사용자의 쿼리를 기반으로 상위 10개의 관련 문서를 찾기 위한 효율적인 유사도 검색을 가능하게 하여 정교한 Q&A 시스템 구축을 간소화합니다. **retriever**는 **vector\_store**에서 생성되며, **create\_stuff\_documents\_chain** 함수를 사용하여 질문-답변 체인이 구축됩니다. **ChatPromptTemplate** 클래스를 사용하여 프롬프트 템플릿을 작성하여 구조화되고 맥락이 풍부한 응답을 보장합니다. Q&A 애플리케이션에서는 답변을 생성하는 데 사용된 출처를 사용자에게 보여주는 것이 중요한 경우가 많습니다. LangChain의 내장 **create\_retrieval\_chain**은 검색된 소스 문서를 "context" 키 아래의 출력으로 전파합니다:
 
-Read more about LangChain RAG tutorials & the terminologies mentioned above [here](/oss/langchain/rag)
+LangChain RAG 튜토리얼 및 위에서 언급한 용어에 대해 [여기](/oss/langchain/rag)에서 자세히 알아보세요
 
 ```python
 from typing import List, Tuple
@@ -491,7 +491,7 @@ Sources:
 
 ## API reference
 
-For detailed documentation of SQLServer Vectorstore features and configurations head to the API reference: [https://python.langchain.com/api\_reference/sqlserver/index.html](https:\python.langchain.com\api_reference\sqlserver\index.html)
+SQLServer Vectorstore 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [https://python.langchain.com/api\_reference/sqlserver/index.html](https:\python.langchain.com\api_reference\sqlserver\index.html)
 
 ## Related
 

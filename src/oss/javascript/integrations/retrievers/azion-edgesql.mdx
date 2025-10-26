@@ -1,41 +1,42 @@
+```markdown
 ---
 title: AzionRetriever
 ---
 
-## Overview
+## 개요
 
-This will help you getting started with the [AzionRetriever](/oss/langchain/retrieval). For detailed documentation of all AzionRetriever features and configurations head to the [API reference](https://api.js.langchain.com/classes/_langchain_community.retrievers_azion_edgesql.AzionRetriever.html).
+이 문서는 [AzionRetriever](/oss/langchain/retrieval) 시작하기를 도와드립니다. 모든 AzionRetriever 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/_langchain_community.retrievers_azion_edgesql.AzionRetriever.html)를 참조하세요.
 
-### Integration details
+### Integration 세부 정보
 
 | Retriever | Self-host | Cloud offering | Package | [Py support] |
 | :--- | :---: | :---: | :---: | :---: |
 [AzionRetriever](https://api.js.langchain.com/classes/_langchain_community.retrievers_azion_edgesql.AzionRetriever.html) | ❌ | ❌ | @langchain/community | ❌ |
 
-## Setup
+## 설정
 
-To use the AzionRetriever, you need to set the AZION_TOKEN environment variable.
+AzionRetriever를 사용하려면 AZION_TOKEN 환경 변수를 설정해야 합니다.
 
 ```typescript
 process.env.AZION_TOKEN = "your-api-key"
 ```
 
-If you are using OpenAI embeddings for this guide, you'll need to set your OpenAI key as well:
+이 가이드에서 OpenAI embeddings를 사용하는 경우 OpenAI key도 설정해야 합니다:
 
 ```typescript
 process.env.OPENAI_API_KEY = "YOUR_API_KEY";
 ```
 
-If you want to get automated tracing from individual queries, you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+개별 쿼리에서 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_API_KEY = "<YOUR API KEY HERE>";
 // process.env.LANGSMITH_TRACING = "true";
 ```
 
-### Installation
+### 설치
 
-This retriever lives in the `@langchain/community/retrievers/azion_edgesql` package:
+이 retriever는 `@langchain/community/retrievers/azion_edgesql` package에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -49,9 +50,9 @@ pnpm add azion @langchain/openai @langchain/community
 ```
 </CodeGroup>
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our retriever:
+이제 retriever를 인스턴스화할 수 있습니다:
 
 ```typescript
 import { AzionRetriever } from "@langchain/community/retrievers/azion_edgesql";
@@ -81,7 +82,7 @@ const retriever = new AzionRetriever(embeddingModel,
 }) // number of results to return from the vector index
 ```
 
-## Usage
+## 사용법
 
 ```typescript
 const query = "Australia"
@@ -111,4 +112,5 @@ await retriever.invoke(query);
 
 ## API reference
 
-For detailed documentation of all AzionRetriever features and configurations head to the [API reference](https://api.js.langchain.com/classes/_langchain_community.retrievers_azion_edgesql.AzionRetriever.html).
+모든 AzionRetriever 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/_langchain_community.retrievers_azion_edgesql.AzionRetriever.html)를 참조하세요.
+```

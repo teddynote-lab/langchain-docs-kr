@@ -1,12 +1,13 @@
+```markdown
 ---
 title: JSONFormer
 ---
 
-[JSONFormer](https://github.com/1rgs/jsonformer) is a library that wraps local Hugging Face pipeline models for structured decoding of a subset of the JSON Schema.
+[JSONFormer](https://github.com/1rgs/jsonformer)는 JSON Schema의 하위 집합에 대한 구조화된 디코딩을 위해 로컬 Hugging Face pipeline 모델을 래핑하는 라이브러리입니다.
 
-It works by filling in the structure tokens and then sampling the content tokens from the model.
+구조 토큰을 채운 다음 모델에서 콘텐츠 토큰을 샘플링하는 방식으로 작동합니다.
 
-**Warning - this module is still experimental**
+**경고 - 이 모듈은 아직 실험적입니다**
 
 ```python
 pip install -qU  jsonformer > /dev/null
@@ -14,7 +15,7 @@ pip install -qU  jsonformer > /dev/null
 
 ### Hugging Face Baseline
 
-First, let's establish a qualitative baseline by checking the output of the model without structured decoding.
+먼저, 구조화된 디코딩 없이 모델의 출력을 확인하여 정성적 기준선을 설정해 보겠습니다.
 
 ```python
 import logging
@@ -104,11 +105,11 @@ Setting `pad_token_id` to `eos_token_id`:50256 for open-end generation.
  'What's the difference between an iterator and an iterable?'
 ```
 
-***That's not so impressive, is it? It didn't follow the JSON format at all! Let's try with the structured decoder.***
+***그다지 인상적이지 않죠? JSON 형식을 전혀 따르지 않았습니다! 이제 구조화된 디코더를 사용해 보겠습니다.***
 
 ## JSONFormer LLM Wrapper
 
-Let's try that again, now providing a the Action input's JSON Schema to the model.
+이제 Action input의 JSON Schema를 모델에 제공하여 다시 시도해 보겠습니다.
 
 ```python
 decoder_schema = {
@@ -139,8 +140,9 @@ print(results)
 {"action": "ask_star_coder", "action_input": {"query": "What's the difference between an iterator and an iter", "temperature": 0.0, "max_new_tokens": 50.0}}
 ```
 
-**Voila! Free of parsing errors.**
+**짜잔! 파싱 오류가 없습니다.**
 
 ```python
 
+```
 ```

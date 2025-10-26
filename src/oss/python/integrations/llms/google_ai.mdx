@@ -4,16 +4,16 @@ title: Google AI
 
 
 <Warning>
-**You are currently on a page documenting the use of Google models as text completion models. Many popular Google models are [chat completion models](/oss/langchain/models).**
+**현재 Google 모델을 text completion 모델로 사용하는 방법을 설명하는 페이지를 보고 계십니다. 많은 인기 있는 Google 모델은 [chat completion 모델](/oss/langchain/models)입니다.**
 
-You may be looking for [this page instead](/oss/integrations/chat/google_generative_ai/).
+[이 페이지](/oss/integrations/chat/google_generative_ai/)를 찾고 계실 수 있습니다.
 </Warning>
 
-A guide on using [Google Generative AI](https://developers.generativeai.google/) models with LangChain. Note: It's separate from Google Cloud Vertex AI [integration](/oss/integrations/llms/google_vertex_ai_palm).
+LangChain과 함께 [Google Generative AI](https://developers.generativeai.google/) 모델을 사용하는 가이드입니다. 참고: 이는 Google Cloud Vertex AI [통합](/oss/integrations/llms/google_vertex_ai_palm)과는 별개입니다.
 
-## Setting up
+## 설정하기
 
-To use Google Generative AI you must install the `langchain-google-genai` Python package and generate an API key. [Read more details](https://developers.generativeai.google/).
+Google Generative AI를 사용하려면 `langchain-google-genai` Python 패키지를 설치하고 API key를 생성해야 합니다. [자세한 내용 읽기](https://developers.generativeai.google/).
 
 ```python
 pip install -qU  langchain-google-genai
@@ -92,7 +92,7 @@ print(
 * **Package Management:** While Python has a vast ecosystem of libraries and packages, managing dependencies and package versions can be challenging. The Python Package Index (PyPI) is the official repository for Python packages, but it can be difficult to ensure compatibility and avoid conflicts between different versions of packages.
 ```
 
-## Using in a chain
+## chain에서 사용하기
 
 ```python
 from langchain_core.prompts import PromptTemplate
@@ -114,7 +114,7 @@ print(chain.invoke({"question": question}))
 4
 ```
 
-## Streaming calls
+## Streaming 호출
 
 ```python
 import sys
@@ -153,7 +153,7 @@ A frozen world, with magic all around.
 
 ### Safety Settings
 
-Gemini models have default safety settings that can be overridden. If you are receiving lots of "Safety Warnings" from your models, you can try tweaking the `safety_settings` attribute of the model. For example, to turn off safety blocking for dangerous content, you can construct your LLM as follows:
+Gemini 모델에는 재정의할 수 있는 기본 안전 설정이 있습니다. 모델에서 많은 "Safety Warnings"를 받고 있다면, 모델의 `safety_settings` 속성을 조정해 볼 수 있습니다. 예를 들어, 위험한 콘텐츠에 대한 안전 차단을 끄려면 다음과 같이 LLM을 구성할 수 있습니다:
 
 ```python
 from langchain_google_genai import GoogleGenerativeAI, HarmBlockThreshold, HarmCategory
@@ -167,4 +167,4 @@ llm = GoogleGenerativeAI(
 )
 ```
 
-For an enumeration of the categories and thresholds available, see Google's [safety setting types](https://ai.google.dev/api/python/google/generativeai/types/SafetySettingDict).
+사용 가능한 카테고리와 임계값의 열거형은 Google의 [safety setting types](https://ai.google.dev/api/python/google/generativeai/types/SafetySettingDict)를 참조하세요.

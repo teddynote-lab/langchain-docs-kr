@@ -2,18 +2,18 @@
 title: Baidu Qianfan
 ---
 
-The `BaiduQianfanEmbeddings` class uses the Baidu Qianfan API to generate embeddings for a given text.
+`BaiduQianfanEmbeddings` 클래스는 Baidu Qianfan API를 사용하여 주어진 텍스트에 대한 embedding을 생성합니다.
 
 ## Setup
 
-An API key is required to use this embedding model. You can get one by registering at https://cloud.baidu.com/doc/WENXINWORKSHOP/s/alj562vvu.
+이 embedding model을 사용하려면 API key가 필요합니다. https://cloud.baidu.com/doc/WENXINWORKSHOP/s/alj562vvu 에서 등록하여 API key를 받을 수 있습니다.
 
-Please set the acquired API key as an environment variable named BAIDU_API_KEY, and set your secret key as an environment variable named BAIDU_SECRET_KEY.
+획득한 API key를 BAIDU_API_KEY라는 이름의 환경 변수로 설정하고, secret key를 BAIDU_SECRET_KEY라는 이름의 환경 변수로 설정하세요.
 
-Then, you'll need to install the [`@langchain/baidu-qianfan`](https://www.npmjs.com/package/@langchain/baidu-qianfan) package:
+그런 다음 [`@langchain/baidu-qianfan`](https://www.npmjs.com/package/@langchain/baidu-qianfan) package를 설치해야 합니다:
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain package 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
@@ -34,5 +34,5 @@ console.log({ res });
 
 ## Related
 
-- Embedding model [conceptual guide](/oss/integrations/text_embedding)
-- Embedding model [how-to guides](/oss/integrations/text_embedding)
+- Embedding model [개념 가이드](/oss/integrations/text_embedding)
+- Embedding model [사용 방법 가이드](/oss/integrations/text_embedding)

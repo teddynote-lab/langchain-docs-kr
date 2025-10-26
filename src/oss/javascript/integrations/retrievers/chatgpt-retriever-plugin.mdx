@@ -1,16 +1,17 @@
+```mdx
 ---
 title: ChatGPT Plugin Retriever
 ---
 
 <Warning>
-This module has been deprecated and is no longer supported. The documentation below will not work in versions 0.2.0 or later.
+이 모듈은 더 이상 사용되지 않으며 지원이 중단되었습니다. 아래 문서는 버전 0.2.0 이상에서 작동하지 않습니다.
 </Warning>
 
-This example shows how to use the ChatGPT Retriever Plugin within LangChain.
+이 예제는 LangChain 내에서 ChatGPT Retriever Plugin을 사용하는 방법을 보여줍니다.
 
-To set up the ChatGPT Retriever Plugin, please follow instructions [here](https://github.com/openai/chatgpt-retrieval-plugin).
+ChatGPT Retriever Plugin을 설정하려면 [여기](https://github.com/openai/chatgpt-retrieval-plugin)의 지침을 따르세요.
 
-## Usage
+## 사용법
 
 ```typescript
 import { ChatGPTPluginRetriever } from "@langchain/classic/retrievers/remote";
@@ -27,6 +28,7 @@ const docs = await retriever.invoke("hello world");
 console.log(docs);
 ```
 
-## Related
+## 관련 문서
 
-- [Retrieval guide](/oss/langchain/retrieval)
+- [Retrieval 가이드](/oss/langchain/retrieval)
+```

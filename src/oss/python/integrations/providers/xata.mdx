@@ -2,19 +2,18 @@
 title: Xata
 ---
 
-> [Xata](https://xata.io) is a serverless data platform, based on `PostgreSQL`.
-> It provides a Python SDK for interacting with your database, and a UI
-> for managing your data.
-> `Xata` has a native vector type, which can be added to any table, and
-> supports similarity search. LangChain inserts vectors directly to `Xata`,
-> and queries it for the nearest neighbors of a given vector, so that you can
-> use all the LangChain Embeddings integrations with `Xata`.
+> [Xata](https://xata.io)는 `PostgreSQL` 기반의 serverless 데이터 플랫폼입니다.
+> 데이터베이스와 상호작용하기 위한 Python SDK와 데이터 관리를 위한 UI를 제공합니다.
+> `Xata`는 네이티브 vector 타입을 가지고 있으며, 이는 모든 테이블에 추가할 수 있고
+> 유사도 검색을 지원합니다. LangChain은 vector를 `Xata`에 직접 삽입하고,
+> 주어진 vector의 최근접 이웃을 쿼리하므로, 모든 LangChain Embeddings 통합을
+> `Xata`와 함께 사용할 수 있습니다.
 
 
 ## Installation and Setup
 
 
-We need to install `xata` python package.
+`xata` python package를 설치해야 합니다.
 
 <CodeGroup>
 ```bash pip
@@ -28,7 +27,7 @@ uv add "xata==1.0.0a7"
 
 ## Vector Store
 
-See a [usage example](/oss/integrations/vectorstores/xata).
+[사용 예제](/oss/integrations/vectorstores/xata)를 참조하세요.
 
 ```python
 from langchain_community.vectorstores import XataVectorStore

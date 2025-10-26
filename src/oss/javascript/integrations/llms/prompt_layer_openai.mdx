@@ -1,15 +1,16 @@
+```mdx
 ---
 title: PromptLayer OpenAI
 ---
 
 <Warning>
-This module has been deprecated and is no longer supported. The documentation below will not work in versions 0.2.0 or later.
+이 모듈은 더 이상 사용되지 않으며 지원이 중단되었습니다. 아래 문서는 버전 0.2.0 이상에서 작동하지 않습니다.
 </Warning>
 
-LangChain integrates with PromptLayer for logging and debugging prompts and responses. To add support for PromptLayer:
+LangChain은 prompt와 response를 로깅하고 디버깅하기 위해 PromptLayer와 통합됩니다. PromptLayer 지원을 추가하려면:
 
-1. Create a PromptLayer account here: [https://promptlayer.com](https://www.promptlayer.com/).
-2. Create an API token and pass it either as `promptLayerApiKey` argument in the `PromptLayerOpenAI` constructor or in the `PROMPTLAYER_API_KEY` environment variable.
+1. 여기에서 PromptLayer 계정을 생성하세요: [https://promptlayer.com](https://www.promptlayer.com/).
+2. API token을 생성하고 `PromptLayerOpenAI` constructor의 `promptLayerApiKey` 인자로 전달하거나 `PROMPTLAYER_API_KEY` 환경 변수에 설정하세요.
 
 ```typescript
 import { PromptLayerOpenAI } from "@langchain/classic/llms/openai";
@@ -26,7 +27,7 @@ const res = await model.invoke(
 
 # Azure PromptLayerOpenAI
 
-LangChain also integrates with PromptLayer for Azure-hosted OpenAI instances:
+LangChain은 Azure에서 호스팅되는 OpenAI 인스턴스에 대해서도 PromptLayer와 통합됩니다:
 
 ```typescript
 import { PromptLayerOpenAI } from "@langchain/classic/llms/openai";
@@ -49,11 +50,12 @@ const res = await model.invoke(
 );
 ```
 
-The request and the response will be logged in the [PromptLayer dashboard](https://promptlayer.com/home).
+request와 response는 [PromptLayer dashboard](https://promptlayer.com/home)에 로깅됩니다.
 
-> **_Note:_** In streaming mode PromptLayer will not log the response.
+> **_참고:_** streaming 모드에서는 PromptLayer가 response를 로깅하지 않습니다.
 
-## Related
+## 관련 문서
 
 
-- [Models guide](/oss/langchain/models)
+- [Models 가이드](/oss/langchain/models)
+```

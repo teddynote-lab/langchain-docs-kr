@@ -1,15 +1,15 @@
 ---
-title: Delete organizations
-sidebarTitle: Delete organizations
+title: 조직 삭제
+sidebarTitle: 조직 삭제
 ---
 
-The LangSmith UI does not currently support the deletion of an individual organization from a self-hosted instance of LangSmith. This, however, can be accomplished by directly removing all traces from all materialized views in ClickHouse (except the runs_history views) and the runs and feedbacks tables and then removing the Organization from the Postgres tenants table.
+LangSmith UI는 현재 self-hosted LangSmith 인스턴스에서 개별 조직 삭제를 지원하지 않습니다. 그러나 ClickHouse의 모든 materialized view(runs_history view 제외)와 runs 및 feedbacks 테이블에서 모든 trace를 직접 제거한 다음 Postgres tenants 테이블에서 Organization을 제거하면 이를 수행할 수 있습니다.
 
-This command using the Organization ID as an argument.
+이 명령은 Organization ID를 인수로 사용합니다.
 
 ### Prerequisites
 
-Ensure you have the following tools/items ready.
+다음 도구/항목을 준비했는지 확인하세요.
 
 1. kubectl
 
@@ -19,55 +19,55 @@ Ensure you have the following tools/items ready.
 
    * [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
 
-3. PostgreSQL database connection:
+3. PostgreSQL database 연결:
 
    * Host
    * Port
    * Username
-     * If using the bundled version, this is `postgres`
+     * bundled 버전을 사용하는 경우 `postgres`입니다
    * Password
-     * If using the bundled version, this is `postgres`
+     * bundled 버전을 사용하는 경우 `postgres`입니다
    * Database name
-     * If using the bundled version, this is `postgres`
+     * bundled 버전을 사용하는 경우 `postgres`입니다
 
-4. Clickhouse database credentials
+4. Clickhouse database 자격 증명
 
    * Host
    * Port
    * Username
-     * If using the bundled version, this is `default`
+     * bundled 버전을 사용하는 경우 `default`입니다
    * Password
-     * If using the bundled version, this is `password`
+     * bundled 버전을 사용하는 경우 `password`입니다
    * Database name
-     * If using the bundled version, this is `default`
+     * bundled 버전을 사용하는 경우 `default`입니다
 
-5. Connectivity to the PostgreSQL database from the machine you will be running the migration script on.
+5. migration script를 실행할 머신에서 PostgreSQL database로의 연결
 
-   * If you are using the bundled version, you may need to port forward the postgresql service to your local machine.
-   * Run `kubectl port-forward svc/langsmith-postgres 5432:5432` to port forward the postgresql service to your local machine.
+   * bundled 버전을 사용하는 경우 postgresql service를 로컬 머신으로 port forward해야 할 수 있습니다.
+   * `kubectl port-forward svc/langsmith-postgres 5432:5432`를 실행하여 postgresql service를 로컬 머신으로 port forward하세요.
 
-6. Connectivity to the Clickhouse database from the machine you will be running the migration script on.
+6. migration script를 실행할 머신에서 Clickhouse database로의 연결
 
-   * If you are using the bundled version, you may need to port forward the clickhouse service to your local machine.
-     * Run `kubectl port-forward svc/langsmith-clickhouse 8123:8123` to port forward the clickhouse service to your local machine.
-   * If you are using Clickhouse Cloud you will want to specify the --ssl flag and use port `8443`
+   * bundled 버전을 사용하는 경우 clickhouse service를 로컬 머신으로 port forward해야 할 수 있습니다.
+     * `kubectl port-forward svc/langsmith-clickhouse 8123:8123`을 실행하여 clickhouse service를 로컬 머신으로 port forward하세요.
+   * Clickhouse Cloud를 사용하는 경우 --ssl flag를 지정하고 port `8443`을 사용해야 합니다
 
-7. The script to delete an organization
+7. 조직을 삭제하는 script
 
-   * You can download the script from [here](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/scripts/delete_organization_sh)
+   * [여기](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/scripts/delete_organization_sh)에서 script를 다운로드할 수 있습니다
 
-### Running the deletion script for a single organization
+### 단일 조직에 대한 삭제 script 실행
 
-Run the following command to run the organization removal script:
+다음 명령을 실행하여 조직 제거 script를 실행하세요:
 
 ```bash
 sh delete_organization.sh <postgres_url> <clickhouse_url> --organization_id <organization_id>
 ```
 
-For example, if you are using the bundled version with port-forwarding, the command would look like:
+예를 들어, port-forwarding과 함께 bundled 버전을 사용하는 경우 명령은 다음과 같습니다:
 
 ```bash
 sh delete_organization.sh "postgres://postgres:postgres@localhost:5432/postgres" "clickhouse://default:password@localhost:8123/default" --organization_id 4ec70ec7-0808-416a-b836-7100aeec934b
 ```
 
-If you visit the LangSmith UI, you should now see organization is no longer present.
+LangSmith UI를 방문하면 이제 조직이 더 이상 존재하지 않는 것을 확인할 수 있습니다.

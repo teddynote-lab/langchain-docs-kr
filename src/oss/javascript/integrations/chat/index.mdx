@@ -1,19 +1,19 @@
 ---
-title: Chat models
+title: Chat model
 ---
 
-[Chat models](/oss/langchain/models) are language models that use a sequence of [messages](/oss/langchain/messages) as inputs and return messages as outputs <Tooltip tip="Models that do not include the prefix 'Chat' in their name or include 'LLM' as a suffix in their name typically refer to older models that do not follow the chat model interface and instead use an interface that takes a string as input and returns a string as output.">(as opposed to plaintext)</Tooltip>.
+[Chat model](/oss/langchain/models)은 [message](/oss/langchain/messages) 시퀀스를 입력으로 사용하고 message를 출력으로 반환하는 language model입니다 <Tooltip tip="이름에 'Chat' 접두사가 포함되지 않거나 'LLM'이 접미사로 포함된 모델은 일반적으로 chat model 인터페이스를 따르지 않고 대신 문자열을 입력으로 받아 문자열을 출력으로 반환하는 인터페이스를 사용하는 이전 모델을 의미합니다.">(일반 텍스트와 대조적으로)</Tooltip>.
 
-## Install and use
+## 설치 및 사용
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+[LangChain 패키지 설치에 대한 일반 지침은 이 섹션을 참조하세요](/oss/langchain/install).
 </Tip>
 
 <AccordionGroup>
 <Accordion title="Groq">
 
-Install:
+설치:
 
 <CodeGroup>
 ```bash npm
@@ -27,13 +27,13 @@ pnpm add @langchain/groq
 ```
 </CodeGroup>
 
-Add environment variables:
+환경 변수 추가:
 
 ```bash
 GROQ_API_KEY=your-api-key
 ```
 
-Instantiate the model:
+모델 인스턴스화:
 
 ```typescript
 import { ChatGroq } from "@langchain/groq";
@@ -51,7 +51,7 @@ await model.invoke("Hello, world!")
 
 <Accordion title="OpenAI">
 
-Install:
+설치:
 
 <CodeGroup>
 ```bash npm
@@ -65,13 +65,13 @@ pnpm add @langchain/openai
 ```
 </CodeGroup>
 
-Add environment variables:
+환경 변수 추가:
 
 ```bash
 OPENAI_API_KEY=your-api-key
 ```
 
-Instantiate the model:
+모델 인스턴스화:
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -85,7 +85,7 @@ await model.invoke("Hello, world!")
 
 <Accordion title="Anthropic">
 
-Install:
+설치:
 
 <CodeGroup>
 ```bash npm
@@ -99,13 +99,13 @@ pnpm add @langchain/anthropic
 ```
 </CodeGroup>
 
-Add environment variables:
+환경 변수 추가:
 
 ```bash
 ANTHROPIC_API_KEY=your-api-key
 ```
 
-Instantiate the model:
+모델 인스턴스화:
 
 ```typescript
 import { ChatAnthropic } from "@langchain/anthropic";
@@ -122,7 +122,7 @@ await model.invoke("Hello, world!")
 
 <Accordion title="Google Gemini">
 
-Install:
+설치:
 
 <CodeGroup>
 ```bash npm
@@ -137,13 +137,13 @@ pnpm add @langchain/google-genai
 ```
 </CodeGroup>
 
-Add environment variables:
+환경 변수 추가:
 
 ```bash
 GOOGLE_API_KEY=your-api-key
 ```
 
-Instantiate the model:
+모델 인스턴스화:
 
 ```typescript
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
@@ -161,7 +161,7 @@ await model.invoke("Hello, world!")
 
 <Accordion title="FireworksAI">
 
-Install:
+설치:
 
 <CodeGroup>
 ```bash npm
@@ -177,13 +177,13 @@ pnpm add @langchain/community
 ```
 </CodeGroup>
 
-Add environment variables:
+환경 변수 추가:
 
 ```bash
 FIREWORKS_API_KEY=your-api-key
 ```
 
-Instantiate the model:
+모델 인스턴스화:
 
 ```typescript
 import { ChatFireworks } from "@langchain/community/chat_models/fireworks";
@@ -200,7 +200,7 @@ await model.invoke("Hello, world!")
 
 <Accordion title="MistralAI">
 
-Install:
+설치:
 
 <CodeGroup>
 ```bash npm
@@ -216,13 +216,13 @@ pnpm add @langchain/mistralai
 ```
 </CodeGroup>
 
-Add environment variables:
+환경 변수 추가:
 
 ```bash
 MISTRAL_API_KEY=your-api-key
 ```
 
-Instantiate the model:
+모델 인스턴스화:
 
 ```typescript
 import { ChatMistralAI } from "@langchain/mistralai";
@@ -240,7 +240,7 @@ await model.invoke("Hello, world!")
 
 <Accordion title="VertexAI">
 
-Install:
+설치:
 
 <CodeGroup>
 ```bash npm
@@ -256,13 +256,13 @@ pnpm add @langchain/google-vertexai
 ```
 </CodeGroup>
 
-Add environment variables:
+환경 변수 추가:
 
 ```bash
 GOOGLE_APPLICATION_CREDENTIALS=credentials.json
 ```
 
-Instantiate the model:
+모델 인스턴스화:
 
 ```typescript
 import { ChatVertexAI } from "@langchain/google-vertexai";
@@ -279,11 +279,11 @@ await model.invoke("Hello, world!")
 </Accordion>
 </AccordionGroup>
 
-## Featured providers
+## 주요 제공업체
 
 | Model                                                                    | Stream | JSON mode | [Tool Calling](/oss/langchain/tools/) | [`withStructuredOutput()`](/oss/langchain/structured-output#the-.withstructuredoutput-method) | [Multimodal](/oss/langchain/messages#multimodal) |
 | :----------------------------------------------------------------------- | :----: | :-------: | :----------------------------------------: | :------------------------------------------------------------------------------------------: | :-------------------------------------------: |
-| [BedrockChat](/oss/integrations/chat/bedrock/)                          |   ✅   |    ❌     |        🟡 (Bedrock Anthropic only)         |                                 🟡 (Bedrock Anthropic only)                                  |          🟡 (Bedrock Anthropic only)          |
+| [BedrockChat](/oss/integrations/chat/bedrock/)                          |   ✅   |    ❌     |        🟡 (Bedrock Anthropic만 해당)         |                                 🟡 (Bedrock Anthropic만 해당)                                  |          🟡 (Bedrock Anthropic만 해당)          |
 | [ChatBedrockConverse](/oss/integrations/chat/bedrock_converse/)         |   ✅   |    ❌     |                     ✅                     |                                              ✅                                              |                      ✅                       |
 | [ChatAnthropic](/oss/integrations/chat/anthropic/)                      |   ✅   |    ❌     |                     ✅                     |                                              ✅                                              |                      ✅                       |
 | [ChatCloudflareWorkersAI](/oss/integrations/chat/cloudflare_workersai/) |   ✅   |    ❌     |                     ❌                     |                                              ❌                                              |                      ❌                       |
@@ -298,7 +298,7 @@ await model.invoke("Hello, world!")
 | [ChatTogetherAI](/oss/integrations/chat/togetherai/)                    |   ✅   |    ✅     |                     ✅                     |                                              ✅                                              |                      ✅                       |
 | [ChatXAI](/oss/integrations/chat/xai/)                                  |   ✅   |    ✅     |                     ✅                     |                                              ✅                                              |                      ❌                       |
 
-## All chat models
+## 모든 chat model
 
 <Columns cols={3}>
   <Card
@@ -306,241 +306,241 @@ await model.invoke("Hello, world!")
     icon="link"
     href="/oss/integrations/chat/alibaba_tongyi"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Anthropic"
     icon="link"
     href="/oss/integrations/chat/anthropic"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Arcjet Redact"
     icon="link"
     href="/oss/integrations/chat/arcjet"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Azure OpenAI"
     icon="link"
     href="/oss/integrations/chat/azure"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Baidu Qianfan"
     icon="link"
     href="/oss/integrations/chat/baidu_qianfan"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Amazon Bedrock"
     icon="link"
     href="/oss/integrations/chat/bedrock"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Amazon Bedrock Converse"
     icon="link"
     href="/oss/integrations/chat/bedrock_converse"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Cerebras"
     icon="link"
     href="/oss/integrations/chat/cerebras"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Cloudflare Workers AI"
     icon="link"
     href="/oss/integrations/chat/cloudflare_workersai"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Cohere"
     icon="link"
     href="/oss/integrations/chat/cohere"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Deep Infra"
     icon="link"
     href="/oss/integrations/chat/deep_infra"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="DeepSeek"
     icon="link"
     href="/oss/integrations/chat/deepseek"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Fake LLM"
     icon="link"
     href="/oss/integrations/chat/fake"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Fireworks"
     icon="link"
     href="/oss/integrations/chat/fireworks"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Friendli"
     icon="link"
     href="/oss/integrations/chat/friendli"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Google GenAI"
     icon="link"
     href="/oss/integrations/chat/google_generative_ai"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Google Vertex AI"
     icon="link"
     href="/oss/integrations/chat/google_vertex_ai"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Groq"
     icon="link"
     href="/oss/integrations/chat/groq"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="IBM watsonx.ai"
     icon="link"
     href="/oss/integrations/chat/ibm"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Llama CPP"
     icon="link"
     href="/oss/integrations/chat/llama_cpp"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Minimax"
     icon="link"
     href="/oss/integrations/chat/minimax"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="MistralAI"
     icon="link"
     href="/oss/integrations/chat/mistral"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Moonshot"
     icon="link"
     href="/oss/integrations/chat/moonshot"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Novita AI"
     icon="link"
     href="/oss/integrations/chat/novita"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Ollama"
     icon="link"
     href="/oss/integrations/chat/ollama"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="OpenAI"
     icon="link"
     href="/oss/integrations/chat/openai"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Perplexity"
     icon="link"
     href="/oss/integrations/chat/perplexity"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="PremAI"
     icon="link"
     href="/oss/integrations/chat/premai"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Tencent Hunyuan"
     icon="link"
     href="/oss/integrations/chat/tencent_hunyuan"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Together"
     icon="link"
     href="/oss/integrations/chat/togetherai"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="WebLLM"
     icon="link"
     href="/oss/integrations/chat/web_llm"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="xAI"
     icon="link"
     href="/oss/integrations/chat/xai"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="YandexGPT"
     icon="link"
     href="/oss/integrations/chat/yandex"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="ZhipuAI"
     icon="link"
     href="/oss/integrations/chat/zhipuai"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
 </Columns>
 
 <Info>
-    If you'd like to contribute an integration, see [Contributing integrations](/oss/contributing#add-a-new-integration).
+    통합을 기여하고 싶으시다면 [통합 기여하기](/oss/contributing#add-a-new-integration)를 참조하세요.
 </Info>

@@ -2,24 +2,24 @@
 title: Zep Cloud
 ---
 
-> Recall, understand, and extract data from chat histories. Power personalized AI experiences.
+> 채팅 기록에서 회상하고, 이해하고, 데이터를 추출하세요. 개인화된 AI 경험을 제공하세요.
 
-> [Zep](https://www.getzep.com) is a long-term memory service for AI Assistant apps.
-> With Zep, you can provide AI assistants with the ability to recall past conversations, no matter how distant,
-> while also reducing hallucinations, latency, and cost.
+> [Zep](https://www.getzep.com)은 AI Assistant 앱을 위한 장기 메모리 서비스입니다.
+> Zep을 사용하면 AI assistant에게 아무리 오래된 대화라도 과거 대화를 회상할 수 있는 능력을 제공하는 동시에
+> hallucination, latency 및 비용을 줄일 수 있습니다.
 
-> See [Zep Cloud Installation Guide](https://help.getzep.com/sdks)
+> [Zep Cloud Installation Guide](https://help.getzep.com/sdks)를 참조하세요
 
 ## Usage
 
-In the examples below, we're using Zep's auto-embedding feature which automatically embeds documents on the Zep server
-using low-latency embedding models.
+아래 예제에서는 Zep의 auto-embedding 기능을 사용하고 있으며, 이는 저지연 embedding model을 사용하여
+Zep 서버에서 자동으로 document를 embedding합니다.
 
 ## Note
 
-- These examples use Zep's async interfaces. Call sync interfaces by removing the `a` prefix from the method names.
+- 이 예제들은 Zep의 async interface를 사용합니다. 동기 interface를 호출하려면 메서드 이름에서 `a` 접두사를 제거하세요.
 
-## Load or create a Collection from documents
+## document에서 Collection 로드 또는 생성
 
 ```python
 from uuid import uuid4
@@ -79,7 +79,7 @@ await wait_for_ready(collection_name)
 Embedding status: 401/401 documents embedded
 ```
 
-## Simarility Search Query over the Collection
+## Collection에 대한 유사도 검색 쿼리
 
 ```python
 # query it
@@ -124,9 +124,9 @@ inadequate one) of the immense extent of numerical tables which it has  ->  0.78
 ====
 ```
 
-## Search over Collection Re-ranked by MMR
+## MMR로 재순위된 Collection 검색
 
-Zep offers native, hardware-accelerated MMR re-ranking of search results.
+Zep은 검색 결과의 하드웨어 가속 네이티브 MMR 재순위 기능을 제공합니다.
 
 ```python
 query = "what is the structure of our solar system?"
@@ -166,9 +166,9 @@ the astronomer and navigator. We feel, nevertheless, that the truly
 ====
 ```
 
-# Filter by Metadata
+# Metadata로 필터링
 
-Use a metadata filter to narrow down results. First, load another book: "Adventures of Sherlock Holmes"
+metadata filter를 사용하여 결과 범위를 좁힙니다. 먼저 다른 책인 "Adventures of Sherlock Holmes"를 로드합니다
 
 ```python
 # Let's add more content to the existing Collection
@@ -198,7 +198,7 @@ Embedding status: 1431/1691 documents embedded
 Embedding status: 1691/1691 documents embedded
 ```
 
-We see results from both books. Note the `source` metadata
+두 책의 결과를 모두 볼 수 있습니다. `source` metadata를 확인하세요
 
 ```python
 query = "Was he interested in astronomy?"
@@ -238,7 +238,7 @@ our regret, that a discovery of such paramount practical value, in a  ->  {'sour
 ====
 ```
 
-Now, we set up a filter
+이제 filter를 설정합니다
 
 ```python
 filter = {

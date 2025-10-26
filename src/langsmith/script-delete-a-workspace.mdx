@@ -1,21 +1,21 @@
 ---
-title: Delete workspaces
-sidebarTitle: Delete workspaces
+title: workspace 삭제
+sidebarTitle: workspace 삭제
 ---
 
 <Note>
-Deleting a workspace is supported **nativley in LangSmith Self-Hosted v0.10**. View [instructions for deleting a workspace](/langsmith/set-up-a-workspace#delete-a-workspace).
+workspace 삭제는 **LangSmith Self-Hosted v0.10에서 기본적으로 지원됩니다**. [workspace 삭제 지침](/langsmith/set-up-a-workspace#delete-a-workspace)을 확인하세요.
 
-Follow the guide below for Self-Hosted versions before v0.10.
+v0.10 이전 Self-Hosted 버전의 경우 아래 가이드를 따르세요.
 </Note>
 
-The LangSmith UI does not currently support the deletion of an individual workspace from an organization. This, however, can be accomplished by directly removing all traces from all materialized views in ClickHouse (except the runs\_history views) and the runs and feedbacks tables and then removing the Workspace from the Postgres tenants table.
+LangSmith UI는 현재 organization에서 개별 workspace를 삭제하는 기능을 지원하지 않습니다. 그러나 ClickHouse의 모든 materialized view(runs\_history view 제외)와 runs 및 feedbacks 테이블에서 모든 trace를 직접 제거한 다음 Postgres tenants 테이블에서 Workspace를 제거하여 이를 수행할 수 있습니다.
 
-This command using the Workspace ID as an argument.
+이 명령은 Workspace ID를 인수로 사용합니다.
 
 ### Prerequisites
 
-Ensure you have the following tools/items ready.
+다음 도구/항목을 준비했는지 확인하세요.
 
 1. kubectl
 
@@ -25,55 +25,55 @@ Ensure you have the following tools/items ready.
 
    * [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
 
-3. PostgreSQL database connection:
+3. PostgreSQL database 연결:
 
    * Host
    * Port
    * Username
-     * If using the bundled version, this is `postgres`
+     * bundled 버전을 사용하는 경우 `postgres`입니다
    * Password
-     * If using the bundled version, this is `postgres`
+     * bundled 버전을 사용하는 경우 `postgres`입니다
    * Database name
-     * If using the bundled version, this is `postgres`
+     * bundled 버전을 사용하는 경우 `postgres`입니다
 
-4. Clickhouse database credentials
+4. Clickhouse database 자격 증명
 
    * Host
    * Port
    * Username
-     * If using the bundled version, this is `default`
+     * bundled 버전을 사용하는 경우 `default`입니다
    * Password
-     * If using the bundled version, this is `password`
+     * bundled 버전을 사용하는 경우 `password`입니다
    * Database name
-     * If using the bundled version, this is `default`
+     * bundled 버전을 사용하는 경우 `default`입니다
 
-5. Connectivity to the PostgreSQL database from the machine you will be running the migration script on.
+5. migration script를 실행할 머신에서 PostgreSQL database로의 연결.
 
-   * If you are using the bundled version, you may need to port forward the postgresql service to your local machine.
-   * Run `kubectl port-forward svc/langsmith-postgres 5432:5432` to port forward the postgresql service to your local machine.
+   * bundled 버전을 사용하는 경우 postgresql service를 로컬 머신으로 port forward해야 할 수 있습니다.
+   * `kubectl port-forward svc/langsmith-postgres 5432:5432`를 실행하여 postgresql service를 로컬 머신으로 port forward하세요.
 
-6. Connectivity to the Clickhouse database from the machine you will be running the migration script on.
+6. migration script를 실행할 머신에서 Clickhouse database로의 연결.
 
-   * If you are using the bundled version, you may need to port forward the clickhouse service to your local machine.
-     * Run `kubectl port-forward svc/langsmith-clickhouse 8123:8123` to port forward the clickhouse service to your local machine.
-   * If you are using Clickhouse Cloud you will want to specify the --ssl flag and use port `8443`
+   * bundled 버전을 사용하는 경우 clickhouse service를 로컬 머신으로 port forward해야 할 수 있습니다.
+     * `kubectl port-forward svc/langsmith-clickhouse 8123:8123`을 실행하여 clickhouse service를 로컬 머신으로 port forward하세요.
+   * Clickhouse Cloud를 사용하는 경우 --ssl flag를 지정하고 port `8443`을 사용해야 합니다
 
-7. The script to delete a workspace
+7. workspace를 삭제하는 script
 
-   * You can download the script from [here](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/scripts/delete_workspace.sh)
+   * [여기](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/scripts/delete_workspace.sh)에서 script를 다운로드할 수 있습니다
 
-### Running the deletion script for a single workspace
+### 단일 workspace에 대한 삭제 script 실행
 
-Run the following command to run the workspace removal script:
+다음 명령을 실행하여 workspace 제거 script를 실행하세요:
 
 ```bash
 sh delete_workspace.sh <postgres_url> <clickhouse_url> --workspace_id <workspace_id>
 ```
 
-For example, if you are using the bundled version with port-forwarding, the command would look like:
+예를 들어, port-forwarding과 함께 bundled 버전을 사용하는 경우 명령은 다음과 같습니다:
 
 ```bash
 sh delete_workspace.sh "postgres://postgres:postgres@localhost:5432/postgres" "clickhouse://default:password@localhost:8123/default" --workspace_id 4ec70ec7-0808-416a-b836-7100aeec934b
 ```
 
-If you visit the LangSmith UI, you should now see workspace is deleted.
+LangSmith UI를 방문하면 이제 workspace가 삭제된 것을 확인할 수 있습니다.

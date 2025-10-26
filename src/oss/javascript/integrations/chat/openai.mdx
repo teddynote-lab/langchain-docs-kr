@@ -2,9 +2,9 @@
 title: ChatOpenAI
 ---
 
-[OpenAI](https://en.wikipedia.org/wiki/OpenAI) is an artificial intelligence (AI) research laboratory.
+[OpenAI](https://en.wikipedia.org/wiki/OpenAI)는 인공지능(AI) 연구소입니다.
 
-This guide will help you getting started with ChatOpenAI [chat models](/oss/langchain/models). For detailed documentation of all ChatOpenAI features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_openai.ChatOpenAI.html).
+이 가이드는 ChatOpenAI [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 ChatOpenAI 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_openai.ChatOpenAI.html)를 참조하세요.
 
 ## Overview
 
@@ -16,7 +16,7 @@ This guide will help you getting started with ChatOpenAI [chat models](/oss/lang
 
 ### Model features
 
-See the links in the table headers below for guides on how to use specific features.
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
@@ -24,17 +24,17 @@ See the links in the table headers below for guides on how to use specific featu
 
 ## Setup
 
-To access OpenAI chat models you'll need to create an OpenAI account, get an API key, and install the `@langchain/openai` integration package.
+OpenAI chat model에 액세스하려면 OpenAI 계정을 생성하고 API key를 받은 다음 `@langchain/openai` integration package를 설치해야 합니다.
 
 ### Credentials
 
-Head to [OpenAI's website](https://platform.openai.com/) to sign up for OpenAI and generate an API key. Once you've done this set the `OPENAI_API_KEY` environment variable:
+[OpenAI 웹사이트](https://platform.openai.com/)로 이동하여 OpenAI에 가입하고 API key를 생성하세요. 완료한 후 `OPENAI_API_KEY` environment variable을 설정하세요:
 
 ```bash
 export OPENAI_API_KEY="your-api-key"
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+model 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```bash
 # export LANGSMITH_TRACING="true"
@@ -43,7 +43,7 @@ If you want to get automated tracing of your model calls you can also set your [
 
 ### Installation
 
-The LangChain @[`ChatOpenAI`] integration lives in the `@langchain/openai` package:
+LangChain @[`ChatOpenAI`] integration은 `@langchain/openai` package에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -59,7 +59,7 @@ pnpm add @langchain/openai @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai"
@@ -121,7 +121,7 @@ J'adore la programmation.
 
 ## Custom URLs
 
-You can customize the base URL the SDK sends requests to by passing a `configuration` parameter like this:
+다음과 같이 `configuration` parameter를 전달하여 SDK가 요청을 보내는 base URL을 사용자 정의할 수 있습니다:
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -137,13 +137,13 @@ const llmWithCustomURL = new ChatOpenAI({
 await llmWithCustomURL.invoke("Hi there!");
 ```
 
-The `configuration` field also accepts other `ClientOptions` parameters accepted by the official SDK.
+`configuration` field는 공식 SDK에서 허용하는 다른 `ClientOptions` parameter도 허용합니다.
 
-If you are hosting on Azure OpenAI, see the [dedicated page instead](/oss/integrations/chat/azure).
+Azure OpenAI에서 호스팅하는 경우 [전용 페이지](/oss/integrations/chat/azure)를 참조하세요.
 
 ## Custom headers
 
-You can specify custom headers in the same `configuration` field:
+동일한 `configuration` field에서 custom header를 지정할 수 있습니다:
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -163,7 +163,7 @@ await llmWithCustomHeaders.invoke("Hi there!");
 
 ## Disabling streaming usage metadata
 
-Some proxies or third-party providers present largely the same API interface as OpenAI, but don't support the more recently added `stream_options` parameter to return streaming usage. You can use @[`ChatOpenAI`] to access these providers by disabling streaming usage like this:
+일부 proxy 또는 third-party provider는 OpenAI와 거의 동일한 API interface를 제공하지만, streaming usage를 반환하기 위해 최근에 추가된 `stream_options` parameter를 지원하지 않습니다. 다음과 같이 streaming usage를 비활성화하여 @[`ChatOpenAI`]를 사용하여 이러한 provider에 액세스할 수 있습니다:
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -182,9 +182,9 @@ await llmWithoutStreamUsage.invoke("Hi there!");
 
 ## Calling fine-tuned models
 
-You can call fine-tuned OpenAI models by passing in your corresponding `modelName` parameter.
+해당하는 `modelName` parameter를 전달하여 fine-tuned OpenAI model을 호출할 수 있습니다.
 
-This generally takes the form of `ft:{OPENAI_MODEL_NAME}:{ORG_NAME}::{MODEL_ID}`. For example:
+일반적으로 `ft:{OPENAI_MODEL_NAME}:{ORG_NAME}::{MODEL_ID}` 형식을 사용합니다. 예를 들어:
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -199,10 +199,10 @@ await fineTunedLlm.invoke("Hi there!");
 
 ## Generation metadata
 
-If you need additional information like logprobs or token usage, these will be returned directly in the `invoke` response within the `response_metadata` field on the message.
+logprobs 또는 token usage와 같은 추가 정보가 필요한 경우, message의 `response_metadata` field 내에서 `invoke` response에 직접 반환됩니다.
 
 <Info>
-    **Requires `@langchain/core` version >=0.1.48.**
+    **`@langchain/core` version >=0.1.48이 필요합니다.**
 </Info>
 
 ```typescript
@@ -287,9 +287,9 @@ console.dir(responseMessageWithLogprobs.response_metadata.logprobs, { depth: nul
 
 ## Custom Tools
 
-[Custom tools](https://platform.openai.com/docs/guides/function-calling#custom-tools) support tools with arbitrary string inputs. They can be particularly useful when you expect your string arguments to be long or complex.
+[Custom tools](https://platform.openai.com/docs/guides/function-calling#custom-tools)는 임의의 string input을 가진 tool을 지원합니다. string argument가 길거나 복잡할 것으로 예상되는 경우 특히 유용할 수 있습니다.
 
-If you use a model that supports custom tools, you can use the @[`ChatOpenAI`] class and the `customTool` function to create a custom tool.
+custom tool을 지원하는 model을 사용하는 경우 @[`ChatOpenAI`] class와 `customTool` function을 사용하여 custom tool을 만들 수 있습니다.
 
 ```typescript
 import { ChatOpenAI, customTool } from "@langchain/openai";
@@ -323,7 +323,7 @@ console.log(result);
 <details>
 <summary>Context-free grammars</summary>
 
-OpenAI supports the specification of a [context-free grammar](https://platform.openai.com/docs/guides/function-calling#context-free-grammars) for custom tool inputs in `lark` or `regex` format. See [OpenAI docs](https://platform.openai.com/docs/guides/function-calling#context-free-grammars) for details. The `format` parameter can be passed into `customTool` as shown below:
+OpenAI는 `lark` 또는 `regex` 형식의 custom tool input에 대한 [context-free grammar](https://platform.openai.com/docs/guides/function-calling#context-free-grammars) 사양을 지원합니다. 자세한 내용은 [OpenAI docs](https://platform.openai.com/docs/guides/function-calling#context-free-grammars)를 참조하세요. `format` parameter는 아래와 같이 `customTool`에 전달할 수 있습니다:
 
 ```typescript
 import { ChatOpenAI, customTool } from "@langchain/openai";
@@ -371,17 +371,17 @@ console.log(result);
 
 ## `strict: true`
 
-As of Aug 6, 2024, OpenAI supports a `strict` argument when calling tools that will enforce that the tool argument schema is respected by the model. [See more](https://platform.openai.com/docs/guides/function-calling).
+2024년 8월 6일부터 OpenAI는 tool을 호출할 때 `strict` argument를 지원하여 model이 tool argument schema를 준수하도록 강제합니다. [자세히 보기](https://platform.openai.com/docs/guides/function-calling).
 
 <Info>
-    Requires `@langchain/openai >= 0.2.6`
+    `@langchain/openai >= 0.2.6`이 필요합니다
 </Info>
 
 <Warning>
-    If `strict: true` the tool definition will also be validated, and a subset of JSON schema are accepted. Crucially, schema cannot have optional args (those with default values). Read [the full docs](https://platform.openai.com/docs/guides/structured-outputs/supported-schemas) on what types of schema are supported.
+    `strict: true`인 경우 tool definition도 검증되며 JSON schema의 하위 집합이 허용됩니다. 중요한 점은 schema에 optional arg(기본값이 있는 arg)가 있을 수 없다는 것입니다. 지원되는 schema 유형에 대한 [전체 문서](https://platform.openai.com/docs/guides/structured-outputs/supported-schemas)를 읽어보세요.
 </Warning>
 
-Here's an example with tool calling. Passing an extra `strict: true` argument to `.bindTools` will pass the param through to all tool definitions:
+다음은 tool calling 예제입니다. `.bindTools`에 추가 `strict: true` argument를 전달하면 모든 tool definition에 param이 전달됩니다:
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -421,7 +421,7 @@ console.dir(strictTrueResult.tool_calls, { depth: null });
 ]
 ```
 
-If you only want to apply this parameter to a select number of tools, you can also pass OpenAI formatted tool schemas directly:
+이 parameter를 선택한 수의 tool에만 적용하려면 OpenAI 형식의 tool schema를 직접 전달할 수도 있습니다:
 
 ```typescript
 import { zodToJsonSchema } from "zod-to-json-schema";
@@ -467,7 +467,7 @@ weatherToolResult.tool_calls;
 
 ## Structured output
 
-We can also pass `strict: true` to the [`.withStructuredOutput()`](https://js.langchain.com/docs/how_to/structured_output/#the-.withstructuredoutput-method). Here's an example:
+[`.withStructuredOutput()`](https://js.langchain.com/docs/how_to/structured_output/#the-.withstructuredoutput-method)에 `strict: true`를 전달할 수도 있습니다. 다음은 예제입니다:
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -496,26 +496,26 @@ await structuredLlm.invoke([{
 ## Responses API
 
 <Warning>
-**Compatibility**
+**호환성**
 
-The below points apply to `@langchain/openai>=0.4.5-rc.0`.
+아래 내용은 `@langchain/openai>=0.4.5-rc.0`에 적용됩니다.
 
 </Warning>
 
-OpenAI supports a [Responses](https://platform.openai.com/docs/guides/responses-vs-chat-completions) API that is oriented toward building [agentic](/oss/langchain/agents) applications. It includes a suite of [built-in tools](https://platform.openai.com/docs/guides/tools?api-mode=responses), including web and file search. It also supports management of [conversation state](https://platform.openai.com/docs/guides/conversation-state?api-mode=responses), allowing you to continue a conversational thread without explicitly passing in previous messages.
+OpenAI는 [agentic](/oss/langchain/agents) 애플리케이션 구축을 지향하는 [Responses](https://platform.openai.com/docs/guides/responses-vs-chat-completions) API를 지원합니다. 여기에는 web 및 file search를 포함한 [built-in tools](https://platform.openai.com/docs/guides/tools?api-mode=responses) 모음이 포함됩니다. 또한 [conversation state](https://platform.openai.com/docs/guides/conversation-state?api-mode=responses) 관리를 지원하여 이전 message를 명시적으로 전달하지 않고도 대화 스레드를 계속할 수 있습니다.
 
-`ChatOpenAI` will route to the Responses API if one of these features is used. You can also specify `useResponsesApi: true` when instantiating `ChatOpenAI`.
+`ChatOpenAI`는 이러한 기능 중 하나가 사용되면 Responses API로 라우팅됩니다. `ChatOpenAI`를 인스턴스화할 때 `useResponsesApi: true`를 지정할 수도 있습니다.
 
 ### Built-in tools
 
-Equipping @[`ChatOpenAI`] with built-in tools will ground its responses with outside information, such as via context in files or the web. The [AIMessage](/oss/langchain/messages/#aimessage) generated from the model will include information about the built-in tool invocation.
+@[`ChatOpenAI`]에 built-in tool을 장착하면 file이나 web의 context와 같은 외부 정보로 응답을 기반으로 합니다. model에서 생성된 [AIMessage](/oss/langchain/messages/#aimessage)에는 built-in tool 호출에 대한 정보가 포함됩니다.
 
 #### Web search
 
-To trigger a web search, pass `{"type": "web_search_preview"}` to the model as you would another tool.
+web search를 트리거하려면 다른 tool과 마찬가지로 `{"type": "web_search_preview"}`를 model에 전달하세요.
 
 <Tip>
-**You can also pass built-in tools as invocation params:**
+**built-in tool을 invocation param으로 전달할 수도 있습니다:**
 
 ```ts
 llm.invoke("...", { tools: [{ type: "web_search_preview" }] });
@@ -534,11 +534,11 @@ await llm.invoke("What was a positive news story from today?");
 
 ```
 
-Note that the response includes structured [content blocks](/oss/langchain/messages/#message-content) that include both the text of the response and OpenAI [annotations](https://platform.openai.com/docs/guides/tools-web-search?api-mode=responses#output-and-citations) citing its sources. The output message will also contain information from any tool invocations.
+response에는 응답 텍스트와 출처를 인용하는 OpenAI [annotations](https://platform.openai.com/docs/guides/tools-web-search?api-mode=responses#output-and-citations)를 모두 포함하는 구조화된 [content blocks](/oss/langchain/messages/#message-content)가 포함됩니다. output message에는 tool 호출의 정보도 포함됩니다.
 
 #### File search
 
-To trigger a file search, pass a [file search tool](https://platform.openai.com/docs/guides/tools-file-search) to the model as you would another tool. You will need to populate an OpenAI-managed vector store and include the vector store ID in the tool definition. See [OpenAI documentation](https://platform.openai.com/docs/guides/tools-file-search) for more details.
+file search를 트리거하려면 다른 tool과 마찬가지로 [file search tool](https://platform.openai.com/docs/guides/tools-file-search)을 model에 전달하세요. OpenAI 관리 vector store를 채우고 tool definition에 vector store ID를 포함해야 합니다. 자세한 내용은 [OpenAI documentation](https://platform.openai.com/docs/guides/tools-file-search)을 참조하세요.
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -551,15 +551,15 @@ await llm.invoke("Is deep research by OpenAI?");
 
 ```
 
-As with [web search](#web-search), the response will include content blocks with citations. It will also include information from the built-in tool invocations.
+[web search](#web-search)와 마찬가지로 response에는 인용이 포함된 content block이 포함됩니다. 또한 built-in tool 호출의 정보도 포함됩니다.
 
 #### Computer Use
 
-ChatOpenAI supports the `computer-use-preview` model, which is a specialized model for the built-in computer use tool. To enable, pass a [computer use tool](https://platform.openai.com/docs/guides/tools-computer-use) as you would pass another tool.
+ChatOpenAI는 built-in computer use tool을 위한 특수 model인 `computer-use-preview` model을 지원합니다. 활성화하려면 다른 tool을 전달하는 것처럼 [computer use tool](https://platform.openai.com/docs/guides/tools-computer-use)을 전달하세요.
 
-Currently tool outputs for computer use are present in `AIMessage.additional_kwargs.tool_outputs`. To reply to the computer use tool call, you need to set `additional_kwargs.type: "computer_call_output"` while creating a corresponding `ToolMessage`.
+현재 computer use에 대한 tool output은 `AIMessage.additional_kwargs.tool_outputs`에 있습니다. computer use tool call에 응답하려면 해당 `ToolMessage`를 생성할 때 `additional_kwargs.type: "computer_call_output"`을 설정해야 합니다.
 
-See [OpenAI documentation](https://platform.openai.com/docs/guides/tools-computer-use) for more details.
+자세한 내용은 [OpenAI documentation](https://platform.openai.com/docs/guides/tools-computer-use)을 참조하세요.
 
 ```typescript
 import { AIMessage, ToolMessage } from "@langchain/core/messages";
@@ -615,7 +615,7 @@ if (computerCall) {
 
 #### Code interpreter
 
-ChatOpenAI allows you to use the built-in [code interpreter tool](https://platform.openai.com/docs/guides/tools-code-interpreter) to support the sandboxed generation and execution of code.
+ChatOpenAI를 사용하면 built-in [code interpreter tool](https://platform.openai.com/docs/guides/tools-code-interpreter)을 사용하여 샌드박스 코드 생성 및 실행을 지원할 수 있습니다.
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -638,7 +638,7 @@ const response = await llmWithTools.invoke(
 );
 ```
 
-Note that the above command creates a new [container](https://platform.openai.com/docs/guides/tools-code-interpreter#containers). We can re-use containers across calls by specifying an existing container ID.
+위 명령은 새 [container](https://platform.openai.com/docs/guides/tools-code-interpreter#containers)를 생성합니다. 기존 container ID를 지정하여 호출 간에 container를 재사용할 수 있습니다.
 
 ```typescript
 const tool_outputs: Record<string, any>[] = response.additional_kwargs.tool_outputs
@@ -655,7 +655,7 @@ const llmWithTools = llm.bindTools([
 
 #### Remote MCP
 
-ChatOpenAI supports the built-in [remote MCP tool](https://platform.openai.com/docs/guides/tools-remote-mcp) that allows for model-generated calls to MCP servers to happen on OpenAI servers.
+ChatOpenAI는 MCP server에 대한 model 생성 호출이 OpenAI server에서 발생하도록 하는 built-in [remote MCP tool](https://platform.openai.com/docs/guides/tools-remote-mcp)을 지원합니다.
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -682,9 +682,9 @@ const response = await llmWithMcp.invoke(
 <Note>
 **MCP Approvals**
 
-When instructed, OpenAI will request approval before making calls to a remote MCP server.
+지시를 받으면 OpenAI는 remote MCP server를 호출하기 전에 승인을 요청합니다.
 
-In the above command, we instructed the model to never require approval. We can also configure the model to always request approval, or to always request approval for specific tools:
+위 명령에서는 model에 승인을 요구하지 않도록 지시했습니다. 항상 승인을 요청하거나 특정 tool에 대해 항상 승인을 요청하도록 구성할 수도 있습니다:
 
 ```typescript
 ...
@@ -705,7 +705,7 @@ const response = await llmWithMcp.invoke(
 );
 ```
 
-With this configuration, responses can contain tool outputs typed as `mcp_approval_request`. To submit approvals for an approval request, you can structure it into a content block in a followup message:
+이 구성을 사용하면 response에 `mcp_approval_request`로 입력된 tool output이 포함될 수 있습니다. approval request에 대한 승인을 제출하려면 후속 message의 content block으로 구조화할 수 있습니다:
 
 ```typescript
 const approvals = [];
@@ -733,7 +733,7 @@ const nextResponse = await model.invoke(
 
 #### Image Generation
 
-ChatOpenAI allows you to bring the built-in [image generation tool](https://platform.openai.com/docs/guides/tools-image-generation) to create images as apart of multi-turn conversations through the responses API.
+ChatOpenAI를 사용하면 built-in [image generation tool](https://platform.openai.com/docs/guides/tools-image-generation)을 사용하여 responses API를 통한 다중 턴 대화의 일부로 이미지를 생성할 수 있습니다.
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -759,13 +759,13 @@ const response = await llmWithImageGeneration.invoke(
 
 
 <Warning>
-**Compatibility**: The below points apply to `@langchain/openai>=0.4.0`.
+**호환성**: 아래 내용은 `@langchain/openai>=0.4.0`에 적용됩니다.
 </Warning>
 
 
-When using reasoning models like `o1`, the default method for `withStructuredOutput` is OpenAI's built-in method for structured output (equivalent to passing `method: "jsonSchema"` as an option into `withStructuredOutput`). JSON schema mostly works the same as other models, but with one important caveat: when defining schema, `z.optional()` is not respected, and you should instead use `z.nullable()`.
+`o1`과 같은 reasoning model을 사용할 때 `withStructuredOutput`의 기본 method는 OpenAI의 built-in structured output method입니다(`withStructuredOutput`에 option으로 `method: "jsonSchema"`를 전달하는 것과 동일). JSON schema는 대부분 다른 model과 동일하게 작동하지만 한 가지 중요한 주의사항이 있습니다: schema를 정의할 때 `z.optional()`은 존중되지 않으며 대신 `z.nullable()`을 사용해야 합니다.
 
-Here's an example:
+다음은 예제입니다:
 
 ```typescript
 import * as z from "zod";
@@ -792,7 +792,7 @@ await reasoningModelOptionalSchema.invoke([{
 { color: 'No color mentioned' }
 ```
 
-And here's an example with `z.nullable()`:
+다음은 `z.nullable()`을 사용한 예제입니다:
 
 ```typescript
 import * as z from "zod";
@@ -821,11 +821,11 @@ await reasoningModelNullableSchema.invoke([{
 
 ## Prompt caching
 
-Newer OpenAI models will automatically [cache parts of your prompt](https://openai.com/index/api-prompt-caching/) if your inputs are above a certain size (1024 tokens at the time of writing) in order to reduce costs for use-cases that require long context.
+최신 OpenAI model은 비용을 절감하기 위해 긴 context가 필요한 use-case를 위해 입력이 특정 크기(작성 시점에 1024 token) 이상인 경우 [prompt의 일부를 자동으로 캐시](https://openai.com/index/api-prompt-caching/)합니다.
 
-**Note:** The number of tokens cached for a given query is not yet standardized in `AIMessage.usage_metadata`, and is instead contained in the `AIMessage.response_metadata` field.
+**참고:** 주어진 query에 대해 캐시된 token 수는 아직 `AIMessage.usage_metadata`에서 표준화되지 않았으며 대신 `AIMessage.response_metadata` field에 포함되어 있습니다.
 
-Here's an example
+다음은 예제입니다
 
 ```typescript
 // @lc-docs-hide-cell
@@ -1155,9 +1155,9 @@ USAGE: {
 
 ## Predicted output
 
-Some OpenAI models (such as their `gpt-4o` and `gpt-4o-mini` series) support [Predicted Outputs](https://platform.openai.com/docs/guides/latency-optimization#use-predicted-outputs), which allow you to pass in a known portion of the LLM's expected output ahead of time to reduce latency. This is useful for cases such as editing text or code, where only a small part of the model's output will change.
+일부 OpenAI model(`gpt-4o` 및 `gpt-4o-mini` 시리즈 등)은 [Predicted Outputs](https://platform.openai.com/docs/guides/latency-optimization#use-predicted-outputs)를 지원하여 대기 시간을 줄이기 위해 LLM의 예상 출력 중 알려진 부분을 미리 전달할 수 있습니다. 이는 model 출력의 작은 부분만 변경되는 텍스트 또는 코드 편집과 같은 경우에 유용합니다.
 
-Here's an example:
+다음은 예제입니다:
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -1255,11 +1255,11 @@ AIMessage {
 }
 ```
 
-Note that currently predictions are billed as additional tokens and will increase your usage and costs in exchange for this reduced latency.
+현재 prediction은 추가 token으로 청구되며 이 감소된 대기 시간과 교환하여 사용량과 비용이 증가합니다.
 
 ## Audio output
 
-Some OpenAI models (such as `gpt-4o-audio-preview`) support generating audio output. This example shows how to use that feature:
+일부 OpenAI model(`gpt-4o-audio-preview` 등)은 audio output 생성을 지원합니다. 다음 예제는 해당 기능을 사용하는 방법을 보여줍니다:
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -1292,11 +1292,11 @@ console.log({
 }
 ```
 
-We see that the audio data is returned inside the `data` field. We are also provided an `expires_at` date field. This field represents the date the audio response will no longer be accessible on the server for use in multi-turn conversations.
+audio data가 `data` field 내에 반환되는 것을 볼 수 있습니다. `expires_at` date field도 제공됩니다. 이 field는 다중 턴 대화에서 사용하기 위해 server에서 audio response에 더 이상 액세스할 수 없는 날짜를 나타냅니다.
 
 ### Streaming Audio Output
 
-OpenAI also supports streaming audio output. Here's an example:
+OpenAI는 streaming audio output도 지원합니다. 다음은 예제입니다:
 
 ```typescript
 import { AIMessageChunk } from "@langchain/core/messages";
@@ -1337,7 +1337,7 @@ console.log({
 
 ### Audio input
 
-These models also support passing audio as input. For this, you must specify `input_audio` fields as seen below:
+이러한 model은 audio를 input으로 전달하는 것도 지원합니다. 이를 위해 아래와 같이 `input_audio` field를 지정해야 합니다:
 
 ```typescript
 import { HumanMessage } from "@langchain/core/messages";
@@ -1364,4 +1364,4 @@ That's a great joke! It's always fun to imagine why cats do the funny things the
 
 ## API reference
 
-For detailed documentation of all ChatOpenAI features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_openai.ChatOpenAI.html).
+모든 ChatOpenAI 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_openai.ChatOpenAI.html)를 참조하세요.

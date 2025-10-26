@@ -2,25 +2,23 @@
 title: Eden AI
 ---
 
-Eden AI is revolutionizing the AI landscape by uniting the best AI providers, empowering users to unlock limitless possibilities and tap into the true potential of artificial intelligence. With an all-in-one comprehensive and hassle-free platform, it allows users to deploy AI features to production lightning fast, enabling effortless access to the full breadth of AI capabilities via a single API. (website: [edenai.co/](https://edenai.co/))
+Eden AI는 최고의 AI 제공업체들을 통합하여 AI 환경을 혁신하고 있으며, 사용자들이 무한한 가능성을 열고 인공지능의 진정한 잠재력을 활용할 수 있도록 지원합니다. 올인원 종합 플랫폼을 통해 사용자는 AI 기능을 프로덕션에 매우 빠르게 배포할 수 있으며, 단일 API를 통해 AI 기능의 전체 범위에 손쉽게 액세스할 수 있습니다. (웹사이트: [edenai.co/](https://edenai.co/))
 
-This example goes over how to use LangChain to interact with Eden AI models
+이 예제는 LangChain을 사용하여 Eden AI 모델과 상호작용하는 방법을 다룹니다
 
 -----------------------------------------------------------------------------------
 
-Accessing the EDENAI's API requires an API key,
+EDENAI의 API에 액세스하려면 API key가 필요합니다.
 
-which you can get by creating an account [app.edenai.run/user/register](https://app.edenai.run/user/register)  and heading here [app.edenai.run/admin/account/settings](https://app.edenai.run/admin/account/settings)
+계정을 생성하여 [app.edenai.run/user/register](https://app.edenai.run/user/register)에서 API key를 얻을 수 있으며, [app.edenai.run/admin/account/settings](https://app.edenai.run/admin/account/settings)로 이동하면 됩니다
 
-Once we have a key we'll want to set it as an environment variable by running:
+key를 얻은 후에는 다음을 실행하여 환경 변수로 설정해야 합니다:
 
 ```bash
 export EDENAI_API_KEY="..."
 ```
 
-If you'd prefer not to set an environment variable you can pass the key in directly via the edenai_api_key named parameter
-
- when initiating the EdenAI LLM class:
+환경 변수를 설정하지 않으려면 EdenAI LLM class를 초기화할 때 edenai_api_key라는 named parameter를 통해 key를 직접 전달할 수 있습니다:
 
 ```python
 from langchain_community.llms import EdenAI
@@ -30,13 +28,13 @@ from langchain_community.llms import EdenAI
 llm = EdenAI(edenai_api_key="...", provider="openai", temperature=0.2, max_tokens=250)
 ```
 
-## Calling a model
+## model 호출하기
 
-The EdenAI API brings together various providers, each offering multiple models.
+EdenAI API는 다양한 provider들을 통합하며, 각 provider는 여러 model을 제공합니다.
 
-To access a specific model, you can simply add 'model' during instantiation.
+특정 model에 액세스하려면 인스턴스화 중에 'model'을 추가하기만 하면 됩니다.
 
-For instance, let's explore the models provided by OpenAI, such as GPT3.5
+예를 들어, GPT3.5와 같은 OpenAI에서 제공하는 model들을 살펴보겠습니다
 
 ### text generation
 
@@ -95,7 +93,7 @@ image_output = text2image("A cat riding a motorcycle by Picasso")
 print_base64_image(image_output)
 ```
 
-### text generation with callback
+### callback을 사용한 text generation
 
 ```python
 from langchain_community.llms import EdenAI

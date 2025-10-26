@@ -1,24 +1,25 @@
+```markdown
 ---
 title: Azure Cosmos DB for Apache Gremlin
 ---
 
->[Azure Cosmos DB for Apache Gremlin](https://learn.microsoft.com/en-us/azure/cosmos-db/gremlin/introduction) is a graph database service that can be used to store massive graphs with billions of vertices and edges. You can query the graphs with millisecond latency and evolve the graph structure easily.
+>[Azure Cosmos DB for Apache Gremlin](https://learn.microsoft.com/en-us/azure/cosmos-db/gremlin/introduction)은 수십억 개의 vertex와 edge를 가진 대규모 graph를 저장하는 데 사용할 수 있는 graph database 서비스입니다. 밀리초 단위의 지연 시간으로 graph를 쿼리하고 graph 구조를 쉽게 발전시킬 수 있습니다.
 >
->[Gremlin](https://en.wikipedia.org/wiki/Gremlin_(query_language)) is a graph traversal language and virtual machine developed by `Apache TinkerPop` of the `Apache Software Foundation`.
+>[Gremlin](https://en.wikipedia.org/wiki/Gremlin_(query_language))은 `Apache Software Foundation`의 `Apache TinkerPop`에서 개발한 graph traversal 언어이자 virtual machine입니다.
 
-This notebook shows how to use LLMs to provide a natural language interface to a graph database you can query with the `Gremlin` query language.
+이 notebook은 LLM을 사용하여 `Gremlin` 쿼리 언어로 쿼리할 수 있는 graph database에 자연어 인터페이스를 제공하는 방법을 보여줍니다.
 
-## Setting up
+## 설정하기
 
-Install a library:
+라이브러리 설치:
 
 ```python
 !pip3 install gremlinpython
 ```
 
-You will need an Azure CosmosDB Graph database instance. One option is to create a [free CosmosDB Graph database instance in Azure](https://learn.microsoft.com/en-us/azure/cosmos-db/free-tier).
+Azure CosmosDB Graph database 인스턴스가 필요합니다. 한 가지 옵션은 [Azure에서 무료 CosmosDB Graph database 인스턴스를 생성](https://learn.microsoft.com/en-us/azure/cosmos-db/free-tier)하는 것입니다.
 
-When you create your Cosmos DB account and Graph, use `/type` as a partition key.
+Cosmos DB 계정과 Graph를 생성할 때 partition key로 `/type`을 사용하세요.
 
 ```python
 cosmosdb_name = "mycosmosdb"
@@ -44,13 +45,13 @@ graph = GremlinGraph(
 )
 ```
 
-## Seeding the database
+## Database에 데이터 채우기
 
-Assuming your database is empty, you can populate it using the GraphDocuments
+database가 비어 있다고 가정하면 GraphDocuments를 사용하여 채울 수 있습니다.
 
-For Gremlin, always add property called 'label' for each Node.
-If no label is set, Node.type is used as a label.
-For cosmos using natural id's make sense, as they are visible in the graph explorer.
+Gremlin의 경우 각 Node에 대해 항상 'label'이라는 property를 추가하세요.
+label이 설정되지 않으면 Node.type이 label로 사용됩니다.
+Cosmos의 경우 자연스러운 id를 사용하는 것이 합리적입니다. graph explorer에서 볼 수 있기 때문입니다.
 
 ```python
 source_doc = Document(
@@ -110,9 +111,9 @@ nest_asyncio.apply()
 graph.add_graph_documents([graph_doc])
 ```
 
-## Refresh graph schema information
+## Graph schema 정보 새로고침
 
-If the schema of database changes (after updates), you can refresh the schema information.
+Database의 schema가 변경되면(업데이트 후) schema 정보를 새로고침할 수 있습니다.
 
 ```python
 graph.refresh_schema()
@@ -122,9 +123,9 @@ graph.refresh_schema()
 print(graph.schema)
 ```
 
-## Querying the graph
+## Graph 쿼리하기
 
-We can now use the gremlin QA chain to ask question of the graph
+이제 gremlin QA chain을 사용하여 graph에 질문할 수 있습니다.
 
 ```python
 chain = GremlinQAChain.from_llm(
@@ -143,4 +144,5 @@ chain.invoke("Who played in The Matrix?")
 
 ```python
 chain.run("How many people played in The Matrix?")
+```
 ```

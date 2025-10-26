@@ -2,25 +2,25 @@
 title: C Transformers
 ---
 
-This page covers how to use the [C Transformers](https://github.com/marella/ctransformers) library within LangChain.
-It is broken into two parts: installation and setup, and then references to specific C Transformers wrappers.
+이 페이지는 LangChain 내에서 [C Transformers](https://github.com/marella/ctransformers) 라이브러리를 사용하는 방법을 다룹니다.
+설치 및 설정, 그리고 특정 C Transformers wrapper에 대한 참조, 이렇게 두 부분으로 나뉩니다.
 
-## Installation and Setup
+## 설치 및 설정
 
-- Install the Python package with `pip install ctransformers`
-- Download a supported [GGML model](https://huggingface.co/TheBloke) (see [Supported Models](https://github.com/marella/ctransformers#supported-models))
+- `pip install ctransformers`로 Python package를 설치합니다
+- 지원되는 [GGML model](https://huggingface.co/TheBloke)을 다운로드합니다 ([지원되는 모델](https://github.com/marella/ctransformers#supported-models) 참조)
 
 ## Wrappers
 
 ### LLM
 
-There exists a CTransformers LLM wrapper, which you can access with:
+CTransformers LLM wrapper가 존재하며, 다음과 같이 접근할 수 있습니다:
 
 ```python
 from langchain_community.llms import CTransformers
 ```
 
-It provides a unified interface for all models:
+모든 model에 대해 통합된 interface를 제공합니다:
 
 ```python
 llm = CTransformers(model='/path/to/ggml-gpt-2.bin', model_type='gpt2')
@@ -28,25 +28,25 @@ llm = CTransformers(model='/path/to/ggml-gpt-2.bin', model_type='gpt2')
 print(llm.invoke('AI is going to'))
 ```
 
-If you are getting `illegal instruction` error, try using `lib='avx'` or `lib='basic'`:
+`illegal instruction` 오류가 발생하는 경우, `lib='avx'` 또는 `lib='basic'`을 사용해보세요:
 
 ```py
 llm = CTransformers(model='/path/to/ggml-gpt-2.bin', model_type='gpt2', lib='avx')
 ```
 
-It can be used with models hosted on the Hugging Face Hub:
+Hugging Face Hub에 호스팅된 model과 함께 사용할 수 있습니다:
 
 ```py
 llm = CTransformers(model='marella/gpt-2-ggml')
 ```
 
-If a model repo has multiple model files (`.bin` files), specify a model file using:
+model repo에 여러 model 파일(`.bin` 파일)이 있는 경우, 다음을 사용하여 model 파일을 지정합니다:
 
 ```py
 llm = CTransformers(model='marella/gpt-2-ggml', model_file='ggml-model.bin')
 ```
 
-Additional parameters can be passed using the `config` parameter:
+추가 parameter는 `config` parameter를 사용하여 전달할 수 있습니다:
 
 ```py
 config = {'max_new_tokens': 256, 'repetition_penalty': 1.1}
@@ -54,6 +54,6 @@ config = {'max_new_tokens': 256, 'repetition_penalty': 1.1}
 llm = CTransformers(model='marella/gpt-2-ggml', config=config)
 ```
 
-See [Documentation](https://github.com/marella/ctransformers#config) for a list of available parameters.
+사용 가능한 parameter 목록은 [Documentation](https://github.com/marella/ctransformers#config)을 참조하세요.
 
-For a more detailed walkthrough of this, see [this notebook](/oss/integrations/llms/ctransformers).
+더 자세한 안내는 [이 notebook](/oss/integrations/llms/ctransformers)을 참조하세요.

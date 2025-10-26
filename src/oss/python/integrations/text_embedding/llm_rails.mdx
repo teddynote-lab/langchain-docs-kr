@@ -2,10 +2,10 @@
 title: LLMRails
 ---
 
-Let's load the LLMRails Embeddings class.
+LLMRails Embeddings class를 로드해보겠습니다.
 
-To use LLMRails embedding you need to pass api key by argument or set it in environment with `LLM_RAILS_API_KEY` key.
-To gey API Key you need to sign up in [console.llmrails.com/signup](https://console.llmrails.com/signup) and then go to [console.llmrails.com/api-keys](https://console.llmrails.com/api-keys) and copy key from there after creating one key in platform.
+LLMRails embedding을 사용하려면 인자로 api key를 전달하거나 `LLM_RAILS_API_KEY` 키로 환경 변수에 설정해야 합니다.
+API Key를 얻으려면 [console.llmrails.com/signup](https://console.llmrails.com/signup)에서 가입한 다음 [console.llmrails.com/api-keys](https://console.llmrails.com/api-keys)로 이동하여 플랫폼에서 키를 생성한 후 복사해야 합니다.
 
 ```python
 from langchain_community.embeddings import LLMRailsEmbeddings
@@ -19,7 +19,7 @@ embeddings = LLMRailsEmbeddings(model="embedding-english-v1")  # or embedding-mu
 text = "This is a test document."
 ```
 
-To generate embeddings, you can either query an invidivual text, or you can query a list of texts.
+embedding을 생성하려면 개별 텍스트를 쿼리하거나 텍스트 목록을 쿼리할 수 있습니다.
 
 ```python
 query_result = embeddings.embed_query(text)

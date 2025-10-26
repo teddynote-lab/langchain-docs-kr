@@ -1,39 +1,39 @@
 ---
 title: "Moorcheh"
-description: "Lightning-fast semantic search engine and vector store using Maximally Informative Binarization (MIB) and Information-Theoretic Score (ITS)"
+description: "Maximally Informative Binarization (MIB)와 Information-Theoretic Score (ITS)를 사용하는 초고속 시맨틱 검색 엔진 및 vector store"
 ---
 
 # Moorcheh
 
-[Moorcheh](https://www.moorcheh.ai/) is a lightning-fast semantic search engine and vector store. Instead of using simple distance metrics like L2 or Cosine, Moorcheh uses Maximally Informative Binarization (MIB) and Information-Theoretic Score (ITS) to retrieve accurate document chunks.
+[Moorcheh](https://www.moorcheh.ai/)는 초고속 시맨틱 검색 엔진이자 vector store입니다. L2 또는 Cosine과 같은 단순 거리 기반 metric 대신, Moorcheh는 Maximally Informative Binarization (MIB)와 Information-Theoretic Score (ITS)를 사용하여 정확한 문서 청크를 검색합니다.
 
-The following tutorial will allow you to use Moorcheh and LangChain to upload and store text documents and vector embeddings as well as retrieve relevant chunks for all of your queries.
+이 튜토리얼에서는 Moorcheh와 LangChain을 사용하여 텍스트 문서와 vector embedding을 업로드하고 저장하며, 모든 쿼리에 대해 관련 청크를 검색하는 방법을 설명합니다.
 
-## Setup
+## 설정
 
-First, install the necessary package:
+먼저 필요한 패키지를 설치하세요:
 
 ```bash
 pip install langchain-moorcheh
 ```
 
-## Initialization
+## 초기화
 
-Get started with Moorcheh
+Moorcheh 시작하기
 
-1. Sign up or log in at the [Moorcheh Console](https://console.moorcheh.ai/).
-2. Go to the "API Keys" tab and generate an API key.
-3. Save the key as an environment variable named `MOORCHEH_API_KEY` (you'll use it below).
-4. To create a namespace for storing data:
-   - In the Console, open the "Namespaces" tab and click "Create namespace"; or
-   - Initialize it programmatically using the vector store code in the next section.
-5. Use your API key to create namespaces, upload documents, and retrieve answers.
+1. [Moorcheh Console](https://console.moorcheh.ai/)에서 회원가입하거나 로그인하세요.
+2. "API Keys" 탭으로 이동하여 API key를 생성하세요.
+3. 생성한 키를 환경 변수 `MOORCHEH_API_KEY`로 저장하세요(아래에서 사용합니다).
+4. 데이터를 저장할 namespace를 생성하려면:
+   - 콘솔에서 "Namespaces" 탭을 열고 "Create namespace"를 클릭하거나,
+   - 다음 섹션의 vector store 코드를 사용해 프로그래밍 방식으로 초기화하세요.
+5. API key를 사용하여 namespace를 생성하고, 문서를 업로드하며, 답변을 조회할 수 있습니다.
 
-For more information about the Moorcheh SDK functions, see the [GitHub repository](https://github.com/moorcheh-ai/moorcheh-python-sdk).
+Moorcheh SDK function에 대한 더 자세한 내용은 [GitHub repository](https://github.com/moorcheh-ai/moorcheh-python-sdk)를 참고하세요.
 
-## Importing Packages
+## 패키지 임포트
 
-Import the below packages:
+아래 패키지를 임포트하세요:
 
 ```python
 from langchain_moorcheh import MoorchehVectorStore
@@ -50,15 +50,15 @@ from langchain_core.vectorstores import VectorStore
 from google.colab import userdata
 ```
 
-## Code Setup
+## 코드 설정
 
-Set your Moorcheh API Key in your environment variables:
+환경 변수에 Moorcheh API Key를 설정하세요:
 
 ```python
 MOORCHEH_API_KEY = os.environ['MOORCHEH_API_KEY']
 ```
 
-Set up your namespace name, type, and create the vector store:
+namespace 이름과 타입을 설정하고 vector store를 생성하세요:
 
 ```python
 namespace = "your_namespace_name"
@@ -70,7 +70,7 @@ store = MoorchehVectorStore(
         )
 ```
 
-## Adding Documents
+## 문서 추가
 
 ```python
 document_1 = Document(
@@ -141,15 +141,15 @@ uuids = [str(uuid4()) for _ in range(len(documents))]
 store.add_documents(documents=documents, ids=uuids)
 ```
 
-## Delete Documents
+## 문서 삭제
 
 ```python
 store.delete(ids=["chunk_id_here"])
 ```
 
-## Query Engine
+## 쿼리 엔진
 
-Once your namespace has been created and you have uploaded documents into it, you can ask queries about the documents directly through the vector store. Set the query and LLM you would like to answer your query. For more information on supported LLMs, please visit our [Github page](https://github.com/moorcheh-ai/moorcheh-python-sdk).
+namespace를 생성하고 문서를 업로드한 후에는, vector store를 통해 문서에 대한 쿼리를 직접 실행할 수 있습니다. 원하는 쿼리와 해당 쿼리에 답할 LLM을 설정하세요. 지원되는 LLM에 대한 자세한 내용은 [Github page](https://github.com/moorcheh-ai/moorcheh-python-sdk)를 방문하세요.
 
 ```python
 query = "Give me a brief summary of the provided documents"
@@ -157,13 +157,13 @@ answer = store.generative_answer(query, ai_model = "anthropic.claude-3-7-sonnet-
 print(answer)
 ```
 
-## Further Resources
+## 추가 자료
 
-For more information about Moorcheh, feel free to visit the resources below:
+Moorcheh에 대해 더 알아보려면 아래 자료를 참고하세요:
 
-*   [Github page](https://github.com/moorcheh-ai/moorcheh-python-sdk)
-*   [Examples Github page](https://github.com/moorcheh-ai/moorcheh-examples)
-*   [Website](https://www.moorcheh.ai/)
-*   [Documentation](https://console.moorcheh.ai/docs)
-*   [Youtube](https://www.youtube.com/@moorchehai)
+*   [Github 페이지](https://github.com/moorcheh-ai/moorcheh-python-sdk)
+*   [예제 Github 페이지](https://github.com/moorcheh-ai/moorcheh-examples)
+*   [웹사이트](https://www.moorcheh.ai/)
+*   [문서](https://console.moorcheh.ai/docs)
+*   [YouTube](https://www.youtube.com/@moorchehai)
 *   [X](https://x.com/moorcheh_ai)

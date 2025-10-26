@@ -2,19 +2,16 @@
 title: Google Routes Tool
 ---
 
-The Google Routes Tool allows your agent to utilize the Google Routes API in order to find a route between
-two or more destinations. You can get a route by walk, transit, car, motorcycle and bicycle.
+Google Routes Tool은 agent가 Google Routes API를 활용하여 두 개 이상의 목적지 사이의 경로를 찾을 수 있도록 합니다. 도보, 대중교통, 자동차, 오토바이, 자전거로 경로를 검색할 수 있습니다.
 
 ## Setup
 
-You will need to get an API key from [Google here](https://developers.google.com/maps/documentation/places/web-service/overview)
-and [enable the Routes API](https://console.cloud.google.com/apis/library/routes.googleapis.com). Then, set your API key
-as `process.env.GOOGLE_ROUTES_API_KEY` or pass it in as an `apiKey` constructor argument.
+[Google에서 API key를 발급](https://developers.google.com/maps/documentation/places/web-service/overview)받고 [Routes API를 활성화](https://console.cloud.google.com/apis/library/routes.googleapis.com)해야 합니다. 그런 다음 API key를 `process.env.GOOGLE_ROUTES_API_KEY`로 설정하거나 `apiKey` constructor argument로 전달하세요.
 
 ## Usage
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain package 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
@@ -83,5 +80,5 @@ export async function run() {
 
 ## Related
 
-- Tool [conceptual guide](/oss/langchain/tools)
-- Tool [how-to guides](/oss/langchain/tools)
+- Tool [개념 가이드](/oss/langchain/tools)
+- Tool [사용 방법 가이드](/oss/langchain/tools)

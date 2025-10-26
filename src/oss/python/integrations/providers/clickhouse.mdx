@@ -2,16 +2,15 @@
 title: ClickHouse
 ---
 
-> [ClickHouse](https://clickhouse.com/) is the fast and resource efficient open-source database for real-time
-> apps and analytics with full SQL support and a wide range of functions to assist users in writing analytical queries.
-> It has data structures and distance search functions (like `L2Distance`) as well as
-> [approximate nearest neighbor search indexes](https://clickhouse.com/docs/en/engines/table-engines/mergetree-family/annindexes)
-> That enables ClickHouse to be used as a high performance and scalable vector database to store and search vectors with SQL.
+> [ClickHouse](https://clickhouse.com/)는 실시간 앱과 분석을 위한 빠르고 리소스 효율적인 오픈소스 데이터베이스로, 완전한 SQL 지원과 사용자가 분석 쿼리를 작성하는 데 도움이 되는 다양한 함수를 제공합니다.
+> `L2Distance`와 같은 데이터 구조 및 거리 검색 함수와
+> [근사 최근접 이웃 검색 인덱스](https://clickhouse.com/docs/en/engines/table-engines/mergetree-family/annindexes)를 갖추고 있어
+> ClickHouse를 SQL로 벡터를 저장하고 검색하는 고성능 및 확장 가능한 vector database로 사용할 수 있습니다.
 
 
-## Installation and Setup
+## 설치 및 설정
 
-We need to install `clickhouse-connect` python package.
+`clickhouse-connect` python package를 설치해야 합니다.
 
 <CodeGroup>
 ```bash pip
@@ -25,7 +24,7 @@ uv add clickhouse-connect
 
 ## Vector Store
 
-See a [usage example](/oss/integrations/vectorstores/clickhouse).
+[사용 예제](/oss/integrations/vectorstores/clickhouse)를 참조하세요.
 
 ```python
 from langchain_community.vectorstores import Clickhouse, ClickhouseSettings

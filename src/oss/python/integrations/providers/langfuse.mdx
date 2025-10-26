@@ -2,15 +2,15 @@
 title: Langfuse
 ---
 
-> **What is Langfuse?** [Langfuse](https://langfuse.com) is an open source LLM engineering platform that helps teams trace API calls, monitor performance, and debug issues in their AI applications.
+> **Langfuse란 무엇인가요?** [Langfuse](https://langfuse.com)는 팀이 API 호출을 추적하고, 성능을 모니터링하며, AI 애플리케이션의 문제를 디버깅할 수 있도록 돕는 오픈 소스 LLM 엔지니어링 플랫폼입니다.
 
-## Tracing LangChain
+## LangChain Tracing
 
-[Langfuse Tracing](https://langfuse.com/docs/tracing) integrates with LangChain using LangChain Callbacks ([Python](https://python.langchain.com/docs/how_to/#callbacks), [JS](https://js.langchain.com/docs/how_to/#callbacks)). Thereby, the Langfuse SDK automatically creates a nested trace for every run of your LangChain applications. This allows you to log, analyze and debug your LangChain application.
+[Langfuse Tracing](https://langfuse.com/docs/tracing)은 LangChain Callbacks([Python](https://python.langchain.com/docs/how_to/#callbacks), [JS](https://js.langchain.com/docs/how_to/#callbacks))를 사용하여 LangChain과 통합됩니다. 이를 통해 Langfuse SDK는 LangChain 애플리케이션의 모든 실행에 대해 자동으로 중첩된 trace를 생성합니다. 이를 통해 LangChain 애플리케이션을 로깅하고, 분석하고, 디버깅할 수 있습니다.
 
-You can configure the integration via (1) constructor arguments or (2) environment variables. Get your Langfuse credentials by signing up at [cloud.langfuse.com](https://cloud.langfuse.com) or [self-hosting Langfuse](https://langfuse.com/self-hosting).
+(1) constructor 인자 또는 (2) 환경 변수를 통해 통합을 구성할 수 있습니다. [cloud.langfuse.com](https://cloud.langfuse.com)에 가입하거나 [Langfuse를 자체 호스팅](https://langfuse.com/self-hosting)하여 Langfuse 자격 증명을 받으세요.
 
-### Constructor arguments
+### Constructor 인자
 
 ```python
 pip install langfuse
@@ -48,7 +48,7 @@ print(response.content)
 langfuse.flush()
 ```
 
-### Environment variables
+### 환경 변수
 
 ```bash filename=".env"
 LANGFUSE_SECRET_KEY="sk-lf-..."
@@ -69,17 +69,17 @@ langfuse_handler = CallbackHandler()
 chain.invoke({"input": "<user_input>"}, config={"callbacks": [langfuse_handler]})
 ```
 
-To see how to use this integration together with other Langfuse features, check out [this end-to-end example](https://langfuse.com/docs/integrations/langchain/example-python).
+이 통합을 다른 Langfuse 기능과 함께 사용하는 방법을 보려면 [이 end-to-end 예제](https://langfuse.com/docs/integrations/langchain/example-python)를 확인하세요.
 
-## Tracing LangGraph
+## LangGraph Tracing
 
-This part demonstrates how [Langfuse](https://langfuse.com/docs) helps to debug, analyze, and iterate on your LangGraph application using the [LangChain integration](https://langfuse.com/docs/integrations/langchain/tracing).
+이 부분에서는 [Langfuse](https://langfuse.com/docs)가 [LangChain 통합](https://langfuse.com/docs/integrations/langchain/tracing)을 사용하여 LangGraph 애플리케이션을 디버깅하고, 분석하고, 반복하는 데 어떻게 도움이 되는지 보여줍니다.
 
-### Initialize Langfuse
+### Langfuse 초기화
 
-**Note:** You need to run at least Python 3.11 ([GitHub Issue](https://github.com/langfuse/langfuse/issues/1926)).
+**참고:** 최소한 Python 3.11을 실행해야 합니다([GitHub Issue](https://github.com/langfuse/langfuse/issues/1926)).
 
-Initialize the Langfuse client with your [API keys](https://langfuse.com/faq/all/where-are-langfuse-api-keys) from the project settings in the Langfuse UI and add them to your environment.
+Langfuse UI의 프로젝트 설정에서 [API keys](https://langfuse.com/faq/all/where-are-langfuse-api-keys)를 사용하여 Langfuse 클라이언트를 초기화하고 환경에 추가하세요.
 
 
 ```python
@@ -101,18 +101,18 @@ os.environ["LANGFUSE_HOST"] = "https://cloud.langfuse.com" # for EU data region
 os.environ["OPENAI_API_KEY"] = "***"
 ```
 
-### Simple chat app with LangGraph
+### LangGraph를 사용한 간단한 채팅 앱
 
-**What we will do in this section:**
+**이 섹션에서 수행할 작업:**
 
-*   Build a support chatbot in LangGraph that can answer common questions
-*   Tracing the chatbot's input and output using Langfuse
+*   일반적인 질문에 답변할 수 있는 지원 챗봇을 LangGraph로 구축
+*   Langfuse를 사용하여 챗봇의 입력 및 출력 추적
 
-We will start with a basic chatbot and build a more advanced multi agent setup in the next section, introducing key LangGraph concepts along the way.
+기본 챗봇으로 시작하여 다음 섹션에서 더 고급 multi agent 설정을 구축하면서 주요 LangGraph 개념을 소개하겠습니다.
 
-#### Create Agent
+#### Agent 생성
 
-Start by creating a `StateGraph`. A `StateGraph` object defines our chatbot's structure as a state machine. We will add nodes to represent the LLM and functions the chatbot can call, and edges to specify how the bot transitions between these functions.
+`StateGraph`를 생성하는 것으로 시작합니다. `StateGraph` 객체는 챗봇의 구조를 상태 머신으로 정의합니다. LLM과 챗봇이 호출할 수 있는 함수를 나타내는 node를 추가하고, 봇이 이러한 함수 간에 전환하는 방법을 지정하는 edge를 추가합니다.
 
 
 ```python
@@ -151,9 +151,9 @@ graph_builder.set_finish_point("chatbot")
 graph = graph_builder.compile()
 ```
 
-#### Add Langfuse as callback to the invocation
+#### 호출에 Langfuse를 callback으로 추가
 
-Now, we will add then [Langfuse callback handler for LangChain](https://langfuse.com/docs/integrations/langchain/tracing) to trace the steps of our application: `config={"callbacks": [langfuse_handler]}`
+이제 애플리케이션의 단계를 추적하기 위해 [LangChain용 Langfuse callback handler](https://langfuse.com/docs/integrations/langchain/tracing)를 추가합니다: `config={"callbacks": [langfuse_handler]}`
 
 
 ```python
@@ -172,11 +172,11 @@ for s in graph.stream({"messages": [HumanMessage(content = "What is Langfuse?")]
 ```
 
 
-#### View traces in Langfuse
+#### Langfuse에서 trace 보기
 
-Example trace in Langfuse: https://cloud.langfuse.com/project/cloramnkj0002jz088vzn1ja4/traces/d109e148-d188-4d6e-823f-aac0864afbab
+Langfuse의 예제 trace: https://cloud.langfuse.com/project/cloramnkj0002jz088vzn1ja4/traces/d109e148-d188-4d6e-823f-aac0864afbab
 
-![Trace view of chat app in Langfuse](https://langfuse.com/images/cookbook/integration-langgraph/integration_langgraph_chatapp_trace.png)
+![Langfuse의 채팅 앱 Trace 뷰](https://langfuse.com/images/cookbook/integration-langgraph/integration_langgraph_chatapp_trace.png)
 
-- Check out the [full notebook](https://langfuse.com/docs/integrations/langchain/example-python-langgraph) to see more examples.
-- To learn how to evaluate the performance of your LangGraph application, check out the [LangGraph evaluation guide](https://langfuse.com/docs/integrations/langchain/example-langgraph-agents).
+- 더 많은 예제를 보려면 [전체 notebook](https://langfuse.com/docs/integrations/langchain/example-python-langgraph)을 확인하세요.
+- LangGraph 애플리케이션의 성능을 평가하는 방법을 알아보려면 [LangGraph 평가 가이드](https://langfuse.com/docs/integrations/langchain/example-langgraph-agents)를 확인하세요.

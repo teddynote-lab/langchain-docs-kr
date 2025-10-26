@@ -2,22 +2,22 @@
 title: Kùzu
 ---
 
-> [Kùzu](https://kuzudb.com/) is an embeddable, scalable, extremely fast graph database.
-> It is permissively licensed with an MIT license, and you can see its source code [here](https://github.com/kuzudb/kuzu).
+> [Kùzu](https://kuzudb.com/)는 임베디드 가능하고, 확장 가능하며, 매우 빠른 그래프 데이터베이스입니다.
+> MIT 라이선스로 허용적으로 라이선스되어 있으며, 소스 코드는 [여기](https://github.com/kuzudb/kuzu)에서 확인할 수 있습니다.
 
-> Key characteristics of Kùzu:
->- Performance and scalability: Implements modern, state-of-the-art join algorithms for graphs.
->- Usability: Very easy to set up and get started with, as there are no servers (embedded architecture).
->- Interoperability: Can conveniently scan and copy data from external columnar formats, CSV, JSON and relational databases.
->- Structured property graph model: Implements the property graph model, with added structure.
->- Cypher support: Allows convenient querying of the graph in Cypher, a declarative query language.
+> Kùzu의 주요 특징:
+>- 성능 및 확장성: 그래프를 위한 최신의 최첨단 join 알고리즘을 구현합니다.
+>- 사용성: 서버가 없는 임베디드 아키텍처로 설정 및 시작이 매우 쉽습니다.
+>- 상호 운용성: 외부 컬럼 형식, CSV, JSON 및 관계형 데이터베이스에서 데이터를 편리하게 스캔하고 복사할 수 있습니다.
+>- 구조화된 property graph 모델: 구조가 추가된 property graph 모델을 구현합니다.
+>- Cypher 지원: 선언적 쿼리 언어인 Cypher로 그래프를 편리하게 쿼리할 수 있습니다.
 
-> Get started with Kùzu by visiting their [documentation](https://docs.kuzudb.com/).
+> Kùzu의 [문서](https://docs.kuzudb.com/)를 방문하여 시작하세요.
 
 
 ## Installation and Setup
 
-Install the Python SDK as follows:
+다음과 같이 Python SDK를 설치합니다:
 
 <CodeGroup>
 ```bash pip
@@ -33,7 +33,7 @@ uv add langchain-kuzu
 
 ## Graphs
 
-See a [usage example](/oss/integrations/graphs/kuzu_db).
+[사용 예제](/oss/integrations/graphs/kuzu_db)를 참조하세요.
 
 ```python
 from langchain_kuzu.graphs.kuzu_graph import KuzuGraph
@@ -41,8 +41,9 @@ from langchain_kuzu.graphs.kuzu_graph import KuzuGraph
 
 ## Chains
 
-See a [usage example](/oss/integrations/graphs/kuzu_db/#creating-kuzuqachain).
+[사용 예제](/oss/integrations/graphs/kuzu_db/#creating-kuzuqachain)를 참조하세요.
 
 ```python
 from langchain_kuzu.chains.graph_qa.kuzu import KuzuQAChain
+```
 ```

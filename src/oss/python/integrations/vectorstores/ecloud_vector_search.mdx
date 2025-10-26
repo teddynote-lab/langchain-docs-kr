@@ -2,22 +2,22 @@
 title: China Mobile ECloud ElasticSearch VectorSearch
 ---
 
->[China Mobile ECloud VectorSearch](https://ecloud.10086.cn/portal/product/elasticsearch) is a fully managed, enterprise-level distributed search and analysis service. China Mobile ECloud VectorSearch provides low-cost, high-performance, and reliable retrieval and analysis platform level product services for structured/unstructured data. As a vector database , it supports multiple index types and similarity distance methods.
+>[China Mobile ECloud VectorSearch](https://ecloud.10086.cn/portal/product/elasticsearch)는 완전 관리형 엔터프라이즈급 분산 검색 및 분석 서비스입니다. China Mobile ECloud VectorSearch는 구조화/비구조화 데이터에 대해 저비용, 고성능, 안정적인 검색 및 분석 플랫폼 수준의 제품 서비스를 제공합니다. vector database로서 다양한 index 유형과 유사도 거리 측정 방법을 지원합니다.
 
-You'll need to install `langchain-community` with `pip install -qU langchain-community` to use this integration
+이 integration을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다
 
-This notebook shows how to use functionality related to the `ECloud ElasticSearch VectorStore`.
-To run, you should have an [China Mobile ECloud VectorSearch](https://ecloud.10086.cn/portal/product/elasticsearch) instance up and running:
+이 notebook은 `ECloud ElasticSearch VectorStore`와 관련된 기능을 사용하는 방법을 보여줍니다.
+실행하려면 [China Mobile ECloud VectorSearch](https://ecloud.10086.cn/portal/product/elasticsearch) instance가 실행 중이어야 합니다:
 
-Read the [help document](https://ecloud.10086.cn/op-help-center/doc/category/1094) to quickly familiarize and configure China Mobile ECloud ElasticSearch instance.
+[도움말 문서](https://ecloud.10086.cn/op-help-center/doc/category/1094)를 읽고 China Mobile ECloud ElasticSearch instance를 빠르게 익히고 구성하세요.
 
-After the instance is up and running, follow these steps to split documents, get embeddings, connect to the baidu cloud elasticsearch instance, index documents, and perform vector retrieval.
+instance가 실행되면 다음 단계에 따라 문서를 분할하고, embedding을 가져오고, baidu cloud elasticsearch instance에 연결하고, 문서를 indexing하고, vector 검색을 수행합니다.
 
 ```python
 #!pip install elasticsearch == 7.10.1
 ```
 
-First, we want to use `OpenAIEmbeddings` so we have to get the OpenAI API Key.
+먼저, `OpenAIEmbeddings`를 사용하려면 OpenAI API Key를 가져와야 합니다.
 
 ```python
 import getpass
@@ -27,7 +27,7 @@ if "OPENAI_API_KEY" not in os.environ:
     os.environ["OPENAI_API_KEY"] = getpass.getpass("OpenAI API Key:")
 ```
 
-Secondly, split documents and get embeddings.
+둘째, 문서를 분할하고 embedding을 가져옵니다.
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -50,7 +50,7 @@ PASSWORD = "your password"
 indexname = "your index name"
 ```
 
-then, index documents
+그런 다음, 문서를 indexing합니다
 
 ```python
 docsearch = EcloudESVectorStore.from_documents(
@@ -64,7 +64,7 @@ docsearch = EcloudESVectorStore.from_documents(
 )
 ```
 
-Finally, Query and retrieve data
+마지막으로, 데이터를 query하고 검색합니다
 
 ```python
 query = "What did the president say about Ketanji Brown Jackson"
@@ -72,7 +72,7 @@ docs = docsearch.similarity_search(query, k=10)
 print(docs[0].page_content)
 ```
 
-A commonly used case
+일반적으로 사용되는 케이스
 
 ```python
 def test_dense_float_vectore_lsh_cosine() -> None:
@@ -144,7 +144,7 @@ def test_dense_float_vectore_lsh_cosine() -> None:
     print(docs[0].page_content)
 ```
 
-With filter case
+filter를 사용하는 케이스
 
 ```python
 def test_dense_float_vectore_exact_with_filter() -> None:

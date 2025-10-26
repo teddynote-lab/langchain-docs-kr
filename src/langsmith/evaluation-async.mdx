@@ -1,23 +1,23 @@
 ---
-title: How to run an evaluation asynchronously
-sidebarTitle: Run an evaluation asynchronously
+title: 비동기적으로 평가 실행하는 방법
+sidebarTitle: 비동기적으로 평가 실행하기
 ---
 
 <Info>
 [Evaluations](/langsmith/evaluation-concepts#applying-evaluations) | [Evaluators](/langsmith/evaluation-concepts#evaluators) | [Datasets](/langsmith/evaluation-concepts#datasets) | [Experiments](/langsmith/evaluation-concepts#experiments)
 </Info>
 
-We can run evaluations asynchronously via the SDK using [aevaluate()](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._arunner.aevaluate), which accepts all of the same arguments as [evaluate()](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate) but expects the application function to be asynchronous. You can learn more about how to use the `evaluate()` function [here](/langsmith/evaluate-llm-application).
+SDK를 사용하여 [aevaluate()](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._arunner.aevaluate)를 통해 비동기적으로 평가를 실행할 수 있습니다. 이 함수는 [evaluate()](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate)와 동일한 인자를 받지만 application function이 비동기여야 합니다. `evaluate()` 함수 사용 방법에 대한 자세한 내용은 [여기](/langsmith/evaluate-llm-application)에서 확인할 수 있습니다.
 
 <Info>
-This guide is only relevant when using the Python SDK. In JS/TS the `evaluate()` function is already async. You can see how to use it [here](/langsmith/evaluate-llm-application).
+이 가이드는 Python SDK를 사용할 때만 관련이 있습니다. JS/TS에서는 `evaluate()` 함수가 이미 async입니다. 사용 방법은 [여기](/langsmith/evaluate-llm-application)에서 확인할 수 있습니다.
 </Info>
 
-## Use `aevaluate()`
+## `aevaluate()` 사용하기
 
 * Python
 
-Requires `langsmith>=0.3.13`
+`langsmith>=0.3.13` 필요
 
 ```python
 from langsmith import wrappers, Client
@@ -71,7 +71,7 @@ results = await ls_client.aevaluate(
 )
 ```
 
-## Related
+## 관련 문서
 
-* [Run an evaluation (synchronously)](/langsmith/evaluate-llm-application)
-* [Handle model rate limits](/langsmith/rate-limiting)
+* [평가 실행하기 (동기적으로)](/langsmith/evaluate-llm-application)
+* [모델 rate limit 처리하기](/langsmith/rate-limiting)

@@ -2,7 +2,7 @@
 title: BrightDataUnlocker
 ---
 
-[Bright Data](https://brightdata.com/) provides a powerful Web Unlocker API that allows you to access websites that might be protected by anti-bot measures, geo-restrictions, or other access limitations, making it particularly useful for AI agents requiring reliable web content extraction.
+[Bright Data](https://brightdata.com/)는 안티봇 조치, 지역 제한 또는 기타 접근 제한으로 보호될 수 있는 웹사이트에 액세스할 수 있는 강력한 Web Unlocker API를 제공하며, 신뢰할 수 있는 웹 콘텐츠 추출이 필요한 AI 에이전트에 특히 유용합니다.
 
 ## Overview
 
@@ -16,17 +16,17 @@ title: BrightDataUnlocker
 
 |Native async|Returns artifact|Return data|Pricing|
 |:-:|:-:|:--|:-:|
-|❌|❌|HTML, Markdown, or screenshot of web pages|Requires Bright Data account|
+|❌|❌|웹 페이지의 HTML, Markdown 또는 스크린샷|Bright Data 계정 필요|
 
 ## Setup
 
-The integration lives in the `langchain-brightdata` package.
+이 통합은 `langchain-brightdata` 패키지에 포함되어 있습니다.
 
 ```python
 pip install langchain-brightdata
 ```
 
-You'll need a Bright Data API key to use this tool. You can set it as an environment variable:
+이 도구를 사용하려면 Bright Data API 키가 필요합니다. 환경 변수로 설정할 수 있습니다:
 
 ```python
 import os
@@ -34,7 +34,7 @@ import os
 os.environ["BRIGHT_DATA_API_KEY"] = "your-api-key"
 ```
 
-Or pass it directly when initializing the tool:
+또는 도구를 초기화할 때 직접 전달할 수 있습니다:
 
 ```python
 from langchain_brightdata import BrightDataUnlocker
@@ -44,22 +44,22 @@ unlocker_tool = BrightDataUnlocker(bright_data_api_key="your-api-key")
 
 ## Instantiation
 
-Here we show how to instantiate an instance of the BrightDataUnlocker tool. This tool allows you to access websites that may be protected by anti-bot measures, geo-restrictions, or other access limitations using Bright Data's Web Unlocker service.
+여기서는 BrightDataUnlocker 도구의 인스턴스를 생성하는 방법을 보여줍니다. 이 도구를 사용하면 Bright Data의 Web Unlocker 서비스를 사용하여 안티봇 조치, 지역 제한 또는 기타 접근 제한으로 보호될 수 있는 웹사이트에 액세스할 수 있습니다.
 
-The tool accepts various parameters during instantiation:
+이 도구는 인스턴스화 시 다양한 매개변수를 허용합니다:
 
-- `bright_data_api_key` (required, str): Your Bright Data API key for authentication.
-- `format` (optional, Literal["raw"]): Format of the response content. Default is "raw".
-- `country` (optional, str): Two-letter country code for geo-specific access (e.g., "us", "gb", "de", "jp"). Set this when you need to view the website as if accessing from a specific country. Default is None.
-- `zone` (optional, str): Bright Data zone to use for the request. The "unlocker" zone is optimized for accessing websites that might block regular requests. Default is "unlocker".
-- `data_format` (optional, Literal["html", "markdown", "screenshot"]): Output format for the retrieved content. Options include:
-  - "html" - Returns the standard HTML content (default)
-  - "markdown" - Returns content converted to markdown format
-  - "screenshot" - Returns a PNG screenshot of the rendered page
+- `bright_data_api_key` (필수, str): 인증을 위한 Bright Data API 키입니다.
+- `format` (선택, Literal["raw"]): 응답 콘텐츠의 형식입니다. 기본값은 "raw"입니다.
+- `country` (선택, str): 지역별 액세스를 위한 두 글자 국가 코드입니다 (예: "us", "gb", "de", "jp"). 특정 국가에서 액세스하는 것처럼 웹사이트를 보려면 이 값을 설정하세요. 기본값은 None입니다.
+- `zone` (선택, str): 요청에 사용할 Bright Data zone입니다. "unlocker" zone은 일반 요청을 차단할 수 있는 웹사이트에 액세스하는 데 최적화되어 있습니다. 기본값은 "unlocker"입니다.
+- `data_format` (선택, Literal["html", "markdown", "screenshot"]): 검색된 콘텐츠의 출력 형식입니다. 옵션은 다음과 같습니다:
+  - "html" - 표준 HTML 콘텐츠를 반환합니다 (기본값)
+  - "markdown" - 마크다운 형식으로 변환된 콘텐츠를 반환합니다
+  - "screenshot" - 렌더링된 페이지의 PNG 스크린샷을 반환합니다
 
 ## Invocation
 
-### Basic Usage
+### 기본 사용법
 
 ```python
 from langchain_brightdata import BrightDataUnlocker
@@ -75,7 +75,7 @@ result = unlocker_tool.invoke("https://example.com")
 print(result)
 ```
 
-### Advanced Usage with Parameters
+### 매개변수를 사용한 고급 사용법
 
 ```python
 from langchain_brightdata import BrightDataUnlocker
@@ -99,23 +99,23 @@ print(result)
 
 ## Customization Options
 
-The BrightDataUnlocker tool accepts several parameters for customization:
+BrightDataUnlocker 도구는 커스터마이징을 위한 여러 매개변수를 허용합니다:
 
 |Parameter|Type|Description|
 |:--|:--|:--|
-|`url`|str|The URL to access|
-|`format`|str|Format of the response content (default: "raw")|
-|`country`|str|Two-letter country code for geo-specific access (e.g., "us", "gb")|
-|`zone`|str|Bright Data zone to use (default: "unlocker")|
-|`data_format`|str|Output format: None (HTML), "markdown", or "screenshot"|
+|`url`|str|액세스할 URL|
+|`format`|str|응답 콘텐츠의 형식 (기본값: "raw")|
+|`country`|str|지역별 액세스를 위한 두 글자 국가 코드 (예: "us", "gb")|
+|`zone`|str|사용할 Bright Data zone (기본값: "unlocker")|
+|`data_format`|str|출력 형식: None (HTML), "markdown" 또는 "screenshot"|
 
 ## Data Format Options
 
-The `data_format` parameter allows you to specify how the content should be returned:
+`data_format` 매개변수를 사용하면 콘텐츠가 반환되는 방식을 지정할 수 있습니다:
 
-- `None` or `"html"` (default): Returns the standard HTML content of the page
-- `"markdown"`: Returns the content converted to markdown format, which is useful for feeding directly to LLMs
-- `"screenshot"`: Returns a PNG screenshot of the rendered page, useful for visual analysis
+- `None` 또는 `"html"` (기본값): 페이지의 표준 HTML 콘텐츠를 반환합니다
+- `"markdown"`: 마크다운 형식으로 변환된 콘텐츠를 반환하며, LLM에 직접 제공하는 데 유용합니다
+- `"screenshot"`: 렌더링된 페이지의 PNG 스크린샷을 반환하며, 시각적 분석에 유용합니다
 
 ## Use within an agent
 

@@ -3,26 +3,26 @@ title: LangChain Decorators
 ---
 
 ~~~
-Disclaimer: `LangChain decorators` is not created by the LangChain team and is not supported by it.
+면책 조항: `LangChain decorators`는 LangChain 팀이 만든 것이 아니며 공식적으로 지원되지 않습니다.
 ~~~
 
->`LangChain decorators` is a layer on the top of LangChain that provides syntactic sugar 🍭 for writing custom langchain prompts and chains
+>`LangChain decorators`는 LangChain 위에 구축된 레이어로, 커스텀 langchain prompt와 chain을 작성하기 위한 syntactic sugar 🍭를 제공합니다
 >
->For Feedback, Issues, Contributions - please raise an issue here:
+>피드백, 이슈, 기여에 대해서는 여기에 이슈를 등록해주세요:
 >[ju-bezdek/langchain-decorators](https://github.com/ju-bezdek/langchain-decorators)
 
 
-Main principles and benefits:
+주요 원칙과 이점:
 
-- more `pythonic` way of writing code
-- write multiline prompts that won't break your code flow with indentation
-- making use of IDE in-built support for **hinting**, **type checking** and **popup with docs** to quickly peek in the function to see the prompt, parameters it consumes etc.
-- leverage all the power of 🦜🔗 LangChain ecosystem
-- adding support for **optional parameters**
-- easily share parameters between the prompts by binding them to one class
+- 더 `pythonic`한 코드 작성 방식
+- 들여쓰기로 인해 코드 흐름이 깨지지 않는 여러 줄 prompt 작성
+- **힌팅**, **타입 체킹**, **문서 팝업**과 같은 IDE 내장 지원을 활용하여 함수를 빠르게 확인하고 prompt, 소비하는 parameter 등을 확인
+- 🦜🔗 LangChain 생태계의 모든 기능 활용
+- **optional parameter** 지원 추가
+- parameter를 하나의 class에 바인딩하여 prompt 간에 쉽게 공유
 
 
-Here is a simple example of a code written with **LangChain Decorators ✨**
+다음은 **LangChain Decorators ✨**로 작성된 간단한 예제입니다
 
 ``` python
 @llm_prompt
@@ -40,9 +40,9 @@ write_me_short_post(topic="starwars")
 write_me_short_post(topic="starwars", platform="redit")
 ```
 
-# Quick start
+# 빠른 시작
 
-## Installation
+## 설치
 
 <CodeGroup>
 ```bash
@@ -54,20 +54,20 @@ uv add langchain_decorators
 ```
 </CodeGroup>
 
-## Examples
+## 예제
 
-Good idea on how to start is to review the examples here:
+시작하는 좋은 방법은 여기 있는 예제를 검토하는 것입니다:
     - [jupyter notebook](https://github.com/ju-bezdek/langchain-decorators/blob/main/example_notebook.ipynb)
     - [colab notebook](https://colab.research.google.com/drive/1no-8WfeP6JaLD9yUtkPgym6x0G9ZYZOG#scrollTo=N4cf__D0E2Yk)
 
-# Defining other parameters
-Here we are just marking a function as a prompt with `llm_prompt` decorator, turning it effectively into a LLMChain. Instead of running it
+# 다른 parameter 정의하기
+여기서는 `llm_prompt` decorator로 함수를 prompt로 표시하여 효과적으로 LLMChain으로 변환합니다. 실행하는 대신
 
 
-Standard LLMchain takes much more init parameter than just inputs_variables and prompt... here is this implementation detail hidden in the decorator.
-Here is how it works:
+표준 LLMchain은 inputs_variables와 prompt보다 훨씬 많은 init parameter를 받습니다... 여기서는 이 구현 세부사항이 decorator에 숨겨져 있습니다.
+작동 방식은 다음과 같습니다:
 
-1. Using **Global settings**:
+1. **Global settings** 사용:
 
 ``` python
 # define global settings for all prompty (if not set - chatGPT is the current default)
@@ -78,7 +78,7 @@ GlobalSettings.define_settings(
     default_streaming_llm=ChatOpenAI(temperature=0.0,streaming=True), this is default... can change it here for all ... will be used for streaming
 )
 ```
-2. Using predefined **prompt types**
+2. 미리 정의된 **prompt types** 사용
 
 ``` python
 #You can change the default prompt types
@@ -95,7 +95,7 @@ def write_a_complicated_code(app_idea:str)->str:
     ...
 
 ```
-3.  Define the settings **directly in the decorator**
+3.  **decorator에서 직접** settings 정의
 
 ``` python
 from langchain_openai import OpenAI
@@ -108,9 +108,9 @@ from langchain_openai import OpenAI
 def creative_writer(book_title:str)->str:
     ...
 ```
-## Passing a memory and/or callbacks:
+## memory 및/또는 callbacks 전달:
 
-To pass any of these, just declare them in the function (or use kwargs to pass anything)
+이들 중 하나를 전달하려면 함수에서 선언하기만 하면 됩니다 (또는 kwargs를 사용하여 무엇이든 전달)
 
 ```python
 
@@ -127,16 +127,16 @@ async def write_me_short_post(topic:str, platform:str="twitter", memory:SimpleMe
 await write_me_short_post(topic="old movies")
 
 ```
-# Simplified streaming
+# 간소화된 streaming
 
-If we want to leverage streaming:
- - we need to define prompt as async function
- - turn on the streaming on the decorator, or we can define PromptType with streaming on
- - capture the stream using StreamingContext
+streaming을 활용하려면:
+ - prompt를 async function으로 정의해야 합니다
+ - decorator에서 streaming을 켜거나 streaming이 켜진 PromptType을 정의할 수 있습니다
+ - StreamingContext를 사용하여 stream을 캡처합니다
 
-This way we just mark which prompt should be streamed, not needing to tinker with what LLM should we use, passing around the creating and distribute streaming handler into particular part of our chain... just turn the streaming on/off on prompt/prompt type...
+이 방식으로 어떤 prompt를 streaming할지만 표시하면 되며, 어떤 LLM을 사용해야 하는지, streaming handler를 생성하고 chain의 특정 부분에 배포하는 것에 대해 신경 쓸 필요가 없습니다... prompt/prompt type에서 streaming을 켜고 끄기만 하면 됩니다...
 
-The streaming will happen only if we call it in streaming context ... there we can define a simple function to handle the stream
+streaming은 streaming context에서 호출할 때만 발생합니다... 여기서 stream을 처리하는 간단한 함수를 정의할 수 있습니다
 
 ``` python
 # this code example is complete and should run as it is
@@ -173,12 +173,12 @@ print("\nWe've captured",len(tokens),"tokens🎉\n")
 print("Here is the result:")
 print(result)
 ```
-# Prompt declarations
-By default the prompt is the whole function docs, unless you mark your prompt
+# Prompt 선언
+기본적으로 prompt는 전체 함수 docs이며, prompt를 표시하지 않는 한
 
-## Documenting your prompt
+## prompt 문서화
 
-We can specify what part of our docs is the prompt definition, by specifying a code block with `<prompt>` language tag
+`<prompt>` 언어 태그가 있는 코드 블록을 지정하여 docs의 어느 부분이 prompt 정의인지 지정할 수 있습니다
 
 ``` python
 @llm_prompt
@@ -200,7 +200,7 @@ def write_me_short_post(topic:str, platform:str="twitter", audience:str = "devel
 
 ## Chat messages prompt
 
-For chat models is very useful to define prompt as a set of message templates... here is how to do it:
+chat model의 경우 prompt를 message template 세트로 정의하는 것이 매우 유용합니다... 방법은 다음과 같습니다:
 
 ``` python
 @llm_prompt
@@ -247,15 +247,15 @@ def simulate_conversation(human_input:str, agent_role:str="a pirate"):
 
 ```
 
-the roles here are model native roles (assistant, user, system for chatGPT)
+여기서 role은 model 네이티브 role입니다 (chatGPT의 경우 assistant, user, system)
 
 
 
 # Optional sections
-- you can define a whole sections of your prompt that should be optional
-- if any input in the section is missing, the whole section won't be rendered
+- prompt의 전체 section을 optional로 정의할 수 있습니다
+- section의 input이 누락되면 전체 section이 렌더링되지 않습니다
 
-the syntax for this is as follows:
+구문은 다음과 같습니다:
 
 ``` python
 @llm_prompt
@@ -273,8 +273,8 @@ def prompt_with_optional_partials():
 ```
 # Output parsers
 
-- llm_prompt decorator natively tries to detect the best output parser based on the output type. (if not set, it returns the raw string)
-- list, dict and pydantic outputs are also supported natively (automatically)
+- llm_prompt decorator는 기본적으로 output type을 기반으로 최적의 output parser를 자동으로 감지하려고 시도합니다. (설정되지 않은 경우 raw string을 반환)
+- list, dict 및 pydantic output도 기본적으로 지원됩니다 (자동으로)
 
 ``` python
 # this code example is complete and should run as it is
@@ -289,10 +289,10 @@ def write_name_suggestions(company_business:str, count:int)->list:
 
 write_name_suggestions(company_business="sells cookies", count=5)
 ```
-## More complex structures
+## 더 복잡한 구조
 
-for dict / pydantic you need to specify the formatting instructions...
-this can be tedious, that's why you can let the output parser gegnerate you the instructions based on the model (pydantic)
+dict / pydantic의 경우 formatting instructions를 지정해야 합니다...
+이것은 지루할 수 있으므로 output parser가 model(pydantic)을 기반으로 instructions를 생성하도록 할 수 있습니다
 
 ``` python
 from langchain_decorators import llm_prompt
@@ -319,7 +319,7 @@ print("company headline: ",company.headline)
 print("company employees: ",company.employees)
 
 ```
-# Binding the prompt to an object
+# object에 prompt 바인딩
 
 ``` python
 from pydantic import BaseModel
@@ -343,7 +343,7 @@ class AssistantPersonality(BaseModel):
     @llm_prompt
     def introduce_your_self(self)->str:
         """
-        ``` <prompt:system>
+        ``` <prompt:system>
         You are an assistant named {assistant_name}.
         Your role is to act as {assistant_role}
         ```
@@ -360,7 +360,7 @@ print(personality.introduce_your_self(personality))
 ```
 
 
-# More examples:
+# 더 많은 예제:
 
-- these and few more examples are also available in the [colab notebook here](https://colab.research.google.com/drive/1no-8WfeP6JaLD9yUtkPgym6x0G9ZYZOG#scrollTo=N4cf__D0E2Yk)
-- including the [ReAct Agent re-implementation](https://colab.research.google.com/drive/1no-8WfeP6JaLD9yUtkPgym6x0G9ZYZOG#scrollTo=3bID5fryE2Yp) using purely langchain decorators
+- 이러한 예제와 몇 가지 추가 예제는 [여기 colab notebook](https://colab.research.google.com/drive/1no-8WfeP6JaLD9yUtkPgym6x0G9ZYZOG#scrollTo=N4cf__D0E2Yk)에서도 확인할 수 있습니다
+- 순수하게 langchain decorators를 사용한 [ReAct Agent 재구현](https://colab.research.google.com/drive/1no-8WfeP6JaLD9yUtkPgym6x0G9ZYZOG#scrollTo=3bID5fryE2Yp)도 포함되어 있습니다

@@ -2,28 +2,28 @@
 title: Requests Toolkit
 ---
 
-We can use the Requests [toolkit](/oss/langchain/tools#toolkits) to construct agents that generate HTTP requests.
+Requests [toolkit](/oss/langchain/tools#toolkits)을 사용하여 HTTP 요청을 생성하는 agent를 구성할 수 있습니다.
 
-For detailed documentation of all API toolkit features and configurations head to the API reference for [RequestsToolkit](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.openapi.toolkit.RequestsToolkit.html).
+모든 API toolkit 기능 및 구성에 대한 자세한 문서는 [RequestsToolkit](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.openapi.toolkit.RequestsToolkit.html) API reference를 참조하세요.
 
-## ⚠️ Security note ⚠️
+## ⚠️ 보안 주의사항 ⚠️
 
-There are inherent risks in giving models discretion to execute real-world actions. Take precautions to mitigate these risks:
+모델에게 실제 작업을 실행할 재량권을 부여하는 것에는 내재된 위험이 있습니다. 이러한 위험을 완화하기 위해 다음 예방 조치를 취하세요:
 
-- Make sure that permissions associated with the tools are narrowly-scoped (e.g., for database operations or API requests);
-- When desired, make use of human-in-the-loop workflows.
+- tool과 연결된 권한이 좁은 범위로 제한되어 있는지 확인하세요 (예: 데이터베이스 작업 또는 API 요청);
+- 필요한 경우 human-in-the-loop 워크플로우를 활용하세요.
 
 ## Setup
 
 ### Installation
 
-This toolkit lives in the `langchain-community` package:
+이 toolkit은 `langchain-community` package에 포함되어 있습니다:
 
 ```python
 pip install -qU langchain-community
 ```
 
-To enable automated tracing of individual tools, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+개별 tool의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -32,18 +32,18 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ## Instantiation
 
-First we will demonstrate a minimal example.
+먼저 최소한의 예제를 시연하겠습니다.
 
-**NOTE**: There are inherent risks in giving models discretion to execute real-world actions. We must "opt-in" to these risks by setting `allow_dangerous_request=True` to use these tools.
-**This can be dangerous for calling unwanted requests**. Please make sure your custom OpenAPI spec (yaml) is safe and that permissions associated with the tools are narrowly-scoped.
+**참고**: 모델에게 실제 작업을 실행할 재량권을 부여하는 것에는 내재된 위험이 있습니다. 이러한 tool을 사용하려면 `allow_dangerous_request=True`를 설정하여 이러한 위험에 "동의"해야 합니다.
+**이는 원치 않는 요청을 호출하는 데 위험할 수 있습니다**. 사용자 정의 OpenAPI spec (yaml)이 안전한지, 그리고 tool과 연결된 권한이 좁은 범위로 제한되어 있는지 확인하세요.
 
 ```python
 ALLOW_DANGEROUS_REQUEST = True
 ```
 
-We can use the [JSONPlaceholder](https://jsonplaceholder.typicode.com) API as a testing ground.
+테스트 환경으로 [JSONPlaceholder](https://jsonplaceholder.typicode.com) API를 사용할 수 있습니다.
 
-Let's create (a subset of) its API spec:
+API spec의 (일부를) 생성해 보겠습니다:
 
 ```python
 from typing import Any, Dict, Union
@@ -106,7 +106,7 @@ def _get_api_spec() -> str:
 api_spec = _get_api_spec()
 ```
 
-Next we can instantiate the toolkit. We require no authorization or other headers for this API:
+다음으로 toolkit을 인스턴스화할 수 있습니다. 이 API에는 인증이나 다른 header가 필요하지 않습니다:
 
 ```python
 from langchain_community.agent_toolkits.openapi.toolkit import RequestsToolkit
@@ -120,7 +120,7 @@ toolkit = RequestsToolkit(
 
 ## Tools
 
-View available tools:
+사용 가능한 tool 보기:
 
 ```python
 tools = toolkit.get_tools()
@@ -207,4 +207,4 @@ The titles of the top two posts are:
 
 ## API reference
 
-For detailed documentation of all API toolkit features and configurations head to the API reference for [RequestsToolkit](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.openapi.toolkit.RequestsToolkit.html).
+모든 API toolkit 기능 및 구성에 대한 자세한 문서는 [RequestsToolkit](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.openapi.toolkit.RequestsToolkit.html) API reference를 참조하세요.

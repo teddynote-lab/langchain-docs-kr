@@ -1,24 +1,25 @@
+```markdown
 ---
 title: xAI
 ---
 
-[xAI](https://console.x.ai) offers an API to interact with Grok models.
+[xAI](https://console.x.ai)는 Grok 모델과 상호작용할 수 있는 API를 제공합니다.
 
-This example goes over how to use LangChain to interact with xAI models.
+이 예제는 LangChain을 사용하여 xAI 모델과 상호작용하는 방법을 다룹니다.
 
-## Installation
+## 설치
 
 ```python
 pip install -U langchain-xai
 ```
 
-## Environment
+## 환경 설정
 
-To use xAI, you'll need to [create an API key](https://console.x.ai/). The API key can be passed in as an init param `xai_api_key` or set as environment variable `XAI_API_KEY`.
+xAI를 사용하려면 [API 키를 생성](https://console.x.ai/)해야 합니다. API 키는 초기화 매개변수 `xai_api_key`로 전달하거나 환경 변수 `XAI_API_KEY`로 설정할 수 있습니다.
 
-## Example
+## 예제
 
-See [ChatXAI docs](/oss/integrations/chat/xai) for detail and supported features.
+자세한 내용과 지원되는 기능은 [ChatXAI 문서](/oss/integrations/chat/xai)를 참조하세요.
 
 ```python
 # Querying chat models with xAI
@@ -36,4 +37,5 @@ for m in chat.stream("Tell me fun things to do in NYC"):
 
 # if you don't want to do streaming, you can use the invoke method
 # chat.invoke("Tell me fun things to do in NYC")
+```
 ```

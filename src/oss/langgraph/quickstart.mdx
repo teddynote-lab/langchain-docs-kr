@@ -1,28 +1,29 @@
+```markdown
 ---
-title: Quickstart
+title: 빠른 시작
 ---
 
 
 
-This quickstart demonstrates how to build a calculator agent using the LangGraph Graph API or the Functional API.
+이 빠른 시작 가이드는 LangGraph Graph API 또는 Functional API를 사용하여 계산기 에이전트를 구축하는 방법을 보여줍니다.
 
-- [Use the Graph API](#use-the-graph-api) if you prefer to define your agent as a graph of nodes and edges.
-- [Use the Functional API](#use-the-functional-api) if you prefer to define your agent as a single function.
+- 에이전트를 노드와 엣지의 그래프로 정의하려면 [Graph API 사용하기](#use-the-graph-api)를 참조하세요.
+- 에이전트를 단일 함수로 정의하려면 [Functional API 사용하기](#use-the-functional-api)를 참조하세요.
 
 <Tip>
-For conceptual information, see [Graph API overview](/oss/langgraph/graph-api) and [Functional API overview](/oss/langgraph/functional-api).
+개념적인 정보는 [Graph API 개요](/oss/langgraph/graph-api)와 [Functional API 개요](/oss/langgraph/functional-api)를 참조하세요.
 </Tip>
 
 <Info>
-For this example, you will need to set up a [Claude (Anthropic)](https://www.anthropic.com/) account and get an API key. Then, set the `ANTHROPIC_API_KEY` environment variable in your terminal.
+이 예제를 실행하려면 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 설정하고 API 키를 발급받아야 합니다. 그런 다음 터미널에서 `ANTHROPIC_API_KEY` 환경 변수를 설정하세요.
 </Info>
 
 <Tabs>
-<Tab title="Use the Graph API">
+<Tab title="Graph API 사용하기">
 
-## 1. Define tools and model
+## 1. tool과 model 정의하기
 
-In this example, we'll use the Claude Sonnet 4.5 model and define tools for addition, multiplication, and division.
+이 예제에서는 Claude Sonnet 4.5 모델을 사용하고 덧셈, 곱셈, 나눗셈을 위한 tool을 정의합니다.
 
 :::python
 ```python
@@ -127,14 +128,14 @@ const modelWithTools = model.bindTools(tools);
 ```
 :::
 
-## 2. Define state
+## 2. state 정의하기
 
-The graph's state is used to store the messages and the number of LLM calls.
+그래프의 state는 메시지와 LLM 호출 횟수를 저장하는 데 사용됩니다.
 
 <Tip>
-    State in LangGraph persists throughout the agent's execution.
+    LangGraph의 State는 에이전트 실행 전체에 걸쳐 유지됩니다.
 
-    The `Annotated` type with `operator.add` ensures that new messages are appended to the existing list rather than replacing it.
+    `operator.add`와 함께 사용되는 `Annotated` 타입은 새 메시지가 기존 목록을 대체하는 대신 추가되도록 보장합니다.
 </Tip>
 
 :::python
@@ -167,9 +168,9 @@ const MessagesState = z.object({
 ```
 :::
 
-## 3. Define model node
+## 3. model node 정의하기
 
-The model node is used to call the LLM and decide whether to call a tool or not.
+model node는 LLM을 호출하고 tool을 호출할지 여부를 결정하는 데 사용됩니다.
 
 :::python
 
@@ -214,9 +215,9 @@ async function llmCall(state: z.infer<typeof MessagesState>) {
 ```
 :::
 
-## 4. Define tool node
+## 4. tool node 정의하기
 
-The tool node is used to call the tools and return the results.
+tool node는 tool을 호출하고 결과를 반환하는 데 사용됩니다.
 
 :::python
 
@@ -259,9 +260,9 @@ async function toolNode(state: z.infer<typeof MessagesState>) {
 ```
 :::
 
-## 5. Define end logic
+## 5. 종료 로직 정의하기
 
-The conditional edge function is used to route to the tool node or end based upon whether the LLM made a tool call.
+conditional edge 함수는 LLM이 tool 호출을 했는지 여부에 따라 tool node로 라우팅하거나 종료하는 데 사용됩니다.
 
 :::python
 
@@ -303,9 +304,9 @@ async function shouldContinue(state: z.infer<typeof MessagesState>) {
 ```
 :::
 
-## 6. Build and compile the agent
+## 6. 에이전트 빌드 및 컴파일하기
 
-The agent is built using the @[`StateGraph`] class and compiled using the @[`compile`][StateGraph.compile] method.
+에이전트는 @[`StateGraph`] 클래스를 사용하여 빌드되고 @[`compile`][StateGraph.compile] 메서드를 사용하여 컴파일됩니다.
 
 :::python
 
@@ -365,9 +366,9 @@ for (const message of result.messages) {
 ```
 :::
 
-Congratulations! You've built your first agent using the LangGraph Graph API.
+축하합니다! LangGraph Graph API를 사용하여 첫 번째 에이전트를 구축했습니다.
 
-<Accordion title="Full code example">
+<Accordion title="전체 코드 예제">
 :::python
 
 ```python
@@ -664,11 +665,11 @@ for (const message of result.messages) {
 </Accordion>
 </Tab>
 
-<Tab title="Use the Functional API">
+<Tab title="Functional API 사용하기">
 
-## 1. Define tools and model
+## 1. tool과 model 정의하기
 
-In this example, we'll use the Claude Sonnet 4.5 model and define tools for addition, multiplication, and division.
+이 예제에서는 Claude Sonnet 4.5 모델을 사용하고 덧셈, 곱셈, 나눗셈을 위한 tool을 정의합니다.
 
 :::python
 
@@ -785,12 +786,12 @@ const modelWithTools = model.bindTools(tools);
 ```
 :::
 
-## 2. Define model node
+## 2. model node 정의하기
 
-The model node is used to call the LLM and decide whether to call a tool or not.
+model node는 LLM을 호출하고 tool을 호출할지 여부를 결정하는 데 사용됩니다.
 
 <Tip>
-    The @[`@task`] decorator marks a function as a task that can be executed as part of the agent. Tasks can be called synchronously or asynchronously within your entrypoint function.
+    @[`@task`] 데코레이터는 함수를 에이전트의 일부로 실행할 수 있는 task로 표시합니다. Task는 entrypoint 함수 내에서 동기적 또는 비동기적으로 호출될 수 있습니다.
 </Tip>
 
 :::python
@@ -825,9 +826,9 @@ const callmodel = task({ name: "callLlm" }, async (messages: BaseMessage[]) => {
 ```
 :::
 
-## 3. Define tool node
+## 3. tool node 정의하기
 
-The tool node is used to call the tools and return the results.
+tool node는 tool을 호출하고 결과를 반환하는 데 사용됩니다.
 
 :::python
 ```python
@@ -850,12 +851,12 @@ const callTool = task({ name: "callTool" }, async (toolCall: ToolCall) => {
 ```
 :::
 
-## 4. Define agent
+## 4. 에이전트 정의하기
 
-The agent is built using the @[`@entrypoint`] function.
+에이전트는 @[`@entrypoint`] 함수를 사용하여 빌드됩니다.
 
 <Note>
-    In the Functional API, instead of defining nodes and edges explicitly, you write standard control flow logic (loops, conditionals) within a single function.
+    Functional API에서는 노드와 엣지를 명시적으로 정의하는 대신, 단일 함수 내에서 표준 제어 흐름 로직(루프, 조건문)을 작성합니다.
 </Note>
 
 :::python
@@ -923,9 +924,9 @@ for (const message of result) {
 ```
 :::
 
-Congratulations! You've built your first agent using the LangGraph Functional API.
+축하합니다! LangGraph Functional API를 사용하여 첫 번째 에이전트를 구축했습니다.
 
-<Accordion title="Full code example" icon="code">
+<Accordion title="전체 코드 예제" icon="code">
 :::python
 
 ```python
@@ -1148,5 +1149,4 @@ for (const message of result) {
 </Accordion>
 </Tab>
 </Tabs>
-
-
+```

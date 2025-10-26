@@ -2,15 +2,15 @@
 title: Nebius
 ---
 
-The `NebiusRetriever` enables efficient similarity search using embeddings from [Nebius AI Studio](https://studio.nebius.ai/). It leverages high-quality embedding models to enable semantic search over documents.
+`NebiusRetriever`는 [Nebius AI Studio](https://studio.nebius.ai/)의 embedding을 사용하여 효율적인 유사도 검색을 가능하게 합니다. 고품질 embedding model을 활용하여 문서에 대한 의미론적 검색을 수행합니다.
 
-This retriever is optimized for scenarios where you need to perform similarity search over a collection of documents, but don't need to persist the vectors to a vector database. It performs vector similarity search in-memory using matrix operations, making it efficient for medium-sized document collections.
+이 retriever는 문서 컬렉션에 대해 유사도 검색을 수행해야 하지만 vector를 vector database에 저장할 필요가 없는 시나리오에 최적화되어 있습니다. matrix 연산을 사용하여 메모리 내에서 vector 유사도 검색을 수행하므로 중간 규모의 문서 컬렉션에 효율적입니다.
 
 ## Setup
 
 ### Installation
 
-The Nebius integration can be installed via pip:
+Nebius integration은 pip를 통해 설치할 수 있습니다:
 
 ```python
 pip install -U langchain-nebius
@@ -18,7 +18,7 @@ pip install -U langchain-nebius
 
 ### Credentials
 
-Nebius requires an API key that can be passed as an initialization parameter `api_key` or set as the environment variable `NEBIUS_API_KEY`. You can obtain an API key by creating an account on [Nebius AI Studio](https://studio.nebius.ai/).
+Nebius는 초기화 parameter `api_key`로 전달하거나 환경 변수 `NEBIUS_API_KEY`로 설정할 수 있는 API key가 필요합니다. [Nebius AI Studio](https://studio.nebius.ai/)에서 계정을 생성하여 API key를 얻을 수 있습니다.
 
 ```python
 import getpass
@@ -31,7 +31,7 @@ if "NEBIUS_API_KEY" not in os.environ:
 
 ## Instantiation
 
-The `NebiusRetriever` requires a `NebiusEmbeddings` instance and a list of documents. Here's how to initialize it:
+`NebiusRetriever`는 `NebiusEmbeddings` instance와 문서 목록이 필요합니다. 초기화 방법은 다음과 같습니다:
 
 ```python
 from langchain_core.documents import Document
@@ -89,7 +89,7 @@ retriever = NebiusRetriever(
 
 ### Retrieve Relevant Documents
 
-You can use the retriever to find documents related to a query:
+retriever를 사용하여 query와 관련된 문서를 찾을 수 있습니다:
 
 ```python
 # Query for European capitals
@@ -110,9 +110,9 @@ Top 3 results:
 3. Rome is the capital of Italy (Country: Italy)
 ```
 
-### Using get_relevant_documents
+### get_relevant_documents 사용하기
 
-You can also use the `get_relevant_documents` method directly (though `invoke` is the preferred interface):
+`get_relevant_documents` method를 직접 사용할 수도 있습니다 (단, `invoke`가 권장되는 interface입니다):
 
 ```python
 # Query for Asian countries
@@ -133,9 +133,9 @@ Top 3 results:
 3. Canberra is the capital of Australia (Country: Australia)
 ```
 
-### Customizing Number of Results
+### 결과 수 사용자 정의
 
-You can adjust the number of results at query time by passing `k` as a parameter:
+query 시점에 `k`를 parameter로 전달하여 결과 수를 조정할 수 있습니다:
 
 ```python
 # Query for a specific country, with custom k
@@ -156,7 +156,7 @@ Top 1 result:
 
 ### Async Support
 
-NebiusRetriever supports async operations:
+NebiusRetriever는 async 작업을 지원합니다:
 
 ```python
 import asyncio
@@ -183,7 +183,7 @@ Top 3 results:
 3. Paris is the capital of France (Country: France)
 ```
 
-### Handling Empty Documents
+### 빈 문서 처리
 
 ```python
 # Create a retriever with empty documents
@@ -204,7 +204,7 @@ Number of results: 0
 
 ## Use within a chain
 
-NebiusRetriever works seamlessly in LangChain RAG pipelines. Here's an example of creating a simple RAG chain with the NebiusRetriever:
+NebiusRetriever는 LangChain RAG pipeline에서 원활하게 작동합니다. 다음은 NebiusRetriever를 사용하여 간단한 RAG chain을 생성하는 예제입니다:
 
 ```python
 from langchain_core.output_parsers import StrOutputParser
@@ -254,9 +254,9 @@ Based on the context provided, three European capitals are:
 3. Rome
 ```
 
-### Creating a Search Tool
+### Search Tool 생성하기
 
-You can use the `NebiusRetrievalTool` to create a tool for agents:
+`NebiusRetrievalTool`을 사용하여 agent용 tool을 생성할 수 있습니다:
 
 ```python
 from langchain_nebius import NebiusRetrievalTool
@@ -288,20 +288,20 @@ Rome is the capital of Italy
 
 ## How It Works
 
-The NebiusRetriever works by:
+NebiusRetriever는 다음과 같이 작동합니다:
 
-1. During initialization:
-   - It stores the provided documents
-   - It uses the provided NebiusEmbeddings to compute embeddings for all documents
-   - These embeddings are stored in memory for quick retrieval
+1. 초기화 중:
+   - 제공된 문서를 저장합니다
+   - 제공된 NebiusEmbeddings를 사용하여 모든 문서에 대한 embedding을 계산합니다
+   - 이러한 embedding은 빠른 검색을 위해 메모리에 저장됩니다
 
-2. During retrieval (`invoke` or `get_relevant_documents`):
-   - It embeds the query using the same embedding model
-   - It computes similarity scores between the query embedding and all document embeddings
-   - It returns the top-k documents sorted by similarity
+2. 검색 중 (`invoke` 또는 `get_relevant_documents`):
+   - 동일한 embedding model을 사용하여 query를 embedding합니다
+   - query embedding과 모든 문서 embedding 간의 유사도 점수를 계산합니다
+   - 유사도 순으로 정렬된 상위 k개의 문서를 반환합니다
 
-This approach is efficient for medium-sized document collections, as it avoids the need for a separate vector database while still providing high-quality semantic search.
+이 접근 방식은 별도의 vector database가 필요 없으면서도 고품질 의미론적 검색을 제공하므로 중간 규모의 문서 컬렉션에 효율적입니다.
 
 ## API reference
 
-For more details about the Nebius AI Studio API, visit the [Nebius AI Studio Documentation](https://studio.nebius.com/api-reference).
+Nebius AI Studio API에 대한 자세한 내용은 [Nebius AI Studio Documentation](https://studio.nebius.com/api-reference)을 참조하세요.

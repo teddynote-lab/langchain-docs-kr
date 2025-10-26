@@ -2,22 +2,22 @@
 title: Lantern
 ---
 
->[Lantern](https://github.com/lanterndata/lantern) is an open-source vector similarity search for `Postgres`
+>[Lantern](https://github.com/lanterndata/lantern)는 `Postgres`용 오픈 소스 vector similarity search입니다
 
-It supports:
+다음 기능을 지원합니다:
 
-- Exact and approximate nearest neighbor search
-- L2 squared distance, hamming distance, and cosine distance
+- Exact 및 approximate nearest neighbor search
+- L2 squared distance, hamming distance, 그리고 cosine distance
 
-You'll need to install `langchain-community` with `pip install -qU langchain-community` to use this integration
+이 통합을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다
 
-This notebook shows how to use the Postgres vector database (`Lantern`).
+이 노트북은 Postgres vector database(`Lantern`) 사용 방법을 보여줍니다.
 
-See the [installation instruction](https://github.com/lanterndata/lantern#-quick-install).
+[설치 안내](https://github.com/lanterndata/lantern#-quick-install)를 참고하세요.
 
-We want to use `OpenAIEmbeddings` so we have to get the OpenAI API Key.
+`OpenAIEmbeddings`를 사용하려면 OpenAI API Key가 필요합니다.
 
-# Pip install necessary package
+# 필요한 패키지 pip로 설치하기
 
 !pip install openai
 !pip install psycopg2-binary
@@ -89,7 +89,7 @@ CONNECTION_STRING = getpass.getpass("DB Connection String:")
 DB Connection String: ········
 ```
 
-## Similarity Search with Cosine Distance (Default)
+## Cosine Distance(기본값)을 사용한 Similarity Search
 
 ```python
 # The Lantern Module will try to create a table with the name of the collection.
@@ -180,7 +180,7 @@ Let’s increase Pell Grants and increase our historic support of HBCUs, and inv
 
 ## Maximal Marginal Relevance Search (MMR)
 
-Maximal marginal relevance optimizes for similarity to query AND diversity among selected documents.
+Maximal marginal relevance는 쿼리와의 유사도와 선택된 문서들 간의 다양성을 동시에 최적화합니다.
 
 ```python
 docs_with_score = db.max_marginal_relevance_search_with_score(query)
@@ -271,10 +271,10 @@ While it shouldn’t have taken something so terrible for people around the worl
 --------------------------------------------------------------------------------
 ```
 
-## Working with vectorstore
+## vectorstore 다루기
 
-Above, we created a vectorstore from scratch. However, often times we want to work with an existing vectorstore.
-In order to do that, we can initialize it directly.
+위에서는 처음부터 vectorstore를 생성했습니다. 그러나 실제로는 기존 vectorstore와 함께 작업해야 하는 경우가 많습니다.
+이를 위해서는 기존 vectorstore를 직접 초기화할 수 있습니다.
 
 ```python
 store = Lantern(
@@ -284,9 +284,9 @@ store = Lantern(
 )
 ```
 
-### Add documents
+### 문서 추가
 
-We can add documents to the existing vectorstore.
+기존 vectorstore에 문서를 추가할 수 있습니다.
 
 ```python
 store.add_documents([Document(page_content="foo")])
@@ -317,10 +317,10 @@ docs_with_score[1]
  0.24038416)
 ```
 
-### Overriding a vectorstore
+### vectorstore 덮어쓰기
 
-If you have an existing collection, you override it by doing `from_documents` and setting `pre_delete_collection` = True
-This will delete the collection before re-populating it
+기존 collection이 있는 경우 `from_documents`를 사용하고 `pre_delete_collection` = True로 설정하여 덮어쓸 수 있습니다.
+이렇게 하면 다시 채우기 전에 해당 collection이 삭제됩니다.
 
 ```python
 db = Lantern.from_documents(
@@ -345,7 +345,7 @@ docs_with_score[0]
  0.2403456)
 ```
 
-### Using a VectorStore as a Retriever
+### VectorStore를 Retriever로 사용하기
 
 ```python
 retriever = store.as_retriever()

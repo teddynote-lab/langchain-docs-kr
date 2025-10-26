@@ -1,55 +1,55 @@
 ---
-title: Implement a LangChain integration
-sidebarTitle: Implement
+title: LangChain integration 구현하기
+sidebarTitle: 구현
 ---
 
-Integration packages are Python packages that users can install for use in their projects. They implement one or more components that adhere to the LangChain interface standards.
+Integration package는 사용자가 프로젝트에서 사용하기 위해 설치할 수 있는 Python package입니다. 이들은 LangChain interface 표준을 준수하는 하나 이상의 component를 구현합니다.
 
-LangChain components are subclasses of base classes in [`langchain-core`](https://github.com/langchain-ai/langchain/tree/master/libs/core). Examples include [chat models](/oss/integrations/chat), [tools](/oss/integrations/tools), [retrievers](/oss/integrations/retrievers), and more.
+LangChain component는 [`langchain-core`](https://github.com/langchain-ai/langchain/tree/master/libs/core)의 base class의 subclass입니다. 예시로는 [chat model](/oss/integrations/chat), [tool](/oss/integrations/tools), [retriever](/oss/integrations/retrievers) 등이 있습니다.
 
-Your integration package will typically implement a subclass of at least one of these components. Expand the tabs below to see details on each.
+여러분의 integration package는 일반적으로 이러한 component 중 최소 하나 이상의 subclass를 구현합니다. 각각에 대한 세부 정보를 보려면 아래 탭을 펼쳐보세요.
 
 <Tabs>
     <Tab title="Chat Models">
-        Chat models are subclasses of the @[`BaseChatModel`] class. They implement methods for generating chat completions, handling message formatting, and managing model parameters.
+        Chat model은 @[`BaseChatModel`] class의 subclass입니다. 이들은 chat completion 생성, message formatting 처리, model parameter 관리를 위한 method를 구현합니다.
 
         <Warning>
-            The chat model integration guide is currently WIP. In the meantime, read the [chat model conceptual guide](/oss/langchain/models) for details on how LangChain chat models function.
+            Chat model integration 가이드는 현재 작업 중입니다. 그동안 LangChain chat model이 어떻게 작동하는지에 대한 자세한 내용은 [chat model 개념 가이드](/oss/langchain/models)를 참조하세요.
         </Warning>
     </Tab>
     <Tab title="Tools">
-        Tools are used in 2 main ways:
+        Tool은 주로 2가지 방식으로 사용됩니다:
 
-        1. To define an "input schema" or "args schema" to pass to a chat model's tool calling feature along with a text request, such that the chat model can generate a "tool call", or parameters to call the tool with.
-        2. To take a "tool call" as generated above, and take some action and return a response that can be passed back to the chat model as a ToolMessage.
+        1. Chat model의 tool calling 기능에 텍스트 요청과 함께 전달할 "input schema" 또는 "args schema"를 정의하여, chat model이 "tool call" 또는 tool을 호출할 parameter를 생성할 수 있도록 합니다.
+        2. 위에서 생성된 "tool call"을 받아 어떤 작업을 수행하고, chat model에 ToolMessage로 다시 전달할 수 있는 응답을 반환합니다.
 
-        The Tools class must inherit from the @[`BaseTool`] base class. This interface has 3 properties and 2 methods that should be implemented in a subclass.
+        Tools class는 @[`BaseTool`] base class를 상속해야 합니다. 이 interface는 subclass에서 구현해야 하는 3개의 property와 2개의 method를 가지고 있습니다.
 
         <Warning>
-            The tools integration guide is currently WIP. In the meantime, read the [tools conceptual guide](/oss/langchain/tools) for details on how LangChain tools function.
+            Tools integration 가이드는 현재 작업 중입니다. 그동안 LangChain tool이 어떻게 작동하는지에 대한 자세한 내용은 [tools 개념 가이드](/oss/langchain/tools)를 참조하세요.
         </Warning>
     </Tab>
     <Tab title="Retrievers">
-        Retrievers are used to retrieve documents from APIs, databases, or other sources based on a query. The Retriever class must inherit from the BaseRetriever base class.
+        Retriever는 query를 기반으로 API, database 또는 기타 소스에서 document를 검색하는 데 사용됩니다. Retriever class는 BaseRetriever base class를 상속해야 합니다.
 
         <Warning>
-            The retriever integration guide is currently WIP. In the meantime, read the [retriever conceptual guide](/oss/integrations/retrievers) for details on how LangChain retrievers function.
+            Retriever integration 가이드는 현재 작업 중입니다. 그동안 LangChain retriever가 어떻게 작동하는지에 대한 자세한 내용은 [retriever 개념 가이드](/oss/integrations/retrievers)를 참조하세요.
         </Warning>
     </Tab>
     <Tab title="Vector Stores">
-        All vector stores must inherit from the @[`VectorStore`] base class. This interface consists of methods for writing, deleting and searching for documents in the vector store.
+        모든 vector store는 @[`VectorStore`] base class를 상속해야 합니다. 이 interface는 vector store에서 document를 작성, 삭제 및 검색하기 위한 method로 구성됩니다.
 
-        See the [vector store integration guide](/oss/integrations/vectorstores) for details on implementing a vector store integration.
+        Vector store integration을 구현하는 방법에 대한 자세한 내용은 [vector store integration 가이드](/oss/integrations/vectorstores)를 참조하세요.
 
         <Warning>
-            The vector store integration guide is currently WIP. In the meantime, read the [vector store conceptual guide](/oss/integrations/vectorstores) for details on how LangChain vector stores function.
+            Vector store integration 가이드는 현재 작업 중입니다. 그동안 LangChain vector store가 어떻게 작동하는지에 대한 자세한 내용은 [vector store 개념 가이드](/oss/integrations/vectorstores)를 참조하세요.
         </Warning>
     </Tab>
     <Tab title="Embeddings">
-        Embedding models are subclasses of the @[`Embeddings`] class.
+        Embedding model은 @[`Embeddings`] class의 subclass입니다.
 
         <Warning>
-            The embedding model integration guide is currently WIP. In the meantime, read the [embedding model conceptual guide](/oss/integrations/text_embedding) for details on how LangChain embedding models function.
+            Embedding model integration 가이드는 현재 작업 중입니다. 그동안 LangChain embedding model이 어떻게 작동하는지에 대한 자세한 내용은 [embedding model 개념 가이드](/oss/integrations/text_embedding)를 참조하세요.
         </Warning>
     </Tab>
 </Tabs>

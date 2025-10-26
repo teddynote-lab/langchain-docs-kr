@@ -1,10 +1,11 @@
+```mdx
 ---
 title: ChatTogetherAI
 ---
 
-[Together AI](https://www.together.ai/) offers an API to query [50+ leading open-source models](https://docs.together.ai/docs/inference-models) in a couple lines of code.
+[Together AI](https://www.together.ai/)는 몇 줄의 코드로 [50개 이상의 주요 오픈소스 모델](https://docs.together.ai/docs/inference-models)을 쿼리할 수 있는 API를 제공합니다.
 
-This guide will help you getting started with `ChatTogetherAI` [chat models](/oss/langchain/models). For detailed documentation of all `ChatTogetherAI` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_chat_models_togetherai.ChatTogetherAI.html).
+이 가이드는 `ChatTogetherAI` [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 `ChatTogetherAI` 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_chat_models_togetherai.ChatTogetherAI.html)를 참조하세요.
 
 ## Overview
 
@@ -16,7 +17,7 @@ This guide will help you getting started with `ChatTogetherAI` [chat models](/os
 
 ### Model features
 
-See the links in the table headers below for guides on how to use specific features.
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
@@ -24,17 +25,17 @@ See the links in the table headers below for guides on how to use specific featu
 
 ## Setup
 
-To access `ChatTogetherAI` models you'll need to create a Together account, get an API key [here](https://api.together.xyz/), and install the `@langchain/community` integration package.
+`ChatTogetherAI` 모델에 액세스하려면 Together 계정을 생성하고, [여기](https://api.together.xyz/)에서 API 키를 받고, `@langchain/community` integration package를 설치해야 합니다.
 
 ### Credentials
 
-Head to [api.together.ai](https://api.together.ai/) to sign up to TogetherAI and generate an API key. Once you've done this set the `TOGETHER_AI_API_KEY` environment variable:
+[api.together.ai](https://api.together.ai/)로 이동하여 TogetherAI에 가입하고 API 키를 생성하세요. 완료한 후 `TOGETHER_AI_API_KEY` environment variable을 설정하세요:
 
 ```bash
 export TOGETHER_AI_API_KEY="your-api-key"
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
 
 ```bash
 # export LANGSMITH_TRACING="true"
@@ -43,7 +44,7 @@ If you want to get automated tracing of your model calls you can also set your [
 
 ### Installation
 
-The LangChain ChatTogetherAI integration lives in the `@langchain/community` package:
+LangChain ChatTogetherAI integration은 `@langchain/community` package에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -59,7 +60,7 @@ pnpm add @langchain/community @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```typescript
 import { ChatTogetherAI } from "@langchain/community/chat_models/togetherai"
@@ -117,4 +118,5 @@ J'adore la programmation.
 
 ## API reference
 
-For detailed documentation of all ChatTogetherAI features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_chat_models_togetherai.ChatTogetherAI.html).
+모든 ChatTogetherAI 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_chat_models_togetherai.ChatTogetherAI.html)를 참조하세요.
+```

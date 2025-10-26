@@ -2,11 +2,11 @@
 title: SupabaseVectorStore
 ---
 
-[Supabase](https://supabase.com/docs) is an open-source Firebase alternative. Supabase is built on top of PostgreSQL, which offers strong SQL querying capabilities and enables a simple interface with already-existing tools and frameworks.
+[Supabase](https://supabase.com/docs)는 오픈소스 Firebase 대안입니다. Supabase는 PostgreSQL 위에 구축되어 강력한 SQL 쿼리 기능을 제공하며 기존 도구 및 프레임워크와의 간단한 인터페이스를 가능하게 합니다.
 
-LangChain.js supports using a Supabase Postgres database as a vector store, using the [`pgvector`](https://github.com/pgvector/pgvector) extension. Refer to the [Supabase blog post](https://supabase.com/blog/openai-embeddings-postgres-vector) for more information.
+LangChain.js는 [`pgvector`](https://github.com/pgvector/pgvector) 확장을 사용하여 Supabase Postgres 데이터베이스를 vector store로 사용하는 것을 지원합니다. 자세한 내용은 [Supabase 블로그 포스트](https://supabase.com/blog/openai-embeddings-postgres-vector)를 참조하세요.
 
-This guide provides a quick overview for getting started with Supabase [vector stores](/oss/integrations/vectorstores). For detailed documentation of all `SupabaseVectorStore` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_supabase.SupabaseVectorStore.html).
+이 가이드는 Supabase [vector stores](/oss/integrations/vectorstores) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `SupabaseVectorStore` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_supabase.SupabaseVectorStore.html)를 참조하세요.
 
 ## Overview
 
@@ -18,9 +18,9 @@ This guide provides a quick overview for getting started with Supabase [vector s
 
 ## Setup
 
-To use Supabase vector stores, you'll need to set up a Supabase database and install the `@langchain/community` integration package. You'll also need to install the official [`@supabase/supabase-js`](https://www.npmjs.com/package/@supabase/supabase-js) SDK as a peer dependency.
+Supabase vector stores를 사용하려면 Supabase 데이터베이스를 설정하고 `@langchain/community` integration package를 설치해야 합니다. 또한 공식 [`@supabase/supabase-js`](https://www.npmjs.com/package/@supabase/supabase-js) SDK를 peer dependency로 설치해야 합니다.
 
-This guide will also use [OpenAI embeddings](/oss/integrations/text_embedding/openai), which require you to install the `@langchain/openai` integration package. You can also use [other supported embeddings models](/oss/integrations/text_embedding) if you wish.
+이 가이드는 [OpenAI embeddings](/oss/integrations/text_embedding/openai)도 사용하므로 `@langchain/openai` integration package를 설치해야 합니다. 원하는 경우 [다른 지원되는 embeddings models](/oss/integrations/text_embedding)를 사용할 수도 있습니다.
 
 <CodeGroup>
 ```bash npm
@@ -34,7 +34,7 @@ pnpm add @langchain/community @langchain/core @supabase/supabase-js @langchain/o
 ```
 </CodeGroup>
 
-Once you've created a database, run the following SQL to set up [`pgvector`](https://github.com/pgvector/pgvector) and create the necessary table and functions:
+데이터베이스를 생성한 후 다음 SQL을 실행하여 [`pgvector`](https://github.com/pgvector/pgvector)를 설정하고 필요한 테이블과 함수를 생성하세요:
 
 ```sql
 -- Enable the pgvector extension to work with embedding vectors
@@ -81,20 +81,20 @@ $$;
 
 ### Credentials
 
-Once you've done this set the `SUPABASE_PRIVATE_KEY` and `SUPABASE_URL` environment variables:
+이 작업을 완료한 후 `SUPABASE_PRIVATE_KEY` 및 `SUPABASE_URL` 환경 변수를 설정하세요:
 
 ```typescript
 process.env.SUPABASE_PRIVATE_KEY = "your-api-key";
 process.env.SUPABASE_URL = "your-supabase-db-url";
 ```
 
-If you are using OpenAI embeddings for this guide, you'll need to set your OpenAI key as well:
+이 가이드에서 OpenAI embeddings를 사용하는 경우 OpenAI key도 설정해야 합니다:
 
 ```typescript
 process.env.OPENAI_API_KEY = "YOUR_API_KEY";
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_TRACING="true"
@@ -169,11 +169,11 @@ await vectorStore.delete({ ids: ["4"] });
 
 ## Query vector store
 
-Once your vector store has been created and the relevant documents have been added you will most likely wish to query it during the running of your chain or agent.
+vector store가 생성되고 관련 문서가 추가되면 chain 또는 agent를 실행하는 동안 쿼리하고 싶을 것입니다.
 
 ### Query directly
 
-Performing a simple similarity search can be done as follows:
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
 
 ```typescript
 const filter = { source: "https://example.com" };
@@ -190,7 +190,7 @@ for (const doc of similaritySearchResults) {
 * Mitochondria are made out of lipids [{"source":"https://example.com"}]
 ```
 
-If you want to execute a similarity search and receive the corresponding scores you can run:
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
 
 ```typescript
 const similaritySearchWithScoreResults = await vectorStore.similaritySearchWithScore("biology", 2, filter)
@@ -207,7 +207,7 @@ for (const [doc, score] of similaritySearchWithScoreResults) {
 
 ### Metadata Query Builder Filtering
 
-You can also use query builder-style filtering similar to how the [Supabase JavaScript library](https://supabase.com/docs/reference/javascript/using-filters) works instead of passing an object. Note that since most of the filter properties are in the metadata column, you need to use arrow operators (-> for integer or ->> for text) as defined in [Postgrest API documentation](https://postgrest.org/en/stable/references/api/tables_views.html#json-columns) and specify the data type of the property (e.g. the column should look something like `metadata->some_int_prop_name::int`).
+객체를 전달하는 대신 [Supabase JavaScript library](https://supabase.com/docs/reference/javascript/using-filters)가 작동하는 방식과 유사한 query builder 스타일 필터링을 사용할 수도 있습니다. 대부분의 필터 속성이 metadata 컬럼에 있으므로 [Postgrest API documentation](https://postgrest.org/en/stable/references/api/tables_views.html#json-columns)에 정의된 대로 arrow operators(정수의 경우 ->, 텍스트의 경우 ->>)를 사용하고 속성의 데이터 타입을 지정해야 합니다(예: 컬럼은 `metadata->some_int_prop_name::int`와 같아야 합니다).
 
 ```typescript
 import { SupabaseFilterRPCCall } from "@langchain/community/vectorstores/supabase";
@@ -229,7 +229,7 @@ for (const doc of funcFilterSearchResults) {
 
 ### Query by turning into retriever
 
-You can also transform the vector store into a [retriever](/oss/langchain/retrieval) for easier usage in your chains.
+vector store를 [retriever](/oss/langchain/retrieval)로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
 
 ```typescript
 const retriever = vectorStore.asRetriever({
@@ -257,12 +257,12 @@ await retriever.invoke("biology");
 
 ### Usage for retrieval-augmented generation
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+retrieval-augmented generation (RAG)을 위해 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
 
-- [Build a RAG app with LangChain](/oss/langchain/rag).
+- [Build a RAG app with LangChain](/oss/langchain/rag)
 - [Agentic RAG](/oss/langgraph/agentic-rag)
 - [Retrieval docs](/oss/langchain/retrieval)
 
 ## API reference
 
-For detailed documentation of all `SupabaseVectorStore` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_supabase.SupabaseVectorStore.html).
+모든 `SupabaseVectorStore` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_supabase.SupabaseVectorStore.html)를 참조하세요.

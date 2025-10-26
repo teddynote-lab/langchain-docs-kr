@@ -2,9 +2,9 @@
 title: YouTube transcripts
 ---
 
->[YouTube](https://www.youtube.com/) is an online video sharing and social media platform created by Google.
+>[YouTube](https://www.youtube.com/)는 Google이 만든 온라인 비디오 공유 및 소셜 미디어 플랫폼입니다.
 
-This notebook covers how to load documents from `YouTube transcripts`.
+이 노트북은 `YouTube transcripts`에서 문서를 로드하는 방법을 다룹니다.
 
 ```python
 from langchain_community.document_loaders import YoutubeLoader
@@ -24,7 +24,7 @@ loader = YoutubeLoader.from_youtube_url(
 loader.load()
 ```
 
-### Add video info
+### 비디오 정보 추가하기
 
 ```python
 pip install -qU  pytube
@@ -37,11 +37,11 @@ loader = YoutubeLoader.from_youtube_url(
 loader.load()
 ```
 
-### Add language preferences
+### 언어 설정 추가하기
 
-Language param : It's a list of language codes in a descending priority, `en` by default.
+Language param : 우선순위가 높은 순서대로 나열된 언어 코드 목록이며, 기본값은 `en`입니다.
 
-translation param : It's a translate preference, you can translate available transcript to your preferred language.
+translation param : 번역 설정으로, 사용 가능한 transcript를 원하는 언어로 번역할 수 있습니다.
 
 ```python
 loader = YoutubeLoader.from_youtube_url(
@@ -53,13 +53,13 @@ loader = YoutubeLoader.from_youtube_url(
 loader.load()
 ```
 
-### Get transcripts as timestamped chunks
+### 타임스탬프가 포함된 청크로 transcript 가져오기
 
-Get one or more @[`Document`] objects, each containing a chunk of the video transcript.  The length of the chunks, in seconds, may be specified.  Each chunk's metadata includes a URL of the video on YouTube, which will start the video at the beginning of the specific chunk.
+하나 이상의 @[`Document`] 객체를 가져오며, 각 객체는 비디오 transcript의 청크를 포함합니다. 청크의 길이는 초 단위로 지정할 수 있습니다. 각 청크의 metadata에는 YouTube 비디오의 URL이 포함되어 있으며, 해당 청크의 시작 부분부터 비디오가 재생됩니다.
 
-`transcript_format` param:  One of the `langchain_community.document_loaders.youtube.TranscriptFormat` values.  In this case, `TranscriptFormat.CHUNKS`.
+`transcript_format` param: `langchain_community.document_loaders.youtube.TranscriptFormat` 값 중 하나입니다. 이 경우 `TranscriptFormat.CHUNKS`입니다.
 
-`chunk_size_seconds` param:  An integer number of video seconds to be represented by each chunk of transcript data.  Default is 120 seconds.
+`chunk_size_seconds` param: 각 transcript 데이터 청크가 나타내는 비디오 초 단위의 정수입니다. 기본값은 120초입니다.
 
 ```python
 from langchain_community.document_loaders.youtube import TranscriptFormat
@@ -73,21 +73,21 @@ loader = YoutubeLoader.from_youtube_url(
 print("\n\n".join(map(repr, loader.load())))
 ```
 
-## YouTube loader from Google Cloud
+## Google Cloud의 YouTube loader
 
-### Prerequisites
+### 사전 요구사항
 
-1. Create a Google Cloud project or use an existing project
-1. Enable the [Youtube Api](https://console.cloud.google.com/apis/enableflow?apiid=youtube.googleapis.com&project=sixth-grammar-344520)
-1. [Authorize credentials for desktop app](https://developers.google.com/drive/api/quickstart/python#authorize_credentials_for_a_desktop_application)
+1. Google Cloud 프로젝트를 생성하거나 기존 프로젝트를 사용합니다
+1. [Youtube Api](https://console.cloud.google.com/apis/enableflow?apiid=youtube.googleapis.com&project=sixth-grammar-344520)를 활성화합니다
+1. [데스크톱 앱용 자격 증명 승인](https://developers.google.com/drive/api/quickstart/python#authorize_credentials_for_a_desktop_application)
 1. `pip install -U google-api-python-client google-auth-httplib2 google-auth-oauthlib youtube-transcript-api`
 
-### 🧑 Instructions for ingesting your Google Docs data
+### 🧑 Google Docs 데이터 수집 지침
 
-By default, the `GoogleDriveLoader` expects the `credentials.json` file to be `~/.credentials/credentials.json`, but this is configurable using the `credentials_file` keyword argument. Same thing with `token.json`. Note that `token.json` will be created automatically the first time you use the loader.
+기본적으로 `GoogleDriveLoader`는 `credentials.json` 파일이 `~/.credentials/credentials.json`에 있을 것으로 예상하지만, `credentials_file` 키워드 인수를 사용하여 구성할 수 있습니다. `token.json`도 마찬가지입니다. `token.json`은 loader를 처음 사용할 때 자동으로 생성됩니다.
 
-`GoogleApiYoutubeLoader` can load from a list of Google Docs document ids or a folder id. You can obtain your folder and document id from the URL:
-Note depending on your set up, the `service_account_path` needs to be set up. See [here](https://developers.google.com/drive/api/v3/quickstart/python) for more details.
+`GoogleApiYoutubeLoader`는 Google Docs 문서 ID 목록 또는 폴더 ID에서 로드할 수 있습니다. URL에서 폴더 및 문서 ID를 얻을 수 있습니다:
+설정에 따라 `service_account_path`를 설정해야 할 수 있습니다. 자세한 내용은 [여기](https://developers.google.com/drive/api/v3/quickstart/python)를 참조하세요.
 
 ```python
 # Init the GoogleApiClient

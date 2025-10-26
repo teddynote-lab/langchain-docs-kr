@@ -2,12 +2,12 @@
 title: StarRocks
 ---
 
->[StarRocks](https://www.starrocks.io/) is a High-Performance Analytical Database.
-`StarRocks` is a next-gen sub-second MPP database for full analytics scenarios, including multi-dimensional analytics, real-time analytics and ad-hoc query.
+>[StarRocks](https://www.starrocks.io/)는 고성능 분석 데이터베이스입니다.
+`StarRocks`는 다차원 분석, 실시간 분석 및 ad-hoc 쿼리를 포함한 전체 분석 시나리오를 위한 차세대 서브초 MPP 데이터베이스입니다.
 
->Usually `StarRocks` is categorized into OLAP, and it has showed excellent performance in [ClickBench — a Benchmark For Analytical DBMS](https://benchmark.clickhouse.com/). Since it has a super-fast vectorized execution engine, it could also be used as a fast vectordb.
+>일반적으로 `StarRocks`는 OLAP으로 분류되며, [ClickBench — a Benchmark For Analytical DBMS](https://benchmark.clickhouse.com/)에서 뛰어난 성능을 보여주었습니다. 초고속 벡터화 실행 엔진을 갖추고 있어 빠른 vectordb로도 사용할 수 있습니다.
 
-Here we'll show how to use the StarRocks Vector Store.
+여기서는 StarRocks Vector Store를 사용하는 방법을 보여드리겠습니다.
 
 ## Setup
 
@@ -15,7 +15,7 @@ Here we'll show how to use the StarRocks Vector Store.
 pip install -qU  pymysql langchain-community
 ```
 
-Set `update_vectordb = False` at the beginning. If there is no docs updated, then we don't need to rebuild the embeddings of docs
+처음에 `update_vectordb = False`로 설정합니다. 업데이트된 문서가 없다면 문서의 embedding을 다시 빌드할 필요가 없습니다.
 
 ```python
 from langchain.chains import RetrievalQA
@@ -36,11 +36,11 @@ update_vectordb = False
   warnings.warn("urllib3 ({}) or chardet ({})/charset_normalizer ({}) doesn't match a supported "
 ```
 
-## Load docs and split them into tokens
+## 문서를 로드하고 token으로 분할하기
 
-Load all markdown files under the `docs` directory
+`docs` 디렉토리 아래의 모든 markdown 파일을 로드합니다.
 
-for starrocks documents, you can clone repo from [github.com/StarRocks/starrocks](https://github.com/StarRocks/starrocks), and there is `docs` directory in it.
+starrocks 문서의 경우 [github.com/StarRocks/starrocks](https://github.com/StarRocks/starrocks)에서 repo를 clone할 수 있으며, 그 안에 `docs` 디렉토리가 있습니다.
 
 ```python
 loader = DirectoryLoader(
@@ -49,7 +49,7 @@ loader = DirectoryLoader(
 documents = loader.load()
 ```
 
-Split docs into tokens, and set `update_vectordb = True` because there are new docs/tokens.
+문서를 token으로 분할하고, 새로운 문서/token이 있으므로 `update_vectordb = True`로 설정합니다.
 
 ```python
 # load text splitter and split docs into snippets of text
@@ -76,9 +76,9 @@ print("# docs  = %d, # splits = %d" % (len(documents), len(split_docs)))
 # docs  = 657, # splits = 2802
 ```
 
-## Create vectordb instance
+## vectordb instance 생성하기
 
-### Use StarRocks as vectordb
+### StarRocks를 vectordb로 사용하기
 
 ```python
 def gen_starrocks(update_vectordb, embeddings, settings):
@@ -89,17 +89,17 @@ def gen_starrocks(update_vectordb, embeddings, settings):
     return docsearch
 ```
 
-## Convert tokens into embeddings and put them into vectordb
+## token을 embedding으로 변환하고 vectordb에 저장하기
 
-Here we use StarRocks as vectordb, you can configure StarRocks instance via `StarRocksSettings`.
+여기서는 StarRocks를 vectordb로 사용하며, `StarRocksSettings`를 통해 StarRocks instance를 구성할 수 있습니다.
 
-Configuring StarRocks instance is pretty much like configuring mysql instance. You need to specify:
+StarRocks instance 구성은 mysql instance 구성과 매우 유사합니다. 다음을 지정해야 합니다:
 
 1. host/port
-2. username(default: 'root')
-3. password(default: '')
-4. database(default: 'default')
-5. table(default: 'langchain')
+2. username(기본값: 'root')
+3. password(기본값: '')
+4. database(기본값: 'default')
+5. table(기본값: 'langchain')
 
 ```python
 embeddings = OpenAIEmbeddings()
@@ -137,7 +137,7 @@ Table Schema:
 ----------------------------------------------------------------------------
 ```
 
-## Build QA and ask question to it
+## QA를 구축하고 질문하기
 
 ```python
 llm = OpenAI()

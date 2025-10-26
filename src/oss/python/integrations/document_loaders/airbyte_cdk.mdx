@@ -1,34 +1,34 @@
 ---
-title: Airbyte CDK (Deprecated)
+title: Airbyte CDK (더 이상 사용되지 않음)
 ---
 
-Note: `AirbyteCDKLoader` is deprecated. Please use [`AirbyteLoader`](/oss/integrations/document_loaders/airbyte) instead.
+참고: `AirbyteCDKLoader`는 더 이상 사용되지 않습니다. 대신 [`AirbyteLoader`](/oss/integrations/document_loaders/airbyte)를 사용하세요.
 
->[Airbyte](https://github.com/airbytehq/airbyte) is a data integration platform for ELT pipelines from APIs, databases & files to warehouses & lakes. It has the largest catalog of ELT connectors to data warehouses and databases.
+>[Airbyte](https://github.com/airbytehq/airbyte)는 API, 데이터베이스 및 파일에서 웨어하우스 및 레이크로의 ELT 파이프라인을 위한 데이터 통합 플랫폼입니다. 데이터 웨어하우스 및 데이터베이스에 대한 가장 큰 ELT 커넥터 카탈로그를 보유하고 있습니다.
 
-A lot of source connectors are implemented using the [Airbyte CDK](https://docs.airbyte.com/connector-development/cdk-python/). This loader allows to run any of these connectors and return the data as documents.
+많은 source connector들이 [Airbyte CDK](https://docs.airbyte.com/connector-development/cdk-python/)를 사용하여 구현되었습니다. 이 loader를 사용하면 이러한 connector들을 실행하고 데이터를 document로 반환할 수 있습니다.
 
 ## Installation
 
-First, you need to install the `airbyte-cdk` python package.
+먼저 `airbyte-cdk` python package를 설치해야 합니다.
 
 ```python
 pip install -qU  airbyte-cdk
 ```
 
-Then, either install an existing connector from the [Airbyte Github repository](https://github.com/airbytehq/airbyte/tree/master/airbyte-integrations/connectors) or create your own connector using the [Airbyte CDK](https://docs.airbyte.io/connector-development/connector-development).
+그런 다음 [Airbyte Github repository](https://github.com/airbytehq/airbyte/tree/master/airbyte-integrations/connectors)에서 기존 connector를 설치하거나 [Airbyte CDK](https://docs.airbyte.io/connector-development/connector-development)를 사용하여 자체 connector를 생성합니다.
 
-For example, to install the Github connector, run
+예를 들어, Github connector를 설치하려면 다음을 실행하세요
 
 ```python
 pip install -qU  "source_github@git+https://github.com/airbytehq/airbyte.git@master#subdirectory=airbyte-integrations/connectors/source-github"
 ```
 
-Some sources are also published as regular packages on PyPI
+일부 source는 PyPI에 일반 package로도 게시되어 있습니다
 
 ## Example
 
-Now you can create an `AirbyteCDKLoader` based on the imported source. It takes a `config` object that's passed to the connector. You also have to pick the stream you want to retrieve records from by name (`stream_name`). Check the connectors documentation page and spec definition for more information on the config object and available streams. For the Github connectors these are:
+이제 import한 source를 기반으로 `AirbyteCDKLoader`를 생성할 수 있습니다. connector에 전달되는 `config` 객체를 받습니다. 또한 이름(`stream_name`)으로 record를 검색할 stream을 선택해야 합니다. config 객체 및 사용 가능한 stream에 대한 자세한 내용은 connector 문서 페이지 및 spec 정의를 확인하세요. Github connector의 경우 다음과 같습니다:
 
 * [https://github.com/airbytehq/airbyte/blob/master/airbyte-integrations/connectors/source-github/source_github/spec.json](https://github.com/airbytehq/airbyte/blob/master/airbyte-integrations/connectors/source-github/source_github/spec.json).
 * [https://docs.airbyte.com/integrations/sources/github/](https://docs.airbyte.com/integrations/sources/github/)
@@ -49,19 +49,19 @@ issues_loader = AirbyteCDKLoader(
 )
 ```
 
-Now you can load documents the usual way
+이제 일반적인 방법으로 document를 로드할 수 있습니다
 
 ```python
 docs = issues_loader.load()
 ```
 
-As `load` returns a list, it will block until all documents are loaded. To have better control over this process, you can also use the `lazy_load` method which returns an iterator instead:
+`load`는 list를 반환하므로 모든 document가 로드될 때까지 차단됩니다. 이 프로세스를 더 잘 제어하려면 대신 iterator를 반환하는 `lazy_load` method를 사용할 수도 있습니다:
 
 ```python
 docs_iterator = issues_loader.lazy_load()
 ```
 
-Keep in mind that by default the page content is empty and the metadata object contains all the information from the record. To create documents in a different way, pass in a record_handler function when creating the loader:
+기본적으로 page content는 비어 있고 metadata 객체에 record의 모든 정보가 포함되어 있다는 점을 유의하세요. 다른 방식으로 document를 생성하려면 loader를 생성할 때 record_handler function을 전달하세요:
 
 ```python
 from langchain_core.documents import Document
@@ -86,9 +86,9 @@ docs = issues_loader.load()
 
 ## Incremental loads
 
-Some streams allow incremental loading, this means the source keeps track of synced records and won't load them again. This is useful for sources that have a high volume of data and are updated frequently.
+일부 stream은 incremental loading을 허용합니다. 즉, source가 동기화된 record를 추적하고 다시 로드하지 않습니다. 이는 데이터 볼륨이 많고 자주 업데이트되는 source에 유용합니다.
 
-To take advantage of this, store the `last_state` property of the loader and pass it in when creating the loader again. This will ensure that only new records are loaded.
+이를 활용하려면 loader의 `last_state` property를 저장하고 loader를 다시 생성할 때 전달하세요. 이렇게 하면 새 record만 로드됩니다.
 
 ```python
 last_state = issues_loader.last_state  # store safely

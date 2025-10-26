@@ -2,11 +2,11 @@
 title: PullMd Loader
 ---
 
->[PullMd](https://pull.md/) is a service that converts web pages into Markdown format. The `langchain-pull-md` package utilizes this service to convert URLs, especially those rendered with JavaScript frameworks like React, Angular, or Vue.js, into Markdown without the need for local rendering.
+>[PullMd](https://pull.md/)는 웹 페이지를 Markdown 형식으로 변환하는 서비스입니다. `langchain-pull-md` 패키지는 이 서비스를 활용하여 React, Angular, Vue.js와 같은 JavaScript 프레임워크로 렌더링된 URL을 로컬 렌더링 없이 Markdown으로 변환합니다.
 
 ## Installation and Setup
 
-To get started with `langchain-pull-md`, you need to install the package via pip:
+`langchain-pull-md`를 시작하려면 pip를 통해 패키지를 설치해야 합니다:
 
 <CodeGroup>
 ```bash pip
@@ -18,11 +18,11 @@ uv add langchain-pull-md
 ```
 </CodeGroup>
 
-See the [usage example](/oss/integrations/document_loaders/pull_md) for detailed integration and usage instructions.
+자세한 통합 및 사용 방법은 [사용 예제](/oss/integrations/document_loaders/pull_md)를 참조하세요.
 
 ## Document Loader
 
-The `PullMdLoader` class in `langchain-pull-md` provides an easy way to convert URLs to Markdown. It's particularly useful for loading content from modern web applications for use within LangChain's processing capabilities.
+`langchain-pull-md`의 `PullMdLoader` 클래스는 URL을 Markdown으로 변환하는 쉬운 방법을 제공합니다. LangChain의 처리 기능 내에서 사용하기 위해 최신 웹 애플리케이션의 콘텐츠를 로드하는 데 특히 유용합니다.
 
 ```python
 from langchain_pull_md import PullMdLoader
@@ -38,11 +38,11 @@ for document in documents:
     print(document.page_content)
 ```
 
-This loader supports any URL and is particularly adept at handling sites built with dynamic JavaScript, making it a versatile tool for markdown extraction in data processing workflows.
+이 loader는 모든 URL을 지원하며, 특히 동적 JavaScript로 구축된 사이트를 처리하는 데 능숙하여 데이터 처리 워크플로우에서 markdown 추출을 위한 다목적 도구입니다.
 
 ## API reference
 
-For a comprehensive guide to all available functions and their parameters, visit the [API reference](https://github.com/chigwell/langchain-pull-md).
+사용 가능한 모든 function과 매개변수에 대한 포괄적인 가이드는 [API reference](https://github.com/chigwell/langchain-pull-md)를 참조하세요.
 
 ## Additional Resources
 

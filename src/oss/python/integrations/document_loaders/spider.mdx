@@ -2,7 +2,7 @@
 title: Spider
 ---
 
-[Spider](https://spider.cloud/) is the [fastest](https://github.com/spider-rs/spider/blob/main/benches/BENCHMARKS.md) and most affordable crawler and scraper that returns LLM-ready data.
+[Spider](https://spider.cloud/)는 LLM에 바로 사용 가능한 데이터를 반환하는 [가장 빠르고](https://github.com/spider-rs/spider/blob/main/benches/BENCHMARKS.md) 가장 저렴한 크롤러이자 스크래퍼입니다.
 
 ## Setup
 
@@ -12,7 +12,7 @@ pip install spider-client
 
 ## Usage
 
-To use spider you need to have an API key from [spider.cloud](https://spider.cloud/).
+Spider를 사용하려면 [spider.cloud](https://spider.cloud/)에서 API key가 필요합니다.
 
 ```python
 from langchain_community.document_loaders import SpiderLoader
@@ -33,9 +33,9 @@ print(data)
 
 ## Modes
 
-- `scrape`: Default mode that scrapes a single URL
-- `crawl`: Crawl all subpages of the domain url provided
+- `scrape`: 단일 URL을 스크래핑하는 기본 모드
+- `crawl`: 제공된 도메인 URL의 모든 하위 페이지를 크롤링
 
 ## Crawler options
 
-The `params` parameter is a dictionary that can be passed to the loader. See the [Spider documentation](https://spider.cloud/docs/api) to see all available parameters
+`params` parameter는 loader에 전달할 수 있는 dictionary입니다. 사용 가능한 모든 parameter를 확인하려면 [Spider 문서](https://spider.cloud/docs/api)를 참조하세요

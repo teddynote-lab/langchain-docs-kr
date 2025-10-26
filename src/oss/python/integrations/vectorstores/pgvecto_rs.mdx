@@ -2,7 +2,7 @@
 title: PGVecto.rs
 ---
 
-This notebook shows how to use functionality related to the Postgres vector database ([pgvecto.rs](https://github.com/tensorchord/pgvecto.rs)).
+이 노트북은 Postgres vector database([pgvecto.rs](https://github.com/tensorchord/pgvecto.rs))와 관련된 기능을 사용하는 방법을 보여줍니다.
 
 ```python
 pip install "pgvecto_rs[sdk]" langchain-community
@@ -27,13 +27,13 @@ docs = text_splitter.split_documents(documents)
 embeddings = FakeEmbeddings(size=3)
 ```
 
-Start the database with the [official demo docker image](https://github.com/tensorchord/pgvecto.rs#installation).
+[공식 데모 Docker 이미지](https://github.com/tensorchord/pgvecto.rs#installation)로 데이터베이스를 시작하세요.
 
 ```python
 ! docker run --name pgvecto-rs-demo -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d tensorchord/pgvecto-rs:latest
 ```
 
-Then contruct the db URL
+그런 다음 DB URL을 구성하세요
 
 ```python
 ## PGVecto.rs needs the connection string to the database.
@@ -56,7 +56,7 @@ URL = "postgresql+psycopg://{username}:{password}@{host}:{port}/{db_name}".forma
 )
 ```
 
-Finally, create the VectorStore from the documents:
+마지막으로 문서에서 VectorStore를 생성하세요:
 
 ```python
 db1 = PGVecto_rs.from_documents(
@@ -68,7 +68,7 @@ db1 = PGVecto_rs.from_documents(
 )
 ```
 
-You can connect to the table laterly with:
+나중에 다음을 사용하여 해당 테이블에 연결할 수 있습니다:
 
 ```python
 # Create new empty vectorstore with collection_name.
@@ -81,11 +81,11 @@ db1 = PGVecto_rs.from_collection_name(
 )
 ```
 
-Make sure that the user is permitted to create a table.
+사용자에게 테이블 생성 권한이 있는지 확인하세요.
 
-## Similarity search with score
+## 점수와 함께 하는 Similarity search
 
-### Similarity Search with Euclidean Distance (Default)
+### Euclidean Distance(기본값)을 사용하는 Similarity Search
 
 ```python
 query = "What did the president say about Ketanji Brown Jackson"
@@ -95,7 +95,7 @@ for doc in docs:
     print("======================")
 ```
 
-### Similarity Search with Filter
+### Filter를 사용하는 Similarity Search
 
 ```python
 from pgvecto_rs.sdk.filters import meta_contains
@@ -110,7 +110,7 @@ for doc in docs:
     print("======================")
 ```
 
-Or:
+또는:
 
 ```python
 query = "What did the president say about Ketanji Brown Jackson"

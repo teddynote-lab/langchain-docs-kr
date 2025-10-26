@@ -2,12 +2,12 @@
 title: Elasticsearch
 ---
 
-Walkthrough of how to generate embeddings using a hosted embedding model in Elasticsearch
+Elasticsearch에서 호스팅되는 embedding model을 사용하여 embedding을 생성하는 방법에 대한 안내
 
-The easiest way to instantiate the `ElasticsearchEmbeddings` class it either
+`ElasticsearchEmbeddings` class를 인스턴스화하는 가장 쉬운 방법은
 
-- using the `from_credentials` constructor if you are using Elastic Cloud
-- or using the `from_es_connection` constructor with any Elasticsearch cluster
+- Elastic Cloud를 사용하는 경우 `from_credentials` constructor 사용
+- 또는 모든 Elasticsearch cluster와 함께 `from_es_connection` constructor 사용
 
 ```python
 !pip -q install langchain-elasticsearch
@@ -22,9 +22,9 @@ from langchain_elasticsearch import ElasticsearchEmbeddings
 model_id = "your_model_id"
 ```
 
-## Testing with `from_credentials`
+## `from_credentials`로 테스트하기
 
-This required an Elastic Cloud `cloud_id`
+이 방법은 Elastic Cloud `cloud_id`가 필요합니다
 
 ```python
 # Instantiate ElasticsearchEmbeddings using credentials
@@ -62,9 +62,9 @@ query_embedding = embeddings.embed_query(query)
 print(f"Embedding for query: {query_embedding}")
 ```
 
-## Testing with Existing Elasticsearch client connection
+## 기존 Elasticsearch client connection으로 테스트하기
 
-This can be used with any Elasticsearch deployment
+이 방법은 모든 Elasticsearch deployment와 함께 사용할 수 있습니다
 
 ```python
 # Create Elasticsearch connection

@@ -2,23 +2,23 @@
 title: Google Memorystore for Redis
 ---
 
-> [Google Memorystore for Redis](https://cloud.google.com/memorystore/docs/redis/memorystore-for-redis-overview) is a fully-managed service that is powered by the Redis in-memory data store to build application caches that provide sub-millisecond data access. Extend your database application to build AI-powered experiences leveraging Memorystore for Redis's LangChain integrations.
+> [Google Memorystore for Redis](https://cloud.google.com/memorystore/docs/redis/memorystore-for-redis-overview)는 Redis 인메모리 데이터 스토어를 기반으로 하는 완전 관리형 서비스로, 밀리초 미만의 데이터 액세스를 제공하는 애플리케이션 캐시를 구축할 수 있습니다. Memorystore for Redis의 LangChain 통합을 활용하여 AI 기반 경험을 구축하도록 데이터베이스 애플리케이션을 확장하세요.
 
-This notebook goes over how to use [Memorystore for Redis](https://cloud.google.com/memorystore/docs/redis/memorystore-for-redis-overview) to [save, load and delete langchain documents](/oss/integrations/document_loaders) with `MemorystoreDocumentLoader` and `MemorystoreDocumentSaver`.
+이 노트북은 [Memorystore for Redis](https://cloud.google.com/memorystore/docs/redis/memorystore-for-redis-overview)를 사용하여 `MemorystoreDocumentLoader`와 `MemorystoreDocumentSaver`로 [langchain 문서를 저장, 로드 및 삭제](/oss/integrations/document_loaders)하는 방법을 다룹니다.
 
-Learn more about the package on [GitHub](https://github.com/googleapis/langchain-google-memorystore-redis-python/).
+[GitHub](https://github.com/googleapis/langchain-google-memorystore-redis-python/)에서 패키지에 대해 자세히 알아보세요.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/googleapis/langchain-google-memorystore-redis-python/blob/main/docs/document_loader.ipynb)
 
-## Before You Begin
+## 시작하기 전에
 
-To run this notebook, you will need to do the following:
+이 노트북을 실행하려면 다음을 수행해야 합니다:
 
-* [Create a Google Cloud Project](https://developers.google.com/workspace/guides/create-project)
-* [Enable the Memorystore for Redis API](https://console.cloud.google.com/flows/enableapi?apiid=redis.googleapis.com)
-* [Create a Memorystore for Redis instance](https://cloud.google.com/memorystore/docs/redis/create-instance-console). Ensure that the version is greater than or equal to 5.0.
+* [Google Cloud Project 생성](https://developers.google.com/workspace/guides/create-project)
+* [Memorystore for Redis API 활성화](https://console.cloud.google.com/flows/enableapi?apiid=redis.googleapis.com)
+* [Memorystore for Redis 인스턴스 생성](https://cloud.google.com/memorystore/docs/redis/create-instance-console). 버전이 5.0 이상인지 확인하세요.
 
-After confirmed access to database in the runtime environment of this notebook, filling the following values and run the cell before running example scripts.
+이 노트북의 런타임 환경에서 데이터베이스에 대한 액세스를 확인한 후, 다음 값을 입력하고 예제 스크립트를 실행하기 전에 셀을 실행하세요.
 
 ```python
 # @markdown Please specify an endpoint associated with the instance and a key prefix for demo purpose.
@@ -26,15 +26,15 @@ ENDPOINT = "redis://127.0.0.1:6379"  # @param {type:"string"}
 KEY_PREFIX = "doc:"  # @param {type:"string"}
 ```
 
-### 🦜🔗 Library Installation
+### 🦜🔗 라이브러리 설치
 
-The integration lives in its own `langchain-google-memorystore-redis` package, so we need to install it.
+이 통합은 자체 `langchain-google-memorystore-redis` 패키지에 있으므로 설치해야 합니다.
 
 ```python
 pip install -upgrade --quiet langchain-google-memorystore-redis
 ```
 
-**Colab only**: Uncomment the following cell to restart the kernel or use the button to restart the kernel. For Vertex AI Workbench you can restart the terminal using the button on top.
+**Colab 전용**: 다음 셀의 주석을 해제하여 커널을 재시작하거나 버튼을 사용하여 커널을 재시작하세요. Vertex AI Workbench의 경우 상단의 버튼을 사용하여 터미널을 재시작할 수 있습니다.
 
 ```python
 # # Automatically restart kernel after installs so that your environment can access the new packages
@@ -44,15 +44,15 @@ pip install -upgrade --quiet langchain-google-memorystore-redis
 # app.kernel.do_shutdown(True)
 ```
 
-### ☁ Set Your Google Cloud Project
+### ☁ Google Cloud Project 설정
 
-Set your Google Cloud project so that you can leverage Google Cloud resources within this notebook.
+이 노트북 내에서 Google Cloud 리소스를 활용할 수 있도록 Google Cloud 프로젝트를 설정하세요.
 
-If you don't know your project ID, try the following:
+프로젝트 ID를 모르는 경우 다음을 시도해보세요:
 
-* Run `gcloud config list`.
-* Run `gcloud projects list`.
-* See the support page: [Locate the project ID](https://support.google.com/googleapi/answer/7014113).
+* `gcloud config list`를 실행하세요.
+* `gcloud projects list`를 실행하세요.
+* 지원 페이지를 참조하세요: [프로젝트 ID 찾기](https://support.google.com/googleapi/answer/7014113).
 
 ```python
 # @markdown Please fill in the value below with your Google Cloud project ID and then run the cell.
@@ -63,12 +63,12 @@ PROJECT_ID = "my-project-id"  # @param {type:"string"}
 !gcloud config set project {PROJECT_ID}
 ```
 
-### 🔐 Authentication
+### 🔐 인증
 
-Authenticate to Google Cloud as the IAM user logged into this notebook in order to access your Google Cloud Project.
+Google Cloud Project에 액세스하기 위해 이 노트북에 로그인한 IAM 사용자로 Google Cloud에 인증하세요.
 
-* If you are using Colab to run this notebook, use the cell below and continue.
-* If you are using Vertex AI Workbench, check out the setup instructions [here](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env).
+* Colab을 사용하여 이 노트북을 실행하는 경우 아래 셀을 사용하고 계속 진행하세요.
+* Vertex AI Workbench를 사용하는 경우 [여기](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env)에서 설정 지침을 확인하세요.
 
 ```python
 from google.colab import auth
@@ -76,16 +76,16 @@ from google.colab import auth
 auth.authenticate_user()
 ```
 
-## Basic Usage
+## 기본 사용법
 
-### Save documents
+### 문서 저장
 
-Save langchain documents with `MemorystoreDocumentSaver.add_documents(<documents>)`. To initialize `MemorystoreDocumentSaver` class you need to provide 2 things:
+`MemorystoreDocumentSaver.add_documents(<documents>)`로 langchain 문서를 저장하세요. `MemorystoreDocumentSaver` 클래스를 초기화하려면 다음 2가지가 필요합니다:
 
-1. `client` - A `redis.Redis` client object.
-1. `key_prefix` - A prefix for the keys to store Documents in Redis.
+1. `client` - `redis.Redis` client 객체.
+1. `key_prefix` - Redis에 Documents를 저장하기 위한 키의 prefix.
 
-The Documents will be stored into randomly generated keys with the specified prefix of `key_prefix`. Alternatively, you can designate the suffixes of the keys by specifying `ids` in the `add_documents` method.
+Documents는 `key_prefix`로 지정된 prefix를 가진 무작위로 생성된 키에 저장됩니다. 또는 `add_documents` 메서드에서 `ids`를 지정하여 키의 suffix를 지정할 수 있습니다.
 
 ```python
 import redis
@@ -117,14 +117,14 @@ saver = MemorystoreDocumentSaver(
 saver.add_documents(test_docs, ids=doc_ids)
 ```
 
-### Load documents
+### 문서 로드
 
-Initialize a loader that loads all documents stored in the Memorystore for Redis instance with a specific prefix.
+특정 prefix로 Memorystore for Redis 인스턴스에 저장된 모든 문서를 로드하는 loader를 초기화하세요.
 
-Load langchain documents with `MemorystoreDocumentLoader.load()` or `MemorystoreDocumentLoader.lazy_load()`. `lazy_load` returns a generator that only queries database during the iteration. To initialize `MemorystoreDocumentLoader` class you need to provide:
+`MemorystoreDocumentLoader.load()` 또는 `MemorystoreDocumentLoader.lazy_load()`로 langchain 문서를 로드하세요. `lazy_load`는 반복 중에만 데이터베이스를 쿼리하는 generator를 반환합니다. `MemorystoreDocumentLoader` 클래스를 초기화하려면 다음이 필요합니다:
 
-1. `client` - A `redis.Redis` client object.
-1. `key_prefix` - A prefix for the keys to store Documents in Redis.
+1. `client` - `redis.Redis` client 객체.
+1. `key_prefix` - Redis에 Documents를 저장하기 위한 키의 prefix.
 
 ```python
 import redis
@@ -140,9 +140,9 @@ for doc in loader.lazy_load():
     print("Loaded documents:", doc)
 ```
 
-### Delete documents
+### 문서 삭제
 
-Delete all of keys with the specified prefix in the Memorystore for Redis instance with `MemorystoreDocumentSaver.delete()`. You can also specify the suffixes of the keys if you know.
+`MemorystoreDocumentSaver.delete()`로 Memorystore for Redis 인스턴스에서 지정된 prefix를 가진 모든 키를 삭제하세요. 알고 있다면 키의 suffix를 지정할 수도 있습니다.
 
 ```python
 docs = loader.load()
@@ -155,13 +155,13 @@ saver.delete()
 print("Documents after delete all:", loader.load())
 ```
 
-## Advanced Usage
+## 고급 사용법
 
-### Customize Document Page Content & Metadata
+### Document Page Content 및 Metadata 커스터마이징
 
-When initializing a loader with more than 1 content field, the `page_content` of the loaded Documents will contain a JSON-encoded string with top level fields equal to the specified fields in `content_fields`.
+2개 이상의 content field로 loader를 초기화할 때, 로드된 Documents의 `page_content`는 `content_fields`에 지정된 필드와 동일한 최상위 필드를 가진 JSON 인코딩된 문자열을 포함합니다.
 
-If the `metadata_fields` are specified, the `metadata` field of the loaded Documents will only have the top level fields equal to the specified `metadata_fields`. If any of the values of the metadata fields is stored as a JSON-encoded string, it will be decoded prior to being loaded to the metadata fields.
+`metadata_fields`가 지정된 경우, 로드된 Documents의 `metadata` 필드는 지정된 `metadata_fields`와 동일한 최상위 필드만 가집니다. metadata 필드의 값 중 JSON 인코딩된 문자열로 저장된 값이 있는 경우, metadata 필드에 로드되기 전에 디코딩됩니다.
 
 ```python
 loader = MemorystoreDocumentLoader(

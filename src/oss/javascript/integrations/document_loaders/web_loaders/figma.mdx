@@ -2,8 +2,8 @@
 title: Figma
 ---
 
-This example goes over how to load data from a Figma file.
-You will need a Figma access token in order to get started.
+이 예제는 Figma 파일에서 데이터를 로드하는 방법을 다룹니다.
+시작하려면 Figma access token이 필요합니다.
 
 ```typescript
 import { FigmaFileLoader } from "@langchain/community/document_loaders/web/figma";
@@ -18,7 +18,7 @@ const docs = await loader.load();
 console.log({ docs });
 ```
 
-You can find your Figma file's key and node ids by opening the file in your browser and extracting them from the URL:
+브라우저에서 파일을 열고 URL에서 Figma 파일의 key와 node id를 추출할 수 있습니다:
 
 ```
 https://www.figma.com/file/<YOUR FILE KEY HERE>/LangChainJS-Test?type=whiteboard&node-id=<YOUR NODE ID HERE>&t=e6lqWkKecuYQRyRg-0

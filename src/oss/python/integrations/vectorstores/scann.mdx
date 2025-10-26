@@ -1,16 +1,17 @@
+```markdown
 ---
 title: ScaNN
 ---
 
-ScaNN (Scalable Nearest Neighbors) is a method for efficient vector similarity search at scale.
+ScaNN (Scalable Nearest Neighbors)은 대규모 벡터 유사도 검색을 효율적으로 수행하는 방법입니다.
 
-ScaNN includes search space pruning and quantization for Maximum Inner Product Search and also supports other distance functions such as Euclidean distance. The implementation is optimized for x86 processors with AVX2 support. See its [Google Research github](https://github.com/google-research/google-research/tree/master/scann) for more details.
+ScaNN은 Maximum Inner Product Search를 위한 검색 공간 가지치기(pruning)와 양자화(quantization)를 포함하며, Euclidean distance와 같은 다른 거리 함수도 지원합니다. 구현은 AVX2를 지원하는 x86 프로세서에 최적화되어 있습니다. 자세한 내용은 [Google Research github](https://github.com/google-research/google-research/tree/master/scann)를 참조하세요.
 
-You'll need to install `langchain-community` with `pip install -qU langchain-community` to use this integration
+이 integration을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다.
 
 ## Installation
 
-Install ScaNN through pip. Alternatively, you can follow instructions on the [ScaNN Website](https://github.com/google-research/google-research/tree/master/scann#building-from-source) to install from source.
+pip를 통해 ScaNN을 설치합니다. 또는 [ScaNN Website](https://github.com/google-research/google-research/tree/master/scann#building-from-source)의 지침에 따라 소스에서 설치할 수 있습니다.
 
 ```python
 pip install -qU  scann
@@ -18,7 +19,7 @@ pip install -qU  scann
 
 ## Retrieval Demo
 
-Below we show how to use ScaNN in conjunction with Huggingface Embeddings.
+아래에서는 Huggingface Embeddings와 함께 ScaNN을 사용하는 방법을 보여줍니다.
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -44,9 +45,9 @@ docs[0]
 
 ## RetrievalQA Demo
 
-Next, we demonstrate using ScaNN in conjunction with Google PaLM API.
+다음으로, Google PaLM API와 함께 ScaNN을 사용하는 방법을 시연합니다.
 
-You can obtain an API key from [developers.generativeai.google/tutorials/setup](https://developers.generativeai.google/tutorials/setup)
+API key는 [developers.generativeai.google/tutorials/setup](https://developers.generativeai.google/tutorials/setup)에서 얻을 수 있습니다.
 
 ```python
 from langchain.chains import RetrievalQA
@@ -77,9 +78,10 @@ print(qa.run("What did the president say about Michael Phelps?"))
 The president did not mention Michael Phelps in his speech.
 ```
 
-## Save and loading local retrieval index
+## 로컬 retrieval index 저장 및 로드
 
 ```python
 db.save_local("/tmp/db", "state_of_union")
 restored_db = ScaNN.load_local("/tmp/db", embeddings, index_name="state_of_union")
+```
 ```

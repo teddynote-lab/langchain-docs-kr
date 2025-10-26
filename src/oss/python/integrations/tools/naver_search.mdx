@@ -2,7 +2,7 @@
 title: Naver Search
 ---
 
-The Naver Search Tool provides a simple interface to search Naver and get results.
+Naver Search Tool은 Naver를 검색하고 결과를 가져오는 간단한 인터페이스를 제공합니다.
 
 ### Integration details
 
@@ -12,21 +12,21 @@ The Naver Search Tool provides a simple interface to search Naver and get result
 
 ### Tool features
 
-**Search** : The Naver Search Tool provides a simple interface to search Naver and get results.
+**Search** : Naver Search Tool은 Naver를 검색하고 결과를 가져오는 간단한 인터페이스를 제공합니다.
 
 ## Setup
 
-### Setting Up API Credentials
+### API Credentials 설정하기
 
-To use Naver Search, you need to obtain API credentials. Follow these steps:
+Naver Search를 사용하려면 API credentials를 발급받아야 합니다. 다음 단계를 따르세요:
 
-Sign in to the [Naver Developers portal](https://developers.naver.com/main/).
-Create a new application and enable the Search API.
-Obtain your **NAVER_CLIENT_ID** and **NAVER_CLIENT_SECRET** from the "Application List" section.
+[Naver Developers portal](https://developers.naver.com/main/)에 로그인합니다.
+새 애플리케이션을 생성하고 Search API를 활성화합니다.
+"Application List" 섹션에서 **NAVER_CLIENT_ID**와 **NAVER_CLIENT_SECRET**을 발급받습니다.
 
-### Setting Up Environment Variables
+### Environment Variables 설정하기
 
-After obtaining the credentials, set them as environment variables in your script:
+credentials를 발급받은 후, 스크립트에서 environment variables로 설정합니다:
 
 ```python
 pip install -qU  langchain-naver-community
@@ -100,7 +100,7 @@ tool.invoke("what is the weather in seoul?")[3:5]
 
 ## Use within an agent
 
-The Naver Search tool can be integrated into LangChain agents for more complex tasks. Below we demonstrate how to set up an agent that can search Naver for current information.
+Naver Search tool은 더 복잡한 작업을 위해 LangChain agent에 통합될 수 있습니다. 아래에서는 현재 정보를 Naver에서 검색할 수 있는 agent를 설정하는 방법을 보여줍니다.
 
 ```python
 from langchain_openai import ChatOpenAI
@@ -126,7 +126,7 @@ agent_executor = create_agent(
 )
 ```
 
-Now we can run the agent with a query.
+이제 쿼리와 함께 agent를 실행할 수 있습니다.
 
 ```python
 query = "What is the weather in Seoul?"

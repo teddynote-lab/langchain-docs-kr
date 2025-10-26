@@ -2,21 +2,21 @@
 title: Typesense
 ---
 
-> [Typesense](https://typesense.org) is an open-source, in-memory search engine, that you can either [self-host](https://typesense.org/docs/guide/install-typesense#option-2-local-machine-self-hosting) or run on [Typesense Cloud](https://cloud.typesense.org/).
+> [Typesense](https://typesense.org)는 오픈소스 인메모리 검색 엔진으로, [자체 호스팅](https://typesense.org/docs/guide/install-typesense#option-2-local-machine-self-hosting)하거나 [Typesense Cloud](https://cloud.typesense.org/)에서 실행할 수 있습니다.
 >
-> Typesense focuses on performance by storing the entire index in RAM (with a backup on disk) and also focuses on providing an out-of-the-box developer experience by simplifying available options and setting good defaults.
+> Typesense는 전체 인덱스를 RAM에 저장하고(디스크에 백업) 성능에 중점을 두며, 사용 가능한 옵션을 단순화하고 좋은 기본값을 설정하여 즉시 사용 가능한 개발자 경험을 제공하는 데 중점을 둡니다.
 >
-> It also lets you combine attribute-based filtering together with vector queries, to fetch the most relevant documents.
+> 또한 속성 기반 필터링과 vector 쿼리를 결합하여 가장 관련성 높은 문서를 가져올 수 있습니다.
 
-This notebook shows you how to use Typesense as your VectorStore.
+이 노트북은 Typesense를 VectorStore로 사용하는 방법을 보여줍니다.
 
-Let's first install our dependencies:
+먼저 의존성을 설치해봅시다:
 
 ```python
 pip install -qU  typesense openapi-schema-pydantic langchain-openai langchain-community tiktoken
 ```
 
-We want to use `OpenAIEmbeddings` so we have to get the OpenAI API Key.
+`OpenAIEmbeddings`를 사용하려면 OpenAI API Key를 가져와야 합니다.
 
 ```python
 import getpass
@@ -33,7 +33,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import CharacterTextSplitter
 ```
 
-Let's import our test dataset:
+테스트 데이터셋을 가져와봅시다:
 
 ```python
 loader = TextLoader("../../how_to/state_of_the_union.txt")
@@ -69,9 +69,9 @@ found_docs = docsearch.similarity_search(query)
 print(found_docs[0].page_content)
 ```
 
-## Typesense as a Retriever
+## Retriever로서의 Typesense
 
-Typesense, as all the other vector stores, is a LangChain Retriever, by using cosine similarity.
+Typesense는 다른 모든 vector store와 마찬가지로 cosine similarity를 사용하는 LangChain Retriever입니다.
 
 ```python
 retriever = docsearch.as_retriever()

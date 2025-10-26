@@ -3,14 +3,14 @@ title: Cohere
 ---
 
 <Warning>
-**You are currently on a page documenting the use of Cohere models as text completion models. Many popular Cohere models are [chat completion models](/oss/langchain/models).**
+**현재 Cohere 모델을 text completion 모델로 사용하는 방법을 설명하는 페이지를 보고 계십니다. 많은 인기 있는 Cohere 모델은 [chat completion 모델](/oss/langchain/models)입니다.**
 
-You may be looking for [this page instead](/oss/integrations/chat/cohere/).
+[이 페이지](/oss/integrations/chat/cohere/)를 찾고 계실 수 있습니다.
 </Warning>
 
->[Cohere](https://cohere.ai/about) is a Canadian startup that provides natural language processing models that help companies improve human-machine interactions.
+>[Cohere](https://cohere.ai/about)는 기업이 인간-기계 상호작용을 개선할 수 있도록 자연어 처리 모델을 제공하는 캐나다 스타트업입니다.
 
-Head to the [API reference](https://python.langchain.com/api_reference/community/llms/langchain_community.llms.cohere.Cohere.html) for detailed documentation of all attributes and methods.
+모든 속성과 메서드에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/llms/langchain_community.llms.cohere.Cohere.html)를 참조하세요.
 
 ## Overview
 
@@ -22,11 +22,11 @@ Head to the [API reference](https://python.langchain.com/api_reference/community
 
 ## Setup
 
-The integration lives in the `langchain-community` package. We also need to install the `cohere` package itself. We can install these with:
+이 통합은 `langchain-community` 패키지에 포함되어 있습니다. 또한 `cohere` 패키지 자체도 설치해야 합니다. 다음과 같이 설치할 수 있습니다:
 
 ### Credentials
 
-We'll need to get a [Cohere API key](https://cohere.com/) and set the `COHERE_API_KEY` environment variable:
+[Cohere API key](https://cohere.com/)를 발급받고 `COHERE_API_KEY` 환경 변수를 설정해야 합니다:
 
 ```python
 import getpass
@@ -42,7 +42,7 @@ if "COHERE_API_KEY" not in os.environ:
 pip install -U langchain-community langchain-cohere
 ```
 
-It's also helpful (but not needed) to set up [LangSmith](https://smith.langchain.com/) for best-in-class observability
+최고 수준의 observability를 위해 [LangSmith](https://smith.langchain.com/)를 설정하는 것도 도움이 됩니다(필수는 아님)
 
 ```python
 os.environ["LANGSMITH_TRACING"] = "true"
@@ -51,7 +51,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ## Invocation
 
-Cohere supports all [LLM](/oss/langchain/models) functionality:
+Cohere는 모든 [LLM](/oss/langchain/models) 기능을 지원합니다:
 
 ```python
 from langchain_cohere import Cohere
@@ -98,4 +98,4 @@ model.batch([message])
 
 ## API reference
 
-For detailed documentation of all `Cohere` llm features and configurations head to the API reference: [python.langchain.com/api_reference/community/llms/langchain_community.llms.cohere.Cohere.html](https://python.langchain.com/api_reference/community/llms/langchain_community.llms.cohere.Cohere.html)
+모든 `Cohere` llm 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/llms/langchain_community.llms.cohere.Cohere.html](https://python.langchain.com/api_reference/community/llms/langchain_community.llms.cohere.Cohere.html)

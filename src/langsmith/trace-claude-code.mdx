@@ -1,13 +1,13 @@
 ---
-title: Trace Claude Code
+title: Claude Code 추적하기
 sidebarTitle: Claude Code
 ---
 
-[Claude Code](https://docs.claude.com/en/docs/claude-code/overview) is one of the most impressive and useful AI coding tools to date. Claude code emits events for monitoring and observability. LangSmith can collect and display these events to give you a full detailed log on what Claude Code does under the hood.
+[Claude Code](https://docs.claude.com/en/docs/claude-code/overview)는 현재까지 가장 인상적이고 유용한 AI 코딩 도구 중 하나입니다. Claude Code는 모니터링과 관찰 가능성을 위한 이벤트를 발생시킵니다. LangSmith는 이러한 이벤트를 수집하고 표시하여 Claude Code가 내부적으로 수행하는 작업에 대한 전체 상세 로그를 제공할 수 있습니다.
 
-## Quick Start
+## 빠른 시작
 
-You can integrate LangSmith tracing with Claude Code by setting the following environment variables in the environment in which you run Claude Code.
+Claude Code를 실행하는 환경에서 다음 환경 변수를 설정하여 LangSmith 추적을 Claude Code와 통합할 수 있습니다.
 
 ```bash
 # Enables Claude Code to emit OTEL events
@@ -33,11 +33,11 @@ claude
 ```
 
 <Note>
-Claude Code emits [open telemetry standard events](https://docs.claude.com/en/docs/claude-code/monitoring-usage#events) for monitoring usage, but this does not include the actual prompts and messages that go to the LLM.
+Claude Code는 사용량 모니터링을 위해 [open telemetry 표준 이벤트](https://docs.claude.com/en/docs/claude-code/monitoring-usage#events)를 발생시키지만, 여기에는 LLM으로 전송되는 실제 prompt와 message가 포함되지 않습니다.
 </Note>
 
 <Note>
-If you're self-hosting LangSmith, replace the base endpoint with your LangSmith api endpoint and append `/api/v1`. For example: `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=https://ai-company.com/api/v1/otel/v1/claude_code`
+LangSmith를 자체 호스팅하는 경우, base endpoint를 LangSmith api endpoint로 교체하고 `/api/v1`을 추가하세요. 예: `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=https://ai-company.com/api/v1/otel/v1/claude_code`
 </Note>
 
 ![Claude Code Trace](/langsmith/images/claude-code-trace.png)

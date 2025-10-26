@@ -2,13 +2,13 @@
 title: Compass DeFi Toolkit
 ---
 
-Interact with various DeFi protocols. Non-custodial.Tools return *unsigned transactions*. The toolkit is built on top of a Universal DeFi API ([Compass API](https://api.compasslabs.ai/)) allowing agents to perform financial operations like:
+다양한 DeFi 프로토콜과 상호작용합니다. 비수탁형입니다. 도구는 *서명되지 않은 트랜잭션*을 반환합니다. 이 toolkit은 Universal DeFi API([Compass API](https://api.compasslabs.ai/))를 기반으로 구축되어 에이전트가 다음과 같은 금융 작업을 수행할 수 있습니다:
 
-- **Swapping tokens** on Uniswap and Aerodrome
-- **Lending** or **borrowing** assets using protocols on Aave
-- **Providing liquidity** on Aerodrome and Uniswap
-- **Transferring funds** between wallets.
-- Querying balances, portfolios and **monitoring positions**.
+- Uniswap과 Aerodrome에서 **토큰 스왑**
+- Aave 프로토콜을 사용한 자산 **대출** 또는 **차입**
+- Aerodrome과 Uniswap에서 **유동성 공급**
+- 지갑 간 **자금 이체**
+- 잔액, 포트폴리오 조회 및 **포지션 모니터링**
 
 ## Overview
 
@@ -20,25 +20,25 @@ Interact with various DeFi protocols. Non-custodial.Tools return *unsigned trans
 
 ### Tool features
 
-Here’s a sample of the tools this toolkit provides (subject to change daily):
+이 toolkit이 제공하는 도구 샘플입니다(매일 변경될 수 있음):
 
-- `aave_supply`: Supply assets to Aave to earn interest.
-- `aave_borrow`: Borrow assets from Aave using collateral.
-- `uniswap_swap_sell_exactly`: Swap a specific amount of one token on Uniswap.
-- `generic_portfolio_get`: Retrieve a wallet’s portfolio in USD and token balances.
-- `generic_transfer_erc20`: Transfer ERC20 tokens between addresses.
+- `aave_supply`: Aave에 자산을 공급하여 이자를 얻습니다.
+- `aave_borrow`: 담보를 사용하여 Aave에서 자산을 차입합니다.
+- `uniswap_swap_sell_exactly`: Uniswap에서 특정 수량의 토큰을 스왑합니다.
+- `generic_portfolio_get`: 지갑의 포트폴리오를 USD 및 토큰 잔액으로 조회합니다.
+- `generic_transfer_erc20`: 주소 간 ERC20 토큰을 이체합니다.
 
 ## Setup
 
-Here we will:
+여기서 다음을 수행합니다:
 
-1. Install the langchain package
-2. Import and instantiate the toolkit
-3. Pass the tools to your agent with `toolkit.get_tools()`
+1. langchain 패키지 설치
+2. toolkit import 및 인스턴스화
+3. `toolkit.get_tools()`를 사용하여 에이전트에 도구 전달
 
 ### Installation
 
-This toolkit lives in the `langchain-compass` package:
+이 toolkit은 `langchain-compass` 패키지에 있습니다:
 
 ```python
 pip install -qU langchain-compass
@@ -46,7 +46,7 @@ pip install -qU langchain-compass
 
 #### Environment Setup
 
-To run these examples, ensure LangChain has access to an LLM service. For instance, if you're using GPT-4o, create a `.env` file containing:
+이 예제를 실행하려면 LangChain이 LLM 서비스에 액세스할 수 있어야 합니다. 예를 들어, GPT-4o를 사용하는 경우 다음 내용이 포함된 `.env` 파일을 생성하세요:
 
 ```plaintext
 # .env file
@@ -55,7 +55,7 @@ OPENAI_API_KEY=<your_openai_api_key_here>
 
 ### Instantiation
 
-Now we can instantiate our toolkit:
+이제 toolkit을 인스턴스화할 수 있습니다:
 
 ```python
 from langchain_compass.toolkits import LangchainCompassToolkit
@@ -65,7 +65,7 @@ toolkit = LangchainCompassToolkit(compass_api_key=None)
 
 ### Tools
 
-View [available tools](#tool-features):
+[사용 가능한 도구](#tool-features) 보기:
 
 ```python
 tools = toolkit.get_tools()
@@ -88,7 +88,7 @@ aave_user_position_summary_get
 
 ## Invocation
 
-To invoke a single tool programmatically:
+프로그래밍 방식으로 단일 도구를 호출하려면:
 
 ```python
 tool_name = "generic_ens_get"
@@ -102,7 +102,7 @@ EnsNameInfoResponse(wallet_address='0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
 
 ## Use within an agent
 
-We will need a LLM or chat model:
+LLM 또는 chat model이 필요합니다:
 
 ```python
 from dotenv import load_dotenv
@@ -113,7 +113,7 @@ load_dotenv()
 llm = ChatOpenAI(model="gpt-4o")
 ```
 
-Initialize the agent with the tools:
+도구를 사용하여 에이전트를 초기화합니다:
 
 ```python
 from langchain.agents import create_agent
@@ -123,7 +123,7 @@ tools = toolkit.get_tools()
 agent_executor = create_agent(llm, tools)
 ```
 
-Example usage:
+사용 예시:
 
 ```python
 example_query = "please set an allowance on Uniswap of 10 WETH for vitalic.eth."  # spelt wrong intentionally
@@ -136,7 +136,7 @@ for event in events:
     event["messages"][-1].pretty_print()
 ```
 
-Expected output:
+예상 출력:
 
 ```
 ================================[1m Human Message [0m=================================
@@ -172,4 +172,4 @@ Name: generic_allowance_set
 
 ## API reference
 
-`langchain-compass` is built on top of the Compass API. Each tool corresponds to an API endpoint. [Please check out the docs here](https://api.compasslabs.ai/)
+`langchain-compass`는 Compass API를 기반으로 구축되었습니다. 각 도구는 API 엔드포인트에 해당합니다. [여기에서 문서를 확인하세요](https://api.compasslabs.ai/)

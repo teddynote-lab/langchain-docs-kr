@@ -2,17 +2,17 @@
 title: Psychic
 ---
 
-This notebook covers how to load documents from `Psychic`. See [here](/oss/integrations/providers/psychic) for more details.
+이 노트북은 `Psychic`에서 문서를 로드하는 방법을 다룹니다. 자세한 내용은 [여기](/oss/integrations/providers/psychic)를 참조하세요.
 
 ## Prerequisites
 
-1. Follow the Quick Start section in [this document](/oss/integrations/providers/psychic)
-2. Log into the [Psychic dashboard](https://dashboard.psychic.dev/) and get your secret key
-3. Install the frontend react library into your web app and have a user authenticate a connection. The connection will be created using the connection id that you specify.
+1. [이 문서](/oss/integrations/providers/psychic)의 Quick Start 섹션을 따라하세요
+2. [Psychic dashboard](https://dashboard.psychic.dev/)에 로그인하여 secret key를 받으세요
+3. 프론트엔드 react 라이브러리를 웹 앱에 설치하고 사용자가 연결을 인증하도록 하세요. 연결은 지정한 connection id를 사용하여 생성됩니다.
 
-## Loading documents
+## 문서 로드하기
 
-Use the `PsychicLoader` class to load in documents from a connection. Each connection has a connector id (corresponding to the SaaS app that was connected) and a connection id (which you passed in to the frontend library).
+`PsychicLoader` 클래스를 사용하여 연결에서 문서를 로드합니다. 각 연결에는 connector id(연결된 SaaS 앱에 해당)와 connection id(프론트엔드 라이브러리에 전달한 값)가 있습니다.
 
 ```python
 # Uncomment this to install psychicapi if you don't already have it installed
@@ -39,9 +39,9 @@ google_drive_loader = PsychicLoader(
 documents = google_drive_loader.load()
 ```
 
-## Converting the docs to embeddings
+## 문서를 embedding으로 변환하기
 
-We can now convert these documents into embeddings and store them in a vector database like Chroma
+이제 이러한 문서를 embedding으로 변환하고 Chroma와 같은 vector database에 저장할 수 있습니다
 
 ```python
 from langchain.chains import RetrievalQAWithSourcesChain

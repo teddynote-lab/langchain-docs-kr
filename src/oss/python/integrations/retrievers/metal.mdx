@@ -2,11 +2,11 @@
 title: Metal
 ---
 
->[Metal](https://github.com/getmetal/metal-python) is a managed service for ML Embeddings.
+>[Metal](https://github.com/getmetal/metal-python)은 ML Embeddings를 위한 관리형 서비스입니다.
 
-This notebook shows how to use [Metal's](https://docs.getmetal.io/introduction) retriever.
+이 노트북은 [Metal의](https://docs.getmetal.io/introduction) retriever를 사용하는 방법을 보여줍니다.
 
-First, you will need to sign up for Metal and get an API key. You can do so [here](https://docs.getmetal.io/misc-create-app)
+먼저 Metal에 가입하고 API key를 받아야 합니다. [여기](https://docs.getmetal.io/misc-create-app)에서 가입할 수 있습니다.
 
 ```python
 pip install -qU  metal_sdk
@@ -22,9 +22,9 @@ INDEX_ID = ""
 metal = Metal(API_KEY, CLIENT_ID, INDEX_ID)
 ```
 
-## Ingest Documents
+## 문서 수집
 
-You only need to do this if you haven't already set up an index
+아직 index를 설정하지 않은 경우에만 이 작업을 수행하면 됩니다.
 
 ```python
 metal.index({"text": "foo1"})
@@ -37,9 +37,9 @@ metal.index({"text": "foo"})
   'createdAt': '2023-03-31T19:51:06.748Z'}}
 ```
 
-## Query
+## 쿼리
 
-Now that our index is set up, we can set up a retriever and start querying it.
+이제 index가 설정되었으므로 retriever를 설정하고 쿼리를 시작할 수 있습니다.
 
 ```python
 from langchain_community.retrievers import MetalRetriever

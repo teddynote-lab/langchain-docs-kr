@@ -4,33 +4,33 @@ title: Interrupts
 
 
 
-Interrupts allow you to pause graph execution at specific points and wait for external input before continuing. This enables human-in-the-loop patterns where you need external input to proceed. When an interrupt is triggered, LangGraph saves the graph state using its [persistence](/oss/langgraph/persistence) layer and waits indefinitely until you resume execution.
+Interrupt는 graph 실행을 특정 지점에서 일시 중지하고 계속하기 전에 외부 입력을 기다릴 수 있게 해줍니다. 이를 통해 외부 입력이 필요한 human-in-the-loop 패턴을 구현할 수 있습니다. Interrupt가 트리거되면 LangGraph는 [persistence](/oss/langgraph/persistence) 레이어를 사용하여 graph 상태를 저장하고 실행을 재개할 때까지 무기한 대기합니다.
 
-Interrupts work by calling the `interrupt()` function at any point in your graph nodes. The function accepts any JSON-serializable value which is surfaced to the caller. When you're ready to continue, you resume execution by re-invoking the graph using `Command`, which then becomes the return value of the `interrupt()` call from inside the node.
+Interrupt는 graph node의 어느 지점에서든 `interrupt()` 함수를 호출하여 작동합니다. 이 함수는 JSON 직렬화 가능한 모든 값을 받아 호출자에게 전달합니다. 계속할 준비가 되면 `Command`를 사용하여 graph를 다시 호출하여 실행을 재개하며, 이는 node 내부의 `interrupt()` 호출의 반환 값이 됩니다.
 
-Unlike static breakpoints (which pause before or after specific nodes), interrupts are **dynamic**—they can be placed anywhere in your code and can be conditional based on your application logic.
+정적 breakpoint(특정 node 전후에 일시 중지)와 달리, interrupt는 **동적**입니다—코드의 어느 곳에나 배치할 수 있으며 애플리케이션 로직에 따라 조건부로 실행될 수 있습니다.
 
 :::python
-- **Checkpointing keeps your place:** the checkpointer writes the exact graph state so you can resume later, even when in an error state.
-- **`thread_id` is your pointer:** set `config={"configurable": {"thread_id": ...}}` to tell the checkpointer which state to load.
-- **Interrupt payloads surface as `__interrupt__`:** the values you pass to `interrupt()` return to the caller in the `__interrupt__` field so you know what the graph is waiting on.
+- **Checkpointing이 위치를 유지합니다:** checkpointer는 정확한 graph 상태를 기록하여 오류 상태에서도 나중에 재개할 수 있습니다.
+- **`thread_id`는 포인터입니다:** `config={"configurable": {"thread_id": ...}}`를 설정하여 checkpointer에게 어떤 상태를 로드할지 알려줍니다.
+- **Interrupt payload는 `__interrupt__`로 표시됩니다:** `interrupt()`에 전달한 값은 `__interrupt__` 필드에서 호출자에게 반환되므로 graph가 무엇을 기다리고 있는지 알 수 있습니다.
 :::
 :::js
-- **Checkpointing keeps your place:** the checkpointer writes the exact graph state so you can resume later, even when in an error state.
-- **`thread_id` is your pointer:** use `{ configurable: { thread_id: ... } }` as options to the `invoke` method to tell the checkpointer which state to load.
-- **Interrupt payloads surface as `__interrupt__`:** the values you pass to `interrupt()` return to the caller in the `__interrupt__` field so you know what the graph is waiting on.
+- **Checkpointing이 위치를 유지합니다:** checkpointer는 정확한 graph 상태를 기록하여 오류 상태에서도 나중에 재개할 수 있습니다.
+- **`thread_id`는 포인터입니다:** `invoke` 메서드의 옵션으로 `{ configurable: { thread_id: ... } }`를 사용하여 checkpointer에게 어떤 상태를 로드할지 알려줍니다.
+- **Interrupt payload는 `__interrupt__`로 표시됩니다:** `interrupt()`에 전달한 값은 `__interrupt__` 필드에서 호출자에게 반환되므로 graph가 무엇을 기다리고 있는지 알 수 있습니다.
 :::
 
-The `thread_id` you choose is effectively your persistent cursor. Reusing it resumes the same checkpoint; using a new value starts a brand-new thread with an empty state.
+선택한 `thread_id`는 사실상 영구적인 커서입니다. 이를 재사용하면 동일한 checkpoint를 재개하고, 새 값을 사용하면 빈 상태로 새로운 thread를 시작합니다.
 
-## Pause using `interrupt`
+## `interrupt`를 사용하여 일시 중지
 
-The @[`interrupt`] function pauses graph execution and returns a value to the caller. When you call @[`interrupt`] within a node, LangGraph saves the current graph state and waits for you to resume execution with input.
+@[`interrupt`] 함수는 graph 실행을 일시 중지하고 호출자에게 값을 반환합니다. node 내에서 @[`interrupt`]를 호출하면 LangGraph는 현재 graph 상태를 저장하고 입력과 함께 실행을 재개할 때까지 기다립니다.
 
-To use @[`interrupt`], you need:
-1. A **checkpointer** to persist the graph state (use a durable checkpointer in production)
-2. A **thread ID** in your config so the runtime knows which state to resume from
-3. To call `interrupt()` where you want to pause (payload must be JSON-serializable)
+@[`interrupt`]를 사용하려면 다음이 필요합니다:
+1. graph 상태를 유지하기 위한 **checkpointer** (프로덕션에서는 영구 checkpointer 사용)
+2. runtime이 어떤 상태를 재개할지 알 수 있도록 config에 **thread ID**
+3. 일시 중지하려는 위치에서 `interrupt()` 호출 (payload는 JSON 직렬화 가능해야 함)
 
 :::python
 ```python
@@ -59,17 +59,17 @@ async function approvalNode(state: State) {
 ```
 :::
 
-When you call @[`interrupt`], here's what happens:
+@[`interrupt`]를 호출하면 다음과 같은 일이 발생합니다:
 
-1. **Graph execution gets suspended** at the exact point where @[`interrupt`] is called
-2. **State is saved** using the checkpointer so execution can be resumed later, In production, this should be a persistent checkpointer (e.g. backed by a database)
-3. **Value is returned** to the caller under `__interrupt__`; it can be any JSON-serializable value (string, object, array, etc.)
-4. **Graph waits indefinitely** until you resume execution with a response
-5. **Response is passed back** into the node when you resume, becoming the return value of the `interrupt()` call
+1. **Graph 실행이 중단됩니다** @[`interrupt`]가 호출된 정확한 지점에서
+2. **상태가 저장됩니다** checkpointer를 사용하여 나중에 실행을 재개할 수 있도록, 프로덕션에서는 영구 checkpointer(예: 데이터베이스 기반)를 사용해야 합니다
+3. **값이 반환됩니다** `__interrupt__` 아래에서 호출자에게; JSON 직렬화 가능한 모든 값(문자열, 객체, 배열 등)이 될 수 있습니다
+4. **Graph가 무기한 대기합니다** 응답과 함께 실행을 재개할 때까지
+5. **응답이 다시 전달됩니다** 재개할 때 node로, `interrupt()` 호출의 반환 값이 됩니다
 
-## Resuming interrupts
+## Interrupt 재개하기
 
-After an interrupt pauses execution, you resume the graph by invoking it again with a `Command` that contains the resume value. The resume value is passed back to the `interrupt` call, allowing the node to continue execution with the external input.
+Interrupt가 실행을 일시 중지한 후, resume 값을 포함하는 `Command`로 graph를 다시 호출하여 재개합니다. Resume 값은 `interrupt` 호출로 다시 전달되어 node가 외부 입력으로 실행을 계속할 수 있게 합니다.
 
 :::python
 ```python
@@ -111,25 +111,25 @@ await graph.invoke(new Command({ resume: true }), config);
 ```
 :::
 
-**Key points about resuming:**
+**재개에 대한 주요 사항:**
 
-- You must use the **same thread ID** when resuming that was used when the interrupt occurred
-- The value passed to `Command(resume=...)` becomes the return value of the @[`interrupt`] call
-- The node restarts from the beginning of the node where the @[`interrupt`] was called when resumed, so any code before the @[`interrupt`] runs again
-- You can pass any JSON-serializable value as the resume value
+- Interrupt가 발생했을 때 사용된 것과 **동일한 thread ID**를 재개할 때 사용해야 합니다
+- `Command(resume=...)`에 전달된 값이 @[`interrupt`] 호출의 반환 값이 됩니다
+- Node는 재개될 때 @[`interrupt`]가 호출된 node의 시작 부분부터 다시 시작되므로 @[`interrupt`] 이전의 모든 코드가 다시 실행됩니다
+- Resume 값으로 JSON 직렬화 가능한 모든 값을 전달할 수 있습니다
 
-## Common patterns
+## 일반적인 패턴
 
-The key thing that interrupts unlock is the ability to pause execution and wait for external input. This is useful for a variety of use cases, including:
+Interrupt가 가능하게 하는 핵심은 실행을 일시 중지하고 외부 입력을 기다리는 능력입니다. 이는 다음을 포함한 다양한 사용 사례에 유용합니다:
 
-- <Icon icon="check-circle" /> [Approval workflows](#approve-or-reject): Pause before executing critical actions (API calls, database changes, financial transactions)
-- <Icon icon="pencil" /> [Review and edit](#review-and-edit-state): Let humans review and modify LLM outputs or tool calls before continuing
-- <Icon icon="wrench" /> [Interrupting tool calls](#interrupts-in-tools): Pause before executing tool calls to review and edit the tool call before execution
-- <Icon icon="shield-check" /> [Validating human input](#validating-human-input): Pause before proceeding to the next step to validate human input
+- <Icon icon="check-circle" /> [승인 워크플로우](#approve-or-reject): 중요한 작업(API 호출, 데이터베이스 변경, 금융 거래) 실행 전에 일시 중지
+- <Icon icon="pencil" /> [검토 및 편집](#review-and-edit-state): 계속하기 전에 사람이 LLM 출력이나 tool 호출을 검토하고 수정하도록 허용
+- <Icon icon="wrench" /> [Tool 호출 중단](#interrupts-in-tools): Tool 호출 실행 전에 일시 중지하여 실행 전에 tool 호출을 검토하고 편집
+- <Icon icon="shield-check" /> [사용자 입력 검증](#validating-human-input): 다음 단계로 진행하기 전에 일시 중지하여 사용자 입력 검증
 
-### Approve or reject
+### 승인 또는 거부
 
-One of the most common uses of interrupts is to pause before a critical action and ask for approval. For example, you might want to ask a human to approve an API call, a database change, or any other important decision.
+Interrupt의 가장 일반적인 사용 사례 중 하나는 중요한 작업 전에 일시 중지하고 승인을 요청하는 것입니다. 예를 들어, API 호출, 데이터베이스 변경 또는 기타 중요한 결정을 승인하도록 사람에게 요청할 수 있습니다.
 
 :::python
 ```python
@@ -172,7 +172,7 @@ function approvalNode(state: State): Command {
 ```
 :::
 
-When you resume the graph, pass `true` to approve or `false` to reject:
+Graph를 재개할 때 승인하려면 `true`를, 거부하려면 `false`를 전달합니다:
 
 :::python
 ```python
@@ -194,7 +194,7 @@ await graph.invoke(new Command({ resume: false }), config);
 ```
 :::
 
-<Accordion title="Full example">
+<Accordion title="전체 예제">
     :::python
 
     ```python
@@ -310,9 +310,9 @@ await graph.invoke(new Command({ resume: false }), config);
 
 </Accordion>
 
-### Review and edit state
+### 상태 검토 및 편집
 
-Sometimes you want to let a human review and edit part of the graph state before continuing. This is useful for correcting LLMs, adding missing information, or making adjustments.
+때로는 계속하기 전에 사람이 graph 상태의 일부를 검토하고 편집하도록 하고 싶을 수 있습니다. 이는 LLM을 수정하거나, 누락된 정보를 추가하거나, 조정을 하는 데 유용합니다.
 
 :::python
 ```python
@@ -347,7 +347,7 @@ function reviewNode(state: State) {
 ```
 :::
 
-When resuming, provide the edited content:
+재개할 때 편집된 내용을 제공합니다:
 
 :::python
 ```python
@@ -367,7 +367,7 @@ await graph.invoke(
 ```
 :::
 
-<Accordion title="Full example">
+<Accordion title="전체 예제">
     :::python
 
     ```python
@@ -461,11 +461,11 @@ await graph.invoke(
 
 </Accordion>
 
-### Interrupts in tools
+### Tool에서의 Interrupt
 
-You can also place interrupts directly inside tool functions. This makes the tool itself pause for approval whenever it's called, and allows for human review and editing of the tool call before it is executed.
+Tool 함수 내부에 직접 interrupt를 배치할 수도 있습니다. 이렇게 하면 tool이 호출될 때마다 tool 자체가 승인을 위해 일시 중지되며, 실행 전에 tool 호출을 사람이 검토하고 편집할 수 있습니다.
 
-First, define a tool that uses @[`interrupt`]:
+먼저 @[`interrupt`]를 사용하는 tool을 정의합니다:
 
 :::python
 ```python
@@ -534,9 +534,9 @@ const sendEmailTool = tool(
 ```
 :::
 
-This approach is useful when you want the approval logic to live with the tool itself, making it reusable across different parts of your graph. The LLM can call the tool naturally, and the interrupt will pause execution whenever the tool is invoked, allowing you to approve, edit, or cancel the action.
+이 접근 방식은 승인 로직이 tool 자체에 있어 graph의 다른 부분에서 재사용할 수 있게 하려는 경우에 유용합니다. LLM은 tool을 자연스럽게 호출할 수 있으며, tool이 호출될 때마다 interrupt가 실행을 일시 중지하여 작업을 승인, 편집 또는 취소할 수 있습니다.
 
-<Accordion title="Full example">
+<Accordion title="전체 예제">
     :::python
 
     ```python
@@ -709,9 +709,9 @@ This approach is useful when you want the approval logic to live with the tool i
 
 </Accordion>
 
-### Validating human input
+### 사용자 입력 검증
 
-Sometimes you need to validate input from humans and ask again if it's invalid. You can do this using multiple @[`interrupt`] calls in a loop.
+때로는 사람의 입력을 검증하고 유효하지 않으면 다시 요청해야 합니다. 루프에서 여러 @[`interrupt`] 호출을 사용하여 이를 수행할 수 있습니다.
 
 :::python
 ```python
@@ -758,9 +758,9 @@ function getAgeNode(state: State) {
 ```
 :::
 
-Each time you resume the graph with invalid input, it will ask again with a clearer message. Once valid input is provided, the node completes and the graph continues.
+유효하지 않은 입력으로 graph를 재개할 때마다 더 명확한 메시지와 함께 다시 요청합니다. 유효한 입력이 제공되면 node가 완료되고 graph가 계속됩니다.
 
-<Accordion title="Full example">
+<Accordion title="전체 예제">
     :::python
 
     ```python
@@ -863,19 +863,19 @@ Each time you resume the graph with invalid input, it will ask again with a clea
 
 </Accordion>
 
-## Rules of interrupts
+## Interrupt 규칙
 
-When you call @[`interrupt`] within a node, LangGraph suspends execution by raising an exception that signals the runtime to pause. This exception propagates up through the call stack and is caught by the runtime, which notifies the graph to save the current state and wait for external input.
+Node 내에서 @[`interrupt`]를 호출하면 LangGraph는 runtime에 일시 중지하라는 신호를 보내는 예외를 발생시켜 실행을 중단합니다. 이 예외는 호출 스택을 통해 전파되고 runtime에 의해 포착되어 graph에 현재 상태를 저장하고 외부 입력을 기다리도록 알립니다.
 
-When execution resumes (after you provide the requested input), the runtime restarts the entire node from the beginning—it does not resume from the exact line where @[`interrupt`] was called. This means any code that ran before the @[`interrupt`] will execute again. Because of this, there's a few important rules to follow when working with interrupts to ensure they behave as expected.
+실행이 재개되면(요청된 입력을 제공한 후), runtime은 전체 node를 처음부터 다시 시작합니다—@[`interrupt`]가 호출된 정확한 줄에서 재개하지 않습니다. 즉, @[`interrupt`] 이전에 실행된 모든 코드가 다시 실행됩니다. 따라서 interrupt가 예상대로 작동하도록 하려면 따라야 할 몇 가지 중요한 규칙이 있습니다.
 
 :::python
-### Do not wrap `interrupt` calls in try/except
+### `interrupt` 호출을 try/except로 감싸지 마세요
 
-The way that @[`interrupt`] pauses execution at the point of the call is by throwing a special exception. If you wrap the @[`interrupt`] call in a try/except block, you will catch this exception and the interrupt will not be passed back to the graph.
+@[`interrupt`]가 호출 지점에서 실행을 일시 중지하는 방식은 특수 예외를 발생시키는 것입니다. @[`interrupt`] 호출을 try/except 블록으로 감싸면 이 예외를 포착하게 되어 interrupt가 graph로 다시 전달되지 않습니다.
 
-* ✅ Separate @[`interrupt`] calls from error-prone code
-* ✅ Use specific exception types in try/except blocks
+* ✅ @[`interrupt`] 호출을 오류가 발생하기 쉬운 코드와 분리하세요
+* ✅ try/except 블록에서 특정 예외 타입을 사용하세요
 
 <CodeGroup>
 ```python Separating logic
@@ -902,7 +902,7 @@ def node_a(state: State):
 ```
 </CodeGroup>
 
-* 🔴 Do not wrap @[`interrupt`] calls in bare try/except blocks
+* 🔴 @[`interrupt`] 호출을 일반 try/except 블록으로 감싸지 마세요
 
 ```python
 def node_a(state: State):
@@ -917,12 +917,12 @@ def node_a(state: State):
 :::
 
 :::js
-### Do not wrap `interrupt` calls in try/catch
+### `interrupt` 호출을 try/catch로 감싸지 마세요
 
-The way that @[`interrupt`] pauses execution at the point of the call is by throwing a special exception. If you wrap the @[`interrupt`] call in a try/catch block, you will catch this exception and the interrupt will not be passed back to the graph.
+@[`interrupt`]가 호출 지점에서 실행을 일시 중지하는 방식은 특수 예외를 발생시키는 것입니다. @[`interrupt`] 호출을 try/catch 블록으로 감싸면 이 예외를 포착하게 되어 interrupt가 graph로 다시 전달되지 않습니다.
 
-* ✅ Separate @[`interrupt`] calls from error-prone code
-* ✅ Conditionally catch errors if needed
+* ✅ @[`interrupt`] 호출을 오류가 발생하기 쉬운 코드와 분리하세요
+* ✅ 필요한 경우 조건부로 오류를 포착하세요
 
 <CodeGroup>
 ```typescript Separating logic
@@ -956,7 +956,7 @@ async function nodeA(state: State) {
 ```
 </CodeGroup>
 
-* 🔴 Do not wrap @[`interrupt`] calls in bare try/catch blocks
+* 🔴 @[`interrupt`] 호출을 일반 try/catch 블록으로 감싸지 마세요
 
 ```typescript
 async function nodeA(state: State) {
@@ -971,13 +971,13 @@ async function nodeA(state: State) {
 ```
 :::
 
-### Do not reorder `interrupt` calls within a node
+### Node 내에서 `interrupt` 호출 순서를 변경하지 마세요
 
-It's common to use multiple interrupts in a single node, however this can lead to unexpected behavior if not handled carefully.
+단일 node에서 여러 interrupt를 사용하는 것은 일반적이지만, 주의하지 않으면 예상치 못한 동작이 발생할 수 있습니다.
 
-When a node contains multiple interrupt calls, LangGraph keeps a list of resume values specific to the task executing the node. Whenever execution resumes, it starts at the beginning of the node. For each interrupt encountered, LangGraph checks if a matching value exists in the task's resume list. Matching is **strictly index-based**, so the order of interrupt calls within the node is important.
+Node에 여러 interrupt 호출이 포함되어 있으면 LangGraph는 node를 실행하는 task에 특정한 resume 값 목록을 유지합니다. 실행이 재개될 때마다 node의 시작 부분에서 시작됩니다. 각 interrupt가 발생할 때마다 LangGraph는 task의 resume 목록에 일치하는 값이 있는지 확인합니다. 일치는 **엄격하게 인덱스 기반**이므로 node 내 interrupt 호출의 순서가 중요합니다.
 
-* ✅ Keep @[`interrupt`] calls consistent across node executions
+* ✅ Node 실행 전반에 걸쳐 @[`interrupt`] 호출을 일관되게 유지하세요
 
 :::python
 ```python
@@ -1011,8 +1011,8 @@ async function nodeA(state: State) {
 ```
 :::
 
-* 🔴 Do not conditionally skip @[`interrupt`] calls within a node
-* 🔴 Do not loop @[`interrupt`] calls using logic that isn't deterministic across executions
+* 🔴 Node 내에서 조건부로 @[`interrupt`] 호출을 건너뛰지 마세요
+* 🔴 실행 전반에 걸쳐 결정적이지 않은 로직을 사용하여 @[`interrupt`] 호출을 반복하지 마세요
 
 :::python
 <CodeGroup>
@@ -1077,12 +1077,12 @@ async function nodeA(state: State) {
 </CodeGroup>
 :::
 
-### Do not return complex values in `interrupt` calls
+### `interrupt` 호출에서 복잡한 값을 반환하지 마세요
 
-Depending on which checkpointer is used, complex values may not be serializable (e.g. you can't serialize a function). To make your graphs adaptable to any deployment, it's best practice to only use values that can be reasonably serialized.
+사용되는 checkpointer에 따라 복잡한 값은 직렬화할 수 없을 수 있습니다(예: 함수를 직렬화할 수 없음). Graph를 모든 배포에 적응할 수 있도록 하려면 합리적으로 직렬화할 수 있는 값만 사용하는 것이 좋습니다.
 
-* ✅ Pass simple, JSON-serializable types to @[`interrupt`]
-* ✅ Pass dictionaries/objects with simple values
+* ✅ @[`interrupt`]에 간단한 JSON 직렬화 가능한 타입을 전달하세요
+* ✅ 간단한 값을 가진 dictionary/object를 전달하세요
 
 :::python
 <CodeGroup>
@@ -1136,7 +1136,7 @@ async function nodeA(state: State) {
 </CodeGroup>
 :::
 
-* 🔴 Do not pass functions, class instances, or other complex objects to @[`interrupt`]
+* 🔴 @[`interrupt`]에 함수, 클래스 인스턴스 또는 기타 복잡한 객체를 전달하지 마세요
 
 :::python
 <CodeGroup>
@@ -1209,15 +1209,15 @@ async function nodeA(state: State) {
 </CodeGroup>
 :::
 
-### Side effects called before `interrupt` must be idempotent
+### `interrupt` 이전에 호출된 부작용은 멱등성이 있어야 합니다
 
-Because interrupts work by re-running the nodes they were called from, side effects called before @[`interrupt`] should (ideally) be idempotent. For context, idempotency means that the same operation can be applied multiple times without changing the result beyond the initial execution.
+Interrupt는 호출된 node를 다시 실행하여 작동하므로 @[`interrupt`] 이전에 호출된 부작용은 (이상적으로) 멱등성이 있어야 합니다. 참고로, 멱등성은 동일한 작업을 여러 번 적용해도 초기 실행 이후 결과가 변경되지 않는다는 것을 의미합니다.
 
-As an example, you might have an API call to update a record inside of a node. If @[`interrupt`] is called after that call is made, it will be re-run multiple times when the node is resumed, potentially overwriting the initial update or creating duplicate records.
+예를 들어, node 내부에 레코드를 업데이트하는 API 호출이 있을 수 있습니다. 해당 호출이 이루어진 후 @[`interrupt`]가 호출되면 node가 재개될 때 여러 번 다시 실행되어 초기 업데이트를 덮어쓰거나 중복 레코드를 생성할 수 있습니다.
 
-* ✅ Use idempotent operations before @[`interrupt`]
-* ✅ Place side effects after @[`interrupt`] calls
-* ✅ Separate side effects into separate nodes when possible
+* ✅ @[`interrupt`] 이전에 멱등성 작업을 사용하세요
+* ✅ @[`interrupt`] 호출 이후에 부작용을 배치하세요
+* ✅ 가능한 경우 부작용을 별도의 node로 분리하세요
 
 :::python
 <CodeGroup>
@@ -1325,8 +1325,8 @@ async function notificationNode(state: State) {
 </CodeGroup>
 :::
 
-* 🔴 Do not perform non-idempotent operations before @[`interrupt`]
-* 🔴 Do not create new records without checking if they exist
+* 🔴 @[`interrupt`] 이전에 멱등성이 없는 작업을 수행하지 마세요
+* 🔴 존재 여부를 확인하지 않고 새 레코드를 생성하지 마세요
 
 :::python
 <CodeGroup>
@@ -1388,9 +1388,9 @@ async function nodeA(state: State) {
 </CodeGroup>
 :::
 
-## Using with subgraphs called as functions
+## 함수로 호출되는 subgraph와 함께 사용
 
-When invoking a subgraph within a node, the parent graph will resume execution from the **beginning of the node** where the subgraph was invoked and the @[`interrupt`] was triggered. Similarly, the **subgraph** will also resume from the beginning of the node where @[`interrupt`] was called.
+Node 내에서 subgraph를 호출할 때, 부모 graph는 subgraph가 호출되고 @[`interrupt`]가 트리거된 **node의 시작 부분**부터 실행을 재개합니다. 마찬가지로 **subgraph**도 @[`interrupt`]가 호출된 node의 시작 부분부터 재개됩니다.
 
 :::python
 ```python
@@ -1425,21 +1425,21 @@ async function nodeInSubgraph(state: State) {
 ```
 :::
 
-## Debugging with interrupts
+## Interrupt를 사용한 디버깅
 
 :::python
-To debug and test a graph, you can use static interrupts as breakpoints to step through the graph execution one node at a time. Static interrupts are triggered at defined points either before or after a node executes. You can set these by specifying `interrupt_before` and `interrupt_after` when compiling the graph.
+Graph를 디버그하고 테스트하려면 정적 interrupt를 breakpoint로 사용하여 한 번에 한 node씩 graph 실행을 단계별로 진행할 수 있습니다. 정적 interrupt는 node가 실행되기 전이나 후에 정의된 지점에서 트리거됩니다. Graph를 컴파일할 때 `interrupt_before`와 `interrupt_after`를 지정하여 이를 설정할 수 있습니다.
 :::
 :::js
-To debug and test a graph, you can use static interrupts as breakpoints to step through the graph execution one node at a time. Static interrupts are triggered at defined points either before or after a node executes. You can set these by specifying `interruptBefore` and `interruptAfter` when compiling the graph.
+Graph를 디버그하고 테스트하려면 정적 interrupt를 breakpoint로 사용하여 한 번에 한 node씩 graph 실행을 단계별로 진행할 수 있습니다. 정적 interrupt는 node가 실행되기 전이나 후에 정의된 지점에서 트리거됩니다. Graph를 컴파일할 때 `interruptBefore`와 `interruptAfter`를 지정하여 이를 설정할 수 있습니다.
 :::
 
 <Note>
-    Static interrupts are **not** recommended for human-in-the-loop workflows. Use the @[`interrupt`] method instead.
+    정적 interrupt는 human-in-the-loop 워크플로우에 **권장되지 않습니다**. 대신 @[`interrupt`] 메서드를 사용하세요.
 </Note>
 
 <Tabs>
-    <Tab title="At compile time">
+    <Tab title="컴파일 시">
         :::python
         ```python
         graph = builder.compile(
@@ -1462,12 +1462,12 @@ To debug and test a graph, you can use static interrupts as breakpoints to step 
         graph.invoke(None, config=config)  # [!code highlight]
         ```
 
-        1. The breakpoints are set during `compile` time.
-        2. `interrupt_before` specifies the nodes where execution should pause before the node is executed.
-        3. `interrupt_after` specifies the nodes where execution should pause after the node is executed.
-        4. A checkpointer is required to enable breakpoints.
-        5. The graph is run until the first breakpoint is hit.
-        6. The graph is resumed by passing in `None` for the input. This will run the graph until the next breakpoint is hit.
+        1. Breakpoint는 `compile` 시에 설정됩니다.
+        2. `interrupt_before`는 node가 실행되기 전에 실행을 일시 중지해야 하는 node를 지정합니다.
+        3. `interrupt_after`는 node가 실행된 후에 실행을 일시 중지해야 하는 node를 지정합니다.
+        4. Breakpoint를 활성화하려면 checkpointer가 필요합니다.
+        5. Graph는 첫 번째 breakpoint에 도달할 때까지 실행됩니다.
+        6. 입력에 `None`을 전달하여 graph를 재개합니다. 이렇게 하면 다음 breakpoint에 도달할 때까지 graph가 실행됩니다.
         :::
         :::js
         ```typescript
@@ -1490,15 +1490,15 @@ To debug and test a graph, you can use static interrupts as breakpoints to step 
         await graph.invoke(null, config);  # [!code highlight]
         ```
 
-        1. The breakpoints are set during `compile` time.
-        2. `interruptBefore` specifies the nodes where execution should pause before the node is executed.
-        3. `interruptAfter` specifies the nodes where execution should pause after the node is executed.
-        4. A checkpointer is required to enable breakpoints.
-        5. The graph is run until the first breakpoint is hit.
-        6. The graph is resumed by passing in `null` for the input. This will run the graph until the next breakpoint is hit.
+        1. Breakpoint는 `compile` 시에 설정됩니다.
+        2. `interruptBefore`는 node가 실행되기 전에 실행을 일시 중지해야 하는 node를 지정합니다.
+        3. `interruptAfter`는 node가 실행된 후에 실행을 일시 중지해야 하는 node를 지정합니다.
+        4. Breakpoint를 활성화하려면 checkpointer가 필요합니다.
+        5. Graph는 첫 번째 breakpoint에 도달할 때까지 실행됩니다.
+        6. 입력에 `null`을 전달하여 graph를 재개합니다. 이렇게 하면 다음 breakpoint에 도달할 때까지 graph가 실행됩니다.
         :::
     </Tab>
-    <Tab title="At run time">
+    <Tab title="런타임 시">
         :::python
         ```python
         config = {
@@ -1519,11 +1519,11 @@ To debug and test a graph, you can use static interrupts as breakpoints to step 
         graph.invoke(None, config=config)  # [!code highlight]
         ```
 
-        1. `graph.invoke` is called with the `interrupt_before` and `interrupt_after` parameters. This is a run-time configuration and can be changed for every invocation.
-        2. `interrupt_before` specifies the nodes where execution should pause before the node is executed.
-        3. `interrupt_after` specifies the nodes where execution should pause after the node is executed.
-        4. The graph is run until the first breakpoint is hit.
-        5. The graph is resumed by passing in `None` for the input. This will run the graph until the next breakpoint is hit.
+        1. `graph.invoke`는 `interrupt_before`와 `interrupt_after` 매개변수와 함께 호출됩니다. 이는 런타임 구성이며 모든 호출마다 변경할 수 있습니다.
+        2. `interrupt_before`는 node가 실행되기 전에 실행을 일시 중지해야 하는 node를 지정합니다.
+        3. `interrupt_after`는 node가 실행된 후에 실행을 일시 중지해야 하는 node를 지정합니다.
+        4. Graph는 첫 번째 breakpoint에 도달할 때까지 실행됩니다.
+        5. 입력에 `None`을 전달하여 graph를 재개합니다. 이렇게 하면 다음 breakpoint에 도달할 때까지 graph가 실행됩니다.
         :::
         :::js
         ```typescript
@@ -1540,17 +1540,17 @@ To debug and test a graph, you can use static interrupts as breakpoints to step 
         await graph.invoke(null, config);  // [!code highlight]
         ```
 
-        1. `graph.invoke` is called with the `interruptBefore` and `interruptAfter` parameters. This is a run-time configuration and can be changed for every invocation.
-        2. `interruptBefore` specifies the nodes where execution should pause before the node is executed.
-        3. `interruptAfter` specifies the nodes where execution should pause after the node is executed.
-        4. The graph is run until the first breakpoint is hit.
-        5. The graph is resumed by passing in `null` for the input. This will run the graph until the next breakpoint is hit.
+        1. `graph.invoke`는 `interruptBefore`와 `interruptAfter` 매개변수와 함께 호출됩니다. 이는 런타임 구성이며 모든 호출마다 변경할 수 있습니다.
+        2. `interruptBefore`는 node가 실행되기 전에 실행을 일시 중지해야 하는 node를 지정합니다.
+        3. `interruptAfter`는 node가 실행된 후에 실행을 일시 중지해야 하는 node를 지정합니다.
+        4. Graph는 첫 번째 breakpoint에 도달할 때까지 실행됩니다.
+        5. 입력에 `null`을 전달하여 graph를 재개합니다. 이렇게 하면 다음 breakpoint에 도달할 때까지 graph가 실행됩니다.
         :::
     </Tab>
 </Tabs>
 
-### Using LangGraph Studio
+### LangGraph Studio 사용
 
-You can use [LangGraph Studio](/langsmith/studio) to set static interrupts in your graph in the UI before running the graph. You can also use the UI to inspect the graph state at any point in the execution.
+[LangGraph Studio](/langsmith/studio)를 사용하여 graph를 실행하기 전에 UI에서 graph에 정적 interrupt를 설정할 수 있습니다. 또한 UI를 사용하여 실행의 모든 지점에서 graph 상태를 검사할 수 있습니다.
 
 ![image](/oss/images/static-interrupt.png)

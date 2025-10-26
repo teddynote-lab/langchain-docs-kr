@@ -2,9 +2,9 @@
 title: Memorize
 ---
 
-Fine-tuning LLM itself to memorize information using unsupervised learning.
+비지도 학습을 사용하여 정보를 기억하도록 LLM 자체를 fine-tuning합니다.
 
-This tool requires LLMs that support fine-tuning. Currently, only `langchain.llms import GradientLLM` is supported.
+이 도구는 fine-tuning을 지원하는 LLM이 필요합니다. 현재는 `langchain.llms import GradientLLM`만 지원됩니다.
 
 ## Imports
 
@@ -17,9 +17,9 @@ from langchain.memory import ConversationBufferMemory
 from langchain_community.llms import GradientLLM
 ```
 
-## Set the Environment API Key
+## Environment API Key 설정
 
-Make sure to get your API key from Gradient AI. You are given $10 in free credits to test and fine-tune different models.
+Gradient AI에서 API key를 받아야 합니다. 다양한 모델을 테스트하고 fine-tuning할 수 있는 $10의 무료 크레딧이 제공됩니다.
 
 ```python
 from getpass import getpass
@@ -36,11 +36,11 @@ if not os.environ.get("GRADIENT_MODEL_ADAPTER_ID", None):
     os.environ["GRADIENT_MODEL_ID"] = getpass("gradient.ai model id:")
 ```
 
-Optional: Validate your Environment variables `GRADIENT_ACCESS_TOKEN` and `GRADIENT_WORKSPACE_ID` to get currently deployed models.
+선택사항: Environment 변수 `GRADIENT_ACCESS_TOKEN`과 `GRADIENT_WORKSPACE_ID`를 검증하여 현재 배포된 모델을 확인합니다.
 
-## Create the `GradientLLM` instance
+## `GradientLLM` 인스턴스 생성
 
-You can specify different parameters such as the model name, max tokens generated, temperature, etc.
+모델 이름, 생성할 최대 토큰 수, temperature 등 다양한 파라미터를 지정할 수 있습니다.
 
 ```python
 llm = GradientLLM(
@@ -51,13 +51,13 @@ llm = GradientLLM(
 )
 ```
 
-## Load tools
+## Tools 로드
 
 ```python
 tools = load_tools(["memorize"], llm=llm)
 ```
 
-## Initiate the Agent
+## Agent 초기화
 
 ```python
 agent = initialize_agent(
@@ -69,9 +69,9 @@ agent = initialize_agent(
 )
 ```
 
-## Run the agent
+## Agent 실행
 
-Ask the agent to memorize a piece of text.
+agent에게 텍스트 조각을 기억하도록 요청합니다.
 
 ```python
 agent.run(

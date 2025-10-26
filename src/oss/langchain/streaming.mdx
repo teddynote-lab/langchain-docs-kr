@@ -4,36 +4,36 @@ title: Streaming
 
 
 
-LangChain implements a streaming system to surface real-time updates.
+LangChain은 실시간 업데이트를 제공하기 위한 streaming 시스템을 구현합니다.
 
-Streaming is crucial for enhancing the responsiveness of applications built on LLMs. By displaying output progressively, even before a complete response is ready, streaming significantly improves user experience (UX), particularly when dealing with the latency of LLMs.
+Streaming은 LLM 기반 애플리케이션의 응답성을 향상시키는 데 매우 중요합니다. 완전한 응답이 준비되기 전에도 출력을 점진적으로 표시함으로써, streaming은 특히 LLM의 지연 시간을 처리할 때 사용자 경험(UX)을 크게 개선합니다.
 
 ## Overview
 
-LangChain's streaming system lets you surface live feedback from agent runs to your application.
+LangChain의 streaming 시스템을 사용하면 agent 실행의 실시간 피드백을 애플리케이션에 전달할 수 있습니다.
 
-What's possible with LangChain streaming:
+LangChain streaming으로 가능한 것들:
 
-* <Icon icon="brain" size={16} /> [**Stream agent progress**](#agent-progress) — get state updates after each agent step.
-* <Icon icon="square-binary" size={16} /> [**Stream LLM tokens**](#llm-tokens) — stream language model tokens as they're generated.
-* <Icon icon="table" size={16} /> [**Stream custom updates**](#custom-updates) — emit user-defined signals (e.g., `"Fetched 10/100 records"`).
-* <Icon icon="layer-plus" size={16} /> [**Stream multiple modes**](#stream-multiple-modes) — choose from `updates` (agent progress), `messages` (LLM tokens + metadata), or `custom` (arbitrary user data).
+* <Icon icon="brain" size={16} /> [**Stream agent progress**](#agent-progress) — 각 agent 단계 후 상태 업데이트를 받습니다.
+* <Icon icon="square-binary" size={16} /> [**Stream LLM tokens**](#llm-tokens) — 생성되는 language model token을 streaming합니다.
+* <Icon icon="table" size={16} /> [**Stream custom updates**](#custom-updates) — 사용자 정의 신호를 전송합니다 (예: `"Fetched 10/100 records"`).
+* <Icon icon="layer-plus" size={16} /> [**Stream multiple modes**](#stream-multiple-modes) — `updates` (agent progress), `messages` (LLM tokens + metadata), 또는 `custom` (임의의 사용자 데이터) 중에서 선택합니다.
 
 ## Agent progress
 
 :::python
-To stream agent progress, use the @[`stream`][CompiledStateGraph.stream] or @[`astream`][CompiledStateGraph.astream] methods with `stream_mode="updates"`. This emits an event after every agent step.
+Agent progress를 streaming하려면 `stream_mode="updates"`와 함께 @[`stream`][CompiledStateGraph.stream] 또는 @[`astream`][CompiledStateGraph.astream] 메서드를 사용하세요. 이는 모든 agent 단계 후에 이벤트를 전송합니다.
 :::
 
 :::js
-To stream agent progress, use the @[`stream`][CompiledStateGraph.stream] method with `streamMode: "updates"`. This emits an event after every agent step.
+Agent progress를 streaming하려면 `streamMode: "updates"`와 함께 @[`stream`][CompiledStateGraph.stream] 메서드를 사용하세요. 이는 모든 agent 단계 후에 이벤트를 전송합니다.
 :::
 
-For example, if you have an agent that calls a tool once, you should see the following updates:
+예를 들어, tool을 한 번 호출하는 agent가 있다면 다음과 같은 업데이트를 볼 수 있습니다:
 
-* **LLM node**: @[`AIMessage`] with tool call requests
-* **Tool node**: @[`ToolMessage`] with execution result
-* **LLM node**: Final AI response
+* **LLM node**: tool call 요청이 포함된 @[`AIMessage`]
+* **Tool node**: 실행 결과가 포함된 @[`ToolMessage`]
+* **LLM node**: 최종 AI 응답
 
 :::python
 
@@ -154,7 +154,7 @@ for await (const chunk of await agent.stream(
 ## LLM tokens
 
 :::python
-To stream tokens as they are produced by the LLM, use `stream_mode="messages"`. Below you can see the output of the agent streaming tool calls and the final response.
+LLM에서 생성되는 token을 streaming하려면 `stream_mode="messages"`를 사용하세요. 아래에서 tool call과 최종 응답을 streaming하는 agent의 출력을 볼 수 있습니다.
 
 ```python title="Streaming LLM tokens"
 from langchain.agents import create_agent
@@ -277,7 +277,7 @@ content: [{'type': 'text', 'text': '!"\n\n'}]
 :::
 
 :::js
-To stream tokens as they are produced by the LLM, use `streamMode: "messages"`:
+LLM에서 생성되는 token을 streaming하려면 `streamMode: "messages"`를 사용하세요:
 
 ```typescript
 import z from "zod";
@@ -314,7 +314,7 @@ for await (const [token, metadata] of await agent.stream(
 ## Custom updates
 
 :::python
-To stream updates from tools as they are executed, you can use @[`get_stream_writer`].
+Tool이 실행될 때 업데이트를 streaming하려면 @[`get_stream_writer`]를 사용할 수 있습니다.
 
 ```python title="Streaming custom updates"
 from langchain.agents import create_agent
@@ -347,12 +347,12 @@ Acquired data for city: San Francisco
 ```
 
 <Note>
-    If you add @[`get_stream_writer`] inside your tool, you won't be able to invoke the tool outside of a LangGraph execution context.
+    Tool 내부에 @[`get_stream_writer`]를 추가하면 LangGraph 실행 컨텍스트 외부에서 tool을 호출할 수 없습니다.
 </Note>
 :::
 
 :::js
-To stream updates from tools as they are executed, you can use the `writer` parameter from the configuration.
+Tool이 실행될 때 업데이트를 streaming하려면 configuration의 `writer` parameter를 사용할 수 있습니다.
 
 ```typescript
 import z from "zod";
@@ -395,14 +395,14 @@ Acquired data for city: San Francisco
 ```
 
 <Note>
-    If you add the `writer` parameter to your tool, you won't be able to invoke the tool outside of a LangGraph execution context without providing a writer function.
+    Tool에 `writer` parameter를 추가하면 writer function을 제공하지 않고는 LangGraph 실행 컨텍스트 외부에서 tool을 호출할 수 없습니다.
 </Note>
 :::
 
 ## Stream multiple modes
 
 :::python
-You can specify multiple streaming modes by passing stream mode as a list: `stream_mode=["updates", "custom"]`:
+Stream mode를 list로 전달하여 여러 streaming mode를 지정할 수 있습니다: `stream_mode=["updates", "custom"]`:
 
 ```python title="Streaming multiple modes"
 from langchain.agents import create_agent
@@ -453,7 +453,7 @@ content: {'model': {'messages': [AIMessage(content='San Francisco weather: It's 
 :::
 
 :::js
-You can specify multiple streaming modes by passing streamMode as an array: `streamMode: ["updates", "messages", "custom"]`:
+streamMode를 array로 전달하여 여러 streaming mode를 지정할 수 있습니다: `streamMode: ["updates", "messages", "custom"]`:
 
 ```typescript
 import z from "zod";
@@ -493,8 +493,8 @@ for await (const [streamMode, chunk] of await agent.stream(
 
 ## Disable streaming
 
-In some applications you might need to disable streaming of individual tokens for a given model.
+일부 애플리케이션에서는 특정 model에 대해 개별 token의 streaming을 비활성화해야 할 수 있습니다.
 
-This is useful in [multi-agent](/oss/langchain/multi-agent) systems to control which agents stream their output.
+이는 [multi-agent](/oss/langchain/multi-agent) 시스템에서 어떤 agent가 출력을 streaming할지 제어하는 데 유용합니다.
 
-See the [Models](/oss/langchain/models#disable-streaming) guide to learn how to disable streaming.
+Streaming을 비활성화하는 방법을 알아보려면 [Models](/oss/langchain/models#disable-streaming) 가이드를 참조하세요.

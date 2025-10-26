@@ -1,24 +1,24 @@
 ---
-title: How to return categorical vs numerical metrics
-sidebarTitle: Return categorical vs numerical metrics
+title: categorical vs numerical metrics 반환 방법
+sidebarTitle: categorical vs numerical metrics 반환
 ---
 
-LangSmith supports both categorical and numerical metrics, and you can return either when writing a custom evaluator.
+LangSmith는 categorical 및 numerical metrics를 모두 지원하며, custom evaluator를 작성할 때 둘 중 하나를 반환할 수 있습니다.
 
-For an evaluator result to be logged as a numerical metric, it must returned as:
+evaluator 결과가 numerical metric으로 기록되려면 다음과 같이 반환되어야 합니다:
 
-* (Python only) an `int`, `float`, or `bool`
-* a dict of the form `{"key": "metric_name", "score": int | float | bool}`
+* (Python만 해당) `int`, `float`, 또는 `bool`
+* `{"key": "metric_name", "score": int | float | bool}` 형식의 dict
 
-For an evaluator result to be logged as a categorical metric, it must be returned as:
+evaluator 결과가 categorical metric으로 기록되려면 다음과 같이 반환되어야 합니다:
 
-* (Python only) a `str`
-* a dict of the form `{"key": "metric_name", "value": str | int | float | bool}`
+* (Python만 해당) `str`
+* `{"key": "metric_name", "value": str | int | float | bool}` 형식의 dict
 
-Here are some examples:
+다음은 몇 가지 예시입니다:
 
-- Python: Requires `langsmith>=0.2.0`
-- TypeScript: Support for multiple scores is available in `langsmith@0.1.32` and higher
+- Python: `langsmith>=0.2.0` 필요
+- TypeScript: 여러 score 지원은 `langsmith@0.1.32` 이상에서 사용 가능
 
 <CodeGroup>
 
@@ -56,6 +56,6 @@ function categoricalMetric(run: Run, example: Example) {
 
 </CodeGroup>
 
-## Related
+## 관련 항목
 
-* [Return multiple metrics in one evaluator](/langsmith/multiple-scores)
+* [하나의 evaluator에서 여러 metrics 반환하기](/langsmith/multiple-scores)

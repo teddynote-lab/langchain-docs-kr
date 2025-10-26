@@ -1,28 +1,29 @@
+```markdown
 ---
 title: SageMakerEndpoint
 ---
 
-[Amazon SageMaker](https://aws.amazon.com/sagemaker/) is a system that can build, train, and deploy machine learning (ML) models for any use case with fully managed infrastructure, tools, and workflows.
+[Amazon SageMaker](https://aws.amazon.com/sagemaker/)는 완전 관리형 인프라, 도구 및 워크플로우를 통해 모든 사용 사례에 대한 머신 러닝(ML) 모델을 구축, 훈련 및 배포할 수 있는 시스템입니다.
 
-This notebooks goes over how to use an LLM hosted on a `SageMaker endpoint`.
+이 노트북은 `SageMaker endpoint`에 호스팅된 LLM을 사용하는 방법을 다룹니다.
 
 ```python
 !pip3 install langchain boto3
 ```
 
-## Set up
+## 설정
 
-You have to set up following required parameters of the `SagemakerEndpoint` call:
+`SagemakerEndpoint` 호출에 필요한 다음 매개변수를 설정해야 합니다:
 
-- `endpoint_name`: The name of the endpoint from the deployed Sagemaker model.
-    Must be unique within an AWS Region.
-- `credentials_profile_name`: The name of the profile in the ~/.aws/credentials or ~/.aws/config files, which
-    has either access keys or role information specified.
-    If not specified, the default credential profile or, if on an EC2 instance,
-    credentials from IMDS will be used.
-    See: [boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html)
+- `endpoint_name`: 배포된 Sagemaker 모델의 endpoint 이름입니다.
+    AWS Region 내에서 고유해야 합니다.
+- `credentials_profile_name`: ~/.aws/credentials 또는 ~/.aws/config 파일에 있는 profile의 이름으로,
+    access key 또는 role 정보가 지정되어 있어야 합니다.
+    지정하지 않으면 기본 credential profile이 사용되거나, EC2 instance에서 실행 중인 경우
+    IMDS의 credential이 사용됩니다.
+    참조: [boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html)
 
-## Example
+## 예제
 
 ```python
 from langchain_core.documents import Document
@@ -42,9 +43,9 @@ docs = [
 ]
 ```
 
-## Example to initialize with external boto3 session
+## 외부 boto3 session으로 초기화하는 예제
 
-### for cross account scenarios
+### cross account 시나리오의 경우
 
 ```python
 import json
@@ -162,4 +163,5 @@ chain = load_qa_chain(
 )
 
 chain({"input_documents": docs, "question": query}, return_only_outputs=True)
+```
 ```

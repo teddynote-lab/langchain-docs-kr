@@ -2,11 +2,11 @@
 title: Google Finance
 ---
 
-This notebook goes over how to use the Google Finance Tool to get information from the Google Finance page.
+이 노트북은 Google Finance Tool을 사용하여 Google Finance 페이지에서 정보를 가져오는 방법을 다룹니다.
 
-To get an SerpApi key key, sign up at: [serpapi.com/users/sign_up](https://serpapi.com/users/sign_up).
+SerpApi key를 얻으려면 다음에서 가입하세요: [serpapi.com/users/sign_up](https://serpapi.com/users/sign_up).
 
-To use the tool with LangChain install following packages
+LangChain과 함께 tool을 사용하려면 다음 패키지를 설치하세요
 
 ```python
 pip install -qU google-search-results langchain-community
@@ -16,7 +16,7 @@ pip install -qU google-search-results langchain-community
 Note: you may need to restart the kernel to use updated packages.
 ```
 
-Then set the environment variable SERPAPI_API_KEY to your SerpApi key or pass the key in as a argument to the wrapper serp_api_key="your secret key".
+그런 다음 환경 변수 SERPAPI_API_KEY를 SerpApi key로 설정하거나 wrapper에 인자로 serp_api_key="your secret key"를 전달하세요.
 
 ```python
 import os
@@ -39,7 +39,7 @@ tool.run("Google")
 '\nQuery: Google\nstock: GOOGL:NASDAQ\nprice: $159.96\npercentage: 0.94\nmovement: Up\nus: price = 42210.57, movement = Down\neurope: price = 23638.56, movement = Up\nasia: price = 38183.26, movement = Up\n'
 ```
 
-In order to create an agent that uses the Google Finance tool install LangGraph
+Google Finance tool을 사용하는 agent를 생성하려면 LangGraph를 설치하세요
 
 ```python
 pip install -qU langgraph langchain-openai
@@ -49,7 +49,7 @@ pip install -qU langgraph langchain-openai
 Note: you may need to restart the kernel to use updated packages.
 ```
 
-and use the @[`create_agent`] functionality to initialize a ReAct agent. You will also need to set up your OPEN_API_KEY (visit [platform.openai.com](https://platform.openai.com)) in order to access OpenAI's chat models.
+그리고 @[`create_agent`] 기능을 사용하여 ReAct agent를 초기화하세요. 또한 OpenAI의 chat model에 액세스하려면 OPEN_API_KEY를 설정해야 합니다([platform.openai.com](https://platform.openai.com) 방문).
 
 ```python
 import os

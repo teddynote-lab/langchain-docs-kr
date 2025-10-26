@@ -1,45 +1,45 @@
-
-### 2. Deploy to LangSmith
+```markdown
+### 2. LangSmith에 배포하기
 
 <Steps>
-<Step title="Navigate to LangSmith Deployments">
-    Log in to [LangSmith](https://smith.langchain.com/). In the left sidebar, select **Deployments**.
+<Step title="LangSmith Deployments로 이동">
+    [LangSmith](https://smith.langchain.com/)에 로그인하세요. 왼쪽 사이드바에서 **Deployments**를 선택하세요.
 </Step>
-<Step title="Create new deployment">
-    Click the **+ New Deployment** button. A pane will open where you can fill in the required fields.
+<Step title="새 deployment 생성">
+    **+ New Deployment** 버튼을 클릭하세요. 필수 필드를 입력할 수 있는 창이 열립니다.
 </Step>
-<Step title="Link repository">
-    If you are a first time user or adding a private repository that has not been previously connected, click the **Add new account** button and follow the instructions to connect your GitHub account.
+<Step title="repository 연결">
+    처음 사용하는 경우이거나 이전에 연결되지 않은 private repository를 추가하는 경우, **Add new account** 버튼을 클릭하고 안내에 따라 GitHub 계정을 연결하세요.
 </Step>
-<Step title="Deploy repository">
-    Select your application's repository. Click **Submit** to deploy. This may take about 15 minutes to complete. You can check the status in the **Deployment details** view.
+<Step title="repository 배포">
+    애플리케이션의 repository를 선택하세요. **Submit**을 클릭하여 배포하세요. 완료까지 약 15분이 소요될 수 있습니다. **Deployment details** 뷰에서 상태를 확인할 수 있습니다.
 </Step>
 </Steps>
 
-### 3. Test your application in Studio
+### 3. Studio에서 애플리케이션 테스트하기
 
-Once your application is deployed:
+애플리케이션이 배포되면:
 
-1. Select the deployment you just created to view more details.
-2. Click the **Studio** button in the top right corner. Studio will open to display your graph.
+1. 방금 생성한 deployment를 선택하여 자세한 내용을 확인하세요.
+2. 오른쪽 상단의 **Studio** 버튼을 클릭하세요. Studio가 열리면서 graph가 표시됩니다.
 
-### 4. Get the API URL for your deployment
+### 4. deployment의 API URL 가져오기
 
-1. In the **Deployment details** view in LangGraph, click the **API URL** to copy it to your clipboard.
-2. Click the `URL` to copy it to the clipboard.
+1. LangGraph의 **Deployment details** 뷰에서 **API URL**을 클릭하여 클립보드에 복사하세요.
+2. `URL`을 클릭하여 클립보드에 복사하세요.
 
-### 5. Test the API
+### 5. API 테스트하기
 
-You can now test the API:
+이제 API를 테스트할 수 있습니다:
 
 <Tabs>
 :::python
 <Tab title="Python">
-1. Install LangGraph Python:
+1. LangGraph Python 설치:
 ```shell
 pip install langgraph-sdk
 ```
-2. Send a message to the agent:
+2. agent에 메시지 보내기:
 ```python
 from langgraph_sdk import get_sync_client # or get_client for async
 
@@ -64,11 +64,11 @@ for chunk in client.runs.stream(
 :::
 :::js
 <Tab title="JavaScript">
-1. Install LangGraph JS:
+1. LangGraph JS 설치:
 ```shell
 npm install @langchain/langgraph-sdk
 ```
-2. Send a message to the agent:
+2. agent에 메시지 보내기:
 ```ts
 const { Client } = await import("@langchain/langgraph-sdk");
 
@@ -118,5 +118,6 @@ curl -s --request POST \
 </Tabs>
 
 <Tip>
-LangSmith offers additional hosting options, including self-hosted and hybrid. For more information, please see the [Hosting overview](/langsmith/hosting).
+LangSmith는 self-hosted 및 hybrid를 포함한 추가 호스팅 옵션을 제공합니다. 자세한 내용은 [Hosting overview](/langsmith/hosting)를 참조하세요.
 </Tip>
+```

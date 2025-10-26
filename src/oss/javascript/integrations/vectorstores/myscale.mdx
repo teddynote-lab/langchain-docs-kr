@@ -3,21 +3,21 @@ title: MyScale
 ---
 
 <Tip>
-**Compatibility**
+**호환성**
 
-Only available on Node.js.
+Node.js에서만 사용 가능합니다.
 </Tip>
 
-[MyScale](https://myscale.com/) is an emerging AI database that harmonizes the power of vector search and SQL analytics, providing a managed, efficient, and responsive experience.
+[MyScale](https://myscale.com/)은 vector search와 SQL 분석의 강력함을 조화롭게 결합하여 관리되고 효율적이며 반응성 있는 경험을 제공하는 새로운 AI 데이터베이스입니다.
 
 ## Setup
 
-1. Launch a cluster through [MyScale's Web Console](https://console.myscale.com/). See [MyScale's official documentation](https://docs.myscale.com/en/quickstart/) for more information.
-2. After launching a cluster, view your `Connection Details` from your cluster's `Actions` menu. You will need the host, port, username, and password.
-3. Install the required Node.js peer dependency in your workspace.
+1. [MyScale의 Web Console](https://console.myscale.com/)을 통해 클러스터를 시작하세요. 자세한 내용은 [MyScale의 공식 문서](https://docs.myscale.com/en/quickstart/)를 참조하세요.
+2. 클러스터를 시작한 후, 클러스터의 `Actions` 메뉴에서 `Connection Details`를 확인하세요. host, port, username, password가 필요합니다.
+3. 작업 공간에 필요한 Node.js peer dependency를 설치하세요.
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
@@ -57,7 +57,7 @@ const filteredResults = await vectorStore.similaritySearch("hello world", 1, {
 console.log(filteredResults);
 ```
 
-## Query Docs From an Existing Collection
+## 기존 Collection에서 문서 쿼리하기
 
 ```typescript
 import { MyScaleStore } from "@langchain/community/vectorstores/myscale";
@@ -86,5 +86,5 @@ console.log(filteredResults);
 
 ## Related
 
-- Vector store [conceptual guide](/oss/integrations/vectorstores)
-- Vector store [how-to guides](/oss/integrations/vectorstores)
+- Vector store [개념 가이드](/oss/integrations/vectorstores)
+- Vector store [how-to 가이드](/oss/integrations/vectorstores)

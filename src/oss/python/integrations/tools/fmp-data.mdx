@@ -1,17 +1,18 @@
+```markdown
 ---
 title: FMP Data
 ---
 
-Access financial market data through natural language queries.
+자연어 쿼리를 통해 금융 시장 데이터에 액세스하세요.
 
 ## Overview
 
-The FMP (Financial Modeling Prep) LangChain integration provides a seamless way to access financial market data through natural language queries. This integration offers two main components:
+FMP(Financial Modeling Prep) LangChain 통합은 자연어 쿼리를 통해 금융 시장 데이터에 액세스할 수 있는 원활한 방법을 제공합니다. 이 통합은 두 가지 주요 컴포넌트를 제공합니다:
 
-- `FMPDataToolkit`: Creates collections of tools based on natural language queries
-- `FMPDataTool`: A single unified tool that automatically selects and uses the appropriate endpoints
+- `FMPDataToolkit`: 자연어 쿼리를 기반으로 도구 모음을 생성합니다
+- `FMPDataTool`: 적절한 endpoint를 자동으로 선택하고 사용하는 단일 통합 도구입니다
 
-The integration leverages LangChain's semantic search capabilities to match user queries with the most relevant FMP API endpoints, making financial data access more intuitive and efficient.
+이 통합은 LangChain의 semantic search 기능을 활용하여 사용자 쿼리를 가장 관련성 높은 FMP API endpoint와 매칭함으로써 금융 데이터 액세스를 더욱 직관적이고 효율적으로 만듭니다.
 
 ## Setup
 
@@ -27,7 +28,7 @@ os.environ["FMP_API_KEY"] = "your-fmp-api-key"  # pragma: allowlist secret
 os.environ["OPENAI_API_KEY"] = "your-openai-api-key"  # pragma: allowlist secret
 ```
 
-It's also helpful (but not needed) to set up [LangSmith](https://smith.langchain.com/) for best-in-class observability:
+최고 수준의 observability를 위해 [LangSmith](https://smith.langchain.com/)를 설정하는 것도 도움이 됩니다(필수는 아님):
 
 ```python
 os.environ["LANGSMITH_TRACING"] = "true"
@@ -36,9 +37,9 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ## Instantiation
 
-There are two main ways to instantiate the FMP LangChain integration:
+FMP LangChain 통합을 인스턴스화하는 두 가지 주요 방법이 있습니다:
 
-1. Using FMPDataToolkit
+1. FMPDataToolkit 사용
 
 ```python
 from langchain_fmp_data import FMPDataToolkit
@@ -62,7 +63,7 @@ custom_toolkit = FMPDataToolkit(
 )
 ```
 
-2. Using FMPDataTool
+2. FMPDataTool 사용
 
 ```python
 from langchain_fmp_data import FMPDataTool
@@ -80,7 +81,7 @@ advanced_tool = FMPDataTool(
 
 ## Invocation
 
-The tools can be invoked in several ways:
+도구는 여러 가지 방법으로 호출할 수 있습니다:
 
 ### Direct Invocation
 
@@ -104,7 +105,7 @@ detailed_result = tool_direct.invoke(
 # fmt: on
 ```
 
-### Using with LangChain Agents
+### LangChain Agent와 함께 사용하기
 
 ```python
 from langchain.agents import AgentExecutor, create_openai_functions_agent
@@ -134,7 +135,7 @@ response = agent_executor.invoke({"input": "What's the PE ratio of Microsoft?"})
 
 ## Advanced Usage
 
-You can customize the tool's behavior:
+도구의 동작을 커스터마이징할 수 있습니다:
 
 ```python
 # Initialize with custom settings
@@ -164,7 +165,7 @@ print(response)
 
 ## Chaining
 
-You can chain the tool similar to other tools simply by creating a chain with desired model.
+원하는 model로 chain을 생성하여 다른 도구와 유사하게 도구를 체이닝할 수 있습니다.
 
 ```python
 from langchain_core.output_parsers import StrOutputParser
@@ -194,7 +195,7 @@ response = runner.invoke(
 
 ### FMPDataToolkit
 
-Main class for creating collections of FMP API tools:
+FMP API 도구 모음을 생성하기 위한 메인 class:
 
 ```python
 from typing import Any
@@ -220,7 +221,7 @@ class FMPDataToolkit:
 
 ### FMPDataTool
 
-Unified tool that automatically selects appropriate FMP endpoints:
+적절한 FMP endpoint를 자동으로 선택하는 통합 도구:
 
 ```python
 # fmt: off
@@ -245,7 +246,7 @@ class FMPDataTool:
 
 ### ResponseFormat
 
-Enum for controlling response format:
+응답 형식을 제어하기 위한 Enum:
 
 ```python
 from enum import Enum
@@ -255,4 +256,5 @@ class ResponseFormat(str, Enum):
     RAW = "raw"  # Raw API response
     ANALYSIS = "text"  # Natural language analysis
     BOTH = "both"  # Both raw data and analysis
+```
 ```

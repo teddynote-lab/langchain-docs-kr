@@ -2,25 +2,13 @@
 title: Dappier
 ---
 
-[Dappier](https://dappier.com) connects any LLM or your Agentic AI to
-real-time, rights-cleared, proprietary data from trusted sources,
-making your AI an expert in anything. Our specialized models include
-Real-Time Web Search, News, Sports, Financial Stock Market Data,
-Crypto Data, and exclusive content from premium publishers. Explore a
-wide range of data models in our marketplace at
-[marketplace.dappier.com](https://marketplace.dappier.com).
+[Dappier](https://dappier.com)는 모든 LLM 또는 Agentic AI를 신뢰할 수 있는 출처의 실시간, 권리가 확보된 독점 데이터에 연결하여 AI를 모든 분야의 전문가로 만들어줍니다. 당사의 특화된 모델에는 실시간 웹 검색, 뉴스, 스포츠, 금융 주식 시장 데이터, 암호화폐 데이터, 그리고 프리미엄 퍼블리셔의 독점 콘텐츠가 포함됩니다. [marketplace.dappier.com](https://marketplace.dappier.com)의 마켓플레이스에서 다양한 데이터 모델을 탐색해보세요.
 
-[Dappier](https://dappier.com) delivers enriched, prompt-ready, and
-contextually relevant data strings, optimized for seamless integration
-with LangChain. Whether you're building conversational AI, recommendation
-engines, or intelligent search, Dappier's LLM-agnostic RAG models ensure
-your AI has access to verified, up-to-date data—without the complexity of
-building and managing your own retrieval pipeline.
+[Dappier](https://dappier.com)는 LangChain과의 원활한 통합을 위해 최적화된 풍부하고, 프롬프트 준비가 완료된, 문맥적으로 관련성 있는 데이터 문자열을 제공합니다. 대화형 AI, 추천 엔진 또는 지능형 검색을 구축하든, Dappier의 LLM 독립적인 RAG 모델은 자체 검색 파이프라인을 구축하고 관리하는 복잡성 없이 검증되고 최신 데이터에 대한 액세스를 보장합니다.
 
 ## Installation and Setup
 
-Install `langchain-dappier` and set environment variable
-`DAPPIER_API_KEY`.
+`langchain-dappier`를 설치하고 환경 변수 `DAPPIER_API_KEY`를 설정하세요.
 
 <CodeGroup>
 ```bash pip
@@ -34,15 +22,13 @@ export DAPPIER_API_KEY="your-api-key"
 ```
 </CodeGroup>
 
-We also need to set our Dappier API credentials, which can be generated at
-the [Dappier site.](https://platform.dappier.com/profile/api-keys).
+또한 [Dappier 사이트](https://platform.dappier.com/profile/api-keys)에서 생성할 수 있는 Dappier API 자격 증명을 설정해야 합니다.
 
-We can find the supported data models by heading over to the
-[Dappier marketplace.](https://platform.dappier.com/marketplace)
+[Dappier 마켓플레이스](https://platform.dappier.com/marketplace)로 이동하여 지원되는 데이터 모델을 확인할 수 있습니다.
 
 ## Chat models
 
-See a [usage example](/oss/integrations/chat/dappier).
+[사용 예제](/oss/integrations/chat/dappier)를 참조하세요.
 
 ```python
 from langchain_community.chat_models import ChatDappierAI
@@ -50,7 +36,7 @@ from langchain_community.chat_models import ChatDappierAI
 
 ## Retriever
 
-See a [usage example](/oss/integrations/retrievers/dappier).
+[사용 예제](/oss/integrations/retrievers/dappier)를 참조하세요.
 
 ```python
 from langchain_dappier import DappierRetriever
@@ -58,11 +44,12 @@ from langchain_dappier import DappierRetriever
 
 ## Tool
 
-See a [usage example](/oss/integrations/tools/dappier).
+[사용 예제](/oss/integrations/tools/dappier)를 참조하세요.
 
 ```python
 from langchain_dappier import (
     DappierRealTimeSearchTool,
     DappierAIRecommendationTool
 )
+```
 ```

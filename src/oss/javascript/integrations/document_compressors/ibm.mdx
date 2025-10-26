@@ -4,7 +4,7 @@ title: IBM watsonx.ai
 
 ## Overview
 
-This will help you getting started with the [Watsonx document compressor](/oss/concepts/#document_compressors). For detailed documentation of all Watsonx document compressor features and configurations head to the [API reference](https://api.js.langchain.com/modules/_langchain_community.document_compressors_ibm.html).
+이 문서는 [Watsonx document compressor](/oss/concepts/#document_compressors) 시작하기를 도와드립니다. 모든 Watsonx document compressor 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/modules/_langchain_community.document_compressors_ibm.html)를 참조하세요.
 
 ### Integration details
 
@@ -14,11 +14,11 @@ This will help you getting started with the [Watsonx document compressor](/oss/c
 
 ## Setup
 
-To access IBM WatsonxAI models you'll need to create an IBM watsonx.ai account, get an API key or any other type of credentials, and install the `@langchain/community` integration package.
+IBM WatsonxAI 모델에 액세스하려면 IBM watsonx.ai 계정을 생성하고, API key 또는 다른 유형의 자격 증명을 얻고, `@langchain/community` integration package를 설치해야 합니다.
 
 ### Credentials
 
-Head to [IBM Cloud](https://cloud.ibm.com/login) to sign up to IBM watsonx.ai and generate an API key or provide any other authentication form as presented below.
+[IBM Cloud](https://cloud.ibm.com/login)로 이동하여 IBM watsonx.ai에 가입하고 API key를 생성하거나 아래에 제시된 다른 인증 형식을 제공하세요.
 
 #### IAM authentication
 
@@ -43,9 +43,9 @@ export WATSONX_AI_PASSWORD=<YOUR_PASSWORD>
 export WATSONX_AI_URL=<URL>
 ```
 
-Once these are placed in your environment variables and object is initialized authentication will proceed automatically.
+이러한 값들이 환경 변수에 설정되고 객체가 초기화되면 인증이 자동으로 진행됩니다.
 
-Authentication can also be accomplished by passing these values as parameters to a new instance.
+인증은 새 인스턴스에 이러한 값을 매개변수로 전달하여 수행할 수도 있습니다.
 
 ## IAM authentication
 
@@ -94,7 +94,7 @@ const props = {
 const instance = new WatsonxLLM(props);
 ```
 
-If you want to get automated tracing from individual queries, you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+개별 쿼리에서 자동 추적을 원하시면, 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_API_KEY = "<YOUR API KEY HERE>";
@@ -103,7 +103,7 @@ If you want to get automated tracing from individual queries, you can also set y
 
 ### Installation
 
-This document compressor lives in the `@langchain/community` package:
+이 document compressor는 `@langchain/community` package에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -119,7 +119,7 @@ pnpm add @langchain/community @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our compressor:
+이제 compressor를 인스턴스화할 수 있습니다:
 
 ```javascript
 import { WatsonxRerank } from "@langchain/community/document_compressors/ibm";
@@ -134,7 +134,7 @@ const watsonxRerank = new WatsonxRerank({
 
 ## Usage
 
-First, set up a basic RAG ingest pipeline with embeddings, a text splitter and a vector store. We'll use this to and rerank some documents regarding the selected query:
+먼저, embeddings, text splitter 및 vector store를 사용하여 기본 RAG ingest pipeline을 설정합니다. 이를 사용하여 선택한 쿼리와 관련된 일부 문서를 rerank합니다:
 
 ```javascript
 import { readFileSync } from "node:fs";
@@ -203,7 +203,7 @@ console.log(result);
 ]
 ```
 
-Pass selected documents to rerank and recive specific score for each
+rerank할 문서를 선택하여 전달하고 각각에 대한 특정 점수를 받습니다
 
 ```javascript
 import { WatsonxRerank } from "@langchain/community/document_compressors/ibm";
@@ -227,7 +227,7 @@ console.log(compressed);
 ]
 ```
 
-Or else you could have the documents returned with the result, for that use .compressDocuments() method as below.
+또는 결과와 함께 문서를 반환하려면 아래와 같이 .compressDocuments() 메서드를 사용할 수 있습니다.
 
 ```javascript
 const compressedWithResults = await reranker.compressDocuments(result, query);
@@ -273,4 +273,4 @@ console.log(compressedWithResults);
 
 ## API reference
 
-For detailed documentation of all Watsonx document compressor features and configurations head to the [API reference](https://api.js.langchain.com/modules/_langchain_community.document_compressors_ibm.html).
+모든 Watsonx document compressor 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/modules/_langchain_community.document_compressors_ibm.html)를 참조하세요.

@@ -2,59 +2,59 @@
 title: Gitlab Toolkit
 ---
 
-The `Gitlab` toolkit contains tools that enable an LLM agent to interact with a gitlab repository.
-The tool is a wrapper for the [python-gitlab](https://github.com/python-gitlab/python-gitlab) library.
+`Gitlab` toolkit은 LLM agent가 gitlab repository와 상호작용할 수 있도록 하는 도구들을 포함하고 있습니다.
+이 도구는 [python-gitlab](https://github.com/python-gitlab/python-gitlab) 라이브러리의 wrapper입니다.
 
 ## Quickstart
 
-1. Install the python-gitlab library
-2. Create a Gitlab personal access token
-3. Set your environmental variables
-4. Pass the tools to your agent with `toolkit.get_tools()`
+1. python-gitlab 라이브러리 설치
+2. Gitlab personal access token 생성
+3. 환경 변수 설정
+4. `toolkit.get_tools()`를 사용하여 agent에 도구 전달
 
-Each of these steps will be explained in great detail below.
+각 단계는 아래에서 자세히 설명됩니다.
 
-1. **Get Issues**- fetches issues from the repository.
+1. **Get Issues**- repository에서 issue들을 가져옵니다.
 
-2. **Get Issue**- fetches details about a specific issue.
+2. **Get Issue**- 특정 issue에 대한 세부 정보를 가져옵니다.
 
-3. **Comment on Issue**- posts a comment on a specific issue.
+3. **Comment on Issue**- 특정 issue에 댓글을 게시합니다.
 
-4. **Create Merge Request**- creates a merge request from the bot's working branch to the base branch.
+4. **Create Merge Request**- bot의 작업 branch에서 base branch로 merge request를 생성합니다.
 
-5. **Create File**- creates a new file in the repository.
+5. **Create File**- repository에 새 파일을 생성합니다.
 
-6. **Read File**- reads a file from the repository.
+6. **Read File**- repository에서 파일을 읽습니다.
 
-7. **Update File**- updates a file in the repository.
+7. **Update File**- repository의 파일을 업데이트합니다.
 
-8. **Delete File**- deletes a file from the repository.
+8. **Delete File**- repository에서 파일을 삭제합니다.
 
 ## Setup
 
-### 1. Install the `python-gitlab` library
+### 1. `python-gitlab` 라이브러리 설치
 
 ```python
 pip install -qU  python-gitlab langchain-community
 ```
 
-### 2. Create a Gitlab personal access token
+### 2. Gitlab personal access token 생성
 
-[Follow the instructions here](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) to create a Gitlab personal access token. Make sure your app has the following repository permissions:
+[여기의 지침을 따라](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) Gitlab personal access token을 생성하세요. 앱에 다음 repository 권한이 있는지 확인하세요:
 
 * read_api
 * read_repository
 * write_repository
 
-### 3. Set Environmental Variables
+### 3. 환경 변수 설정
 
-Before initializing your agent, the following environmental variables need to be set:
+agent를 초기화하기 전에 다음 환경 변수를 설정해야 합니다:
 
-* **GITLAB_URL** - The URL hosted Gitlab. Defaults to "[gitlab.com](https://gitlab.com)".
-* **GITLAB_PERSONAL_ACCESS_TOKEN**- The personal access token you created in the last step
-* **GITLAB_REPOSITORY**- The name of the Gitlab repository you want your bot to act upon. Must follow the format \{username\}/\{repo-name\}.
-* **GITLAB_BRANCH**- The branch where the bot will make its commits. Defaults to 'main.'
-* **GITLAB_BASE_BRANCH**- The base branch of your repo, usually either 'main' or 'master.' This is where merge requests will base from. Defaults to 'main.'
+* **GITLAB_URL** - 호스팅된 Gitlab의 URL. 기본값은 "[gitlab.com](https://gitlab.com)"입니다.
+* **GITLAB_PERSONAL_ACCESS_TOKEN**- 이전 단계에서 생성한 personal access token
+* **GITLAB_REPOSITORY**- bot이 작동할 Gitlab repository의 이름. \{username\}/\{repo-name\} 형식을 따라야 합니다.
+* **GITLAB_BRANCH**- bot이 commit을 수행할 branch. 기본값은 'main'입니다.
+* **GITLAB_BASE_BRANCH**- repository의 base branch로, 일반적으로 'main' 또는 'master'입니다. merge request가 기반으로 할 branch입니다. 기본값은 'main'입니다.
 
 ## Example: Simple Agent
 

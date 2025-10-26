@@ -2,13 +2,13 @@
 title: You.com Search
 ---
 
-The [you.com API](https://api.you.com) is a suite of tools designed to help developers ground the output of LLMs in the most recent, most accurate, most relevant information that may not have been included in their training dataset.
+[you.com API](https://api.you.com)는 LLM의 출력을 학습 데이터셋에 포함되지 않았을 수 있는 가장 최신의, 가장 정확한, 가장 관련성 높은 정보로 근거를 제공하도록 돕기 위해 설계된 도구 모음입니다.
 
 ## Setup
 
-The tool lives in the `langchain-community` package.
+이 도구는 `langchain-community` 패키지에 있습니다.
 
-You also need to set your you.com API key.
+you.com API key도 설정해야 합니다.
 
 ```python
 pip install -qU langchain-community
@@ -29,7 +29,7 @@ os.environ["OPENAI_API_KEY"] = ""
 # dotenv.load_dotenv()
 ```
 
-It's also helpful (but not needed) to set up [LangSmith](https://smith.langchain.com/) for best-in-class observability
+최고 수준의 observability를 위해 [LangSmith](https://smith.langchain.com/)를 설정하는 것도 도움이 됩니다 (필수는 아님)
 
 ```python
 os.environ["LANGSMITH_TRACING"] = "true"
@@ -76,7 +76,7 @@ page_content='- Humidity70%\n- UV Index1 of 11\n- Sunrise7:18 am\n- Sunset4:34 p
 
 ## Chaining
 
-We show here how to use it as part of an [agent](/oss/langchain/agents). We use the OpenAI Functions Agent, so we will need to setup and install the required dependencies for that. We will also use [LangSmith Hub](https://smith.langchain.com/hub) to pull the prompt from, so we will need to install that.
+여기서는 [agent](/oss/langchain/agents)의 일부로 사용하는 방법을 보여줍니다. OpenAI Functions Agent를 사용하므로 필요한 종속성을 설정하고 설치해야 합니다. 또한 [LangSmith Hub](https://smith.langchain.com/hub)를 사용하여 prompt를 가져올 것이므로 이를 설치해야 합니다.
 
 ```python
 # you need a model to use in the chain

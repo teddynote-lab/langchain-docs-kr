@@ -2,19 +2,19 @@
 title: Facebook - Meta
 ---
 
->[Meta Platforms, Inc.](https://www.facebook.com/), doing business as `Meta`, formerly
-> named `Facebook, Inc.`, and `TheFacebook, Inc.`, is an American multinational technology
-> conglomerate. The company owns and operates `Facebook`, `Instagram`, `Threads`,
-> and `WhatsApp`, among other products and services.
+>[Meta Platforms, Inc.](https://www.facebook.com/)는 `Meta`라는 이름으로 사업을 운영하며, 이전에는
+> `Facebook, Inc.` 및 `TheFacebook, Inc.`로 명명되었던 미국의 다국적 기술
+> 대기업입니다. 이 회사는 `Facebook`, `Instagram`, `Threads`,
+> `WhatsApp` 등의 제품과 서비스를 소유하고 운영합니다.
 
 ## Embedding models
 
 ### LASER
 
->[LASER](https://github.com/facebookresearch/LASER) is a Python library developed by
-> the `Meta AI Research` team and used for
-> creating multilingual sentence embeddings for
-> [over 147 languages as of 2/25/2024](https://github.com/facebookresearch/flores/blob/main/flores200/README.md#languages-in-flores-200)
+>[LASER](https://github.com/facebookresearch/LASER)는 `Meta AI Research` 팀이 개발한
+> Python 라이브러리로,
+> [2024년 2월 25일 기준 147개 이상의 언어](https://github.com/facebookresearch/flores/blob/main/flores200/README.md#languages-in-flores-200)에 대한
+> 다국어 문장 임베딩을 생성하는 데 사용됩니다.
 
 <CodeGroup>
 ```bash pip
@@ -26,7 +26,7 @@ uv add laser_encoders
 ```
 </CodeGroup>
 
-See a [usage example](/oss/integrations/text_embedding/laser).
+[사용 예제](/oss/integrations/text_embedding/laser)를 참조하세요.
 
 ```python
 from langchain_community.embeddings.laser import LaserEmbeddings
@@ -36,11 +36,11 @@ from langchain_community.embeddings.laser import LaserEmbeddings
 
 ### Facebook Messenger
 
->[Messenger](https://en.wikipedia.org/wiki/Messenger_(software)) is an instant messaging app and
-> platform developed by `Meta Platforms`. Originally developed as `Facebook Chat` in 2008, the company revamped its
-> messaging service in 2010.
+>[Messenger](https://en.wikipedia.org/wiki/Messenger_(software))는 `Meta Platforms`에서 개발한 인스턴트 메시징 앱이자
+> 플랫폼입니다. 2008년 `Facebook Chat`으로 처음 개발되었으며, 회사는 2010년에
+> 메시징 서비스를 개편했습니다.
 
-See a [usage example](/oss/integrations/document_loaders/facebook_chat).
+[사용 예제](/oss/integrations/document_loaders/facebook_chat)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import FacebookChatLoader
@@ -50,14 +50,14 @@ from langchain_community.document_loaders import FacebookChatLoader
 
 ### Facebook Faiss
 
->[Facebook AI Similarity Search (Faiss)](https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/)
-> is a library for efficient similarity search and clustering of dense vectors. It contains algorithms that
-> search in sets of vectors of any size, up to ones that possibly do not fit in RAM. It also contains supporting
-> code for evaluation and parameter tuning.
+>[Facebook AI Similarity Search (Faiss)](https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/)는
+> 밀집 벡터의 효율적인 유사도 검색 및 클러스터링을 위한 라이브러리입니다. RAM에 맞지 않을 수 있는 크기를 포함하여
+> 모든 크기의 벡터 집합을 검색하는 알고리즘을 포함합니다. 또한 평가 및 파라미터 튜닝을 위한
+> 지원 코드도 포함되어 있습니다.
 
-[Faiss documentation](https://faiss.ai/).
+[Faiss 문서](https://faiss.ai/).
 
-We need to install `faiss` python package.
+`faiss` python 패키지를 설치해야 합니다.
 
 <CodeGroup>
 ```bash pip
@@ -69,7 +69,7 @@ uv add faiss-gpu # For CUDA 7.5+ supported GPUs.
 ```
 </CodeGroup>
 
-OR
+또는
 
 <CodeGroup>
 ```bash pip
@@ -81,7 +81,7 @@ uv add faiss-cpu # For CPU Installation
 ```
 </CodeGroup>
 
-See a [usage example](/oss/integrations/vectorstores/faiss).
+[사용 예제](/oss/integrations/vectorstores/faiss)를 참조하세요.
 
 ```python
 from langchain_community.vectorstores import FAISS
@@ -91,11 +91,11 @@ from langchain_community.vectorstores import FAISS
 
 ### Facebook Messenger
 
->[Messenger](https://en.wikipedia.org/wiki/Messenger_(software)) is an instant messaging app and
-> platform developed by `Meta Platforms`. Originally developed as `Facebook Chat` in 2008, the company revamped its
-> messaging service in 2010.
+>[Messenger](https://en.wikipedia.org/wiki/Messenger_(software))는 `Meta Platforms`에서 개발한 인스턴트 메시징 앱이자
+> 플랫폼입니다. 2008년 `Facebook Chat`으로 처음 개발되었으며, 회사는 2010년에
+> 메시징 서비스를 개편했습니다.
 
-See a [usage example](/oss/integrations/chat_loaders/facebook).
+[사용 예제](/oss/integrations/chat_loaders/facebook)를 참조하세요.
 
 ```python
 from langchain_community.chat_loaders.facebook_messenger import (

@@ -3,7 +3,7 @@ title: Google Vertex AI Embeddings
 sidebarTitle: VertexAIEmbeddings
 ---
 
-This will help you get started with Google Vertex AI Embeddings models using LangChain. For detailed documentation on `Google Vertex AI Embeddings` features and configuration options, please refer to the [API reference](https://python.langchain.com/api_reference/google_vertexai/embeddings/langchain_google_vertexai.embeddings.VertexAIEmbeddings.html).
+이 문서는 LangChain을 사용하여 Google Vertex AI Embeddings 모델을 시작하는 데 도움을 드립니다. `Google Vertex AI Embeddings`의 기능 및 구성 옵션에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/google_vertexai/embeddings/langchain_google_vertexai.embeddings.VertexAIEmbeddings.html)를 참조하세요.
 
 ## Overview
 
@@ -15,23 +15,23 @@ This will help you get started with Google Vertex AI Embeddings models using Lan
 
 ## Setup
 
-To access Google Vertex AI Embeddings models you'll need to
+Google Vertex AI Embeddings 모델에 액세스하려면 다음이 필요합니다:
 
-- Create a Google Cloud account
-- Install the `langchain-google-vertexai` integration package.
+- Google Cloud 계정 생성
+- `langchain-google-vertexai` integration package 설치
 
 ### Credentials
 
-Head to [Google Cloud](https://cloud.google.com/free/) to sign up to create an account. Once you've done this set the GOOGLE_APPLICATION_CREDENTIALS environment variable:
+[Google Cloud](https://cloud.google.com/free/)로 이동하여 계정을 생성하세요. 완료한 후 GOOGLE_APPLICATION_CREDENTIALS 환경 변수를 설정하세요:
 
-For more information, see:
+자세한 내용은 다음을 참조하세요:
 
 [cloud.google.com/docs/authentication/application-default-credentials#GAC](https://cloud.google.com/docs/authentication/application-default-credentials#GAC)
 [googleapis.dev/python/google-auth/latest/reference/google.auth.html#module-google.auth](https://googleapis.dev/python/google-auth/latest/reference/google.auth.html#module-google.auth)
 
-**OPTIONAL : Authenticate your notebook environment (Colab only)**
+**선택사항: 노트북 환경 인증 (Colab 전용)**
 
-If you're running this notebook on Google Colab, run the cell below to authenticate your environment.
+Google Colab에서 이 노트북을 실행하는 경우, 아래 셀을 실행하여 환경을 인증하세요.
 
 ```python
 import sys
@@ -42,11 +42,11 @@ if "google.colab" in sys.modules:
     auth.authenticate_user()
 ```
 
-**Set Google Cloud project information and initialize Vertex AI SDK**
+**Google Cloud 프로젝트 정보 설정 및 Vertex AI SDK 초기화**
 
-To get started using Vertex AI, you must have an existing Google Cloud project and [enable the Vertex AI API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com).
+Vertex AI를 사용하려면 기존 Google Cloud 프로젝트가 있어야 하며 [Vertex AI API를 활성화](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com)해야 합니다.
 
-Learn more about [setting up a project and a development environment](https://cloud.google.com/vertex-ai/docs/start/cloud-environment).
+[프로젝트 및 개발 환경 설정](https://cloud.google.com/vertex-ai/docs/start/cloud-environment)에 대해 자세히 알아보세요.
 
 ```python
 PROJECT_ID = "[your-project-id]"  # @param {type:"string"}
@@ -57,7 +57,7 @@ import vertexai
 vertexai.init(project=PROJECT_ID, location=LOCATION)
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_TRACING"] = "true"
@@ -66,7 +66,7 @@ os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key:
 
 ### Installation
 
-The LangChain Google Vertex AI Embeddings integration lives in the `langchain-google-vertexai` package:
+LangChain Google Vertex AI Embeddings integration은 `langchain-google-vertexai` package에 있습니다:
 
 ```python
 pip install -qU langchain-google-vertexai
@@ -74,8 +74,8 @@ pip install -qU langchain-google-vertexai
 
 ## Instantiation
 
-Now we can instantiate our model object and generate embeddings:
->Check the list of [Supported Models](https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings#supported-models)
+이제 모델 객체를 인스턴스화하고 embedding을 생성할 수 있습니다:
+>[지원되는 모델](https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings#supported-models) 목록을 확인하세요
 
 ```python
 from langchain_google_vertexai import VertexAIEmbeddings
@@ -86,9 +86,9 @@ embeddings = VertexAIEmbeddings(model_name="gemini-embedding-001")
 
 ## Indexing and Retrieval
 
-Embedding models are often used in retrieval-augmented generation (RAG) flows, both as part of indexing data as well as later retrieving it. For more detailed instructions, please see our [RAG tutorials](/oss/langchain/rag).
+Embedding 모델은 데이터 인덱싱과 나중에 검색하는 과정 모두에서 retrieval-augmented generation (RAG) 플로우에 자주 사용됩니다. 자세한 지침은 [RAG tutorials](/oss/langchain/rag)를 참조하세요.
 
-Below, see how to index and retrieve data using the `embeddings` object we initialized above. In this example, we will index and retrieve a sample document in the `InMemoryVectorStore`.
+아래에서는 위에서 초기화한 `embeddings` 객체를 사용하여 데이터를 인덱싱하고 검색하는 방법을 확인할 수 있습니다. 이 예제에서는 `InMemoryVectorStore`에서 샘플 문서를 인덱싱하고 검색합니다.
 
 ```python
 # Create a vector store with a sample text
@@ -117,13 +117,13 @@ retrieved_documents[0].page_content
 
 ## Direct Usage
 
-Under the hood, the vectorstore and retriever implementations are calling `embeddings.embed_documents(...)` and `embeddings.embed_query(...)` to create embeddings for the text(s) used in `from_texts` and retrieval `invoke` operations, respectively.
+내부적으로 vectorstore와 retriever 구현은 `embeddings.embed_documents(...)`와 `embeddings.embed_query(...)`를 호출하여 `from_texts` 및 retrieval `invoke` 작업에 사용되는 텍스트에 대한 embedding을 생성합니다.
 
-You can directly call these methods to get embeddings for your own use cases.
+이러한 메서드를 직접 호출하여 자신의 사용 사례에 맞는 embedding을 얻을 수 있습니다.
 
 ### Embed single texts
 
-You can embed single texts or documents with `embed_query`:
+`embed_query`를 사용하여 단일 텍스트 또는 문서를 embedding할 수 있습니다:
 
 ```python
 single_vector = embeddings.embed_query(text)
@@ -136,7 +136,7 @@ print(str(single_vector)[:100])  # Show the first 100 characters of the vector
 
 ### Embed multiple texts
 
-You can embed multiple texts with `embed_documents`:
+`embed_documents`를 사용하여 여러 텍스트를 embedding할 수 있습니다:
 
 ```python
 text2 = (
@@ -154,5 +154,4 @@ for vector in two_vectors:
 
 ## API reference
 
-For detailed documentation on `Google Vertex AI Embeddings
-` features and configuration options, please refer to the [API reference](https://python.langchain.com/api_reference/google_vertexai/embeddings/langchain_google_vertexai.embeddings.VertexAIEmbeddings.html).
+`Google Vertex AI Embeddings`의 기능 및 구성 옵션에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/google_vertexai/embeddings/langchain_google_vertexai.embeddings.VertexAIEmbeddings.html)를 참조하세요.

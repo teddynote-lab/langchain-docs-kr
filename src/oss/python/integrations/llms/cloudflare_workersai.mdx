@@ -2,9 +2,9 @@
 title: Cloudflare Workers AI
 ---
 
-[Cloudflare AI documentation](https://developers.cloudflare.com/workers-ai/models/) listed all generative text models available.
+[Cloudflare AI 문서](https://developers.cloudflare.com/workers-ai/models/)에는 사용 가능한 모든 생성형 텍스트 모델이 나열되어 있습니다.
 
-Both Cloudflare account ID and API token are required. Find how to obtain them from [this document](https://developers.cloudflare.com/workers-ai/get-started/rest-api/).
+Cloudflare account ID와 API token이 모두 필요합니다. [이 문서](https://developers.cloudflare.com/workers-ai/get-started/rest-api/)에서 이들을 얻는 방법을 확인하세요.
 
 ```python
 from langchain.chains import LLMChain
@@ -18,7 +18,7 @@ AI Assistant: """
 prompt = PromptTemplate.from_template(template)
 ```
 
-Get authentication before running LLM.
+LLM을 실행하기 전에 인증을 받으세요.
 
 ```python
 import getpass

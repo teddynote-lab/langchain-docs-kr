@@ -2,44 +2,39 @@
 title: Neon Postgres
 ---
 
-Neon is a fully managed serverless PostgreSQL database. It separates storage and compute to offer
-features such as instant branching and automatic scaling.
+Neon은 완전 관리형 서버리스 PostgreSQL 데이터베이스입니다. 스토리지와 컴퓨팅을 분리하여 즉각적인 브랜칭 및 자동 스케일링과 같은 기능을 제공합니다.
 
-With the `pgvector` extension, Neon provides a vector store that can be used with LangChain.js to store and query embeddings.
+`pgvector` 확장을 통해 Neon은 LangChain.js와 함께 사용하여 임베딩을 저장하고 쿼리할 수 있는 vector store를 제공합니다.
 
 ## Setup
 
-### Select a Neon project
+### Neon 프로젝트 선택
 
-If you do not have a Neon account, sign up for one at [Neon](https://neon.tech). After logging into the Neon Console, proceed
-to the [Projects](https://console.neon.tech/app/projects) section and select an existing project or create a new one.
+Neon 계정이 없다면 [Neon](https://neon.tech)에서 가입하세요. Neon Console에 로그인한 후 [Projects](https://console.neon.tech/app/projects) 섹션으로 이동하여 기존 프로젝트를 선택하거나 새 프로젝트를 생성하세요.
 
-Your Neon project comes with a ready-to-use Postgres database named `neondb` that you can use to store embeddings. Navigate to
-the Connection Details section to find your database connection string. It should look similar to this:
+Neon 프로젝트에는 임베딩을 저장하는 데 사용할 수 있는 `neondb`라는 즉시 사용 가능한 Postgres 데이터베이스가 함께 제공됩니다. Connection Details 섹션으로 이동하여 데이터베이스 연결 문자열을 찾으세요. 다음과 유사하게 보일 것입니다:
 
 ```text
 postgres://alex:AbC123dEf@ep-cool-darkness-123456.us-east-2.aws.neon.tech/dbname?sslmode=require
 ```
 
-Keep your connection string handy for later use.
+나중에 사용할 수 있도록 연결 문자열을 보관해 두세요.
 
-### Application code
+### Application 코드
 
-To work with Neon Postgres, you need to install the `@neondatabase/serverless` package which provides a JavaScript/TypeScript
-driver to connect to the database.
+Neon Postgres를 사용하려면 데이터베이스에 연결하기 위한 JavaScript/TypeScript 드라이버를 제공하는 `@neondatabase/serverless` 패키지를 설치해야 합니다.
 
 ```bash npm
 npm install @neondatabase/serverless
 ```
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
 npm install @langchain/community @langchain/core
 ```
-To initialize a `NeonPostgres` vectorstore, you need to provide your Neon database connection string. You can use the connection string
-we fetched above directly, or store it as an environment variable and use it in your code.
+`NeonPostgres` vectorstore를 초기화하려면 Neon 데이터베이스 연결 문자열을 제공해야 합니다. 위에서 가져온 연결 문자열을 직접 사용하거나 환경 변수로 저장하여 코드에서 사용할 수 있습니다.
 
 ```typescript
 const vectorStore = await NeonPostgres.initialize(embeddings, {
@@ -146,5 +141,5 @@ console.log(resultsFour);
 
 ## Related
 
-- Vector store [conceptual guide](/oss/integrations/vectorstores)
-- Vector store [how-to guides](/oss/integrations/vectorstores)
+- Vector store [개념 가이드](/oss/integrations/vectorstores)
+- Vector store [사용 방법 가이드](/oss/integrations/vectorstores)

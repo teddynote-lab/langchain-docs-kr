@@ -1,15 +1,14 @@
 ---
-title: YouTube audio
+title: YouTube 오디오
 ---
 
-Building chat or QA applications on YouTube videos is a topic of high interest.
+YouTube 동영상을 기반으로 채팅 또는 QA 애플리케이션을 구축하는 것은 높은 관심을 받는 주제입니다.
 
-Below we show how to easily go from a `YouTube url` to `audio of the video` to `text` to `chat`!
+아래에서는 `YouTube url`에서 `동영상의 오디오`로, `텍스트`로, 그리고 `채팅`으로 쉽게 변환하는 방법을 보여드립니다!
 
-We wil use the `OpenAIWhisperParser`, which will use the OpenAI Whisper API to transcribe audio to text,
-and the  `OpenAIWhisperParserLocal` for local support and running on private clouds or on premise.
+OpenAI Whisper API를 사용하여 오디오를 텍스트로 변환하는 `OpenAIWhisperParser`와 로컬 지원 및 프라이빗 클라우드 또는 온프레미스에서 실행하기 위한 `OpenAIWhisperParserLocal`을 사용할 것입니다.
 
-Note: You will need to have an `OPENAI_API_KEY` supplied.
+참고: `OPENAI_API_KEY`가 제공되어야 합니다.
 
 ```python
 from langchain_community.document_loaders.blob_loaders.youtube_audio import (
@@ -22,9 +21,9 @@ from langchain_community.document_loaders.parsers.audio import (
 )
 ```
 
-We will use `yt_dlp` to download audio for YouTube urls.
+YouTube url의 오디오를 다운로드하기 위해 `yt_dlp`를 사용할 것입니다.
 
-We will use `pydub` to split downloaded audio files (such that we adhere to Whisper API's 25MB file size limit).
+다운로드한 오디오 파일을 분할하기 위해 `pydub`를 사용할 것입니다 (Whisper API의 25MB 파일 크기 제한을 준수하기 위해).
 
 ```python
 pip install -qU  yt_dlp
@@ -32,13 +31,13 @@ pip install -qU  pydub
 pip install -qU  librosa
 ```
 
-### YouTube url to text
+### YouTube url을 텍스트로 변환
 
-Use `YoutubeAudioLoader` to fetch / download the audio files.
+`YoutubeAudioLoader`를 사용하여 오디오 파일을 가져오거나 다운로드합니다.
 
-Then, ues `OpenAIWhisperParser()` to transcribe them to text.
+그런 다음 `OpenAIWhisperParser()`를 사용하여 텍스트로 변환합니다.
 
-Let's take the first lecture of Andrej Karpathy's YouTube course as an example!
+Andrej Karpathy의 YouTube 강좌 첫 번째 강의를 예시로 들어보겠습니다!
 
 ```python
 # set a flag to switch between local and remote parsing
@@ -91,9 +90,9 @@ docs[0].page_content[0:500]
 "Hello, my name is Andrej and I've been training deep neural networks for a bit more than a decade. And in this lecture I'd like to show you what neural network training looks like under the hood. So in particular we are going to start with a blank Jupyter notebook and by the end of this lecture we will define and train a neural net and you'll get to see everything that goes on under the hood and exactly sort of how that works on an intuitive level. Now specifically what I would like to do is I w"
 ```
 
-### Building a chat app from YouTube video
+### YouTube 동영상으로 채팅 앱 만들기
 
-Given `Documents`, we can easily enable chat / question+answering.
+`Documents`가 주어지면 채팅 / 질문+답변을 쉽게 활성화할 수 있습니다.
 
 ```python
 from langchain.chains import RetrievalQA

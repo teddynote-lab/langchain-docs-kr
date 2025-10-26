@@ -2,11 +2,11 @@
 title: scikit-learn
 ---
 
->[scikit-learn](https://scikit-learn.org/stable/) is an open-source collection of machine learning algorithms, including some implementations of the [k nearest neighbors](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.NearestNeighbors.html). `SKLearnVectorStore` wraps this implementation and adds the possibility to persist the vector store in json, bson (binary json) or Apache Parquet format.
+>[scikit-learn](https://scikit-learn.org/stable/)은 [k nearest neighbors](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.NearestNeighbors.html)의 일부 구현을 포함한 오픈 소스 머신 러닝 알고리즘 모음입니다. `SKLearnVectorStore`는 이 구현을 래핑하고 vector store를 json, bson (binary json) 또는 Apache Parquet 형식으로 저장할 수 있는 기능을 추가합니다.
 
-This notebook shows how to use the `SKLearnVectorStore` vector database.
+이 노트북은 `SKLearnVectorStore` vector database를 사용하는 방법을 보여줍니다.
 
-You'll need to install `langchain-community` with `pip install -qU langchain-community` to use this integration
+이 integration을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다
 
 ```python
 pip install -qU  scikit-learn
@@ -18,7 +18,7 @@ pip install -qU  bson
 pip install -qU  pandas pyarrow
 ```
 
-To use OpenAI embeddings, you will need an OpenAI key. You can get one at [platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys) or feel free to use any other embeddings.
+OpenAI embeddings를 사용하려면 OpenAI key가 필요합니다. [platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)에서 key를 얻거나 다른 embeddings를 자유롭게 사용하셔도 됩니다.
 
 ```python
 import os
@@ -28,9 +28,9 @@ if "OPENAI_API_KEY" not in os.environ:
     os.environ["OPENAI_API_KEY"] = getpass("Enter your OpenAI key:")
 ```
 
-## Basic usage
+## 기본 사용법
 
-### Load a sample document corpus
+### 샘플 문서 corpus 로드하기
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -45,7 +45,7 @@ docs = text_splitter.split_documents(documents)
 embeddings = OpenAIEmbeddings()
 ```
 
-### Create the SKLearnVectorStore, index the document corpus and run a sample query
+### SKLearnVectorStore 생성, 문서 corpus 인덱싱 및 샘플 쿼리 실행
 
 ```python
 import tempfile
@@ -74,7 +74,7 @@ One of the most serious constitutional responsibilities a President has is nomin
 And I did that 4 days ago, when I nominated Circuit Court of Appeals Judge Ketanji Brown Jackson. One of our nation’s top legal minds, who will continue Justice Breyer’s legacy of excellence.
 ```
 
-## Saving and loading a vector store
+## vector store 저장 및 로드하기
 
 ```python
 vector_store.persist()
@@ -111,7 +111,7 @@ One of the most serious constitutional responsibilities a President has is nomin
 And I did that 4 days ago, when I nominated Circuit Court of Appeals Judge Ketanji Brown Jackson. One of our nation’s top legal minds, who will continue Justice Breyer’s legacy of excellence.
 ```
 
-## Clean-up
+## 정리
 
 ```python
 os.remove(persist_path)

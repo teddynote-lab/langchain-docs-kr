@@ -2,17 +2,17 @@
 title: Smabbler
 ---
 
-> Smabbler’s graph-powered platform boosts AI development by transforming data into a structured knowledge foundation.
+> Smabbler의 graph 기반 플랫폼은 데이터를 구조화된 지식 기반으로 변환하여 AI 개발을 향상시킵니다.
 
 ## Galaxia
 
-> Galaxia Knowledge Base is an integrated knowledge base and retrieval mechanism for RAG. In contrast to standard solution, it is based on Knowledge Graphs built using symbolic NLP and Knowledge Representation solutions. Provided texts are analysed and transformed into Graphs containing text, language and semantic information. This rich structure allows for retrieval that is based on semantic information, not on vector similarity/distance.
+> Galaxia Knowledge Base는 RAG를 위한 통합 지식 베이스 및 retrieval 메커니즘입니다. 일반적인 솔루션과 달리, symbolic NLP와 Knowledge Representation 솔루션을 사용해 구축된 Knowledge Graphs를 기반으로 합니다. 제공된 텍스트는 분석되어 텍스트, 언어, 의미 정보를 담은 Graphs로 변환됩니다. 이 풍부한 구조는 vector similarity/distance가 아닌 의미 정보에 기반한 retrieval을 가능하게 합니다.
 
-Implementing RAG using Galaxia involves first uploading your files to [Galaxia](https://beta.cloud.smabbler.com/home), analyzing them there and then building a model (knowledge graph). When the model is built, you can use `GalaxiaRetriever` to connect to the API and start retrieving.
+Galaxia를 사용해 RAG를 구현하려면 먼저 파일을 [Galaxia](https://beta.cloud.smabbler.com/home)에 업로드하고, 그곳에서 분석한 다음 모델(knowledge graph)을 빌드합니다. 모델이 구축되면 `GalaxiaRetriever`를 사용해 API에 연결하고 retrieval을 시작할 수 있습니다.
 
-More information: [docs](https://smabbler.gitbook.io/smabbler)
+자세한 정보: [docs](https://smabbler.gitbook.io/smabbler)
 
-## Installation
+## 설치
 <CodeGroup>
 ```bash pip
 pip install langchain-galaxia-retriever
@@ -23,18 +23,23 @@ uv add langchain-galaxia-retriever
 ```
 </CodeGroup>
 
-## Usage
+## 사용법
 
 ```
+# GalaxiaRetriever 모듈 가져오기
 from langchain_galaxia_retriever.retriever import GalaxiaRetriever
 
+# GalaxiaRetriever 인스턴스 생성
 gr = GalaxiaRetriever(
-    api_url="beta.api.smabbler.com",
-    api_key="<key>",
-    knowledge_base_id="<knowledge_base_id>",
-    n_retries=10,
-    wait_time=5,
+    api_url="beta.api.smabbler.com",   # API URL
+    api_key="<key>",                   # API Key
+    knowledge_base_id="<knowledge_base_id>",  # Knowledge Base ID
+    n_retries=10,                      # 재시도 횟수
+    wait_time=5,                       # 재시도 간 대기 시간(초)
 )
 
+# 질문을 전달하여 retrieval 수행
 result = gr.invoke('<test question>')
+# 결과 출력
 print(result)
+```

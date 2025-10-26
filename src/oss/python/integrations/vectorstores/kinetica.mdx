@@ -2,16 +2,16 @@
 title: Kinetica Vectorstore API
 ---
 
->[Kinetica](https://www.kinetica.com/) is a database with integrated support for vector similarity search
+>[Kinetica](https://www.kinetica.com/)는 벡터 유사도 검색을 통합 지원하는 데이터베이스입니다
 
-It supports:
+지원 기능:
 
-- exact and approximate nearest neighbor search
-- L2 distance, inner product, and cosine distance
+- 정확한 최근접 이웃 검색 및 근사 최근접 이웃 검색
+- L2 거리, 내적, 코사인 거리
 
-This notebook shows how to use the Kinetica vector store (`Kinetica`).
+이 노트북은 Kinetica vector store (`Kinetica`)를 사용하는 방법을 보여줍니다.
 
-This needs an instance of Kinetica which can easily be setup using the instructions given here - [installation instruction](https://www.kinetica.com/developer-edition/).
+이를 위해서는 Kinetica 인스턴스가 필요하며, 다음 지침에 따라 쉽게 설정할 수 있습니다 - [설치 지침](https://www.kinetica.com/developer-edition/).
 
 ```python
 # Pip install necessary package
@@ -20,7 +20,7 @@ pip install "gpudb>=7.2.2.0"
 pip install -qU  tiktoken
 ```
 
-We want to use `OpenAIEmbeddings` so we have to get the OpenAI API Key.
+`OpenAIEmbeddings`를 사용하려면 OpenAI API Key를 가져와야 합니다.
 
 ```python
 import getpass
@@ -137,7 +137,7 @@ documents = [
 uuids = [str(uuid4()) for _ in range(len(documents))]
 ```
 
-## Similarity Search with Euclidean Distance (Default)
+## Euclidean Distance를 사용한 유사도 검색 (기본값)
 
 ```python
 # The Kinetica Module will try to create a table with the name of the collection.
@@ -202,10 +202,10 @@ Similarity search with score
 * [SIM=0.945397] The weather forecast for tomorrow is cloudy and overcast, with a high of 62 degrees. [{'source': 'news'}]
 ```
 
-## Working with vectorstore
+## vectorstore 작업하기
 
-Above, we created a vectorstore from scratch. However, often times we want to work with an existing vectorstore.
-In order to do that, we can initialize it directly.
+위에서는 vectorstore를 처음부터 생성했습니다. 그러나 종종 기존 vectorstore를 사용하고 싶을 때가 있습니다.
+이를 위해 직접 초기화할 수 있습니다.
 
 ```python
 store = Kinetica(
@@ -215,9 +215,9 @@ store = Kinetica(
 )
 ```
 
-### Add documents
+### 문서 추가하기
 
-We can add documents to the existing vectorstore.
+기존 vectorstore에 문서를 추가할 수 있습니다.
 
 ```python
 store.add_documents([Document(page_content="foo")])
@@ -248,9 +248,9 @@ docs_with_score[1]
  1.2609431743621826)
 ```
 
-### Overriding a vectorstore
+### vectorstore 덮어쓰기
 
-If you have an existing collection, you override it by doing `from_documents` and setting `pre_delete_collection` = True
+기존 collection이 있는 경우, `from_documents`를 수행하고 `pre_delete_collection` = True로 설정하여 덮어쓸 수 있습니다
 
 ```python
 db = Kinetica.from_documents(
@@ -275,7 +275,7 @@ docs_with_score[0]
  1.260920763015747)
 ```
 
-### Using a VectorStore as a Retriever
+### VectorStore를 Retriever로 사용하기
 
 ```python
 retriever = store.as_retriever()

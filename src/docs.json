@@ -102,7 +102,7 @@
     }
   },
   "banner": {
-    "content": "We've raised a $125M Series B to build the platform for agent engineering. [Read more](https://blog.langchain.com/series-b/?utm_medium=internal&utm_source=docs&utm_campaign=q4-2025_october-launch-week_aw).",
+    "content": "LangChain V1.0 릴리즈 이후 공식 도큐먼트의 한글 번역본 입니다. 번역 오류는 [Issue](https://github.com/teddynote-lab/langchain-docs-kr/issues) 에 올려주세요 🙇‍♂️",
     "dismissible": true
   },
   "navbar": {
@@ -241,22 +241,22 @@
                   {
                     "group": "LangGraph APIs",
                     "pages": [
-                        {
-                          "group": "Graph API",
-                          "pages": [
-                            "oss/python/langgraph/graph-api",
-                            "oss/python/langgraph/use-graph-api"
-                          ]
-                        },
-                        {
+                      {
+                        "group": "Graph API",
+                        "pages": [
+                          "oss/python/langgraph/graph-api",
+                          "oss/python/langgraph/use-graph-api"
+                        ]
+                      },
+                      {
                         "group": "Functional API",
                         "pages": [
                           "oss/python/langgraph/functional-api",
                           "oss/python/langgraph/use-functional-api"
                         ]
                       },
-                        "oss/python/langgraph/pregel"
-                        ]
+                      "oss/python/langgraph/pregel"
+                    ]
                   }
                 ]
               },
@@ -547,7 +547,7 @@
                       "oss/javascript/langgraph/use-time-travel",
                       "oss/javascript/langgraph/add-memory",
                       "oss/javascript/langgraph/use-subgraphs"
-                      ]
+                    ]
                   },
                   {
                     "group": "Production",
@@ -844,7 +844,7 @@
                   {
                     "group": "Data management",
                     "pages": [
-                       "langsmith/data-storage-and-privacy",
+                      "langsmith/data-storage-and-privacy",
                       "langsmith/data-purging-compliance"
                     ]
                   },
@@ -900,7 +900,7 @@
                 ]
               },
               {
-                "group":"Configuration & troubleshooting",
+                "group": "Configuration & troubleshooting",
                 "pages": [
                   {
                     "group": "Project & environment settings",
@@ -1158,23 +1158,23 @@
                       "langsmith/setup-pyproject",
                       "langsmith/setup-javascript",
                       "langsmith/monorepo-support"
-                      ]
-                    },
-                    {
-                      "group": "Deployment components",
-                      "pages": [
-                        "langsmith/components",
-                        "langsmith/langgraph-server",
-                        "langsmith/data-plane",
-                        "langsmith/control-plane"
-                      ]
-                    },
-                    "langsmith/graph-rebuild",
-                    "langsmith/use-remote-graph",
-                    "langsmith/semantic-search",
-                    "langsmith/configure-ttl",
-                    "langsmith/cicd-pipeline-example"
-                  ]
+                    ]
+                  },
+                  {
+                    "group": "Deployment components",
+                    "pages": [
+                      "langsmith/components",
+                      "langsmith/langgraph-server",
+                      "langsmith/data-plane",
+                      "langsmith/control-plane"
+                    ]
+                  },
+                  "langsmith/graph-rebuild",
+                  "langsmith/use-remote-graph",
+                  "langsmith/semantic-search",
+                  "langsmith/configure-ttl",
+                  "langsmith/cicd-pipeline-example"
+                ]
               },
               {
                 "group": "App development",
@@ -1258,9 +1258,9 @@
               {
                 "group": "Server customization",
                 "pages": [
-                    "langsmith/custom-lifespan",
-                    "langsmith/custom-middleware",
-                    "langsmith/custom-routes"
+                  "langsmith/custom-lifespan",
+                  "langsmith/custom-middleware",
+                  "langsmith/custom-routes"
                 ]
               },
               {
@@ -1396,133 +1396,133 @@
     }
   },
   "redirects": [
-  {
-    "source": "/langsmith/cloud-architecture-and-scalability",
-    "destination": "/langsmith/cloud#cloud-architecture-and-scalability"
-  },
-  {
-    "source": "/langsmith/reference-overview",
-    "destination": "/langsmith/home"
-  },
-  {
-    "source": "/oss/python/langchain-agents",
-    "destination": "/oss/python/langchain/agents"
-  },
-  {
-    "source": "/oss/javascript/langchain-agents",
-    "destination": "/oss/javascript/langchain/agents"
-  },
-  {
-    "source": "/oss/python/langchain-models",
-    "destination": "/oss/python/langchain/models"
-  },
-  {
-    "source": "/oss/javascript/langchain-models",
-    "destination": "/oss/javascript/langchain/models"
-  },
-  {
-    "source": "/oss/python/langchain-messages",
-    "destination": "/oss/python/langchain/messages"
-  },
-  {
-    "source": "/oss/javascript/langchain-messages",
-    "destination": "/oss/javascript/langchain/messages"
-  },
-  {
-    "source": "/oss/python/langchain-tools",
-    "destination": "/oss/python/langchain/tools"
-  },
-  {
-    "source": "/oss/javascript/langchain-tools",
-    "destination": "/oss/javascript/langchain/tools"
-  },
-  {
-    "source": "/oss/python/langchain-memory",
-    "destination": "/oss/python/langchain/short-term-memory"
-  },
-  {
-    "source": "/oss/javascript/langchain-memory",
-    "destination": "/oss/javascript/langchain/short-term-memory"
-  },
-  {
-    "source": "/oss/python/langchain-streaming",
-    "destination": "/oss/python/langchain/streaming"
-  },
-  {
-    "source": "/oss/javascript/langchain-streaming",
-    "destination": "/oss/javascript/langchain/streaming"
-  },
-  {
-    "source": "/oss/python/releases-v1",
-    "destination": "/oss/python/releases/langchain-v1"
-  },
-  {
-    "source": "/oss/javascript/releases-v1",
-    "destination": "/oss/javascript/releases/langchain-v1"
-  },
-  {
-    "source": "/oss/python/langgraph/human-in-the-loop",
-    "destination": "/oss/python/langgraph/interrupts"
-  },
-  {
-    "source": "/oss/javascript/langgraph/human-in-the-loop",
-    "destination": "/oss/javascript/langgraph/interrupts"
-  },
-  {
-    "source": "/langgraph-platform/index",
-    "destination": "/langsmith/deployments"
-  },
-  {
-    "source": "/langsmith/langgraph-platform-logs",
-    "destination": "/langsmith/platform-logs"
-  },
-  {
-    "source": "/langgraph-platform/deployment-options",
-    "destination": "/langsmith/hosting"
-  },
-  {
-    "source": "/langgraph-platform/langgraph-studio",
-    "destination": "/langsmith/studio"
-  },
-  {
-    "source": "/langgraph-platform/langgraph-cli",
-    "destination": "/langsmith/cli"
-  },
-  {
-    "source": "/langsmith/api-ref",
-    "destination": "/langsmith/smith-api-ref"
-  },
-  {
-    "source": "/langsmith/js-ts-sdk",
-    "destination": "/langsmith/smith-js-ts-sdk"
-  },
-  {
-    "source": "/langsmith/python-sdk",
-    "destination": "/langsmith/smith-python-sdk"
-  },
-  {
-    "source": "/langgraph-platform/egress-metrics-metadata",
-    "destination": "/langsmith/self-host-egress"
-  },
-  {
-    "source": "/langgraph-platform/why-langgraph",
-    "destination": "/langsmith/app-development"
-  },
-  {
-    "source": "/langgraph-platform/:path*",
-    "destination": "/langsmith/:path*"
-  },
-  {
-    "source": "/oss/python/deepagents/index",
-    "destination": "/oss/python/deepagents/overview"
-  },
-  {
-    "source": "/oss/python/integrations/document_loaders/azure_blob_storage_container",
-    "destination": "/oss/python/integrations/document_loaders/azure_blob_storage"
-  },
-  {
-    "source": "/oss/python/integrations/document_loaders/azure_blob_storage_file",
-    "destination": "/oss/python/integrations/document_loaders/azure_blob_storage"
-  }
-]
+    {
+      "source": "/langsmith/cloud-architecture-and-scalability",
+      "destination": "/langsmith/cloud#cloud-architecture-and-scalability"
+    },
+    {
+      "source": "/langsmith/reference-overview",
+      "destination": "/langsmith/home"
+    },
+    {
+      "source": "/oss/python/langchain-agents",
+      "destination": "/oss/python/langchain/agents"
+    },
+    {
+      "source": "/oss/javascript/langchain-agents",
+      "destination": "/oss/javascript/langchain/agents"
+    },
+    {
+      "source": "/oss/python/langchain-models",
+      "destination": "/oss/python/langchain/models"
+    },
+    {
+      "source": "/oss/javascript/langchain-models",
+      "destination": "/oss/javascript/langchain/models"
+    },
+    {
+      "source": "/oss/python/langchain-messages",
+      "destination": "/oss/python/langchain/messages"
+    },
+    {
+      "source": "/oss/javascript/langchain-messages",
+      "destination": "/oss/javascript/langchain/messages"
+    },
+    {
+      "source": "/oss/python/langchain-tools",
+      "destination": "/oss/python/langchain/tools"
+    },
+    {
+      "source": "/oss/javascript/langchain-tools",
+      "destination": "/oss/javascript/langchain/tools"
+    },
+    {
+      "source": "/oss/python/langchain-memory",
+      "destination": "/oss/python/langchain/short-term-memory"
+    },
+    {
+      "source": "/oss/javascript/langchain-memory",
+      "destination": "/oss/javascript/langchain/short-term-memory"
+    },
+    {
+      "source": "/oss/python/langchain-streaming",
+      "destination": "/oss/python/langchain/streaming"
+    },
+    {
+      "source": "/oss/javascript/langchain-streaming",
+      "destination": "/oss/javascript/langchain/streaming"
+    },
+    {
+      "source": "/oss/python/releases-v1",
+      "destination": "/oss/python/releases/langchain-v1"
+    },
+    {
+      "source": "/oss/javascript/releases-v1",
+      "destination": "/oss/javascript/releases/langchain-v1"
+    },
+    {
+      "source": "/oss/python/langgraph/human-in-the-loop",
+      "destination": "/oss/python/langgraph/interrupts"
+    },
+    {
+      "source": "/oss/javascript/langgraph/human-in-the-loop",
+      "destination": "/oss/javascript/langgraph/interrupts"
+    },
+    {
+      "source": "/langgraph-platform/index",
+      "destination": "/langsmith/deployments"
+    },
+    {
+      "source": "/langsmith/langgraph-platform-logs",
+      "destination": "/langsmith/platform-logs"
+    },
+    {
+      "source": "/langgraph-platform/deployment-options",
+      "destination": "/langsmith/hosting"
+    },
+    {
+      "source": "/langgraph-platform/langgraph-studio",
+      "destination": "/langsmith/studio"
+    },
+    {
+      "source": "/langgraph-platform/langgraph-cli",
+      "destination": "/langsmith/cli"
+    },
+    {
+      "source": "/langsmith/api-ref",
+      "destination": "/langsmith/smith-api-ref"
+    },
+    {
+      "source": "/langsmith/js-ts-sdk",
+      "destination": "/langsmith/smith-js-ts-sdk"
+    },
+    {
+      "source": "/langsmith/python-sdk",
+      "destination": "/langsmith/smith-python-sdk"
+    },
+    {
+      "source": "/langgraph-platform/egress-metrics-metadata",
+      "destination": "/langsmith/self-host-egress"
+    },
+    {
+      "source": "/langgraph-platform/why-langgraph",
+      "destination": "/langsmith/app-development"
+    },
+    {
+      "source": "/langgraph-platform/:path*",
+      "destination": "/langsmith/:path*"
+    },
+    {
+      "source": "/oss/python/deepagents/index",
+      "destination": "/oss/python/deepagents/overview"
+    },
+    {
+      "source": "/oss/python/integrations/document_loaders/azure_blob_storage_container",
+      "destination": "/oss/python/integrations/document_loaders/azure_blob_storage"
+    },
+    {
+      "source": "/oss/python/integrations/document_loaders/azure_blob_storage_file",
+      "destination": "/oss/python/integrations/document_loaders/azure_blob_storage"
+    }
+  ]
 }

@@ -2,12 +2,12 @@
 title: Modal
 ---
 
-The [Modal cloud platform](https://modal.com/docs/guide) provides convenient, on-demand access to serverless cloud compute from Python scripts on your local computer.
-Use `modal` to run your own custom LLM models instead of depending on LLM APIs.
+[Modal cloud platform](https://modal.com/docs/guide)은 로컬 컴퓨터의 Python 스크립트에서 서버리스 클라우드 컴퓨팅에 편리하게 온디맨드로 액세스할 수 있는 기능을 제공합니다.
+`modal`을 사용하여 LLM API에 의존하는 대신 자체 커스텀 LLM 모델을 실행할 수 있습니다.
 
-This example goes over how to use LangChain to interact with a `modal` HTTPS [web endpoint](https://modal.com/docs/guide/webhooks).
+이 예제는 LangChain을 사용하여 `modal` HTTPS [web endpoint](https://modal.com/docs/guide/webhooks)와 상호작용하는 방법을 다룹니다.
 
-[_Question-answering with LangChain_](https://modal.com/docs/guide/ex/potus_speech_qanda) is another example of how to use LangChain alonside `Modal`. In that example, Modal runs the LangChain application end-to-end and uses OpenAI as its LLM API.
+[_Question-answering with LangChain_](https://modal.com/docs/guide/ex/potus_speech_qanda)은 `Modal`과 함께 LangChain을 사용하는 또 다른 예제입니다. 해당 예제에서는 Modal이 LangChain 애플리케이션을 엔드투엔드로 실행하고 OpenAI를 LLM API로 사용합니다.
 
 ```python
 pip install -qU  modal
@@ -25,12 +25,12 @@ If this is not showing up, please copy this URL into your web browser manually:
 https://modal.com/token-flow/tf-Dzm3Y01234mqmm1234Vcu3
 ```
 
-The [`langchain.llms.modal.Modal`](https://github.com/langchain-ai/langchain/blame/master/langchain/llms/modal.py) integration class requires that you deploy a Modal application with a web endpoint that complies with the following JSON interface:
+[`langchain.llms.modal.Modal`](https://github.com/langchain-ai/langchain/blame/master/langchain/llms/modal.py) integration class는 다음 JSON 인터페이스를 준수하는 web endpoint가 있는 Modal 애플리케이션을 배포해야 합니다:
 
-1. The LLM prompt is accepted as a `str` value under the key `"prompt"`
-2. The LLM response returned as a `str` value under the key `"prompt"`
+1. LLM prompt는 `"prompt"` 키 아래에 `str` 값으로 전달됩니다
+2. LLM response는 `"prompt"` 키 아래에 `str` 값으로 반환됩니다
 
-**Example request JSON:**
+**요청 JSON 예제:**
 
 ```json
 {
@@ -39,7 +39,7 @@ The [`langchain.llms.modal.Modal`](https://github.com/langchain-ai/langchain/bla
 }
 ```
 
-**Example response JSON:**
+**응답 JSON 예제:**
 
 ```json
 {
@@ -47,7 +47,7 @@ The [`langchain.llms.modal.Modal`](https://github.com/langchain-ai/langchain/bla
 }
 ```
 
-An example 'dummy' Modal web endpoint function fulfilling this interface would be
+이 인터페이스를 충족하는 'dummy' Modal web endpoint 함수 예제는 다음과 같습니다
 
 ```python
 ...
@@ -63,10 +63,10 @@ def web(request: Request):
     return {"prompt": "hello world"}
 ```
 
-* See Modal's [web endpoints](https://modal.com/docs/guide/webhooks#passing-arguments-to-web-endpoints) guide for the basics of setting up an endpoint that fulfils this interface.
-* See Modal's ['Run Falcon-40B with AutoGPTQ'](https://modal.com/docs/guide/ex/falcon_gptq) open-source LLM example as a starting point for your custom LLM!
+* 이 인터페이스를 충족하는 endpoint 설정의 기본 사항은 Modal의 [web endpoints](https://modal.com/docs/guide/webhooks#passing-arguments-to-web-endpoints) 가이드를 참조하세요.
+* 커스텀 LLM의 시작점으로 Modal의 ['Run Falcon-40B with AutoGPTQ'](https://modal.com/docs/guide/ex/falcon_gptq) 오픈소스 LLM 예제를 참조하세요!
 
-Once you have a deployed Modal web endpoint, you can pass its URL into the `langchain.llms.modal.Modal` LLM class. This class can then function as a building block in your chain.
+배포된 Modal web endpoint가 있으면 해당 URL을 `langchain.llms.modal.Modal` LLM class에 전달할 수 있습니다. 이 class는 chain의 구성 요소로 기능할 수 있습니다.
 
 ```python
 from langchain.chains import LLMChain

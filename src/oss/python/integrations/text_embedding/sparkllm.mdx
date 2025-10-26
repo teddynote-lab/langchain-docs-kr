@@ -2,11 +2,11 @@
 title: SparkLLM Text Embeddings
 ---
 
-Official Website: [www.xfyun.cn/doc/spark/Embedding_new_api.html](https://www.xfyun.cn/doc/spark/Embedding_new_api.html)
+공식 웹사이트: [www.xfyun.cn/doc/spark/Embedding_new_api.html](https://www.xfyun.cn/doc/spark/Embedding_new_api.html)
 
-An API key is required to use this embedding model. You can get one by registering at [platform.SparkLLM-ai.com/docs/text-Embedding](https://platform.SparkLLM-ai.com/docs/text-Embedding).
+이 embedding model을 사용하려면 API key가 필요합니다. [platform.SparkLLM-ai.com/docs/text-Embedding](https://platform.SparkLLM-ai.com/docs/text-Embedding)에서 등록하여 발급받을 수 있습니다.
 
-SparkLLMTextEmbeddings support 2K token window and preduces vectors with 2560 dimensions.
+SparkLLMTextEmbeddings는 2K token window를 지원하며 2560 차원의 vector를 생성합니다.
 
 ```python
 from langchain_community.embeddings import SparkLLMTextEmbeddings
@@ -18,7 +18,7 @@ embeddings = SparkLLMTextEmbeddings(
 )
 ```
 
-Alternatively, you can set API key this way:
+또는 다음과 같은 방법으로 API key를 설정할 수 있습니다:
 
 ```python
 text_q = "Introducing iFlytek"

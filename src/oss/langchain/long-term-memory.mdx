@@ -1,21 +1,21 @@
 ---
-title: Long-term memory
+title: Long Term Memory
 ---
 
 
 
 ## Overview
 
-LangChain agents use [LangGraph persistence](/oss/langgraph/persistence#memory-store) to enable long-term memory. This is a more advanced topic and requires knowledge of LangGraph to use.
+LangChain agent는 [LangGraph persistence](/oss/langgraph/persistence#memory-store)를 사용하여 장기 메모리를 활성화합니다. 이는 고급 주제이며 사용하려면 LangGraph에 대한 지식이 필요합니다.
 
 
 ## Memory storage
 
-LangGraph stores long-term memories as JSON documents in a [store](/oss/langgraph/persistence#memory-store).
+LangGraph는 장기 메모리를 [store](/oss/langgraph/persistence#memory-store)에 JSON 문서로 저장합니다.
 
-Each memory is organized under a custom `namespace` (similar to a folder) and a distinct `key` (like a file name). Namespaces often include user or org IDs or other labels that makes it easier to organize information.
+각 메모리는 사용자 정의 `namespace`(폴더와 유사)와 고유한 `key`(파일 이름과 유사) 아래에 구성됩니다. Namespace는 종종 사용자 또는 조직 ID 또는 정보를 더 쉽게 구성할 수 있게 해주는 기타 레이블을 포함합니다.
 
-This structure enables hierarchical organization of memories. Cross-namespace searching is then supported through content filters.
+이 구조는 메모리의 계층적 구성을 가능하게 합니다. 그런 다음 콘텐츠 필터를 통해 네임스페이스 간 검색이 지원됩니다.
 
 :::python
 ```python
@@ -93,9 +93,9 @@ const items = await store.search( // [!code highlight]
 ```
 :::
 
-For more information about the memory store, see the [Persistence](/oss/langgraph/persistence#memory-store) guide.
+memory store에 대한 자세한 내용은 [Persistence](/oss/langgraph/persistence#memory-store) 가이드를 참조하세요.
 
-## Read long-term memory in tools
+## tool에서 장기 메모리 읽기
 
 :::python
 ```python A tool the agent can use to look up user information
@@ -218,7 +218,7 @@ console.log(result.messages.at(-1)?.content);
 :::
 
 <a id="write-long-term"></a>
-## Write long-term memory from tools
+## tool에서 장기 메모리 쓰기
 
 :::python
 ```python Example of a tool that updates user information
@@ -328,3 +328,6 @@ console.log(result?.value); // Output: { name: "John Smith" }
 ```
 
 :::
+
+
+CRITICAL: Provide ONLY the translated MDX content without any additional explanation, comments, or questions. If the content is empty or contains only frontmatter, return it exactly as provided.

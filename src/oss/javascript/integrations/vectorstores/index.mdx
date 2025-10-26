@@ -1,10 +1,10 @@
 ---
-title: "Vector stores"
+title: "Vector store"
 ---
 
-## Overview
+## 개요
 
-A [vector store](/oss/integrations/vectorstores) stores [embedded](/oss/integrations/text_embedding) data and performs similarity search.
+[Vector store](/oss/integrations/vectorstores)는 [임베딩된](/oss/integrations/text_embedding) 데이터를 저장하고 유사도 검색을 수행합니다.
 
 ```mermaid
 flowchart LR
@@ -26,17 +26,17 @@ flowchart LR
 
 ### Interface
 
-LangChain provides a unified interface for vector stores, allowing you to:
+LangChain은 vector store를 위한 통합 interface를 제공하여 다음을 수행할 수 있습니다:
 
-- `addDocuments` - Add documents to the store.
-- `delete` - Remove stored documents by ID.
-- `similaritySearch` - Query for semantically similar documents.
+- `addDocuments` - store에 document를 추가합니다.
+- `delete` - ID로 저장된 document를 제거합니다.
+- `similaritySearch` - 의미적으로 유사한 document를 쿼리합니다.
 
-This abstraction lets you switch between different implementations without altering your application logic.
+이 추상화를 통해 애플리케이션 로직을 변경하지 않고도 다양한 구현 간에 전환할 수 있습니다.
 
 ### Initialization
 
-Most vectorstores in LangChain accept an embedding model as an argument when initializing the vector store.
+LangChain의 대부분의 vectorstore는 vector store를 초기화할 때 embedding model을 인수로 받습니다.
 
 ```typescript
 import { OpenAIEmbeddings } from "@langchain/openai";
@@ -48,9 +48,9 @@ const embeddings = new OpenAIEmbeddings({
 const vectorStore = new MemoryVectorStore(embeddings);
 ```
 
-### Adding docuemnts
+### Document 추가하기
 
-You can add documents to the vector store by using the `addDocuments` function.
+`addDocuments` function을 사용하여 vector store에 document를 추가할 수 있습니다.
 
 ```typescript
 import { Document } from "@langchain/core/documents";
@@ -60,9 +60,9 @@ const document = new Document({
 await vectorStore.addDocuments([document]);
 ```
 
-### Deleting documents
+### Document 삭제하기
 
-You can delete documents from the vector store by using the `delete` function.
+`delete` function을 사용하여 vector store에서 document를 삭제할 수 있습니다.
 
 ```typescript
 await vectorStore.delete({
@@ -74,49 +74,49 @@ await vectorStore.delete({
 
 ### Similarity search
 
-Issue a semantic query using `similaritySearch`, which returns the closest embedded documents:
+`similaritySearch`를 사용하여 의미론적 쿼리를 실행하면 가장 가까운 임베딩된 document가 반환됩니다:
 
 ```typescript
 const results = await vectorStore.similaritySearch("Hello world", 10);
 ```
 
 
-Many vector stores support parameters like:
+많은 vector store가 다음과 같은 parameter를 지원합니다:
 
-* `k` — number of results to return
-* `filter` — conditional filtering based on metadata
+* `k` — 반환할 결과 수
+* `filter` — metadata 기반 조건부 필터링
 
-### Similarity metrics & indexing
+### Similarity metric 및 indexing
 
-Embedding similarity may be computed using:
+Embedding 유사도는 다음을 사용하여 계산될 수 있습니다:
 
 * **Cosine similarity**
 * **Euclidean distance**
 * **Dot product**
 
-Efficient search often employs indexing methods such as HNSW (Hierarchical Navigable Small World), though specifics depend on the vector store.
+효율적인 검색은 종종 HNSW(Hierarchical Navigable Small World)와 같은 indexing 방법을 사용하지만, 구체적인 내용은 vector store에 따라 다릅니다.
 
 ### Metadata filtering
 
-Filtering by metadata (e.g., source, date) can refine search results:
+Metadata(예: source, date)로 필터링하면 검색 결과를 개선할 수 있습니다:
 
 ```typescript
 vectorStore.similaritySearch("query", 2, { source: "tweets" });
 ```
 
 <important>
-Support for metadata-based filtering varies between implementations.
-Check the documentation of your chosen vector store for details.
+Metadata 기반 필터링 지원은 구현에 따라 다릅니다.
+자세한 내용은 선택한 vector store의 문서를 확인하세요.
 </important>
 
-## Top integrations
+## 주요 통합
 
-**Select embedding model:**
+**Embedding model 선택:**
 
 <AccordionGroup>
 <Accordion title="OpenAI">
 
-Install dependencies:
+dependency 설치:
 
 <CodeGroup>
 
@@ -131,13 +131,13 @@ pnpm add @langchain/openai
 ```
 </CodeGroup>
 
-Add environment variables:
+환경 변수 추가:
 
 ```bash
 OPENAI_API_KEY=your-api-key
 ```
 
-Instantiate the model:
+Model 인스턴스화:
 
 ```typescript
 import { OpenAIEmbeddings } from "@langchain/openai";
@@ -150,7 +150,7 @@ const embeddings = new OpenAIEmbeddings({
 </Accordion>
 <Accordion title="Azure">
 
-Install dependencies
+dependency 설치
 
 <CodeGroup>
 
@@ -166,7 +166,7 @@ pnpm add @langchain/openai
 ```
 </CodeGroup>
 
-Add environment variables:
+환경 변수 추가:
 
 ```bash
 AZURE_OPENAI_API_INSTANCE_NAME=<YOUR_INSTANCE_NAME>
@@ -174,7 +174,7 @@ AZURE_OPENAI_API_KEY=<YOUR_KEY>
 AZURE_OPENAI_API_VERSION="2024-02-01"
 ```
 
-Instantiate the model:
+Model 인스턴스화:
 
 ```typescript
 import { AzureOpenAIEmbeddings } from "@langchain/openai";
@@ -188,7 +188,7 @@ const embeddings = new AzureOpenAIEmbeddings({
 
 <Accordion title="AWS">
 
-Install dependencies:
+dependency 설치:
 
 <CodeGroup>
 
@@ -206,13 +206,13 @@ pnpm add @langchain/aws
 
 </CodeGroup>
 
-Add environment variables:
+환경 변수 추가:
 
 ```bash
 BEDROCK_AWS_REGION=your-region
 ```
 
-Instantiate the model:
+Model 인스턴스화:
 
 ```typescript
 import { BedrockEmbeddings } from "@langchain/aws";
@@ -225,7 +225,7 @@ const embeddings = new BedrockEmbeddings({
 </Accordion>
 <Accordion title="Google Gemini">
 
-Install dependencies:
+dependency 설치:
 
 <CodeGroup>
 ```bash npm
@@ -241,13 +241,13 @@ pnpm add @langchain/google-genai
 ```
 </CodeGroup>
 
-Add environment variables:
+환경 변수 추가:
 
 ```bash
 GOOGLE_API_KEY=your-api-key
 ```
 
-Instantiate the model:
+Model 인스턴스화:
 
 ```typescript
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
@@ -260,7 +260,7 @@ const embeddings = new GoogleGenerativeAIEmbeddings({
 </Accordion>
 <Accordion title="Google Vertex">
 
-Install dependencies:
+dependency 설치:
 
 <CodeGroup>
 
@@ -277,13 +277,13 @@ pnpm add @langchain/google-vertexai
 ```
 </CodeGroup>
 
-Add environment variables:
+환경 변수 추가:
 
 ```bash
 GOOGLE_APPLICATION_CREDENTIALS=credentials.json
 ```
 
-Instantiate the model:
+Model 인스턴스화:
 
 ```typescript
 import { VertexAIEmbeddings } from "@langchain/google-vertexai";
@@ -296,7 +296,7 @@ const embeddings = new VertexAIEmbeddings({
 </Accordion>
 <Accordion title="MistralAI">
 
-Install dependencies:
+dependency 설치:
 
 <CodeGroup>
 ```bash npm
@@ -312,13 +312,13 @@ pnpm add @langchain/mistralai
 ```
 </CodeGroup>
 
-Add environment variables:
+환경 변수 추가:
 
 ```bash
 MISTRAL_API_KEY=your-api-key
 ```
 
-Instantiate the model:
+Model 인스턴스화:
 
 ```typescript
 import { MistralAIEmbeddings } from "@langchain/mistralai";
@@ -331,7 +331,7 @@ const embeddings = new MistralAIEmbeddings({
 </Accordion>
 <Accordion title="Cohere">
 
-Install dependencies:
+dependency 설치:
 
 <CodeGroup>
 ```bash npm
@@ -348,13 +348,13 @@ pnpm add @langchain/cohere
 
 </CodeGroup>
 
-Add environment variables:
+환경 변수 추가:
 
 ```bash
 COHERE_API_KEY=your-api-key
 ```
 
-Instantiate the model:
+Model 인스턴스화:
 
 ```typescript
 import { CohereEmbeddings } from "@langchain/cohere";
@@ -367,7 +367,7 @@ const embeddings = new CohereEmbeddings({
 </Accordion>
 <Accordion title="Ollama">
 
-Install dependencies:
+dependency 설치:
 
 <CodeGroup>
 ```bash npm
@@ -383,7 +383,7 @@ pnpm add @langchain/ollama
 ```
 </CodeGroup>
 
-Instantiate the model:
+Model 인스턴스화:
 
 ```typescript
 import { OllamaEmbeddings } from "@langchain/ollama";
@@ -397,7 +397,7 @@ const embeddings = new OllamaEmbeddings({
 </Accordion>
 </AccordionGroup>
 
-**Select vector store:**
+**Vector store 선택:**
 
 <AccordionGroup>
 <Accordion title="Memory">
@@ -595,9 +595,9 @@ const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
 </Accordion>
 </AccordionGroup>
 
-LangChain.js integrates with a variety of vector stores. You can check out a full list below:
+LangChain.js는 다양한 vector store와 통합됩니다. 아래에서 전체 목록을 확인할 수 있습니다:
 
-## All vector stores
+## 모든 vector store
 
 <Columns cols={3}>
   <Card
@@ -605,356 +605,356 @@ LangChain.js integrates with a variety of vector stores. You can check out a ful
     icon="link"
     href="/oss/integrations/vectorstores/analyticdb"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Astra DB"
     icon="link"
     href="/oss/integrations/vectorstores/astradb"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Azion EdgeSQL"
     icon="link"
     href="/oss/integrations/vectorstores/azion-edgesql"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Azure AI Search"
     icon="link"
     href="/oss/integrations/vectorstores/azure_aisearch"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Azure Cosmos DB for MongoDB vCore"
     icon="link"
     href="/oss/integrations/vectorstores/azure_cosmosdb_mongodb"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Azure Cosmos DB for NoSQL"
     icon="link"
     href="/oss/integrations/vectorstores/azure_cosmosdb_nosql"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Cassandra"
     icon="link"
     href="/oss/integrations/vectorstores/cassandra"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Chroma"
     icon="link"
     href="/oss/integrations/vectorstores/chroma"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="ClickHouse"
     icon="link"
     href="/oss/integrations/vectorstores/clickhouse"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="CloseVector"
     icon="link"
     href="/oss/integrations/vectorstores/closevector"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Cloudflare Vectorize"
     icon="link"
     href="/oss/integrations/vectorstores/cloudflare_vectorize"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Convex"
     icon="link"
     href="/oss/integrations/vectorstores/convex"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Couchbase"
     icon="link"
     href="/oss/integrations/vectorstores/couchbase"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Elasticsearch"
     icon="link"
     href="/oss/integrations/vectorstores/elasticsearch"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Faiss"
     icon="link"
     href="/oss/integrations/vectorstores/faiss"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Google Cloud SQL for PostgreSQL"
     icon="link"
     href="/oss/integrations/vectorstores/google_cloudsql_pg"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Google Vertex AI Matching Engine"
     icon="link"
     href="/oss/integrations/vectorstores/googlevertexai"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="SAP HANA Cloud Vector Engine"
     icon="link"
     href="/oss/integrations/vectorstores/hanavector"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="HNSWLib"
     icon="link"
     href="/oss/integrations/vectorstores/hnswlib"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="LanceDB"
     icon="link"
     href="/oss/integrations/vectorstores/lancedb"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="libSQL"
     icon="link"
     href="/oss/integrations/vectorstores/libsql"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="MariaDB"
     icon="link"
     href="/oss/integrations/vectorstores/mariadb"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="In-memory"
     icon="link"
     href="/oss/integrations/vectorstores/memory"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Milvus"
     icon="link"
     href="/oss/integrations/vectorstores/milvus"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Momento Vector Index (MVI)"
     icon="link"
     href="/oss/integrations/vectorstores/momento_vector_index"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="MongoDB Atlas"
     icon="link"
     href="/oss/integrations/vectorstores/mongodb_atlas"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="MyScale"
     icon="link"
     href="/oss/integrations/vectorstores/myscale"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Neo4j Vector Index"
     icon="link"
     href="/oss/integrations/vectorstores/neo4jvector"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Neon Postgres"
     icon="link"
     href="/oss/integrations/vectorstores/neon"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="OpenSearch"
     icon="link"
     href="/oss/integrations/vectorstores/opensearch"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="PGVector"
     icon="link"
     href="/oss/integrations/vectorstores/pgvector"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Pinecone"
     icon="link"
     href="/oss/integrations/vectorstores/pinecone"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Prisma"
     icon="link"
     href="/oss/integrations/vectorstores/prisma"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Qdrant"
     icon="link"
     href="/oss/integrations/vectorstores/qdrant"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Redis"
     icon="link"
     href="/oss/integrations/vectorstores/redis"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Rockset"
     icon="link"
     href="/oss/integrations/vectorstores/rockset"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="SingleStore"
     icon="link"
     href="/oss/integrations/vectorstores/singlestore"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Supabase"
     icon="link"
     href="/oss/integrations/vectorstores/supabase"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Tigris"
     icon="link"
     href="/oss/integrations/vectorstores/tigris"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Turbopuffer"
     icon="link"
     href="/oss/integrations/vectorstores/turbopuffer"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="TypeORM"
     icon="link"
     href="/oss/integrations/vectorstores/typeorm"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Typesense"
     icon="link"
     href="/oss/integrations/vectorstores/typesense"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Upstash Vector"
     icon="link"
     href="/oss/integrations/vectorstores/upstash"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="USearch"
     icon="link"
     href="/oss/integrations/vectorstores/usearch"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Vectara"
     icon="link"
     href="/oss/integrations/vectorstores/vectara"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Vercel Postgres"
     icon="link"
     href="/oss/integrations/vectorstores/vercel_postgres"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Voy"
     icon="link"
     href="/oss/integrations/vectorstores/voy"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Weaviate"
     icon="link"
     href="/oss/integrations/vectorstores/weaviate"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Xata"
     icon="link"
     href="/oss/integrations/vectorstores/xata"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Zep Open Source"
     icon="link"
     href="/oss/integrations/vectorstores/zep"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Zep Cloud"
     icon="link"
     href="/oss/integrations/vectorstores/zep_cloud"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
 </Columns>

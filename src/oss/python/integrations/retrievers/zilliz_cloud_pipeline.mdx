@@ -2,27 +2,27 @@
 title: Zilliz Cloud Pipeline
 ---
 
-> [Zilliz Cloud Pipelines](https://docs.zilliz.com/docs/pipelines) transform your unstructured data to a searchable vector collection, chaining up the embedding, ingestion, search, and deletion of your data.
+> [Zilliz Cloud Pipelines](https://docs.zilliz.com/docs/pipelines)는 비구조화된 데이터를 검색 가능한 vector collection으로 변환하며, 데이터의 embedding, 수집, 검색 및 삭제를 연결합니다.
 >
-> Zilliz Cloud Pipelines are available in the Zilliz Cloud Console and via RestFul APIs.
+> Zilliz Cloud Pipelines는 Zilliz Cloud Console과 RestFul API를 통해 사용할 수 있습니다.
 
-This notebook demonstrates how to prepare Zilliz Cloud Pipelines and use the them via a LangChain Retriever.
+이 노트북은 Zilliz Cloud Pipelines를 준비하고 LangChain Retriever를 통해 사용하는 방법을 보여줍니다.
 
-## Prepare Zilliz Cloud Pipelines
+## Zilliz Cloud Pipelines 준비하기
 
-To get pipelines ready for LangChain Retriever, you need to create and configure the services in Zilliz Cloud.
+LangChain Retriever를 위한 pipeline을 준비하려면 Zilliz Cloud에서 서비스를 생성하고 구성해야 합니다.
 
-**1. Set up Database**
+**1. Database 설정**
 
-- [Register with Zilliz Cloud](https://docs.zilliz.com/docs/register-with-zilliz-cloud)
-- [Create a cluster](https://docs.zilliz.com/docs/create-cluster)
+- [Zilliz Cloud에 등록하기](https://docs.zilliz.com/docs/register-with-zilliz-cloud)
+- [Cluster 생성하기](https://docs.zilliz.com/docs/create-cluster)
 
-**2. Create Pipelines**
+**2. Pipelines 생성**
 
-- [Document ingestion, search, deletion](https://docs.zilliz.com/docs/pipelines-doc-data)
-- [Text ingestion, search, deletion](https://docs.zilliz.com/docs/pipelines-text-data)
+- [문서 수집, 검색, 삭제](https://docs.zilliz.com/docs/pipelines-doc-data)
+- [텍스트 수집, 검색, 삭제](https://docs.zilliz.com/docs/pipelines-text-data)
 
-## Use LangChain Retriever
+## LangChain Retriever 사용하기
 
 ```python
 pip install -qU langchain-milvus
@@ -41,15 +41,15 @@ retriever = ZillizCloudPipelineRetriever(
 )
 ```
 
-### Add documents
+### 문서 추가하기
 
-To add documents, you can use the method `add_texts` or `add_doc_url`, which inserts documents from a list of texts or a presigned/public url with corresponding metadata into the store.
+문서를 추가하려면 `add_texts` 또는 `add_doc_url` 메서드를 사용할 수 있으며, 이는 텍스트 목록이나 presigned/public url의 문서를 해당 metadata와 함께 저장소에 삽입합니다.
 
-- if using a **text ingestion pipeline**, you can use the method `add_texts`, which inserts a batch of texts with the corresponding metadata into the Zilliz Cloud storage.
+- **텍스트 수집 pipeline**을 사용하는 경우, `add_texts` 메서드를 사용할 수 있으며, 이는 해당 metadata와 함께 텍스트 배치를 Zilliz Cloud storage에 삽입합니다.
 
     **Arguments:**
-  - `texts`: A list of text strings.
-  - `metadata`: A key-value dictionary of metadata will be inserted as preserved fields required by ingestion pipeline. Defaults to None.
+  - `texts`: 텍스트 문자열 목록.
+  - `metadata`: ingestion pipeline에서 요구하는 보존 필드로 삽입될 metadata의 key-value dictionary. 기본값은 None입니다.
 
 ```python
 # retriever.add_texts(
@@ -58,13 +58,13 @@ To add documents, you can use the method `add_texts` or `add_doc_url`, which ins
 #     )
 ```
 
-- if using a **document ingestion pipeline**, you can use the method `add_doc_url`, which inserts a document from url with the corresponding metadata into the Zilliz Cloud storage.
+- **문서 수집 pipeline**을 사용하는 경우, `add_doc_url` 메서드를 사용할 수 있으며, 이는 url의 문서를 해당 metadata와 함께 Zilliz Cloud storage에 삽입합니다.
 
     **Arguments:**
-  - `doc_url`: A document url.
-  - `metadata`: A key-value dictionary of metadata will be inserted as preserved fields required by ingestion pipeline. Defaults to None.
+  - `doc_url`: 문서 url.
+  - `metadata`: ingestion pipeline에서 요구하는 보존 필드로 삽입될 metadata의 key-value dictionary. 기본값은 None입니다.
 
-The following example works with a document ingestion pipeline, which requires milvus version as metadata. We will use an [example document](https://publicdataset.zillizcloud.com/milvus_doc.md) describing how to delete entities in Milvus v2.3.x.
+다음 예제는 metadata로 milvus version이 필요한 문서 수집 pipeline과 함께 작동합니다. Milvus v2.3.x에서 entity를 삭제하는 방법을 설명하는 [예제 문서](https://publicdataset.zillizcloud.com/milvus_doc.md)를 사용하겠습니다.
 
 ```python
 retriever.add_doc_url(
@@ -77,18 +77,18 @@ retriever.add_doc_url(
 {'token_usage': 1247, 'doc_name': 'milvus_doc.md', 'num_chunks': 6}
 ```
 
-### Get relevant documents
+### 관련 문서 가져오기
 
-To query the retriever, you can use the method `get_relevant_documents`, which returns a list of LangChain Document objects.
+retriever를 쿼리하려면 `get_relevant_documents` 메서드를 사용할 수 있으며, 이는 LangChain Document 객체 목록을 반환합니다.
 
 **Arguments:**
 
-- `query`: String to find relevant documents for.
-- `top_k`: The number of results. Defaults to 10.
-- `offset`: The number of records to skip in the search result. Defaults to 0.
-- `output_fields`: The extra fields to present in output.
-- `filter`: The Milvus expression to filter search results. Defaults to "".
-- `run_manager`: The callbacks handler to use.
+- `query`: 관련 문서를 찾기 위한 문자열.
+- `top_k`: 결과 개수. 기본값은 10입니다.
+- `offset`: 검색 결과에서 건너뛸 레코드 수. 기본값은 0입니다.
+- `output_fields`: 출력에 표시할 추가 필드.
+- `filter`: 검색 결과를 필터링하기 위한 Milvus expression. 기본값은 ""입니다.
+- `run_manager`: 사용할 callbacks handler.
 
 ```python
 retriever.get_relevant_documents(

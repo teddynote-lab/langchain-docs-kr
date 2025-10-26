@@ -2,29 +2,29 @@
 title: vlite
 ---
 
-VLite is a simple and blazing fast vector database that allows you to store and retrieve data semantically using embeddings. Made with numpy, vlite is a lightweight batteries-included database to implement RAG, similarity search, and embeddings into your projects.
+VLite는 embedding을 사용하여 의미론적으로 데이터를 저장하고 검색할 수 있는 간단하고 매우 빠른 vector database입니다. numpy로 만들어진 vlite는 RAG, 유사도 검색, embedding을 프로젝트에 구현하기 위한 경량 배터리 포함 database입니다.
 
-You'll need to install `langchain-community` with `pip install -qU langchain-community` to use this integration
+이 integration을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다
 
-## Installation
+## 설치
 
-To use the VLite in LangChain, you need to install the `vlite` package:
+LangChain에서 VLite를 사용하려면 `vlite` package를 설치해야 합니다:
 
 ```bash
 !pip install vlite
 ```
 
-## Importing VLite
+## VLite Import하기
 
 ```python
 from langchain_community.vectorstores import VLite
 ```
 
-## Basic Example
+## 기본 예제
 
-In this basic example, we load a text document, and store them in the VLite vector database. Then, we perform a similarity search to retrieve relevant documents based on a query.
+이 기본 예제에서는 텍스트 문서를 로드하고 VLite vector database에 저장합니다. 그런 다음 쿼리를 기반으로 관련 문서를 검색하기 위해 유사도 검색을 수행합니다.
 
-VLite handles chunking and embedding of the text for you, and you can change these parameters by pre-chunking the text and/or embeddings those chunks into the VLite database.
+VLite는 텍스트의 chunking과 embedding을 자동으로 처리하며, 텍스트를 미리 chunking하거나 해당 chunk를 VLite database에 embedding하여 이러한 매개변수를 변경할 수 있습니다.
 
 ```python
 from langchain.document_loaders import TextLoader
@@ -48,9 +48,9 @@ docs = vlite.similarity_search(query)
 print(docs[0].page_content)
 ```
 
-## Adding Texts and Documents
+## Text와 Document 추가하기
 
-You can add texts or documents to the VLite vector database using the `add_texts` and `add_documents` methods, respectively.
+`add_texts`와 `add_documents` method를 사용하여 VLite vector database에 text 또는 document를 추가할 수 있습니다.
 
 ```python
 # Add texts to the VLite vector database
@@ -62,9 +62,9 @@ documents = [Document(page_content="This is a document.", metadata={"source": "e
 vlite.add_documents(documents)
 ```
 
-## Similarity Search
+## 유사도 검색
 
-VLite provides methods for performing similarity search on the stored documents.
+VLite는 저장된 document에 대한 유사도 검색을 수행하는 method를 제공합니다.
 
 ```python
 # Perform a similarity search
@@ -75,18 +75,18 @@ docs = vlite.similarity_search(query, k=3)
 docs_with_scores = vlite.similarity_search_with_score(query, k=3)
 ```
 
-## Max Marginal Relevance Search
+## Max Marginal Relevance 검색
 
-VLite also supports Max Marginal Relevance (MMR) search, which optimizes for both similarity to the query and diversity among the retrieved documents.
+VLite는 Max Marginal Relevance (MMR) 검색도 지원하며, 이는 쿼리와의 유사성과 검색된 document 간의 다양성을 모두 최적화합니다.
 
 ```python
 # Perform an MMR search
 docs = vlite.max_marginal_relevance_search(query, k=3)
 ```
 
-## Updating and Deleting Documents
+## Document 업데이트 및 삭제
 
-You can update or delete documents in the VLite vector database using the `update_document` and `delete` methods.
+`update_document`와 `delete` method를 사용하여 VLite vector database의 document를 업데이트하거나 삭제할 수 있습니다.
 
 ```python
 # Update a document
@@ -99,9 +99,9 @@ document_ids = ["doc_id_1", "doc_id_2"]
 vlite.delete(document_ids)
 ```
 
-## Retrieving Documents
+## Document 검색하기
 
-You can retrieve documents from the VLite vector database based on their IDs or metadata using the `get` method.
+`get` method를 사용하여 ID 또는 metadata를 기반으로 VLite vector database에서 document를 검색할 수 있습니다.
 
 ```python
 # Retrieve documents by IDs
@@ -113,9 +113,9 @@ metadata_filter = {"source": "example.txt"}
 docs = vlite.get(where=metadata_filter)
 ```
 
-## Creating VLite Instances
+## VLite Instance 생성하기
 
-You can create VLite instances using various methods:
+다양한 method를 사용하여 VLite instance를 생성할 수 있습니다:
 
 ```python
 # Create a VLite instance from texts
@@ -128,9 +128,9 @@ vlite = VLite.from_documents(documents)
 vlite = VLite.from_existing_index(collection="existing_collection")
 ```
 
-## Additional Features
+## 추가 기능
 
-VLite provides additional features for managing the vector database:
+VLite는 vector database 관리를 위한 추가 기능을 제공합니다:
 
 ```python
 from langchain.vectorstores import VLite

@@ -3,20 +3,20 @@ title: Google Cloud Storage
 ---
 
 <Tip>
-**Compatibility**
+**호환성**
 
-Only available on Node.js.
+Node.js에서만 사용 가능합니다.
 </Tip>
 
-This covers how to load a Google Cloud Storage File into LangChain documents.
+이 문서는 Google Cloud Storage 파일을 LangChain document로 로드하는 방법을 다룹니다.
 
 ## Setup
 
-To use this loader, you'll need to have Unstructured already set up and ready to use at an available URL endpoint. It can also be configured to run locally.
+이 loader를 사용하려면 Unstructured가 이미 설정되어 있고 사용 가능한 URL endpoint에서 사용할 준비가 되어 있어야 합니다. 로컬에서 실행되도록 구성할 수도 있습니다.
 
-See the docs [here](/oss/integrations/document_loaders/file_loaders/unstructured) for information on how to do that.
+설정 방법에 대한 정보는 [여기](/oss/integrations/document_loaders/file_loaders/unstructured) 문서를 참조하세요.
 
-You'll also need to install the official Google Cloud Storage SDK:
+또한 공식 Google Cloud Storage SDK를 설치해야 합니다:
 
 ```bash npm
 npm install @langchain/community @langchain/core @google-cloud/storage
@@ -24,9 +24,9 @@ npm install @langchain/community @langchain/core @google-cloud/storage
 
 ## Usage
 
-Once Unstructured is configured, you can use the Google Cloud Storage loader to load files and then convert them into a Document.
+Unstructured가 구성되면 Google Cloud Storage loader를 사용하여 파일을 로드하고 Document로 변환할 수 있습니다.
 
-In addition, you can optionally provide a `storageOptions` parameter to specify not only your storage options but also other authentication ways if you don't want Application Default Credentials(ADC) as default manner.
+또한 선택적으로 `storageOptions` 매개변수를 제공하여 storage 옵션뿐만 아니라 Application Default Credentials(ADC)를 기본 방식으로 사용하지 않으려는 경우 다른 인증 방법을 지정할 수 있습니다.
 
 ```typescript
 import { GoogleCloudStorageLoader } from "@langchain/community/document_loaders/web/google_cloud_storage";

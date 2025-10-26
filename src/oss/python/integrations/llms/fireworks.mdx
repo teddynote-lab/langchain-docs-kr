@@ -3,14 +3,14 @@ title: Fireworks
 ---
 
 <Warning>
-**You are currently on a page documenting the use of Fireworks models as text completion models. Many popular Fireworks models are [chat completion models](/oss/langchain/models).**
+**현재 Fireworks 모델을 text completion 모델로 사용하는 방법을 설명하는 페이지를 보고 계십니다. 많은 인기 있는 Fireworks 모델은 [chat completion 모델](/oss/langchain/models)입니다.**
 
-You may be looking for [this page instead](/oss/integrations/chat/fireworks/).
+[이 페이지](/oss/integrations/chat/fireworks/)를 찾고 계실 수 있습니다.
 </Warning>
 
->[Fireworks](https://app.fireworks.ai/) accelerates product development on generative AI by creating an innovative AI experiment and production platform.
+>[Fireworks](https://app.fireworks.ai/)는 혁신적인 AI 실험 및 프로덕션 플랫폼을 만들어 생성형 AI 제품 개발을 가속화합니다.
 
-This example goes over how to use LangChain to interact with `Fireworks` models.
+이 예제는 LangChain을 사용하여 `Fireworks` 모델과 상호작용하는 방법을 다룹니다.
 
 ## Overview
 
@@ -24,8 +24,8 @@ This example goes over how to use LangChain to interact with `Fireworks` models.
 
 ### Credentials
 
-Sign in to [Fireworks AI](http://fireworks.ai) for the an API Key to access our models, and make sure it is set as the `FIREWORKS_API_KEY` environment variable.
-3. Set up your model using a model id. If the model is not set, the default model is fireworks-llama-v2-7b-chat. See the full, most up-to-date model list on [fireworks.ai](https://fireworks.ai).
+[Fireworks AI](http://fireworks.ai)에 로그인하여 모델에 액세스할 수 있는 API Key를 받고, `FIREWORKS_API_KEY` environment variable로 설정되어 있는지 확인하세요.
+3. model id를 사용하여 모델을 설정하세요. 모델이 설정되지 않은 경우 기본 모델은 fireworks-llama-v2-7b-chat입니다. [fireworks.ai](https://fireworks.ai)에서 전체 최신 모델 목록을 확인하세요.
 
 ```python
 import getpass
@@ -37,7 +37,7 @@ if "FIREWORKS_API_KEY" not in os.environ:
 
 ### Installation
 
-You need to install the `langchain-fireworks` python package for the rest of the notebook to work.
+나머지 노트북이 작동하려면 `langchain-fireworks` python package를 설치해야 합니다.
 
 ```python
 pip install -qU langchain-fireworks
@@ -61,7 +61,7 @@ llm = Fireworks(
 
 ## Invocation
 
-You can call the model directly with string prompts to get completions.
+문자열 prompt로 모델을 직접 호출하여 completion을 얻을 수 있습니다.
 
 ```python
 output = llm.invoke("Who's the best quarterback in the NFL?")
@@ -72,7 +72,7 @@ print(output)
  If Manningville Station, Lions rookie EJ Manuel's
 ```
 
-### Invoking with multiple prompts
+### 여러 prompt로 호출하기
 
 ```python
 # Calling multiple prompts
@@ -89,7 +89,7 @@ print(output.generations)
 [[Generation(text=" We're not just asking, we've done some research. We'")], [Generation(text=' The conversation is dominated by Kobe Bryant, Dwyane Wade,')]]
 ```
 
-### Invoking with additional parameters
+### 추가 parameter와 함께 호출하기
 
 ```python
 # Setting additional parameters: temperature, max_tokens, top_p
@@ -108,7 +108,7 @@ December is a cold month in Kansas City, with temperatures of
 
 ## Chaining
 
-You can use the LangChain Expression Language to create a simple chain with non-chat models.
+LangChain Expression Language를 사용하여 non-chat 모델로 간단한 chain을 만들 수 있습니다.
 
 ```python
 from langchain_core.prompts import PromptTemplate
@@ -132,7 +132,7 @@ print(chain.invoke({"topic": "bears"}))
 
 ## Streaming
 
-You can stream the output, if you want.
+원하는 경우 출력을 stream할 수 있습니다.
 
 ```python
 for token in chain.stream({"topic": "bears"}):
@@ -145,4 +145,4 @@ for token in chain.stream({"topic": "bears"}):
 
 ## API reference
 
-For detailed documentation of all `Fireworks` LLM features and configurations head to the API reference: [python.langchain.com/api_reference/fireworks/llms/langchain_fireworks.llms.Fireworks.html#langchain_fireworks.llms.Fireworks](https://python.langchain.com/api_reference/fireworks/llms/langchain_fireworks.llms.Fireworks.html#langchain_fireworks.llms.Fireworks)
+모든 `Fireworks` LLM 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/fireworks/llms/langchain_fireworks.llms.Fireworks.html#langchain_fireworks.llms.Fireworks](https://python.langchain.com/api_reference/fireworks/llms/langchain_fireworks.llms.Fireworks.html#langchain_fireworks.llms.Fireworks)

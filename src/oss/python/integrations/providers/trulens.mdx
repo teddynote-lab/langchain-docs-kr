@@ -2,14 +2,14 @@
 title: TruLens
 ---
 
->[TruLens](https://trulens.org) is an [open-source](https://github.com/truera/trulens) package that provides instrumentation and evaluation tools for large language model (LLM) based applications.
+>[TruLens](https://trulens.org)는 대규모 언어 모델(LLM) 기반 애플리케이션을 위한 계측 및 평가 도구를 제공하는 [오픈소스](https://github.com/truera/trulens) 패키지입니다.
 
-This page covers how to use [TruLens](https://trulens.org) to evaluate and track LLM apps built on langchain.
+이 페이지에서는 [TruLens](https://trulens.org)를 사용하여 langchain으로 구축된 LLM 앱을 평가하고 추적하는 방법을 다룹니다.
 
 
 ## Installation and Setup
 
-Install the `trulens-eval` python package.
+`trulens-eval` python 패키지를 설치합니다.
 
 <CodeGroup>
 ```bash pip
@@ -23,15 +23,15 @@ uv add trulens-eval
 
 ## Quickstart
 
-See the integration details in the [TruLens documentation](https://www.trulens.org/trulens_eval/getting_started/quickstarts/langchain_quickstart/).
+통합 세부 정보는 [TruLens 문서](https://www.trulens.org/trulens_eval/getting_started/quickstarts/langchain_quickstart/)를 참조하세요.
 
 ### Tracking
 
-Once you've created your LLM chain, you can use TruLens for evaluation and tracking.
-TruLens has a number of [out-of-the-box Feedback Functions](https://www.trulens.org/trulens_eval/evaluation/feedback_functions/),
-and is also an extensible framework for LLM evaluation.
+LLM chain을 생성한 후에는 TruLens를 사용하여 평가 및 추적을 수행할 수 있습니다.
+TruLens는 다양한 [기본 제공 Feedback Function](https://www.trulens.org/trulens_eval/evaluation/feedback_functions/)을 제공하며,
+LLM 평가를 위한 확장 가능한 프레임워크이기도 합니다.
 
-Create the feedback functions:
+Feedback Function을 생성합니다:
 
 ```python
 from trulens_eval.feedback import Feedback, Huggingface,
@@ -55,11 +55,11 @@ toxicity = Feedback(openai.toxicity).on_input()
 
 ### Chains
 
-After you've set up Feedback Function(s) for evaluating your LLM, you can wrap your application with
-TruChain to get detailed tracing, logging and evaluation of your LLM app.
+LLM을 평가하기 위한 Feedback Function을 설정한 후, TruChain으로 애플리케이션을 래핑하여
+LLM 앱의 상세한 추적, 로깅 및 평가를 수행할 수 있습니다.
 
-Note: See code for the `chain` creation is in
-the [TruLens documentation](https://www.trulens.org/trulens_eval/getting_started/quickstarts/langchain_quickstart/).
+참고: `chain` 생성을 위한 코드는
+[TruLens 문서](https://www.trulens.org/trulens_eval/getting_started/quickstarts/langchain_quickstart/)를 참조하세요.
 
 ```python
 from trulens_eval import TruChain
@@ -76,9 +76,9 @@ truchain("que hora es?")
 
 ### Evaluation
 
-Now you can explore your LLM-based application!
+이제 LLM 기반 애플리케이션을 탐색할 수 있습니다!
 
-Doing so will help you understand how your LLM application is performing at a glance. As you iterate new versions of your LLM application, you can compare their performance across all of the different quality metrics you've set up. You'll also be able to view evaluations at a record level, and explore the chain metadata for each record.
+이를 통해 LLM 애플리케이션의 성능을 한눈에 파악할 수 있습니다. LLM 애플리케이션의 새 버전을 반복하면서 설정한 다양한 품질 메트릭 전반에 걸쳐 성능을 비교할 수 있습니다. 또한 레코드 수준에서 평가를 확인하고 각 레코드의 chain 메타데이터를 탐색할 수 있습니다.
 
 ```python
 from trulens_eval import Tru
@@ -87,4 +87,4 @@ tru = Tru()
 tru.run_dashboard() # open a Streamlit app to explore
 ```
 
-For more information on TruLens, visit [trulens.org](https://www.trulens.org/)
+TruLens에 대한 자세한 내용은 [trulens.org](https://www.trulens.org/)를 방문하세요.

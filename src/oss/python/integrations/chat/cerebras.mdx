@@ -2,21 +2,21 @@
 title: ChatCerebras
 ---
 
-This guide provides a quick overview for getting started with Cerebras [chat models](/oss/langchain/models). For detailed documentation of all ChatCerebras features and configurations head to the [API reference](https://python.langchain.com/api_reference/cerebras/chat_models/langchain_cerebras.chat_models.ChatCerebras.html#).
+이 가이드는 Cerebras [chat models](/oss/langchain/models) 시작하기에 대한 간단한 개요를 제공합니다. 모든 ChatCerebras 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/cerebras/chat_models/langchain_cerebras.chat_models.ChatCerebras.html#)를 참조하세요.
 
-At Cerebras, we've developed the world's largest and fastest AI processor, the Wafer-Scale Engine-3 (WSE-3). The Cerebras CS-3 system, powered by the WSE-3, represents a new class of AI supercomputer that sets the standard for generative AI training and inference with unparalleled performance and scalability.
+Cerebras에서는 세계에서 가장 크고 빠른 AI 프로세서인 Wafer-Scale Engine-3 (WSE-3)를 개발했습니다. WSE-3로 구동되는 Cerebras CS-3 시스템은 비교할 수 없는 성능과 확장성으로 생성형 AI 학습 및 추론의 표준을 설정하는 새로운 클래스의 AI 슈퍼컴퓨터를 나타냅니다.
 
-With Cerebras as your inference provider, you can:
+Cerebras를 추론 제공자로 사용하면 다음을 수행할 수 있습니다:
 
-- Achieve unprecedented speed for AI inference workloads
-- Build commercially with high throughput
-- Effortlessly scale your AI workloads with our seamless clustering technology
+- AI 추론 워크로드에 대한 전례 없는 속도 달성
+- 높은 처리량으로 상업적 구축
+- 원활한 클러스터링 기술로 AI 워크로드를 손쉽게 확장
 
-Our CS-3 systems can be quickly and easily clustered to create the largest AI supercomputers in the world, making it simple to place and run the largest models. Leading corporations, research institutions, and governments are already using Cerebras solutions to develop proprietary models and train popular open-source models.
+우리의 CS-3 시스템은 빠르고 쉽게 클러스터링되어 세계에서 가장 큰 AI 슈퍼컴퓨터를 만들 수 있으며, 가장 큰 모델을 배치하고 실행하는 것을 간단하게 만듭니다. 주요 기업, 연구 기관 및 정부는 이미 Cerebras 솔루션을 사용하여 독점 모델을 개발하고 인기 있는 오픈 소스 모델을 학습하고 있습니다.
 
-Want to experience the power of Cerebras? Check out our [website](https://cerebras.ai) for more resources and explore options for accessing our technology through the Cerebras Cloud or on-premise deployments!
+Cerebras의 힘을 경험하고 싶으신가요? 더 많은 리소스를 보려면 [웹사이트](https://cerebras.ai)를 확인하고 Cerebras Cloud 또는 온프레미스 배포를 통해 우리 기술에 액세스하는 옵션을 탐색하세요!
 
-For more information about Cerebras Cloud, visit [cloud.cerebras.ai](https://cloud.cerebras.ai/). Our API reference is available at [inference-docs.cerebras.ai](https://inference-docs.cerebras.ai/).
+Cerebras Cloud에 대한 자세한 내용은 [cloud.cerebras.ai](https://cloud.cerebras.ai/)를 방문하세요. API reference는 [inference-docs.cerebras.ai](https://inference-docs.cerebras.ai/)에서 확인할 수 있습니다.
 
 ## Overview
 
@@ -40,7 +40,7 @@ pip install langchain-cerebras
 
 ### Credentials
 
-Get an API Key from [cloud.cerebras.ai](https://cloud.cerebras.ai/) and add it to your environment variables:
+[cloud.cerebras.ai](https://cloud.cerebras.ai/)에서 API Key를 받아 환경 변수에 추가하세요:
 
 ```
 export CEREBRAS_API_KEY="your-api-key-here"
@@ -58,7 +58,7 @@ if "CEREBRAS_API_KEY" not in os.environ:
 Enter your Cerebras API key:  ········
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -67,7 +67,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-The LangChain Cerebras integration lives in the `langchain-cerebras` package:
+LangChain Cerebras integration은 `langchain-cerebras` 패키지에 있습니다:
 
 ```python
 pip install -qU langchain-cerebras
@@ -75,7 +75,7 @@ pip install -qU langchain-cerebras
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```python
 from langchain_cerebras import ChatCerebras
@@ -205,4 +205,4 @@ As Dr. Vex delved deeper into her research, she began to experience strange and 
 
 ## API reference
 
-For detailed documentation of all ChatCerebras features and configurations head to the API reference: [python.langchain.com/api_reference/cerebras/chat_models/langchain_cerebras.chat_models.ChatCerebras.html#](https://python.langchain.com/api_reference/cerebras/chat_models/langchain_cerebras.chat_models.ChatCerebras.html#)
+모든 ChatCerebras 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/cerebras/chat_models/langchain_cerebras.chat_models.ChatCerebras.html#](https://python.langchain.com/api_reference/cerebras/chat_models/langchain_cerebras.chat_models.ChatCerebras.html#)

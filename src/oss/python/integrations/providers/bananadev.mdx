@@ -2,14 +2,13 @@
 title: BananaDev
 ---
 
->[Banana](https://www.banana.dev/) provided serverless GPU inference for AI models,
-> a CI/CD build pipeline and a simple Python framework (`Potassium`) to server your models.
+>[Banana](https://www.banana.dev/)는 AI 모델을 위한 serverless GPU inference, CI/CD build pipeline, 그리고 모델을 서빙하기 위한 간단한 Python framework (`Potassium`)를 제공합니다.
 
-This page covers how to use the [Banana](https://www.banana.dev) ecosystem within LangChain.
+이 페이지에서는 LangChain 내에서 [Banana](https://www.banana.dev) 생태계를 사용하는 방법을 다룹니다.
 
 ## Installation and Setup
 
-- Install the python package `banana-dev`:
+- Python 패키지 `banana-dev` 설치:
 
 <CodeGroup>
 ```bash pip
@@ -21,28 +20,27 @@ uv add banana-dev
 ```
 </CodeGroup>
 
-- Get an Banana api key from the [Banana.dev dashboard](https://app.banana.dev) and set it as an environment variable (`BANANA_API_KEY`)
-- Get your model's key and url slug from the model's details page.
+- [Banana.dev dashboard](https://app.banana.dev)에서 Banana API key를 발급받아 환경 변수(`BANANA_API_KEY`)로 설정하세요
+- 모델 상세 페이지에서 model key와 url slug를 확인하세요.
 
 ## Define your Banana Template
 
-You'll need to set up a Github repo for your Banana app. You can get started in 5 minutes using [this guide](https://docs.banana.dev/banana-docs/).
+Banana 앱을 위해 GitHub repo를 설정해야 합니다. [이 가이드](https://docs.banana.dev/banana-docs/)를 사용하면 5분 내로 시작할 수 있습니다.
 
-Alternatively, for a ready-to-go LLM example, you can check out Banana's [CodeLlama-7B-Instruct-GPTQ](https://github.com/bananaml/demo-codellama-7b-instruct-gptq) GitHub repository. Just fork it and deploy it within Banana.
+또는, 바로 사용 가능한 LLM 예시로 Banana의 [CodeLlama-7B-Instruct-GPTQ](https://github.com/bananaml/demo-codellama-7b-instruct-gptq) GitHub 저장소를 확인해 보세요. 포크한 뒤 Banana에 배포하면 됩니다.
 
-Other starter repos are available [here](https://github.com/orgs/bananaml/repositories?q=demo-&type=all&language=&sort=).
+다른 시작용 리포지토리는 [여기](https://github.com/orgs/bananaml/repositories?q=demo-&type=all&language=&sort=)에서 확인할 수 있습니다.
 
 ## Build the Banana app
 
-To use Banana apps within LangChain, you must include the `outputs` key
-in the returned json, and the value must be a string.
+LangChain에서 Banana 앱을 사용하려면 반환되는 json에 `outputs` 키가 포함되어야 하며, 해당 값은 문자열이어야 합니다.
 
 ```python
 # Return the results as a dictionary
 result = {'outputs': result}
 ```
 
-An example inference function would be:
+추론 함수 예시는 다음과 같습니다:
 
 ```python
 @app.handler("/")
@@ -54,13 +52,20 @@ def handler(context: dict, request: Request) -> Response:
     temperature = request.json.get("temperature", 0.7)
     prompt = request.json.get("prompt")
     prompt_template=f'''[INST] Write code to solve the following coding problem that obeys the constraints and passes the example test cases. Please wrap your code answer using ```:
+```python
+# 프롬프트 템플릿 일부
     {prompt}
     [/INST]
     '''
+    # 입력을 토크나이즈하고 GPU로 이동
     input_ids = tokenizer(prompt_template, return_tensors='pt').input_ids.cuda()
+    # 모델에서 텍스트를 생성 (temperature와 max_new_tokens 설정)
     output = model.generate(inputs=input_ids, temperature=temperature, max_new_tokens=max_new_tokens)
+    # 토큰을 텍스트로 디코드
     result = tokenizer.decode(output[0])
+    # Banana는 outputs 키의 문자열 값을 기대하므로 해당 형태로 응답
     return Response(json={"outputs": result}, status=200)
+```
 ```
 
 This example is from the `app.py` file in [CodeLlama-7B-Instruct-GPTQ](https://github.com/bananaml/demo-codellama-7b-instruct-gptq).
@@ -70,7 +75,9 @@ This example is from the `app.py` file in [CodeLlama-7B-Instruct-GPTQ](https://g
 
 
 ```python
+```python
+# LangChain 커뮤니티 Banana LLM import
 from langchain_community.llms import Banana
 ```
 
-See a [usage example](/oss/integrations/llms/banana).
+[사용 예시](/oss/integrations/llms/banana)를 참고하세요.

@@ -2,19 +2,19 @@
 title: Tensorlake
 ---
 
-Tensorlake is the AI Data Cloud that reliably transforms data from unstructured sources into ingestion-ready formats for AI Applications.
+Tensorlake는 비정형 소스의 데이터를 AI 애플리케이션을 위한 수집 준비 형식으로 안정적으로 변환하는 AI Data Cloud입니다.
 
-The `langchain-tensorlake` package provides seamless integration between [Tensorlake](https://tensorlake.ai) and [LangChain](https://langchain.com),
-enabling you to build sophisticated document processing agents with enhanced parsing features, like signature detection.
+`langchain-tensorlake` 패키지는 [Tensorlake](https://tensorlake.ai)와 [LangChain](https://langchain.com) 간의 원활한 통합을 제공하여,
+서명 감지와 같은 향상된 파싱 기능을 갖춘 정교한 문서 처리 에이전트를 구축할 수 있게 해줍니다.
 
-## Tensorlake feature overview
+## Tensorlake 기능 개요
 
-Tensorlake gives you tools to:
-- Extract: Schema-driven structured data extraction to pull out specific fields from documents.
-- Parse: Convert documents to markdown to build RAG/Knowledge Graph systems.
-- Orchestrate: Build programmable workflows for large-scale ingestion and enrichment of Documents, Text, Audio, Video and more.
+Tensorlake는 다음과 같은 도구를 제공합니다:
+- Extract: 문서에서 특정 필드를 추출하기 위한 스키마 기반 구조화된 데이터 추출.
+- Parse: RAG/Knowledge Graph 시스템을 구축하기 위해 문서를 markdown으로 변환.
+- Orchestrate: 문서, 텍스트, 오디오, 비디오 등의 대규모 수집 및 보강을 위한 프로그래밍 가능한 워크플로우 구축.
 
-Learn more at [docs.tensorlake.ai](https://docs.tensorlake.ai/introduction)
+자세한 내용은 [docs.tensorlake.ai](https://docs.tensorlake.ai/introduction)에서 확인하세요
 
 ---
 
@@ -34,24 +34,24 @@ uv add langchain-tensorlake
 
 ## Examples
 
-Follow a [full tutorial](https://docs.tensorlake.ai/examples/tutorials/real-estate-agent-with-langgraph-cli) on how to detect signatures in unstructured documents using the `langchain-tensorlake` tool.
+`langchain-tensorlake` 도구를 사용하여 비정형 문서에서 서명을 감지하는 방법에 대한 [전체 튜토리얼](https://docs.tensorlake.ai/examples/tutorials/real-estate-agent-with-langgraph-cli)을 따라해보세요.
 
-Or check out this [colab notebook](https://colab.research.google.com/drive/1VRWIPCWYnjcRtQL864Bqm9CJ6g4EpRqs?usp=sharing) for a quick start.
+또는 빠른 시작을 위해 이 [colab notebook](https://colab.research.google.com/drive/1VRWIPCWYnjcRtQL864Bqm9CJ6g4EpRqs?usp=sharing)을 확인하세요.
 
 ---
 ## Quick Start
 
-### 1. Set up your environment
+### 1. 환경 설정
 
-You should configure credentials for Tensorlake and OpenAI by setting the following environment variables:
+다음 환경 변수를 설정하여 Tensorlake와 OpenAI에 대한 자격 증명을 구성해야 합니다:
 ```
 export TENSORLAKE_API_KEY="your-tensorlake-api-key"
 export OPENAI_API_KEY = "your-openai-api-key"
 ```
 
-Get your Tensorlake API key from the [Tensorlake Cloud Console](https://cloud.tensorlake.ai/). New users get 100 free credits.
+[Tensorlake Cloud Console](https://cloud.tensorlake.ai/)에서 Tensorlake API key를 받으세요. 신규 사용자는 100개의 무료 크레딧을 받습니다.
 
-### 2. Import necessary packages
+### 2. 필요한 패키지 import
 
 ```python
 from langchain_tensorlake import document_markdown_tool
@@ -60,7 +60,7 @@ import asyncio
 import os
 ```
 
-### 3. Build a Signature Detection Agent
+### 3. Signature Detection Agent 구축
 
 ```python
 async def main(question):
@@ -83,9 +83,9 @@ async def main(question):
     print(result["messages"][-1].content)
 ```
 
-*Note:* We highly recommend using `openai` as the agent model to ensure the agent sets the right parsing parameters
+*참고:* 에이전트가 올바른 파싱 파라미터를 설정할 수 있도록 에이전트 모델로 `openai`를 사용하는 것을 강력히 권장합니다
 
-### 4. Example Usage
+### 4. 사용 예제
 
 ```python
 # Define the path to the document to be parsed
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     asyncio.run(main(question))
 ```
 
-## Need help?
+## 도움이 필요하신가요?
 
-Reach out to us on [Slack](https://join.slack.com/t/tensorlakecloud/shared_invite/zt-32fq4nmib-gO0OM5RIar3zLOBm~ZGqKg) or on the
-[package repository on GitHub](https://github.com/tensorlakeai/langchain-tensorlake) directly.
+[Slack](https://join.slack.com/t/tensorlakecloud/shared_invite/zt-32fq4nmib-gO0OM5RIar3zLOBm~ZGqKg)이나
+[GitHub의 패키지 저장소](https://github.com/tensorlakeai/langchain-tensorlake)를 통해 직접 문의하세요.

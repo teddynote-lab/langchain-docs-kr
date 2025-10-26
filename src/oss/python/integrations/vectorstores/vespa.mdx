@@ -2,29 +2,30 @@
 title: Vespa
 ---
 
->[Vespa](https://vespa.ai/) is a fully featured search engine and vector database. It supports vector search (ANN), lexical search, and search in structured data, all in the same query.
+>[Vespa](https://vespa.ai/)는 완전한 기능을 갖춘 검색 엔진이자 vector database입니다. vector search(ANN), lexical search, 그리고 구조화된 데이터 검색을 모두 동일한 쿼리에서 지원합니다.
 
-This notebook shows how to use `Vespa.ai` as a LangChain vector store.
+이 노트북은 `Vespa.ai`를 LangChain vector store로 사용하는 방법을 보여줍니다.
 
-You'll need to install `langchain-community` with `pip install -qU langchain-community` to use this integration
+이 integration을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다
 
-In order to create the vector store, we use
-[pyvespa](https://pyvespa.readthedocs.io/en/latest/index.html) to create a
-connection a `Vespa` service.
+vector store를 생성하기 위해
+[pyvespa](https://pyvespa.readthedocs.io/en/latest/index.html)를 사용하여
+`Vespa` 서비스에 대한 연결을 생성합니다.
 
 ```python
 pip install -qU  pyvespa
 ```
 
-Using the `pyvespa` package, you can either connect to a
+`pyvespa` 패키지를 사용하여
 [Vespa Cloud instance](https://pyvespa.readthedocs.io/en/latest/deploy-vespa-cloud.html)
-or a local
-[Docker instance](https://pyvespa.readthedocs.io/en/latest/deploy-docker.html).
-Here, we will create a new Vespa application and deploy that using Docker.
+또는 로컬
+[Docker instance](https://pyvespa.readthedocs.io/en/latest/deploy-docker.html)에
+연결할 수 있습니다.
+여기서는 새로운 Vespa application을 생성하고 Docker를 사용하여 배포합니다.
 
-#### Creating a Vespa application
+#### Vespa application 생성하기
 
-First, we need to create an application package:
+먼저 application package를 생성해야 합니다:
 
 ```python
 from vespa.package import ApplicationPackage, Field, RankProfile
@@ -50,22 +51,17 @@ app_package.schema.add_rank_profile(
 )
 ```
 
-This sets up a Vespa application with a schema for each document that contains
-two fields: `text` for holding the document text and `embedding` for holding
-the embedding vector. The `text` field is set up to use a BM25 index for
-efficient text retrieval, and we'll see how to use this and hybrid search a
-bit later.
+이것은 두 개의 field를 포함하는 각 document에 대한 schema를 가진 Vespa application을 설정합니다: document text를 보관하는 `text`와 embedding vector를 보관하는 `embedding`입니다. `text` field는 효율적인 텍스트 검색을 위해 BM25 index를 사용하도록 설정되며, 나중에 이것과 hybrid search를 사용하는 방법을 살펴보겠습니다.
 
-The `embedding` field is set up with a vector of length 384 to hold the
-embedding representation of the text. See
-[Vespa's Tensor Guide](https://docs.vespa.ai/en/tensor-user-guide.html)
-for more on tensors in Vespa.
+`embedding` field는 텍스트의 embedding 표현을 보관하기 위해 길이 384의 vector로 설정됩니다. Vespa의 tensor에 대한 자세한 내용은
+[Vespa's Tensor Guide](https://docs.vespa.ai/en/tensor-user-guide.html)를
+참조하세요.
 
-Lastly, we add a [rank profile](https://docs.vespa.ai/en/ranking.html) to
-instruct Vespa how to order documents. Here we set this up with a
-[nearest neighbor search](https://docs.vespa.ai/en/nearest-neighbor-search.html).
+마지막으로 [rank profile](https://docs.vespa.ai/en/ranking.html)을 추가하여
+Vespa에게 document를 정렬하는 방법을 지시합니다. 여기서는
+[nearest neighbor search](https://docs.vespa.ai/en/nearest-neighbor-search.html)로 설정합니다.
 
-Now we can deploy this application locally:
+이제 이 application을 로컬에 배포할 수 있습니다:
 
 ```python
 from vespa.deployment import VespaDocker
@@ -74,13 +70,11 @@ vespa_docker = VespaDocker()
 vespa_app = vespa_docker.deploy(application_package=app_package)
 ```
 
-This deploys and creates a connection to a `Vespa` service. In case you
-already have a Vespa application running, for instance in the cloud,
-please refer to the PyVespa application for how to connect.
+이것은 `Vespa` 서비스에 대한 연결을 배포하고 생성합니다. 이미 실행 중인 Vespa application이 있는 경우(예: 클라우드에서), 연결 방법에 대해서는 PyVespa application을 참조하세요.
 
-#### Creating a Vespa vector store
+#### Vespa vector store 생성하기
 
-Now, let's load some documents:
+이제 일부 document를 로드해 보겠습니다:
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -98,13 +92,9 @@ from langchain_community.embeddings.sentence_transformer import (
 embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 ```
 
-Here, we also set up local sentence embedder to transform the text to embedding
-vectors. One could also use OpenAI embeddings, but the vector length needs to
-be updated to `1536` to reflect the larger size of that embedding.
+여기서는 텍스트를 embedding vector로 변환하기 위해 로컬 sentence embedder도 설정합니다. OpenAI embedding을 사용할 수도 있지만, 해당 embedding의 더 큰 크기를 반영하기 위해 vector 길이를 `1536`으로 업데이트해야 합니다.
 
-To feed these to Vespa, we need to configure how the vector store should map to
-fields in the Vespa application. Then we create the vector store directly from
-this set of documents:
+이것들을 Vespa에 공급하려면 vector store가 Vespa application의 field에 어떻게 매핑되어야 하는지 구성해야 합니다. 그런 다음 이 document 세트에서 직접 vector store를 생성합니다:
 
 ```python
 vespa_config = dict(
@@ -118,11 +108,10 @@ from langchain_community.vectorstores import VespaStore
 db = VespaStore.from_documents(docs, embedding_function, app=vespa_app, **vespa_config)
 ```
 
-This creates a Vespa vector store and feeds that set of documents to Vespa.
-The vector store takes care of calling the embedding function for each document
-and inserts them into the database.
+이것은 Vespa vector store를 생성하고 해당 document 세트를 Vespa에 공급합니다.
+vector store는 각 document에 대해 embedding function을 호출하고 데이터베이스에 삽입하는 작업을 처리합니다.
 
-We can now query the vector store:
+이제 vector store를 쿼리할 수 있습니다:
 
 ```python
 query = "What did the president say about Ketanji Brown Jackson"
@@ -131,23 +120,16 @@ results = db.similarity_search(query)
 print(results[0].page_content)
 ```
 
-This will use the embedding function given above to create a representation
-for the query and use that to search Vespa. Note that this will use the
-`default` ranking function, which we set up in the application package
-above. You can use the `ranking` argument to `similarity_search` to
-specify which ranking function to use.
+이것은 위에서 제공한 embedding function을 사용하여 쿼리에 대한 표현을 생성하고 이를 사용하여 Vespa를 검색합니다. 이것은 위의 application package에서 설정한 `default` ranking function을 사용합니다. `similarity_search`의 `ranking` 인수를 사용하여 사용할 ranking function을 지정할 수 있습니다.
 
-Please refer to the [pyvespa documentation](https://pyvespa.readthedocs.io/en/latest/getting-started-pyvespa.html#Query)
-for more information.
+자세한 내용은 [pyvespa documentation](https://pyvespa.readthedocs.io/en/latest/getting-started-pyvespa.html#Query)을 참조하세요.
 
-This covers the basic usage of the Vespa store in LangChain.
-Now you can return the results and continue using these in LangChain.
+이것은 LangChain에서 Vespa store의 기본 사용법을 다룹니다.
+이제 결과를 반환하고 LangChain에서 계속 사용할 수 있습니다.
 
-#### Updating documents
+#### Document 업데이트하기
 
-An alternative to calling `from_documents`, you can create the vector
-store directly and call `add_texts` from that. This can also be used to update
-documents:
+`from_documents`를 호출하는 대신 vector store를 직접 생성하고 여기서 `add_texts`를 호출할 수 있습니다. 이것은 document를 업데이트하는 데에도 사용할 수 있습니다:
 
 ```python
 query = "What did the president say about Ketanji Brown Jackson"
@@ -161,12 +143,11 @@ results = db.similarity_search(query)
 print(results[0].page_content)
 ```
 
-However, the `pyvespa` library contains methods to manipulate
-content on Vespa which you can use directly.
+그러나 `pyvespa` 라이브러리에는 Vespa의 콘텐츠를 조작하는 메서드가 포함되어 있으며 이를 직접 사용할 수 있습니다.
 
-#### Deleting documents
+#### Document 삭제하기
 
-You can delete documents using the `delete` function:
+`delete` function을 사용하여 document를 삭제할 수 있습니다:
 
 ```python
 result = db.similarity_search(query)
@@ -177,12 +158,11 @@ result = db.similarity_search(query)
 # docs[0].metadata["id"] != "id:testapp:testapp::32"
 ```
 
-Again, the `pyvespa` connection contains methods to delete documents as well.
+마찬가지로 `pyvespa` 연결에는 document를 삭제하는 메서드도 포함되어 있습니다.
 
-### Returning with scores
+### 점수와 함께 반환하기
 
-The `similarity_search` method only returns the documents in order of
-relevancy. To retrieve the actual scores:
+`similarity_search` 메서드는 관련성 순서로 document만 반환합니다. 실제 점수를 검색하려면:
 
 ```python
 results = db.similarity_search_with_score(query)
@@ -190,22 +170,17 @@ result = results[0]
 # result[1] ~= 0.463
 ```
 
-This is a result of using the `"all-MiniLM-L6-v2"` embedding model using the
-cosine distance function (as given by the argument `angular` in the
-application function).
+이것은 cosine distance function을 사용하는 `"all-MiniLM-L6-v2"` embedding model을 사용한 결과입니다(application function의 `angular` 인수로 제공됨).
 
-Different embedding functions need different distance functions, and Vespa
-needs to know which distance function to use when orderings documents.
-Please refer to the
-[documentation on distance functions](https://docs.vespa.ai/en/reference/schema-reference.html#distance-metric)
-for more information.
+다른 embedding function에는 다른 distance function이 필요하며, Vespa는 document를 정렬할 때 사용할 distance function을 알아야 합니다.
+자세한 내용은
+[documentation on distance functions](https://docs.vespa.ai/en/reference/schema-reference.html#distance-metric)를 참조하세요.
 
-### As retriever
+### Retriever로 사용하기
 
-To use this vector store as a
-[LangChain retriever](/oss/langchain/retrieval)
-simply call the `as_retriever` function, which is a standard vector store
-method:
+이 vector store를
+[LangChain retriever](/oss/langchain/retrieval)로 사용하려면
+표준 vector store 메서드인 `as_retriever` function을 호출하기만 하면 됩니다:
 
 ```python
 db = VespaStore.from_documents(docs, embedding_function, app=vespa_app, **vespa_config)
@@ -216,16 +191,13 @@ results = retriever.invoke(query)
 # results[0].metadata["id"] == "id:testapp:testapp::32"
 ```
 
-This allows for more general, unstructured, retrieval from the vector store.
+이것은 vector store에서 보다 일반적이고 비구조화된 검색을 가능하게 합니다.
 
 ### Metadata
 
-In the example so far, we've only used the text and the embedding for that
-text. Documents usually contain additional information, which in LangChain
-is referred to as metadata.
+지금까지의 예제에서는 텍스트와 해당 텍스트의 embedding만 사용했습니다. Document에는 일반적으로 추가 정보가 포함되어 있으며, LangChain에서는 이를 metadata라고 합니다.
 
-Vespa can contain many fields with different types by adding them to the application
-package:
+Vespa는 application package에 추가하여 다양한 타입의 많은 field를 포함할 수 있습니다:
 
 ```python
 app_package.schema.add_fields(
@@ -238,7 +210,7 @@ app_package.schema.add_fields(
 vespa_app = vespa_docker.deploy(application_package=app_package)
 ```
 
-We can add some metadata fields in the documents:
+document에 일부 metadata field를 추가할 수 있습니다:
 
 ```python
 # Add metadata
@@ -248,14 +220,14 @@ for i, doc in enumerate(docs):
     doc.metadata["author"] = ["Joe Biden", "Unknown"][min(i, 1)]
 ```
 
-And let the Vespa vector store know about these fields:
+그리고 Vespa vector store에 이러한 field에 대해 알려줍니다:
 
 ```python
 vespa_config.update(dict(metadata_fields=["date", "rating", "author"]))
 ```
 
-Now, when searching for these documents, these fields will be returned.
-Also, these fields can be filtered on:
+이제 이러한 document를 검색할 때 이러한 field가 반환됩니다.
+또한 이러한 field를 필터링할 수 있습니다:
 
 ```python
 db = VespaStore.from_documents(docs, embedding_function, app=vespa_app, **vespa_config)
@@ -267,12 +239,9 @@ results = db.similarity_search(query, filter="rating > 3")
 
 ### Custom query
 
-If the default behavior of the similarity search does not fit your
-requirements, you can always provide your own query. Thus, you don't
-need to provide all of the configuration to the vector store, but
-rather just write this yourself.
+similarity search의 기본 동작이 요구 사항에 맞지 않는 경우 항상 자체 쿼리를 제공할 수 있습니다. 따라서 vector store에 모든 구성을 제공할 필요 없이 직접 작성할 수 있습니다.
 
-First, let's add a BM25 ranking function to our application:
+먼저 application에 BM25 ranking function을 추가해 보겠습니다:
 
 ```python
 from vespa.package import FieldSet
@@ -283,7 +252,7 @@ vespa_app = vespa_docker.deploy(application_package=app_package)
 db = VespaStore.from_documents(docs, embedding_function, app=vespa_app, **vespa_config)
 ```
 
-Then, to perform a regular text search based on BM25:
+그런 다음 BM25를 기반으로 일반 텍스트 검색을 수행하려면:
 
 ```python
 query = "What did the president say about Ketanji Brown Jackson"
@@ -299,15 +268,12 @@ results = db.similarity_search_with_score(query, custom_query=custom_query)
 # results[0][1] ~= 14.384
 ```
 
-All of the powerful search and query capabilities of Vespa can be used
-by using a custom query. Please refer to the Vespa documentation on it's
-[Query API](https://docs.vespa.ai/en/query-api.html) for more details.
+custom query를 사용하여 Vespa의 모든 강력한 검색 및 쿼리 기능을 사용할 수 있습니다. 자세한 내용은 Vespa documentation의
+[Query API](https://docs.vespa.ai/en/query-api.html)를 참조하세요.
 
 ### Hybrid search
 
-Hybrid search means using both a classic term-based search such as
-BM25 and a vector search and combining the results. We need to create
-a new rank profile for hybrid search on Vespa:
+Hybrid search는 BM25와 같은 기존 term 기반 검색과 vector search를 모두 사용하고 결과를 결합하는 것을 의미합니다. Vespa에서 hybrid search를 위한 새로운 rank profile을 생성해야 합니다:
 
 ```python
 app_package.schema.add_rank_profile(
@@ -321,8 +287,7 @@ vespa_app = vespa_docker.deploy(application_package=app_package)
 db = VespaStore.from_documents(docs, embedding_function, app=vespa_app, **vespa_config)
 ```
 
-Here, we score each document as a combination of it's BM25 score and its
-distance score. We can query using a custom query:
+여기서는 각 document를 BM25 점수와 distance 점수의 조합으로 점수를 매깁니다. custom query를 사용하여 쿼리할 수 있습니다:
 
 ```python
 query = "What did the president say about Ketanji Brown Jackson"
@@ -343,17 +308,13 @@ results = db.similarity_search_with_score(query, custom_query=custom_query)
 # results[0][1] ~= 2.897
 ```
 
-### Native embedders in Vespa
+### Vespa의 Native embedder
 
-Up until this point we've used an embedding function in Python to provide
-embeddings for the texts. Vespa supports embedding function natively, so
-you can defer this calculation in to Vespa. One benefit is the ability to use
-GPUs when embedding documents if you have a large collections.
+지금까지 텍스트에 대한 embedding을 제공하기 위해 Python의 embedding function을 사용했습니다. Vespa는 embedding function을 기본적으로 지원하므로 이 계산을 Vespa로 연기할 수 있습니다. 한 가지 이점은 대규모 컬렉션이 있는 경우 document를 embedding할 때 GPU를 사용할 수 있다는 것입니다.
 
-Please refer to [Vespa embeddings](https://docs.vespa.ai/en/embedding.html)
-for more information.
+자세한 내용은 [Vespa embeddings](https://docs.vespa.ai/en/embedding.html)를 참조하세요.
 
-First, we need to modify our application package:
+먼저 application package를 수정해야 합니다:
 
 ```python
 from vespa.package import Component, Parameter
@@ -384,11 +345,9 @@ app_package.schema.add_rank_profile(
 )
 ```
 
-Please refer to the embeddings documentation on adding embedder models
-and tokenizers to the application. Note that the `hfembedding` field
-includes instructions for embedding using the `hf-embedder`.
+embedder model과 tokenizer를 application에 추가하는 방법은 embeddings documentation을 참조하세요. `hfembedding` field에는 `hf-embedder`를 사용한 embedding 지침이 포함되어 있습니다.
 
-Now we can query with a custom query:
+이제 custom query로 쿼리할 수 있습니다:
 
 ```python
 query = "What did the president say about Ketanji Brown Jackson"
@@ -406,18 +365,14 @@ results = db.similarity_search_with_score(query, custom_query=custom_query)
 # results[0][1] ~= 0.630
 ```
 
-Note that the query here includes an `embed` instruction to embed the query
-using the same model as for the documents.
+여기서 쿼리에는 document와 동일한 model을 사용하여 쿼리를 embedding하는 `embed` 지침이 포함되어 있습니다.
 
 ### Approximate nearest neighbor
 
-In all of the above examples, we've used exact nearest neighbor to
-find results. However, for large collections of documents this is
-not feasible as one has to scan through all documents to find the
-best matches. To avoid this, we can use
-[approximate nearest neighbors](https://docs.vespa.ai/en/approximate-nn-hnsw.html).
+위의 모든 예제에서는 결과를 찾기 위해 exact nearest neighbor를 사용했습니다. 그러나 대규모 document 컬렉션의 경우 최상의 일치 항목을 찾기 위해 모든 document를 스캔해야 하므로 실행 가능하지 않습니다. 이를 방지하기 위해
+[approximate nearest neighbors](https://docs.vespa.ai/en/approximate-nn-hnsw.html)를 사용할 수 있습니다.
 
-First, we can change the embedding field to create a HNSW index:
+먼저 embedding field를 변경하여 HNSW index를 생성할 수 있습니다:
 
 ```python
 from vespa.package import HNSW
@@ -436,9 +391,7 @@ app_package.schema.add_fields(
 )
 ```
 
-This creates a HNSW index on the embedding data which allows for efficient
-searching. With this set, we can easily search using ANN by setting
-the `approximate` argument to `True`:
+이것은 효율적인 검색을 가능하게 하는 embedding data에 HNSW index를 생성합니다. 이것이 설정되면 `approximate` 인수를 `True`로 설정하여 ANN을 사용하여 쉽게 검색할 수 있습니다:
 
 ```python
 query = "What did the president say about Ketanji Brown Jackson"
@@ -446,4 +399,4 @@ results = db.similarity_search(query, approximate=True)
 # results[0][0].metadata["id"], "id:testapp:testapp::32")
 ```
 
-This covers most of the functionality in the Vespa vector store in LangChain.
+이것은 LangChain의 Vespa vector store에 있는 대부분의 기능을 다룹니다.

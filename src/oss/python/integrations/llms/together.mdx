@@ -1,16 +1,17 @@
+```mdx
 ---
 title: Together AI
 ---
 
 <Warning>
-**You are currently on a page documenting the use of Together AI models as text completion models. Many popular Together AI models are [chat completion models](/oss/langchain/models).**
+**현재 Together AI 모델을 text completion 모델로 사용하는 방법을 설명하는 페이지를 보고 계십니다. 많은 인기 있는 Together AI 모델은 [chat completion 모델](/oss/langchain/models)입니다.**
 
-You may be looking for [this page instead](/oss/integrations/chat/together/).
+[이 페이지](/oss/integrations/chat/together/)를 찾고 계실 수 있습니다.
 </Warning>
 
-[Together AI](https://www.together.ai/) offers an API to query [50+ leading open-source models](https://docs.together.ai/docs/inference-models) in a couple lines of code.
+[Together AI](https://www.together.ai/)는 몇 줄의 코드로 [50개 이상의 주요 오픈소스 모델](https://docs.together.ai/docs/inference-models)을 쿼리할 수 있는 API를 제공합니다.
 
-This example goes over how to use LangChain to interact with Together AI models.
+이 예제는 LangChain을 사용하여 Together AI 모델과 상호작용하는 방법을 다룹니다.
 
 ## Installation
 
@@ -20,9 +21,8 @@ pip install -U langchain-together
 
 ## Environment
 
-To use Together AI, you'll need an API key which you can find here:
-[api.together.ai/settings/api-keys](https://api.together.ai/settings/api-keys). This can be passed in as an init param
-`together_api_key` or set as environment variable `TOGETHER_API_KEY`.
+Together AI를 사용하려면 API key가 필요하며, 여기에서 찾을 수 있습니다:
+[api.together.ai/settings/api-keys](https://api.together.ai/settings/api-keys). 이는 초기화 매개변수 `together_api_key`로 전달하거나 환경 변수 `TOGETHER_API_KEY`로 설정할 수 있습니다.
 
 ## Example
 
@@ -56,4 +56,5 @@ llm = Together(
 )
 
 print(llm.invoke("def bubble_sort(): "))
+```
 ```

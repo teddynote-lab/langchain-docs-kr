@@ -2,25 +2,25 @@
 title: Oxylabs
 ---
 
->[Oxylabs](https://oxylabs.io/) is a market-leading web intelligence collection platform, driven by the highest business, ethics, and compliance standards, enabling companies worldwide to unlock data-driven insights.
+>[Oxylabs](https://oxylabs.io/)는 최고 수준의 비즈니스, 윤리 및 규정 준수 표준을 기반으로 하는 시장 선도적인 웹 인텔리전스 수집 플랫폼으로, 전 세계 기업들이 데이터 기반 인사이트를 활용할 수 있도록 지원합니다.
 
 ## Overview
 
-This package contains the LangChain integration with Oxylabs, providing tools to scrape Google search results with Oxylabs Web Scraper API using LangChain's framework.
+이 패키지는 Oxylabs와 LangChain의 통합을 포함하며, LangChain 프레임워크를 사용하여 Oxylabs Web Scraper API로 Google 검색 결과를 스크래핑하는 도구를 제공합니다.
 
-The following classes are provided by this package:
+이 패키지에서 제공하는 클래스는 다음과 같습니다:
 
-- `OxylabsSearchRun` - A tool that returns scraped Google search results in a formatted text
-- `OxylabsSearchResults` - A tool that returns scraped Google search results in a JSON format
-- `OxylabsSearchAPIWrapper` - An API wrapper for initializing Oxylabs API
+- `OxylabsSearchRun` - 스크래핑된 Google 검색 결과를 포맷된 텍스트로 반환하는 도구
+- `OxylabsSearchResults` - 스크래핑된 Google 검색 결과를 JSON 형식으로 반환하는 도구
+- `OxylabsSearchAPIWrapper` - Oxylabs API를 초기화하기 위한 API wrapper
 
-|             Pricing             |
+|             가격             |
 |:-------------------------------:|
-| ✅ Free 5,000 results for 1 week |
+| ✅ 1주일 동안 무료로 5,000개 결과 제공 |
 
 ## Setup
 
-Install the required dependencies.
+필요한 종속성을 설치합니다.
 
 ```python
 pip install -qU langchain-oxylabs
@@ -28,7 +28,7 @@ pip install -qU langchain-oxylabs
 
 ### Credentials
 
-Set up the proper API keys and environment variables. Create your API user credentials: Sign up for a free trial or purchase the product in the [Oxylabs dashboard](https://dashboard.oxylabs.io/en/registration) to create your API user credentials (OXYLABS_USERNAME and OXYLABS_PASSWORD).
+적절한 API key와 environment variable을 설정합니다. API 사용자 자격 증명을 생성하세요: [Oxylabs dashboard](https://dashboard.oxylabs.io/en/registration)에서 무료 평가판에 가입하거나 제품을 구매하여 API 사용자 자격 증명(OXYLABS_USERNAME 및 OXYLABS_PASSWORD)을 생성합니다.
 
 ```python
 import getpass
@@ -51,7 +51,7 @@ tool_ = OxylabsSearchRun(wrapper=oxylabs_wrapper)
 
 ### Invoke directly with args
 
-The `OxylabsSearchRun` tool takes a single "query" argument, which should be a natural language query and returns combined string format result:
+`OxylabsSearchRun` tool은 자연어 쿼리여야 하는 단일 "query" argument를 받아 결합된 문자열 형식의 결과를 반환합니다:
 
 ```python
 tool_.invoke({"query": "Restaurants in Paris."})
@@ -91,7 +91,7 @@ pprint(tool_call_result.content)
 
 ## Use within an agent
 
-Install the required dependencies.
+필요한 종속성을 설치합니다.
 
 ```python
 pip install -qU "langchain[openai]" langgraph
@@ -127,7 +127,7 @@ for step in agent.stream(
 
 ## JSON results
 
-`OxylabsSearchResults` tool can be used as an alternative to `OxylabsSearchRun` to retrieve results in a JSON format:
+`OxylabsSearchResults` tool은 `OxylabsSearchRun` 대신 JSON 형식으로 결과를 검색하는 데 사용할 수 있습니다:
 
 ```python
 import json
@@ -146,6 +146,6 @@ for result in response_results:
 
 ## API reference
 
-More information about this integration package can be found here: [github.com/oxylabs/langchain-oxylabs](https://github.com/oxylabs/langchain-oxylabs)
+이 통합 패키지에 대한 자세한 정보는 여기에서 확인할 수 있습니다: [github.com/oxylabs/langchain-oxylabs](https://github.com/oxylabs/langchain-oxylabs)
 
-Oxylabs Web Scraper API documentation: [developers.oxylabs.io/scraper-apis/web-scraper-api](https://developers.oxylabs.io/scraper-apis/web-scraper-api)
+Oxylabs Web Scraper API 문서: [developers.oxylabs.io/scraper-apis/web-scraper-api](https://developers.oxylabs.io/scraper-apis/web-scraper-api)

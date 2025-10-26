@@ -1,48 +1,48 @@
 ---
-title: How to interact with a deployment using RemoteGraph
-sidebarTitle: Interact with a deployment using RemoteGraph
+title: RemoteGraph를 사용하여 배포와 상호작용하는 방법
+sidebarTitle: RemoteGraph를 사용하여 배포와 상호작용하기
 ---
 
-[`RemoteGraph`](https://langchain-ai.github.io/langgraph/reference/remote_graph) is a client-side interface that allows you to interact with your [deployment](/langsmith/deployments) as if it were a local graph. It provides API parity with [`CompiledGraph`](/oss/langgraph/graph-api#compiling-your-graph), which means that you can use the same methods (`invoke()`, `stream()`, `get_state()`, etc.) in your development and production environments. This page describes how to initialize a `RemoteGraph` and interact with it.
+[`RemoteGraph`](https://langchain-ai.github.io/langgraph/reference/remote_graph)는 [배포](/langsmith/deployments)와 로컬 graph처럼 상호작용할 수 있게 해주는 클라이언트 측 인터페이스입니다. [`CompiledGraph`](/oss/langgraph/graph-api#compiling-your-graph)와 API 동등성을 제공하므로, 개발 환경과 프로덕션 환경에서 동일한 메서드(`invoke()`, `stream()`, `get_state()` 등)를 사용할 수 있습니다. 이 페이지에서는 `RemoteGraph`를 초기화하고 상호작용하는 방법을 설명합니다.
 
-`RemoteGraph` is useful for the following:
+`RemoteGraph`는 다음과 같은 경우에 유용합니다:
 
-- Separation of development and deployment: Build and test a graph locally with `CompiledGraph`, deploy it to LangSmith, and then [use `RemoteGraph`](#initialize-the-graph) to call it in production while working with the same API interface.
-- Thread-level persistence: [Persist and fetch the state](#persist-state-at-the-thread-level) of a conversation across calls with a thread ID.
-- Subgraph embedding: Compose modular graphs for a multi-agent workflow by embedding a `RemoteGraph` as a [subgraph](#use-as-a-subgraph) within another graph.
-- Reusable workflows: Use deployed graphs as nodes or [tools](https://langchain-ai.github.io/langgraph/reference/remote_graph/#langgraph.pregel.remote.RemoteGraph.as_tool), so that you can reuse and expose complex logic.
+- 개발과 배포의 분리: `CompiledGraph`로 로컬에서 graph를 빌드하고 테스트한 후 LangSmith에 배포하고, 동일한 API 인터페이스로 작업하면서 프로덕션에서 [`RemoteGraph`를 사용](#initialize-the-graph)하여 호출합니다.
+- Thread 레벨 지속성: Thread ID를 사용하여 호출 간에 대화의 [상태를 유지하고 가져옵니다](#persist-state-at-the-thread-level).
+- Subgraph 임베딩: 다른 graph 내에서 `RemoteGraph`를 [subgraph](#use-as-a-subgraph)로 임베드하여 멀티 에이전트 워크플로우를 위한 모듈식 graph를 구성합니다.
+- 재사용 가능한 워크플로우: 배포된 graph를 node 또는 [tool](https://langchain-ai.github.io/langgraph/reference/remote_graph/#langgraph.pregel.remote.RemoteGraph.as_tool)로 사용하여 복잡한 로직을 재사용하고 노출할 수 있습니다.
 
 <Warning>
-**Important: Avoid calling the same deployment**
+**중요: 동일한 배포 호출 방지**
 
-`RemoteGraph` is designed to call graphs on other deployments. Do not use `RemoteGraph` to call itself or another graph on the same deployment, as this can lead to deadlocks and resource exhaustion. Instead, use local graph composition or [subgraphs](/oss/langgraph/use-subgraphs) for graphs within the same deployment.
+`RemoteGraph`는 다른 배포의 graph를 호출하도록 설계되었습니다. `RemoteGraph`를 사용하여 자기 자신이나 동일한 배포의 다른 graph를 호출하지 마세요. 이는 교착 상태와 리소스 고갈로 이어질 수 있습니다. 대신 동일한 배포 내의 graph에는 로컬 graph 구성 또는 [subgraph](/oss/langgraph/use-subgraphs)를 사용하세요.
 </Warning>
 
-## Prerequisites
+## 사전 요구 사항
 
-Before getting started with `RemoteGraph`, make sure you have:
+`RemoteGraph`를 시작하기 전에 다음이 필요합니다:
 
-- Access to [LangSmith](/langsmith/home), where your graphs are developed and managed.
-- A running [LangGraph Server](/langsmith/langgraph-server), which hosts your deployed graphs for remote interaction.
+- Graph가 개발되고 관리되는 [LangSmith](/langsmith/home)에 대한 액세스
+- 원격 상호작용을 위해 배포된 graph를 호스팅하는 실행 중인 [LangGraph Server](/langsmith/langgraph-server)
 
-## Initialize the graph
+## Graph 초기화
 
-When initializing a `RemoteGraph`, you must always specify:
+`RemoteGraph`를 초기화할 때 항상 다음을 지정해야 합니다:
 
-- `name`: The name of the graph you want to interact with **or** an assistant ID. If you specify a graph name, the default assistant will be used. If you specify an assistant ID, that specific assistant will be used. The graph name is the same name you use in the `langgraph.json` configuration file for your deployment.
-- `api_key`: A valid [LangSmith API key](/langsmith/create-account-api-key). You can set as an environment variable (`LANGSMITH_API_KEY`) or pass directly in the `api_key` argument. You can also provide the API key in the `client` / `sync_client` arguments, if `LangGraphClient` / `SyncLangGraphClient` was initialized with the `api_key` argument.
+- `name`: 상호작용하려는 graph의 이름 **또는** assistant ID. Graph 이름을 지정하면 기본 assistant가 사용됩니다. Assistant ID를 지정하면 해당 특정 assistant가 사용됩니다. Graph 이름은 배포의 `langgraph.json` 구성 파일에서 사용하는 것과 동일한 이름입니다.
+- `api_key`: 유효한 [LangSmith API key](/langsmith/create-account-api-key). 환경 변수(`LANGSMITH_API_KEY`)로 설정하거나 `api_key` 인수에 직접 전달할 수 있습니다. `LangGraphClient` / `SyncLangGraphClient`가 `api_key` 인수로 초기화된 경우 `client` / `sync_client` 인수에서도 API key를 제공할 수 있습니다.
 
-Additionally, you have to provide one of the following:
+또한 다음 중 하나를 제공해야 합니다:
 
-- [`url`](#use-a-url): The URL of the deployment you want to interact with. If you pass the `url` argument, both sync and async clients will be created using the provided URL, headers (if provided), and default configuration values (e.g., timeout).
-- [`client`](#use-a-client): A `LangGraphClient` instance for interacting with the deployment asynchronously (e.g., using `.astream()`, `.ainvoke()`, `.aget_state()`, `.aupdate_state()`).
-- `sync_client`: A `SyncLangGraphClient` instance for interacting with the deployment synchronously (e.g., using `.stream()`, `.invoke()`, `.get_state()`, `.update_state()`).
+- [`url`](#use-a-url): 상호작용하려는 배포의 URL. `url` 인수를 전달하면 제공된 URL, header(제공된 경우) 및 기본 구성 값(예: timeout)을 사용하여 동기 및 비동기 client가 모두 생성됩니다.
+- [`client`](#use-a-client): 배포와 비동기적으로 상호작용하기 위한 `LangGraphClient` 인스턴스(예: `.astream()`, `.ainvoke()`, `.aget_state()`, `.aupdate_state()` 사용).
+- `sync_client`: 배포와 동기적으로 상호작용하기 위한 `SyncLangGraphClient` 인스턴스(예: `.stream()`, `.invoke()`, `.get_state()`, `.update_state()` 사용).
 
 <Note>
-If you pass both `client` or `sync_client` as well as the `url` argument, they will take precedence over the `url` argument. If none of the `client` / `sync_client` / `url` arguments are provided, `RemoteGraph` will raise a `ValueError` at runtime.
+`client` 또는 `sync_client`와 `url` 인수를 모두 전달하면 `url` 인수보다 우선합니다. `client` / `sync_client` / `url` 인수가 모두 제공되지 않으면 `RemoteGraph`는 런타임에 `ValueError`를 발생시킵니다.
 </Note>
 
-### Use a URL
+### URL 사용
 
 <CodeGroup>
 
@@ -76,7 +76,7 @@ const remoteGraph = new RemoteGraph({ graphId: assistantId, url });
 
 </CodeGroup>
 
-### Use a client
+### Client 사용
 
 <CodeGroup>
 
@@ -114,14 +114,14 @@ const remoteGraph = new RemoteGraph({ graphId: assistantId, client });
 
 </CodeGroup>
 
-## Invoke the graph
+## Graph 호출
 
-`RemoteGraph` implements the same Runnable interface as `CompiledGraph`, so you can use it in the same way as a compiled graph. It supports the full set of standard methods, including `.invoke()`, `.stream()`, `.get_state()`, and `.update_state()`, as well as their asynchronous variants.
+`RemoteGraph`는 `CompiledGraph`와 동일한 Runnable 인터페이스를 구현하므로 compiled graph와 동일한 방식으로 사용할 수 있습니다. `.invoke()`, `.stream()`, `.get_state()`, `.update_state()` 및 비동기 변형을 포함한 전체 표준 메서드 세트를 지원합니다.
 
-### Asynchronously
+### 비동기적으로
 
 <Note>
-To use the graph asynchronously, you must provide either the `url` or `client` when initializing the `RemoteGraph`.
+Graph를 비동기적으로 사용하려면 `RemoteGraph`를 초기화할 때 `url` 또는 `client`를 제공해야 합니다.
 </Note>
 
 <CodeGroup>
@@ -154,10 +154,10 @@ for await (const chunk of await remoteGraph.stream({
 
 </CodeGroup>
 
-### Synchronously
+### 동기적으로
 
 <Note>
-To use the graph synchronously, you must provide either the `url` or `sync_client` when initializing the `RemoteGraph`.
+Graph를 동기적으로 사용하려면 `RemoteGraph`를 초기화할 때 `url` 또는 `sync_client`를 제공해야 합니다.
 </Note>
 
 <CodeGroup>
@@ -177,11 +177,11 @@ for chunk in remote_graph.stream({
 
 </CodeGroup>
 
-## Persist state at the thread level
+## Thread 레벨에서 상태 유지
 
-By default, graph runs (for example, calls made with `.invoke()` or `.stream()`) are stateless, which means that intermediate checkpoints and the final state are not persisted after a run.
+기본적으로 graph 실행(예: `.invoke()` 또는 `.stream()`으로 수행된 호출)은 상태 비저장이므로 중간 checkpoint와 최종 상태가 실행 후 유지되지 않습니다.
 
-If you want to preserve the outputs of a run—for example, to support human-in-the-loop workflows—you can create a thread and pass its ID through the `config` argument. This works the same way as with a regular compiled graph:
+실행의 출력을 보존하려면(예: human-in-the-loop 워크플로우를 지원하기 위해) thread를 생성하고 `config` 인수를 통해 해당 ID를 전달할 수 있습니다. 이는 일반 compiled graph와 동일한 방식으로 작동합니다:
 
 <CodeGroup>
 
@@ -232,15 +232,15 @@ console.log(threadState);
 
 </CodeGroup>
 
-## Use as a subgraph
+## Subgraph로 사용
 
 <Note>
-If you need to use a `checkpointer` with a graph that has a `RemoteGraph` subgraph node, make sure to use UUIDs as thread IDs.
+`RemoteGraph` subgraph node가 있는 graph와 함께 `checkpointer`를 사용해야 하는 경우 thread ID로 UUID를 사용해야 합니다.
 </Note>
 
-A graph can also call out to multiple `RemoteGraph` instances as [_subgraph_](/oss/langgraph/use-subgraphs) nodes. This allows for modular, scalable workflows where different responsibilities are split across separate graphs.
+Graph는 여러 `RemoteGraph` 인스턴스를 [_subgraph_](/oss/langgraph/use-subgraphs) node로 호출할 수도 있습니다. 이를 통해 서로 다른 책임이 별도의 graph로 분할되는 모듈식의 확장 가능한 워크플로우를 구현할 수 있습니다.
 
-`RemoteGraph` exposes the same interface as a regular `CompiledGraph`, so you can use it directly as a subgraph inside another graph. For example:
+`RemoteGraph`는 일반 `CompiledGraph`와 동일한 인터페이스를 노출하므로 다른 graph 내에서 subgraph로 직접 사용할 수 있습니다. 예를 들어:
 
 <CodeGroup>
 

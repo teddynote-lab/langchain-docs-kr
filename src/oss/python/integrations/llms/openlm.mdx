@@ -2,15 +2,15 @@
 title: OpenLM
 ---
 
-[OpenLM](https://github.com/r2d4/openlm) is a zero-dependency OpenAI-compatible LLM provider that can call different inference endpoints directly via HTTP.
+[OpenLM](https://github.com/r2d4/openlm)은 HTTP를 통해 다양한 추론 엔드포인트를 직접 호출할 수 있는 의존성이 없는 OpenAI 호환 LLM provider입니다.
 
-It implements the OpenAI Completion class so that it can be used as a drop-in replacement for the OpenAI API. This changeset utilizes BaseOpenAI for minimal added code.
+OpenAI Completion class를 구현하여 OpenAI API의 드롭인 대체제로 사용할 수 있습니다. 이 변경 사항은 최소한의 추가 코드로 BaseOpenAI를 활용합니다.
 
-This example goes over how to use LangChain to interact with both OpenAI and HuggingFace. You'll need API keys from both.
+이 예제는 LangChain을 사용하여 OpenAI와 HuggingFace 모두와 상호작용하는 방법을 다룹니다. 두 곳 모두에서 API key가 필요합니다.
 
 ### Setup
 
-Install dependencies and set API keys.
+의존성을 설치하고 API key를 설정합니다.
 
 ```python
 # Uncomment to install openlm and openai if you haven't already
@@ -34,9 +34,9 @@ if "HF_API_TOKEN" not in os.environ:
     os.environ["HF_API_TOKEN"] = getpass()
 ```
 
-### Using LangChain with OpenLM
+### LangChain과 OpenLM 사용하기
 
-Here we're going to call two models in an LLMChain, `text-davinci-003` from OpenAI and `gpt2` on HuggingFace.
+여기서는 LLMChain에서 두 개의 model을 호출할 것입니다. OpenAI의 `text-davinci-003`과 HuggingFace의 `gpt2`입니다.
 
 ```python
 from langchain.chains import LLMChain

@@ -2,24 +2,23 @@
 title: LocalAI
 ---
 
->[LocalAI](https://localai.io/) is the free, Open Source OpenAI alternative.
-> `LocalAI` act as a drop-in replacement REST API that’s compatible with OpenAI API
-> specifications for local inferencing. It allows you to run LLMs, generate images,
-> audio (and not only) locally or on-prem with consumer grade hardware,
-> supporting multiple model families and architectures.
+>[LocalAI](https://localai.io/)는 무료 오픈 소스 OpenAI 대안입니다.
+> `LocalAI`는 로컬 추론을 위한 OpenAI API 사양과 호환되는 드롭인 대체 REST API로 작동합니다.
+> 소비자급 하드웨어로 로컬 또는 온프레미스에서 LLM을 실행하고, 이미지를 생성하고,
+> 오디오(그 외에도)를 생성할 수 있으며, 여러 모델 패밀리와 아키텍처를 지원합니다.
 
 <Warning>
-**For proper compatibility, please ensure you are using the `openai` SDK at version **0.x**.**
+**적절한 호환성을 위해 `openai` SDK 버전 **0.x**를 사용하고 있는지 확인하세요.**
 </Warning>
 
 <Info>
-`langchain-localai` is a 3rd party integration package for LocalAI. It provides a simple way to use LocalAI services in LangChain.
-The source code is available on [Github](https://github.com/mkhludnev/langchain-localai)
+`langchain-localai`는 LocalAI를 위한 서드파티 통합 패키지입니다. LangChain에서 LocalAI 서비스를 사용하는 간단한 방법을 제공합니다.
+소스 코드는 [Github](https://github.com/mkhludnev/langchain-localai)에서 확인할 수 있습니다.
 </Info>
 
 ## Installation and Setup
 
-We have to install several python packages:
+여러 python 패키지를 설치해야 합니다:
 
 <CodeGroup>
 ```bash pip
@@ -34,7 +33,7 @@ uv add tenacity openai
 
 ## Embedding models
 
-See a [usage example](/oss/integrations/text_embedding/localai).
+[사용 예제](/oss/integrations/text_embedding/localai)를 참조하세요.
 
 ```python
 from langchain_localai import LocalAIEmbeddings

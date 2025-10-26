@@ -2,7 +2,7 @@
 title: BrightDataSERP
 ---
 
-[Bright Data](https://brightdata.com/) provides a powerful SERP API that allows you to query search engines (Google,Bing.DuckDuckGo,Yandex) with geo-targeting and advanced customization options, particularly useful for AI agents requiring real-time web information.
+[Bright Data](https://brightdata.com/)는 검색 엔진(Google, Bing, DuckDuckGo, Yandex)을 지역 타겟팅 및 고급 사용자 정의 옵션과 함께 쿼리할 수 있는 강력한 SERP API를 제공하며, 실시간 웹 정보가 필요한 AI 에이전트에 특히 유용합니다.
 
 ## Overview
 
@@ -16,16 +16,16 @@ title: BrightDataSERP
 
 |Native async|Returns artifact|Return data|Pricing|
 |:-:|:-:|:--|:-:|
-|❌|❌|Title, URL, snippet, position, and other search result data|Requires Bright Data account|
+|❌|❌|제목, URL, 스니펫, 위치 및 기타 검색 결과 데이터|Bright Data 계정 필요|
 
 ## Setup
 
-The integration lives in the `langchain-brightdata` package.
+이 integration은 `langchain-brightdata` 패키지에 포함되어 있습니다.
 pip install langchain-brightdata
 
 ### Credentials
 
-You'll need a Bright Data API key to use this tool. You can set it as an environment variable:
+이 도구를 사용하려면 Bright Data API key가 필요합니다. 환경 변수로 설정할 수 있습니다:
 
 ```python
 import os
@@ -33,7 +33,7 @@ import os
 os.environ["BRIGHT_DATA_API_KEY"] = "your-api-key"
 ```
 
-Or pass it directly when initializing the tool:
+또는 도구를 초기화할 때 직접 전달할 수 있습니다:
 
 ```python
 from langchain_brightdata import BrightDataSERP
@@ -43,27 +43,27 @@ serp_tool = BrightDataSERP(bright_data_api_key="your-api-key")
 
 ## Instantiation
 
-Here we show how to instantiate an instance of the BrightDataSERP tool. This tool allows you to perform search engine queries with various customization options including geo-targeting, language preferences, device type simulation, and specific search types using Bright Data's SERP API.
+여기서는 BrightDataSERP 도구의 인스턴스를 생성하는 방법을 보여줍니다. 이 도구를 사용하면 Bright Data의 SERP API를 사용하여 지역 타겟팅, 언어 기본 설정, 기기 유형 시뮬레이션 및 특정 검색 유형을 포함한 다양한 사용자 정의 옵션으로 검색 엔진 쿼리를 수행할 수 있습니다.
 
-The tool accepts various parameters during instantiation:
+이 도구는 인스턴스화 시 다양한 매개변수를 허용합니다:
 
-- `bright_data_api_key` (required, str): Your Bright Data API key for authentication.
-- `search_engine` (optional, str): Search engine to use for queries. Default is "google". Other options include "bing", "yahoo", "yandex", "DuckDuckGo" etc.
-- `country` (optional, str): Two-letter country code for localized search results (e.g., "us", "gb", "de", "jp"). Default is "us".
-- `language` (optional, str): Two-letter language code for the search results (e.g., "en", "es", "fr", "de"). Default is "en".
-- `results_count` (optional, int): Number of search results to return. Default is 10. Maximum value is typically 100.
-- `search_type` (optional, str): Type of search to perform. Options include:
-  - None (default): Regular web search
-  - "isch": Images search
-  - "shop": Shopping search
-  - "nws": News search
-  - "jobs": Jobs search
-- `device_type` (optional, str): Device type to simulate for the search. Options include:
-  - None (default): Desktop device
-  - "mobile": Generic mobile device
-  - "ios": iOS device (iPhone)
-  - "android": Android device
-- `parse_results` (optional, bool): Whether to return parsed JSON results. Default is False, which returns raw HTML response.
+- `bright_data_api_key` (필수, str): 인증을 위한 Bright Data API key입니다.
+- `search_engine` (선택, str): 쿼리에 사용할 검색 엔진입니다. 기본값은 "google"입니다. 다른 옵션으로는 "bing", "yahoo", "yandex", "DuckDuckGo" 등이 있습니다.
+- `country` (선택, str): 지역화된 검색 결과를 위한 두 글자 국가 코드입니다 (예: "us", "gb", "de", "jp"). 기본값은 "us"입니다.
+- `language` (선택, str): 검색 결과를 위한 두 글자 언어 코드입니다 (예: "en", "es", "fr", "de"). 기본값은 "en"입니다.
+- `results_count` (선택, int): 반환할 검색 결과 수입니다. 기본값은 10입니다. 최대값은 일반적으로 100입니다.
+- `search_type` (선택, str): 수행할 검색 유형입니다. 옵션은 다음과 같습니다:
+  - None (기본값): 일반 웹 검색
+  - "isch": 이미지 검색
+  - "shop": 쇼핑 검색
+  - "nws": 뉴스 검색
+  - "jobs": 채용 검색
+- `device_type` (선택, str): 검색을 위해 시뮬레이션할 기기 유형입니다. 옵션은 다음과 같습니다:
+  - None (기본값): 데스크톱 기기
+  - "mobile": 일반 모바일 기기
+  - "ios": iOS 기기 (iPhone)
+  - "android": Android 기기
+- `parse_results` (선택, bool): 파싱된 JSON 결과를 반환할지 여부입니다. 기본값은 False이며, 이 경우 원시 HTML 응답을 반환합니다.
 
 ## Invocation
 
@@ -115,18 +115,18 @@ print(results)
 
 ## Customization Options
 
-The BrightDataSERP tool accepts several parameters for customization:
+BrightDataSERP 도구는 사용자 정의를 위한 여러 매개변수를 허용합니다:
 
 |Parameter|Type|Description|
 |:--|:--|:--|
-|`query`|str|The search query to perform|
-|`search_engine`|str|Search engine to use (default: "google")|
-|`country`|str|Two-letter country code for localized results (default: "us")|
-|`language`|str|Two-letter language code (default: "en")|
-|`results_count`|int|Number of results to return (default: 10)|
-|`search_type`|str|Type of search: None (web), "isch" (images), "shop", "nws" (news), "jobs"|
-|`device_type`|str|Device type: None (desktop), "mobile", "ios", "android"|
-|`parse_results`|bool|Whether to return structured JSON (default: False)|
+|`query`|str|수행할 검색 쿼리|
+|`search_engine`|str|사용할 검색 엔진 (기본값: "google")|
+|`country`|str|지역화된 결과를 위한 두 글자 국가 코드 (기본값: "us")|
+|`language`|str|두 글자 언어 코드 (기본값: "en")|
+|`results_count`|int|반환할 결과 수 (기본값: 10)|
+|`search_type`|str|검색 유형: None (웹), "isch" (이미지), "shop", "nws" (뉴스), "jobs"|
+|`device_type`|str|기기 유형: None (데스크톱), "mobile", "ios", "android"|
+|`parse_results`|bool|구조화된 JSON을 반환할지 여부 (기본값: False)|
 
 ## Use within an agent
 

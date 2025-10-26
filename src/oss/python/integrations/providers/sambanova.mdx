@@ -2,39 +2,39 @@
 title: SambaNova
 ---
 
-Customers are turning to [SambaNova](https://sambanova.ai/) to quickly deploy state-of-the-art AI capabilities to gain competitive advantage. Our purpose-built enterprise-scale AI platform is the technology backbone for the next generation of AI computing. We power the foundation models that unlock the valuable business insights trapped in data.
+고객들은 경쟁 우위를 확보하기 위해 최첨단 AI 기능을 신속하게 배포하기 위해 [SambaNova](https://sambanova.ai/)를 선택하고 있습니다. 우리의 특수 목적 엔터프라이즈급 AI 플랫폼은 차세대 AI 컴퓨팅의 기술적 기반입니다. 우리는 데이터에 갇혀 있는 귀중한 비즈니스 인사이트를 해제하는 foundation model을 지원합니다.
 
-Designed for AI, the SambaNova RDU was built with a revolutionary dataflow architecture. This design makes the RDU significantly more efficient for these workloads than GPUs as it eliminates redundant calls to memory, which are an inherent limitation of how GPUs function. This built-in efficiency is one of the features that makes the RDU capable of much higher performance than GPUs in a fraction of the footprint.
+AI를 위해 설계된 SambaNova RDU는 혁신적인 dataflow 아키텍처로 구축되었습니다. 이 설계는 GPU 기능의 고유한 한계인 메모리에 대한 중복 호출을 제거함으로써 RDU를 이러한 워크로드에 대해 GPU보다 훨씬 더 효율적으로 만듭니다. 이러한 내장된 효율성은 RDU가 훨씬 작은 공간에서 GPU보다 훨씬 높은 성능을 발휘할 수 있게 하는 기능 중 하나입니다.
 
-On top of our architecture We have developed some platforms that allow companies and developers to get full advantage of the RDU processors and open source models.
+우리의 아키텍처 위에 기업과 개발자가 RDU 프로세서와 오픈 소스 모델의 모든 이점을 활용할 수 있도록 하는 몇 가지 플랫폼을 개발했습니다.
 
 ### SambaNovaCloud
 
-SambaNova's [SambaNova Cloud](https://cloud.sambanova.ai/) is a platform for performing inference with open-source models
+SambaNova의 [SambaNova Cloud](https://cloud.sambanova.ai/)는 오픈 소스 모델로 추론을 수행하기 위한 플랫폼입니다
 
-You can obtain a free SambaNovaCloud API key [here](https://cloud.sambanova.ai/)
+무료 SambaNovaCloud API key를 [여기](https://cloud.sambanova.ai/)에서 얻을 수 있습니다
 
 ### SambaStudio
 
-SambaNova's [SambaStudio](https://docs.sambanova.ai/sambastudio/latest/sambastudio-intro.html) is a rich, GUI-based platform that provides the functionality to train, deploy, and manage models in SambaNova DataScale systems.
+SambaNova의 [SambaStudio](https://docs.sambanova.ai/sambastudio/latest/sambastudio-intro.html)는 SambaNova DataScale 시스템에서 모델을 훈련, 배포 및 관리하는 기능을 제공하는 풍부한 GUI 기반 플랫폼입니다.
 
 ## Installation and Setup
 
-Install the integration package:
+integration package를 설치합니다:
 
 ```bash
 pip install langchain-sambanova
 ```
 
-set your API key it as an environment variable:
+API key를 환경 변수로 설정합니다:
 
-If you are a SambaNovaCloud user:
+SambaNovaCloud 사용자인 경우:
 
 ```bash
 export SAMBANOVA_API_KEY="your-sambanova-cloud-api-key-here"
 ```
 
-or if you are SambaStudio User
+또는 SambaStudio 사용자인 경우
 
 ```bash
 export SAMBASTUDIO_API_KEY="your-sambastudio-api-key-here"
@@ -49,7 +49,7 @@ llm = ChatSambaNovaCloud(model="Meta-Llama-3.3-70B-Instruct", temperature=0.7)
 llm.invoke("Tell me a joke about artificial intelligence.")
 ```
 
-For a more detailed walkthrough of the ChatSambaNovaCloud component, see [this notebook](https://python.langchain.com/docs/integrations/chat/sambanova/)
+ChatSambaNovaCloud component에 대한 더 자세한 안내는 [이 notebook](https://python.langchain.com/docs/integrations/chat/sambanova/)을 참조하세요
 
 ```python
 from langchain_sambanova import ChatSambaStudio
@@ -58,7 +58,7 @@ llm = ChatSambaStudio(model="Meta-Llama-3.3-70B-Instruct", temperature=0.7)
 llm.invoke("Tell me a joke about artificial intelligence.")
 ```
 
-For a more detailed walkthrough of the ChatSambaStudio component, see [this notebook](https://python.langchain.com/docs/integrations/chat/sambastudio/)
+ChatSambaStudio component에 대한 더 자세한 안내는 [이 notebook](https://python.langchain.com/docs/integrations/chat/sambastudio/)을 참조하세요
 
 ## Embedding Models
 
@@ -69,7 +69,7 @@ embeddings = SambaNovaCloudEmbeddings(model="E5-Mistral-7B-Instruct")
 embeddings.embed_query("What is the meaning of life?")
 ```
 
-For a more detailed walkthrough of the SambaNovaCloudEmbeddings component, see [this notebook](https://python.langchain.com/docs/integrations/text_embedding/sambanova/)
+SambaNovaCloudEmbeddings component에 대한 더 자세한 안내는 [이 notebook](https://python.langchain.com/docs/integrations/text_embedding/sambanova/)을 참조하세요
 
 ```python
 from langchain_sambanova import SambaStudioEmbeddings
@@ -78,6 +78,6 @@ embeddings = SambaStudioEmbeddings(model="e5-mistral-7b-instruct")
 embeddings.embed_query("What is the meaning of life?")
 ```
 
-For a more detailed walkthrough of the SambaStudioEmbeddings component, see [this notebook](https://python.langchain.com/docs/integrations/text_embedding/sambastudio/)
+SambaStudioEmbeddings component에 대한 더 자세한 안내는 [이 notebook](https://python.langchain.com/docs/integrations/text_embedding/sambastudio/)을 참조하세요
 
 API Reference [langchain-sambanova](https://docs.sambanova.ai/cloud/api-reference)

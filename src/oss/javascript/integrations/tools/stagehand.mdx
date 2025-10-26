@@ -92,23 +92,23 @@ async function main() {
 main();
 ```
 
-## Usage on Browserbase - remote headless browser
+## Browserbase에서 사용하기 - 원격 headless 브라우저
 
-If you want to run the browser remotely, you can use the Browserbase platform.
+브라우저를 원격으로 실행하려면 Browserbase 플랫폼을 사용할 수 있습니다.
 
-You need to set the `BROWSERBASE_API_KEY` environment variable to your Browserbase API key.
+`BROWSERBASE_API_KEY` 환경 변수를 Browserbase API key로 설정해야 합니다.
 
 ```bash
 export BROWSERBASE_API_KEY="your-browserbase-api-key"
 ```
 
-You also need to set `BROWSERBASE_PROJECT_ID` to your Browserbase project ID.
+또한 `BROWSERBASE_PROJECT_ID`를 Browserbase project ID로 설정해야 합니다.
 
 ```bash
 export BROWSERBASE_PROJECT_ID="your-browserbase-project-id"
 ```
 
-Then initialize the Stagehand instance with the `BROWSERBASE` environment.
+그런 다음 `BROWSERBASE` environment로 Stagehand 인스턴스를 초기화합니다.
 
 ```typescript
 const stagehand = new Stagehand({
@@ -116,8 +116,8 @@ const stagehand = new Stagehand({
 });
 ```
 
-## Related
+## 관련 문서
 
-- Tool [conceptual guide](/oss/langchain/tools)
-- Tool [how-to guides](/oss/langchain/tools)
-- [Stagehand Documentation](https://github.com/browserbase/stagehand#readme)
+- Tool [개념 가이드](/oss/langchain/tools)
+- Tool [사용 가이드](/oss/langchain/tools)
+- [Stagehand 문서](https://github.com/browserbase/stagehand#readme)

@@ -1,47 +1,47 @@
 ---
-title: Use time-travel
+title: Time-travel 사용하기
 sidebarTitle: Time travel
 ---
 
 
 
-When working with non-deterministic systems that make model-based decisions (e.g., agents powered by LLMs), it can be useful to examine their decision-making process in detail:
+모델 기반 의사결정을 수행하는 비결정적 시스템(예: LLM으로 구동되는 agent)을 다룰 때, 의사결정 과정을 자세히 살펴보는 것이 유용할 수 있습니다:
 
-1. <Icon icon="lightbulb" size={16} /> **Understand reasoning**: Analyze the steps that led to a successful result.
-2. <Icon icon="bug" size={16} /> **Debug mistakes**: Identify where and why errors occurred.
-3. <Icon icon="magnifying-glass" size={16} /> **Explore alternatives**: Test different paths to uncover better solutions.
+1. <Icon icon="lightbulb" size={16} /> **추론 이해하기**: 성공적인 결과로 이어진 단계를 분석합니다.
+2. <Icon icon="bug" size={16} /> **실수 디버깅하기**: 오류가 발생한 위치와 이유를 파악합니다.
+3. <Icon icon="magnifying-glass" size={16} /> **대안 탐색하기**: 더 나은 솔루션을 찾기 위해 다양한 경로를 테스트합니다.
 
-LangGraph provides [time travel](/oss/langgraph/use-time-travel) functionality to support these use cases. Specifically, you can resume execution from a prior checkpoint — either replaying the same state or modifying it to explore alternatives. In all cases, resuming past execution produces a new fork in the history.
+LangGraph는 이러한 사용 사례를 지원하기 위해 [time travel](/oss/langgraph/use-time-travel) 기능을 제공합니다. 구체적으로, 이전 checkpoint에서 실행을 재개할 수 있습니다 — 동일한 state를 재생하거나 수정하여 대안을 탐색할 수 있습니다. 모든 경우에 과거 실행을 재개하면 히스토리에 새로운 분기가 생성됩니다.
 
-To use [time-travel](/oss/langgraph/use-time-travel) in LangGraph:
+LangGraph에서 [time-travel](/oss/langgraph/use-time-travel)을 사용하려면:
 
 :::python
-1. [Run the graph](#1-run-the-graph) with initial inputs using @[`invoke`][CompiledStateGraph.invoke] or @[`stream`][CompiledStateGraph.stream] methods.
-2. [Identify a checkpoint in an existing thread](#2-identify-a-checkpoint): Use the @[`get_state_history`] method to retrieve the execution history for a specific `thread_id` and locate the desired `checkpoint_id`.
-  Alternatively, set an [interrupt](/oss/langgraph/interrupts) before the node(s) where you want execution to pause. You can then find the most recent checkpoint recorded up to that interrupt.
-3. [Update the graph state (optional)](#3-update-the-state-optional): Use the @[`update_state`] method to modify the graph's state at the checkpoint and resume execution from alternative state.
-4. [Resume execution from the checkpoint](#4-resume-execution-from-the-checkpoint): Use the `invoke` or `stream` methods with an input of `None` and a configuration containing the appropriate `thread_id` and `checkpoint_id`.
+1. [graph 실행하기](#1-run-the-graph): @[`invoke`][CompiledStateGraph.invoke] 또는 @[`stream`][CompiledStateGraph.stream] method를 사용하여 초기 입력으로 graph를 실행합니다.
+2. [기존 thread에서 checkpoint 식별하기](#2-identify-a-checkpoint): @[`get_state_history`] method를 사용하여 특정 `thread_id`에 대한 실행 히스토리를 검색하고 원하는 `checkpoint_id`를 찾습니다.
+  또는 실행을 일시 중지하려는 node 앞에 [interrupt](/oss/langgraph/interrupts)를 설정할 수 있습니다. 그런 다음 해당 interrupt까지 기록된 가장 최근 checkpoint를 찾을 수 있습니다.
+3. [graph state 업데이트하기 (선택사항)](#3-update-the-state-optional): @[`update_state`] method를 사용하여 checkpoint에서 graph의 state를 수정하고 대체 state에서 실행을 재개합니다.
+4. [checkpoint에서 실행 재개하기](#4-resume-execution-from-the-checkpoint): 입력을 `None`으로 하고 적절한 `thread_id`와 `checkpoint_id`를 포함하는 configuration으로 `invoke` 또는 `stream` method를 사용합니다.
 :::
 
 :::js
-1. [Run the graph](#1-run-the-graph) with initial inputs using @[`invoke`][CompiledStateGraph.invoke] or @[`stream`][CompiledStateGraph.stream] methods.
-2. [Identify a checkpoint in an existing thread](#2-identify-a-checkpoint): Use the @[`getStateHistory`] method to retrieve the execution history for a specific `thread_id` and locate the desired `checkpoint_id`.
-  Alternatively, set a [breakpoint](/oss/langgraph/interrupts) before the node(s) where you want execution to pause. You can then find the most recent checkpoint recorded up to that breakpoint.
-3. [Update the graph state (optional)](#3-update-the-state-optional): Use the @[`updateState`] method to modify the graph's state at the checkpoint and resume execution from alternative state.
-4. [Resume execution from the checkpoint](#4-resume-execution-from-the-checkpoint): Use the `invoke` or `stream` methods with an input of `null` and a configuration containing the appropriate `thread_id` and `checkpoint_id`.
+1. [graph 실행하기](#1-run-the-graph): @[`invoke`][CompiledStateGraph.invoke] 또는 @[`stream`][CompiledStateGraph.stream] method를 사용하여 초기 입력으로 graph를 실행합니다.
+2. [기존 thread에서 checkpoint 식별하기](#2-identify-a-checkpoint): @[`getStateHistory`] method를 사용하여 특정 `thread_id`에 대한 실행 히스토리를 검색하고 원하는 `checkpoint_id`를 찾습니다.
+  또는 실행을 일시 중지하려는 node 앞에 [breakpoint](/oss/langgraph/interrupts)를 설정할 수 있습니다. 그런 다음 해당 breakpoint까지 기록된 가장 최근 checkpoint를 찾을 수 있습니다.
+3. [graph state 업데이트하기 (선택사항)](#3-update-the-state-optional): @[`updateState`] method를 사용하여 checkpoint에서 graph의 state를 수정하고 대체 state에서 실행을 재개합니다.
+4. [checkpoint에서 실행 재개하기](#4-resume-execution-from-the-checkpoint): 입력을 `null`로 하고 적절한 `thread_id`와 `checkpoint_id`를 포함하는 configuration으로 `invoke` 또는 `stream` method를 사용합니다.
 :::
 
 <Tip>
-For a conceptual overview of time-travel, see [Time travel](/oss/langgraph/use-time-travel).
+Time-travel의 개념적 개요는 [Time travel](/oss/langgraph/use-time-travel)을 참조하세요.
 </Tip>
 
-## In a workflow
+## workflow에서
 
-This example builds a simple LangGraph workflow that generates a joke topic and writes a joke using an LLM. It demonstrates how to run the graph, retrieve past execution checkpoints, optionally modify the state, and resume execution from a chosen checkpoint to explore alternate outcomes.
+이 예제는 농담 주제를 생성하고 LLM을 사용하여 농담을 작성하는 간단한 LangGraph workflow를 구축합니다. graph를 실행하고, 과거 실행 checkpoint를 검색하고, 선택적으로 state를 수정하고, 선택한 checkpoint에서 실행을 재개하여 대체 결과를 탐색하는 방법을 보여줍니다.
 
 ### Setup
 
-First we need to install the packages required
+먼저 필요한 패키지를 설치해야 합니다
 
 :::python
 ```python
@@ -56,7 +56,7 @@ npm install @langchain/langgraph @langchain/anthropic
 ```
 :::
 
-Next, we need to set API keys for Anthropic (the LLM we will use)
+다음으로, Anthropic(사용할 LLM)에 대한 API key를 설정해야 합니다
 
 :::python
 ```python
@@ -80,7 +80,7 @@ process.env.ANTHROPIC_API_KEY = "YOUR_API_KEY";
 :::
 
 <Tip>
-Sign up for [LangSmith](https://smith.langchain.com) to quickly spot issues and improve the performance of your LangGraph projects. LangSmith lets you use trace data to debug, test, and monitor your LLM apps built with LangGraph.
+[LangSmith](https://smith.langchain.com)에 가입하여 LangGraph 프로젝트의 문제를 빠르게 발견하고 성능을 개선하세요. LangSmith를 사용하면 trace 데이터를 활용하여 LangGraph로 구축된 LLM 앱을 디버그, 테스트 및 모니터링할 수 있습니다.
 </Tip>
 
 :::python
@@ -320,7 +320,7 @@ console.log(selectedState.values);
 ### 3. Update the state
 
 :::python
-@[`update_state`] will create a new checkpoint. The new checkpoint will be associated with the same thread, but a new checkpoint ID.
+@[`update_state`]는 새로운 checkpoint를 생성합니다. 새 checkpoint는 동일한 thread와 연결되지만 새로운 checkpoint ID를 갖습니다.
 
 ```python
 new_config = graph.update_state(selected_state.config, values={"topic": "chickens"})
@@ -335,7 +335,7 @@ print(new_config)
 :::
 
 :::js
-`updateState` will create a new checkpoint. The new checkpoint will be associated with the same thread, but a new checkpoint ID.
+`updateState`는 새로운 checkpoint를 생성합니다. 새 checkpoint는 동일한 thread와 연결되지만 새로운 checkpoint ID를 갖습니다.
 
 ```typescript
 const newConfig = await graph.updateState(selectedState.config, {

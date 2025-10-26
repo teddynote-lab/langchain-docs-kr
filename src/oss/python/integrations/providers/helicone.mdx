@@ -2,25 +2,25 @@
 title: Helicone
 ---
 
-This page covers how to use the [Helicone](https://helicone.ai) ecosystem within LangChain.
+이 페이지는 LangChain 내에서 [Helicone](https://helicone.ai) 생태계를 사용하는 방법을 다룹니다.
 
-## What is Helicone?
+## Helicone이란?
 
-Helicone is an [open-source](https://github.com/Helicone/helicone) observability platform that proxies your OpenAI traffic and provides you key insights into your spend, latency and usage.
+Helicone은 OpenAI 트래픽을 프록시하고 비용, 지연 시간 및 사용량에 대한 주요 인사이트를 제공하는 [오픈 소스](https://github.com/Helicone/helicone) 관찰성 플랫폼입니다.
 
 
-## Quick start
+## 빠른 시작
 
-With your LangChain environment you can just add the following parameter.
+LangChain 환경에서 다음 파라미터를 추가하기만 하면 됩니다.
 
 ```bash
 export OPENAI_API_BASE="https://oai.hconeai.com/v1"
 ```
 
-Now head over to [helicone.ai](https://www.helicone.ai/signup) to create your account, and add your OpenAI API key within our dashboard to view your logs.
+이제 [helicone.ai](https://www.helicone.ai/signup)로 이동하여 계정을 생성하고, 대시보드에 OpenAI API key를 추가하여 로그를 확인하세요.
 
 
-## How to enable Helicone caching
+## Helicone caching 활성화 방법
 
 ```python
 from langchain_openai import OpenAI
@@ -32,9 +32,9 @@ text = "What is a helicone?"
 print(llm.invoke(text))
 ```
 
-[Helicone caching docs](https://docs.helicone.ai/advanced-usage/caching)
+[Helicone caching 문서](https://docs.helicone.ai/advanced-usage/caching)
 
-## How to use Helicone custom properties
+## Helicone custom properties 사용 방법
 
 ```python
 from langchain_openai import OpenAI
@@ -50,4 +50,4 @@ text = "What is a helicone?"
 print(llm.invoke(text))
 ```
 
-[Helicone property docs](https://docs.helicone.ai/advanced-usage/custom-properties)
+[Helicone property 문서](https://docs.helicone.ai/advanced-usage/custom-properties)

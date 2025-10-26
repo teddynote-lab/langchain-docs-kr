@@ -1,638 +1,565 @@
 ---
-title: LangGraph Server changelog
-sidebarTitle: LangGraph Server changelog
+title: LangGraph Server 변경 로그
+sidebarTitle: LangGraph Server 변경 로그
 ---
 
-[LangGraph Server](/langsmith/langgraph-server) is an API platform for creating and managing agent-based applications. It provides built-in persistence, a task queue, and supports deploying, configuring, and running assistants (agentic workflows) at scale. This changelog documents all notable updates, features, and fixes to LangGraph Server releases.
+[LangGraph Server](/langsmith/langgraph-server)는 에이전트 기반 애플리케이션을 생성하고 관리하기 위한 API 플랫폼입니다. 내장된 영속성, 작업 큐를 제공하며, 대규모로 어시스턴트(에이전트 워크플로우)를 배포, 구성, 실행할 수 있도록 지원합니다. 이 변경 로그는 LangGraph Server 릴리스의 모든 주요 업데이트, 기능, 수정 사항을 문서화합니다.
 
 <a id="2025-10-10"></a>
 ## v0.4.39
-- Upgraded `hono` from version 4.7.6 to 4.9.7, addressing a security issue related to the `bodyLimit` middleware.
-- Allowed customization of the base authentication URL to enhance flexibility.
-- Pinned the 'ty' dependency to a stable version using 'uv' to prevent unexpected linting failures.
+- `hono`를 4.7.6 버전에서 4.9.7로 업그레이드하여 `bodyLimit` 미들웨어와 관련된 보안 문제를 해결했습니다.
+- 기본 인증 URL을 커스터마이즈할 수 있도록 하여 유연성을 높였습니다.
+- 'ty' 의존성을 'uv'를 사용해 안정적인 버전으로 고정하여 예기치 않은 린트 실패를 방지했습니다.
 
 <a id="2025-10-08"></a>
 ## v0.4.38
-- Replaced `LANGSMITH_API_KEY` with `LANGSMITH_CONTROL_PLANE_API_KEY` to support hybrid deployments requiring license verification.
-- Introduced self-hosted log ingestion support, configurable via `SELF_HOSTED_LOGS_ENABLED` and `SELF_HOSTED_LOGS_ENDPOINT` environment variables.
+- 라이선스 검증이 필요한 하이브리드 배포를 지원하기 위해 `LANGSMITH_API_KEY`를 `LANGSMITH_CONTROL_PLANE_API_KEY`로 교체했습니다.
+- `SELF_HOSTED_LOGS_ENABLED` 및 `SELF_HOSTED_LOGS_ENDPOINT` 환경 변수로 구성 가능한 자체 호스팅 로그 수집 기능을 도입했습니다.
 
 <a id="2025-10-06"></a>
 ## v0.4.37
-- Required create permissions for copying threads to ensure proper authorization.
+- 스레드 복사 시 적절한 권한 부여를 위해 생성 권한이 필요하도록 변경했습니다.
 
 <a id="2025-10-03"></a>
 ## v0.4.36
-- Improved error handling and added a delay to the sweep loop for smoother operation during Redis downtime or cancellation errors.
-- Updated the queue entrypoint to start the core-api gRPC server when `FF_USE_CORE_API` is enabled.
-- Introduced checks for invalid configurations in assistant endpoints to ensure consistency with other endpoints.
+- Redis 다운타임 또는 취소 오류 발생 시 스윕 루프에 지연을 추가하고 오류 처리를 개선하여 운영을 원활하게 했습니다.
+- 큐 엔트리포인트를 업데이트하여 `FF_USE_CORE_API`가 활성화된 경우 core-api gRPC 서버를 시작하도록 했습니다.
+- 어시스턴트 엔드포인트의 잘못된 구성에 대한 검사를 도입하여 다른 엔드포인트와의 일관성을 확보했습니다.
 
 <a id="2025-10-02"></a>
 ## v0.4.35
-- Resolved a timezone issue in the core API, ensuring accurate time data retrieval.
-- Introduced a new `middleware_order` setting to apply authentication middleware before custom middleware, allowing finer control over protected route configurations.
-- Logged the Redis URL when errors occur during Redis client creation.
-- Improved Go engine/runtime context propagation to ensure consistent execution flow.
-- Removed the unnecessary `assistants.put` call from the executor entrypoint to streamline the process.
+- core API의 타임존 문제를 해결하여 정확한 시간 데이터 조회가 가능하도록 했습니다.
+- 인증 미들웨어를 커스텀 미들웨어보다 먼저 적용할 수 있도록 `middleware_order` 설정을 추가하여 보호된 라우트 구성을 세밀하게 제어할 수 있게 했습니다.
+- Redis 클라이언트 생성 중 오류 발생 시 Redis URL을 로그에 남기도록 개선했습니다.
+- Go 엔진/런타임의 컨텍스트 전파를 개선하여 실행 흐름의 일관성을 확보했습니다.
+- executor 엔트리포인트에서 불필요한 `assistants.put` 호출을 제거하여 프로세스를 간소화했습니다.
 
 <a id="2025-10-01"></a>
 ## v0.4.34
-- Blocked unauthorized users from updating thread TTL settings to enhance security.
+- 권한이 없는 사용자가 스레드 TTL 설정을 업데이트하지 못하도록 차단하여 보안을 강화했습니다.
 
 <a id="2025-10-01"></a>
 ## v0.4.33
-- Improved error handling for Redis locks by logging `LockNotOwnedError` and extending initial pool migration lock timeout to 60 seconds.
-- Updated the BaseMessage schema to align with the latest langchain-core version and synchronized build dependencies for consistent local development.
+- Redis 락 오류 처리 시 `LockNotOwnedError`를 로그에 남기고, 초기 풀 마이그레이션 락 타임아웃을 60초로 연장하여 안정성을 높였습니다.
+- BaseMessage 스키마를 최신 langchain-core 버전에 맞게 업데이트하고, 로컬 개발의 일관성을 위해 빌드 의존성을 동기화했습니다.
 
 <a id="2025-09-30"></a>
 ## v0.4.32
-- Added a GO persistence layer to the API image, enabling GRPC server operation with PostgreSQL support and enhancing configurability.
-- Set the status to error when a timeout occurs to improve error handling.
+- API 이미지에 GO 영속성 레이어를 추가하여 PostgreSQL 지원과 gRPC 서버 운영이 가능해졌으며, 구성 가능성을 강화했습니다.
+- 타임아웃 발생 시 상태를 오류로 설정하여 오류 처리를 개선했습니다.
 
 <a id="2025-09-30"></a>
 ## v0.4.30
-- Added support for context when using `stream_mode="events"` and included new tests for this functionality.
-- Added support for overriding the server port using `$LANGGRAPH_SERVER_PORT` and removed an unnecessary Dockerfile `ARG` for cleaner configuration.
-- Applied authorization filters to all table references in thread delete CTE to enhance security.
-- Introduced self-hosted metrics ingestion capability, allowing metrics to be sent to an OTLP collector every minute when the corresponding environment variables are set.
-- Ensured that the `set_latest` function properly updates the name and description of the version.
+- `stream_mode="events"` 사용 시 컨텍스트 지원을 추가하고, 해당 기능에 대한 새로운 테스트를 포함했습니다.
+- `$LANGGRAPH_SERVER_PORT`를 사용해 서버 포트를 오버라이드할 수 있도록 지원하고, 불필요한 Dockerfile `ARG`를 제거하여 구성을 간소화했습니다.
+- 스레드 삭제 CTE의 모든 테이블 참조에 권한 필터를 적용하여 보안을 강화했습니다.
+- 자체 호스팅 메트릭 수집 기능을 도입하여, 관련 환경 변수가 설정된 경우 매분마다 OTLP 수집기로 메트릭을 전송할 수 있게 했습니다.
+- `set_latest` 함수가 버전의 이름과 설명을 올바르게 업데이트하도록 개선했습니다.
 
 <a id="2025-09-26"></a>
 ## v0.4.29
-- Ensured proper cleanup of redis pubsub connections in all scenarios.
+- 모든 상황에서 redis pubsub 연결이 올바르게 정리되도록 했습니다.
 
 <a id="2025-09-25"></a>
 ## v0.4.28
-- Added a format parameter to the queue metrics server for enhanced customization.
-- Corrected `MOUNT_PREFIX` environment variable usage in CLI for consistency with documentation and to prevent confusion.
-- Added a feature to log warnings when messages are dropped due to no subscribers, controllable via a feature flag.
-- Added support for Bookworm and Bullseye distributions in Node images.
-- Consolidated executor definitions by moving them from the `langgraph-go` repository, improving manageability and updating the checkpointer setup method for server migrations.
-- Ensured correct response headers are sent for a2a, improving compatibility and communication.
-- Consolidated PostgreSQL checkpoint implementation, added CI testing for the `/core` directory, fixed RemoteStore test errors, and enhanced the Store implementation with transactions.
-- Added PostgreSQL migrations to the queue server to prevent errors from graphs being added before migrations are performed.
+- 큐 메트릭 서버에 포맷 파라미터를 추가하여 커스터마이즈를 강화했습니다.
+- CLI에서 `MOUNT_PREFIX` 환경 변수 사용을 문서와 일치시키고 혼동을 방지하도록 수정했습니다.
+- 구독자가 없을 때 메시지가 드롭되는 경우 경고 로그를 남기는 기능을 추가했으며, 기능 플래그로 제어할 수 있습니다.
+- Node 이미지에서 Bookworm 및 Bullseye 배포판 지원을 추가했습니다.
+- executor 정의를 `langgraph-go` 저장소에서 이동하여 관리성을 높이고, 서버 마이그레이션을 위한 checkpointer 설정 방법을 업데이트했습니다.
+- a2a에 대해 올바른 응답 헤더가 전송되도록 개선하여 호환성과 통신을 강화했습니다.
+- PostgreSQL 체크포인트 구현을 통합하고, `/core` 디렉터리에 대한 CI 테스트를 추가했으며, RemoteStore 테스트 오류를 수정하고 Store 구현에 트랜잭션을 추가했습니다.
+- 큐 서버에 PostgreSQL 마이그레이션을 추가하여 마이그레이션 전에 그래프가 추가될 때 발생하는 오류를 방지했습니다.
 
 <a id="2025-09-23"></a>
 ## v0.4.27
-- Replaced `coredis` with `redis-py` to improve connection handling and reliability under high traffic loads.
+- `coredis`를 `redis-py`로 교체하여 고트래픽 환경에서 연결 처리 및 신뢰성을 개선했습니다.
 
 <a id="2025-09-22-v0.4.24"></a>
 ## v0.4.24
-- Added functionality to return full message history for A2A calls in accordance with the A2A spec.
-- Added a `LANGGRAPH_SERVER_HOST` environment variable to Dockerfiles to support custom host settings for dual stack mode.
+- A2A 스펙에 따라 A2A 호출 시 전체 메시지 히스토리를 반환하는 기능을 추가했습니다.
+- Dockerfile에 `LANGGRAPH_SERVER_HOST` 환경 변수를 추가하여 듀얼 스택 모드에서 커스텀 호스트 설정을 지원했습니다.
 
 <a id="2025-09-22"></a>
 ## v0.4.23
-- Use a faster message codec for redis streaming.
+- redis 스트리밍에 더 빠른 메시지 코덱을 사용하도록 변경했습니다.
 
 <a id="2025-09-19"></a>
 ## v0.4.22
-- Ported long-stream handling to the run stream, join, and cancel endpoints for improved stream management.
+- 스트림 관리 개선을 위해 run stream, join, cancel 엔드포인트에 long-stream 처리를 이식했습니다.
 
 <a id="2025-09-18"></a>
 ## v0.4.21
-- Added A2A streaming functionality and enhanced testing with the A2A SDK.
-- Added Prometheus metrics to track language usage in graphs, middleware, and authentication for improved insights.
-- Fixed bugs in Open Source Software related to message conversion for chunks.
-- Removed await from pubsub subscribes to reduce flakiness in cluster tests and added retries in the shutdown suite to enhance API stability.
+- A2A 스트리밍 기능을 추가하고 A2A SDK로 테스트를 강화했습니다.
+- 그래프, 미들웨어, 인증에서 언어 사용량을 추적할 수 있도록 Prometheus 메트릭을 추가하여 인사이트를 개선했습니다.
+- 청크 메시지 변환 관련 오픈소스 소프트웨어 버그를 수정했습니다.
+- pubsub 구독에서 await를 제거하여 클러스터 테스트의 불안정성을 줄이고, 종료 스위트에 재시도를 추가하여 API 안정성을 높였습니다.
 
 <a id="2025-09-11"></a>
 ## v0.4.20
-- Optimized Pubsub initialization to prevent overhead and address subscription timing issues, ensuring smoother run execution.
+- Pubsub 초기화를 최적화하여 오버헤드를 줄이고 구독 타이밍 문제를 해결하여 실행을 원활하게 했습니다.
 
 <a id="2025-09-11"></a>
 ## v0.4.19
-- Removed warnings from psycopg by addressing function checks introduced in version 3.2.10.
+- psycopg 3.2.10에서 도입된 함수 체크로 인해 발생하는 경고를 제거했습니다.
 
 <a id="2025-09-11"></a>
 ## v0.4.17
-- Filtered out logs with mount prefix to reduce noise in logging output.
+- mount prefix가 포함된 로그를 필터링하여 로그 출력의 노이즈를 줄였습니다.
 
 <a id="2025-09-10"></a>
 ## v0.4.16
-- Added support for implicit thread creation in a2a to streamline operations.
-- Improved error serialization and emission in distributed runtime streams, enabling more comprehensive testing.
+- a2a에서 암시적 스레드 생성을 지원하여 작업을 간소화했습니다.
+- 분산 런타임 스트림에서 오류 직렬화 및 방출을 개선하여 더 포괄적인 테스트가 가능하도록 했습니다.
 
 <a id="2025-09-09"></a>
 ## v0.4.13
-- Monitored queue status in the health endpoint to ensure correct behavior when PostgreSQL fails to initialize.
-- Addressed an issue with unequal swept ID lengths to improve log clarity.
-- Enhanced streaming outputs by avoiding re-serialization of DR payloads, using msgpack byte inspection for json-like parsing.
+- health 엔드포인트에서 큐 상태를 모니터링하여 PostgreSQL 초기화 실패 시 올바른 동작을 보장했습니다.
+- 길이가 다른 swept ID 문제를 해결하여 로그 명확성을 높였습니다.
+- DR 페이로드의 재직렬화를 피하고 msgpack 바이트 검사를 사용해 json-like 파싱을 적용하여 스트리밍 출력 품질을 개선했습니다.
 
 <a id="2025-09-04"></a>
 ## v0.4.12
-- Ensured metrics are returned even when experiencing database connection issues.
-- Optimized update streams to prevent unnecessary data transmission.
-- Upgraded `hono` from version 4.9.2 to 4.9.6 in the `storage_postgres/langgraph-api-server` for improved URL path parsing security.
-- Added retries and an in-memory cache for LangSmith access calls to improve resilience against single failures.
+- 데이터베이스 연결 문제 발생 시에도 메트릭이 반환되도록 했습니다.
+- 불필요한 데이터 전송을 방지하기 위해 업데이트 스트림을 최적화했습니다.
+- `storage_postgres/langgraph-api-server`에서 `hono`를 4.9.2에서 4.9.6으로 업그레이드하여 URL 경로 파싱 보안을 강화했습니다.
+- LangSmith 접근 호출에 재시도 및 인메모리 캐시를 추가하여 단일 실패에 대한 복원력을 높였습니다.
 
 <a id="2025-09-04"></a>
 ## v0.4.11
-- Added support for TTL (time-to-live) in thread updates.
+- 스레드 업데이트에 TTL(time-to-live) 지원을 추가했습니다.
 
 <a id="2025-09-04"></a>
 ## v0.4.10
-- In distributed runtime, update serde logic for final checkpoint -> thread setting.
+- 분산 런타임에서 최종 체크포인트 -> 스레드 설정을 위한 serde 로직을 업데이트했습니다.
 
 <a id="2025-09-02"></a>
 ## v0.4.9
-- Added support for filtering search results by IDs in the search endpoint for more precise queries.
-- Included configurable headers for assistant endpoints to enhance request customization.
-- Implemented a simple A2A endpoint with support for agent card retrieval, task creation, and task management.
+- 검색 엔드포인트에서 ID별로 검색 결과를 필터링할 수 있도록 지원하여 더 정밀한 쿼리가 가능해졌습니다.
+- 어시스턴트 엔드포인트에 구성 가능한 헤더를 포함하여 요청 커스터마이즈를 강화했습니다.
+- 에이전트 카드 조회, 작업 생성 및 관리가 가능한 간단한 A2A 엔드포인트를 구현했습니다.
 
 <a id="2025-08-30"></a>
 ## v0.4.7
-- Stopped the inclusion of x-api-key to enhance security.
+- 보안 강화를 위해 x-api-key 포함을 중단했습니다.
 
 <a id="2025-08-29"></a>
 ## v0.4.6
-- Fixed a race condition when joining streams, preventing duplicate start events.
+- 스트림 조인 시 발생하는 레이스 컨디션을 수정하여 중복 시작 이벤트를 방지했습니다.
 
 <a id="2025-08-29"></a>
 ## v0.4.5
-- Ensured the checkpointer starts and stops correctly before and after the queue to improve shutdown and startup efficiency.
-- Resolved an issue where workers were being prematurely cancelled when the queue was cancelled.
-- Prevented queue termination by adding a fallback for cases when Redis fails to wake a worker.
+- 큐 시작/종료 전후에 checkpointer가 올바르게 동작하도록 하여 종료 및 시작 효율성을 개선했습니다.
+- 큐가 취소될 때 워커가 조기에 취소되는 문제를 해결했습니다.
+- Redis가 워커를 깨우지 못하는 경우를 대비해 폴백을 추가하여 큐 종료를 방지했습니다.
 
 <a id="2025-08-28"></a>
 ## v0.4.4
-- Set the custom auth thread_id to None for stateless runs to prevent conflicts.
-- Improved Redis signaling in the Go runtime by adding a wakeup worker and Redis lock implementation, and updated sweep logic.
+- 상태 없는 실행을 위해 커스텀 인증 thread_id를 None으로 설정하여 충돌을 방지했습니다.
+- Go 런타임에서 Redis 신호 처리를 개선하고, wakeup 워커 및 Redis 락 구현을 추가했으며, 스윕 로직을 업데이트했습니다.
 
 <a id="2025-08-27"></a>
 ## v0.4.3
-- Added stream mode to thread stream for improved data processing.
-- Added a durability parameter to runs for improved data persistence.
+- 스레드 스트림에 스트림 모드를 추가하여 데이터 처리 효율을 높였습니다.
+- 실행(run)에 내구성 파라미터를 추가하여 데이터 영속성을 강화했습니다.
 
 <a id="2025-08-27"></a>
 ## v0.4.2
-- Ensured pubsub is initialized before creating a run to prevent errors from missing messages.
+- 실행(run) 생성 전에 pubsub이 초기화되도록 하여 누락된 메시지로 인한 오류를 방지했습니다.
 
 <a id="2025-08-25"></a>
 ## v0.4.0
-- Emitted attempt messages correctly within the thread stream.
-- Reduced cluster conflicts by using only the thread ID for hashing in cluster mapping, prioritizing efficiency with stream_thread_cache.
-- Introduced a stream endpoint for threads to track all outputs across sequentially executed runs.
-- Made the filter query builder in PostgreSQL more robust against malformed expressions and improved validation to prevent potential security risks.
+- 스레드 스트림 내에서 시도 메시지를 올바르게 방출하도록 했습니다.
+- 클러스터 매핑에서 스레드 ID만 해싱에 사용하여 클러스터 충돌을 줄이고, stream_thread_cache로 효율성을 우선시했습니다.
+- 스레드의 모든 출력 추적을 위한 스트림 엔드포인트를 도입했습니다.
+- PostgreSQL의 필터 쿼리 빌더를 잘못된 표현식에 더 견고하게 만들고, 검증을 개선하여 잠재적 보안 위험을 방지했습니다.
 
 <a id="2025-08-25"></a>
 ## v0.3.4
-- Added custom Prometheus metrics for Redis/PG connection pools and switched the queue server to Uvicorn/Starlette for improved monitoring.
-- Restored Wolfi image build by correcting shell command formatting and added a Makefile target for testing with nginx.
+- Redis/PG 연결 풀에 대한 커스텀 Prometheus 메트릭을 추가하고, 큐 서버를 Uvicorn/Starlette로 전환하여 모니터링을 강화했습니다.
+- shell 명령어 포맷을 수정하여 Wolfi 이미지 빌드를 복구하고, nginx로 테스트할 수 있는 Makefile 타겟을 추가했습니다.
 
 <a id="2025-08-22"></a>
 ## v0.3.3
-- Added timeouts to specific Redis calls to prevent workers from being left active.
-- Updated the Golang runtime and added pytest skips for unsupported functionalities, including initial support for passing store to node and message streaming.
-- Introduced a reverse proxy setup for serving combined Python and Node.js graphs, with nginx handling server routing, to facilitate a Postgres/Redis backend for the Node.js API server.
+- 특정 Redis 호출에 타임아웃을 추가하여 워커가 활성 상태로 남는 것을 방지했습니다.
+- Golang 런타임을 업데이트하고, 지원되지 않는 기능에 대해 pytest skip을 추가했으며, store 전달 및 메시지 스트리밍에 대한 초기 지원을 포함했습니다.
+- Python과 Node.js 그래프를 통합 제공하기 위한 리버스 프록시 설정을 도입하고, nginx가 서버 라우팅을 처리하여 Node.js API 서버에 Postgres/Redis 백엔드를 제공할 수 있도록 했습니다.
 
 <a id="2025-08-21"></a>
 ## v0.3.1
-- Added a statement timeout to the pool to prevent long-running queries.
+- 풀에 statement timeout을 추가하여 장시간 실행되는 쿼리를 방지했습니다.
 
 <a id="2025-08-21"></a>
 ## v0.3.0
-- Set a default 15-minute statement timeout and implemented monitoring for long-running queries to ensure system efficiency.
-- Stop propagating run configurable values to the thread configuration, because this can cause issues on subsequent runs if you are specifying a checkpoint_id. This is a **slight breaking change** in behavior, since the thread value will no longer automatically reflect the unioned configuration of the most recent run. We believe this behavior is more intuitive, however.
-- Enhanced compatibility with older worker versions by handling event data in channel names within ops.py.
+- 기본 statement timeout을 15분으로 설정하고, 장시간 실행 쿼리 모니터링을 구현하여 시스템 효율성을 확보했습니다.
+- run의 configurable 값을 thread 설정에 전파하지 않도록 변경했습니다. checkpoint_id를 지정하는 경우 이후 실행에서 문제가 발생할 수 있기 때문입니다. 이로 인해 thread 값이 최근 실행의 unioned configuration을 자동으로 반영하지 않게 되므로 **약간의 호환성 깨짐**이 있습니다. 하지만 이 동작이 더 직관적이라고 판단합니다.
+- ops.py에서 채널 이름의 이벤트 데이터를 처리하여 이전 워커 버전과의 호환성을 강화했습니다.
 
 <a id="2025-08-20"></a>
 ## v0.2.137
-- Fixed an unbound local error and improved logging for thread interruptions or errors, along with type updates.
+- 바인딩되지 않은 로컬 오류를 수정하고, 스레드 중단 또는 오류 발생 시 로깅을 개선했으며, 타입 업데이트를 포함했습니다.
 
 <a id="2025-08-20"></a>
 ## v0.2.136
-- Added enhanced logging to aid in debugging metaview issues.
-- Upgraded executor and runtime to the latest version for improved performance and stability.
+- 메타뷰 문제 디버깅을 돕기 위해 로깅을 강화했습니다.
+- executor와 런타임을 최신 버전으로 업그레이드하여 성능과 안정성을 개선했습니다.
 
 <a id="2025-08-19"></a>
 ## v0.2.135
-- Ensured async coroutines are properly awaited to prevent potential runtime errors.
+- async 코루틴이 올바르게 await되도록 하여 잠재적 런타임 오류를 방지했습니다.
 
 <a id="2025-08-18"></a>
 ## v0.2.134
-- Enhanced search functionality to improve performance by allowing users to select specific columns for query results.
+- 검색 기능을 개선하여 쿼리 결과에 특정 컬럼을 선택할 수 있도록 하여 성능을 향상시켰습니다.
 
 <a id="2025-08-18"></a>
 ## v0.2.133
-- Added count endpoints for crons, threads, and assistants to enhance data tracking (#1132).
-- Improved SSH functionality for better reliability and stability.
-- Updated @langchain/langgraph-api to version 0.0.59 to fix an invalid state schema issue.
+- crons, threads, assistants에 대한 count 엔드포인트를 추가하여 데이터 추적을 강화했습니다 (#1132).
+- SSH 기능을 개선하여 신뢰성과 안정성을 높였습니다.
+- @langchain/langgraph-api를 0.0.59 버전으로 업데이트하여 잘못된 상태 스키마 문제를 해결했습니다.
 
 <a id="2025-08-15"></a>
 ## v0.2.132
-- Added Go language images to enhance project compatibility and functionality.
-- Printed internal PIDs for JS workers to facilitate process inspection via SIGUSR1 signal.
-- Resolved a `run_pkey` error that occurred when attempting to insert duplicate runs.
-- Added `ty run` command and switched to using uuid7 for generating run IDs.
-- Implemented the initial Golang runtime to expand language support.
+- Go 언어 이미지를 추가하여 프로젝트 호환성과 기능을 강화했습니다.
+- JS 워커의 내부 PID를 출력하여 SIGUSR1 신호를 통한 프로세스 검사에 활용할 수 있게 했습니다.
+- 중복 실행 삽입 시 발생하는 `run_pkey` 오류를 해결했습니다.
+- `ty run` 명령어를 추가하고, run ID 생성을 위해 uuid7을 사용하도록 변경했습니다.
+- 초기 Golang 런타임을 구현하여 언어 지원을 확장했습니다.
 
 <a id="2025-08-14"></a>
 ## v0.2.131
-- Added support for `object agent spec` with descriptions in JS.
+- JS에서 설명이 포함된 `object agent spec` 지원을 추가했습니다.
 
 <a id="2025-08-13"></a>
 ## v0.2.130
-- Added a feature flag (FF_RICH_THREADS=false) to disable thread updates on run creation, reducing lock contention and simplifying thread status handling.
-- Utilized existing connections for `aput` and `apwrite` operations to improve performance.
-- Improved error handling for decoding issues to enhance data processing reliability.
-- Excluded headers from logs to improve security while maintaining runtime functionality.
-- Fixed an error that prevented mapping slots to a single node.
-- Added debug logs to track node execution in JS deployments for improved issue diagnosis.
-- Changed the default multitask strategy to enqueue, improving throughput by eliminating the need to fetch inflight runs during new run insertions.
-- Optimized database operations for `Runs.next` and `Runs.sweep` to reduce redundant queries and improve efficiency.
-- Improved run creation speed by skipping unnecessary inflight runs queries.
+- 실행 생성 시 스레드 업데이트를 비활성화하는 기능 플래그(FF_RICH_THREADS=false)를 추가하여 락 경합을 줄이고 스레드 상태 처리를 단순화했습니다.
+- `aput` 및 `apwrite` 작업에 기존 연결을 활용하여 성능을 개선했습니다.
+- 디코딩 오류 처리 로직을 개선하여 데이터 처리 신뢰성을 높였습니다.
+- 로그에서 헤더를 제외하여 보안을 강화하면서 런타임 기능을 유지했습니다.
+- 슬롯을 단일 노드에 매핑하지 못하는 오류를 수정했습니다.
+- JS 배포에서 노드 실행 추적을 위한 디버그 로그를 추가하여 문제 진단을 개선했습니다.
+- 기본 멀티태스크 전략을 enqueue로 변경하여 새로운 실행 삽입 시 inflight run을 조회할 필요 없이 처리량을 개선했습니다.
+- `Runs.next` 및 `Runs.sweep`의 데이터베이스 작업을 최적화하여 중복 쿼리를 줄이고 효율성을 높였습니다.
+- inflight run 쿼리를 생략하여 실행 생성 속도를 개선했습니다.
 
 <a id="2025-08-11"></a>
 ## v0.2.129
-- Stopped passing internal LGP fields to context to prevent breaking type checks.
-- Exposed content-location headers to ensure correct resumability behavior in the API.
+- 내부 LGP 필드를 컨텍스트에 전달하지 않도록 하여 타입 체크 오류를 방지했습니다.
+- content-location 헤더를 노출하여 API의 올바른 재개 동작을 보장했습니다.
 
 <a id="2025-08-08"></a>
 ## v0.2.128
-- Ensured synchronized updates between `configurable` and `context` in assistants, preventing setup errors and supporting smoother version transitions.
+- assistants에서 `configurable`과 `context`의 동기화 업데이트를 보장하여 설정 오류를 방지하고 버전 전환을 원활하게 지원했습니다.
 
 <a id="2025-08-08"></a>
 ## v0.2.127
-- Excluded unrequested stream modes from the resumable stream to optimize functionality.
+- 요청되지 않은 스트림 모드를 재개 가능한 스트림에서 제외하여 기능을 최적화했습니다.
 
 <a id="2025-08-08"></a>
 ## v0.2.126
-- Made access logger headers configurable to enhance logging flexibility.
-- Debounced the Runs.stats function to reduce the frequency of expensive calls and improve performance.
-- Introduced debouncing for sweepers to enhance performance and efficiency (#1147).
-- Acquired a lock for TTL sweeping to prevent database spamming during scale-out operations.
+- 액세스 로거 헤더를 구성 가능하게 하여 로깅 유연성을 강화했습니다.
+- Runs.stats 함수에 디바운스를 적용하여 비용이 많이 드는 호출 빈도를 줄이고 성능을 개선했습니다.
+- 스위퍼에 디바운스를 도입하여 성능과 효율성을 높였습니다 (#1147).
+- TTL 스위핑에 락을 획득하여 스케일 아웃 시 데이터베이스 스팸을 방지했습니다.
 
 <a id="2025-08-06"></a>
 ## v0.2.125
-- Updated tracing context replicas to use the new format, ensuring compatibility.
+- 트레이싱 컨텍스트 레플리카를 새로운 포맷으로 업데이트하여 호환성을 확보했습니다.
 
 <a id="2025-08-06"></a>
 ## v0.2.123
-- Added an entrypoint to the queue replica for improved deployment management.
+- 큐 레플리카에 엔트리포인트를 추가하여 배포 관리성을 개선했습니다.
 
 <a id="2025-08-06"></a>
 ## v0.2.122
-- Utilized persisted interrupt status in `join` to ensure correct handling of user's interrupt state after completion.
+- `join`에서 영속된 interrupt 상태를 활용하여 완료 후 사용자의 interrupt 상태를 올바르게 처리하도록 했습니다.
 
 <a id="2025-08-06"></a>
 ## v0.2.121
-- Consolidated events to a single channel to prevent race conditions and optimize startup performance.
-- Ensured custom lifespans are invoked on queue workers for proper setup, and added tests.
+- 이벤트를 단일 채널로 통합하여 레이스 컨디션을 방지하고, 시작 성능을 최적화했습니다.
+- 큐 워커에서 커스텀 lifespan이 호출되도록 보장하고, 테스트를 추가했습니다.
 
 <a id="2025-08-04"></a>
 ## v0.2.120
-- Restored the original streaming behavior of runs, ensuring consistent inclusion of interrupt events based on `stream_mode` settings.
-- Optimized `Runs.next` query to reduce average execution time from ~14.43ms to ~2.42ms, improving performance.
-- Added support for stream mode "tasks" and "checkpoints", normalized the UI namespace, and upgraded `@langchain/langgraph-api` for enhanced functionality.
+- 실행(run)의 원래 스트리밍 동작을 복원하여 `stream_mode` 설정에 따라 interrupt 이벤트가 일관되게 포함되도록 했습니다.
+- `Runs.next` 쿼리를 최적화하여 평균 실행 시간을 약 14.43ms에서 2.42ms로 단축하여 성능을 개선했습니다.
+- 스트림 모드 "tasks"와 "checkpoints"를 지원하고, UI 네임스페이스를 정규화했으며, `@langchain/langgraph-api`를 업그레이드하여 기능을 강화했습니다.
 
 <a id="2025-07-31"></a>
 ## v0.2.117
-- Added a composite index on threads for faster searches with owner-based authentication and updated the default sort order to `updated_at` for improved query performance.
+- 소유자 기반 인증을 위한 빠른 검색을 위해 스레드에 복합 인덱스를 추가하고, 기본 정렬 순서를 `updated_at`으로 변경하여 쿼리 성능을 개선했습니다.
 
 <a id="2025-07-31"></a>
 ## v0.2.116
-- Reduced the default number of history checkpoints from 10 to 1 to optimize performance.
+- 기본 히스토리 체크포인트 개수를 10개에서 1개로 줄여 성능을 최적화했습니다.
 
 <a id="2025-07-31"></a>
 ## v0.2.115
-- Optimized cache re-use to enhance application performance and efficiency.
+- 캐시 재사용을 최적화하여 애플리케이션 성능과 효율성을 높였습니다.
 
 <a id="2025-07-30"></a>
 ## v0.2.113
-- Improved thread search pagination by updating response headers with `X-Pagination-Total` and `X-Pagination-Next` for better navigation.
+- 응답 헤더에 `X-Pagination-Total` 및 `X-Pagination-Next`를 추가하여 스레드 검색 페이지네이션을 개선했습니다.
 
 <a id="2025-07-30"></a>
 ## v0.2.112
-- Ensured sync logging methods are awaited and added a linter to prevent future occurrences.
-- Fixed an issue where JavaScript tasks were not being populated correctly for JS graphs.
+- 동기 로깅 메서드가 await되도록 보장하고, 향후 발생 방지를 위한 린터를 추가했습니다.
+- JS 그래프에서 JavaScript 작업이 올바르게 채워지지 않는 문제를 수정했습니다.
 
 <a id="2025-07-29"></a>
 ## v0.2.111
-- Fixed JS graph streaming failure by starting the heartbeat as soon as the connection opens.
+- 연결이 열리자마자 하트비트를 시작하여 JS 그래프 스트리밍 실패 문제를 해결했습니다.
 
 <a id="2025-07-29"></a>
 ## v0.2.110
-- Added interrupts as default values for join operations while preserving stream behavior.
+- join 작업에 기본값으로 interrupt를 추가하면서 스트림 동작을 유지했습니다.
 
 <a id="2025-07-28"></a>
 ## v0.2.109
-- Fixed an issue where config schema was missing when `config_type` was not set, ensuring more reliable configurations.
+- `config_type`이 설정되지 않은 경우 config 스키마가 누락되는 문제를 해결하여 더 신뢰성 있는 구성을 보장했습니다.
 
 <a id="2025-07-28"></a>
 ## v0.2.108
-- Prepared for LangGraph v0.6 compatibility with new context API support and bug fixes.
+- 새로운 context API 지원 및 버그 수정으로 LangGraph v0.6 호환성을 준비했습니다.
 
 <a id="2025-07-27"></a>
 ## v0.2.107
-- Implemented caching for authentication processes to enhance performance and efficiency.
-- Optimized database performance by merging count and select queries.
+- 인증 프로세스에 캐싱을 도입하여 성능과 효율성을 높였습니다.
+- count와 select 쿼리를 병합하여 데이터베이스 성능을 최적화했습니다.
 
 <a id="2025-07-27"></a>
 ## v0.2.106
-- Made log streams resumable, enhancing reliability and improving user experience when reconnecting.
+- 로그 스트림을 재개 가능하게 만들어, 재접속 시 신뢰성과 사용자 경험을 개선했습니다.
 
 <a id="2025-07-27"></a>
 ## v0.2.105
-- Added a heapdump endpoint to save memory heap information to a file.
+- 메모리 힙 정보를 파일로 저장하는 heapdump 엔드포인트를 추가했습니다.
 
 <a id="2025-07-25"></a>
 ## v0.2.103
-- Used the correct metadata endpoint to resolve issues with data retrieval.
+- 올바른 메타데이터 엔드포인트를 사용하여 데이터 조회 문제를 해결했습니다.
 
 <a id="2025-07-24"></a>
 ## v0.2.102
-- Captured interrupt events in the wait method to preserve previous behavior from langgraph 0.5.0.
-- Added support for SDK structlog in the JavaScript environment for enhanced logging capabilities.
+- langgraph 0.5.0의 이전 동작을 유지하기 위해 wait 메서드에서 interrupt 이벤트를 캡처하도록 했습니다.
+- JavaScript 환경에서 SDK structlog 지원을 추가하여 로깅 기능을 강화했습니다.
 
 <a id="2025-07-24"></a>
 ## v0.2.101
-- Corrected the metadata endpoint for self-hosted deployments.
+- 자체 호스팅 배포에서 메타데이터 엔드포인트를 올바르게 수정했습니다.
 
 <a id="2025-07-22"></a>
 ## v0.2.99
-- Improved license check by adding an in-memory cache and handling Redis connection errors more effectively.
-- Reloaded assistants to preserve manually created ones while discarding those removed from the configuration file.
-- Reverted changes to ensure the UI namespace for gen UI is a valid JavaScript property name.
-- Ensured that the UI namespace for generated UI is a valid JavaScript property name, improving API compliance.
-- Enhanced error handling to return a 422 status code for unprocessable entity requests.
+- 라이선스 체크에 인메모리 캐시를 추가하고, Redis 연결 오류를 더 효과적으로 처리하도록 개선했습니다.
+- 어시스턴트 재로드 시 수동으로 생성된 어시스턴트는 유지하고, 구성 파일에서 제거된 것은 삭제하도록 했습니다.
+- gen UI의 UI 네임스페이스가 유효한 JavaScript 속성명이 되도록 변경 사항을 되돌렸습니다.
+- 생성된 UI의 네임스페이스가 유효한 JavaScript 속성명이 되도록 보장하여 API 준수성을 높였습니다.
+- 처리할 수 없는 엔티티 요청에 대해 422 상태 코드를 반환하도록 오류 처리를 강화했습니다.
 
 <a id="2025-07-19"></a>
 ## v0.2.98
-- Added context to langgraph nodes to improve log filtering and trace visibility.
+- langgraph 노드에 컨텍스트를 추가하여 로그 필터링 및 추적 가시성을 개선했습니다.
 
 <a id="2025-07-19"></a>
 ## v0.2.97
-- Improved interoperability with the ckpt ingestion worker on the main loop to prevent task scheduling issues.
-- Delayed queue worker startup until after migrations are completed to prevent premature execution.
-- Enhanced thread state error handling by adding specific metadata and improved response codes for better clarity when state updates fail during creation.
-- Exposed the interrupt ID when retrieving the thread state to improve API transparency.
+- 메인 루프에서 ckpt 수집 워커와의 상호운용성을 개선하여 작업 스케줄링 문제를 방지했습니다.
+- 마이그레이션 완료 후에만 큐 워커가 시작되도록 지연하여 조기 실행을 방지했습니다.
+- 스레드 상태 오류 처리 시 특정 메타데이터와 응답 코드를 추가하여 생성 중 상태 업데이트 실패 시 명확성을 높였습니다.
+- 스레드 상태 조회 시 interrupt ID를 노출하여 API 투명성을 강화했습니다.
 
 <a id="2025-07-17"></a>
 ## v0.2.96
 
-* Added a fallback mechanism for configurable header patterns to handle exclude/include settings more effectively.
+* exclude/include 설정을 더 효과적으로 처리하기 위해 구성 가능한 헤더 패턴에 폴백 메커니즘을 추가했습니다.
 
 <a id="2025-07-17"></a>
 ## v0.2.95
 
-* Avoided setting the future if it is already done to prevent redundant operations.
-* Resolved compatibility errors in CI by switching from `typing.TypedDict` to `typing_extensions.TypedDict` for Python versions below 3.12.
+* 이미 완료된 경우 future를 설정하지 않도록 하여 중복 작업을 방지했습니다.
+* Python 3.12 미만 버전에서 `typing.TypedDict` 대신 `typing_extensions.TypedDict`를 사용하도록 변경하여 CI 호환성 오류를 해결했습니다.
 
 <a id="2025-07-16"></a>
 ## v0.2.94
 
-* Improved performance by omitting pending sends for langgraph versions 0.5 and above.
-* Improved server startup logs to provide clearer warnings when the DD_API_KEY environment variable is set.
+* langgraph 0.5 이상 버전에서 보류 중인 전송을 생략하여 성능을 개선했습니다.
+* DD_API_KEY 환경 변수가 설정된 경우 서버 시작 로그를 더 명확하게 개선했습니다.
 
 <a id="2025-07-16"></a>
 ## v0.2.93
 
-* Removed the GIN index for run metadata to improve performance.
+* 실행(run) 메타데이터에 대한 GIN 인덱스를 제거하여 성능을 개선했습니다.
 
 <a id="2025-07-16"></a>
 ## v0.2.92
 
-* Enabled copying functionality for blobs and checkpoints, improving data management flexibility.
+* blob 및 체크포인트 복사 기능을 활성화하여 데이터 관리 유연성을 높였습니다.
 
 <a id="2025-07-16"></a>
 ## v0.2.91
 
-* Reduced writes to the `checkpoint_blobs` table by inlining small values (null, numeric, str, etc.). This means we don't need to store extra values for channels that haven't been updated.
+* `checkpoint_blobs` 테이블에 대한 쓰기를 줄이기 위해 작은 값(null, 숫자, 문자열 등)을 인라인 처리했습니다. 업데이트되지 않은 채널에 대해 추가 값을 저장할 필요가 없어졌습니다.
 
 <a id="2025-07-16"></a>
 ## v0.2.90
 
-* Improve checkpoint writes via node-local background queueing.
+* 노드 로컬 백그라운드 큐잉을 통해 체크포인트 쓰기 성능을 개선했습니다.
 
 <a id="2025-07-15"></a>
 ## v0.2.89
 
-* Decoupled checkpoint writing from thread/run state by removing foreign keys and updated logger to prevent timeout-related failures.
+* 체크포인트 쓰기를 스레드/실행 상태에서 분리하고, 외래 키를 제거했으며, 타임아웃 관련 실패를 방지하기 위해 로거를 업데이트했습니다.
 
 <a id="2025-07-14"></a>
 ## v0.2.88
 
-* Removed the foreign key constraint for `thread` in the `run` table to simplify database schema.
+* 데이터베이스 스키마를 단순화하기 위해 `run` 테이블의 `thread` 외래 키 제약을 제거했습니다.
 
 <a id="2025-07-14"></a>
 ## v0.2.87
 
-* Added more detailed logs for Redis worker signaling to improve debugging.
+* Redis 워커 신호에 대한 로그를 더 상세하게 추가하여 디버깅을 개선했습니다.
 
 <a id="2025-07-11"></a>
 ## v0.2.86
 
-* Honored tool descriptions in the `/mcp` endpoint to align with expected functionality.
+* `/mcp` 엔드포인트에서 툴 설명을 반영하여 기대되는 기능과 일치하도록 했습니다.
 
 <a id="2025-07-10"></a>
 ## v0.2.85
 
-* Added support for the `on_disconnect` field to `runs/wait` and included disconnect logs for better debugging.
+* `runs/wait`에 `on_disconnect` 필드 지원을 추가하고, 디버깅을 위한 disconnect 로그를 포함했습니다.
 
 <a id="2025-07-09"></a>
 ## v0.2.84
 
-* Removed unnecessary status updates to streamline thread handling and updated version to 0.2.84.
+* 불필요한 상태 업데이트를 제거하여 스레드 처리를 간소화하고, 버전을 0.2.84로 업데이트했습니다.
 
 <a id="2025-07-09"></a>
 ## v0.2.83
 
-* Reduced the default time-to-live for resumable streams to 2 minutes.
-* Enhanced data submission logic to send data to both Beacon and LangSmith instance based on license configuration.
-* Enabled submission of self-hosted data to a LangSmith instance when the endpoint is configured.
+* 재개 가능한 스트림의 기본 time-to-live을 2분으로 줄였습니다.
+* Beacon 및 LangSmith 인스턴스에 라이선스 구성에 따라 데이터를 제출할 수 있도록 데이터 제출 로직을 강화했습니다.
+* 엔드포인트가 구성된 경우 자체 호스팅 데이터를 LangSmith 인스턴스에 제출할 수 있도록 지원했습니다.
 
 <a id="2025-07-03"></a>
 ## v0.2.82
 
-* Addressed a race condition in background runs by implementing a lock using join, ensuring reliable execution across CTEs.
+* join을 사용해 락을 구현하여 백그라운드 실행에서 발생하는 레이스 컨디션을 해결하고, CTE 전반에 걸쳐 신뢰성을 확보했습니다.
 
 <a id="2025-07-03"></a>
 ## v0.2.81
 
-* Optimized run streams by reducing initial wait time to improve responsiveness for older or non-existent runs.
+* 초기 대기 시간을 줄여 오래되었거나 존재하지 않는 실행(run)에 대한 응답성을 개선하여 실행 스트림을 최적화했습니다.
 
 <a id="2025-07-03"></a>
 ## v0.2.80
 
-* Corrected parameter passing in the `logger.ainfo()` API call to resolve a TypeError.
+* `logger.ainfo()` API 호출에서 파라미터 전달을 올바르게 수정하여 TypeError를 해결했습니다.
 
 <a id="2025-07-02"></a>
 ## v0.2.79
 
-* Fixed a JsonDecodeError in checkpointing with remote graph by correcting JSON serialization to handle trailing slashes properly.
-* Introduced a configuration flag to disable webhooks globally across all routes.
+* JSON 직렬화 시 트레일링 슬래시를 올바르게 처리하여 원격 그래프 체크포인트에서 발생하는 JsonDecodeError를 수정했습니다.
+* 모든 라우트에서 웹훅을 전역적으로 비활성화할 수 있는 구성 플래그를 도입했습니다.
 
 <a id="2025-07-02"></a>
 ## v0.2.78
 
-* Added timeout retries to webhook calls to improve reliability.
-* Added HTTP request metrics, including a request count and latency histogram, for enhanced monitoring capabilities.
+* 웹훅 호출에 타임아웃 재시도를 추가하여 신뢰성을 높였습니다.
+* HTTP 요청 메트릭(요청 수, 지연 시간 히스토그램 등)을 추가하여 모니터링 기능을 강화했습니다.
 
 <a id="2025-07-02"></a>
 ## v0.2.77
 
-* Added HTTP metrics to improve performance monitoring.
-* Changed the Redis cache delimiter to reduce conflicts with subgraph message names and updated caching behavior.
+* HTTP 메트릭을 추가하여 성능 모니터링을 강화했습니다.
+* Redis 캐시 구분자를 변경하여 서브그래프 메시지 이름과의 충돌을 줄이고, 캐싱 동작을 업데이트했습니다.
 
 <a id="2025-07-01"></a>
 ## v0.2.76
 
-* Updated Redis cache delimiter to prevent conflicts with subgraph messages.
+* Redis 캐시 구분자를 업데이트하여 서브그래프 메시지와의 충돌을 방지했습니다.
 
 <a id="2025-06-30"></a>
 ## v0.2.74
 
-* Scheduled webhooks in an isolated loop to ensure thread-safe operations and prevent errors with PYTHONASYNCIODEBUG=1.
+* 웹훅을 격리된 루프에서 스케줄링하여 스레드 안전성을 확보하고, PYTHONASYNCIODEBUG=1 환경에서 오류를 방지했습니다.
 
 <a id="2025-06-27"></a>
 ## v0.2.73
 
-* Fixed an infinite frame loop issue and removed the dict_parser due to structlog's unexpected behavior.
-* Throw a 409 error on deadlock occurrence during run cancellations to handle lock conflicts gracefully.
+* 무한 프레임 루프 문제를 해결하고, structlog의 예기치 않은 동작으로 인해 dict_parser를 제거했습니다.
+* 실행 취소 중 데드락 발생 시 409 오류를 반환하여 락 충돌을 우아하게 처리했습니다.
 
 <a id="2025-06-27"></a>
 ## v0.2.72
 
-* Ensured compatibility with future langgraph versions.
-* Implemented a 409 response status to handle deadlock issues during cancellation.
+* 향후 langgraph 버전과의 호환성을 확보했습니다.
+* 취소 중 데드락 문제를 처리하기 위해 409 응답 상태를 구현했습니다.
 
 <a id="2025-06-26"></a>
 ## v0.2.71
 
-* Improved logging for better clarity and detail regarding log types.
+* 로그 유형에 대한 명확성과 세부 정보를 높이기 위해 로깅을 개선했습니다.
 
 <a id="2025-06-26"></a>
 ## v0.2.70
 
-* Improved error handling to better distinguish and log TimeoutErrors caused by users from internal run timeouts.
+* 사용자에 의해 발생한 TimeoutError와 내부 실행(run) 타임아웃을 더 잘 구분하고 로그에 남기도록 오류 처리를 개선했습니다.
 
 <a id="2025-06-26"></a>
 ## v0.2.69
 
-* Added sorting and pagination to the crons API and updated schema definitions for improved accuracy.
+* crons API에 정렬 및 페이지네이션을 추가하고, 스키마 정의를 업데이트하여 정확성을 높였습니다.
 
 <a id="2025-06-26"></a>
 ## v0.2.66
 
-* Fixed a 404 error when creating multiple runs with the same thread_id using `on_not_exist="create"`.
+* `on_not_exist="create"` 옵션으로 동일한 thread_id로 여러 실행(run)을 생성할 때 발생하는 404 오류를 수정했습니다.
 
 <a id="2025-06-25"></a>
 ## v0.2.65
 
-* Ensured that only fields from `assistant_versions` are returned when necessary.
-* Ensured consistent data types for in-memory and PostgreSQL users, improving internal authentication handling.
+* 필요한 경우 `assistant_versions`의 필드만 반환하도록 했습니다.
+* 인메모리 및 PostgreSQL 사용자에 대해 데이터 타입을 일관되게 처리하여 내부 인증 처리를 개선했습니다.
 
 <a id="2025-06-24"></a>
 ## v0.2.64
 
-* Added descriptions to version entries for better clarity.
+* 버전 항목에 설명을 추가하여 명확성을 높였습니다.
 
 <a id="2025-06-23"></a>
 ## v0.2.62
 
-* Improved user handling for custom authentication in the JS Studio.
-* Added Prometheus-format run statistics to the metrics endpoint for better monitoring.
-* Added run statistics in Prometheus format to the metrics endpoint.
+* JS Studio에서 커스텀 인증을 위한 사용자 처리를 개선했습니다.
+* 메트릭 엔드포인트에 Prometheus 포맷의 실행(run) 통계를 추가하여 모니터링을 강화했습니다.
+* 메트릭 엔드포인트에 Prometheus 포맷의 실행 통계를 추가했습니다.
 
 <a id="2025-06-20"></a>
 ## v0.2.61
 
-* Set a maximum idle time for Redis connections to prevent unnecessary open connections.
+* Redis 연결의 최대 유휴 시간을 설정하여 불필요한 연결 유지 방지를 강화했습니다.
 
 <a id="2025-06-20"></a>
 ## v0.2.60
 
-* Enhanced error logging to include traceback details for dictionary operations.
-* Added a `/metrics` endpoint to expose queue worker metrics for monitoring.
+* 딕셔너리 작업 오류 발생 시 traceback을 포함하여 오류 로깅을 강화했습니다.
+* 큐 워커 메트릭을 노출하는 `/metrics` 엔드포인트를 추가하여 모니터링을 강화했습니다.
 
 <a id="2025-06-18"></a>
 ## v0.2.57
 
-* Removed CancelledError from retriable exceptions to allow local interrupts while maintaining retriability for workers.
-* Introduced middleware to gracefully shut down the server after completing in-flight requests upon receiving a SIGINT.
-* Reduced metadata stored in checkpoint to only include necessary information.
-* Improved error handling in join runs to return error details when present.
+* 재시도 가능한 예외에서 CancelledError를 제거하여 워커는 재시도 가능하면서 로컬 인터럽트가 허용되도록 했습니다.
+* SIGINT 수신 시 서버가 진행 중인 요청을 완료한 후 정상적으로 종료할 수 있도록 미들웨어를 도입했습니다.
+* 체크포인트에 저장되는 메타데이터를 필요한 정보만 포함하도록 축소했습니다.
+* join 실행(run)에서 오류가 있을 경우 오류 세부 정보를 반환하도록 오류 처리를 개선했습니다.
 
 <a id="2025-06-17"></a>
 ## v0.2.56
 
-* Improved application stability by adding a handler for SIGTERM signals.
+* SIGTERM 신호에 대한 핸들러를 추가하여 애플리케이션 안정성을 강화했습니다.
 
 <a id="2025-06-17"></a>
 ## v0.2.55
 
-* Improved the handling of cancellations in the queue entrypoint.
-* Improved cancellation handling in the queue entry point.
-
-<a id="2025-06-16"></a>
-## v0.2.54
-
-* Enhanced error message for LuaLock timeout during license validation.
-* Fixed the $contains filter in custom auth by requiring an explicit ::text cast and updated tests accordingly.
-* Ensured project and tenant IDs are formatted as UUIDs for consistency.
-
-<a id="2025-06-13"></a>
-## v0.2.53
-
-* Resolved a timing issue to ensure the queue starts only after the graph is registered.
-* Improved performance by setting thread and run status in a single query and enhanced error handling during checkpoint writes.
-* Reduced the default background grace period to 3 minutes.
-
-<a id="2025-06-12"></a>
-## v0.2.52
-
-* Now logging expected graphs when one is omitted to improve traceability.
-* Implemented a time-to-live (TTL) feature for resumable streams.
-* Improved query efficiency and consistency by adding a unique index and optimizing row locking.
-
-<a id="2025-06-12"></a>
-## v0.2.51
-
-* Handled `CancelledError` by marking tasks as ready to retry, improving error management in worker processes.
-* Added LG API version and request ID to metadata and logs for better tracking.
-* Added LG API version and request ID to metadata and logs to improve traceability.
-* Improved database performance by creating indexes concurrently.
-* Ensured postgres write is committed only after the Redis running marker is set to prevent race conditions.
-* Enhanced query efficiency and reliability by adding a unique index on thread_id/running, optimizing row locks, and ensuring deterministic run selection.
-* Resolved a race condition by ensuring Postgres updates only occur after the Redis running marker is set.
-
-<a id="2025-06-07"></a>
-## v0.2.46
-
-* Introduced a new connection for each operation while preserving transaction characteristics in Threads state `update()` and `bulk()` commands.
-
-<a id="2025-06-05"></a>
-## v0.2.45
-
-* Enhanced streaming feature by incorporating tracing contexts.
-* Removed an unnecessary query from the Crons.search function.
-* Resolved connection reuse issue when scheduling next run for multiple cron jobs.
-* Removed an unnecessary query in the Crons.search function to improve efficiency.
-* Resolved an issue with scheduling the next cron run by improving connection reuse.
-
-<a id="2025-06-04"></a>
-## v0.2.44
-
-* Enhanced the worker logic to exit the pipeline before continuing when the Redis message limit is reached.
-* Introduced a ceiling for Redis message size with an option to skip messages larger than 128 MB for improved performance.
-* Ensured the pipeline always closes properly to prevent resource leaks.
-
-<a id="2025-06-04"></a>
-## v0.2.43
-
-* Improved performance by omitting logs in metadata calls and ensuring output schema compliance in value streaming.
-* Ensured the connection is properly closed after use.
-* Aligned output format to strictly adhere to the specified schema.
-* Stopped sending internal logs in metadata requests to improve privacy.
-
-<a id="2025-06-04"></a>
-## v0.2.42
-
-* Added timestamps to track the start and end of a request's run.
-* Added tracer information to the configuration settings.
-* Added support for streaming with tracing contexts.
-
-<a id="2025-06-03"></a>
-## v0.2.41
-
-* Added locking mechanism to prevent errors in pipelined executions.
+* 큐 엔트리포인트에서 취소 처리 로직을 개선했습니다.
+* 큐 엔트리 포인트에서 취소 처리 로직을 개선했습니다.

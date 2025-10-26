@@ -2,19 +2,19 @@
 title: Dria
 ---
 
->[Dria](https://dria.co/) is a hub of public RAG models for developers to both contribute and utilize a shared embedding lake. This notebook demonstrates how to use the `Dria API` for data retrieval tasks.
+>[Dria](https://dria.co/)는 개발자들이 공유 embedding lake에 기여하고 활용할 수 있는 공개 RAG 모델의 허브입니다. 이 노트북은 데이터 검색 작업을 위해 `Dria API`를 사용하는 방법을 보여줍니다.
 
 # Installation
 
-Ensure you have the `dria` package installed. You can install it using pip:
+`dria` 패키지가 설치되어 있는지 확인하세요. pip를 사용하여 설치할 수 있습니다:
 
 ```python
 pip install -qU dria
 ```
 
-# Configure API Key
+# API Key 구성
 
-Set up your Dria API key for access.
+접근을 위해 Dria API key를 설정하세요.
 
 ```python
 import os
@@ -22,9 +22,9 @@ import os
 os.environ["DRIA_API_KEY"] = "DRIA_API_KEY"
 ```
 
-# Initialize Dria Retriever
+# Dria Retriever 초기화
 
-Create an instance of `DriaRetriever`.
+`DriaRetriever`의 인스턴스를 생성하세요.
 
 ```python
 from langchain_community.retrievers import DriaRetriever
@@ -33,9 +33,9 @@ api_key = os.getenv("DRIA_API_KEY")
 retriever = DriaRetriever(api_key=api_key)
 ```
 
-# **Create Knowledge Base**
+# **Knowledge Base 생성**
 
-Create a knowledge on [Dria's Knowledge Hub](https://dria.co/knowledge)
+[Dria's Knowledge Hub](https://dria.co/knowledge)에서 knowledge를 생성하세요
 
 ```python
 contract_id = retriever.create_knowledge_base(
@@ -46,9 +46,9 @@ contract_id = retriever.create_knowledge_base(
 )
 ```
 
-# Add Data
+# 데이터 추가
 
-Load data into your Dria knowledge base.
+Dria knowledge base에 데이터를 로드하세요.
 
 ```python
 texts = [
@@ -61,9 +61,9 @@ ids = retriever.add_texts(texts)
 print("Data added with IDs:", ids)
 ```
 
-# Retrieve Data
+# 데이터 검색
 
-Use the retriever to find relevant documents given a query.
+retriever를 사용하여 쿼리와 관련된 문서를 찾으세요.
 
 ```python
 query = "Find information about Dria."

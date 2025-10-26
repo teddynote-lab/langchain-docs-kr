@@ -1,31 +1,31 @@
 ---
-title: Set up feedback criteria
-sidebarTitle: Set up feedback criteria
+title: 피드백 기준 설정하기
+sidebarTitle: 피드백 기준 설정하기
 ---
 
 <Tip>
-**Recommended Reading**
+**권장 읽기 자료**
 
-Before diving into this content, it might be helpful to read the following:
+이 내용을 살펴보기 전에 다음 문서를 읽어보시면 도움이 됩니다:
 
-- [Conceptual guide on tracing and feedback](/langsmith/observability-concepts)
-- [Reference guide on feedback data format](/langsmith/feedback-data-format)
+- [추적 및 피드백에 대한 개념 가이드](/langsmith/observability-concepts)
+- [피드백 데이터 형식에 대한 참조 가이드](/langsmith/feedback-data-format)
 
 </Tip>
 
-Feedback criteria are represented in the application as feedback tags. For human feedback, you can set up new feedback criteria as continuous feedback or categorical feedback.
+피드백 기준은 애플리케이션에서 피드백 태그로 표현됩니다. 사람의 피드백을 위해 연속형 피드백 또는 범주형 피드백으로 새로운 피드백 기준을 설정할 수 있습니다.
 
-To set up a new feedback criteria, follow [this link](https://smith.langchain.com/settings/workspaces/feedbacks) to view all existing tags for your workspace, then click **New Tag**.
+새로운 피드백 기준을 설정하려면 [이 링크](https://smith.langchain.com/settings/workspaces/feedbacks)를 따라 워크스페이스의 모든 기존 태그를 확인한 다음 **New Tag**를 클릭하세요.
 
-## Continuous feedback
+## 연속형 피드백
 
-For continuous feedback, you can enter a feedback tag name, then select a minimum and maximum value. Every value, including floating-point numbers, within this range will be accepted as feedback scores.
+연속형 피드백의 경우 피드백 태그 이름을 입력한 다음 최소값과 최대값을 선택할 수 있습니다. 부동 소수점 숫자를 포함하여 이 범위 내의 모든 값이 피드백 점수로 허용됩니다.
 
 ![](/langsmith/images/cont-feedback.png)
 
-## Categorical feedback
+## 범주형 피드백
 
-For categorical feedback, you can enter a feedback tag name, then add a list of categories, each category mapping to a score. When you provide feedback, you can select one of these categories as the feedback score.
-Both the category label and the score will be logged as feedback in `value` and `score` fields, respectively.
+범주형 피드백의 경우 피드백 태그 이름을 입력한 다음 각 범주가 점수에 매핑되는 범주 목록을 추가할 수 있습니다. 피드백을 제공할 때 이러한 범주 중 하나를 피드백 점수로 선택할 수 있습니다.
+범주 레이블과 점수는 각각 `value` 및 `score` 필드에 피드백으로 기록됩니다.
 
 ![](/langsmith/images/cat-feedback.png)

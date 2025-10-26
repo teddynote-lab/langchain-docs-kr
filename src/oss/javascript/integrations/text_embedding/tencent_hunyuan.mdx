@@ -1,33 +1,34 @@
+```mdx
 ---
 title: TencentHunyuan
 ---
 
-The `TencentHunyuanEmbeddings` class uses the Tencent Hunyuan API to generate embeddings for a given text.
+`TencentHunyuanEmbeddings` class는 Tencent Hunyuan API를 사용하여 주어진 텍스트에 대한 embedding을 생성합니다.
 
 ## Setup
 
-1. Sign up for a Tencent Cloud account [here](https://cloud.tencent.com/register).
-2. Create SecretID & SecretKey [here](https://console.cloud.tencent.com/cam/capi).
-3. Set SecretID and SecretKey as environment variables named `TENCENT_SECRET_ID` and `TENCENT_SECRET_KEY`, respectively.
+1. [여기](https://cloud.tencent.com/register)에서 Tencent Cloud 계정에 가입하세요.
+2. [여기](https://console.cloud.tencent.com/cam/capi)에서 SecretID & SecretKey를 생성하세요.
+3. SecretID와 SecretKey를 각각 `TENCENT_SECRET_ID`와 `TENCENT_SECRET_KEY`라는 이름의 환경 변수로 설정하세요.
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
 npm install @langchain/community @langchain/core
 ```
-If you are using LangChain.js in a browser environment, you'll also need to install the following dependencies:
+브라우저 환경에서 LangChain.js를 사용하는 경우, 다음 의존성도 설치해야 합니다:
 
 ```bash npm
 npm install crypto-js
 ```
 
-And then make sure that you import from the `web` as shown below.
+그런 다음 아래와 같이 `web`에서 import하는지 확인하세요.
 
 ## Usage
 
-Here's an example:
+다음은 예제입니다:
 
 ```typescript
 // in nodejs environment
@@ -47,5 +48,6 @@ console.log({ documentRes });
 
 ## Related
 
-- Embedding model [conceptual guide](/oss/integrations/text_embedding)
-- Embedding model [how-to guides](/oss/integrations/text_embedding)
+- Embedding model [개념 가이드](/oss/integrations/text_embedding)
+- Embedding model [사용 방법 가이드](/oss/integrations/text_embedding)
+```

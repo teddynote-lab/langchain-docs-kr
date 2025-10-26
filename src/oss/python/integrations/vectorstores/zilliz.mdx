@@ -2,19 +2,19 @@
 title: Zilliz
 ---
 
->[Zilliz Cloud](https://zilliz.com/doc/quick_start) is a fully managed service on cloud for `LF AI Milvus®`,
+>[Zilliz Cloud](https://zilliz.com/doc/quick_start)는 `LF AI Milvus®`를 위한 완전 관리형 클라우드 서비스입니다.
 
-This notebook shows how to use functionality related to the Zilliz Cloud managed vector database.
+이 노트북은 Zilliz Cloud 관리형 vector database와 관련된 기능을 사용하는 방법을 보여줍니다.
 
-You'll need to install `langchain-community` with `pip install -qU langchain-community` to use this integration
+이 integration을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다.
 
-To run, you should have a `Zilliz Cloud` instance up and running. Here are the [installation instructions](https://zilliz.com/cloud)
+실행하려면 `Zilliz Cloud` 인스턴스가 실행 중이어야 합니다. [설치 지침](https://zilliz.com/cloud)은 여기를 참조하세요.
 
 ```python
 pip install -qU  pymilvus
 ```
 
-We want to use `OpenAIEmbeddings` so we have to get the OpenAI API Key.
+`OpenAIEmbeddings`를 사용하려면 OpenAI API Key를 가져와야 합니다.
 
 ```python
 import getpass

@@ -2,7 +2,7 @@
 title: Copy Paste
 ---
 
-This notebook covers how to load a document object from something you just want to copy and paste. In this case, you don't even need to use a DocumentLoader, but rather can just construct the Document directly.
+이 노트북은 복사하여 붙여넣기한 내용에서 document 객체를 로드하는 방법을 다룹니다. 이 경우 DocumentLoader를 사용할 필요 없이 Document를 직접 생성할 수 있습니다.
 
 ```python
 from langchain_core.documents import Document
@@ -18,7 +18,7 @@ doc = Document(page_content=text)
 
 ## Metadata
 
-If you want to add metadata about the where you got this piece of text, you easily can with the metadata key.
+텍스트를 가져온 출처에 대한 metadata를 추가하려면 metadata key를 사용하여 쉽게 추가할 수 있습니다.
 
 ```python
 metadata = {"source": "internet", "date": "Friday"}

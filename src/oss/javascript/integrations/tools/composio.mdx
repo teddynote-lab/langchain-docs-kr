@@ -1,9 +1,9 @@
 ---
 title: Composio
-description: Access 500+ tools and integrations through Composio's unified API platform for AI agents, with OAuth handling, event-driven workflows, and multi-user support.
+description: OAuth 처리, 이벤트 기반 워크플로우, 다중 사용자 지원을 갖춘 AI 에이전트를 위한 Composio의 통합 API 플랫폼을 통해 500개 이상의 도구와 통합에 액세스하세요.
 ---
 
-[Composio](https://composio.dev) is an integration platform that provides access to 500+ tools across popular applications like GitHub, Slack, Notion, and more. It enables AI agents to interact with external services through a unified API, handling authentication, permissions, and event-driven workflows.
+[Composio](https://composio.dev)는 GitHub, Slack, Notion 등 인기 있는 애플리케이션에서 500개 이상의 도구에 대한 액세스를 제공하는 통합 플랫폼입니다. AI 에이전트가 통합 API를 통해 외부 서비스와 상호 작용할 수 있도록 하며, 인증, 권한 및 이벤트 기반 워크플로우를 처리합니다.
 
 ## Overview
 
@@ -15,21 +15,21 @@ description: Access 500+ tools and integrations through Composio's unified API p
 
 ### Tool features
 
-- **500+ Tool Access**: Pre-built integrations for GitHub, Slack, Gmail, Jira, Notion, and more
-- **Authentication Management**: Handles OAuth flows, API keys, and authentication state
-- **Event-Driven Workflows**: Trigger agents based on external events (new Slack messages, GitHub issues, etc.)
-- **Fine-Grained Permissions**: Control tool access and data exposure per user
-- **Custom Tool Support**: Add proprietary APIs and internal tools
+- **500개 이상의 도구 액세스**: GitHub, Slack, Gmail, Jira, Notion 등을 위한 사전 구축된 통합
+- **인증 관리**: OAuth 플로우, API key 및 인증 상태 처리
+- **이벤트 기반 워크플로우**: 외부 이벤트(새로운 Slack 메시지, GitHub issue 등)를 기반으로 에이전트 트리거
+- **세밀한 권한 제어**: 사용자별 도구 액세스 및 데이터 노출 제어
+- **커스텀 도구 지원**: 독점 API 및 내부 도구 추가
 
 ## Setup
 
-The integration lives in the `@composio/langchain` package.
+이 통합은 `@composio/langchain` package에 포함되어 있습니다.
 
 ```bash
 npm install @composio/langchain @composio/core
 ```
 
-Or using other package managers:
+또는 다른 package manager를 사용하여:
 
 ```bash
 yarn add @composio/langchain @composio/core
@@ -39,7 +39,7 @@ pnpm add @composio/langchain @composio/core
 
 ### Credentials
 
-You'll need a Composio API key. Sign up for free at [composio.dev](https://composio.dev) to get your API key.
+Composio API key가 필요합니다. [composio.dev](https://composio.dev)에서 무료로 가입하여 API key를 받으세요.
 
 ```typescript Set API key
 import * as dotenv from 'dotenv';
@@ -49,7 +49,7 @@ dotenv.config();
 process.env.COMPOSIO_API_KEY = 'your_api_key_here';
 ```
 
-It's also helpful to set up [LangSmith](https://docs.smith.langchain.com/) for tracing:
+추적을 위해 [LangSmith](https://docs.smith.langchain.com/)를 설정하는 것도 유용합니다:
 
 ```typescript Enable tracing
 // process.env.LANGSMITH_API_KEY = 'your_langsmith_key';
@@ -58,7 +58,7 @@ It's also helpful to set up [LangSmith](https://docs.smith.langchain.com/) for t
 
 ## Instantiation
 
-Initialize Composio with the LangChain provider and get tools from specific toolkits. Each toolkit represents a service (e.g., GitHub, Slack) with multiple tools (actions you can perform).
+LangChain provider로 Composio를 초기화하고 특정 toolkit에서 도구를 가져옵니다. 각 toolkit은 여러 도구(수행할 수 있는 작업)가 있는 서비스(예: GitHub, Slack)를 나타냅니다.
 
 ```typescript Initialize Composio
 import { Composio } from '@composio/core';
@@ -78,19 +78,19 @@ console.log(`Loaded ${tools.length} tools from GitHub toolkit`);
 
 ### Available toolkits
 
-Composio provides toolkits for various services:
+Composio는 다양한 서비스를 위한 toolkit을 제공합니다:
 
-**Productivity**: GitHub, Slack, Gmail, Jira, Notion, Asana, Trello, ClickUp
-**Communication**: Discord, Telegram, WhatsApp, Microsoft Teams
-**Development**: GitLab, Bitbucket, Linear, Sentry
-**Data & Analytics**: Google Sheets, Airtable, HubSpot, Salesforce
-**And 100+ more...**
+**생산성**: GitHub, Slack, Gmail, Jira, Notion, Asana, Trello, ClickUp
+**커뮤니케이션**: Discord, Telegram, WhatsApp, Microsoft Teams
+**개발**: GitLab, Bitbucket, Linear, Sentry
+**데이터 및 분석**: Google Sheets, Airtable, HubSpot, Salesforce
+**그리고 100개 이상...**
 
 ## Invocation
 
 ### Get tools from multiple toolkits
 
-You can load tools from multiple services:
+여러 서비스에서 도구를 로드할 수 있습니다:
 
 ```typescript
 // Get tools from multiple toolkits
@@ -99,7 +99,7 @@ const tools = await composio.tools.get('default', ['GITHUB', 'SLACK', 'GMAIL']);
 
 ### Get specific tools
 
-Instead of entire toolkits, you can load specific tools:
+전체 toolkit 대신 특정 도구를 로드할 수 있습니다:
 
 ```typescript
 // Get specific tools by name
@@ -110,7 +110,7 @@ const tools = await composio.tools.get('default', {
 
 ### User-specific tools
 
-Composio supports multi-user scenarios with user-specific authentication:
+Composio는 사용자별 인증을 통한 다중 사용자 시나리오를 지원합니다:
 
 ```typescript
 // Get tools for a specific user
@@ -120,7 +120,7 @@ const tools = await composio.tools.get('user_123', 'GITHUB');
 
 ## Use within an agent
 
-Here's a complete example using Composio tools with a LangGraph agent to interact with HackerNews:
+다음은 HackerNews와 상호 작용하기 위해 LangGraph 에이전트와 함께 Composio 도구를 사용하는 완전한 예제입니다:
 
 ```typescript
 import { ChatOpenAI } from '@langchain/openai';
@@ -198,7 +198,7 @@ console.log(nextState.messages[nextState.messages.length - 1].content);
 
 ### Using with GitHub toolkit
 
-Here's an example that stars a GitHub repository:
+다음은 GitHub repository에 star를 추가하는 예제입니다:
 
 ```typescript
 import { ChatOpenAI } from '@langchain/openai';
@@ -241,7 +241,7 @@ console.log(result.messages[result.messages.length - 1].content);
 
 ## Authentication setup
 
-Before using tools that require authentication, users need to connect their accounts:
+인증이 필요한 도구를 사용하기 전에 사용자는 자신의 계정을 연결해야 합니다:
 
 ```typescript
 import { Composio } from '@composio/core';
@@ -264,7 +264,7 @@ console.log(`Authenticate at: ${authConnection.redirectUrl}`);
 
 ## Multi-user scenarios
 
-For applications with multiple users:
+여러 사용자가 있는 애플리케이션의 경우:
 
 ```typescript
 // Each user authenticates their own accounts
@@ -281,11 +281,11 @@ const agent2 = createAgent(model, toolsUser2);
 
 ## Event-driven workflows
 
-Composio supports triggering agents based on external events. When events occur in connected apps (like new GitHub commits or Slack messages), triggers automatically send structured payloads to your application.
+Composio는 외부 이벤트를 기반으로 에이전트를 트리거하는 것을 지원합니다. 연결된 앱에서 이벤트가 발생하면(새로운 GitHub commit 또는 Slack 메시지 등) trigger가 자동으로 구조화된 payload를 애플리케이션에 전송합니다.
 
 ### Creating a trigger
 
-First, create a trigger for the events you want to monitor:
+먼저 모니터링하려는 이벤트에 대한 trigger를 생성합니다:
 
 ```typescript
 import { Composio } from '@composio/core';
@@ -314,7 +314,7 @@ console.log(`Trigger created: ${trigger.triggerId}`);
 
 ### Subscribing to triggers (Development)
 
-For local development and prototyping, you can subscribe directly to triggers:
+로컬 개발 및 프로토타이핑을 위해 trigger를 직접 구독할 수 있습니다:
 
 ```typescript
 import { Composio } from '@composio/core';
@@ -343,7 +343,7 @@ composio.triggers.subscribe(
 
 ### Type-safe trigger handling
 
-For better type safety, define payload types:
+더 나은 type 안전성을 위해 payload type을 정의합니다:
 
 ```typescript
 import { TriggerEvent } from '@composio/core';
@@ -366,7 +366,7 @@ function handleGitHubStarAddedEvent(event: TriggerEvent<GitHubStarAddedEventPayl
 
 ### Webhooks (Production)
 
-For production, configure webhooks in the [Composio dashboard](https://platform.composio.dev/settings/events):
+프로덕션의 경우 [Composio dashboard](https://platform.composio.dev/settings/events)에서 webhook을 구성합니다:
 
 ```typescript
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -395,17 +395,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 ```
 
-For more details, see the [Composio Triggers documentation](https://docs.composio.dev/docs/using-triggers)
+자세한 내용은 [Composio Triggers documentation](https://docs.composio.dev/docs/using-triggers)을 참조하세요.
 
 ## Advanced features
 
 ### Custom tools
 
-Composio allows you to create custom tools that can be used alongside built-in tools. There are two types:
+Composio를 사용하면 기본 제공 도구와 함께 사용할 수 있는 커스텀 도구를 만들 수 있습니다. 두 가지 유형이 있습니다:
 
 #### Standalone tools
 
-Simple tools that don't require authentication:
+인증이 필요하지 않은 간단한 도구:
 
 ```typescript
 import { Composio } from '@composio/core';
@@ -438,7 +438,7 @@ const allTools = [...tools, tool];
 
 #### Toolkit-based tools
 
-Tools that require authentication and can use toolkit credentials:
+인증이 필요하고 toolkit credential을 사용할 수 있는 도구:
 
 ```typescript
 import { Composio } from '@composio/core';
@@ -486,7 +486,7 @@ const tool = await composio.tools.createCustomTool({
 });
 ```
 
-Execute custom tools:
+커스텀 도구 실행:
 
 ```typescript
 import { Composio } from '@composio/core';
@@ -504,11 +504,11 @@ const result = await composio.tools.execute('TOOL_SLUG', {
 });
 ```
 
-For more details, see the [Composio Custom Tools documentation](https://docs.composio.dev/docs/custom-tools)
+자세한 내용은 [Composio Custom Tools documentation](https://docs.composio.dev/docs/custom-tools)을 참조하세요.
 
 ### Fine-grained permissions
 
-Control what actions tools can perform:
+도구가 수행할 수 있는 작업을 제어합니다:
 
 ```typescript
 // Get tools with specific permissions
@@ -520,8 +520,7 @@ const tools = await composio.tools.get('default', 'GITHUB', {
 
 ## API reference
 
-For detailed documentation of all Composio features and configurations, visit:
+모든 Composio 기능 및 구성에 대한 자세한 문서는 다음을 참조하세요:
 - [Composio Documentation](https://docs.composio.dev)
 - [LangChain Provider Guide](https://docs.composio.dev/providers/langchain)
 - [Available Tools & Actions](https://docs.composio.dev/toolkits/introduction)
-

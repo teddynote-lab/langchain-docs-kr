@@ -2,59 +2,57 @@
 title: Unstructured
 ---
 
->The `unstructured` package from
-[Unstructured.IO](https://www.unstructured.io/) extracts clean text from raw source documents like
-PDFs and Word documents.
-This page covers how to use the [`unstructured`](https://github.com/Unstructured-IO/unstructured)
-ecosystem within LangChain.
+>[Unstructured.IO](https://www.unstructured.io/)의 `unstructured` 패키지는
+PDF 및 Word 문서와 같은 원본 소스 문서에서 깨끗한 텍스트를 추출합니다.
+이 페이지에서는 LangChain 내에서 [`unstructured`](https://github.com/Unstructured-IO/unstructured)
+생태계를 사용하는 방법을 다룹니다.
 
 ## Installation and Setup
 
-If you are using a loader that runs locally, use the following steps to get `unstructured` and its
-dependencies running.
+로컬에서 실행되는 loader를 사용하는 경우, 다음 단계를 따라 `unstructured`와 그
+종속성을 실행하세요.
 
-- For the smallest installation footprint and to take advantage of features not available in the
-  open-source `unstructured` package, install the Python SDK with `pip install unstructured-client`
-  along with `pip install langchain-unstructured` to use the `UnstructuredLoader` and partition
-  remotely against the Unstructured API. This loader lives
-  in a LangChain partner repo instead of the `langchain-community` repo and you will need an
-  `api_key`, which you can generate a free key [here](https://unstructured.io/api-key/).
-    - Unstructured's documentation for the sdk can be found here:
+- 가장 작은 설치 공간과 오픈 소스 `unstructured` 패키지에서 사용할 수 없는 기능을 활용하려면,
+  `pip install unstructured-client`로 Python SDK를 설치하고
+  `pip install langchain-unstructured`를 설치하여 `UnstructuredLoader`를 사용하고
+  Unstructured API에 대해 원격으로 partition하세요. 이 loader는
+  `langchain-community` 저장소 대신 LangChain 파트너 저장소에 있으며 `api_key`가 필요합니다.
+  무료 키는 [여기](https://unstructured.io/api-key/)에서 생성할 수 있습니다.
+    - SDK에 대한 Unstructured의 문서는 여기에서 찾을 수 있습니다:
       https://docs.unstructured.io/api-reference/api-services/sdk
 
-- To run everything locally, install the open-source python package with `pip install unstructured`
-  along with `pip install langchain-community` and use the same `UnstructuredLoader` as mentioned above.
-    - You can install document specific dependencies with extras, e.g. `pip install "unstructured[docx]"`. Learn more about extras [here](https://docs.unstructured.io/open-source/installation/full-installation).
-    - To install the dependencies for all document types, use `pip install "unstructured[all-docs]"`.
-- Install the following system dependencies if they are not already available on your system with e.g. `brew install` for Mac.
-  Depending on what document types you're parsing, you may not need all of these.
-    - `libmagic-dev` (filetype detection)
-    - `poppler-utils` (images and PDFs)
-    - `tesseract-ocr`(images and PDFs)
-    - `qpdf` (PDFs)
-    - `libreoffice` (MS Office docs)
-    - `pandoc` (EPUBs)
-- When running locally, Unstructured also recommends using Docker [by following this
-  guide](https://docs.unstructured.io/open-source/installation/docker-installation) to ensure all
-  system dependencies are installed correctly.
+- 모든 것을 로컬에서 실행하려면, `pip install unstructured`로 오픈 소스 python 패키지를 설치하고
+  `pip install langchain-community`를 설치한 후 위에서 언급한 것과 동일한 `UnstructuredLoader`를 사용하세요.
+    - extras를 사용하여 문서별 종속성을 설치할 수 있습니다. 예: `pip install "unstructured[docx]"`. extras에 대한 자세한 내용은 [여기](https://docs.unstructured.io/open-source/installation/full-installation)에서 확인하세요.
+    - 모든 문서 유형에 대한 종속성을 설치하려면 `pip install "unstructured[all-docs]"`를 사용하세요.
+- 시스템에 아직 설치되지 않은 경우 다음 시스템 종속성을 설치하세요. 예: Mac의 경우 `brew install`.
+  파싱하는 문서 유형에 따라 이 모든 것이 필요하지 않을 수 있습니다.
+    - `libmagic-dev` (파일 유형 감지)
+    - `poppler-utils` (이미지 및 PDF)
+    - `tesseract-ocr`(이미지 및 PDF)
+    - `qpdf` (PDF)
+    - `libreoffice` (MS Office 문서)
+    - `pandoc` (EPUB)
+- 로컬에서 실행할 때, Unstructured는 모든 시스템 종속성이 올바르게 설치되도록
+  [이 가이드를 따라](https://docs.unstructured.io/open-source/installation/docker-installation) Docker를 사용할 것을 권장합니다.
 
-The Unstructured API requires API keys to make requests.
-You can request an API key [here](https://unstructured.io/api-key-hosted) and start using it today!
-Checkout the README [here](https://github.com/Unstructured-IO/unstructured-api) here to get started making API calls.
-We'd love to hear your feedback, let us know how it goes in our [community slack](https://join.slack.com/t/unstructuredw-kbe4326/shared_invite/zt-1x7cgo0pg-PTptXWylzPQF9xZolzCnwQ).
-And stay tuned for improvements to both quality and performance!
-Check out the instructions
-[here](https://github.com/Unstructured-IO/unstructured-api#dizzy-instructions-for-using-the-docker-image) if you'd like to self-host the Unstructured API or run it locally.
+Unstructured API는 요청을 하기 위해 API 키가 필요합니다.
+[여기](https://unstructured.io/api-key-hosted)에서 API 키를 요청하고 오늘부터 사용을 시작할 수 있습니다!
+API 호출을 시작하려면 [여기](https://github.com/Unstructured-IO/unstructured-api) README를 확인하세요.
+여러분의 피드백을 듣고 싶습니다. [커뮤니티 slack](https://join.slack.com/t/unstructuredw-kbe4326/shared_invite/zt-1x7cgo0pg-PTptXWylzPQF9xZolzCnwQ)에서 어떻게 진행되는지 알려주세요.
+품질과 성능 모두의 개선을 기대해 주세요!
+Unstructured API를 자체 호스팅하거나 로컬에서 실행하려면
+[여기](https://github.com/Unstructured-IO/unstructured-api#dizzy-instructions-for-using-the-docker-image) 지침을 확인하세요.
 
 
 ## Data Loaders
 
-The primary usage of `Unstructured` is in data loaders.
+`Unstructured`의 주요 사용법은 data loader입니다.
 
 ### UnstructuredLoader
 
-See a [usage example](/oss/integrations/document_loaders/unstructured_file) to see how you can use
-this loader for both partitioning locally and remotely with the serverless Unstructured API.
+로컬 partitioning과 서버리스 Unstructured API를 사용한 원격 partitioning 모두에 이 loader를 사용하는 방법을 보려면
+[사용 예제](/oss/integrations/document_loaders/unstructured_file)를 참조하세요.
 
 ```python
 from langchain_unstructured import UnstructuredLoader
@@ -62,7 +60,7 @@ from langchain_unstructured import UnstructuredLoader
 
 ### UnstructuredCHMLoader
 
-`CHM` means `Microsoft Compiled HTML Help`.
+`CHM`은 `Microsoft Compiled HTML Help`를 의미합니다.
 
 ```python
 from langchain_community.document_loaders import UnstructuredCHMLoader
@@ -70,11 +68,11 @@ from langchain_community.document_loaders import UnstructuredCHMLoader
 
 ### UnstructuredCSVLoader
 
-A `comma-separated values` (`CSV`) file is a delimited text file that uses
-a comma to separate values. Each line of the file is a data record.
-Each record consists of one or more fields, separated by commas.
+`comma-separated values` (`CSV`) 파일은 쉼표를 사용하여 값을 구분하는 구분된 텍스트 파일입니다.
+파일의 각 줄은 데이터 레코드입니다.
+각 레코드는 쉼표로 구분된 하나 이상의 필드로 구성됩니다.
 
-See a [usage example](/oss/integrations/document_loaders/csv#unstructuredcsvloader).
+[사용 예제](/oss/integrations/document_loaders/csv#unstructuredcsvloader)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredCSVLoader
@@ -82,7 +80,7 @@ from langchain_community.document_loaders import UnstructuredCSVLoader
 
 ### UnstructuredEmailLoader
 
-See a [usage example](/oss/integrations/document_loaders/email).
+[사용 예제](/oss/integrations/document_loaders/email)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredEmailLoader
@@ -90,12 +88,11 @@ from langchain_community.document_loaders import UnstructuredEmailLoader
 
 ### UnstructuredEPubLoader
 
-[EPUB](https://en.wikipedia.org/wiki/EPUB) is an `e-book file format` that uses
-the “.epub” file extension. The term is short for electronic publication and
-is sometimes styled `ePub`. `EPUB` is supported by many e-readers, and compatible
-software is available for most smartphones, tablets, and computers.
+[EPUB](https://en.wikipedia.org/wiki/EPUB)은 ".epub" 파일 확장자를 사용하는 `전자책 파일 형식`입니다.
+이 용어는 electronic publication의 약자이며 때때로 `ePub`으로 표기됩니다.
+`EPUB`은 많은 전자책 리더에서 지원되며, 호환 가능한 소프트웨어는 대부분의 스마트폰, 태블릿 및 컴퓨터에서 사용할 수 있습니다.
 
-See a [usage example](/oss/integrations/document_loaders/epub).
+[사용 예제](/oss/integrations/document_loaders/epub)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredEPubLoader
@@ -103,7 +100,7 @@ from langchain_community.document_loaders import UnstructuredEPubLoader
 
 ### UnstructuredExcelLoader
 
-See a [usage example](/oss/integrations/document_loaders/microsoft_excel).
+[사용 예제](/oss/integrations/document_loaders/microsoft_excel)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredExcelLoader
@@ -111,7 +108,7 @@ from langchain_community.document_loaders import UnstructuredExcelLoader
 
 ### UnstructuredFileIOLoader
 
-See a [usage example](/oss/integrations/document_loaders/google_drive#passing-in-optional-file-loaders).
+[사용 예제](/oss/integrations/document_loaders/google_drive#passing-in-optional-file-loaders)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredFileIOLoader
@@ -125,7 +122,7 @@ from langchain_community.document_loaders import UnstructuredHTMLLoader
 
 ### UnstructuredImageLoader
 
-See a [usage example](/oss/integrations/document_loaders/image).
+[사용 예제](/oss/integrations/document_loaders/image)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredImageLoader
@@ -133,7 +130,7 @@ from langchain_community.document_loaders import UnstructuredImageLoader
 
 ### UnstructuredMarkdownLoader
 
-See a [usage example](/oss/integrations/vectorstores/starrocks).
+[사용 예제](/oss/integrations/vectorstores/starrocks)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
@@ -141,12 +138,12 @@ from langchain_community.document_loaders import UnstructuredMarkdownLoader
 
 ### UnstructuredODTLoader
 
-The `Open Document Format for Office Applications (ODF)`, also known as `OpenDocument`,
-is an open file format for word processing documents, spreadsheets, presentations
-and graphics and using ZIP-compressed XML files. It was developed with the aim of
-providing an open, XML-based file format specification for office applications.
+`Open Document Format for Office Applications (ODF)`, 또는 `OpenDocument`로 알려진 형식은
+워드 프로세싱 문서, 스프레드시트, 프레젠테이션 및 그래픽을 위한 오픈 파일 형식이며
+ZIP으로 압축된 XML 파일을 사용합니다. 이는 오피스 애플리케이션을 위한 개방형 XML 기반 파일 형식 사양을
+제공하기 위한 목적으로 개발되었습니다.
 
-See a [usage example](/oss/integrations/document_loaders/odt).
+[사용 예제](/oss/integrations/document_loaders/odt)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredODTLoader
@@ -154,9 +151,10 @@ from langchain_community.document_loaders import UnstructuredODTLoader
 
 ### UnstructuredOrgModeLoader
 
-An [Org Mode](https://en.wikipedia.org/wiki/Org-mode) document is a document editing, formatting, and organizing mode, designed for notes, planning, and authoring within the free software text editor Emacs.
+[Org Mode](https://en.wikipedia.org/wiki/Org-mode) 문서는 자유 소프트웨어 텍스트 편집기 Emacs 내에서
+노트, 계획 및 작성을 위해 설계된 문서 편집, 서식 지정 및 구성 모드입니다.
 
-See a [usage example](/oss/integrations/document_loaders/org_mode).
+[사용 예제](/oss/integrations/document_loaders/org_mode)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredOrgModeLoader
@@ -170,7 +168,7 @@ from langchain_community.document_loaders import UnstructuredPDFLoader
 
 ### UnstructuredPowerPointLoader
 
-See a [usage example](/oss/integrations/document_loaders/microsoft_powerpoint).
+[사용 예제](/oss/integrations/document_loaders/microsoft_powerpoint)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredPowerPointLoader
@@ -178,10 +176,10 @@ from langchain_community.document_loaders import UnstructuredPowerPointLoader
 
 ### UnstructuredRSTLoader
 
-A `reStructured Text` (`RST`) file is a file format for textual data
-used primarily in the Python programming language community for technical documentation.
+`reStructured Text` (`RST`) 파일은 주로 Python 프로그래밍 언어 커뮤니티에서
+기술 문서를 위해 사용되는 텍스트 데이터용 파일 형식입니다.
 
-See a [usage example](/oss/integrations/document_loaders/rst).
+[사용 예제](/oss/integrations/document_loaders/rst)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredRSTLoader
@@ -189,7 +187,7 @@ from langchain_community.document_loaders import UnstructuredRSTLoader
 
 ### UnstructuredRTFLoader
 
-See a usage example in the API documentation.
+API 문서에서 사용 예제를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredRTFLoader
@@ -197,10 +195,10 @@ from langchain_community.document_loaders import UnstructuredRTFLoader
 
 ### UnstructuredTSVLoader
 
-A `tab-separated values` (`TSV`) file is a simple, text-based file format for storing tabular data.
-Records are separated by newlines, and values within a record are separated by tab characters.
+`tab-separated values` (`TSV`) 파일은 표 형식 데이터를 저장하기 위한 간단한 텍스트 기반 파일 형식입니다.
+레코드는 줄바꿈으로 구분되며, 레코드 내의 값은 탭 문자로 구분됩니다.
 
-See a [usage example](/oss/integrations/document_loaders/tsv).
+[사용 예제](/oss/integrations/document_loaders/tsv)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredTSVLoader
@@ -208,7 +206,7 @@ from langchain_community.document_loaders import UnstructuredTSVLoader
 
 ### UnstructuredURLLoader
 
-See a [usage example](/oss/integrations/document_loaders/url).
+[사용 예제](/oss/integrations/document_loaders/url)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredURLLoader
@@ -216,7 +214,7 @@ from langchain_community.document_loaders import UnstructuredURLLoader
 
 ### UnstructuredWordDocumentLoader
 
-See a [usage example](/oss/integrations/document_loaders/microsoft_word#using-unstructured).
+[사용 예제](/oss/integrations/document_loaders/microsoft_word#using-unstructured)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredWordDocumentLoader
@@ -224,7 +222,7 @@ from langchain_community.document_loaders import UnstructuredWordDocumentLoader
 
 ### UnstructuredXMLLoader
 
-See a [usage example](/oss/integrations/document_loaders/xml).
+[사용 예제](/oss/integrations/document_loaders/xml)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import UnstructuredXMLLoader

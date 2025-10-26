@@ -1,17 +1,17 @@
 ---
-title: JSONLines files
+title: JSONLines 파일
 ---
 
-This example goes over how to load data from JSONLines or JSONL files. The second argument is a JSONPointer to the property to extract from each JSON object in the file. One document will be created for each JSON object in the file.
+이 예제는 JSONLines 또는 JSONL 파일에서 데이터를 로드하는 방법을 다룹니다. 두 번째 인수는 파일의 각 JSON 객체에서 추출할 속성을 가리키는 JSONPointer입니다. 파일의 각 JSON 객체마다 하나의 document가 생성됩니다.
 
-Example JSONLines file:
+JSONLines 파일 예제:
 
 ```json
 {"html": "This is a sentence."}
 {"html": "This is another sentence."}
 ```
 
-Example code:
+코드 예제:
 
 ```typescript
 import { JSONLinesLoader } from "@langchain/classic/document_loaders/fs/json";

@@ -2,17 +2,17 @@
 title: SageMaker
 ---
 
-Let's load the `SageMaker Endpoints Embeddings` class. The class can be used if you host, e.g. your own Hugging Face model on SageMaker.
+`SageMaker Endpoints Embeddings` class를 로드해보겠습니다. 이 class는 예를 들어 자체 Hugging Face model을 SageMaker에 호스팅하는 경우 사용할 수 있습니다.
 
-For instructions on how to do this, please see [here](https://www.philschmid.de/custom-inference-huggingface-sagemaker).
+이를 수행하는 방법에 대한 지침은 [여기](https://www.philschmid.de/custom-inference-huggingface-sagemaker)를 참조하세요.
 
-**Note**: In order to handle batched requests, you will need to adjust the return line in the `predict_fn()` function within the custom `inference.py` script:
+**참고**: 일괄 요청을 처리하려면 사용자 정의 `inference.py` script 내의 `predict_fn()` function에서 return 라인을 조정해야 합니다:
 
-Change from
+다음에서
 
 `return {"vectors": sentence_embeddings[0].tolist()}`
 
-to:
+다음으로 변경:
 
 `return {"vectors": sentence_embeddings.tolist()}`.
 

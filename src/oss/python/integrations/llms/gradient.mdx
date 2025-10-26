@@ -2,9 +2,9 @@
 title: Gradient
 ---
 
-`Gradient` allows to fine tune and get completions on LLMs with a simple web API.
+`Gradient`는 간단한 web API를 통해 LLM을 fine tune하고 completion을 얻을 수 있게 해줍니다.
 
-This notebook goes over how to use LangChain with [Gradient](https://gradient.ai/).
+이 노트북은 [Gradient](https://gradient.ai/)와 함께 LangChain을 사용하는 방법을 다룹니다.
 
 ## Imports
 
@@ -14,9 +14,9 @@ from langchain_community.llms import GradientLLM
 from langchain_core.prompts import PromptTemplate
 ```
 
-## Set the Environment API Key
+## Environment API Key 설정
 
-Make sure to get your API key from Gradient AI. You are given $10 in free credits to test and fine-tune different models.
+Gradient AI에서 API key를 받아야 합니다. 다양한 모델을 테스트하고 fine-tune할 수 있는 $10의 무료 크레딧이 제공됩니다.
 
 ```python
 import os
@@ -31,7 +31,7 @@ if not os.environ.get("GRADIENT_WORKSPACE_ID", None):
     os.environ["GRADIENT_WORKSPACE_ID"] = getpass("gradient.ai workspace id:")
 ```
 
-Optional: Validate your Environment variables `GRADIENT_ACCESS_TOKEN` and `GRADIENT_WORKSPACE_ID` to get currently deployed models. Using the `gradientai` Python package.
+선택사항: `gradientai` Python package를 사용하여 Environment 변수 `GRADIENT_ACCESS_TOKEN`과 `GRADIENT_WORKSPACE_ID`를 검증하여 현재 배포된 모델을 확인할 수 있습니다.
 
 ```python
 pip install -qU  gradientai
@@ -72,11 +72,11 @@ new_model.id, new_model.name
 ('674119b5-f19e-4856-add2-767ae7f7d7ef_model_adapter', 'my_model_adapter')
 ```
 
-## Create the Gradient instance
+## Gradient instance 생성
 
-You can specify different parameters such as the model, max_tokens generated, temperature, etc.
+model, max_tokens 생성 수, temperature 등 다양한 parameter를 지정할 수 있습니다.
 
-As we later want to fine-tune out model, we select the model_adapter with the id `674119b5-f19e-4856-add2-767ae7f7d7ef_model_adapter`, but you can use any base or fine-tunable model.
+나중에 모델을 fine-tune하려고 하므로, id가 `674119b5-f19e-4856-add2-767ae7f7d7ef_model_adapter`인 model_adapter를 선택하지만, 어떤 base 또는 fine-tunable 모델이든 사용할 수 있습니다.
 
 ```python
 llm = GradientLLM(
@@ -89,9 +89,9 @@ llm = GradientLLM(
 )
 ```
 
-## Create a Prompt Template
+## Prompt Template 생성
 
-We will create a prompt template for Question and Answer.
+질문과 답변을 위한 prompt template을 생성합니다.
 
 ```python
 template = """Question: {question}
@@ -101,15 +101,15 @@ Answer: """
 prompt = PromptTemplate.from_template(template)
 ```
 
-## Initiate the LLMChain
+## LLMChain 초기화
 
 ```python
 llm_chain = LLMChain(prompt=prompt, llm=llm)
 ```
 
-## Run the LLMChain
+## LLMChain 실행
 
-Provide a question and run the LLMChain.
+질문을 제공하고 LLMChain을 실행합니다.
 
 ```python
 question = "What NFL team won the Super Bowl in 1994?"
@@ -121,12 +121,12 @@ llm_chain.run(question=question)
 '\nThe San Francisco 49ers won the Super Bowl in 1994.'
 ```
 
-# Improve the results by fine-tuning (optional)
+# fine-tuning으로 결과 개선하기 (선택사항)
 
-Well - that is wrong - the San Francisco 49ers did not win.
-The correct answer to the question would be `The Dallas Cowboys!`.
+음 - 이것은 틀렸습니다 - San Francisco 49ers는 우승하지 않았습니다.
+질문에 대한 올바른 답변은 `The Dallas Cowboys!`입니다.
 
-Let's increase the odds for the correct answer, by fine-tuning on the correct answer using the PromptTemplate.
+PromptTemplate을 사용하여 올바른 답변으로 fine-tuning함으로써 정확한 답변의 확률을 높여봅시다.
 
 ```python
 dataset = [

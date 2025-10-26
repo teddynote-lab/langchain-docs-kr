@@ -2,15 +2,15 @@
 title: Valthera
 ---
 
-> [Valthera](https://github.com/valthera/valthera) is an open-source framework that empowers LLM Agents to drive meaningful, context-aware user engagement. It evaluates user motivation and ability in real time, ensuring that notifications and actions are triggered only when users are most receptive.
+> [Valthera](https://github.com/valthera/valthera)는 LLM Agent가 의미 있고 맥락을 인식하는 사용자 참여를 유도할 수 있도록 지원하는 오픈소스 프레임워크입니다. 실시간으로 사용자의 동기와 능력을 평가하여 사용자가 가장 수용적일 때만 알림과 작업이 트리거되도록 보장합니다.
 >
-> **langchain-valthera** integrates Valthera with LangChain, enabling developers to build smarter, behavior-driven engagement systems that deliver personalized interactions.
+> **langchain-valthera**는 Valthera를 LangChain과 통합하여 개발자가 개인화된 상호작용을 제공하는 더 스마트한 행동 기반 참여 시스템을 구축할 수 있도록 합니다.
 
-## Installation and Setup
+## 설치 및 설정
 
-### Install langchain-valthera
+### langchain-valthera 설치
 
-Install the LangChain Valthera package via pip:
+pip를 통해 LangChain Valthera 패키지를 설치하세요:
 
 <CodeGroup>
 ```bash pip
@@ -22,15 +22,15 @@ uv add langchain-valthera
 ```
 </CodeGroup>
 
-Import the ValtheraTool:
+ValtheraTool을 import하세요:
 
 ```python
 from langchain_valthera.tools import ValtheraTool
 ```
 
-### Example: Initializing the ValtheraTool for LangChain
+### 예제: LangChain용 ValtheraTool 초기화
 
-This example shows how to initialize the ValtheraTool using a `DataAggregator` and configuration for motivation and ability scoring.
+이 예제는 `DataAggregator`와 동기 및 능력 점수 계산을 위한 구성을 사용하여 ValtheraTool을 초기화하는 방법을 보여줍니다.
 
 ```python
 import os
@@ -68,4 +68,4 @@ print("✅ ValtheraTool successfully initialized for LangChain integration!")
 ```
 
 
-The langchain-valthera integration allows you to assess user behavior and decide on the best course of action for engagement, ensuring that interactions are both timely and relevant within your LangChain applications.
+langchain-valthera 통합을 통해 사용자 행동을 평가하고 참여를 위한 최선의 조치를 결정할 수 있으며, LangChain 애플리케이션 내에서 상호작용이 시기적절하고 관련성 있게 이루어지도록 보장합니다.

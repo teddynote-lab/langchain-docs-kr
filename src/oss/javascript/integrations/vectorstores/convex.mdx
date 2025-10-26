@@ -2,29 +2,29 @@
 title: Convex
 ---
 
-LangChain.js supports [Convex](https://convex.dev/) as a [vector store](https://docs.convex.dev/vector-search), and supports the standard similarity search.
+LangChain.js는 [Convex](https://convex.dev/)를 [vector store](https://docs.convex.dev/vector-search)로 지원하며, 표준 유사도 검색을 지원합니다.
 
 ## Setup
 
-### Create project
+### 프로젝트 생성
 
-Get a working [Convex](https://docs.convex.dev/) project set up, for example by using:
+작동하는 [Convex](https://docs.convex.dev/) 프로젝트를 설정합니다. 예를 들어 다음을 사용할 수 있습니다:
 
 ```bash
 npm create convex@latest
 ```
 
-### Add database accessors
+### 데이터베이스 accessor 추가
 
-Add query and mutation helpers to `convex/langchain/db.ts`:
+`convex/langchain/db.ts`에 query 및 mutation helper를 추가합니다:
 
 ```ts title="convex/langchain/db.ts"
 export * from "@langchain/community/utils/convex";
 ```
 
-### Configure your schema
+### schema 구성
 
-Set up your schema (for vector indexing):
+schema를 설정합니다 (vector indexing을 위해):
 
 ```ts title="convex/schema.ts"
 import { defineSchema, defineTable } from "convex/server";
@@ -45,7 +45,7 @@ export default defineSchema({
 ## Usage
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+[LangChain 패키지 설치에 대한 일반적인 지침은 이 섹션을 참조하세요](/oss/langchain/install).
 </Tip>
 
 ```bash npm
@@ -97,5 +97,5 @@ export const search = action({
 
 ## Related
 
-- Vector store [conceptual guide](/oss/integrations/vectorstores)
-- Vector store [how-to guides](/oss/integrations/vectorstores)
+- Vector store [개념 가이드](/oss/integrations/vectorstores)
+- Vector store [how-to 가이드](/oss/integrations/vectorstores)

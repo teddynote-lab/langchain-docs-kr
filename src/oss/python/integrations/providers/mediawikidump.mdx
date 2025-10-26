@@ -2,16 +2,16 @@
 title: MediaWikiDump
 ---
 
->[MediaWiki XML Dumps](https://www.mediawiki.org/wiki/Manual:Importing_XML_dumps) contain the content of a wiki
-> (wiki pages with all their revisions), without the site-related data. A XML dump does not create a full backup
-> of the wiki database, the dump does not contain user accounts, images, edit logs, etc.
+>[MediaWiki XML Dumps](https://www.mediawiki.org/wiki/Manual:Importing_XML_dumps)는 사이트 관련 데이터 없이 위키의 콘텐츠
+> (모든 수정 버전이 포함된 위키 페이지)를 포함합니다. XML dump는 위키 데이터베이스의 전체 백업을 생성하지 않으며,
+> 사용자 계정, 이미지, 편집 로그 등은 포함하지 않습니다.
 
 
 ## Installation and Setup
 
-We need to install several python packages.
+여러 python package를 설치해야 합니다.
 
-The `mediawiki-utilities` supports XML schema 0.11 in unmerged branches.
+`mediawiki-utilities`는 병합되지 않은 branch에서 XML schema 0.11을 지원합니다.
 
 <CodeGroup>
 ```bash pip
@@ -23,7 +23,7 @@ uv add U git+https://github.com/mediawiki-utilities/python-mwtypes@updates_schem
 ```
 </CodeGroup>
 
-The `mediawiki-utilities mwxml` has a bug, fix PR pending.
+`mediawiki-utilities mwxml`에는 버그가 있으며, 수정 PR이 대기 중입니다.
 
 <CodeGroup>
 ```bash pip
@@ -39,7 +39,7 @@ uv add mwparserfromhell
 
 ## Document Loader
 
-See a [usage example](/oss/integrations/document_loaders/mediawikidump).
+[사용 예제](/oss/integrations/document_loaders/mediawikidump)를 참조하세요.
 
 
 ```python

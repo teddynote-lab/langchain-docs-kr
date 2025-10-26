@@ -1,4 +1,0 @@
-기본적으로 LangSmith는 명시적으로 허용하지 않는 한 prerelease 버전을 설치**하지 않는** `uv`/`pip` 동작을 따릅니다. prerelease를 사용하려면 다음 옵션을 사용할 수 있습니다:
-
-- `pyproject.toml` 사용 시: `[tool.uv]` 섹션에 `allow-prereleases = true`를 추가합니다.
-- `requirements.txt` 또는 `setup.py` 사용 시: 전이 종속성을 포함하여 모든 prerelease 종속성을 명시적으로 지정해야 합니다. 예를 들어, `a==0.0.1a1`을 선언하고 `a`가 `b==0.0.1a1`에 의존하는 경우, 종속성에 `b==0.0.1a1`도 명시적으로 포함해야 합니다.

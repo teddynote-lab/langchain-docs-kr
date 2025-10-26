@@ -1,18 +1,17 @@
 ---
-title: Trace with the Vercel AI SDK (JS/TS only)
+title: Vercel AI SDK로 추적하기 (JS/TS 전용)
 sidebarTitle: Vercel AI SDK
 ---
 
-You can use LangSmith to trace runs from the Vercel AI SDK. This guide will walk through an example.
+LangSmith를 사용하여 Vercel AI SDK의 실행을 추적할 수 있습니다. 이 가이드에서는 예제를 통해 설명합니다.
 
 ## Installation
 
 <Note>
-This wrapper requires AI SDK v5 and `langsmith>=0.3.63`. If you are using an older version of the AI SDK or `langsmith`, see the OpenTelemetry (OTEL)
-based approach [on this page](/langsmith/legacy-trace-with-vercel-ai-sdk).
+이 wrapper는 AI SDK v5와 `langsmith>=0.3.63`이 필요합니다. 이전 버전의 AI SDK 또는 `langsmith`를 사용하는 경우, [이 페이지](/langsmith/legacy-trace-with-vercel-ai-sdk)의 OpenTelemetry (OTEL) 기반 접근 방식을 참조하세요.
 </Note>
 
-Install the Vercel AI SDK. This guide uses Vercel's OpenAI integration for the code snippets below, but you can use any of their other options as well.
+Vercel AI SDK를 설치합니다. 이 가이드는 아래 코드 스니펫에서 Vercel의 OpenAI integration을 사용하지만, 다른 옵션도 사용할 수 있습니다.
 
 <CodeGroup>
 
@@ -49,7 +48,7 @@ export LANGSMITH_WORKSPACE_ID=<your-workspace-id>
 
 ## Basic setup
 
-Import and wrap AI SDK methods, then use them as you normally would:
+AI SDK method를 import하고 wrap한 다음, 평소처럼 사용하세요:
 
 ```typescript
 import { openai } from "@ai-sdk/openai";
@@ -66,9 +65,9 @@ await generateText({
 });
 ```
 
-You should see a trace in your LangSmith dashboard [like this one](https://smith.langchain.com/public/4f0e689e-c801-44d3-8857-93b47ab100cc/r).
+LangSmith 대시보드에서 [이와 같은](https://smith.langchain.com/public/4f0e689e-c801-44d3-8857-93b47ab100cc/r) trace를 볼 수 있습니다.
 
-You can also trace runs with tool calls:
+tool call이 있는 실행도 추적할 수 있습니다:
 
 ```typescript
 import * as ai from "ai";
@@ -107,14 +106,13 @@ await generateText({
 });
 ```
 
-Which results in a trace like [this one](https://smith.langchain.com/public/6075fa2c-d255-4885-a66a-4fc798afaa9f/r).
+결과는 [이와 같은](https://smith.langchain.com/public/6075fa2c-d255-4885-a66a-4fc798afaa9f/r) trace가 됩니다.
 
-You can use other AI SDK methods exactly as you usually would.
+다른 AI SDK method도 평소처럼 정확히 동일하게 사용할 수 있습니다.
 
-### With `traceable`
+### `traceable`과 함께 사용하기
 
-You can wrap `traceable` calls around AI SDK calls or within AI SDK tool calls. This is useful if you
-want to group runs together in LangSmith:
+AI SDK call 주위나 AI SDK tool call 내부에 `traceable` call을 wrap할 수 있습니다. 이는 LangSmith에서 실행을 그룹화하려는 경우 유용합니다:
 
 ```typescript
 import * as ai from "ai";
@@ -161,14 +159,12 @@ const wrapper = traceable(async (input: string) => {
 await wrapper("What are my orders and where are they? My user ID is 123.");
 ```
 
-The resulting trace will look [like this](https://smith.langchain.com/public/ff25bc26-9389-4798-8b91-2bdcc95d4a8e/r).
+결과 trace는 [이와 같이](https://smith.langchain.com/public/ff25bc26-9389-4798-8b91-2bdcc95d4a8e/r) 보입니다.
 
 ## Tracing in serverless environments
 
-When tracing in serverless environments, you must wait for all runs to flush before your environment
-shuts down. To do this, you can pass a LangSmith [`Client`](https://docs.smith.langchain.com/reference/js/classes/client.Client) instance when wrapping the AI SDK method,
-then call `await client.awaitPendingTraceBatches()`.
-Make sure to also pass it into any `traceable` wrappers you create as well:
+serverless 환경에서 추적할 때는 환경이 종료되기 전에 모든 실행이 flush되기를 기다려야 합니다. 이를 위해 AI SDK method를 wrap할 때 LangSmith [`Client`](https://docs.smith.langchain.com/reference/js/classes/client.Client) instance를 전달한 다음, `await client.awaitPendingTraceBatches()`를 호출할 수 있습니다.
+생성하는 모든 `traceable` wrapper에도 이를 전달해야 합니다:
 
 ```typescript
 import * as ai from "ai";
@@ -223,8 +219,7 @@ try {
 }
 ```
 
-If you are using `Next.js`, there is a convenient [`after`](https://nextjs.org/docs/app/api-reference/functions/after) hook
-where you can put this logic:
+`Next.js`를 사용하는 경우, 이 로직을 넣을 수 있는 편리한 [`after`](https://nextjs.org/docs/app/api-reference/functions/after) hook이 있습니다:
 
 ```typescript
 import { after } from "next/server"
@@ -247,17 +242,14 @@ export async function POST(request: Request) {
 };
 ```
 
-See [this page](/langsmith/serverless-environments) for more detail, including information
-around managing rate limits in serverless environments.
+serverless 환경에서 rate limit 관리에 대한 정보를 포함한 자세한 내용은 [이 페이지](/langsmith/serverless-environments)를 참조하세요.
 
 ## Passing LangSmith config
 
-You can pass LangSmith-specific config to your wrapper both when initially wrapping your
-AI SDK methods and while running them via `providerOptions.langsmith`.
-This includes metadata (which you can later use to filter runs in LangSmith), top-level run name,
-tags, custom client instances, and more.
+AI SDK method를 처음 wrap할 때와 `providerOptions.langsmith`를 통해 실행하는 동안 모두 LangSmith 전용 config를 wrapper에 전달할 수 있습니다.
+여기에는 metadata(나중에 LangSmith에서 실행을 필터링하는 데 사용할 수 있음), 최상위 실행 이름, tag, 사용자 정의 client instance 등이 포함됩니다.
 
-Config passed while wrapping will apply to all future calls you make with the wrapped method:
+wrap할 때 전달된 config는 wrapped method로 수행하는 모든 향후 호출에 적용됩니다:
 
 ```typescript
 import { openai } from "@ai-sdk/openai";
@@ -279,9 +271,8 @@ await generateText({
 });
 ```
 
-While passing config at runtime via `providerOptions.langsmith` will apply only to that run.
-We suggest importing and wrapping your config in `createLangSmithProviderOptions` to ensure
-proper typing:
+반면 `providerOptions.langsmith`를 통해 runtime에 config를 전달하면 해당 실행에만 적용됩니다.
+적절한 typing을 보장하기 위해 `createLangSmithProviderOptions`에서 config를 import하고 wrap하는 것을 권장합니다:
 
 ```typescript
 import { openai } from "@ai-sdk/openai";
@@ -313,16 +304,12 @@ await generateText({
 
 ## Redacting data
 
-You can customize what inputs and outputs the AI SDK sends to LangSmith by specifying custom input/output
-processing functions. This is useful if you are dealing with sensitive data that you would like to
-avoid sending to LangSmith.
+사용자 정의 input/output 처리 함수를 지정하여 AI SDK가 LangSmith로 전송하는 input과 output을 사용자 정의할 수 있습니다. 이는 LangSmith로 전송하지 않으려는 민감한 데이터를 처리하는 경우 유용합니다.
 
-Because output formats vary depending on which AI SDK method you are using, we suggest defining and passing config
-individually into wrapped methods. You will also need to provide separate functions for child LLM runs within
-AI SDK calls, since calling `generateText` at top level calls the LLM internally and can do so multiple times.
+output 형식은 사용하는 AI SDK method에 따라 다르므로, wrapped method에 개별적으로 config를 정의하고 전달하는 것을 권장합니다. 최상위 수준에서 `generateText`를 호출하면 내부적으로 LLM을 호출하고 여러 번 호출할 수 있으므로, AI SDK call 내의 하위 LLM 실행에 대해서도 별도의 함수를 제공해야 합니다.
 
-We also suggest passing a generic parameter into `createLangSmithProviderOptions` to get proper types for inputs and outputs.
-Here's an example for `generateText`:
+또한 input과 output에 대한 적절한 type을 얻기 위해 `createLangSmithProviderOptions`에 generic parameter를 전달하는 것을 권장합니다.
+다음은 `generateText`에 대한 예제입니다:
 
 ```typescript
 import {
@@ -383,10 +370,9 @@ const { text } = await generateText({
 console.log(text);
 ```
 
-The actual return value will contain the original, non-redacted result but the trace in LangSmith
-will be redacted. [Here's an example](https://smith.langchain.com/public/b4c69c8e-285b-4c0c-8492-e571e2cf562f/r).
+실제 반환 값에는 원본의 redact되지 않은 결과가 포함되지만 LangSmith의 trace는 redact됩니다. [여기 예제가 있습니다](https://smith.langchain.com/public/b4c69c8e-285b-4c0c-8492-e571e2cf562f/r).
 
-For redacting tool input/output, wrap your `execute` method in a `traceable` like this:
+tool input/output을 redact하려면 다음과 같이 `execute` method를 `traceable`로 wrap하세요:
 
 ```typescript
 import * as ai from "ai";
@@ -432,5 +418,4 @@ const { text } = await generateText({
 });
 ```
 
-The `traceable` return type is complex, which makes the cast necessary. You may also omit the AI SDK `tool` wrapper function
-if you wish to avoid the cast.
+`traceable` 반환 type이 복잡하므로 cast가 필요합니다. cast를 피하려면 AI SDK `tool` wrapper 함수를 생략할 수도 있습니다.

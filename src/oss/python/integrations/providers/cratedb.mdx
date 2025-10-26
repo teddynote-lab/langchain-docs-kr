@@ -2,21 +2,20 @@
 title: CrateDB
 ---
 
-> [CrateDB] is a distributed and scalable SQL database for storing and
-> analyzing massive amounts of data in near real-time, even with complex
-> queries. It is PostgreSQL-compatible, based on Lucene, and inheriting
-> from Elasticsearch.
+> [CrateDB]는 복잡한 쿼리에서도 거의 실시간으로 대량의 데이터를 저장하고
+> 분석하기 위한 분산 및 확장 가능한 SQL 데이터베이스입니다. PostgreSQL과 호환되며,
+> Lucene 기반이고 Elasticsearch에서 상속받았습니다.
 
 
 ## Installation and Setup
 
-### Setup CrateDB
-There are two ways to get started with CrateDB quickly. Alternatively,
-choose other [CrateDB installation options].
+### CrateDB 설정
+CrateDB를 빠르게 시작하는 두 가지 방법이 있습니다. 또는
+다른 [CrateDB installation options]를 선택할 수 있습니다.
 
-#### Start CrateDB on your local machine
-Example: Run a single-node CrateDB instance with security disabled,
-using Docker or Podman. This is not recommended for production use.
+#### 로컬 머신에서 CrateDB 시작
+예시: Docker 또는 Podman을 사용하여 보안이 비활성화된 단일 노드 CrateDB 인스턴스를 실행합니다.
+프로덕션 환경에서는 권장되지 않습니다.
 
 ```bash
 docker run --name=cratedb --rm \
@@ -24,13 +23,13 @@ docker run --name=cratedb --rm \
   crate:latest -Cdiscovery.type=single-node
 ```
 
-#### Deploy cluster on CrateDB Cloud
-[CrateDB Cloud] is a managed CrateDB service. Sign up for a
-[free trial][CrateDB Cloud Console].
+#### CrateDB Cloud에 클러스터 배포
+[CrateDB Cloud]는 관리형 CrateDB 서비스입니다.
+[무료 평가판][CrateDB Cloud Console]에 가입하세요.
 
-### Install Client
-Install the most recent version of the [langchain-cratedb] package
-and a few others that are needed for this tutorial.
+### Client 설치
+[langchain-cratedb] 패키지의 최신 버전과 이 튜토리얼에 필요한
+몇 가지 다른 패키지를 설치합니다.
 
 <CodeGroup>
 ```bash pip
@@ -44,20 +43,20 @@ uv add langchain-cratedb langchain-openai unstructured
 
 
 ## Documentation
-For a more detailed walkthrough of the CrateDB wrapper, see
-[using LangChain with CrateDB]. See also [all features of CrateDB]
-to learn about other functionality provided by CrateDB.
+CrateDB wrapper에 대한 자세한 안내는
+[using LangChain with CrateDB]를 참조하세요. CrateDB가 제공하는 다른 기능에 대해 알아보려면
+[all features of CrateDB]도 참조하세요.
 
 
 ## Features
-The CrateDB adapter for LangChain provides APIs to use CrateDB as vector store,
-document loader, and storage for chat messages.
+LangChain용 CrateDB adapter는 CrateDB를 vector store,
+document loader, 그리고 chat message 저장소로 사용하기 위한 API를 제공합니다.
 
 ### Vector Store
-Use the CrateDB vector store functionality around `FLOAT_VECTOR` and `KNN_MATCH`
-for similarity search and other purposes. See also [CrateDBVectorStore Tutorial].
+유사도 검색 및 기타 목적을 위해 `FLOAT_VECTOR`와 `KNN_MATCH`를 활용한
+CrateDB vector store 기능을 사용합니다. [CrateDBVectorStore Tutorial]도 참조하세요.
 
-Make sure you've configured a valid OpenAI API key.
+유효한 OpenAI API key를 설정했는지 확인하세요.
 ```bash
 export OPENAI_API_KEY=sk-XJZ...
 ```
@@ -89,10 +88,10 @@ docs_with_score = store.similarity_search_with_score(query)
 ```
 
 ### Document Loader
-Load load documents from a CrateDB database table, using the document loader
-`CrateDBLoader`, which is based on SQLAlchemy. See also [CrateDBLoader Tutorial].
+SQLAlchemy 기반의 document loader `CrateDBLoader`를 사용하여
+CrateDB 데이터베이스 테이블에서 문서를 로드합니다. [CrateDBLoader Tutorial]도 참조하세요.
 
-To use the document loader in your applications:
+애플리케이션에서 document loader를 사용하려면:
 ```python
 import sqlalchemy as sa
 from langchain_community.utilities import SQLDatabase
@@ -111,10 +110,10 @@ documents = loader.load()
 ```
 
 ### Chat Message History
-Use CrateDB as the storage for your chat messages.
-See also [CrateDBChatMessageHistory Tutorial].
+CrateDB를 chat message 저장소로 사용합니다.
+[CrateDBChatMessageHistory Tutorial]도 참조하세요.
 
-To use the chat message history in your applications:
+애플리케이션에서 chat message history를 사용하려면:
 ```python
 from langchain_cratedb import CrateDBChatMessageHistory
 
@@ -130,11 +129,11 @@ message_history.add_user_message("hi!")
 ```
 
 ### Full Cache
-The standard / full cache avoids invoking the LLM when the supplied
-prompt is exactly the same as one encountered already.
-See also [CrateDBCache Example].
+standard / full cache는 제공된 prompt가 이미 접한 것과 정확히 동일할 때
+LLM 호출을 방지합니다.
+[CrateDBCache Example]도 참조하세요.
 
-To use the full cache in your applications:
+애플리케이션에서 full cache를 사용하려면:
 ```python
 import sqlalchemy as sa
 from langchain.globals import set_llm_cache
@@ -158,12 +157,12 @@ print(answer.content)
 
 ### Semantic Cache
 
-The semantic cache allows users to retrieve cached prompts based on semantic
-similarity between the user input and previously cached inputs. It also avoids
-invoking the LLM when not needed.
-See also [CrateDBSemanticCache Example].
+semantic cache는 사용자 입력과 이전에 캐시된 입력 간의 의미적 유사성을 기반으로
+캐시된 prompt를 검색할 수 있게 합니다. 또한 필요하지 않을 때
+LLM 호출을 방지합니다.
+[CrateDBSemanticCache Example]도 참조하세요.
 
-To use the semantic cache in your applications:
+애플리케이션에서 semantic cache를 사용하려면:
 ```python
 import sqlalchemy as sa
 from langchain.globals import set_llm_cache

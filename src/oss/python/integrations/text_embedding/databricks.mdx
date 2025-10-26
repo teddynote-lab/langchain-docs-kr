@@ -2,9 +2,9 @@
 title: DatabricksEmbeddings
 ---
 
-> [Databricks](https://www.databricks.com/) Lakehouse Platform unifies data, analytics, and AI on one platform.
+> [Databricks](https://www.databricks.com/) Lakehouse Platform은 데이터, 분석 및 AI를 하나의 플랫폼에 통합합니다.
 
-This guide provides a quick overview for getting started with Databricks [embedding models](/oss/integrations/text_embedding). For detailed documentation of all `DatabricksEmbeddings` features and configurations head to the [API reference](https://python.langchain.com/api_reference/community/embeddings/langchain_community.embeddings.databricks.DatabricksEmbeddings.html).
+이 가이드는 Databricks [embedding models](/oss/integrations/text_embedding) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `DatabricksEmbeddings` 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/embeddings/langchain_community.embeddings.databricks.DatabricksEmbeddings.html)를 참조하세요.
 
 ## Overview
 
@@ -16,26 +16,25 @@ This guide provides a quick overview for getting started with Databricks [embedd
 
 ### Supported Methods
 
-`DatabricksEmbeddings` supports all methods of @[`Embeddings`] class including async APIs.
+`DatabricksEmbeddings`는 비동기 API를 포함한 @[`Embeddings`] 클래스의 모든 메서드를 지원합니다.
 
 ### Endpoint Requirement
 
-The serving endpoint `DatabricksEmbeddings` wraps must have OpenAI-compatible embedding input/output format ([reference](https://mlflow.org/docs/latest/llms/deployments/index.html#embeddings)). As long as the input format is compatible, `DatabricksEmbeddings` can be used for any endpoint type hosted on [Databricks Model Serving](https://docs.databricks.com/en/machine-learning/model-serving/index.html):
+`DatabricksEmbeddings`가 래핑하는 serving endpoint는 OpenAI 호환 embedding 입력/출력 형식을 가져야 합니다([참조](https://mlflow.org/docs/latest/llms/deployments/index.html#embeddings)). 입력 형식이 호환되는 한, `DatabricksEmbeddings`는 [Databricks Model Serving](https://docs.databricks.com/en/machine-learning/model-serving/index.html)에서 호스팅되는 모든 endpoint 유형에 사용할 수 있습니다:
 
-1. Foundation Models - Curated list of state-of-the-art foundation models such as BAAI General Embedding (BGE). These endpoint are ready to use in your Databricks workspace without any set up.
-2. Custom Models - You can also deploy custom embedding models to a serving endpoint via MLflow with
-your choice of framework such as LangChain, Pytorch, Transformers, etc.
-3. External Models - Databricks endpoints can serve models that are hosted outside Databricks as a proxy, such as proprietary model service like OpenAI text-embedding-3.
+1. Foundation Models - BAAI General Embedding (BGE)과 같은 최첨단 foundation model의 큐레이션된 목록입니다. 이러한 endpoint는 별도의 설정 없이 Databricks workspace에서 바로 사용할 수 있습니다.
+2. Custom Models - LangChain, Pytorch, Transformers 등 원하는 프레임워크를 사용하여 MLflow를 통해 커스텀 embedding model을 serving endpoint에 배포할 수도 있습니다.
+3. External Models - Databricks endpoint는 OpenAI text-embedding-3과 같은 독점 모델 서비스처럼 Databricks 외부에서 호스팅되는 모델을 프록시로 제공할 수 있습니다.
 
 ## Setup
 
-To access Databricks models you'll need to create a Databricks account, set up credentials (only if you are outside Databricks workspace), and install required packages.
+Databricks 모델에 액세스하려면 Databricks 계정을 생성하고, 자격 증명을 설정하고(Databricks workspace 외부에 있는 경우에만), 필요한 패키지를 설치해야 합니다.
 
-### Credentials (only if you are outside Databricks)
+### Credentials (Databricks 외부에 있는 경우에만)
 
-If you are running LangChain app inside Databricks, you can skip this step.
+Databricks 내부에서 LangChain 앱을 실행하는 경우 이 단계를 건너뛸 수 있습니다.
 
-Otherwise, you need manually set the Databricks workspace hostname and personal access token to `DATABRICKS_HOST` and `DATABRICKS_TOKEN` environment variables, respectively. See [Authentication Documentation](https://docs.databricks.com/en/dev-tools/auth/index.html#databricks-personal-access-tokens) for how to get an access token.
+그렇지 않은 경우, Databricks workspace hostname과 personal access token을 각각 `DATABRICKS_HOST` 및 `DATABRICKS_TOKEN` 환경 변수에 수동으로 설정해야 합니다. access token을 얻는 방법은 [Authentication Documentation](https://docs.databricks.com/en/dev-tools/auth/index.html#databricks-personal-access-tokens)을 참조하세요.
 
 ```python
 import getpass
@@ -50,7 +49,7 @@ if "DATABRICKS_TOKEN" not in os.environ:
 
 ### Installation
 
-The LangChain Databricks integration lives in the `databricks-langchain` package:
+LangChain Databricks integration은 `databricks-langchain` 패키지에 포함되어 있습니다:
 
 ```python
 pip install -qU databricks-langchain
@@ -71,9 +70,9 @@ embeddings = DatabricksEmbeddings(
 
 ## Indexing and Retrieval
 
-Embedding models are often used in retrieval-augmented generation (RAG) flows, both as part of indexing data as well as later retrieving it. For more detailed instructions, please see our [RAG tutorials](/oss/langchain/rag).
+Embedding model은 데이터 인덱싱과 이후 검색 모두에서 retrieval-augmented generation (RAG) 플로우에 자주 사용됩니다. 자세한 지침은 [RAG tutorials](/oss/langchain/rag)를 참조하세요.
 
-Below, see how to index and retrieve data using the `embeddings` object we initialized above. In this example, we will index and retrieve a sample document in the `InMemoryVectorStore`.
+아래에서는 위에서 초기화한 `embeddings` 객체를 사용하여 데이터를 인덱싱하고 검색하는 방법을 확인할 수 있습니다. 이 예제에서는 `InMemoryVectorStore`에서 샘플 문서를 인덱싱하고 검색합니다.
 
 ```python
 # Create a vector store with a sample text
@@ -98,13 +97,13 @@ retrieved_document[0].page_content
 
 ## Direct Usage
 
-Under the hood, the vectorstore and retriever implementations are calling `embeddings.embed_documents(...)` and `embeddings.embed_query(...)` to create embeddings for the text(s) used in `from_texts` and retrieval `invoke` operations, respectively.
+내부적으로 vectorstore와 retriever 구현은 `embeddings.embed_documents(...)`와 `embeddings.embed_query(...)`를 호출하여 각각 `from_texts` 및 retrieval `invoke` 작업에 사용되는 텍스트에 대한 embedding을 생성합니다.
 
-You can directly call these methods to get embeddings for your own use cases.
+이러한 메서드를 직접 호출하여 자신의 사용 사례에 맞는 embedding을 얻을 수 있습니다.
 
 ### Embed single texts
 
-You can embed single texts or documents with `embed_query`:
+`embed_query`를 사용하여 단일 텍스트 또는 문서를 embedding할 수 있습니다:
 
 ```python
 single_vector = embeddings.embed_query(text)
@@ -113,7 +112,7 @@ print(str(single_vector)[:100])  # Show the first 100 characters of the vector
 
 ### Embed multiple texts
 
-You can embed multiple texts with `embed_documents`:
+`embed_documents`를 사용하여 여러 텍스트를 embedding할 수 있습니다:
 
 ```python
 text2 = (
@@ -126,7 +125,7 @@ for vector in two_vectors:
 
 ### Async Usage
 
-You can also use `aembed_query` and `aembed_documents` for producing embeddings asynchronously:
+`aembed_query`와 `aembed_documents`를 사용하여 비동기적으로 embedding을 생성할 수도 있습니다:
 
 ```python
 import asyncio
@@ -142,4 +141,4 @@ asyncio.run(async_example())
 
 ## API reference
 
-For detailed documentation on `DatabricksEmbeddings` features and configuration options, please refer to the [API reference](https://python.langchain.com/api_reference/community/embeddings/langchain_community.embeddings.databricks.DatabricksEmbeddings.html).
+`DatabricksEmbeddings` 기능 및 구성 옵션에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/embeddings/langchain_community.embeddings.databricks.DatabricksEmbeddings.html)를 참조하세요.

@@ -2,11 +2,11 @@
 title: Annoy
 ---
 
-> [Annoy](https://github.com/spotify/annoy) (`Approximate Nearest Neighbors Oh Yeah`) is a C++ library with Python bindings to search for points in space that are close to a given query point. It also creates large read-only file-based data structures that are mapped into memory so that many processes may share the same data.
+> [Annoy](https://github.com/spotify/annoy) (`Approximate Nearest Neighbors Oh Yeah`)는 주어진 쿼리 포인트에 가까운 공간의 포인트를 검색하기 위한 Python 바인딩이 포함된 C++ 라이브러리입니다. 또한 메모리에 매핑되는 대용량 읽기 전용 파일 기반 데이터 구조를 생성하여 여러 프로세스가 동일한 데이터를 공유할 수 있습니다.
 
-You'll need to install `langchain-community` with `pip install -qU langchain-community` to use this integration
+이 integration을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다
 
-This notebook shows how to use functionality related to the `Annoy` vector database.
+이 노트북은 `Annoy` vector database와 관련된 기능을 사용하는 방법을 보여줍니다.
 
 ```{note}
 NOTE: Annoy is read-only - once the index is built you cannot add any more embeddings!
@@ -17,7 +17,7 @@ If you want to progressively add new entries to your VectorStore then better cho
 pip install -qU  annoy
 ```
 
-## Create VectorStore from texts
+## 텍스트에서 VectorStore 생성
 
 ```python
 from langchain_community.vectorstores import Annoy
@@ -62,7 +62,7 @@ vector_store.similarity_search_with_score("food", k=3)
  (Document(page_content='my car', metadata={}), 1.1580758094787598)]
 ```
 
-## Create VectorStore from docs
+## 문서에서 VectorStore 생성
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -103,7 +103,7 @@ print(docs[0].page_content[:100])
 Tonight. I call on the Senate to: Pass the Freedom to Vote Act. Pass the John Lewis Voting Rights Ac
 ```
 
-## Create VectorStore via existing embeddings
+## 기존 embedding을 통해 VectorStore 생성
 
 ```python
 embs = embeddings_func.embed_documents(texts)
@@ -125,7 +125,7 @@ vector_store_from_embeddings.similarity_search_with_score("food", k=3)
  (Document(page_content='my car', metadata={}), 1.1580758094787598)]
 ```
 
-## Search via embeddings
+## embedding을 통한 검색
 
 ```python
 motorbike_emb = embeddings_func.embed_query("motorbike")
@@ -151,7 +151,7 @@ vector_store.similarity_search_with_score_by_vector(motorbike_emb, k=3)
  (Document(page_content='pizza is great', metadata={}), 1.3254905939102173)]
 ```
 
-## Search via docstore id
+## docstore id를 통한 검색
 
 ```python
 vector_store.index_to_docstore_id
@@ -185,7 +185,7 @@ vector_store.similarity_search_with_score_by_index(some_docstore_id, k=3)
  (Document(page_content='my car', metadata={}), 1.2895267009735107)]
 ```
 
-## Save and load
+## 저장 및 로드
 
 ```python
 vector_store.save_local("my_annoy_index_and_docstore")
@@ -212,7 +212,7 @@ loaded_vector_store.similarity_search_with_score_by_index(some_docstore_id, k=3)
  (Document(page_content='my car', metadata={}), 1.2895267009735107)]
 ```
 
-## Construct from scratch
+## 처음부터 구성
 
 ```python
 import uuid

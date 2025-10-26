@@ -2,9 +2,9 @@
 title: WeaviateStore
 ---
 
-[Weaviate](https://weaviate.io/) is an open source vector database that stores both objects and vectors, allowing for combining vector search with structured filtering. LangChain connects to Weaviate via the weaviate-client package, the official Typescript client for Weaviate.
+[Weaviate](https://weaviate.io/)는 객체와 벡터를 모두 저장하는 오픈 소스 벡터 데이터베이스로, 벡터 검색과 구조화된 필터링을 결합할 수 있습니다. LangChain은 Weaviate의 공식 Typescript 클라이언트인 weaviate-client 패키지를 통해 Weaviate에 연결됩니다.
 
-This guide provides a quick overview for getting started with Weaviate [vector stores](/oss/integrations/vectorstores). For detailed documentation of all `WeaviateStore` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_weaviate.WeaviateStore.html).
+이 가이드는 Weaviate [vector stores](/oss/integrations/vectorstores) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `WeaviateStore` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_weaviate.WeaviateStore.html)를 참조하세요.
 
 ## Overview
 
@@ -16,9 +16,9 @@ This guide provides a quick overview for getting started with Weaviate [vector s
 
 ## Setup
 
-To use Weaviate vector stores, you'll need to set up a Weaviate instance and install the `@langchain/weaviate` integration package. You should also install the `weaviate-client` package to initialize a client to connect to your instance with, and the `uuid` package if you want to assign indexed documents ids.
+Weaviate vector store를 사용하려면 Weaviate 인스턴스를 설정하고 `@langchain/weaviate` integration 패키지를 설치해야 합니다. 또한 인스턴스에 연결할 클라이언트를 초기화하기 위해 `weaviate-client` 패키지를 설치해야 하며, 인덱싱된 문서에 id를 할당하려면 `uuid` 패키지도 설치해야 합니다.
 
-This guide will also use [OpenAI embeddings](/oss/integrations/text_embedding/openai), which require you to install the `@langchain/openai` integration package. You can also use [other supported embeddings models](/oss/integrations/text_embedding) if you wish.
+이 가이드는 [OpenAI embeddings](/oss/integrations/text_embedding/openai)도 사용하므로 `@langchain/openai` integration 패키지를 설치해야 합니다. 원하는 경우 [다른 지원되는 embeddings 모델](/oss/integrations/text_embedding)을 사용할 수도 있습니다.
 
 <CodeGroup>
 ```bash npm
@@ -32,11 +32,11 @@ pnpm add @langchain/weaviate @langchain/core weaviate-client uuid @langchain/ope
 ```
 </CodeGroup>
 
-You'll need to run Weaviate either locally or on a server. See [the Weaviate documentation](https://weaviate.io/developers/weaviate/installation) for more information.
+Weaviate를 로컬 또는 서버에서 실행해야 합니다. 자세한 내용은 [Weaviate 문서](https://weaviate.io/developers/weaviate/installation)를 참조하세요.
 
 ### Credentials
 
-Once you've set up your instance, set the following environment variables:
+인스턴스를 설정한 후 다음 환경 변수를 설정하세요:
 
 ```typescript
 // If running locally, include port e.g. "localhost:8080"
@@ -45,13 +45,13 @@ process.env.WEAVIATE_URL = "YOUR_WEAVIATE_URL";
 process.env.WEAVIATE_API_KEY = "YOUR_API_KEY";
 ```
 
-If you are using OpenAI embeddings for this guide, you'll need to set your OpenAI key as well:
+이 가이드에서 OpenAI embeddings를 사용하는 경우 OpenAI 키도 설정해야 합니다:
 
 ```typescript
 process.env.OPENAI_API_KEY = "YOUR_API_KEY";
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_TRACING="true"
@@ -60,9 +60,9 @@ If you want to get automated tracing of your model calls you can also set your [
 
 ## Instantiation
 
-### Connect a weaviate client
+### weaviate client 연결
 
-In most cases, you should use one of the connection helper functions to connect to your Weaviate instance:
+대부분의 경우 Weaviate 인스턴스에 연결하기 위해 연결 헬퍼 함수 중 하나를 사용해야 합니다:
 
 - connectToWeaviateCloud
 - connectToLocal
@@ -89,9 +89,9 @@ const weaviateClient = weaviate.connectToWeaviateCloud({
 });
 ```
 
-### Initiate the vectorStore
+### vectorStore 초기화
 
-To create a collection, specify at least the collection name. If you don't specify any properties, `auto-schema` creates them.
+collection을 생성하려면 최소한 collection 이름을 지정해야 합니다. property를 지정하지 않으면 `auto-schema`가 자동으로 생성합니다.
 
 ```typescript
 const vectorStore = new WeaviateStore(embeddings, {
@@ -101,7 +101,7 @@ const vectorStore = new WeaviateStore(embeddings, {
 });
 ```
 
-To use Weaviate's named vectors, vectorizers, reranker, generative-models etc., use the `schema` property when enabling the vector store. The collection name and other properties in `schema` will take precedence when creating the vector store.
+Weaviate의 named vectors, vectorizers, reranker, generative-models 등을 사용하려면 vector store를 활성화할 때 `schema` property를 사용하세요. `schema`의 collection 이름 및 기타 property는 vector store를 생성할 때 우선적으로 적용됩니다.
 
 ```typescript
 const vectorStore = new WeaviateStore(embeddings, {
@@ -134,9 +134,9 @@ const vectorStore = new WeaviateStore(embeddings, {
 
 ## Manage vector store
 
-### Add items to vector store
+### vector store에 항목 추가
 
-**Note:** If you want to associate ids with your indexed documents, they must be UUIDs.
+**참고:** 인덱싱된 문서에 id를 연결하려면 UUID여야 합니다.
 
 ```typescript
 import type { Document } from "@langchain/core/documents";
@@ -177,9 +177,9 @@ await vectorStore.addDocuments(documents, { ids: uuids });
 ]
 ```
 
-### Delete items from vector store
+### vector store에서 항목 삭제
 
-You can delete by id as by passing a `filter` param:
+id로 삭제하거나 `filter` 파라미터를 전달하여 삭제할 수 있습니다:
 
 ```typescript
 await vectorStore.delete({ ids: [uuids[3]] });
@@ -187,14 +187,14 @@ await vectorStore.delete({ ids: [uuids[3]] });
 
 ## Query vector store
 
-Once your vector store has been created and the relevant documents have been added you will most likely wish to query it during the running of your chain or agent.
-In weaviate's v3, the client interacts with `collections` as the primary way to work with objects in the database. The `collection` object can be re-used throughout the codebase
+vector store가 생성되고 관련 문서가 추가되면 chain 또는 agent를 실행하는 동안 쿼리하고 싶을 것입니다.
+Weaviate의 v3에서 클라이언트는 데이터베이스의 객체를 다루는 주요 방법으로 `collections`와 상호작용합니다. `collection` 객체는 코드베이스 전체에서 재사용할 수 있습니다.
 
-### Query directly
+### 직접 쿼리
 
-Performing a simple similarity search can be done as follows. The `Filter` helper class makes it easier to use filters with conditions. The v3 client streamlines how you use `Filter` so your code is cleaner and more concise.
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다. `Filter` 헬퍼 클래스를 사용하면 조건이 있는 필터를 더 쉽게 사용할 수 있습니다. v3 클라이언트는 `Filter` 사용 방식을 간소화하여 코드를 더 깔끔하고 간결하게 만듭니다.
 
-See [this page](https://weaviate.io/developers/weaviate/api/graphql/filters) for more on Weaviate filter syntax.
+Weaviate 필터 구문에 대한 자세한 내용은 [이 페이지](https://weaviate.io/developers/weaviate/api/graphql/filters)를 참조하세요.
 
 ```typescript
 import { Filters } from "weaviate-client";
@@ -215,7 +215,7 @@ for (const doc of similaritySearchResults) {
 * Mitochondria are made out of lipids [{"source":"https://example.com"}]
 ```
 
-If you want to execute a similarity search and receive the corresponding scores you can run:
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
 
 ```typescript
 const similaritySearchWithScoreResults = await vectorStore.similaritySearchWithScore("biology", 2, filter)
@@ -232,9 +232,9 @@ for (const [doc, score] of similaritySearchWithScoreResults) {
 
 ### Hybrid Search
 
-In Weaviate, `Hybrid search` combines the results of a vector search and a keyword (BM25F) search by fusing the two result sets. To change the relative weights of the keyword and vector components, set the `alpha` value in your query.
+Weaviate에서 `Hybrid search`는 벡터 검색과 키워드(BM25F) 검색의 결과를 두 결과 세트를 융합하여 결합합니다. 키워드 및 벡터 구성 요소의 상대적 가중치를 변경하려면 쿼리에서 `alpha` 값을 설정하세요.
 
-Check **[docs](https://weaviate.io/developers/weaviate/search/hybrid)** for the full list of hybrid search options.
+hybrid search 옵션의 전체 목록은 **[문서](https://weaviate.io/developers/weaviate/search/hybrid)**를 확인하세요.
 
 ```typescript
 const results = await vectorStore.hybridSearch("biology",
@@ -251,13 +251,13 @@ const results = await vectorStore.hybridSearch("biology",
 
 ### Retrieval Augmented Generation (RAG)
 
-Retrieval Augmented Generation (RAG) combines information retrieval with generative AI models.
+Retrieval Augmented Generation (RAG)은 정보 검색과 생성형 AI 모델을 결합합니다.
 
-In Weaviate, a RAG query consists of two parts: a search query, and a prompt for the model. Weaviate first performs the search, then passes both the search results and your prompt to a generative AI model before returning the generated response.
+Weaviate에서 RAG 쿼리는 두 부분으로 구성됩니다: 검색 쿼리와 모델을 위한 프롬프트입니다. Weaviate는 먼저 검색을 수행한 다음 검색 결과와 프롬프트를 모두 생성형 AI 모델에 전달한 후 생성된 응답을 반환합니다.
 
-- @param query The query to search for.
-- @param options available options for performing the hybrid search
-- @param generate available options for the generation. Check docs for complete list
+- @param query 검색할 쿼리입니다.
+- @param options hybrid search를 수행하기 위한 사용 가능한 옵션
+- @param generate 생성을 위한 사용 가능한 옵션. 전체 목록은 문서를 확인하세요
 
 ```typescript
 const results = await vectorStore.generate("hello world",
@@ -276,9 +276,9 @@ const results = await vectorStore.generate("hello world",
 );
 ```
 
-### Query by turning into retriever
+### retriever로 변환하여 쿼리
 
-You can also transform the vector store into a [retriever](/oss/langchain/retrieval) for easier usage in your chains.
+vector store를 [retriever](/oss/langchain/retrieval)로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
 
 ```typescript
 const retriever = vectorStore.asRetriever({
@@ -304,14 +304,14 @@ await retriever.invoke("biology");
 ]
 ```
 
-### Usage for retrieval-augmented generation
+### retrieval-augmented generation 사용법
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+retrieval-augmented generation (RAG)을 위해 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
 
-- [Build a RAG app with LangChain](/oss/langchain/rag).
+- [LangChain으로 RAG 앱 구축하기](/oss/langchain/rag)
 - [Agentic RAG](/oss/langgraph/agentic-rag)
-- [Retrieval docs](/oss/langchain/retrieval)
+- [Retrieval 문서](/oss/langchain/retrieval)
 
 ## API reference
 
-For detailed documentation of all `WeaviateStore` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_weaviate.WeaviateStore.html).
+모든 `WeaviateStore` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_weaviate.WeaviateStore.html)를 참조하세요.

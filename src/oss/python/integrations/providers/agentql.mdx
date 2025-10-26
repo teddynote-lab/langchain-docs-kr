@@ -2,11 +2,11 @@
 title: AgentQL
 ---
 
-[AgentQL](https://www.agentql.com/) provides web interaction and structured data extraction from any web page using an [AgentQL query](https://docs.agentql.com/agentql-query) or a Natural Language prompt. AgentQL can be used across multiple languages and web pages without breaking over time and change.
+[AgentQL](https://www.agentql.com/)은 [AgentQL query](https://docs.agentql.com/agentql-query) 또는 자연어 프롬프트를 사용하여 모든 웹 페이지에서 웹 상호작용 및 구조화된 데이터 추출을 제공합니다. AgentQL은 여러 언어와 웹 페이지에서 시간이 지나도 변경되어도 중단 없이 사용할 수 있습니다.
 
 ## Installation and Setup
 
-Install the integration package:
+integration package를 설치합니다:
 
 <CodeGroup>
 ```bash pip
@@ -20,24 +20,24 @@ uv add langchain-agentql
 
 ## API Key
 
-Get an API Key from our [Dev Portal](https://dev.agentql.com/) and add it to your environment variables:
+[Dev Portal](https://dev.agentql.com/)에서 API Key를 받아 환경 변수에 추가합니다:
 ```
 export AGENTQL_API_KEY="your-api-key-here"
 ```
 
 ## DocumentLoader
-AgentQL's document loader provides structured data extraction from any web page using an AgentQL query.
+AgentQL의 document loader는 AgentQL query를 사용하여 모든 웹 페이지에서 구조화된 데이터 추출을 제공합니다.
 
 ```python
 from langchain_agentql.document_loaders import AgentQLLoader
 ```
-See our [document loader documentation and usage example](/oss/integrations/document_loaders/agentql).
+[document loader 문서 및 사용 예제](/oss/integrations/document_loaders/agentql)를 참조하세요.
 
 ## Tools and Toolkits
-AgentQL tools provides web interaction and structured data extraction from any web page using an AgentQL query or a Natural Language prompt.
+AgentQL tools는 AgentQL query 또는 자연어 프롬프트를 사용하여 모든 웹 페이지에서 웹 상호작용 및 구조화된 데이터 추출을 제공합니다.
 
 ```python
 from langchain_agentql.tools import ExtractWebDataTool, ExtractWebDataBrowserTool, GetWebElementBrowserTool
 from langchain_agentql import AgentQLBrowserToolkit
 ```
-See our [tools documentation and usage example](/oss/integrations/tools/agentql).
+[tools 문서 및 사용 예제](/oss/integrations/tools/agentql)를 참조하세요.

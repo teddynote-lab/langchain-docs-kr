@@ -2,13 +2,12 @@
 title: AstraDBByteStore
 ---
 
-This will help you get started with Astra DB [key-value stores](/oss/integrations/stores). For detailed documentation of all `AstraDBByteStore` features and configurations head to the [API reference](https://python.langchain.com/api_reference/astradb/storage/langchain_astradb.storage.AstraDBByteStore.html).
+이 문서는 Astra DB [key-value stores](/oss/integrations/stores) 시작하기를 도와드립니다. 모든 `AstraDBByteStore` 기능과 설정에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/astradb/storage/langchain_astradb.storage.AstraDBByteStore.html)를 참조하세요.
 
 ## Overview
 
-> [DataStax Astra DB](https://docs.datastax.com/en/astra-db-serverless/index.html) is a serverless
-> AI-ready database built on `Apache Cassandra®` and made conveniently available
-> through an easy-to-use JSON API.
+> [DataStax Astra DB](https://docs.datastax.com/en/astra-db-serverless/index.html)는 `Apache Cassandra®` 기반으로 구축된 serverless
+> AI-ready database이며, 사용하기 쉬운 JSON API를 통해 편리하게 사용할 수 있습니다.
 
 ### Integration details
 
@@ -18,11 +17,11 @@ This will help you get started with Astra DB [key-value stores](/oss/integration
 
 ## Setup
 
-To create an `AstraDBByteStore` byte store, you'll need to [create a DataStax account](https://www.datastax.com/products/datastax-astra).
+`AstraDBByteStore` byte store를 생성하려면 [DataStax 계정을 생성](https://www.datastax.com/products/datastax-astra)해야 합니다.
 
 ### Credentials
 
-After signing up, set the following credentials:
+가입 후 다음 자격 증명을 설정하세요:
 
 ```python
 from getpass import getpass
@@ -33,7 +32,7 @@ ASTRA_DB_APPLICATION_TOKEN = getpass("ASTRA_DB_APPLICATION_TOKEN = ")
 
 ### Installation
 
-The LangChain AstraDB integration lives in the `langchain-astradb` package:
+LangChain AstraDB integration은 `langchain-astradb` package에 포함되어 있습니다:
 
 ```python
 pip install -qU langchain-astradb
@@ -41,7 +40,7 @@ pip install -qU langchain-astradb
 
 ## Instantiation
 
-Now we can instantiate our byte store:
+이제 byte store를 인스턴스화할 수 있습니다:
 
 ```python
 from langchain_astradb import AstraDBByteStore
@@ -55,7 +54,7 @@ kv_store = AstraDBByteStore(
 
 ## Usage
 
-You can set data under keys like this using the `mset` method:
+`mset` method를 사용하여 다음과 같이 key 아래에 데이터를 설정할 수 있습니다:
 
 ```python
 kv_store.mset(
@@ -77,7 +76,7 @@ kv_store.mget(
 [b'value1', b'value2']
 ```
 
-And you can delete data using the `mdelete` method:
+그리고 `mdelete` method를 사용하여 데이터를 삭제할 수 있습니다:
 
 ```python
 kv_store.mdelete(
@@ -99,8 +98,8 @@ kv_store.mget(
 [None, None]
 ```
 
-You can use an `AstraDBByteStore` anywhere you'd use other ByteStores.
+다른 ByteStores를 사용하는 모든 곳에서 `AstraDBByteStore`를 사용할 수 있습니다.
 
 ## API reference
 
-For detailed documentation of all `AstraDBByteStore` features and configurations, head to the API reference: [python.langchain.com/api_reference/astradb/storage/langchain_astradb.storage.AstraDBByteStore.html](https://python.langchain.com/api_reference/astradb/storage/langchain_astradb.storage.AstraDBByteStore.html)
+모든 `AstraDBByteStore` 기능과 설정에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/astradb/storage/langchain_astradb.storage.AstraDBByteStore.html](https://python.langchain.com/api_reference/astradb/storage/langchain_astradb.storage.AstraDBByteStore.html)

@@ -3,12 +3,12 @@ title: CSV
 ---
 
 <Tip>
-**Compatibility**: Only available on Node.js.
+**호환성**: Node.js에서만 사용 가능합니다.
 </Tip>
 
-This notebook provides a quick overview for getting started with `CSVLoader` [document loaders](/oss/integrations/document_loaders). For detailed documentation of all `CSVLoader` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_fs_csv.CSVLoader.html).
+이 노트북은 `CSVLoader` [document loaders](/oss/integrations/document_loaders) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `CSVLoader` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_fs_csv.CSVLoader.html)를 참조하세요.
 
-This example goes over how to load data from CSV files. The second argument is the `column` name to extract from the CSV file. One document will be created for each row in the CSV file. When `column` is not specified, each row is converted into a key/value pair with each key/value pair outputted to a new line in the document's `pageContent`. When `column` is specified, one document is created for each row, and the value of the specified column is used as the document's `pageContent`.
+이 예제는 CSV 파일에서 데이터를 로드하는 방법을 다룹니다. 두 번째 인수는 CSV 파일에서 추출할 `column` 이름입니다. CSV 파일의 각 행에 대해 하나의 document가 생성됩니다. `column`이 지정되지 않으면 각 행은 key/value 쌍으로 변환되며, 각 key/value 쌍은 document의 `pageContent`에 새 줄로 출력됩니다. `column`이 지정되면 각 행에 대해 하나의 document가 생성되고, 지정된 column의 값이 document의 `pageContent`로 사용됩니다.
 
 ## Overview
 
@@ -20,11 +20,11 @@ This example goes over how to load data from CSV files. The second argument is t
 
 ## Setup
 
-To access `CSVLoader` document loader you'll need to install the `@langchain/community` integration, along with the `d3-dsv@2` peer dependency.
+`CSVLoader` document loader에 액세스하려면 `@langchain/community` integration과 `d3-dsv@2` peer dependency를 설치해야 합니다.
 
 ### Installation
 
-The LangChain CSVLoader integration lives in the `@langchain/community` integration package.
+LangChain CSVLoader integration은 `@langchain/community` integration package에 포함되어 있습니다.
 
 <CodeGroup>
 ```bash npm
@@ -40,7 +40,7 @@ pnpm add @langchain/community @langchain/core d3-dsv@2
 
 ## Instantiation
 
-Now we can instantiate our model object and load documents:
+이제 model 객체를 인스턴스화하고 document를 로드할 수 있습니다:
 
 ```typescript
 import { CSVLoader } from "@langchain/community/document_loaders/fs/csv"
@@ -81,7 +81,7 @@ console.log(docs[0].metadata)
 
 ## Usage, extracting a single column
 
-Example CSV file:
+예제 CSV 파일:
 
 ```csv
 id｜html
@@ -119,4 +119,4 @@ Document {
 
 ## API reference
 
-For detailed documentation of all CSVLoader features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_fs_csv.CSVLoader.html).
+모든 CSVLoader 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_fs_csv.CSVLoader.html)를 참조하세요.

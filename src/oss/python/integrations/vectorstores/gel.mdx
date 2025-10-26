@@ -2,15 +2,15 @@
 title: Gel
 ---
 
-> An implementation of LangChain vectorstore abstraction using `gel` as the backend.
+> `gel`을 backend로 사용하는 LangChain vectorstore 추상화의 구현입니다.
 
-[Gel](https://www.geldata.com/) is an open-source PostgreSQL data layer optimized for fast development to production cycle. It comes with a high-level strictly typed graph-like data model, composable hierarchical query language, full SQL support, migrations, Auth and AI modules.
+[Gel](https://www.geldata.com/)은 빠른 개발에서 프로덕션 사이클로의 전환에 최적화된 오픈소스 PostgreSQL 데이터 레이어입니다. 고수준의 엄격하게 타입이 지정된 그래프형 데이터 모델, 구성 가능한 계층적 쿼리 언어, 완전한 SQL 지원, 마이그레이션, Auth 및 AI 모듈을 제공합니다.
 
-The code lives in an integration package called [langchain-gel](https://github.com/geldata/langchain-gel).
+코드는 [langchain-gel](https://github.com/geldata/langchain-gel)이라는 통합 패키지에 있습니다.
 
 ## Setup
 
-First install relevant packages:
+먼저 관련 패키지를 설치합니다:
 
 ```python
 ! pip install -qU gel langchain-gel
@@ -18,29 +18,29 @@ First install relevant packages:
 
 ## Initialization
 
-In order to use Gel as a backend for your `VectorStore`, you're going to need a working Gel instance.
-Fortunately, it doesn't have to involve Docker containers or anything complicated, unless you want to!
+`VectorStore`의 backend로 Gel을 사용하려면 작동하는 Gel 인스턴스가 필요합니다.
+다행히도 원하지 않는 한 Docker 컨테이너나 복잡한 작업이 필요하지 않습니다!
 
-To set up a local instance, run:
+로컬 인스턴스를 설정하려면 다음을 실행하세요:
 
 ```python
 ! gel project init --non-interactive
 ```
 
-If you are using [Gel Cloud](https://cloud.geldata.com/) (and you should!), add one more argument to that command:
+[Gel Cloud](https://cloud.geldata.com/)를 사용하는 경우(사용하는 것을 권장합니다!), 해당 명령에 인수를 하나 더 추가하세요:
 
 ```bash
 gel project init --server-instance <org-name>/<instance-name>
 ```
 
-For a comprehensive list of ways to run Gel, take a look at [Running Gel](https://docs.geldata.com/reference/running) section of the reference docs.
+Gel을 실행하는 다양한 방법에 대한 포괄적인 목록은 참조 문서의 [Running Gel](https://docs.geldata.com/reference/running) 섹션을 참조하세요.
 
-### Set up the schema
+### 스키마 설정
 
-[Gel schema](https://docs.geldata.com/reference/datamodel) is an explicit high-level description of your application's data model.
-Aside from enabling you to define exactly how your data is going to be laid out, it drives Gel's many powerful features such as links, access policies, functions, triggers, constraints, indexes, and more.
+[Gel schema](https://docs.geldata.com/reference/datamodel)는 애플리케이션의 데이터 모델에 대한 명시적인 고수준 설명입니다.
+데이터 레이아웃을 정확하게 정의할 수 있을 뿐만 아니라, link, access policy, function, trigger, constraint, index 등과 같은 Gel의 강력한 기능을 구동합니다.
 
-The LangChain's @[`VectorStore`] expects the following layout for the schema:
+LangChain의 @[`VectorStore`]는 스키마에 대해 다음과 같은 레이아웃을 기대합니다:
 
 ```python
 schema_content = """
@@ -68,14 +68,14 @@ with open("dbschema/default.gel", "w") as f:
     f.write(schema_content)
 ```
 
-In order to apply schema changes to the database, run a migration using Gel's [migration mechanism](https://docs.geldata.com/reference/datamodel/migrations):
+데이터베이스에 스키마 변경 사항을 적용하려면 Gel의 [migration mechanism](https://docs.geldata.com/reference/datamodel/migrations)을 사용하여 마이그레이션을 실행하세요:
 
 ```python
 ! gel migration create --non-interactive
 ! gel migrate
 ```
 
-From this point onward, `GelVectorStore` can be used as a drop-in replacement for any other vectorstore available in LangChain.
+이 시점부터 `GelVectorStore`는 LangChain에서 사용 가능한 다른 vectorstore의 드롭인 대체품으로 사용할 수 있습니다.
 
 ## Instantiation
 
@@ -99,9 +99,9 @@ vector_store = GelVectorStore(
 
 ## Manage vector store
 
-### Add items to vector store
+### vector store에 항목 추가
 
-Note that adding documents by ID will over-write any existing documents that match that ID.
+ID로 문서를 추가하면 해당 ID와 일치하는 기존 문서를 덮어쓰게 됩니다.
 
 ```python
 from langchain_core.documents import Document
@@ -152,7 +152,7 @@ docs = [
 vector_store.add_documents(docs, ids=[doc.metadata["id"] for doc in docs])
 ```
 
-### Delete items from vector store
+### vector store에서 항목 삭제
 
 ```python
 vector_store.delete(ids=["3"])
@@ -160,11 +160,11 @@ vector_store.delete(ids=["3"])
 
 ## Query vector store
 
-Once your vector store has been created and the relevant documents have been added you will most likely wish to query it during the running of your chain or agent.
+vector store가 생성되고 관련 문서가 추가되면 chain이나 agent를 실행하는 동안 쿼리하고 싶을 것입니다.
 
 ### Filtering Support
 
-The vectorstore supports a set of filters that can be applied against the metadata fields of the documents.
+vectorstore는 문서의 metadata 필드에 적용할 수 있는 필터 세트를 지원합니다.
 
 | Operator | Meaning/Category        |
 |----------|-------------------------|
@@ -182,9 +182,9 @@ The vectorstore supports a set of filters that can be applied against the metada
 | \$and     | Logical (and)           |
 | \$or      | Logical (or)            |
 
-### Query directly
+### 직접 쿼리
 
-Performing a simple similarity search can be done as follows:
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
 
 ```python
 results = vector_store.similarity_search(
@@ -194,7 +194,7 @@ for doc in results:
     print(f"* {doc.page_content} [{doc.metadata}]")
 ```
 
-If you provide a dict with multiple fields, but no operators, the top level will be interpreted as a logical **AND** filter
+operator 없이 여러 필드가 있는 dict를 제공하면 최상위 레벨은 논리적 **AND** 필터로 해석됩니다
 
 ```python
 vector_store.similarity_search(
@@ -220,7 +220,7 @@ vector_store.similarity_search(
 )
 ```
 
-If you want to execute a similarity search and receive the corresponding scores you can run:
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
 
 ```python
 results = vector_store.similarity_search_with_score(query="cats", k=1)
@@ -228,9 +228,9 @@ for doc, score in results:
     print(f"* [SIM={score:3f}] {doc.page_content} [{doc.metadata}]")
 ```
 
-### Query by turning into retriever
+### retriever로 변환하여 쿼리
 
-You can also transform the vector store into a retriever for easier usage in your chains.
+chain에서 더 쉽게 사용할 수 있도록 vector store를 retriever로 변환할 수도 있습니다.
 
 ```python
 retriever = vector_store.as_retriever(search_kwargs={"k": 1})
@@ -239,7 +239,7 @@ retriever.invoke("kitty")
 
 ## Usage for retrieval-augmented generation
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+retrieval-augmented generation (RAG)에 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
 
 - [Build a RAG app with LangChain](/oss/langchain/rag)
 - [Agentic RAG](/oss/langgraph/agentic-rag)
@@ -247,4 +247,4 @@ For guides on how to use this vector store for retrieval-augmented generation (R
 
 ## API reference
 
-For detailed documentation of all GelVectorStore features and configurations head to the API reference: [python.langchain.com/api_reference/](https://python.langchain.com/api_reference/)
+모든 GelVectorStore 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/](https://python.langchain.com/api_reference/)

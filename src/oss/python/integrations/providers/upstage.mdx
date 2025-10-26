@@ -2,32 +2,32 @@
 title: Upstage
 ---
 
->[Upstage](https://upstage.ai) is a leading artificial intelligence (AI) company specializing in delivering above-human-grade performance LLM components.
+>[Upstage](https://upstage.ai)는 인간 수준 이상의 성능을 제공하는 LLM 컴포넌트를 전문으로 하는 선도적인 인공지능(AI) 기업입니다.
 >
->**Solar Pro** is an enterprise-grade LLM optimized for single-GPU deployment, excelling in instruction-following and processing structured formats like HTML and Markdown. It supports English, Korean, and Japanese with top multilingual performance and offers domain expertise in finance, healthcare, and legal.
+>**Solar Pro**는 단일 GPU 배포에 최적화된 엔터프라이즈급 LLM으로, instruction-following과 HTML 및 Markdown과 같은 구조화된 형식 처리에 뛰어납니다. 영어, 한국어, 일본어를 지원하며 최고 수준의 다국어 성능을 제공하고, 금융, 의료, 법률 분야의 전문성을 제공합니다.
 
->Other than Solar, Upstage also offers features for real-world RAG (retrieval-augmented generation), such as **Document Parse** and **Groundedness Check**.
+>Solar 외에도 Upstage는 **Document Parse** 및 **Groundedness Check**와 같은 실제 RAG(retrieval-augmented generation)를 위한 기능을 제공합니다.
 
 ### Upstage LangChain integrations
 
 | API | Description | Import | Example usage |
 | --- | --- | --- | --- |
-| Chat | Build assistants using Solar Chat | `from langchain_upstage import ChatUpstage` | [Go](/oss/integrations/chat/upstage) |
-| Text Embedding | Embed strings to vectors | `from langchain_upstage import UpstageEmbeddings` | [Go](/oss/integrations/text_embedding/upstage) |
-| Groundedness Check | Verify groundedness of assistant's response | `from langchain_upstage import UpstageGroundednessCheck` | [Go](/oss/integrations/tools/upstage_groundedness_check) |
-| Document Parse | Serialize documents with tables and figures | `from langchain_upstage import UpstageDocumentParseLoader` | [Go](/oss/integrations/document_loaders/upstage) |
+| Chat | Solar Chat을 사용하여 assistant 구축 | `from langchain_upstage import ChatUpstage` | [바로가기](/oss/integrations/chat/upstage) |
+| Text Embedding | 문자열을 벡터로 임베딩 | `from langchain_upstage import UpstageEmbeddings` | [바로가기](/oss/integrations/text_embedding/upstage) |
+| Groundedness Check | assistant 응답의 근거성 검증 | `from langchain_upstage import UpstageGroundednessCheck` | [바로가기](/oss/integrations/tools/upstage_groundedness_check) |
+| Document Parse | 표와 그림이 포함된 문서 직렬화 | `from langchain_upstage import UpstageDocumentParseLoader` | [바로가기](/oss/integrations/document_loaders/upstage) |
 
-See [documentations](https://console.upstage.ai/docs/getting-started/overview) for more details about the models and features.
+모델 및 기능에 대한 자세한 내용은 [문서](https://console.upstage.ai/docs/getting-started/overview)를 참조하세요.
 
 ## Installation and Setup
 
-Install `langchain-upstage` package:
+`langchain-upstage` 패키지 설치:
 
 ```bash
 pip install -qU langchain-core langchain-upstage
 ```
 
-Get [API Keys](https://console.upstage.ai) and set environment variable `UPSTAGE_API_KEY`.
+[API Keys](https://console.upstage.ai)를 받고 환경 변수 `UPSTAGE_API_KEY`를 설정하세요.
 
 ```python
 import os
@@ -39,7 +39,7 @@ os.environ["UPSTAGE_API_KEY"] = "YOUR_API_KEY"
 
 ### Solar LLM
 
-See [a usage example](/oss/integrations/chat/upstage).
+[사용 예제](/oss/integrations/chat/upstage)를 참조하세요.
 
 ```python
 from langchain_upstage import ChatUpstage
@@ -51,7 +51,7 @@ print(response)
 
 ## Embedding models
 
-See [a usage example](/oss/integrations/text_embedding/upstage).
+[사용 예제](/oss/integrations/text_embedding/upstage)를 참조하세요.
 
 ```python
 from langchain_upstage import UpstageEmbeddings
@@ -70,7 +70,7 @@ print(query_result)
 
 ### Document Parse
 
-See [a usage example](/oss/integrations/document_loaders/upstage).
+[사용 예제](/oss/integrations/document_loaders/upstage)를 참조하세요.
 
 ```python
 from langchain_upstage import UpstageDocumentParseLoader
@@ -89,7 +89,7 @@ for doc in docs[:3]:
 
 ### Groundedness Check
 
-See [a usage example](/oss/integrations/tools/upstage_groundedness_check).
+[사용 예제](/oss/integrations/tools/upstage_groundedness_check)를 참조하세요.
 
 ```python
 from langchain_upstage import UpstageGroundednessCheck

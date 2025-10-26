@@ -1,53 +1,51 @@
 ---
 title: "Monorepo"
-description: "How the Open SWE monorepo is configured"
+description: "Open SWE monorepo가 어떻게 구성되어 있는지"
 ---
 
-Open SWE is organized as a Yarn workspace monorepo with Turbo build orchestration, designed to efficiently manage multiple applications and shared code. This structure enables code reuse, consistent tooling, and streamlined development workflows.
+Open SWE는 Turbo 빌드 오케스트레이션을 사용하는 Yarn workspace monorepo로 구성되어 있으며, 여러 애플리케이션과 공유 코드를 효율적으로 관리하도록 설계되었습니다. 이 구조는 코드 재사용, 일관된 도구 사용, 그리고 간소화된 개발 워크플로우를 가능하게 합니다.
 
-## Repository Structure
+## Repository 구조
 
-The monorepo is organized into two main directories:
+monorepo는 두 개의 주요 디렉토리로 구성되어 있습니다:
 
 ### Applications (`apps/`)
 
 **`apps/open-swe`** - LangGraph Agent Application
 
-- Contains the core LangGraph agent implementation with TypeScript
-- Includes three specialized graphs: manager, planner, and programmer
-- Handles GitHub webhook integration and LLM interactions
+- TypeScript로 작성된 핵심 LangGraph agent 구현을 포함합니다
+- manager, planner, programmer의 세 가지 특화된 graph를 포함합니다
+- GitHub webhook 통합 및 LLM 상호작용을 처리합니다
 
 **`apps/web`** - Next.js Web Interface
 
-- React frontend with Next.js framework
-- Uses Shadcn UI components (Radix UI) with Tailwind CSS
-- Provides the user interface for interacting with the LangGraph agent
-- Includes authentication and proxy routes for secure communication
+- Next.js framework를 사용하는 React frontend
+- Tailwind CSS와 함께 Shadcn UI component(Radix UI)를 사용합니다
+- LangGraph agent와 상호작용하기 위한 사용자 인터페이스를 제공합니다
+- 안전한 통신을 위한 인증 및 proxy route를 포함합니다
 
 **`apps/docs`** - Mintlify Documentation
 
-- Contains this documentation site built with Mintlify
-- Provides comprehensive setup and usage guides
-- Includes API documentation and development resources
+- Mintlify로 구축된 이 문서 사이트를 포함합니다
+- 포괄적인 설정 및 사용 가이드를 제공합니다
+- API 문서 및 개발 리소스를 포함합니다
 
 ### Packages (`packages/`)
 
 **`packages/shared`** - Common Utilities Package
 
-- Centralized location for shared types, constants, and utilities
-- Used by both the agent and web applications
-- Exports modules via `@openswe/shared` namespace
-- Contains crypto utilities, GraphState types, and Open SWE specific modules
+- 공유 type, constant, utility의 중앙 집중식 위치
+- agent와 web application 모두에서 사용됩니다
+- `@openswe/shared` namespace를 통해 module을 export합니다
+- crypto utility, GraphState type, Open SWE 특정 module을 포함합니다
 
 <Note>
-  The shared package must be built before other packages can import from it. Any
-  code used by both the agent and web app should be placed here to avoid
-  duplication.
+  shared package는 다른 package가 import하기 전에 빌드되어야 합니다. agent와 web app 모두에서 사용되는 모든 코드는 중복을 피하기 위해 여기에 배치되어야 합니다.
 </Note>
 
 ## Turbo Orchestration
 
-The monorepo uses [Turbo](https://turbo.build/) for efficient build orchestration and task management:
+monorepo는 효율적인 빌드 오케스트레이션과 작업 관리를 위해 [Turbo](https://turbo.build/)를 사용합니다:
 
 ### Task Dependencies
 
@@ -63,21 +61,21 @@ The monorepo uses [Turbo](https://turbo.build/) for efficient build orchestratio
 }
 ```
 
-The `^build` dependency ensures that shared packages are built before dependent packages, maintaining proper build order across the monorepo.
+`^build` dependency는 shared package가 의존하는 package보다 먼저 빌드되도록 보장하여, monorepo 전체에서 적절한 빌드 순서를 유지합니다.
 
-### Available Scripts
+### 사용 가능한 Script
 
-Run these commands from the repository root:
+repository root에서 다음 명령어를 실행하세요:
 
-- `yarn build` - Build all packages in dependency order
-- `yarn lint` - Run linting across all packages
-- `yarn format` - Format code using Prettier
+- `yarn build` - 의존성 순서대로 모든 package 빌드
+- `yarn lint` - 모든 package에 대해 linting 실행
+- `yarn format` - Prettier를 사용하여 코드 포맷팅
 
-## Dependency Management Best Practices
+## Dependency 관리 모범 사례
 
 <Steps>
-  <Step title="Install dependencies in specific packages">
-    Always install dependencies in the specific package where they're used, never in the root `package.json` unless adding a resolution.
+  <Step title="특정 package에 dependency 설치">
+    resolution을 추가하는 경우가 아니라면, 항상 사용되는 특정 package에 dependency를 설치하고, root `package.json`에는 절대 설치하지 마세요.
 
     ```bash
     # Correct - install in specific package
@@ -89,8 +87,8 @@ Run these commands from the repository root:
     ```
   </Step>
 
-  <Step title="Use resolutions for shared dependencies">
-    When multiple packages need the same dependency, add a resolution to the root `package.json` to ensure version consistency.
+  <Step title="공유 dependency에 대한 resolution 사용">
+    여러 package가 동일한 dependency를 필요로 할 때, 버전 일관성을 보장하기 위해 root `package.json`에 resolution을 추가하세요.
 
     ```json
     {
@@ -102,8 +100,8 @@ Run these commands from the repository root:
     ```
   </Step>
 
-  <Step title="Build shared packages after changes">
-    Run `yarn build` from the root when making changes to `packages/shared` to make them available to other packages.
+  <Step title="변경 후 shared package 빌드">
+    `packages/shared`를 변경한 후에는 root에서 `yarn build`를 실행하여 다른 package에서 사용할 수 있도록 하세요.
 
     ```bash
     # After modifying packages/shared
@@ -112,9 +110,9 @@ Run these commands from the repository root:
   </Step>
 </Steps>
 
-## Postinstall Hook Requirements
+## Postinstall Hook 요구사항
 
-The `apps/open-swe` package includes a critical `postinstall` hook:
+`apps/open-swe` package는 중요한 `postinstall` hook을 포함합니다:
 
 ```json
 {
@@ -125,28 +123,23 @@ The `apps/open-swe` package includes a critical `postinstall` hook:
 ```
 
 <Note>
-  This postinstall hook is **required** for LangSmith deployment. Since
-  Open SWE is a monorepo and the agent requires access to built files from the
-  shared package, we must run the build process before starting the LangGraph
-  server.
+  이 postinstall hook은 LangSmith 배포에 **필수**입니다. Open SWE는 monorepo이고 agent가 shared package의 빌드된 파일에 접근해야 하므로, LangGraph server를 시작하기 전에 빌드 프로세스를 실행해야 합니다.
 </Note>
 
-### Why This Matters
+### 중요한 이유
 
-1. **Deployment Compatibility**: LangSmith needs all dependencies built and available
-2. **Shared Package Access**: The agent imports utilities from `@openswe/shared` which must be compiled
-3. **Build Order**: Ensures the shared package is built before the agent attempts to use it
+1. **배포 호환성**: LangSmith는 모든 dependency가 빌드되고 사용 가능해야 합니다
+2. **Shared Package 접근**: agent는 컴파일되어야 하는 `@openswe/shared`에서 utility를 import합니다
+3. **빌드 순서**: agent가 사용을 시도하기 전에 shared package가 빌드되도록 보장합니다
 
 <Tip>
-  If you encounter import errors related to the shared package during
-  development, run `yarn build` from the root to ensure all packages are
-  properly built and linked.
+  개발 중 shared package와 관련된 import 오류가 발생하면, root에서 `yarn build`를 실행하여 모든 package가 올바르게 빌드되고 링크되었는지 확인하세요.
 </Tip>
 
-## Workspace Configuration
+## Workspace 구성
 
-The monorepo uses Yarn 3.5.1 with the following configuration:
+monorepo는 다음 구성으로 Yarn 3.5.1을 사용합니다:
 
-- **Node Linker**: `node-modules` for compatibility
-- **Workspaces**: Automatically discovers packages in `apps/*` and `packages/*`
-- **Package Manager**: Enforced via `packageManager` field in `package.json`
+- **Node Linker**: 호환성을 위한 `node-modules`
+- **Workspaces**: `apps/*`와 `packages/*`에서 package를 자동으로 검색합니다
+- **Package Manager**: `package.json`의 `packageManager` 필드를 통해 강제됩니다

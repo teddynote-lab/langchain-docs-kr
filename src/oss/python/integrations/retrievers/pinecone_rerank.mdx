@@ -2,11 +2,11 @@
 title: Pinecone Rerank
 ---
 
-> This notebook shows how to use **PineconeRerank** for two-stage vector retrieval reranking using Pinecone's hosted reranking API as demonstrated in `langchain_pinecone/libs/pinecone/rerank.py`.
+> 이 노트북은 `langchain_pinecone/libs/pinecone/rerank.py`에서 보여주는 것처럼 Pinecone의 호스팅 reranking API를 사용하여 2단계 벡터 검색 reranking을 위해 **PineconeRerank**를 사용하는 방법을 보여줍니다.
 
 ## Setup
 
-Install the `langchain-pinecone` package.
+`langchain-pinecone` 패키지를 설치합니다.
 
 ```python
 pip install -qU "langchain-pinecone"
@@ -14,7 +14,7 @@ pip install -qU "langchain-pinecone"
 
 ## Credentials
 
-Set your Pinecone API key to use the reranking API.
+reranking API를 사용하기 위해 Pinecone API key를 설정합니다.
 
 ```python
 import os
@@ -27,7 +27,7 @@ os.environ["PINECONE_API_KEY"] = os.getenv("PINECONE_API_KEY") or getpass(
 
 ## Instantiation
 
-Use `PineconeRerank` to rerank a list of documents by relevance to a query.
+`PineconeRerank`를 사용하여 쿼리와의 관련성에 따라 문서 목록을 rerank합니다.
 
 ```python
 from langchain_core.documents import Document
@@ -65,9 +65,9 @@ Score: 0.0042 | Content: Berlin is the capital of Germany.
 
 ## Usage
 
-### Reranking with Top-N
+### Top-N으로 Reranking하기
 
-Specify `top_n` to limit the number of returned documents.
+반환되는 문서 수를 제한하려면 `top_n`을 지정합니다.
 
 ```python
 # Return only top-1 result
@@ -83,9 +83,9 @@ Top-1 Result:
 Score: 0.9998 | Content: Paris is the capital of France.
 ```
 
-## Reranking with Custom Rank Fields
+## 사용자 정의 Rank Fields로 Reranking하기
 
-If your documents are dictionaries or have custom fields, use `rank_fields` to specify the field to rank on.
+문서가 dictionary이거나 사용자 정의 필드를 가지고 있는 경우, `rank_fields`를 사용하여 rank할 필드를 지정합니다.
 
 ```python
 # Sample dictionary documents with 'text' field
@@ -118,7 +118,7 @@ ID: doc1 | Score: 0.0006
 ID: doc2 | Score: 0.0000
 ```
 
-We can rerank based on title field
+title 필드를 기준으로 rerank할 수 있습니다
 
 ```python
 economic_docs = reranker_text.rerank(docs_dict, "Economic forecast.")
@@ -136,12 +136,12 @@ ID: doc3 | Score: 0.0002 | Title: Climate Policy
 ID: doc1 | Score: 0.0000 | Title: Renewable Energy
 ```
 
-## Reranking with Additional Parameters
+## 추가 Parameters로 Reranking하기
 
-You can pass model-specific parameters (e.g., `truncate`) directly to `.rerank()`.
+model별 parameters(예: `truncate`)를 `.rerank()`에 직접 전달할 수 있습니다.
 
-How to handle inputs longer than those supported by the model. Accepted values: END or NONE.
-END truncates the input sequence at the input token limit. NONE returns an error when the input exceeds the input token limit.
+모델이 지원하는 것보다 긴 입력을 처리하는 방법입니다. 허용되는 값: END 또는 NONE.
+END는 입력 token 제한에서 입력 시퀀스를 잘라냅니다. NONE은 입력이 입력 token 제한을 초과할 때 오류를 반환합니다.
 
 ```python
 # Rerank with custom truncate parameter
@@ -165,10 +165,10 @@ ID: docA | Score: 0.6950
 ID: docB | Score: 0.0001
 ```
 
-## Use within a chain
+## Chain 내에서 사용하기
 
 ## API reference
 
 - `PineconeRerank(model, top_n, rank_fields, return_documents)`
 - `.rerank(documents, query, rank_fields=None, model=None, top_n=None, truncate="END")`
-- `.compress_documents(documents, query)` (returns @[`Document`] objects with `relevance_score` in metadata)
+- `.compress_documents(documents, query)` (metadata에 `relevance_score`가 포함된 @[`Document`] 객체를 반환합니다)

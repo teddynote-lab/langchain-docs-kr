@@ -1,22 +1,23 @@
+```markdown
 ---
 title: Browserbase Loader
 ---
 
 ## Description
 
-[Browserbase](https://browserbase.com) is a developer platform to reliably run, manage, and monitor headless browsers.
+[Browserbase](https://browserbase.com)는 headless browser를 안정적으로 실행, 관리 및 모니터링하기 위한 개발자 플랫폼입니다.
 
-Power your AI data retrievals with:
+다음 기능으로 AI 데이터 검색을 강화하세요:
 
-- [Serverless Infrastructure](https://docs.browserbase.com/under-the-hood) providing reliable browsers to extract data from complex UIs
-- [Stealth Mode](https://docs.browserbase.com/features/stealth-mode) with included fingerprinting tactics and automatic captcha solving
-- [Session Debugger](https://docs.browserbase.com/features/sessions) to inspect your Browser Session with networks timeline and logs
-- [Live Debug](https://docs.browserbase.com/guides/session-debug-connection/browser-remote-control) to quickly debug your automation
+- 복잡한 UI에서 데이터를 추출할 수 있는 안정적인 브라우저를 제공하는 [Serverless Infrastructure](https://docs.browserbase.com/under-the-hood)
+- 지문 인식 방지 기술과 자동 captcha 해결 기능이 포함된 [Stealth Mode](https://docs.browserbase.com/features/stealth-mode)
+- 네트워크 타임라인과 로그로 Browser Session을 검사할 수 있는 [Session Debugger](https://docs.browserbase.com/features/sessions)
+- 자동화를 빠르게 디버그할 수 있는 [Live Debug](https://docs.browserbase.com/guides/session-debug-connection/browser-remote-control)
 
 ## Installation
 
-- Get an API key and Project ID from [browserbase.com](https://browserbase.com) and set it in environment variables (`BROWSERBASE_API_KEY`, `BROWSERBASE_PROJECT_ID`).
-- Install the [Browserbase SDK](http://github.com/browserbase/js-sdk):
+- [browserbase.com](https://browserbase.com)에서 API key와 Project ID를 발급받아 환경 변수(`BROWSERBASE_API_KEY`, `BROWSERBASE_PROJECT_ID`)에 설정하세요.
+- [Browserbase SDK](http://github.com/browserbase/js-sdk)를 설치하세요:
 
 ```bash npm
 npm i @langchain/community @langchain/core @browserbasehq/sdk
@@ -24,7 +25,7 @@ npm i @langchain/community @langchain/core @browserbasehq/sdk
 
 ## Example
 
-Utilize the `BrowserbaseLoader` as follows to allow your agent to load websites:
+다음과 같이 `BrowserbaseLoader`를 활용하여 agent가 웹사이트를 로드할 수 있도록 하세요:
 
 ```typescript
 import { BrowserbaseLoader } from "@langchain/community/document_loaders/web/browserbase";
@@ -37,10 +38,11 @@ const docs = await loader.load();
 
 ## Arguments
 
-- `urls`: Required. List of URLs to load.
+- `urls`: 필수. 로드할 URL 목록입니다.
 
 ## Options
 
-- `textContent` Retrieve only text content. Default is `false`.
-- `sessionId` Optional. Provide an existing Session ID.
-- `proxy` Optional. Enable/Disable Proxies.
+- `textContent` 텍스트 콘텐츠만 검색합니다. 기본값은 `false`입니다.
+- `sessionId` 선택사항. 기존 Session ID를 제공합니다.
+- `proxy` 선택사항. Proxy를 활성화/비활성화합니다.
+```

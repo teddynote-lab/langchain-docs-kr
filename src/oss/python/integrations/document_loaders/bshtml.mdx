@@ -2,7 +2,7 @@
 title: BSHTMLLoader
 ---
 
-This guide provides a quick overview for getting started with BeautifulSoup4 [document loader](https://python.langchain.com/docs/concepts/document_loaders). For detailed documentation of all __ModuleName__Loader features and configurations head to the [API reference](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.html_bs.BSHTMLLoader.html).
+이 가이드는 BeautifulSoup4 [document loader](https://python.langchain.com/docs/concepts/document_loaders) 시작하기에 대한 간단한 개요를 제공합니다. 모든 __ModuleName__Loader 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.html_bs.BSHTMLLoader.html)를 참조하세요.
 
 ## Overview
 
@@ -20,13 +20,13 @@ This guide provides a quick overview for getting started with BeautifulSoup4 [do
 
 ## Setup
 
-To access BSHTMLLoader document loader you'll need to install the `langchain-community` integration package and the `bs4` python package.
+BSHTMLLoader document loader에 접근하려면 `langchain-community` integration package와 `bs4` python package를 설치해야 합니다.
 
 ### Credentials
 
-No credentials are needed to use the `BSHTMLLoader` class.
+`BSHTMLLoader` class를 사용하는 데 필요한 credentials는 없습니다.
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -35,7 +35,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-Install **langchain-community** and **bs4**.
+**langchain-community**와 **bs4**를 설치합니다.
 
 ```python
 pip install -qU langchain-community bs4
@@ -43,9 +43,9 @@ pip install -qU langchain-community bs4
 
 ## Initialization
 
-Now we can instantiate our model object and load documents:
+이제 model object를 인스턴스화하고 document를 로드할 수 있습니다:
 
-- TODO: Update model instantiation with relevant params.
+- TODO: 관련 params로 model instantiation을 업데이트하세요.
 
 ```python
 from langchain_community.document_loaders import BSHTMLLoader
@@ -92,9 +92,9 @@ page[0]
 Document(metadata={'source': './example_data/fake-content.html', 'title': 'Test Title'}, page_content='\nTest Title\n\n\nMy First Heading\nMy first paragraph.\n\n\n')
 ```
 
-## Adding separator to BS4
+## BS4에 separator 추가하기
 
-We can also pass a separator to use when calling get_text on the soup
+soup에서 get_text를 호출할 때 사용할 separator를 전달할 수도 있습니다
 
 ```python
 loader = BSHTMLLoader(
@@ -119,4 +119,4 @@ page_content='
 
 ## API reference
 
-For detailed documentation of all BSHTMLLoader features and configurations head to the API reference: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.html_bs.BSHTMLLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.html_bs.BSHTMLLoader.html)
+모든 BSHTMLLoader 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.html_bs.BSHTMLLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.html_bs.BSHTMLLoader.html)

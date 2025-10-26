@@ -2,21 +2,21 @@
 title: Petals
 ---
 
-`Petals` runs 100B+ language models at home, BitTorrent-style.
+`Petals`는 BitTorrent 방식으로 100B+ 언어 모델을 가정에서 실행합니다.
 
-This notebook goes over how to use LangChain with [Petals](https://github.com/bigscience-workshop/petals).
+이 노트북은 LangChain을 [Petals](https://github.com/bigscience-workshop/petals)와 함께 사용하는 방법을 다룹니다.
 
-## Install petals
+## petals 설치
 
-The `petals` package is required to use the Petals API. Install `petals` using `pip3 install petals`.
+Petals API를 사용하려면 `petals` 패키지가 필요합니다. `pip3 install petals`를 사용하여 `petals`를 설치하세요.
 
-For Apple Silicon(M1/M2) users please follow this guide [https://github.com/bigscience-workshop/petals/issues/147#issuecomment-1365379642](https://github.com/bigscience-workshop/petals/issues/147#issuecomment-1365379642) to install petals
+Apple Silicon(M1/M2) 사용자는 petals 설치를 위해 이 가이드를 따라주세요 [https://github.com/bigscience-workshop/petals/issues/147#issuecomment-1365379642](https://github.com/bigscience-workshop/petals/issues/147#issuecomment-1365379642)
 
 ```python
 !pip3 install petals
 ```
 
-## Imports
+## Import
 
 ```python
 import os
@@ -26,9 +26,9 @@ from langchain_community.llms import Petals
 from langchain_core.prompts import PromptTemplate
 ```
 
-## Set the Environment API Key
+## Environment API Key 설정
 
-Make sure to get [your API key](https://huggingface.co/docs/api-inference/quicktour#get-your-api-token) from Huggingface.
+Huggingface에서 [API key](https://huggingface.co/docs/api-inference/quicktour#get-your-api-token)를 받아야 합니다.
 
 ```python
 from getpass import getpass
@@ -44,9 +44,9 @@ HUGGINGFACE_API_KEY = getpass()
 os.environ["HUGGINGFACE_API_KEY"] = HUGGINGFACE_API_KEY
 ```
 
-## Create the Petals instance
+## Petals 인스턴스 생성
 
-You can specify different parameters such as the model name, max new tokens, temperature, etc.
+모델 이름, max new tokens, temperature 등 다양한 파라미터를 지정할 수 있습니다.
 
 ```python
 # this can take several minutes to download big files!
@@ -58,9 +58,9 @@ llm = Petals(model_name="bigscience/bloom-petals")
 Downloading:   1%|▏                        | 40.8M/7.19G [00:24<15:44, 7.57MB/s]
 ```
 
-## Create a Prompt Template
+## Prompt Template 생성
 
-We will create a prompt template for Question and Answer.
+질문과 답변을 위한 prompt template을 생성합니다.
 
 ```python
 template = """Question: {question}
@@ -70,15 +70,15 @@ Answer: Let's think step by step."""
 prompt = PromptTemplate.from_template(template)
 ```
 
-## Initiate the LLMChain
+## LLMChain 초기화
 
 ```python
 llm_chain = LLMChain(prompt=prompt, llm=llm)
 ```
 
-## Run the LLMChain
+## LLMChain 실행
 
-Provide a question and run the LLMChain.
+질문을 제공하고 LLMChain을 실행합니다.
 
 ```python
 question = "What NFL team won the Super Bowl in the year Justin Beiber was born?"

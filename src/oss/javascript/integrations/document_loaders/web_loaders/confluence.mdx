@@ -1,20 +1,21 @@
+```markdown
 ---
 title: Confluence
 ---
 
 <Tip>
-**Compatibility**
+**호환성**
 
-Only available on Node.js.
+Node.js에서만 사용 가능합니다.
 </Tip>
 
-This covers how to load document objects from pages in a Confluence space.
+Confluence space의 페이지에서 document object를 로드하는 방법을 다룹니다.
 
 ## Credentials
 
-- You'll need to set up an access token and provide it along with your confluence username in order to authenticate the request
-- You'll also need the `space key` for the space containing the pages to load as documents. This can be found in the url when navigating to your space e.g. `https://example.atlassian.net/wiki/spaces/{SPACE_KEY}`
-- And you'll need to install `html-to-text` to parse the pages into plain text
+- 요청을 인증하기 위해 access token을 설정하고 confluence username과 함께 제공해야 합니다
+- 또한 document로 로드할 페이지가 포함된 space의 `space key`가 필요합니다. 이는 space로 이동할 때 url에서 찾을 수 있습니다. 예: `https://example.atlassian.net/wiki/spaces/{SPACE_KEY}`
+- 그리고 페이지를 plain text로 파싱하기 위해 `html-to-text`를 설치해야 합니다
 
 ```bash npm
 npm install @langchain/community @langchain/core html-to-text
@@ -52,4 +53,5 @@ if (username && accessToken) {
     "You need either a username and access token, or a personal access token (PAT), to use this example."
   );
 }
+```
 ```

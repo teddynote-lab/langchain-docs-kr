@@ -2,25 +2,25 @@
 title: Serper - Google Search API
 ---
 
-This page covers how to use the [Serper](https://serper.dev) Google Search API within LangChain. Serper is a low-cost Google Search API that can be used to add answer box, knowledge graph, and organic results data from Google Search.
-It is broken into two parts: setup, and then references to the specific Google Serper wrapper.
+이 페이지는 LangChain 내에서 [Serper](https://serper.dev) Google Search API를 사용하는 방법을 다룹니다. Serper는 Google Search의 answer box, knowledge graph, organic results 데이터를 추가하는 데 사용할 수 있는 저비용 Google Search API입니다.
+이 문서는 설정과 특정 Google Serper wrapper에 대한 참조, 두 부분으로 나뉩니다.
 
 ## Setup
 
-- Go to [serper.dev](https://serper.dev) to sign up for a free account
-- Get the api key and set it as an environment variable (`SERPER_API_KEY`)
+- [serper.dev](https://serper.dev)로 이동하여 무료 계정에 가입하세요
+- API key를 받아서 환경 변수(`SERPER_API_KEY`)로 설정하세요
 
 ## Wrappers
 
 ### Utility
 
-There exists a GoogleSerperAPIWrapper utility which wraps this API. To import this utility:
+이 API를 감싸는 GoogleSerperAPIWrapper utility가 존재합니다. 이 utility를 import하려면:
 
 ```python
 from langchain_community.utilities import GoogleSerperAPIWrapper
 ```
 
-You can use it as part of a Self Ask chain:
+Self Ask chain의 일부로 사용할 수 있습니다:
 
 ```python
 from langchain_community.utilities import GoogleSerperAPIWrapper
@@ -62,15 +62,15 @@ So the final answer is: El Palmar, Spain
 'El Palmar, Spain'
 ```
 
-For a more detailed walkthrough of this wrapper, see [this notebook](/oss/integrations/tools/google_serper).
+이 wrapper에 대한 더 자세한 안내는 [이 노트북](/oss/integrations/tools/google_serper)을 참조하세요.
 
 ### Tool
 
-You can also easily load this wrapper as a Tool (to use with an Agent).
-You can do this with:
+이 wrapper를 Tool로 쉽게 로드할 수도 있습니다(Agent와 함께 사용하기 위해).
+다음과 같이 할 수 있습니다:
 ```python
 from langchain_community.agent_toolkits.load_tools import load_tools
 tools = load_tools(["google-serper"])
 ```
 
-For more information on tools, see [this page](/oss/integrations/tools).
+tool에 대한 자세한 정보는 [이 페이지](/oss/integrations/tools)를 참조하세요.

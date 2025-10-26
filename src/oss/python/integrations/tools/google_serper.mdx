@@ -2,7 +2,7 @@
 title: Google Serper
 ---
 
-This notebook goes over how to use the `Google Serper` component to search the web. First you need to sign up for a free account at [serper.dev](https://serper.dev) and get your api key.
+이 노트북은 `Google Serper` 컴포넌트를 사용하여 웹을 검색하는 방법을 다룹니다. 먼저 [serper.dev](https://serper.dev)에서 무료 계정에 가입하고 API 키를 받아야 합니다.
 
 ```python
 pip install -qU  langchain-community langchain-openai
@@ -29,15 +29,15 @@ search.run("Obama's first name?")
 'Barack Hussein Obama II'
 ```
 
-## As part of a Self Ask With Search Agent
+## Self Ask With Search Agent의 일부로 사용하기
 
-In order to create an agent that uses the Google Serper tool install LangGraph
+Google Serper 도구를 사용하는 agent를 생성하려면 LangGraph를 설치하세요
 
 ```python
 pip install -qU langgraph langchain-openai
 ```
 
-and use the @[`create_agent`] functionality to initialize a ReAct agent. You will also need to set up your OPENAI_API_KEY (visit [platform.openai.com](https://platform.openai.com)) in order to access OpenAI's chat models.
+그리고 @[`create_agent`] 기능을 사용하여 ReAct agent를 초기화하세요. 또한 OpenAI의 chat model에 액세스하려면 OPENAI_API_KEY를 설정해야 합니다([platform.openai.com](https://platform.openai.com) 방문).
 
 ```python
 from langchain.chat_models import init_chat_model
@@ -72,9 +72,9 @@ for event in events:
     event["messages"][-1].pretty_print()
 ```
 
-## Obtaining results with metadata
+## 메타데이터와 함께 결과 얻기
 
-If you would also like to obtain the results in a structured way including metadata. For this we will be using the `results` method of the wrapper.
+메타데이터를 포함하여 구조화된 방식으로 결과를 얻고 싶다면, wrapper의 `results` 메서드를 사용합니다.
 
 ```python
 search = GoogleSerperAPIWrapper()
@@ -217,9 +217,9 @@ pprint.pp(results)
  'credits': 1}
 ```
 
-## Searching for Google Images
+## Google 이미지 검색
 
-We can also query Google Images using this wrapper. For example:
+이 wrapper를 사용하여 Google 이미지를 검색할 수도 있습니다. 예를 들어:
 
 ```python
 search = GoogleSerperAPIWrapper(type="images")
@@ -363,9 +363,9 @@ pprint.pp(results)
  'credits': 1}
 ```
 
-## Searching for Google News
+## Google 뉴스 검색
 
-We can also query Google News using this wrapper. For example:
+이 wrapper를 사용하여 Google 뉴스를 검색할 수도 있습니다. 예를 들어:
 
 ```python
 search = GoogleSerperAPIWrapper(type="news")
@@ -478,7 +478,7 @@ pprint.pp(results)
  'credits': 1}
 ```
 
-If you want to only receive news articles published in the last hour, you can do the following:
+지난 1시간 이내에 게시된 뉴스 기사만 받고 싶다면 다음과 같이 할 수 있습니다:
 
 ```python
 search = GoogleSerperAPIWrapper(type="news", tbs="qdr:h")
@@ -507,26 +507,26 @@ pprint.pp(results)
  'credits': 1}
 ```
 
-Some examples of the `tbs` parameter:
+`tbs` 파라미터의 몇 가지 예시:
 
-`qdr:h` (past hour)
-`qdr:d` (past day)
-`qdr:w` (past week)
-`qdr:m` (past month)
-`qdr:y` (past year)
+`qdr:h` (지난 1시간)
+`qdr:d` (지난 1일)
+`qdr:w` (지난 1주)
+`qdr:m` (지난 1개월)
+`qdr:y` (지난 1년)
 
-You can specify intermediate time periods by adding a number:
-`qdr:h12` (past 12 hours)
-`qdr:d3` (past 3 days)
-`qdr:w2` (past 2 weeks)
-`qdr:m6` (past 6 months)
-`qdr:y2` (past 2 years)
+숫자를 추가하여 중간 기간을 지정할 수 있습니다:
+`qdr:h12` (지난 12시간)
+`qdr:d3` (지난 3일)
+`qdr:w2` (지난 2주)
+`qdr:m6` (지난 6개월)
+`qdr:y2` (지난 2년)
 
-For all supported filters simply go to [Google Search](https://google.com), search for something, click on "Tools", add your date filter and check the URL for "tbs=".
+지원되는 모든 필터를 확인하려면 [Google Search](https://google.com)로 이동하여 검색하고, "도구"를 클릭한 다음 날짜 필터를 추가하고 URL에서 "tbs="를 확인하세요.
 
-## Searching for Google Places
+## Google Places 검색
 
-We can also query Google Places using this wrapper. For example:
+이 wrapper를 사용하여 Google Places를 검색할 수도 있습니다. 예를 들어:
 
 ```python
 search = GoogleSerperAPIWrapper(type="places")

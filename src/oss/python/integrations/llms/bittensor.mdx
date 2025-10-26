@@ -2,17 +2,17 @@
 title: Bittensor
 ---
 
->[Bittensor](https://bittensor.com/) is a mining network, similar to Bitcoin, that includes built-in incentives designed to encourage miners to contribute compute + knowledge.
+>[Bittensor](https://bittensor.com/)는 Bitcoin과 유사한 마이닝 네트워크로, 마이너들이 컴퓨팅 파워와 지식을 기여하도록 장려하기 위해 설계된 내장 인센티브를 포함하고 있습니다.
 >
->`NIBittensorLLM` is developed by [Neural Internet](https://neuralinternet.ai/), powered by `Bittensor`.
+>`NIBittensorLLM`은 [Neural Internet](https://neuralinternet.ai/)에서 개발했으며, `Bittensor`를 기반으로 합니다.
 
->This LLM showcases true potential of decentralized AI by giving you the best response(s) from the `Bittensor protocol`, which consist of various AI models such as `OpenAI`, `LLaMA2` etc.
+>이 LLM은 `OpenAI`, `LLaMA2` 등 다양한 AI 모델로 구성된 `Bittensor protocol`에서 최고의 응답을 제공함으로써 탈중앙화 AI의 진정한 잠재력을 보여줍니다.
 
-Users can view their logs, requests, and API keys on the [Validator Endpoint Frontend](https://api.neuralinternet.ai/). However, changes to the configuration are currently prohibited; otherwise, the user's queries will be blocked.
+사용자는 [Validator Endpoint Frontend](https://api.neuralinternet.ai/)에서 로그, 요청 및 API key를 확인할 수 있습니다. 그러나 현재 구성 변경은 금지되어 있으며, 그렇지 않으면 사용자의 쿼리가 차단됩니다.
 
-If you encounter any difficulties or have any questions, please feel free to reach out to our developer on [GitHub](https://github.com/Kunj-2206), [Discord](https://discordapp.com/users/683542109248159777) or join our discord server for latest update and queries [Neural Internet](https://discord.gg/neuralinternet).
+어려움을 겪거나 질문이 있으시면 [GitHub](https://github.com/Kunj-2206), [Discord](https://discordapp.com/users/683542109248159777)에서 개발자에게 문의하거나 최신 업데이트 및 질문을 위해 discord 서버 [Neural Internet](https://discord.gg/neuralinternet)에 참여하세요.
 
-## Different Parameter and response handling for NIBittensorLLM
+## NIBittensorLLM의 다양한 Parameter 및 response 처리
 
 ```python
 import json
@@ -52,7 +52,7 @@ json_multi_resp = json.loads(multi_resp)
 pprint(json_multi_resp)
 ```
 
-## Using NIBittensorLLM with LLMChain and PromptTemplate
+## LLMChain 및 PromptTemplate과 함께 NIBittensorLLM 사용하기
 
 ```python
 from langchain.chains import LLMChain
@@ -80,7 +80,7 @@ question = "What is bittensor?"
 llm_chain.run(question)
 ```
 
-## Using NIBittensorLLM with Conversational Agent and Google Search Tool
+## Conversational Agent 및 Google Search Tool과 함께 NIBittensorLLM 사용하기
 
 ```python
 from langchain_community.utilities import GoogleSearchAPIWrapper

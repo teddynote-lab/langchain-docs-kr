@@ -2,26 +2,26 @@
 title: AWS Lambda
 ---
 
->[`Amazon AWS Lambda`](https://aws.amazon.com/pm/lambda/) is a serverless computing service provided by `Amazon Web Services` (`AWS`). It helps developers to build and run applications and services without provisioning or managing servers. This serverless architecture enables you to focus on writing and deploying code, while AWS automatically takes care of scaling, patching, and managing the infrastructure required to run your applications.
+>[`Amazon AWS Lambda`](https://aws.amazon.com/pm/lambda/)는 `Amazon Web Services`(`AWS`)에서 제공하는 서버리스 컴퓨팅 서비스입니다. 개발자가 서버를 프로비저닝하거나 관리할 필요 없이 애플리케이션과 서비스를 구축하고 실행할 수 있도록 도와줍니다. 이 서버리스 아키텍처를 통해 코드 작성 및 배포에 집중할 수 있으며, AWS가 애플리케이션 실행에 필요한 인프라의 확장, 패치 및 관리를 자동으로 처리합니다.
 
-This notebook goes over how to use the `AWS Lambda` Tool.
+이 노트북은 `AWS Lambda` Tool을 사용하는 방법을 다룹니다.
 
-By including the `AWS Lambda` in the list of tools provided to an Agent, you can grant your Agent the ability to invoke code running in your AWS Cloud for whatever purposes you need.
+Agent에 제공되는 tool 목록에 `AWS Lambda`를 포함시키면, Agent가 필요한 목적을 위해 AWS Cloud에서 실행되는 코드를 호출할 수 있는 기능을 부여할 수 있습니다.
 
-When an Agent uses the `AWS Lambda` tool, it will provide an argument of type string which will in turn be passed into the Lambda function via the event parameter.
+Agent가 `AWS Lambda` tool을 사용할 때, 문자열 타입의 인수를 제공하며, 이는 event 파라미터를 통해 Lambda function으로 전달됩니다.
 
-First, you need to install `boto3` python package.
+먼저 `boto3` python package를 설치해야 합니다.
 
 ```python
 pip install -qU  boto3 > /dev/null
 pip install -qU langchain-community
 ```
 
-In order for an agent to use the tool, you must provide it with the name and description that match the functionality of you lambda function's logic.
+Agent가 tool을 사용하려면 Lambda function의 로직 기능과 일치하는 이름과 설명을 제공해야 합니다.
 
-You must also provide the name of your function.
+또한 function의 이름도 제공해야 합니다.
 
-Note that because this tool is effectively just a wrapper around the boto3 library, you will need to run `aws configure` in order to make use of the tool. For more detail, see [here](https://docs.aws.amazon.com/cli/index.html)
+이 tool은 기본적으로 boto3 라이브러리의 wrapper이므로, tool을 사용하려면 `aws configure`를 실행해야 합니다. 자세한 내용은 [여기](https://docs.aws.amazon.com/cli/index.html)를 참조하세요.
 
 ```python
 from langchain.agents import AgentType, initialize_agent, load_tools

@@ -1,23 +1,23 @@
 ---
-title: Contributing
-sidebarTitle: Overview
+title: 기여하기
+sidebarTitle: 개요
 ---
 
 
 
-**Welcome! Thank you for your interest in contributing.**
+**환영합니다! 기여에 관심을 가져주셔서 감사합니다.**
 
-LangChain has helped form the largest developer community in generative AI, and we're always open to new contributors. Whether you're fixing bugs, adding features, improving documentation, or sharing feedback, your involvement helps make LangChain and LangGraph better for everyone.
+LangChain은 생성형 AI 분야에서 가장 큰 개발자 커뮤니티를 형성하는 데 도움을 주었으며, 우리는 항상 새로운 기여자를 환영합니다. 버그 수정, 기능 추가, 문서 개선, 피드백 공유 등 어떤 방식이든 여러분의 참여는 LangChain과 LangGraph를 모두를 위해 더 나아지게 만듭니다.
 
-## Ways to Contribute
+## 기여 방법
 
 <AccordionGroup>
-    <Accordion title="Report bugs" icon="bug">
-        Found a bug? Please help us fix it by following these steps:
+    <Accordion title="버그 신고" icon="bug">
+        버그를 발견하셨나요? 다음 단계를 따라 수정에 도움을 주세요:
 
         <Steps>
-            <Step title="Search">
-                Check if the issue already exists in our GitHub Issues for the respective repo:
+            <Step title="검색">
+                해당 저장소의 GitHub Issues에서 이미 존재하는 이슈인지 확인하세요:
 
                 :::python
                 <Columns cols={2}>
@@ -32,27 +32,27 @@ LangChain has helped form the largest developer community in generative AI, and 
                 </Columns>
                 :::
             </Step>
-            <Step title="Create issue">
-                If no issue exists, create a new one. When writing, be sure to follow the template provided and to include a [minimal, reproducible, example](https://stackoverflow.com/help/minimal-reproducible-example). Attach any relevant labels to the final issue once created. If a project maintainer is unable to reproduce the issue, it is unlikely to be addressed in a timely manner.
+            <Step title="이슈 생성">
+                이슈가 없다면 새로 생성하세요. 작성 시 제공된 템플릿을 따르고 [최소한의 재현 가능한 예제](https://stackoverflow.com/help/minimal-reproducible-example)를 포함해야 합니다. 생성된 이슈에 관련 레이블을 첨부하세요. 프로젝트 관리자가 이슈를 재현할 수 없는 경우, 적시에 처리되지 않을 가능성이 높습니다.
             </Step>
-            <Step title="Wait">
-                A project maintainer will triage the issue and may ask for additional information. Please be patient as we manage a high volume of issues. Do not bump the issue unless you have new information to provide.
+            <Step title="대기">
+                프로젝트 관리자가 이슈를 분류하고 추가 정보를 요청할 수 있습니다. 많은 양의 이슈를 관리하고 있으니 인내심을 가져주세요. 새로운 정보를 제공할 것이 없다면 이슈를 재촉하지 마세요.
             </Step>
         </Steps>
 
-        If you are adding an issue, please try to keep it focused on a single topic. If two issues are related, or blocking, please [link them](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword) rather than combining them. For example,
+        이슈를 추가할 때는 단일 주제에 집중하도록 노력하세요. 두 이슈가 관련되어 있거나 차단 관계에 있다면, 결합하기보다는 [링크](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword)로 연결하세요. 예를 들어,
 
         ```text
         This issue is blocked by #123 and related to #456.
         ```
     </Accordion>
 
-    <Accordion title="Suggest features" icon="wand-magic-sparkles">
-        Have an idea for a new feature or enhancement?
+    <Accordion title="기능 제안" icon="wand-magic-sparkles">
+        새로운 기능이나 개선 사항에 대한 아이디어가 있으신가요?
 
         <Steps>
-            <Step title="Search">
-                Search the issues for the respective repository for existing feature requests:
+            <Step title="검색">
+                해당 저장소의 이슈에서 기존 기능 요청을 검색하세요:
 
                 :::python
                 <Columns cols={2}>
@@ -67,34 +67,34 @@ LangChain has helped form the largest developer community in generative AI, and 
                 </Columns>
                 :::
             </Step>
-            <Step title="Discuss">
+            <Step title="논의">
                 :::python
-                If no requests exist, start a new discussion under the [relevant category](https://forum.langchain.com/c/help/langchain/14) so that project maintainers and the community can provide feedback.
+                요청이 없다면 [관련 카테고리](https://forum.langchain.com/c/help/langchain/14)에서 새로운 논의를 시작하여 프로젝트 관리자와 커뮤니티가 피드백을 제공할 수 있도록 하세요.
                 :::
                 :::js
-                If no requests exist, start a new discussion under the [relevant category](https://forum.langchain.com/c/help/langchain/13) so that project maintainers and the community can provide feedback.
+                요청이 없다면 [관련 카테고리](https://forum.langchain.com/c/help/langchain/13)에서 새로운 논의를 시작하여 프로젝트 관리자와 커뮤니티가 피드백을 제공할 수 있도록 하세요.
                 :::
             </Step>
-            <Step title="Describe">
-                Be sure to describe the use case and why it would be valuable to others. If possible, provide examples or mockups where applicable. Outline test cases that should pass.
+            <Step title="설명">
+                사용 사례와 다른 사람들에게 왜 가치가 있는지 설명하세요. 가능하다면 해당되는 경우 예제나 모형을 제공하세요. 통과해야 하는 테스트 케이스를 개요로 작성하세요.
             </Step>
         </Steps>
     </Accordion>
 
-    <Accordion title="Improve documentation" icon="book">
-        Documentation improvements are always welcome! We strive to keep our docs clear and comprehensive, and your perspective can make a big difference.
+    <Accordion title="문서 개선" icon="book">
+        문서 개선은 언제나 환영합니다! 우리는 문서를 명확하고 포괄적으로 유지하기 위해 노력하며, 여러분의 관점이 큰 차이를 만들 수 있습니다.
 
-        <Card title="How to propose changes to the documentation" href="/oss/contributing/documentation" arrow>Guide</Card>
+        <Card title="문서 변경 제안 방법" href="/oss/contributing/documentation" arrow>가이드</Card>
     </Accordion>
 
-    <Accordion title="Contribute code" icon="code">
-        With a large userbase, it can be hard for our small team to keep up with all the feature requests and bug fixes. If you have the skills and time, we would love your help!
+    <Accordion title="코드 기여" icon="code">
+        대규모 사용자 기반으로 인해 우리의 작은 팀이 모든 기능 요청과 버그 수정을 따라가기 어려울 수 있습니다. 기술과 시간이 있다면 여러분의 도움을 환영합니다!
 
-        <Card title="How to make your first Pull Request" href="/oss/contributing/code" arrow>Guide</Card>
+        <Card title="첫 번째 Pull Request 만드는 방법" href="/oss/contributing/code" arrow>가이드</Card>
 
-        If you start working on an issue, please assign it to yourself or ask a maintainer to do so. This helps avoid duplicate work.
+        이슈 작업을 시작하는 경우, 본인에게 할당하거나 관리자에게 할당을 요청하세요. 이는 중복 작업을 방지하는 데 도움이 됩니다.
 
-        If you are looking for something to work on, check out the issues labeled "good first issue" or "help wanted" in our repos:
+        작업할 것을 찾고 있다면, 저장소에서 "good first issue" 또는 "help wanted" 레이블이 붙은 이슈를 확인하세요:
 
         :::python
         <Columns cols={2}>
@@ -109,12 +109,12 @@ LangChain has helped form the largest developer community in generative AI, and 
         </Columns>
         :::
     </Accordion>
-    <Accordion title="Add a new integration" icon="plug-circle-plus">
+    <Accordion title="새로운 통합 추가" icon="plug-circle-plus">
         <Columns cols={2}>
-            <Card title="LangChain" icon="link" href="/oss/contributing/integrations-langchain" arrow>Guide to adding a new LangChain integration</Card>
-            <Card title="LangGraph" icon="circle-nodes" href="/oss/contributing/integrations-langgraph" arrow>Guide to adding a new LangGraph integration</Card>
+            <Card title="LangChain" icon="link" href="/oss/contributing/integrations-langchain" arrow>새로운 LangChain 통합 추가 가이드</Card>
+            <Card title="LangGraph" icon="circle-nodes" href="/oss/contributing/integrations-langgraph" arrow>새로운 LangGraph 통합 추가 가이드</Card>
         </Columns>
     </Accordion>
 </AccordionGroup>
 
-Thank you for helping make LangChain better! 🦜❤️
+LangChain을 더 나아지게 만드는 데 도움을 주셔서 감사합니다! 🦜❤️

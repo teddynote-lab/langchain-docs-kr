@@ -12,18 +12,18 @@ import chat_uiJS from '/snippets/oss/ui-js.mdx';
 <chat_uiJS />
 :::
 
-### Connect to your agent
+### agent에 연결하기
 
-Agent Chat UI can connect to both [local](/oss/langgraph/studio#setup-local-langgraph-server) and [deployed agents](/oss/langgraph/deploy).
+Agent Chat UI는 [로컬](/oss/langgraph/studio#setup-local-langgraph-server) 및 [배포된 agent](/oss/langgraph/deploy) 모두에 연결할 수 있습니다.
 
-After starting Agent Chat UI, you'll need to configure it to connect to your agent:
+Agent Chat UI를 시작한 후, agent에 연결하도록 구성해야 합니다:
 
-1. **Graph ID**: Enter your graph name (find this under `graphs` in your `langgraph.json` file)
-2. **Deployment URL**: Your LangGraph server's endpoint (e.g., `http://localhost:2024` for local development, or your deployed agent's URL)
-3. **LangSmith API key (optional)**: Add your LangSmith API key (not required if you're using a local LangGraph server)
+1. **Graph ID**: graph 이름을 입력하세요 (`langgraph.json` 파일의 `graphs` 아래에서 찾을 수 있습니다)
+2. **Deployment URL**: LangGraph server의 endpoint (예: 로컬 개발의 경우 `http://localhost:2024`, 또는 배포된 agent의 URL)
+3. **LangSmith API key (선택사항)**: LangSmith API key를 추가하세요 (로컬 LangGraph server를 사용하는 경우 필수가 아닙니다)
 
-Once configured, Agent Chat UI will automatically fetch and display any interrupted threads from your agent.
+구성이 완료되면 Agent Chat UI는 agent에서 중단된 thread를 자동으로 가져와 표시합니다.
 
 <Tip>
-  Agent Chat UI has out-of-the-box support for rendering tool calls and tool result messages. To customize what messages are shown, see [Hiding Messages in the Chat](https://github.com/langchain-ai/agent-chat-ui?tab=readme-ov-file#hiding-messages-in-the-chat).
+  Agent Chat UI는 tool call 및 tool result message 렌더링을 기본적으로 지원합니다. 표시되는 message를 사용자 정의하려면 [Hiding Messages in the Chat](https://github.com/langchain-ai/agent-chat-ui?tab=readme-ov-file#hiding-messages-in-the-chat)을 참조하세요.
 </Tip>

@@ -1,21 +1,21 @@
 ---
-title: Trace with OpenTelemetry
+title: OpenTelemetry로 추적하기
 sidebarTitle: OpenTelemetry
 ---
 
-LangSmith supports OpenTelemetry-based tracing, allowing you to send traces from any OpenTelemetry-compatible application. This guide covers both automatic instrumentation for LangChain applications and manual instrumentation for other frameworks.
+LangSmith는 OpenTelemetry 기반 추적을 지원하여 OpenTelemetry 호환 애플리케이션에서 추적 데이터를 전송할 수 있습니다. 이 가이드는 LangChain 애플리케이션의 자동 계측과 다른 프레임워크의 수동 계측을 모두 다룹니다.
 
-Learn how to trace your LLM applications using OpenTelemetry with LangSmith.
+OpenTelemetry를 사용하여 LangSmith로 LLM 애플리케이션을 추적하는 방법을 알아보세요.
 
 <Note>
-Update the LangSmith URL appropriately for self-hosted installations or organizations in the EU region in the requests below. For the EU region, use `eu.api.smith.langchain.com`.
+아래 요청에서 자체 호스팅 설치 또는 EU 지역의 조직에 맞게 LangSmith URL을 적절히 업데이트하세요. EU 지역의 경우 `eu.api.smith.langchain.com`을 사용하세요.
 </Note>
 
-## Trace a LangChain application
+## LangChain 애플리케이션 추적하기
 
-If you're using LangChain or LangGraph, use the built-in integration to trace your application:
+LangChain 또는 LangGraph를 사용하는 경우, 내장된 통합을 사용하여 애플리케이션을 추적하세요:
 
-1. Install the LangSmith package with OpenTelemetry support:
+1. OpenTelemetry 지원이 포함된 LangSmith 패키지를 설치합니다:
 
    <CodeGroup>
 
@@ -27,10 +27,10 @@ If you're using LangChain or LangGraph, use the built-in integration to trace yo
    </CodeGroup>
 
    <Info>
-   Requires Python SDK version `langsmith>=0.3.18`. We recommend `langsmith>=0.4.25` to benefit from important OpenTelemetry fixes.
+   Python SDK 버전 `langsmith>=0.3.18`이 필요합니다. 중요한 OpenTelemetry 수정 사항을 활용하려면 `langsmith>=0.4.25`를 권장합니다.
    </Info>
 
-2. In your LangChain/LangGraph App, enable the OpenTelemetry integration by setting the `LANGSMITH_OTEL_ENABLED` environment variable:
+2. LangChain/LangGraph 앱에서 `LANGSMITH_OTEL_ENABLED` 환경 변수를 설정하여 OpenTelemetry 통합을 활성화합니다:
 
    <CodeGroup>
 
@@ -44,7 +44,7 @@ If you're using LangChain or LangGraph, use the built-in integration to trace yo
 
    </CodeGroup>
 
-3. Create a LangChain application with tracing. For example:
+3. 추적 기능이 있는 LangChain 애플리케이션을 생성합니다. 예를 들어:
 
    ```python
    import os
@@ -61,13 +61,13 @@ If you're using LangChain or LangGraph, use the built-in integration to trace yo
    print(result.content)
    ```
 
-4. View the traces in your LangSmith dashboard ([example](https://smith.langchain.com/public/a762af6c-b67d-4f22-90a0-728df16baeba/r)) once your application runs.
+4. 애플리케이션이 실행되면 LangSmith 대시보드([예시](https://smith.langchain.com/public/a762af6c-b67d-4f22-90a0-728df16baeba/r))에서 추적 데이터를 확인합니다.
 
-## Trace a non-LangChain application
+## LangChain이 아닌 애플리케이션 추적하기
 
-For non-LangChain applications or custom instrumentation, you can trace your application in LangSmith with a standard OpenTelemetry client. (We recommend **langsmith ≥ 0.4.25**.)
+LangChain이 아닌 애플리케이션이나 사용자 정의 계측의 경우, 표준 OpenTelemetry 클라이언트를 사용하여 LangSmith에서 애플리케이션을 추적할 수 있습니다. (**langsmith ≥ 0.4.25** 권장)
 
-1. Install the OpenTelemetry SDK, OpenTelemetry exporter packages, as well as the OpenAI package:
+1. OpenTelemetry SDK, OpenTelemetry exporter 패키지 및 OpenAI 패키지를 설치합니다:
 
    <CodeGroup>
 
@@ -79,7 +79,7 @@ For non-LangChain applications or custom instrumentation, you can trace your app
 
    </CodeGroup>
 
-2. Setup environment variables for the endpoint, substitute your specific values:
+2. endpoint에 대한 환경 변수를 설정하고, 특정 값으로 대체합니다:
 
    <CodeGroup>
 
@@ -91,14 +91,14 @@ For non-LangChain applications or custom instrumentation, you can trace your app
    </CodeGroup>
 
    <Note>
-   Depending on how your otel exporter is configured, you may need to append `/v1/traces` to the endpoint if you are only sending traces.
+   otel exporter가 구성된 방식에 따라 추적만 전송하는 경우 endpoint에 `/v1/traces`를 추가해야 할 수 있습니다.
    </Note>
 
    <Note>
-   If you're self-hosting LangSmith, replace the base endpoint with your LangSmith api endpoint and append `/api/v1`. For example: `OTEL_EXPORTER_OTLP_ENDPOINT=https://ai-company.com/api/v1/otel`
+   LangSmith를 자체 호스팅하는 경우, 기본 endpoint를 LangSmith api endpoint로 교체하고 `/api/v1`을 추가하세요. 예: `OTEL_EXPORTER_OTLP_ENDPOINT=https://ai-company.com/api/v1/otel`
    </Note>
 
-   Optional: Specify a custom project name other than "default":
+   선택 사항: "default" 이외의 사용자 정의 프로젝트 이름을 지정합니다:
 
    <CodeGroup>
 
@@ -109,9 +109,9 @@ For non-LangChain applications or custom instrumentation, you can trace your app
 
    </CodeGroup>
 
-3. Log a trace.
+3. 추적을 기록합니다.
 
-   This code sets up an OTEL tracer and exporter that will send traces to LangSmith. It then calls OpenAI and sends the required OpenTelemetry attributes.
+   이 코드는 LangSmith로 추적 데이터를 전송할 OTEL tracer와 exporter를 설정합니다. 그런 다음 OpenAI를 호출하고 필요한 OpenTelemetry 속성을 전송합니다.
 
    ```python
    from openai import OpenAI
@@ -174,19 +174,19 @@ For non-LangChain applications or custom instrumentation, you can trace your app
        call_openai()
    ```
 
-4. View the trace in your LangSmith dashboard ([example](https://smith.langchain.com/public/4f2890b1-f105-44aa-a6cf-c777dcc27a37/r)).
+4. LangSmith 대시보드([예시](https://smith.langchain.com/public/4f2890b1-f105-44aa-a6cf-c777dcc27a37/r))에서 추적 데이터를 확인합니다.
 
-## Send traces to an alternate provider
+## 다른 제공자에게 추적 데이터 전송하기
 
-While LangSmith is the default destination for OpenTelemetry traces, you can also configure OpenTelemetry to send traces to other observability platforms.
+LangSmith가 OpenTelemetry 추적의 기본 대상이지만, 다른 관찰성 플랫폼으로 추적 데이터를 전송하도록 OpenTelemetry를 구성할 수도 있습니다.
 
 <Info>
-Available in LangSmith Python SDK **≥ 0.4.1**. We recommend **≥ 0.4.25** for fixes that improve OTEL export and hybrid fan-out stability.
+LangSmith Python SDK **≥ 0.4.1**에서 사용 가능합니다. OTEL export 및 하이브리드 fan-out 안정성을 개선하는 수정 사항을 위해 **≥ 0.4.25**를 권장합니다.
 </Info>
 
-### Use environment variables for global configuration
+### 전역 구성을 위한 환경 변수 사용
 
-By default, the LangSmith OpenTelemetry exporter will send data to the LangSmith API OTEL endpoint, but this can be customized by setting standard OTEL environment variables:
+기본적으로 LangSmith OpenTelemetry exporter는 LangSmith API OTEL endpoint로 데이터를 전송하지만, 표준 OTEL 환경 변수를 설정하여 사용자 정의할 수 있습니다:
 
 ```bash
 OTEL_EXPORTER_OTLP_ENDPOINT: Override the endpoint URL
@@ -194,14 +194,14 @@ OTEL_EXPORTER_OTLP_HEADERS: Add custom headers (LangSmith API keys and Project a
 OTEL_SERVICE_NAME: Set a custom service name (defaults to "langsmith")
 ```
 
-LangSmith uses the HTTP trace exporter by default. If you'd like to use your own tracing provider, you can either:
+LangSmith는 기본적으로 HTTP trace exporter를 사용합니다. 자체 추적 제공자를 사용하려면 다음 중 하나를 수행할 수 있습니다:
 
-1. Set the OTEL environment variables as shown above, or
-2. Set a global trace provider before initializing LangChain components, which LangSmith will detect and use instead of creating its own.
+1. 위에 표시된 대로 OTEL 환경 변수를 설정하거나,
+2. LangChain 컴포넌트를 초기화하기 전에 전역 trace provider를 설정하면, LangSmith가 이를 감지하고 자체 provider를 생성하는 대신 사용합니다.
 
-### Configure alternate OTLP endpoints
+### 대체 OTLP endpoint 구성
 
-To send traces to a different provider, configure the OTLP exporter with your provider's endpoint:
+다른 제공자에게 추적 데이터를 전송하려면 제공자의 endpoint로 OTLP exporter를 구성하세요:
 
 ```python
 import os
@@ -237,182 +237,182 @@ print(result.content)
 ```
 
 <Info>
-Hybrid tracing is available in version **≥ 0.4.1**. To send traces **only** to your OTEL endpoint, set:
+하이브리드 추적은 버전 **≥ 0.4.1**에서 사용 가능합니다. OTEL endpoint로**만** 추적 데이터를 전송하려면 다음을 설정하세요:
 
 `LANGSMITH_OTEL_ONLY="true"`
-(Recommendation: use **langsmith ≥ 0.4.25**.)
+(권장: **langsmith ≥ 0.4.25** 사용)
 </Info>
 
-## Supported OpenTelemetry attribute and event mapping
+## 지원되는 OpenTelemetry 속성 및 이벤트 매핑
 
-When sending traces to LangSmith via OpenTelemetry, the following attributes are mapped to LangSmith fields:
+OpenTelemetry를 통해 LangSmith로 추적 데이터를 전송할 때 다음 속성이 LangSmith 필드에 매핑됩니다:
 
-### Core LangSmith attributes
+### 핵심 LangSmith 속성
 
-| OpenTelemetry attribute        | LangSmith field  | Notes                                                                        |
+| OpenTelemetry 속성             | LangSmith 필드   | 참고                                                                         |
 | ------------------------------ | ---------------- | ---------------------------------------------------------------------------- |
-| `langsmith.trace.name`         | Run name         | Overrides the span name for the run                                          |
-| `langsmith.span.kind`          | Run type         | Values: `llm`, `chain`, `tool`, `retriever`, `embedding`, `prompt`, `parser` |
-| `langsmith.trace.session_id`   | Session ID       | Session identifier for related traces                                        |
-| `langsmith.trace.session_name` | Session name     | Name of the session                                                          |
-| `langsmith.span.tags`          | Tags             | Custom tags attached to the span (comma-separated)                           |
-| `langsmith.metadata.{key}`     | `metadata.{key}` | Custom metadata with langsmith prefix                                        |
+| `langsmith.trace.name`         | Run name         | run의 span 이름을 재정의합니다                                          |
+| `langsmith.span.kind`          | Run type         | 값: `llm`, `chain`, `tool`, `retriever`, `embedding`, `prompt`, `parser` |
+| `langsmith.trace.session_id`   | Session ID       | 관련 추적의 세션 식별자                                        |
+| `langsmith.trace.session_name` | Session name     | 세션 이름                                                          |
+| `langsmith.span.tags`          | Tags             | span에 첨부된 사용자 정의 태그 (쉼표로 구분)                           |
+| `langsmith.metadata.{key}`     | `metadata.{key}` | langsmith 접두사가 있는 사용자 정의 메타데이터                                        |
 
-### GenAI standard attributes
+### GenAI 표준 속성
 
-| OpenTelemetry attribute                 | LangSmith field               | Notes                                                         |
+| OpenTelemetry 속성                      | LangSmith 필드                | 참고                                                         |
 | --------------------------------------- | ----------------------------- | ------------------------------------------------------------- |
-| `gen_ai.system`                         | `metadata.ls_provider`        | The GenAI system (e.g., "openai", "anthropic")                |
-| `gen_ai.operation.name`                 | Run type                      | Maps "chat"/"completion" to "llm", "embedding" to "embedding" |
-| `gen_ai.prompt`                         | `inputs`                      | The input prompt sent to the model                            |
-| `gen_ai.completion`                     | `outputs`                     | The output generated by the model                             |
-| `gen_ai.prompt.{n}.role`                | `inputs.messages[n].role`     | Role for the nth input message                                |
-| `gen_ai.prompt.{n}.content`             | `inputs.messages[n].content`  | Content for the nth input message                             |
-| `gen_ai.prompt.{n}.message.role`        | `inputs.messages[n].role`     | Alternative format for role                                   |
-| `gen_ai.prompt.{n}.message.content`     | `inputs.messages[n].content`  | Alternative format for content                                |
-| `gen_ai.completion.{n}.role`            | `outputs.messages[n].role`    | Role for the nth output message                               |
-| `gen_ai.completion.{n}.content`         | `outputs.messages[n].content` | Content for the nth output message                            |
-| `gen_ai.completion.{n}.message.role`    | `outputs.messages[n].role`    | Alternative format for role                                   |
-| `gen_ai.completion.{n}.message.content` | `outputs.messages[n].content` | Alternative format for content                                |
-| `gen_ai.input.messages`                 | `inputs.messages`             | Array of input messages                                       |
-| `gen_ai.output.messages`                | `outputs.messages`            | Array of output messages                                      |
-| `gen_ai.tool.name`                      | `invocation_params.tool_name` | Tool name, also sets run type to "tool"                       |
+| `gen_ai.system`                         | `metadata.ls_provider`        | GenAI 시스템 (예: "openai", "anthropic")                |
+| `gen_ai.operation.name`                 | Run type                      | "chat"/"completion"을 "llm"으로, "embedding"을 "embedding"으로 매핑 |
+| `gen_ai.prompt`                         | `inputs`                      | 모델에 전송된 입력 프롬프트                            |
+| `gen_ai.completion`                     | `outputs`                     | 모델이 생성한 출력                             |
+| `gen_ai.prompt.{n}.role`                | `inputs.messages[n].role`     | n번째 입력 메시지의 역할                                |
+| `gen_ai.prompt.{n}.content`             | `inputs.messages[n].content`  | n번째 입력 메시지의 내용                             |
+| `gen_ai.prompt.{n}.message.role`        | `inputs.messages[n].role`     | 역할의 대체 형식                                   |
+| `gen_ai.prompt.{n}.message.content`     | `inputs.messages[n].content`  | 내용의 대체 형식                                |
+| `gen_ai.completion.{n}.role`            | `outputs.messages[n].role`    | n번째 출력 메시지의 역할                               |
+| `gen_ai.completion.{n}.content`         | `outputs.messages[n].content` | n번째 출력 메시지의 내용                            |
+| `gen_ai.completion.{n}.message.role`    | `outputs.messages[n].role`    | 역할의 대체 형식                                   |
+| `gen_ai.completion.{n}.message.content` | `outputs.messages[n].content` | 내용의 대체 형식                                |
+| `gen_ai.input.messages`                 | `inputs.messages`             | 입력 메시지 배열                                       |
+| `gen_ai.output.messages`                | `outputs.messages`            | 출력 메시지 배열                                      |
+| `gen_ai.tool.name`                      | `invocation_params.tool_name` | 도구 이름, run type을 "tool"로 설정                       |
 
-### GenAI request parameters
+### GenAI 요청 매개변수
 
-| OpenTelemetry attribute            | LangSmith field                       | Notes                                   |
+| OpenTelemetry 속성                 | LangSmith 필드                        | 참고                                   |
 | ---------------------------------- | ------------------------------------- | --------------------------------------- |
-| `gen_ai.request.model`             | `invocation_params.model`             | The model name used for the request     |
-| `gen_ai.response.model`            | `invocation_params.model`             | The model name returned in the response |
-| `gen_ai.request.temperature`       | `invocation_params.temperature`       | Temperature setting                     |
-| `gen_ai.request.top_p`             | `invocation_params.top_p`             | Top-p sampling setting                  |
-| `gen_ai.request.max_tokens`        | `invocation_params.max_tokens`        | Maximum tokens setting                  |
-| `gen_ai.request.frequency_penalty` | `invocation_params.frequency_penalty` | Frequency penalty setting               |
-| `gen_ai.request.presence_penalty`  | `invocation_params.presence_penalty`  | Presence penalty setting                |
-| `gen_ai.request.seed`              | `invocation_params.seed`              | Random seed used for generation         |
-| `gen_ai.request.stop_sequences`    | `invocation_params.stop`              | Sequences that stop generation          |
-| `gen_ai.request.top_k`             | `invocation_params.top_k`             | Top-k sampling parameter                |
-| `gen_ai.request.encoding_formats`  | `invocation_params.encoding_formats`  | Output encoding formats                 |
+| `gen_ai.request.model`             | `invocation_params.model`             | 요청에 사용된 모델 이름     |
+| `gen_ai.response.model`            | `invocation_params.model`             | 응답에서 반환된 모델 이름 |
+| `gen_ai.request.temperature`       | `invocation_params.temperature`       | Temperature 설정                     |
+| `gen_ai.request.top_p`             | `invocation_params.top_p`             | Top-p 샘플링 설정                  |
+| `gen_ai.request.max_tokens`        | `invocation_params.max_tokens`        | 최대 토큰 설정                  |
+| `gen_ai.request.frequency_penalty` | `invocation_params.frequency_penalty` | Frequency penalty 설정               |
+| `gen_ai.request.presence_penalty`  | `invocation_params.presence_penalty`  | Presence penalty 설정                |
+| `gen_ai.request.seed`              | `invocation_params.seed`              | 생성에 사용된 랜덤 시드         |
+| `gen_ai.request.stop_sequences`    | `invocation_params.stop`              | 생성을 중지하는 시퀀스          |
+| `gen_ai.request.top_k`             | `invocation_params.top_k`             | Top-k 샘플링 매개변수                |
+| `gen_ai.request.encoding_formats`  | `invocation_params.encoding_formats`  | 출력 인코딩 형식                 |
 
-### GenAI usage metrics
+### GenAI 사용량 메트릭
 
-| OpenTelemetry attribute          | LangSmith field                | Notes                                     |
+| OpenTelemetry 속성               | LangSmith 필드                 | 참고                                     |
 | -------------------------------- | ------------------------------ | ----------------------------------------- |
-| `gen_ai.usage.input_tokens`      | `usage_metadata.input_tokens`  | Number of input tokens used               |
-| `gen_ai.usage.output_tokens`     | `usage_metadata.output_tokens` | Number of output tokens used              |
-| `gen_ai.usage.total_tokens`      | `usage_metadata.total_tokens`  | Total number of tokens used               |
-| `gen_ai.usage.prompt_tokens`     | `usage_metadata.input_tokens`  | Number of input tokens used (deprecated)  |
-| `gen_ai.usage.completion_tokens` | `usage_metadata.output_tokens` | Number of output tokens used (deprecated) |
-| `gen_ai.usage.details.reasoning_tokens` | `usage_metadata.reasoning_tokens` | Number of reasoning tokens used |
+| `gen_ai.usage.input_tokens`      | `usage_metadata.input_tokens`  | 사용된 입력 토큰 수               |
+| `gen_ai.usage.output_tokens`     | `usage_metadata.output_tokens` | 사용된 출력 토큰 수              |
+| `gen_ai.usage.total_tokens`      | `usage_metadata.total_tokens`  | 사용된 총 토큰 수               |
+| `gen_ai.usage.prompt_tokens`     | `usage_metadata.input_tokens`  | 사용된 입력 토큰 수 (더 이상 사용되지 않음)  |
+| `gen_ai.usage.completion_tokens` | `usage_metadata.output_tokens` | 사용된 출력 토큰 수 (더 이상 사용되지 않음) |
+| `gen_ai.usage.details.reasoning_tokens` | `usage_metadata.reasoning_tokens` | 사용된 추론 토큰 수 |
 
-### TraceLoop attributes
+### TraceLoop 속성
 
-| OpenTelemetry attribute                  | LangSmith field  | Notes                                            |
+| OpenTelemetry 속성                       | LangSmith 필드   | 참고                                            |
 | ---------------------------------------- | ---------------- | ------------------------------------------------ |
-| `traceloop.entity.input`                 | `inputs`         | Full input value from TraceLoop                  |
-| `traceloop.entity.output`                | `outputs`        | Full output value from TraceLoop                 |
-| `traceloop.entity.name`                  | Run name         | Entity name from TraceLoop                       |
-| `traceloop.span.kind`                    | Run type         | Maps to LangSmith run types                      |
-| `traceloop.llm.request.type`             | Run type         | "embedding" maps to "embedding", others to "llm" |
-| `traceloop.association.properties.{key}` | `metadata.{key}` | Custom metadata with traceloop prefix            |
+| `traceloop.entity.input`                 | `inputs`         | TraceLoop의 전체 입력 값                  |
+| `traceloop.entity.output`                | `outputs`        | TraceLoop의 전체 출력 값                 |
+| `traceloop.entity.name`                  | Run name         | TraceLoop의 엔티티 이름                       |
+| `traceloop.span.kind`                    | Run type         | LangSmith run type에 매핑                      |
+| `traceloop.llm.request.type`             | Run type         | "embedding"은 "embedding"으로, 나머지는 "llm"으로 매핑 |
+| `traceloop.association.properties.{key}` | `metadata.{key}` | traceloop 접두사가 있는 사용자 정의 메타데이터            |
 
-### OpenInference attributes
+### OpenInference 속성
 
-| OpenTelemetry attribute   | LangSmith field          | Notes                                     |
+| OpenTelemetry 속성        | LangSmith 필드           | 참고                                     |
 | ------------------------- | ------------------------ | ----------------------------------------- |
-| `input.value`             | `inputs`                 | Full input value, can be string or JSON   |
-| `output.value`            | `outputs`                | Full output value, can be string or JSON  |
-| `openinference.span.kind` | Run type                 | Maps various kinds to LangSmith run types |
-| `llm.system`              | `metadata.ls_provider`   | LLM system provider                       |
-| `llm.model_name`          | `metadata.ls_model_name` | Model name from OpenInference             |
-| `tool.name`               | Run name                 | Tool name when span kind is "TOOL"        |
-| `metadata`                | `metadata.*`             | JSON string of metadata to be merged      |
+| `input.value`             | `inputs`                 | 전체 입력 값, 문자열 또는 JSON일 수 있음   |
+| `output.value`            | `outputs`                | 전체 출력 값, 문자열 또는 JSON일 수 있음  |
+| `openinference.span.kind` | Run type                 | 다양한 종류를 LangSmith run type에 매핑 |
+| `llm.system`              | `metadata.ls_provider`   | LLM 시스템 제공자                       |
+| `llm.model_name`          | `metadata.ls_model_name` | OpenInference의 모델 이름             |
+| `tool.name`               | Run name                 | span kind가 "TOOL"일 때 도구 이름        |
+| `metadata`                | `metadata.*`             | 병합될 메타데이터의 JSON 문자열      |
 
-### LLM attributes
+### LLM 속성
 
-| OpenTelemetry attribute      | LangSmith field                       | Notes                                |
+| OpenTelemetry 속성           | LangSmith 필드                        | 참고                                |
 | ---------------------------- | ------------------------------------- | ------------------------------------ |
-| `llm.input_messages`         | `inputs.messages`                     | Input messages                       |
-| `llm.output_messages`        | `outputs.messages`                    | Output messages                      |
-| `llm.token_count.prompt`     | `usage_metadata.input_tokens`         | Prompt token count                   |
-| `llm.token_count.completion` | `usage_metadata.output_tokens`        | Completion token count               |
-| `llm.token_count.total`      | `usage_metadata.total_tokens`         | Total token count                    |
-| `llm.usage.total_tokens`     | `usage_metadata.total_tokens`         | Alternative total token count        |
-| `llm.invocation_parameters`  | `invocation_params.*`                 | JSON string of invocation parameters |
+| `llm.input_messages`         | `inputs.messages`                     | 입력 메시지                       |
+| `llm.output_messages`        | `outputs.messages`                    | 출력 메시지                      |
+| `llm.token_count.prompt`     | `usage_metadata.input_tokens`         | 프롬프트 토큰 수                   |
+| `llm.token_count.completion` | `usage_metadata.output_tokens`        | 완료 토큰 수               |
+| `llm.token_count.total`      | `usage_metadata.total_tokens`         | 총 토큰 수                    |
+| `llm.usage.total_tokens`     | `usage_metadata.total_tokens`         | 대체 총 토큰 수        |
+| `llm.invocation_parameters`  | `invocation_params.*`                 | 호출 매개변수의 JSON 문자열 |
 | `llm.presence_penalty`       | `invocation_params.presence_penalty`  | Presence penalty                     |
 | `llm.frequency_penalty`      | `invocation_params.frequency_penalty` | Frequency penalty                    |
-| `llm.request.functions`      | `invocation_params.functions`         | Function definitions                 |
+| `llm.request.functions`      | `invocation_params.functions`         | 함수 정의                 |
 
-### Prompt template attributes
+### 프롬프트 템플릿 속성
 
-| OpenTelemetry attribute         | LangSmith field | Notes                                            |
+| OpenTelemetry 속성              | LangSmith 필드 | 참고                                            |
 | ------------------------------- | --------------- | ------------------------------------------------ |
-| `llm.prompt_template.variables` | Run type        | Sets run type to "prompt", used with input.value |
+| `llm.prompt_template.variables` | Run type        | run type을 "prompt"로 설정, input.value와 함께 사용 |
 
-### Retriever attributes
+### Retriever 속성
 
-| OpenTelemetry attribute                     | LangSmith field                     | Notes                                         |
+| OpenTelemetry 속성                          | LangSmith 필드                      | 참고                                         |
 | ------------------------------------------- | ----------------------------------- | --------------------------------------------- |
-| `retrieval.documents.{n}.document.content`  | `outputs.documents[n].page_content` | Content of the nth retrieved document         |
-| `retrieval.documents.{n}.document.metadata` | `outputs.documents[n].metadata`     | Metadata of the nth retrieved document (JSON) |
+| `retrieval.documents.{n}.document.content`  | `outputs.documents[n].page_content` | n번째 검색된 문서의 내용         |
+| `retrieval.documents.{n}.document.metadata` | `outputs.documents[n].metadata`     | n번째 검색된 문서의 메타데이터 (JSON) |
 
-### Tool attributes
+### 도구 속성
 
-| OpenTelemetry attribute | LangSmith field                    | Notes                                     |
+| OpenTelemetry 속성  | LangSmith 필드                     | 참고                                     |
 | ----------------------- | ---------------------------------- | ----------------------------------------- |
-| `tools`                 | `invocation_params.tools`          | Array of tool definitions                 |
-| `tool_arguments`        | `invocation_params.tool_arguments` | Tool arguments as JSON or key-value pairs |
+| `tools`                 | `invocation_params.tools`          | 도구 정의 배열                 |
+| `tool_arguments`        | `invocation_params.tool_arguments` | JSON 또는 키-값 쌍으로 된 도구 인수 |
 
-### Logfire attributes
+### Logfire 속성
 
-| OpenTelemetry attribute | LangSmith field    | Notes                                            |
+| OpenTelemetry 속성  | LangSmith 필드     | 참고                                            |
 | ----------------------- | ------------------ | ------------------------------------------------ |
-| `prompt`                | `inputs`           | Logfire prompt input                             |
-| `all_messages_events`   | `outputs`          | Logfire message events output                    |
-| `events`                | `inputs`/`outputs` | Logfire events array, splits input/choice events |
+| `prompt`                | `inputs`           | Logfire 프롬프트 입력                             |
+| `all_messages_events`   | `outputs`          | Logfire 메시지 이벤트 출력                    |
+| `events`                | `inputs`/`outputs` | Logfire 이벤트 배열, 입력/선택 이벤트 분할 |
 
-### OpenTelemetry event mapping
+### OpenTelemetry 이벤트 매핑
 
-| Event name                  | LangSmith field      | Notes                                                            |
+| 이벤트 이름                  | LangSmith 필드       | 참고                                                            |
 | --------------------------- | -------------------- | ---------------------------------------------------------------- |
-| `gen_ai.content.prompt`     | `inputs`             | Extracts prompt content from event attributes                    |
-| `gen_ai.content.completion` | `outputs`            | Extracts completion content from event attributes                |
-| `gen_ai.system.message`     | `inputs.messages[]`  | System message in conversation                                   |
-| `gen_ai.user.message`       | `inputs.messages[]`  | User message in conversation                                     |
-| `gen_ai.assistant.message`  | `outputs.messages[]` | Assistant message in conversation                                |
-| `gen_ai.tool.message`       | `outputs.messages[]` | Tool response message                                            |
-| `gen_ai.choice`             | `outputs`            | Model choice/response with finish reason                         |
-| `exception`                 | `status`, `error`    | Sets status to "error" and extracts exception message/stacktrace |
+| `gen_ai.content.prompt`     | `inputs`             | 이벤트 속성에서 프롬프트 내용 추출                    |
+| `gen_ai.content.completion` | `outputs`            | 이벤트 속성에서 완료 내용 추출                |
+| `gen_ai.system.message`     | `inputs.messages[]`  | 대화의 시스템 메시지                                   |
+| `gen_ai.user.message`       | `inputs.messages[]`  | 대화의 사용자 메시지                                     |
+| `gen_ai.assistant.message`  | `outputs.messages[]` | 대화의 어시스턴트 메시지                                |
+| `gen_ai.tool.message`       | `outputs.messages[]` | 도구 응답 메시지                                            |
+| `gen_ai.choice`             | `outputs`            | 완료 이유가 포함된 모델 선택/응답                         |
+| `exception`                 | `status`, `error`    | 상태를 "error"로 설정하고 예외 메시지/스택트레이스 추출 |
 
-#### Event attribute extraction
+#### 이벤트 속성 추출
 
-For message events, the following attributes are extracted:
+메시지 이벤트의 경우 다음 속성이 추출됩니다:
 
-* `content` → message content
-* `role` → message role
-* `id` → tool\_call\_id (for tool messages)
-* `gen_ai.event.content` → full message JSON
+* `content` → 메시지 내용
+* `role` → 메시지 역할
+* `id` → tool\_call\_id (도구 메시지의 경우)
+* `gen_ai.event.content` → 전체 메시지 JSON
 
-For choice events:
+선택 이벤트의 경우:
 
-* `finish_reason` → choice finish reason
-* `message.content` → choice message content
-* `message.role` → choice message role
-* `tool_calls.{n}.id` → tool call ID
-* `tool_calls.{n}.function.name` → tool function name
-* `tool_calls.{n}.function.arguments` → tool function arguments
-* `tool_calls.{n}.type` → tool call type
+* `finish_reason` → 선택 완료 이유
+* `message.content` → 선택 메시지 내용
+* `message.role` → 선택 메시지 역할
+* `tool_calls.{n}.id` → 도구 호출 ID
+* `tool_calls.{n}.function.name` → 도구 함수 이름
+* `tool_calls.{n}.function.arguments` → 도구 함수 인수
+* `tool_calls.{n}.type` → 도구 호출 유형
 
-For exception events:
+예외 이벤트의 경우:
 
-* `exception.message` → error message
-* `exception.stacktrace` → error stacktrace (appended to message)
+* `exception.message` → 오류 메시지
+* `exception.stacktrace` → 오류 스택트레이스 (메시지에 추가됨)
 
-## Implementation examples
+## 구현 예제
 
-### Trace using the LangSmith SDK
+### LangSmith SDK를 사용한 추적
 
-Use the LangSmith SDK's OpenTelemetry helper to configure export:
+LangSmith SDK의 OpenTelemetry 헬퍼를 사용하여 export를 구성합니다:
 
 ```python
 import asyncio
@@ -451,20 +451,20 @@ if __name__ == "__main__":
 ```
 
 <Note>
-You do not need to set OTEL environment variables or exporters. `configure()` wires them for LangSmith automatically; instrumentors (like `GoogleADKInstrumentor`) create the spans.
+OTEL 환경 변수나 exporter를 설정할 필요가 없습니다. `configure()`가 LangSmith에 대해 자동으로 연결합니다; instrumentor(예: `GoogleADKInstrumentor`)가 span을 생성합니다.
 </Note>
 
-5. View the trace in your LangSmith dashboard ([example](https://smith.langchain.com/public/106f5bed-edca-4357-91a5-80089252c9ed/r)).
+5. LangSmith 대시보드([예시](https://smith.langchain.com/public/106f5bed-edca-4357-91a5-80089252c9ed/r))에서 추적 데이터를 확인합니다.
 
-## Advanced configuration
+## 고급 구성
 
-### Use OpenTelemetry Collector for fan-out
+### fan-out을 위한 OpenTelemetry Collector 사용
 
-For more advanced scenarios, you can use the OpenTelemetry Collector to fan out your telemetry data to multiple destinations. This is a more scalable approach than configuring multiple exporters in your application code.
+더 고급 시나리오의 경우, OpenTelemetry Collector를 사용하여 텔레메트리 데이터를 여러 대상으로 fan-out할 수 있습니다. 이는 애플리케이션 코드에서 여러 exporter를 구성하는 것보다 확장 가능한 접근 방식입니다.
 
-1. [Install the OpenTelemetry Collector](https://opentelemetry.io/docs/collector/getting-started/) for your environment.
+1. 환경에 맞는 [OpenTelemetry Collector를 설치](https://opentelemetry.io/docs/collector/getting-started/)합니다.
 
-2. Create a configuration file (e.g., `otel-collector-config.yaml`) that exports to multiple destinations:
+2. 여러 대상으로 export하는 구성 파일(예: `otel-collector-config.yaml`)을 생성합니다:
 
    ```yaml
    receivers:
@@ -497,7 +497,7 @@ For more advanced scenarios, you can use the OpenTelemetry Collector to fan out 
          exporters: [otlphttp/langsmith, otlphttp/other_provider]
    ```
 
-3. Configure your application to send to the collector:
+3. collector로 전송하도록 애플리케이션을 구성합니다:
 
    ```python
    import os
@@ -529,28 +529,28 @@ For more advanced scenarios, you can use the OpenTelemetry Collector to fan out 
    print(result.content)
    ```
 
-This approach offers several advantages:
+이 접근 방식은 여러 가지 장점을 제공합니다:
 
-* Centralized configuration for all your telemetry destinations
-* Reduced overhead in your application code
-* Better scalability and resilience
-* Ability to add or remove destinations without changing application code
+* 모든 텔레메트리 대상에 대한 중앙 집중식 구성
+* 애플리케이션 코드의 오버헤드 감소
+* 더 나은 확장성과 복원력
+* 애플리케이션 코드를 변경하지 않고 대상을 추가하거나 제거할 수 있는 기능
 
-### Distributed tracing with LangChain and OpenTelemetry
+### LangChain과 OpenTelemetry를 사용한 분산 추적
 
-Distributed tracing is essential when your LLM application spans multiple services or processes. OpenTelemetry's context propagation capabilities ensure that traces remain connected across service boundaries.
+LLM 애플리케이션이 여러 서비스나 프로세스에 걸쳐 있을 때 분산 추적은 필수적입니다. OpenTelemetry의 컨텍스트 전파 기능은 서비스 경계를 넘어 추적이 연결된 상태로 유지되도록 보장합니다.
 
-#### Context propagation in distributed tracing
+#### 분산 추적의 컨텍스트 전파
 
-In distributed systems, context propagation passes trace metadata between services so that related spans are linked to the same trace:
+분산 시스템에서 컨텍스트 전파는 관련 span이 동일한 추적에 연결되도록 서비스 간에 추적 메타데이터를 전달합니다:
 
-* **Trace ID**: A unique identifier for the entire trace
-* **Span ID**: A unique identifier for the current span
-* **Sampling Decision**: Indicates whether this trace should be sampled
+* **Trace ID**: 전체 추적에 대한 고유 식별자
+* **Span ID**: 현재 span에 대한 고유 식별자
+* **Sampling Decision**: 이 추적을 샘플링해야 하는지 여부를 나타냄
 
-#### Set up distributed tracing with LangChain
+#### LangChain으로 분산 추적 설정
 
-To enable distributed tracing across multiple services:
+여러 서비스에 걸쳐 분산 추적을 활성화하려면:
 
 ```python
 import os

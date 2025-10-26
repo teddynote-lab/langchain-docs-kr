@@ -2,18 +2,18 @@
 title: Google Books
 ---
 
-The Google Books tool that supports the ReAct pattern and allows you to search the Google Books API. Google Books is the largest API in the world that keeps track of books in a curated manner. It has over 40 million entries, which can give users a significant amount of data.
+Google Books tool은 ReAct 패턴을 지원하며 Google Books API를 검색할 수 있게 해줍니다. Google Books는 세계에서 가장 큰 API로, 책을 체계적으로 관리하고 추적합니다. 4천만 개 이상의 항목을 보유하고 있어 사용자에게 상당한 양의 데이터를 제공할 수 있습니다.
 
-### Tool features
+### Tool 기능
 
-Currently the tool has the following capabilities:
+현재 이 tool은 다음과 같은 기능을 제공합니다:
 
-- Gathers the relevant information from the Google Books API using a key word search
-- Formats the information into a readable output, and return the result to the agent
+- 키워드 검색을 사용하여 Google Books API에서 관련 정보를 수집합니다
+- 정보를 읽기 쉬운 출력 형식으로 포맷하고 결과를 agent에 반환합니다
 
 ## Setup
 
-Make sure `langchain-community` is installed.
+`langchain-community`가 설치되어 있는지 확인하세요.
 
 ```python
 pip install -qU  langchain-community
@@ -21,13 +21,13 @@ pip install -qU  langchain-community
 
 ### Credentials
 
-You will need an API key from Google Books. You can do this by visiting and following the steps at [https://developers.google.com/books/docs/v1/using#APIKey](https://developers.google.com/books/docs/v1/using#APIKey).
+Google Books에서 API key가 필요합니다. [https://developers.google.com/books/docs/v1/using#APIKey](https://developers.google.com/books/docs/v1/using#APIKey)를 방문하여 단계를 따라 진행하면 됩니다.
 
-Then you will need to set the environment variable `GOOGLE_BOOKS_API_KEY` to your Google Books API key.
+그런 다음 환경 변수 `GOOGLE_BOOKS_API_KEY`를 Google Books API key로 설정해야 합니다.
 
 ## Instantiation
 
-To instantiate the tool import the Google Books tool and set your credentials.
+tool을 인스턴스화하려면 Google Books tool을 import하고 credentials를 설정하세요.
 
 ```python
 import os
@@ -41,7 +41,7 @@ tool = GoogleBooksQueryRun(api_wrapper=GoogleBooksAPIWrapper())
 
 ## Invocation
 
-You can invoke the tool by calling the `run` method.
+`run` method를 호출하여 tool을 실행할 수 있습니다.
 
 ```python
 tool.run("ai")
@@ -66,9 +66,9 @@ You can read more at http://books.google.ca/books?id=oE3YDwAAQBAJ&dq=ai&hl=&sour
 You can read more at https://play.google.com/store/books/details?id=eRmdDwAAQBAJ&source=gbs_api'
 ```
 
-### [Invoke directly with args](/oss/langchain/tools)
+### [args와 함께 직접 호출하기](/oss/langchain/tools)
 
-See below for an direct invocation example.
+직접 호출 예제는 아래를 참조하세요.
 
 ```python
 import os
@@ -82,9 +82,9 @@ tool = GoogleBooksQueryRun(api_wrapper=GoogleBooksAPIWrapper())
 tool.run("ai")
 ```
 
-### [Invoke with ToolCall](/oss/langchain/tools)
+### [ToolCall과 함께 호출하기](/oss/langchain/tools)
 
-See below for a tool call example.
+tool call 예제는 아래를 참조하세요.
 
 ```python
 import getpass
@@ -118,7 +118,7 @@ print(suggestions)
 
 ## Chaining
 
-See the below example for chaining.
+chaining 예제는 아래를 참조하세요.
 
 ```python
 import getpass
@@ -153,4 +153,4 @@ agent_executor.invoke({"input": "Can you recommend me some books related to ai?"
 
 ## API reference
 
-The Google Books API can be found here: [https://developers.google.com/books](https://developers.google.com/books)
+Google Books API는 여기에서 찾을 수 있습니다: [https://developers.google.com/books](https://developers.google.com/books)

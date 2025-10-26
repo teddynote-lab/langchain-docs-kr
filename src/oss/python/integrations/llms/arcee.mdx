@@ -2,7 +2,7 @@
 title: Arcee
 ---
 
-This notebook demonstrates how to use the `Arcee` class for generating text using Arcee's Domain Adapted Language Models (DALMs).
+이 노트북은 Arcee의 Domain Adapted Language Models (DALMs)를 사용하여 텍스트를 생성하기 위해 `Arcee` 클래스를 사용하는 방법을 보여줍니다.
 
 ```python
 ##Installing the langchain packages needed to use the integration
@@ -11,7 +11,7 @@ pip install -qU langchain-community
 
 ### Setup
 
-Before using Arcee, make sure the Arcee API key is set as `ARCEE_API_KEY` environment variable. You can also pass the api key as a named parameter.
+Arcee를 사용하기 전에 Arcee API key가 `ARCEE_API_KEY` 환경 변수로 설정되어 있는지 확인하세요. api key를 named parameter로 전달할 수도 있습니다.
 
 ```python
 from langchain_community.llms import Arcee
@@ -25,8 +25,8 @@ arcee = Arcee(
 
 ### Additional Configuration
 
-You can also configure Arcee's parameters such as `arcee_api_url`, `arcee_app_url`, and `model_kwargs` as needed.
-Setting the `model_kwargs` at the object initialization uses the parameters as default for all the subsequent calls to the generate response.
+필요에 따라 `arcee_api_url`, `arcee_app_url`, `model_kwargs`와 같은 Arcee의 parameter들을 구성할 수도 있습니다.
+객체 초기화 시 `model_kwargs`를 설정하면 이후 generate response에 대한 모든 호출에서 해당 parameter들이 기본값으로 사용됩니다.
 
 ```python
 arcee = Arcee(
@@ -49,7 +49,7 @@ arcee = Arcee(
 
 ### Generating Text
 
-You can generate text from Arcee by providing a prompt. Here's an example:
+prompt를 제공하여 Arcee에서 텍스트를 생성할 수 있습니다. 다음은 예시입니다:
 
 ```python
 # Generate text
@@ -59,7 +59,7 @@ response = arcee(prompt)
 
 ### Additional parameters
 
-Arcee allows you to apply `filters` and set the `size` (in terms of count) of retrieved document(s) to aid text generation. Filters help narrow down the results. Here's how to use these parameters:
+Arcee를 사용하면 `filters`를 적용하고 텍스트 생성을 돕기 위해 검색된 문서의 `size`(개수 기준)를 설정할 수 있습니다. Filter는 결과 범위를 좁히는 데 도움이 됩니다. 다음은 이러한 parameter들을 사용하는 방법입니다:
 
 ```python
 # Define filters

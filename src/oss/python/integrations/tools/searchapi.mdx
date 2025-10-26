@@ -2,7 +2,7 @@
 title: SearchApi
 ---
 
-This notebook shows examples of how to use SearchApi to search the web. Go to [https://www.searchapi.io/](https://www.searchapi.io/) to sign up for a free account and get API key.
+이 노트북은 SearchApi를 사용하여 웹을 검색하는 방법의 예제를 보여줍니다. [https://www.searchapi.io/](https://www.searchapi.io/)에 방문하여 무료 계정에 가입하고 API key를 받으세요.
 
 ```python
 import os
@@ -26,7 +26,7 @@ search.run("Obama's first name?")
 'Barack Obama Full name: Barack Hussein Obama II'
 ```
 
-## Using as part of a Self Ask With Search Chain
+## Self Ask With Search Chain의 일부로 사용하기
 
 ```python
 os.environ["OPENAI_API_KEY"] = ""
@@ -110,9 +110,9 @@ Based on the information:
 Therefore, Plato lived longer than both Socrates and Aristotle.
 ```
 
-## Custom parameters
+## 사용자 정의 매개변수
 
-SearchApi wrapper can be customized to use different engines like [Google News](https://www.searchapi.io/docs/google-news), [Google Jobs](https://www.searchapi.io/docs/google-jobs), [Google Scholar](https://www.searchapi.io/docs/google-scholar), or others which can be found in [SearchApi](https://www.searchapi.io/docs/google) documentation. All parameters supported by SearchApi can be passed when executing the query.
+SearchApi wrapper는 [Google News](https://www.searchapi.io/docs/google-news), [Google Jobs](https://www.searchapi.io/docs/google-jobs), [Google Scholar](https://www.searchapi.io/docs/google-scholar)와 같은 다양한 엔진을 사용하도록 사용자 정의할 수 있으며, 다른 엔진들은 [SearchApi](https://www.searchapi.io/docs/google) 문서에서 찾을 수 있습니다. SearchApi에서 지원하는 모든 매개변수는 쿼리를 실행할 때 전달할 수 있습니다.
 
 ```python
 search = SearchApiAPIWrapper(engine="google_jobs")
@@ -126,7 +126,7 @@ search.run("AI Engineer", location="Portugal", gl="pt")[0:500]
 'No good search result found'
 ```
 
-## Getting results with metadata
+## metadata와 함께 결과 가져오기
 
 ```python
 import pprint

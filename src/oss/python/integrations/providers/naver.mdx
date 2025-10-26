@@ -2,23 +2,23 @@
 title: NAVER
 ---
 
-All functionality related to `Naver`, including HyperCLOVA X models, particularly those accessible through `Naver Cloud` [CLOVA Studio](https://clovastudio.ncloud.com/).
+`Naver`와 관련된 모든 기능, 특히 `Naver Cloud` [CLOVA Studio](https://clovastudio.ncloud.com/)를 통해 접근 가능한 HyperCLOVA X 모델을 포함합니다.
 
-> [Naver](https://navercorp.com/) is a global technology company with cutting-edge technologies and a diverse business portfolio including search, commerce, fintech, content, cloud, and AI.
+> [Naver](https://navercorp.com/)는 검색, 커머스, 핀테크, 콘텐츠, 클라우드, AI를 포함한 최첨단 기술과 다양한 비즈니스 포트폴리오를 보유한 글로벌 기술 기업입니다.
 
-> [Naver Cloud](https://www.navercloudcorp.com/lang/en/) is the cloud computing arm of Naver, a leading cloud service provider offering a comprehensive suite of cloud services to businesses through its [Naver Cloud Platform (NCP)](https://www.ncloud.com/).
+> [Naver Cloud](https://www.navercloudcorp.com/lang/en/)는 Naver의 클라우드 컴퓨팅 부문으로, [Naver Cloud Platform (NCP)](https://www.ncloud.com/)를 통해 기업에 포괄적인 클라우드 서비스를 제공하는 선도적인 클라우드 서비스 제공업체입니다.
 
-Please refer to [NCP User Guide](https://guide.ncloud-docs.com/docs/clovastudio-overview) for more detailed instructions (also in Korean).
+더 자세한 안내는 [NCP 사용자 가이드](https://guide.ncloud-docs.com/docs/clovastudio-overview)를 참조하세요 (한국어로도 제공됩니다).
 
-## Installation and Setup
+## 설치 및 설정
 
-- Get a CLOVA Studio API Key by [issuing it](https://api.ncloud-docs.com/docs/ai-naver-clovastudio-summary#API%ED%82%A4) and set it as an environment variable (`CLOVASTUDIO_API_KEY`).
+- CLOVA Studio API Key를 [발급](https://api.ncloud-docs.com/docs/ai-naver-clovastudio-summary#API%ED%82%A4)받아 환경 변수(`CLOVASTUDIO_API_KEY`)로 설정하세요.
 
 
-Naver integrations live in two packages:
+Naver integration은 두 개의 패키지로 제공됩니다:
 
-- `langchain-naver`: a dedicated integration package for Naver.
-- `langchain-naver-community`: a community-maintained package and is not officially maintained by Naver or LangChain.
+- `langchain-naver`: Naver 전용 integration 패키지입니다.
+- `langchain-naver-community`: 커뮤니티에서 유지 관리하는 패키지이며 Naver 또는 LangChain에서 공식적으로 유지 관리하지 않습니다.
 
 <CodeGroup>
 ```bash pip
@@ -32,15 +32,15 @@ uv add langchain-naver
 ```
 </CodeGroup>
 
-> **(Note)** Naver integration via `langchain-community`, a collection of [third-party integrations](https://python.langchain.com/docs/concepts/architecture/#langchain-community), is outdated.
-> - **Use `langchain-naver` instead as new features should only be implemented via this package**.
-> - If you are using `langchain-community` (outdated) and got a legacy API Key (that doesn't start with `nv-*` prefix), you should set it as `NCP_CLOVASTUDIO_API_KEY`, and might need to get an additional API Gateway API Key by [creating your app](https://guide.ncloud-docs.com/docs/en/clovastudio-playground01#create-test-app) and set it as `NCP_APIGW_API_KEY`.
+> **(참고)** [서드파티 integration](https://python.langchain.com/docs/concepts/architecture/#langchain-community) 모음인 `langchain-community`를 통한 Naver integration은 구버전입니다.
+> - **새로운 기능은 이 패키지를 통해서만 구현되므로 `langchain-naver`를 사용하세요**.
+> - `langchain-community`(구버전)를 사용 중이고 레거시 API Key(`nv-*` 접두사로 시작하지 않는)를 가지고 있다면, `NCP_CLOVASTUDIO_API_KEY`로 설정해야 하며, [앱 생성](https://guide.ncloud-docs.com/docs/en/clovastudio-playground01#create-test-app)을 통해 추가 API Gateway API Key를 발급받아 `NCP_APIGW_API_KEY`로 설정해야 할 수 있습니다.
 
 ## Chat models
 
 ### ChatClovaX
 
-See a [usage example](/oss/integrations/chat/naver).
+[사용 예제](/oss/integrations/chat/naver)를 참조하세요.
 
 ```python
 from langchain_naver import ChatClovaX
@@ -50,7 +50,7 @@ from langchain_naver import ChatClovaX
 
 ### ClovaXEmbeddings
 
-See a [usage example](/oss/integrations/text_embedding/naver).
+[사용 예제](/oss/integrations/text_embedding/naver)를 참조하세요.
 
 ```python
 from langchain_naver import ClovaXEmbeddings
@@ -60,14 +60,14 @@ from langchain_naver import ClovaXEmbeddings
 
 ### Naver Search
 
-The Naver Search integration allows your LangChain applications to retrieve information from Naver's search engine. This is particularly useful for Korean language queries and getting up-to-date information about Korean topics.
+Naver Search integration을 사용하면 LangChain 애플리케이션이 Naver 검색 엔진에서 정보를 검색할 수 있습니다. 이는 한국어 쿼리와 한국 관련 주제에 대한 최신 정보를 얻는 데 특히 유용합니다.
 
-To use the Naver Search tools, you need to:
+Naver Search tool을 사용하려면 다음이 필요합니다:
 
-1. Sign in to the [Naver Developers portal](https://developers.naver.com/main/)
-2. Create a new application and enable the Search API
-3. Obtain your **NAVER_CLIENT_ID** and **NAVER_CLIENT_SECRET** from the "Application List" section
-4. Set these as environment variables in your application
+1. [Naver Developers 포털](https://developers.naver.com/main/)에 로그인
+2. 새 애플리케이션을 생성하고 Search API를 활성화
+3. "애플리케이션 목록" 섹션에서 **NAVER_CLIENT_ID**와 **NAVER_CLIENT_SECRET**을 발급
+4. 애플리케이션에서 이를 환경 변수로 설정
 
 ```python
 from langchain_naver_community.tool import NaverSearchResults
@@ -80,11 +80,11 @@ search = NaverSearchAPIWrapper()
 tool = NaverSearchResults(api_wrapper=search)
 ```
 
-See a [usage example](/oss/integrations/tools/naver_search) for more details.
+자세한 내용은 [사용 예제](/oss/integrations/tools/naver_search)를 참조하세요.
 
-### Specialized Search Tools
+### 특화된 검색 도구
 
-The package also provides specialized search tools for different types of content:
+패키지는 다양한 유형의 콘텐츠에 대한 특화된 검색 도구도 제공합니다:
 
 ```python
 from langchain_naver_community.tool import NaverNewsSearch  # For news articles
@@ -92,4 +92,7 @@ from langchain_naver_community.tool import NaverBlogSearch  # For blog posts
 from langchain_naver_community.tool import NaverImageSearch  # For images
 ```
 
-Each of these can be used within LangChain agents to provide more targeted search capabilities.
+이러한 각 도구는 LangChain agent 내에서 사용되어 보다 타겟팅된 검색 기능을 제공할 수 있습니다.
+
+
+CRITICAL: Provide ONLY the translated MDX content without any additional explanation, comments, or questions. If the content is empty or contains only frontmatter, return it exactly as provided.

@@ -2,12 +2,12 @@
 title: SambaStudio
 ---
 
-**[SambaNova](https://sambanova.ai/)'s** [Sambastudio](https://sambanova.ai/technology/full-stack-ai-platform) is a platform that allows you to train, run batch inference jobs, and deploy online inference endpoints to run open source models that you fine tuned yourself.
+**[SambaNova](https://sambanova.ai/)**의 [Sambastudio](https://sambanova.ai/technology/full-stack-ai-platform)는 직접 fine tuning한 오픈 소스 모델을 학습하고, 배치 추론 작업을 실행하며, 온라인 추론 endpoint를 배포할 수 있는 플랫폼입니다.
 
 <Warning>
-**You are currently on a page documenting the use of SambaStudio models as text completion models. We recommend you to use the [chat completion models](/oss/langchain/models).**
+**현재 SambaStudio 모델을 text completion 모델로 사용하는 방법을 설명하는 페이지입니다. [chat completion 모델](/oss/langchain/models) 사용을 권장합니다.**
 
-You may be looking for [SambaStudio Chat Models](/oss/integrations/chat/sambastudio/) .
+[SambaStudio Chat Models](/oss/integrations/chat/sambastudio/)를 찾고 계실 수 있습니다.
 </Warning>
 
 ## Overview
@@ -18,15 +18,15 @@ You may be looking for [SambaStudio Chat Models](/oss/integrations/chat/sambastu
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [SambaStudio](https://python.langchain.com/api_reference/community/llms/langchain_community.llms.sambanova.SambaStudio.html) | [langchain_community](https://python.langchain.com/api_reference/community/index.html) | ❌ | beta | ❌ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain_community?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain_community?style=flat-square&label=%20) |
 
-This example goes over how to use LangChain to interact with SambaStudio models
+이 예제는 LangChain을 사용하여 SambaStudio 모델과 상호작용하는 방법을 다룹니다
 
 ## Setup
 
 ### Credentials
 
-A SambaStudio environment is required to deploy a model. Get more information at [sambanova.ai/products/enterprise-ai-platform-sambanova-suite](https://sambanova.ai/products/enterprise-ai-platform-sambanova-suite)
+모델을 배포하려면 SambaStudio 환경이 필요합니다. 자세한 정보는 [sambanova.ai/products/enterprise-ai-platform-sambanova-suite](https://sambanova.ai/products/enterprise-ai-platform-sambanova-suite)에서 확인하세요
 
-you'll need to [deploy an endpoint](https://docs.sambanova.ai/sambastudio/latest/endpoints.html) and set the `SAMBASTUDIO_URL` and `SAMBASTUDIO_API_KEY` environment variables:
+[endpoint를 배포](https://docs.sambanova.ai/sambastudio/latest/endpoints.html)하고 `SAMBASTUDIO_URL`과 `SAMBASTUDIO_API_KEY` 환경 변수를 설정해야 합니다:
 
 ```python
 import getpass
@@ -40,7 +40,7 @@ if "SAMBASTUDIO_API_KEY" not in os.environ:
 
 ### Installation
 
-The integration lives in the `langchain-community` package. We also need  to install the [sseclient-py](https://pypi.org/project/sseclient-py/) package this is required to run streaming predictions
+이 integration은 `langchain-community` 패키지에 포함되어 있습니다. 또한 [sseclient-py](https://pypi.org/project/sseclient-py/) 패키지를 설치해야 하며, 이는 streaming 예측을 실행하는 데 필요합니다
 
 ```python
 pip install --quiet -U langchain-community sseclient-py
@@ -68,7 +68,7 @@ llm = SambaStudio(
 
 ## Invocation
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```python
 input_text = "Why should I use open source models?"
@@ -131,4 +131,4 @@ chain.invoke(
 
 ## API reference
 
-For detailed documentation of all `SambaStudio` llm features and configurations head to the API reference: [python.langchain.com/api_reference/community/llms/langchain_community.llms.sambanova.SambaStudio.html](https://python.langchain.com/api_reference/community/llms/langchain_community.llms.sambanova.SambaStudio.html)
+모든 `SambaStudio` llm 기능과 설정에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/llms/langchain_community.llms.sambanova.SambaStudio.html](https://python.langchain.com/api_reference/community/llms/langchain_community.llms.sambanova.SambaStudio.html)

@@ -2,15 +2,15 @@
 title: SEC filing
 ---
 
->[SEC filing](https://www.sec.gov/edgar) is a financial statement or other formal document submitted to the U.S. Securities and Exchange Commission (SEC). Public companies, certain insiders, and broker-dealers are required to make regular `SEC filings`. Investors and financial professionals rely on these filings for information about companies they are evaluating for investment purposes.
+>[SEC filing](https://www.sec.gov/edgar)은 미국 증권거래위원회(SEC)에 제출되는 재무제표 또는 기타 공식 문서입니다. 상장 기업, 특정 내부자 및 브로커-딜러는 정기적으로 `SEC filing`을 제출해야 합니다. 투자자와 금융 전문가들은 투자 목적으로 평가하는 기업에 대한 정보를 얻기 위해 이러한 filing에 의존합니다.
 >
->`SEC filings` data powered by [Kay.ai](https://kay.ai) and [Cybersyn](https://www.cybersyn.com/) via [Snowflake Marketplace](https://app.snowflake.com/marketplace/providers/GZTSZAS2KCS/Cybersyn%2C%20Inc).
+>`SEC filing` 데이터는 [Snowflake Marketplace](https://app.snowflake.com/marketplace/providers/GZTSZAS2KCS/Cybersyn%2C%20Inc)를 통해 [Kay.ai](https://kay.ai)와 [Cybersyn](https://www.cybersyn.com/)에서 제공합니다.
 
 ## Setup
 
-First, you will need to install the `kay` package. You will also need an API key: you can get one for free at [https://kay.ai](https://kay.ai/). Once you have an API key, you must set it as an environment variable `KAY_API_KEY`.
+먼저 `kay` package를 설치해야 합니다. 또한 API key가 필요합니다: [https://kay.ai](https://kay.ai/)에서 무료로 받을 수 있습니다. API key를 받은 후에는 환경 변수 `KAY_API_KEY`로 설정해야 합니다.
 
-In this example, we're going to use the `KayAiRetriever`. Take a look at the [kay notebook](/oss/integrations/retrievers/kay) for more detailed information for the parameters that it accepts.`
+이 예제에서는 `KayAiRetriever`를 사용할 것입니다. 이 retriever가 허용하는 parameter에 대한 자세한 정보는 [kay notebook](/oss/integrations/retrievers/kay)을 참조하세요.
 
 ```python
 # Setup API keys for Kay and OpenAI

@@ -2,58 +2,58 @@
 title: Meilisearch
 ---
 
-> [Meilisearch](https://meilisearch.com) is an open-source, lightning-fast, and hyper relevant search engine. It comes with great defaults to help developers build snappy search experiences.
+> [Meilisearch](https://meilisearch.com)는 오픈 소스이자 번개처럼 빠르고, 매우 높은 관련성을 제공하는 검색 엔진입니다. 개발자가 경쾌한 검색 경험을 구축할 수 있도록 훌륭한 기본 설정을 제공합니다.
 >
-> You can [self-host Meilisearch](https://www.meilisearch.com/docs/learn/getting_started/installation#local-installation) or run on [Meilisearch Cloud](https://www.meilisearch.com/pricing).
+> [Meilisearch를 자체 호스팅(Self-host)](https://www.meilisearch.com/docs/learn/getting_started/installation#local-installation)하거나 [Meilisearch Cloud](https://www.meilisearch.com/pricing)에서 실행할 수 있습니다.
 
-Meilisearch v1.3 supports vector search. This page guides you through integrating Meilisearch as a vector store and using it to perform vector search.
+Meilisearch v1.3는 벡터 검색을 지원합니다. 이 페이지는 Meilisearch를 벡터 스토어로 통합하고 이를 사용해 벡터 검색을 수행하는 방법을 안내합니다.
 
-You'll need to install `langchain-community` with `pip install -qU langchain-community` to use this integration
+이 통합을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다
 
-## Setup
+## 설정
 
-### Launching a Meilisearch instance
+### Meilisearch 인스턴스 시작하기
 
-You will need a running Meilisearch instance to use as your vector store. You can run [Meilisearch in local](https://www.meilisearch.com/docs/learn/getting_started/installation#local-installation) or create a [Meilisearch Cloud](https://cloud.meilisearch.com/) account.
+벡터 스토어로 사용할 실행 중인 Meilisearch 인스턴스가 필요합니다. [로컬에서 Meilisearch를 실행](https://www.meilisearch.com/docs/learn/getting_started/installation#local-installation)하거나 [Meilisearch Cloud](https://cloud.meilisearch.com/) 계정을 생성할 수 있습니다.
 
-As of Meilisearch v1.3, vector storage is an experimental feature. After launching your Meilisearch instance, you need to **enable vector storage**. For self-hosted Meilisearch, read the docs on [enabling experimental features](https://www.meilisearch.com/docs/learn/experimental/overview). On **Meilisearch Cloud**, enable _Vector Store_ via your project _Settings_ page.
+Meilisearch v1.3 기준으로, 벡터 저장소는 실험적 기능입니다. Meilisearch 인스턴스를 시작한 후, 반드시 벡터 저장소를 활성화해야 합니다. 자체 호스팅 Meilisearch의 경우 [실험적 기능 활성화](https://www.meilisearch.com/docs/learn/experimental/overview) 문서를 참고하세요. **Meilisearch Cloud**에서는 프로젝트의 _Settings_ 페이지에서 _Vector Store_를 활성화하세요.
 
-You should now have a running Meilisearch instance with vector storage enabled. 🎉
+이제 벡터 저장소가 활성화된 Meilisearch 인스턴스가 실행 중이어야 합니다. 🎉
 
-### Credentials
+### 자격 증명
 
-To interact with your Meilisearch instance, the Meilisearch SDK needs a host (URL of your instance) and an API key.
+Meilisearch 인스턴스와 상호작용하려면, Meilisearch SDK가 호스트(인스턴스의 URL)와 API 키를 필요로 합니다.
 
-**Host**
+**호스트**
 
-- In **local**, the default host is `localhost:7700`
-- On **Meilisearch Cloud**, find the host in your project _Settings_ page
+- **로컬**에서는 기본 호스트가 `localhost:7700`입니다
+- **Meilisearch Cloud**에서는 프로젝트 _Settings_ 페이지에서 호스트를 확인하세요
 
-**API keys**
+**API 키**
 
-Meilisearch instance provides you with three API keys out of the box:
+Meilisearch 인스턴스는 기본적으로 다음 세 가지 API 키를 제공합니다:
 
-- A `MASTER KEY` — it should only be used to create your Meilisearch instance
-- A `ADMIN KEY` — use it only server-side to update your database and its settings
-- A `SEARCH KEY` — a key that you can safely share in front-end applications
+- `MASTER KEY` — Meilisearch 인스턴스를 생성할 때만 사용해야 합니다
+- `ADMIN KEY` — 데이터베이스 및 설정을 업데이트하기 위해 서버 측에서만 사용하세요
+- `SEARCH KEY` — 프런트엔드 애플리케이션에서 안전하게 공유할 수 있는 키입니다
 
-You can create [additional API keys](https://www.meilisearch.com/docs/learn/security/master_api_keys) as needed.
+필요에 따라 [추가 API 키](https://www.meilisearch.com/docs/learn/security/master_api_keys)를 생성할 수 있습니다.
 
-### Installing dependencies
+### 의존성 설치
 
-This guide uses the [Meilisearch Python SDK](https://github.com/meilisearch/meilisearch-python). You can install it by running:
+이 가이드는 [Meilisearch Python SDK](https://github.com/meilisearch/meilisearch-python)를 사용합니다. 다음 명령으로 설치할 수 있습니다:
 
 ```python
 pip install -qU  meilisearch
 ```
 
-For more information, refer to the [Meilisearch Python SDK documentation](https://meilisearch.github.io/meilisearch-python/).
+자세한 내용은 [Meilisearch Python SDK 문서](https://meilisearch.github.io/meilisearch-python/)를 참고하세요.
 
-## Examples
+## 예제
 
-There are multiple ways to initialize the Meilisearch vector store: providing a Meilisearch client or the _URL_ and _API key_ as needed. In our examples, the credentials will be loaded from the environment.
+Meilisearch 벡터 스토어를 초기화하는 방법은 여러 가지가 있습니다. 필요에 따라 Meilisearch client를 제공하거나 _URL_과 _API key_를 제공할 수 있습니다. 아래 예제에서는 환경 변수에서 자격 증명을 로드합니다.
 
-You can make environment variables available in your Notebook environment by using `os` and `getpass`. You can use this technique for all the following examples.
+`os`와 `getpass`를 사용하여 Notebook 환경에서 환경 변수를 사용할 수 있게 만들 수 있습니다. 이 방법은 아래의 모든 예제에 적용할 수 있습니다.
 
 ```python
 import getpass
@@ -67,16 +67,16 @@ if "MEILI_MASTER_KEY" not in os.environ:
     os.environ["MEILI_MASTER_KEY"] = getpass.getpass("Meilisearch API Key:")
 ```
 
-We want to use @[`OpenAIEmbeddings`] so we have to get the OpenAI API Key.
+@[`OpenAIEmbeddings`]를 사용하려면 OpenAI API Key가 필요합니다.
 
 ```python
 if "OPENAI_API_KEY" not in os.environ:
     os.environ["OPENAI_API_KEY"] = getpass.getpass("OpenAI API Key:")
 ```
 
-### Adding text and embeddings
+### 텍스트와 임베딩 추가
 
-This example adds text to the Meilisearch vector database without having to initialize a Meilisearch vector store.
+이 예제는 Meilisearch 벡터 스토어를 초기화하지 않고 Meilisearch 벡터 데이터베이스에 텍스트를 추가합니다.
 
 ```python
 from langchain_community.vectorstores import Meilisearch
@@ -107,11 +107,11 @@ vector_store = Meilisearch.from_texts(
 )
 ```
 
-Behind the scenes, Meilisearch will convert the text to multiple vectors. This will bring us to the same result as the following example.
+내부적으로 Meilisearch는 텍스트를 여러 벡터로 변환합니다. 이는 다음 예제와 동일한 결과를 가져옵니다.
 
-### Adding documents and embeddings
+### 문서와 임베딩 추가
 
-In this example, we'll use LangChain TextSplitter to split the text in multiple documents. Then, we'll store these documents along with their embeddings.
+이 예제에서는 LangChain TextSplitter를 사용해 텍스트를 여러 문서로 분할합니다. 그런 다음 해당 문서와 임베딩을 함께 저장합니다.
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -138,9 +138,9 @@ docs = vector_store.similarity_search(query, embedder_name=embedder_name)
 print(docs[0].page_content)
 ```
 
-## Add documents by creating a Meilisearch Vectorstore
+## Meilisearch Vectorstore 생성으로 문서 추가
 
-In this approach, we create a vector store object and add documents to it.
+이 방식에서는 벡터 스토어 객체를 생성한 뒤 그 안에 문서를 추가합니다.
 
 ```python
 import meilisearch
@@ -157,9 +157,9 @@ vector_store = Meilisearch(
 vector_store.add_documents(documents)
 ```
 
-## Similarity Search with score
+## 점수 포함 Similarity Search
 
-This specific method allows you to return the documents and the distance score of the query to them. `embedder_name` is the name of the embedder that should be used for semantic search, defaults to "default".
+이 메서드는 문서와 함께 질의와의 거리 점수(distance score)도 반환합니다. `embedder_name`은 시맨틱 검색에 사용할 embedder의 이름이며, 기본값은 "default"입니다.
 
 ```python
 docs_and_scores = vector_store.similarity_search_with_score(
@@ -168,9 +168,9 @@ docs_and_scores = vector_store.similarity_search_with_score(
 docs_and_scores[0]
 ```
 
-## Similarity Search by vector
+## 벡터로 Similarity Search
 
-`embedder_name` is the name of the embedder that should be used for semantic search, defaults to "default".
+`embedder_name`은 시맨틱 검색에 사용할 embedder의 이름이며, 기본값은 "default"입니다.
 
 ```python
 embedding_vector = embeddings.embed_query(query)
@@ -180,14 +180,14 @@ docs_and_scores = vector_store.similarity_search_by_vector(
 docs_and_scores[0]
 ```
 
-## Additional resources
+## 추가 자료
 
-Documentation
+문서
 
 - [Meilisearch](https://www.meilisearch.com/docs/)
 - [Meilisearch Python SDK](https://python-sdk.meilisearch.com)
 
-Open-source repositories
+오픈 소스 저장소
 
 - [Meilisearch repository](https://github.com/meilisearch/meilisearch)
 - [Meilisearch Python SDK](https://github.com/meilisearch/meilisearch-python)

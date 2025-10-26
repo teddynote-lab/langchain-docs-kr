@@ -1,22 +1,22 @@
 ---
-title: Kinetica Vectorstore based Retriever
+title: Kinetica Vectorstore 기반 Retriever
 ---
 
->[Kinetica](https://www.kinetica.com/) is a database with integrated support for vector similarity search
+>[Kinetica](https://www.kinetica.com/)는 vector 유사도 검색을 통합 지원하는 데이터베이스입니다
 
-It supports:
+지원 기능:
 
-- exact and approximate nearest neighbor search
-- L2 distance, inner product, and cosine distance
+- 정확한 최근접 이웃 검색 및 근사 최근접 이웃 검색
+- L2 distance, inner product, cosine distance
 
-This notebook shows how to use a retriever based on Kinetica vector store (`Kinetica`).
+이 노트북은 Kinetica vector store(`Kinetica`)를 기반으로 한 retriever 사용 방법을 보여줍니다.
 
 ```python
 # Please ensure that this connector is installed in your working environment.
 pip install gpudb==7.2.0.9
 ```
 
-We want to use `OpenAIEmbeddings` so we have to get the OpenAI API Key.
+`OpenAIEmbeddings`를 사용하려면 OpenAI API Key를 가져와야 합니다.
 
 ```python
 import getpass
@@ -57,7 +57,7 @@ def create_config() -> KineticaSettings:
     return KineticaSettings(host=HOST, username=USERNAME, password=PASSWORD)
 ```
 
-## Create Retriever from vector store
+## vector store에서 Retriever 생성하기
 
 ```python
 loader = TextLoader("../../how_to/state_of_the_union.txt")
@@ -84,7 +84,7 @@ db = Kinetica.from_documents(
 retriever = db.as_retriever(search_kwargs={"k": 2})
 ```
 
-## Search with retriever
+## retriever로 검색하기
 
 ```python
 result = retriever.get_relevant_documents(

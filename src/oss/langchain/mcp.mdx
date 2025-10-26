@@ -5,16 +5,16 @@ title: Model Context Protocol (MCP)
 
 
 :::python
-[Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) is an open protocol that standardizes how applications provide tools and context to LLMs. LangChain agents can use tools defined on MCP servers using the [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchain-mcp-adapters) library.
+[Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction)은 애플리케이션이 LLM에 도구와 컨텍스트를 제공하는 방법을 표준화하는 개방형 프로토콜입니다. LangChain agent는 [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchain-mcp-adapters) 라이브러리를 사용하여 MCP server에 정의된 도구를 사용할 수 있습니다.
 :::
 :::js
-[Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) is an open protocol that standardizes how applications provide tools and context to LLMs. LangChain agents can use tools defined on MCP servers using the [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchainjs/tree/main/libs/langchain-mcp-adapters/adapters) library.
+[Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction)은 애플리케이션이 LLM에 도구와 컨텍스트를 제공하는 방법을 표준화하는 개방형 프로토콜입니다. LangChain agent는 [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchainjs/tree/main/libs/langchain-mcp-adapters/adapters) 라이브러리를 사용하여 MCP server에 정의된 도구를 사용할 수 있습니다.
 :::
 
-## Install
+## 설치
 
 :::python
-Install the `langchain-mcp-adapters` library to use MCP tools in LangGraph:
+LangGraph에서 MCP 도구를 사용하려면 `langchain-mcp-adapters` 라이브러리를 설치하세요:
 
 <CodeGroup>
 ```bash pip
@@ -28,7 +28,7 @@ uv add langchain-mcp-adapters
 :::
 
 :::js
-Install the `@langchain/mcp-adapters` library to use MCP tools in LangGraph:
+LangGraph에서 MCP 도구를 사용하려면 `@langchain/mcp-adapters` 라이브러리를 설치하세요:
 
 <CodeGroup>
 ```bash npm
@@ -49,18 +49,18 @@ bun add @langchain/mcp-adapters
 </CodeGroup>
 :::
 
-## Transport types
+## Transport 타입
 
-MCP supports different transport mechanisms for client-server communication:
+MCP는 클라이언트-서버 통신을 위한 다양한 transport 메커니즘을 지원합니다:
 
-- stdio: Client launches server as a subprocess and communicates via standard input/output. Best for local tools and simple setups.
-- Streamable HTTP: Server runs as an independent process handling HTTP requests. Supports remote connections and multiple clients.
-- Server-Sent Events (SSE): a variant of streamable HTTP optimized for real-time streaming communication.
+- stdio: 클라이언트가 서버를 하위 프로세스로 실행하고 표준 입력/출력을 통해 통신합니다. 로컬 도구와 간단한 설정에 가장 적합합니다.
+- Streamable HTTP: 서버가 HTTP 요청을 처리하는 독립적인 프로세스로 실행됩니다. 원격 연결과 여러 클라이언트를 지원합니다.
+- Server-Sent Events (SSE): 실시간 스트리밍 통신에 최적화된 streamable HTTP의 변형입니다.
 
-## Use MCP tools
+## MCP 도구 사용
 
 :::python
-`langchain-mcp-adapters` enables agents to use tools defined across one or more MCP server.
+`langchain-mcp-adapters`는 agent가 하나 이상의 MCP server에 정의된 도구를 사용할 수 있게 합니다.
 
 ```python Accessing multiple MCP servers icon="server"
 from langchain_mcp_adapters.client import MultiServerMCPClient  # [!code highlight]
@@ -99,7 +99,7 @@ weather_response = await agent.ainvoke(
 :::
 
 :::js
-`@langchain/mcp-adapters` enables agents to use tools defined across one or more MCP server.
+`@langchain/mcp-adapters`는 agent가 하나 이상의 MCP server에 정의된 도구를 사용할 수 있게 합니다.
 
 ```ts Accessing multiple MCP servers icon="server"
 import { MultiServerMCPClient } from "@langchain/mcp-adapters";  // [!code highlight]
@@ -137,13 +137,13 @@ const weatherResponse = await agent.invoke({
 :::
 
 <Note>
-    `MultiServerMCPClient` is **stateless by default**. Each tool invocation creates a fresh MCP `ClientSession`, executes the tool, and then cleans up.
+    `MultiServerMCPClient`는 **기본적으로 stateless입니다**. 각 도구 호출은 새로운 MCP `ClientSession`을 생성하고, 도구를 실행한 다음 정리합니다.
 </Note>
 
-## Custom MCP servers
+## 커스텀 MCP server
 
 :::python
-To create your own MCP servers, you can use the `mcp` library. This library provides a simple way to define [tools](https://modelcontextprotocol.io/docs/learn/server-concepts#tools-ai-actions) and run them as servers.
+자체 MCP server를 생성하려면 `mcp` 라이브러리를 사용할 수 있습니다. 이 라이브러리는 [도구](https://modelcontextprotocol.io/docs/learn/server-concepts#tools-ai-actions)를 정의하고 server로 실행하는 간단한 방법을 제공합니다.
 
 <CodeGroup>
 ```bash pip
@@ -157,7 +157,7 @@ uv add mcp
 :::
 
 :::js
-To create your own MCP servers, you can use the `@modelcontextprotocol/sdk` library. This library provides a simple way to define [tools](https://modelcontextprotocol.io/docs/learn/server-concepts#tools-ai-actions) and run them as servers.
+자체 MCP server를 생성하려면 `@modelcontextprotocol/sdk` 라이브러리를 사용할 수 있습니다. 이 라이브러리는 [도구](https://modelcontextprotocol.io/docs/learn/server-concepts#tools-ai-actions)를 정의하고 server로 실행하는 간단한 방법을 제공합니다.
 
 <CodeGroup>
 ```bash npm
@@ -178,7 +178,7 @@ bun add @modelcontextprotocol/sdk
 </CodeGroup>
 :::
 
-Use the following reference implementations to test your agent with MCP tool servers.
+다음 참조 구현을 사용하여 MCP 도구 server로 agent를 테스트하세요.
 
 :::python
 ```python title="Math server (stdio transport)" icon="floppy-disk"
@@ -392,9 +392,9 @@ app.listen(PORT, () => {
 ```
 :::
 
-## Stateful tool usage
+## Stateful 도구 사용
 
-For stateful servers that maintain context between tool calls, use `client.session()` to create a persistent `ClientSession`.
+도구 호출 간에 컨텍스트를 유지하는 stateful server의 경우, `client.session()`을 사용하여 영구적인 `ClientSession`을 생성하세요.
 
 :::python
 ```python Using MCP ClientSession for stateful tool usage
@@ -416,10 +416,10 @@ const tools = await loadMCPTools(session);
 ```
 :::
 
-## Additional resources
+## 추가 리소스
 
-* [MCP documentation](https://modelcontextprotocol.io/introduction)
-* [MCP Transport documentation](https://modelcontextprotocol.io/docs/concepts/transports)
+* [MCP 문서](https://modelcontextprotocol.io/introduction)
+* [MCP Transport 문서](https://modelcontextprotocol.io/docs/concepts/transports)
 :::python
 * [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchain-mcp-adapters)
 :::

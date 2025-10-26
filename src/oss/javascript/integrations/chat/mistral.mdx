@@ -2,9 +2,9 @@
 title: ChatMistralAI
 ---
 
-[Mistral AI](https://mistral.ai/) is a platform that offers hosting for their powerful [open source models](https://docs.mistral.ai/getting-started/models/).
+[Mistral AI](https://mistral.ai/)는 강력한 [오픈 소스 모델](https://docs.mistral.ai/getting-started/models/)을 호스팅하는 플랫폼입니다.
 
-This will help you getting started with ChatMistralAI [chat models](/oss/langchain/models). For detailed documentation of all ChatMistralAI features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_mistralai.ChatMistralAI.html).
+이 문서는 ChatMistralAI [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 ChatMistralAI 기능과 설정에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_mistralai.ChatMistralAI.html)를 참조하세요.
 
 ## Overview
 
@@ -16,7 +16,7 @@ This will help you getting started with ChatMistralAI [chat models](/oss/langcha
 
 ### Model features
 
-See the links in the table headers below for guides on how to use specific features.
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
@@ -24,17 +24,17 @@ See the links in the table headers below for guides on how to use specific featu
 
 ## Setup
 
-To access Mistral AI models you'll need to create a Mistral AI account, get an API key, and install the `@langchain/mistralai` integration package.
+Mistral AI 모델에 액세스하려면 Mistral AI 계정을 생성하고 API key를 발급받은 후 `@langchain/mistralai` integration package를 설치해야 합니다.
 
 ### Credentials
 
-Head [here](https://console.mistral.ai/) to sign up to Mistral AI and generate an API key. Once you've done this set the `MISTRAL_API_KEY` environment variable:
+[여기](https://console.mistral.ai/)로 이동하여 Mistral AI에 가입하고 API key를 생성하세요. 완료한 후 `MISTRAL_API_KEY` environment variable을 설정하세요:
 
 ```bash
 export MISTRAL_API_KEY="your-api-key"
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```bash
 # export LANGSMITH_TRACING="true"
@@ -43,7 +43,7 @@ If you want to get automated tracing of your model calls you can also set your [
 
 ### Installation
 
-The LangChain ChatMistralAI integration lives in the `@langchain/mistralai` package:
+LangChain ChatMistralAI integration은 `@langchain/mistralai` package에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -59,7 +59,7 @@ pnpm add @langchain/mistralai @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```typescript
 import { ChatMistralAI } from "@langchain/mistralai"
@@ -74,11 +74,11 @@ const llm = new ChatMistralAI({
 
 ## Invocation
 
-When sending chat messages to mistral, there are a few requirements to follow:
+mistral에 chat message를 보낼 때 따라야 할 몇 가지 요구사항이 있습니다:
 
-- The first message can _*not*_ be an assistant (ai) message.
-- Messages _*must*_ alternate between user and assistant (ai) messages.
-- Messages can _*not*_ end with an assistant (ai) or system message.
+- 첫 번째 메시지는 assistant (ai) message가 _*될 수 없습니다*_.
+- Message는 user와 assistant (ai) message 간에 _*교대로*_ 나타나야 합니다.
+- Message는 assistant (ai) 또는 system message로 _*끝날 수 없습니다*_.
 
 ```typescript
 const aiMsg = await llm.invoke([
@@ -123,9 +123,9 @@ J'adore la programmation.
 
 ## Tool calling
 
-Mistral's API supports [tool calling](/oss/langchain/tools) for a subset of their models. You can see which models support tool calling [on this page](https://docs.mistral.ai/capabilities/function_calling/).
+Mistral의 API는 일부 모델에 대해 [tool calling](/oss/langchain/tools)을 지원합니다. tool calling을 지원하는 모델은 [이 페이지](https://docs.mistral.ai/capabilities/function_calling/)에서 확인할 수 있습니다.
 
-The examples below demonstrates how to use it:
+아래 예제는 사용 방법을 보여줍니다:
 
 ```typescript
 import { ChatMistralAI } from "@langchain/mistralai";
@@ -185,7 +185,7 @@ console.log(calcToolRes.tool_calls);
 
 ## Hooks
 
-Mistral AI supports custom hooks for three events: beforeRequest, requestError, and reponse. Examples of the function signature for each hook type can be seen below:
+Mistral AI는 세 가지 이벤트에 대한 custom hook을 지원합니다: beforeRequest, requestError, reponse. 각 hook type에 대한 function signature 예제는 아래에서 확인할 수 있습니다:
 
 ```typescript
 const beforeRequestHook = (req: Request): Request | void | Promise<Request | void> => {
@@ -201,7 +201,7 @@ const responseHook = (res: Response, req: Request): void | Promise<void> => {
 };
 ```
 
-To add these hooks to the chat model, either pass them as arguments and they are automatically added:
+이러한 hook을 chat model에 추가하려면 argument로 전달하면 자동으로 추가됩니다:
 
 ```typescript
 import { ChatMistralAI } from "@langchain/mistralai"
@@ -217,7 +217,7 @@ const modelWithHooks = new ChatMistralAI({
 });
 ```
 
-Or assign and add them manually after instantiation:
+또는 인스턴스화 후 수동으로 할당하고 추가할 수 있습니다:
 
 ```typescript
 import { ChatMistralAI } from "@langchain/mistralai"
@@ -236,9 +236,9 @@ model.responseHooks = [ ...model.responseHooks, responseHook ];
 model.addAllHooksToHttpClient();
 ```
 
-The method addAllHooksToHttpClient clears all currently added hooks before assigning the entire updated hook lists to avoid hook duplication.
+addAllHooksToHttpClient method는 hook 중복을 방지하기 위해 전체 업데이트된 hook list를 할당하기 전에 현재 추가된 모든 hook을 지웁니다.
 
-Hooks can be removed one at a time, or all hooks can be cleared from the model at once.
+Hook은 한 번에 하나씩 제거하거나 모델에서 모든 hook을 한 번에 지울 수 있습니다.
 
 ```typescript
 model.removeHookFromHttpClient(beforeRequestHook);
@@ -248,4 +248,4 @@ model.removeAllHooksFromHttpClient();
 
 ## API reference
 
-For detailed documentation of all ChatMistralAI features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_mistralai.ChatMistralAI.html).
+모든 ChatMistralAI 기능과 설정에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_mistralai.ChatMistralAI.html)를 참조하세요.

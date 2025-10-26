@@ -2,9 +2,9 @@
 title: TavilySearchAPI
 ---
 
->[Tavily's Search API](https://tavily.com) is a search engine built specifically for AI agents (LLMs), delivering real-time, accurate, and factual results at speed.
+>[Tavily's Search API](https://tavily.com)는 AI 에이전트(LLM)를 위해 특별히 구축된 검색 엔진으로, 실시간으로 정확하고 사실적인 결과를 빠르게 제공합니다.
 
-We can use this as a [retriever](/oss/langchain/retrieval). It will show functionality specific to this integration. After going through, it may be useful to explore [relevant use-case pages](/oss/langchain/rag) to learn how to use this vectorstore as part of a larger chain.
+이를 [retriever](/oss/langchain/retrieval)로 사용할 수 있습니다. 이 통합에 특화된 기능을 보여드리겠습니다. 진행한 후에는 [관련 사용 사례 페이지](/oss/langchain/rag)를 탐색하여 이 vectorstore를 더 큰 chain의 일부로 사용하는 방법을 배우는 것이 유용할 수 있습니다.
 
 ### Integration details
 
@@ -12,7 +12,7 @@ We can use this as a [retriever](/oss/langchain/retrieval). It will show functio
 
 ## Setup
 
-If you want to get automated tracing from individual queries, you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+개별 쿼리에서 자동화된 추적을 원하는 경우, 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -21,13 +21,13 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-The integration lives in the `langchain-community` package. We also need to install the `tavily-python` package itself.
+이 통합은 `langchain-community` 패키지에 포함되어 있습니다. 또한 `tavily-python` 패키지 자체도 설치해야 합니다.
 
 ```python
 pip install -qU langchain-community tavily-python
 ```
 
-We also need to set our Tavily API key.
+Tavily API key도 설정해야 합니다.
 
 ```python
 import getpass
@@ -38,7 +38,7 @@ os.environ["TAVILY_API_KEY"] = getpass.getpass()
 
 ## Instantiation
 
-Now we can instantiate our retriever:
+이제 retriever를 인스턴스화할 수 있습니다:
 
 ```python
 from langchain_community.retrievers import TavilySearchAPIRetriever
@@ -62,7 +62,7 @@ retriever.invoke(query)
 
 ## Use within a chain
 
-We can easily combine this retriever in to a chain.
+이 retriever를 chain에 쉽게 결합할 수 있습니다.
 
 ```python
 from langchain_core.output_parsers import StrOutputParser
@@ -103,4 +103,4 @@ chain.invoke("how many units did bretch of the wild sell in 2020")
 
 ## API reference
 
-For detailed documentation of all `TavilySearchAPIRetriever` features and configurations head to the [API reference](https://python.langchain.com/api_reference/community/retrievers/langchain_community.retrievers.tavily_search_api.TavilySearchAPIRetriever.html).
+모든 `TavilySearchAPIRetriever` 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/retrievers/langchain_community.retrievers.tavily_search_api.TavilySearchAPIRetriever.html)를 참조하세요.

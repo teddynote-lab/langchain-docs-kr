@@ -2,12 +2,12 @@
 title: Infinity Reranker
 ---
 
-`Infinity` is a high-throughput, low-latency REST API for serving text-embeddings, reranking models and clip.
-For more info, please visit [here](https://github.com/michaelfeil/infinity?tab=readme-ov-file#reranking).
+`Infinity`는 text-embedding, reranking model 및 clip을 제공하기 위한 고처리량, 저지연 REST API입니다.
+자세한 정보는 [여기](https://github.com/michaelfeil/infinity?tab=readme-ov-file#reranking)를 참조하세요.
 
-This notebook shows how to use Infinity Reranker for document compression and retrieval.
+이 노트북은 문서 압축 및 검색을 위해 Infinity Reranker를 사용하는 방법을 보여줍니다.
 
-You can launch an Infinity Server with a reranker model in CLI:
+CLI에서 reranker model을 사용하여 Infinity Server를 실행할 수 있습니다:
 
 ```bash
 pip install "infinity-emb[all]"
@@ -36,9 +36,9 @@ def pretty_print_docs(docs):
     )
 ```
 
-## Set up the base vector store retriever
+## 기본 vector store retriever 설정
 
-Let's start by initializing a simple vector store retriever and storing the 2023 State of the Union speech (in chunks). We can set up the retriever to retrieve a high number (20) of docs.
+간단한 vector store retriever를 초기화하고 2023년 국정연설(청크 단위)을 저장하는 것부터 시작하겠습니다. retriever가 많은 수(20개)의 문서를 검색하도록 설정할 수 있습니다.
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -274,9 +274,9 @@ My fellow Americans—tonight , we have gathered in a sacred space—the citadel
 In this Capitol, generation after generation, Americans have debated great questions amid great strife, and have done great things.
 ```
 
-## Reranking with InfinityRerank
+## InfinityRerank를 사용한 Reranking
 
-Now let's wrap our base retriever with a `ContextualCompressionRetriever`. We'll use the `InfinityRerank` to rerank the returned results.
+이제 기본 retriever를 `ContextualCompressionRetriever`로 래핑하겠습니다. `InfinityRerank`를 사용하여 반환된 결과를 rerank합니다.
 
 ```python
 from infinity_client import Client

@@ -2,25 +2,25 @@
 title: Upstash Vector
 ---
 
-> [Upstash Vector](https://upstash.com/docs/vector/overall/whatisvector) is a serverless vector database designed for working with vector embeddings.
+> [Upstash Vector](https://upstash.com/docs/vector/overall/whatisvector)는 vector embedding 작업을 위해 설계된 서버리스 vector 데이터베이스입니다.
 >
-> The vector langchain integration is a wrapper around the [upstash-vector](https://github.com/upstash/vector-py) package.
+> vector langchain integration은 [upstash-vector](https://github.com/upstash/vector-py) 패키지를 감싸는 wrapper입니다.
 >
-> The python package uses the [vector rest api](https://upstash.com/docs/vector/api/get-started) behind the scenes.
+> python 패키지는 내부적으로 [vector rest api](https://upstash.com/docs/vector/api/get-started)를 사용합니다.
 
 ## Installation
 
-Create a free vector database from [upstash console](https://console.upstash.com/vector) with the desired dimensions and distance metric.
+[upstash console](https://console.upstash.com/vector)에서 원하는 차원과 거리 메트릭으로 무료 vector 데이터베이스를 생성하세요.
 
-You can then create an `UpstashVectorStore` instance by:
+그런 다음 다음과 같은 방법으로 `UpstashVectorStore` 인스턴스를 생성할 수 있습니다:
 
-- Providing the environment variables `UPSTASH_VECTOR_URL` and `UPSTASH_VECTOR_TOKEN`
+- 환경 변수 `UPSTASH_VECTOR_URL`과 `UPSTASH_VECTOR_TOKEN` 제공
 
-- Giving them as parameters to the constructor
+- 생성자에 매개변수로 전달
 
-- Passing an Upstash Vector `Index` instance to the constructor
+- Upstash Vector `Index` 인스턴스를 생성자에 전달
 
-Also, an @[`Embeddings`] instance is required to turn given texts into embeddings. Here we use `OpenAIEmbeddings` as an example
+또한, 주어진 텍스트를 embedding으로 변환하기 위해 @[`Embeddings`] 인스턴스가 필요합니다. 여기서는 예시로 `OpenAIEmbeddings`를 사용합니다
 
 ```python
 pip install langchain-openai langchain langchain-community upstash-vector
@@ -43,17 +43,17 @@ embeddings = OpenAIEmbeddings()
 store = UpstashVectorStore(embedding=embeddings)
 ```
 
-An alternative way of creating `UpstashVectorStore` is to [create an Upstash Vector index by selecting a model](https://upstash.com/docs/vector/features/embeddingmodels#using-a-model) and passing `embedding=True`. In this configuration, documents or queries will be sent to Upstash as text and embedded there.
+`UpstashVectorStore`를 생성하는 다른 방법은 [모델을 선택하여 Upstash Vector index를 생성](https://upstash.com/docs/vector/features/embeddingmodels#using-a-model)하고 `embedding=True`를 전달하는 것입니다. 이 구성에서는 문서나 쿼리가 텍스트로 Upstash에 전송되고 그곳에서 embedding됩니다.
 
 ```python
 store = UpstashVectorStore(embedding=True)
 ```
 
-If you are interested in trying out this approach, you can update the initialization of `store` like above and run the rest of the tutorial.
+이 방법을 시도해보고 싶다면, 위와 같이 `store`의 초기화를 업데이트하고 나머지 튜토리얼을 실행할 수 있습니다.
 
 ## Load documents
 
-Load an example text file and split it into chunks which can be turned into vector embeddings.
+예제 텍스트 파일을 로드하고 vector embedding으로 변환할 수 있는 청크로 분할합니다.
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -75,7 +75,7 @@ docs[:3]
 
 ## Inserting documents
 
-The vectorstore embeds text chunks using the embedding object and batch inserts them into the database. This returns an id array of the inserted vectors.
+vectorstore는 embedding 객체를 사용하여 텍스트 청크를 embedding하고 데이터베이스에 일괄 삽입합니다. 이는 삽입된 vector의 id 배열을 반환합니다.
 
 ```python
 inserted_vectors = store.add_documents(docs)
@@ -93,10 +93,10 @@ inserted_vectors[:5]
 
 ## Querying
 
-The database can be queried using a vector or a text prompt.
-If a text prompt is used, it's first converted into embedding and then queried.
+데이터베이스는 vector 또는 텍스트 프롬프트를 사용하여 쿼리할 수 있습니다.
+텍스트 프롬프트를 사용하는 경우, 먼저 embedding으로 변환된 후 쿼리됩니다.
 
-The `k` parameter specifies how many results to return from the query.
+`k` 매개변수는 쿼리에서 반환할 결과의 수를 지정합니다.
 
 ```python
 result = store.similarity_search("technology", k=5)
@@ -113,9 +113,9 @@ result
 
 ## Querying with score
 
-The score of the query can be included for every result.
+쿼리의 score를 모든 결과에 포함할 수 있습니다.
 
-> The score returned in the query requests is a normalized value between 0 and 1, where 1 indicates the highest similarity and 0 the lowest regardless of the similarity function used. For more information look at the [docs](https://upstash.com/docs/vector/overall/features#vector-similarity-functions).
+> 쿼리 요청에서 반환되는 score는 0과 1 사이의 정규화된 값으로, 사용된 유사도 함수에 관계없이 1은 가장 높은 유사도를, 0은 가장 낮은 유사도를 나타냅니다. 자세한 내용은 [문서](https://upstash.com/docs/vector/overall/features#vector-similarity-functions)를 참조하세요.
 
 ```python
 result = store.similarity_search_with_score("technology", k=5)
@@ -134,7 +134,7 @@ for doc, score in result:
 
 ## Namespaces
 
-Namespaces can be used to separate different types of documents. This can increase the efficiency of the queries since the search space is reduced. When no namespace is provided, the default namespace is used.
+Namespace는 다양한 유형의 문서를 분리하는 데 사용할 수 있습니다. 이는 검색 공간이 줄어들기 때문에 쿼리의 효율성을 높일 수 있습니다. namespace가 제공되지 않으면 기본 namespace가 사용됩니다.
 
 ```python
 store_books = UpstashVectorStore(embedding=embeddings, namespace="books")
@@ -186,7 +186,7 @@ result
 
 ## Metadata Filtering
 
-Metadata can be used to filter the results of a query. You can refer to the [docs](https://upstash.com/docs/vector/features/filtering) to see more complex ways of filtering.
+Metadata는 쿼리 결과를 필터링하는 데 사용할 수 있습니다. 더 복잡한 필터링 방법을 보려면 [문서](https://upstash.com/docs/vector/features/filtering)를 참조하세요.
 
 ```python
 result = store_books.similarity_search("dystopia", k=3, filter="year < 2000")
@@ -201,9 +201,9 @@ result
 
 ## Getting info about vector database
 
-You can get information about your database like the distance metric dimension using the info function.
+info 함수를 사용하여 거리 메트릭 차원과 같은 데이터베이스에 대한 정보를 얻을 수 있습니다.
 
-> When an insert happens, the database an indexing takes place. While this is happening new vectors can not be queried. `pendingVectorCount` represents the number of vector that are currently being indexed.
+> 삽입이 발생하면 데이터베이스에서 인덱싱이 수행됩니다. 이 작업이 진행되는 동안 새로운 vector는 쿼리할 수 없습니다. `pendingVectorCount`는 현재 인덱싱 중인 vector의 수를 나타냅니다.
 
 ```python
 store.info()
@@ -215,7 +215,7 @@ InfoResult(vector_count=49, pending_vector_count=0, index_size=2978163, dimensio
 
 ## Deleting vectors
 
-Vectors can be deleted by their ids
+Vector는 id로 삭제할 수 있습니다
 
 ```python
 store.delete(inserted_vectors)
@@ -223,7 +223,7 @@ store.delete(inserted_vectors)
 
 ## Clearing the vector database
 
-This will clear the vector database
+이것은 vector 데이터베이스를 지웁니다
 
 ```python
 store.delete(delete_all=True)

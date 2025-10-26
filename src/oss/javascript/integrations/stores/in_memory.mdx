@@ -2,9 +2,9 @@
 title: InMemoryStore
 ---
 
-This will help you get started with [InMemoryStore](/oss/integrations/stores). For detailed documentation of all InMemoryStore features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_core.stores.InMemoryStore.html).
+이 문서는 [InMemoryStore](/oss/integrations/stores) 시작하기를 도와드립니다. 모든 InMemoryStore 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_core.stores.InMemoryStore.html)를 참조하세요.
 
-The `InMemoryStore` allows for a generic type to be assigned to the values in the store. We'll assign type `BaseMessage` as the type of our values, keeping with the theme of a chat history store.
+`InMemoryStore`는 store의 값에 제네릭 타입을 할당할 수 있습니다. 채팅 기록 store의 테마를 유지하면서 값의 타입으로 `BaseMessage` 타입을 할당하겠습니다.
 
 ## Overview
 
@@ -18,7 +18,7 @@ The `InMemoryStore` allows for a generic type to be assigned to the values in th
 
 ### Installation
 
-The LangChain InMemoryStore integration lives in the `@langchain/core` package:
+LangChain InMemoryStore integration은 `@langchain/core` package에 포함되어 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -34,7 +34,7 @@ pnpm add @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our byte store:
+이제 byte store를 인스턴스화할 수 있습니다:
 
 ```typescript
 import { InMemoryStore } from "@langchain/core/stores"
@@ -45,7 +45,7 @@ const kvStore = new InMemoryStore<BaseMessage>();
 
 ## Usage
 
-You can set data under keys like this using the `mset` method:
+`mset` method를 사용하여 다음과 같이 key 아래에 데이터를 설정할 수 있습니다:
 
 ```typescript
 import { AIMessage, HumanMessage } from "@langchain/core/messages";
@@ -82,7 +82,7 @@ await kvStore.mget(
 ]
 ```
 
-And you can delete data using the `mdelete` method:
+그리고 `mdelete` method를 사용하여 데이터를 삭제할 수 있습니다:
 
 ```typescript
 await kvStore.mdelete(
@@ -106,7 +106,7 @@ await kvStore.mget(
 
 ## Yielding values
 
-If you want to get back all the keys you can call the `yieldKeys` method. Optionally, you can pass a key prefix to only get back keys which match that prefix.
+모든 key를 가져오려면 `yieldKeys` method를 호출할 수 있습니다. 선택적으로 key prefix를 전달하여 해당 prefix와 일치하는 key만 가져올 수 있습니다.
 
 ```typescript
 import { InMemoryStore } from "@langchain/core/stores"
@@ -136,4 +136,4 @@ console.log(yieldedKeys);
 
 ## API reference
 
-For detailed documentation of all InMemoryStore features and configurations, head to the [API reference](https://api.js.langchain.com/classes/langchain_core.stores.InMemoryStore.html)
+모든 InMemoryStore 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_core.stores.InMemoryStore.html)를 참조하세요

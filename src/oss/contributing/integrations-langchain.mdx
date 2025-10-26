@@ -1,91 +1,90 @@
 ---
-title: Contributing integrations
-sidebarTitle: Guide
+title: Integration 기여하기
+sidebarTitle: 가이드
 ---
 
-**Integrations are a core component of LangChain.**
+**Integration은 LangChain의 핵심 구성 요소입니다.**
 
-LangChain provides standard interfaces for several different components (language models, vector stores, etc) that are crucial when building LLM applications. Contributing an integration helps expand LangChain's ecosystem and makes your service discoverable to millions of developers.
+LangChain은 LLM 애플리케이션을 구축할 때 중요한 여러 구성 요소(language model, vector store 등)에 대한 표준 interface를 제공합니다. Integration을 기여하면 LangChain의 생태계를 확장하고 수백만 명의 개발자에게 여러분의 서비스를 알릴 수 있습니다.
 
-## Why contribute an integration to LangChain?
+## 왜 LangChain에 integration을 기여해야 하나요?
 
-<Card title="Discoverability" icon="magnifying-glass">
-    LangChain is the most used framework for building LLM applications, with over 20 million monthly downloads.
+<Card title="발견 가능성" icon="magnifying-glass">
+    LangChain은 월 2천만 건 이상의 다운로드를 기록하며 LLM 애플리케이션 구축을 위해 가장 많이 사용되는 프레임워크입니다.
 </Card>
 
-<Card title="Interoperability" icon="arrows-rotate">
-    LangChain components expose a standard interface, allowing developers to easily swap them for each other. If you implement a LangChain integration, any developer using a different component will easily be able to swap yours in.
+<Card title="상호 운용성" icon="arrows-rotate">
+    LangChain component는 표준 interface를 제공하여 개발자가 쉽게 서로 교체할 수 있습니다. LangChain integration을 구현하면 다른 component를 사용하는 모든 개발자가 쉽게 여러분의 것으로 교체할 수 있습니다.
 </Card>
 
-<Card title="Best Practices" icon="star">
-    Through their standard interface, LangChain components encourage and facilitate best practices (streaming, async, etc.) that improve developer experience and application performance.
+<Card title="모범 사례" icon="star">
+    표준 interface를 통해 LangChain component는 개발자 경험과 애플리케이션 성능을 향상시키는 모범 사례(streaming, async 등)를 장려하고 촉진합니다.
 </Card>
 
-## Components to integrate
+## 통합할 component
 
-While any component can be integrated into LangChain, there are specific types of integrations we encourage more:
+모든 component를 LangChain에 통합할 수 있지만, 특히 권장하는 특정 유형의 integration이 있습니다:
 
-**Integrate these ✅**:
-- [**Chat Models**](/oss/integrations/chat): Most actively used component type
-- [**Tools/Toolkits**](/oss/integrations/tools): Enable agent capabilities
-- [**Retrievers**](/oss/integrations/retrievers): Core to RAG applications
-- [**Embedding Models**](/oss/integrations/text_embedding): Foundation for vector operations
-- [**Vector Stores**](/oss/integrations/vectorstores): Essential for semantic search
+**이것들을 통합하세요 ✅**:
+- [**Chat Models**](/oss/integrations/chat): 가장 활발하게 사용되는 component 유형
+- [**Tools/Toolkits**](/oss/integrations/tools): Agent 기능 활성화
+- [**Retrievers**](/oss/integrations/retrievers): RAG 애플리케이션의 핵심
+- [**Embedding Models**](/oss/integrations/text_embedding): Vector 연산의 기초
+- [**Vector Stores**](/oss/integrations/vectorstores): 의미론적 검색에 필수적
 
-**Not these ❌**:
-- **LLMs (Text-Completion Models)**: Deprecated in favor of [Chat Models](/oss/integrations/chat)
-- [**Document Loaders**](/oss/integrations/document_loaders): High maintenance burden
-- [**Key-Value Stores**](/oss/integrations/stores): Limited usage
-- **Document Transformers**: Niche use cases
-- **Model Caches**: Infrastructure concerns
-- **Graphs**: Complex abstractions
-- **Message Histories**: Storage abstractions
-- **Callbacks**: System-level components
-- **Chat Loaders**: Limited demand
-- **Adapters**: Edge case utilities
+**이것들은 안 됩니다 ❌**:
+- **LLMs (Text-Completion Models)**: [Chat Models](/oss/integrations/chat)를 위해 더 이상 사용되지 않음
+- [**Document Loaders**](/oss/integrations/document_loaders): 높은 유지보수 부담
+- [**Key-Value Stores**](/oss/integrations/stores): 제한적인 사용
+- **Document Transformers**: 틈새 사용 사례
+- **Model Caches**: 인프라 관련 문제
+- **Graphs**: 복잡한 추상화
+- **Message Histories**: Storage 추상화
+- **Callbacks**: 시스템 레벨 component
+- **Chat Loaders**: 제한적인 수요
+- **Adapters**: 특수 사례 유틸리티
 
-## How to contribute an integration
+## Integration을 기여하는 방법
 
 <Steps>
-    <Step title="Confirm eligibility">
-        Verify that your integration is in the list of [encouraged components](#components-to-integrate) we are currently accepting.
+    <Step title="자격 확인">
+        현재 수락 중인 [권장 component](#components-to-integrate) 목록에 여러분의 integration이 있는지 확인하세요.
     </Step>
 
-    <Step title="Implement your package">
-        <Card title="How to implement a LangChain integration" icon="link" href="/oss/contributing/implement-langchain" arrow />
+    <Step title="패키지 구현">
+        <Card title="LangChain integration 구현 방법" icon="link" href="/oss/contributing/implement-langchain" arrow />
     </Step>
 
-    <Step title="Pass standard tests">
-        If applicable, implement support for LangChain's [standard test](/oss/contributing/standard-tests-langchain) suite for your integration and successfully run them.
+    <Step title="표준 테스트 통과">
+        해당되는 경우, integration에 대한 LangChain의 [표준 테스트](/oss/contributing/standard-tests-langchain) suite 지원을 구현하고 성공적으로 실행하세요.
     </Step>
 
-    <Step title="Publish integration">
-        <Card title="How to publish an integration" icon="upload" href="/oss/contributing/publish-langchain" arrow />
+    <Step title="Integration 게시">
+        <Card title="Integration 게시 방법" icon="upload" href="/oss/contributing/publish-langchain" arrow />
     </Step>
 
-    <Step title="Add documentation">
-        Open a PR to add documentation for your integration to the official LangChain docs.
+    <Step title="문서 추가">
+        공식 LangChain 문서에 integration 문서를 추가하기 위한 PR을 여세요.
 
-        <Accordion title="Integration documentation guide" icon="book">
-            An integration is only as useful as its documentation. To ensure a consistent experience for users, docs are required for all new integrations. We have a standard starting-point template for each type of integration for you to copy and modify.
+        <Accordion title="Integration 문서 가이드" icon="book">
+            Integration은 문서만큼만 유용합니다. 사용자에게 일관된 경험을 보장하기 위해 모든 새로운 integration에는 문서가 필요합니다. 복사하고 수정할 수 있도록 각 integration 유형에 대한 표준 시작점 template이 있습니다.
 
-            In a new PR to the LangChain [docs repo](https://github.com/langchain-ai/docs), create a new file in the relevant directory under `src/oss/python/integrations/<component_type>/integration_name.mdx` using the appropriate template file:
+            LangChain [docs repo](https://github.com/langchain-ai/docs)에 새 PR을 열어 적절한 template 파일을 사용하여 `src/oss/python/integrations/<component_type>/integration_name.mdx` 아래의 관련 디렉토리에 새 파일을 생성하세요:
 
             - [Chat models](https://github.com/langchain-ai/docs/blob/main/src/oss/python/integrations/chat/TEMPLATE.mdx)
             - [Tools and toolkits](https://github.com/langchain-ai/docs/blob/main/src/oss/python/integrations/tools/TEMPLATE.mdx)
             - [Retrievers](https://github.com/langchain-ai/docs/blob/main/src/oss/python/integrations/retrievers/TEMPLATE.mdx)
-            - Text splitters - Coming soon
-            - Embedding models - Coming soon
+            - Text splitters - 곧 제공 예정
+            - Embedding models - 곧 제공 예정
             - [Vector stores](https://github.com/langchain-ai/docs/blob/main/src/oss/python/integrations/vectorstores/TEMPLATE.mdx)
-            - Document loaders - Coming soon
-            - Key-value stores - Coming soon
+            - Document loaders - 곧 제공 예정
+            - Key-value stores - 곧 제공 예정
 
-            For reference docs, please open an issue on the repo so that a maintainer can add them.
+            Reference 문서의 경우, maintainer가 추가할 수 있도록 repo에 issue를 여세요.
         </Accordion>
     </Step>
 
-    <Step title="Co-marketing" icon="megaphone">
-        (Optional) Engage with the LangChain team for joint [co-marketing](/oss/contributing/comarketing).
+    <Step title="공동 마케팅" icon="megaphone">
+        (선택 사항) LangChain 팀과 협력하여 공동 [co-marketing](/oss/contributing/comarketing)을 진행하세요.
     </Step>
 </Steps>
-

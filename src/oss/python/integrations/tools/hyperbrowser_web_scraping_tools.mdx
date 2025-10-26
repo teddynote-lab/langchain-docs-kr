@@ -1,37 +1,37 @@
 ---
-title: Hyperbrowser Web Scraping Tools
+title: Hyperbrowser 웹 스크래핑 도구
 ---
 
-[Hyperbrowser](https://hyperbrowser.ai) is a platform for running and scaling headless browsers. It lets you launch and manage browser sessions at scale and provides easy to use solutions for any webscraping needs, such as scraping a single page or crawling an entire site.
+[Hyperbrowser](https://hyperbrowser.ai)는 headless 브라우저를 실행하고 확장하기 위한 플랫폼입니다. 대규모로 브라우저 세션을 시작하고 관리할 수 있으며, 단일 페이지 스크래핑이나 전체 사이트 크롤링과 같은 모든 웹 스크래핑 요구사항에 대해 사용하기 쉬운 솔루션을 제공합니다.
 
-Key Features:
+주요 기능:
 
-- Instant Scalability - Spin up hundreds of browser sessions in seconds without infrastructure headaches
-- Simple Integration - Works seamlessly with popular tools like Puppeteer and Playwright
-- Powerful APIs - Easy to use APIs for scraping/crawling any site, and much more
-- Bypass Anti-Bot Measures - Built-in stealth mode, ad blocking, automatic CAPTCHA solving, and rotating proxies
+- 즉각적인 확장성 - 인프라 문제 없이 수백 개의 브라우저 세션을 몇 초 만에 시작
+- 간편한 통합 - Puppeteer 및 Playwright와 같은 인기 있는 도구와 원활하게 작동
+- 강력한 API - 모든 사이트를 스크래핑/크롤링하기 위한 사용하기 쉬운 API 등
+- 봇 방지 조치 우회 - 내장된 스텔스 모드, 광고 차단, 자동 CAPTCHA 해결 및 순환 프록시
 
-This guide provides a quick overview for getting started with Hyperbrowser web tools.
+이 가이드는 Hyperbrowser 웹 도구를 시작하기 위한 빠른 개요를 제공합니다.
 
-For more information about Hyperbrowser, please visit the [Hyperbrowser website](https://hyperbrowser.ai) or if you want to check out the docs, you can visit the [Hyperbrowser docs](https://docs.hyperbrowser.ai).
+Hyperbrowser에 대한 자세한 내용은 [Hyperbrowser 웹사이트](https://hyperbrowser.ai)를 방문하거나, 문서를 확인하려면 [Hyperbrowser 문서](https://docs.hyperbrowser.ai)를 방문하세요.
 
-## Key Capabilities
+## 주요 기능
 
 ### Scrape
 
-Hyperbrowser provides powerful scraping capabilities that allow you to extract data from any webpage. The scraping tool can convert web content into structured formats like markdown or HTML, making it easy to process and analyze the data.
+Hyperbrowser는 모든 웹페이지에서 데이터를 추출할 수 있는 강력한 스크래핑 기능을 제공합니다. 스크래핑 도구는 웹 콘텐츠를 markdown이나 HTML과 같은 구조화된 형식으로 변환하여 데이터를 쉽게 처리하고 분석할 수 있습니다.
 
 ### Crawl
 
-The crawling functionality enables you to navigate through multiple pages of a website automatically. You can set parameters like page limits to control how extensively the crawler explores the site, collecting data from each page it visits.
+크롤링 기능을 사용하면 웹사이트의 여러 페이지를 자동으로 탐색할 수 있습니다. 페이지 제한과 같은 매개변수를 설정하여 크롤러가 사이트를 얼마나 광범위하게 탐색할지 제어하고, 방문하는 각 페이지에서 데이터를 수집할 수 있습니다.
 
 ### Extract
 
-Hyperbrowser's extraction capabilities use AI to pull specific information from webpages according to your defined schema. This allows you to transform unstructured web content into structured data that matches your exact requirements.
+Hyperbrowser의 추출 기능은 AI를 사용하여 정의된 스키마에 따라 웹페이지에서 특정 정보를 추출합니다. 이를 통해 구조화되지 않은 웹 콘텐츠를 정확한 요구사항에 맞는 구조화된 데이터로 변환할 수 있습니다.
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부정보
 
 | Tool         | Package                | Local | Serializable | JS support |
 | :----------- | :--------------------- | :---: | :----------: | :--------: |
@@ -39,31 +39,31 @@ Hyperbrowser's extraction capabilities use AI to pull specific information from 
 | Scrape Tool  | langchain-hyperbrowser |  ❌   |      ❌      |     ❌     |
 | Extract Tool | langchain-hyperbrowser |  ❌   |      ❌      |     ❌     |
 
-## Setup
+## 설정
 
-To access the Hyperbrowser web tools you'll need to install the `langchain-hyperbrowser` integration package, and create a Hyperbrowser account and get an API key.
+Hyperbrowser 웹 도구에 액세스하려면 `langchain-hyperbrowser` 통합 패키지를 설치하고, Hyperbrowser 계정을 생성하여 API 키를 받아야 합니다.
 
-### Credentials
+### 자격 증명
 
-Head to [Hyperbrowser](https://app.hyperbrowser.ai/) to sign up and generate an API key. Once you've done this set the HYPERBROWSER_API_KEY environment variable:
+[Hyperbrowser](https://app.hyperbrowser.ai/)로 이동하여 가입하고 API 키를 생성하세요. 완료되면 HYPERBROWSER_API_KEY 환경 변수를 설정하세요:
 
 ```bash
 export HYPERBROWSER_API_KEY=<your-api-key>
 ```
 
-### Installation
+### 설치
 
-Install **langchain-hyperbrowser**.
+**langchain-hyperbrowser**를 설치하세요.
 
 ```python
 pip install -qU langchain-hyperbrowser
 ```
 
-## Instantiation
+## 인스턴스화
 
 ### Crawl Tool
 
-The `HyperbrowserCrawlTool` is a powerful tool that can crawl entire websites, starting from a given URL. It supports configurable page limits and scraping options.
+`HyperbrowserCrawlTool`은 주어진 URL에서 시작하여 전체 웹사이트를 크롤링할 수 있는 강력한 도구입니다. 구성 가능한 페이지 제한 및 스크래핑 옵션을 지원합니다.
 
 ```python
 from langchain_hyperbrowser import HyperbrowserCrawlTool
@@ -72,7 +72,7 @@ tool = HyperbrowserCrawlTool()
 
 ### Scrape Tool
 
-The `HyperbrowserScrapeTool` is a tool that can scrape content from web pages. It supports both markdown and HTML output formats, along with metadata extraction.
+`HyperbrowserScrapeTool`은 웹 페이지에서 콘텐츠를 스크래핑할 수 있는 도구입니다. markdown 및 HTML 출력 형식과 메타데이터 추출을 지원합니다.
 
 ```python
 from langchain_hyperbrowser import HyperbrowserScrapeTool
@@ -81,16 +81,16 @@ tool = HyperbrowserScrapeTool()
 
 ### Extract Tool
 
-The `HyperbrowserExtractTool` is a powerful tool that uses AI to extract structured data from web pages. It can extract information based predefined schemas.
+`HyperbrowserExtractTool`은 AI를 사용하여 웹 페이지에서 구조화된 데이터를 추출하는 강력한 도구입니다. 사전 정의된 스키마를 기반으로 정보를 추출할 수 있습니다.
 
 ```python
 from langchain_hyperbrowser import HyperbrowserExtractTool
 tool = HyperbrowserExtractTool()
 ```
 
-## Invocation
+## 호출
 
-### Basic Usage
+### 기본 사용법
 
 #### Crawl Tool
 
@@ -150,9 +150,9 @@ print(result)
 {'data': {'title': 'Example Domain'}, 'error': None}
 ```
 
-### With Custom Options
+### 사용자 정의 옵션 사용
 
-#### Crawl Tool with Custom Options
+#### 사용자 정의 옵션을 사용한 Crawl Tool
 
 ```python
 result = HyperbrowserCrawlTool().run(
@@ -172,7 +172,7 @@ print(result)
 {'data': [CrawledPage(metadata={'url': 'https://www.example.com/', 'title': 'Example Domain', 'viewport': 'width=device-width, initial-scale=1', 'sourceURL': 'https://example.com'}, html=None, markdown='Example Domain\n\n# Example Domain\n\nThis domain is for use in illustrative examples in documents. You may use this\ndomain in literature without prior coordination or asking for permission.\n\n[More information...](https://www.iana.org/domains/example)', links=None, screenshot=None, url='https://example.com', status='completed', error=None)], 'error': None}
 ```
 
-#### Scrape Tool with Custom Options
+#### 사용자 정의 옵션을 사용한 Scrape Tool
 
 ```python
 result = HyperbrowserScrapeTool().run(
@@ -191,7 +191,7 @@ print(result)
 {'data': ScrapeJobData(metadata={'url': 'https://www.example.com/', 'title': 'Example Domain', 'viewport': 'width=device-width, initial-scale=1', 'sourceURL': 'https://example.com'}, html='<html><head>\n    <title>Example Domain</title>\n\n    <meta charset="utf-8">\n    <meta http-equiv="Content-type" content="text/html; charset=utf-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1">\n        \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is for use in illustrative examples in documents. You may use this\n    domain in literature without prior coordination or asking for permission.</p>\n    <p><a href="https://www.iana.org/domains/example">More information...</a></p>\n</div>\n\n\n</body></html>', markdown='Example Domain\n\n# Example Domain\n\nThis domain is for use in illustrative examples in documents. You may use this\ndomain in literature without prior coordination or asking for permission.\n\n[More information...](https://www.iana.org/domains/example)', links=None, screenshot=None), 'error': None}
 ```
 
-#### Extract Tool with Custom Schema
+#### 사용자 정의 스키마를 사용한 Extract Tool
 
 ```python
 from typing import List
@@ -222,9 +222,9 @@ print(result)
 {'data': {'products': [{'price': 9.99, 'title': 'Essence Mascara Lash Princess'}, {'price': 19.99, 'title': 'Eyeshadow Palette with Mirror'}, {'price': 14.99, 'title': 'Powder Canister'}, {'price': 12.99, 'title': 'Red Lipstick'}, {'price': 8.99, 'title': 'Red Nail Polish'}, {'price': 49.99, 'title': 'Calvin Klein CK One'}, {'price': 129.99, 'title': 'Chanel Coco Noir Eau De'}, {'price': 89.99, 'title': "Dior J'adore"}, {'price': 69.99, 'title': 'Dolce Shine Eau de'}, {'price': 79.99, 'title': 'Gucci Bloom Eau de'}]}, 'error': None}
 ```
 
-### Async Usage
+### 비동기 사용
 
-All tools support async usage:
+모든 도구는 비동기 사용을 지원합니다:
 
 ```python
 from typing import List
@@ -302,9 +302,9 @@ Cell In[6], line 11, in ExtractionSchema()
 NameError: name 'List' is not defined
 ```
 
-## Use within an agent
+## Agent 내에서 사용
 
-Here's how to use any of the web tools within an agent:
+다음은 agent 내에서 웹 도구를 사용하는 방법입니다:
 
 ```python
 from langchain_hyperbrowser import HyperbrowserCrawlTool
@@ -361,37 +361,37 @@ domain in literature without prior coordination or asking for permission.
 If you would like to crawl more pages or need additional information, please let me know!
 ```
 
-## Configuration Options
+## 구성 옵션
 
-### Common Options
+### 공통 옵션
 
-All tools support these basic configuration options:
+모든 도구는 다음과 같은 기본 구성 옵션을 지원합니다:
 
-- `url`: The URL to process
-- `session_options`: Browser session configuration
-  - `use_proxy`: Whether to use a proxy
-  - `solve_captchas`: Whether to automatically solve CAPTCHAs
-  - `accept_cookies`: Whether to accept cookies
+- `url`: 처리할 URL
+- `session_options`: 브라우저 세션 구성
+  - `use_proxy`: 프록시 사용 여부
+  - `solve_captchas`: CAPTCHA 자동 해결 여부
+  - `accept_cookies`: 쿠키 수락 여부
 
-### Tool-Specific Options
+### 도구별 옵션
 
 #### Crawl Tool
 
-- `max_pages`: Maximum number of pages to crawl
-- `scrape_options`: Options for scraping each page
-  - `formats`: List of output formats (markdown, html)
+- `max_pages`: 크롤링할 최대 페이지 수
+- `scrape_options`: 각 페이지 스크래핑 옵션
+  - `formats`: 출력 형식 목록 (markdown, html)
 
 #### Scrape Tool
 
-- `scrape_options`: Options for scraping the page
-  - `formats`: List of output formats (markdown, html)
+- `scrape_options`: 페이지 스크래핑 옵션
+  - `formats`: 출력 형식 목록 (markdown, html)
 
 #### Extract Tool
 
-- `schema`: Pydantic model defining the structure to extract
-- `extraction_prompt`: Natural language prompt for extraction
+- `schema`: 추출할 구조를 정의하는 Pydantic 모델
+- `extraction_prompt`: 추출을 위한 자연어 프롬프트
 
-For more details, see the respective API references:
+자세한 내용은 각 API 참조를 확인하세요:
 
 - [Crawl API Reference](https://docs.hyperbrowser.ai/reference/api-reference/crawl)
 - [Scrape API Reference](https://docs.hyperbrowser.ai/reference/api-reference/scrape)

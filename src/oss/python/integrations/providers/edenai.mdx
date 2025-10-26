@@ -2,20 +2,20 @@
 title: Eden AI
 ---
 
->[Eden AI](https://docs.edenai.co/docs/getting-started-with-eden-ai) user interface (UI)
-> is designed for handling the AI projects. With `Eden AI Portal`,
-> you can perform no-code AI using the best engines for the market.
+>[Eden AI](https://docs.edenai.co/docs/getting-started-with-eden-ai) user interface (UI)는
+> AI 프로젝트를 처리하기 위해 설계되었습니다. `Eden AI Portal`을 사용하면
+> 시장 최고의 엔진을 활용하여 노코드 AI를 수행할 수 있습니다.
 
 
 ## Installation and Setup
 
-Accessing the Eden AI API requires an API key, which you can get by
-[creating an account](https://app.edenai.run/user/register) and
-heading [here](https://app.edenai.run/admin/account/settings).
+Eden AI API에 접근하려면 API key가 필요하며,
+[계정 생성](https://app.edenai.run/user/register) 후
+[여기](https://app.edenai.run/admin/account/settings)에서 발급받을 수 있습니다.
 
 ## LLMs
 
-See a [usage example](/oss/integrations/llms/edenai).
+[사용 예제](/oss/integrations/llms/edenai)를 참조하세요.
 
 ```python
 from langchain_community.llms import EdenAI
@@ -24,7 +24,7 @@ from langchain_community.llms import EdenAI
 
 ## Chat models
 
-See a [usage example](/oss/integrations/chat/edenai).
+[사용 예제](/oss/integrations/chat/edenai)를 참조하세요.
 
 ```python
 from langchain_community.chat_models.edenai import ChatEdenAI
@@ -32,7 +32,7 @@ from langchain_community.chat_models.edenai import ChatEdenAI
 
 ## Embedding models
 
-See a [usage example](/oss/integrations/text_embedding/edenai).
+[사용 예제](/oss/integrations/text_embedding/edenai)를 참조하세요.
 
 ```python
 from langchain_community.embeddings.edenai import EdenAiEmbeddings
@@ -40,7 +40,7 @@ from langchain_community.embeddings.edenai import EdenAiEmbeddings
 
 ## Tools
 
-Eden AI provides a list of tools that grants your Agent the ability to do multiple tasks, such as:
+Eden AI는 Agent에게 다음과 같은 다양한 작업을 수행할 수 있는 능력을 부여하는 도구 목록을 제공합니다:
 * speech to text
 * text to speech
 * text explicit content detection
@@ -49,7 +49,7 @@ Eden AI provides a list of tools that grants your Agent the ability to do multip
 * OCR invoice parsing
 * OCR ID parsing
 
-See a [usage example](/oss/integrations/tools/edenai_tools).
+[사용 예제](/oss/integrations/tools/edenai_tools)를 참조하세요.
 
 ```python
 from langchain_community.tools.edenai import (

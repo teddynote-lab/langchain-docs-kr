@@ -3,29 +3,29 @@ title: Elasticsearch
 ---
 
 <Tip>
-**Compatibility**: Only available on Node.js.
+**호환성**: Node.js에서만 사용 가능합니다.
 </Tip>
 
-[Elasticsearch](https://github.com/elastic/elasticsearch) is a distributed, RESTful search engine optimized for speed and relevance on production-scale workloads. It supports also vector search using the [k-nearest neighbor](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm) (kNN) algorithm and also [custom models for Natural Language Processing](https://www.elastic.co/blog/how-to-deploy-nlp-text-embeddings-and-vector-search) (NLP).
-You can read more about the support of vector search in Elasticsearch [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/knn-search.html).
+[Elasticsearch](https://github.com/elastic/elasticsearch)는 프로덕션 규모의 워크로드에서 속도와 관련성을 최적화한 분산형 RESTful 검색 엔진입니다. [k-nearest neighbor](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm) (kNN) 알고리즘을 사용한 벡터 검색과 [자연어 처리를 위한 커스텀 모델](https://www.elastic.co/blog/how-to-deploy-nlp-text-embeddings-and-vector-search) (NLP)도 지원합니다.
+Elasticsearch의 벡터 검색 지원에 대한 자세한 내용은 [여기](https://www.elastic.co/guide/en/elasticsearch/reference/current/knn-search.html)에서 확인할 수 있습니다.
 
-This guide provides a quick overview for getting started with Elasticsearch [vector stores](/oss/integrations/vectorstores). For detailed documentation of all `ElasticVectorSearch` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_elasticsearch.ElasticVectorSearch.html).
+이 가이드는 Elasticsearch [vector store](/oss/integrations/vectorstores) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `ElasticVectorSearch` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_elasticsearch.ElasticVectorSearch.html)를 참조하세요.
 
-## Overview
+## 개요
 
-### Integration details
+### Integration 세부 정보
 
 | Class | Package | [PY support](https://python.langchain.com/docs/integrations/vectorstores/elasticsearch/) |  Version |
 | :--- | :--- | :---: | :---: |
 | [`ElasticVectorSearch`](https://api.js.langchain.com/classes/langchain_community_vectorstores_elasticsearch.ElasticVectorSearch.html) | [`@langchain/community`](https://www.npmjs.com/package/@langchain/community) | ✅ |  ![NPM - Version](https://img.shields.io/npm/v/@langchain/community?style=flat-square&label=%20&) |
 
-## Setup
+## 설정
 
-To use Elasticsearch vector stores, you'll need to install the `@langchain/community` integration package.
+Elasticsearch vector store를 사용하려면 `@langchain/community` integration package를 설치해야 합니다.
 
-LangChain.js accepts [`@elastic/elasticsearch`](https://github.com/elastic/elasticsearch-js) as the client for Elasticsearch vectorstore. You'll need to install it as a peer dependency.
+LangChain.js는 Elasticsearch vectorstore의 client로 [`@elastic/elasticsearch`](https://github.com/elastic/elasticsearch-js)를 사용합니다. peer dependency로 설치해야 합니다.
 
-This guide will also use [OpenAI embeddings](/oss/integrations/text_embedding/openai), which require you to install the `@langchain/openai` integration package. You can also use [other supported embeddings models](/oss/integrations/text_embedding) if you wish.
+이 가이드는 [OpenAI embeddings](/oss/integrations/text_embedding/openai)도 사용하므로 `@langchain/openai` integration package를 설치해야 합니다. 원하는 경우 [다른 지원되는 embeddings 모델](/oss/integrations/text_embedding)을 사용할 수도 있습니다.
 
 <CodeGroup>
 ```bash npm
@@ -39,30 +39,30 @@ pnpm add @langchain/community @elastic/elasticsearch @langchain/openai @langchai
 ```
 </CodeGroup>
 
-### Credentials
+### 자격 증명
 
-To use Elasticsearch vector stores, you'll need to have an Elasticsearch instance running.
+Elasticsearch vector store를 사용하려면 실행 중인 Elasticsearch 인스턴스가 필요합니다.
 
-You can use the [official Docker image](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html) to get started, or you can use [Elastic Cloud](https://www.elastic.co/cloud/), Elastic's official cloud service.
+[공식 Docker 이미지](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)를 사용하여 시작하거나 Elastic의 공식 클라우드 서비스인 [Elastic Cloud](https://www.elastic.co/cloud/)를 사용할 수 있습니다.
 
-For connecting to Elastic Cloud you can read the documentation reported [here](https://www.elastic.co/guide/en/kibana/current/api-keys.html) for obtaining an API key.
+Elastic Cloud에 연결하려면 API key를 얻기 위해 [여기](https://www.elastic.co/guide/en/kibana/current/api-keys.html)에 설명된 문서를 참조하세요.
 
-If you are using OpenAI embeddings for this guide, you'll need to set your OpenAI key as well:
+이 가이드에서 OpenAI embeddings를 사용하는 경우 OpenAI key도 설정해야 합니다:
 
 ```typescript
 process.env.OPENAI_API_KEY = "YOUR_API_KEY";
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_TRACING="true"
 // process.env.LANGSMITH_API_KEY="your-api-key"
 ```
 
-## Instantiation
+## 인스턴스화
 
-Instatiating Elasticsearch will vary depending on where your instance is hosted.
+Elasticsearch 인스턴스화는 인스턴스가 호스팅되는 위치에 따라 달라집니다.
 
 ```typescript
 import {
@@ -108,9 +108,9 @@ const clientArgs: ElasticClientArgs = {
 const vectorStore = new ElasticVectorSearch(embeddings, clientArgs);
 ```
 
-## Manage vector store
+## Vector store 관리
 
-### Add items to vector store
+### Vector store에 항목 추가
 
 ```typescript
 import type { Document } from "@langchain/core/documents";
@@ -144,21 +144,21 @@ await vectorStore.addDocuments(documents, { ids: ["1", "2", "3", "4"] });
 [ '1', '2', '3', '4' ]
 ```
 
-### Delete items from vector store
+### Vector store에서 항목 삭제
 
-You can delete values from the store by passing the same id you passed in:
+전달한 것과 동일한 id를 전달하여 store에서 값을 삭제할 수 있습니다:
 
 ```typescript
 await vectorStore.delete({ ids: ["4"] });
 ```
 
-## Query vector store
+## Vector store 쿼리
 
-Once your vector store has been created and the relevant documents have been added you will most likely wish to query it during the running of your chain or agent.
+Vector store가 생성되고 관련 문서가 추가되면 chain 또는 agent를 실행하는 동안 쿼리하고 싶을 것입니다.
 
-### Query directly
+### 직접 쿼리
 
-Performing a simple similarity search can be done as follows:
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
 
 ```typescript
 const filter = [{
@@ -179,9 +179,9 @@ for (const doc of similaritySearchResults) {
 * Mitochondria are made out of lipids [{"source":"https://example.com"}]
 ```
 
-The vector store supports [Elasticsearch filter syntax](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html) operators.
+Vector store는 [Elasticsearch filter syntax](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html) 연산자를 지원합니다.
 
-If you want to execute a similarity search and receive the corresponding scores you can run:
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
 
 ```typescript
 const similaritySearchWithScoreResults = await vectorStore.similaritySearchWithScore("biology", 2, filter)
@@ -196,9 +196,9 @@ for (const [doc, score] of similaritySearchWithScoreResults) {
 * [SIM=0.370] Mitochondria are made out of lipids [{"source":"https://example.com"}]
 ```
 
-### Query by turning into retriever
+### Retriever로 변환하여 쿼리
 
-You can also transform the vector store into a [retriever](/oss/langchain/retrieval) for easier usage in your chains.
+Vector store를 [retriever](/oss/langchain/retrieval)로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
 
 ```typescript
 const retriever = vectorStore.asRetriever({
@@ -224,14 +224,14 @@ await retriever.invoke("biology");
 ]
 ```
 
-### Usage for retrieval-augmented generation
+### Retrieval-augmented generation 사용
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+Retrieval-augmented generation (RAG)을 위해 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
 
-- [Build a RAG app with LangChain](/oss/langchain/rag).
+- [LangChain으로 RAG 앱 만들기](/oss/langchain/rag)
 - [Agentic RAG](/oss/langgraph/agentic-rag)
-- [Retrieval docs](/oss/langchain/retrieval)
+- [Retrieval 문서](/oss/langchain/retrieval)
 
 ## API reference
 
-For detailed documentation of all `ElasticVectorSearch` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_elasticsearch.ElasticVectorSearch.html).
+모든 `ElasticVectorSearch` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_elasticsearch.ElasticVectorSearch.html)를 참조하세요.

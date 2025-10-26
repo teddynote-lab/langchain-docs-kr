@@ -1,14 +1,14 @@
 ---
-title: Overview
+title: 개요
 ---
 
-All functionality related to `Microsoft Azure` and other `Microsoft` products.
+`Microsoft Azure` 및 기타 `Microsoft` 제품과 관련된 모든 기능입니다.
 
 ## Chat Models
 
 ### Azure OpenAI
 
-See a [usage example](/oss/integrations/chat/azure)
+[사용 예제](/oss/integrations/chat/azure)를 참조하세요
 
 ```typescript
 import { AzureChatOpenAI } from "@langchain/openai";
@@ -26,19 +26,19 @@ const model = new AzureChatOpenAI({
 
 ### Azure OpenAI
 
-> [Microsoft Azure](https://en.wikipedia.org/wiki/Microsoft_Azure), often referred to as `Azure` is a cloud computing platform run by `Microsoft`, which offers access, management, and development of applications and services through global data centers. It provides a range of capabilities, including software as a service (SaaS), platform as a service (PaaS), and infrastructure as a service (IaaS). `Microsoft Azure` supports many programming languages, tools, and frameworks, including Microsoft-specific and third-party software and systems.
+> [Microsoft Azure](https://en.wikipedia.org/wiki/Microsoft_Azure)는 흔히 `Azure`라고 불리며, `Microsoft`가 운영하는 클라우드 컴퓨팅 플랫폼으로, 전 세계 데이터 센터를 통해 애플리케이션과 서비스의 액세스, 관리 및 개발을 제공합니다. 이는 SaaS(Software as a Service), PaaS(Platform as a Service), IaaS(Infrastructure as a Service)를 포함한 다양한 기능을 제공합니다. `Microsoft Azure`는 Microsoft 전용 및 타사 소프트웨어와 시스템을 포함하여 다양한 프로그래밍 언어, 도구 및 프레임워크를 지원합니다.
 
-> [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service/) is a cloud service to help you quickly develop generative AI experiences with a diverse set of prebuilt and curated models from OpenAI, Meta and beyond.
+> [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service/)는 OpenAI, Meta 등에서 제공하는 다양한 사전 구축 및 선별된 모델을 사용하여 생성형 AI 경험을 빠르게 개발할 수 있도록 지원하는 클라우드 서비스입니다.
 
-LangChain.js supports integration with [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service/) using the new Azure integration in the [OpenAI SDK](https://github.com/openai/openai-node).
+LangChain.js는 [OpenAI SDK](https://github.com/openai/openai-node)의 새로운 Azure 통합을 사용하여 [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service/)와의 통합을 지원합니다.
 
-You can learn more about Azure OpenAI and its difference with the OpenAI API on [this page](https://learn.microsoft.com/azure/ai-services/openai/overview). If you don't have an Azure account, you can [create a free account](https://azure.microsoft.com/free/) to get started.
+Azure OpenAI와 OpenAI API의 차이점에 대해서는 [이 페이지](https://learn.microsoft.com/azure/ai-services/openai/overview)에서 자세히 알아볼 수 있습니다. Azure 계정이 없는 경우 [무료 계정을 생성](https://azure.microsoft.com/free/)하여 시작할 수 있습니다.
 
-You'll need to have an Azure OpenAI instance deployed. You can deploy a version on Azure Portal following [this guide](https://learn.microsoft.com/azure/ai-services/openai/how-to/create-resource?pivots=web-portal).
+Azure OpenAI 인스턴스를 배포해야 합니다. [이 가이드](https://learn.microsoft.com/azure/ai-services/openai/how-to/create-resource?pivots=web-portal)에 따라 Azure Portal에서 버전을 배포할 수 있습니다.
 
-Once you have your instance running, make sure you have the name of your instance and key. You can find the key in the Azure Portal, under the "Keys and Endpoint" section of your instance.
+인스턴스가 실행되면 인스턴스의 이름과 키가 있는지 확인하세요. 키는 Azure Portal의 인스턴스 "Keys and Endpoint" 섹션에서 찾을 수 있습니다.
 
-If you're using Node.js, you can define the following environment variables to use the service:
+Node.js를 사용하는 경우 다음 환경 변수를 정의하여 서비스를 사용할 수 있습니다:
 
 ```bash
 AZURE_OPENAI_API_INSTANCE_NAME=<YOUR_INSTANCE_NAME>
@@ -49,19 +49,19 @@ AZURE_OPENAI_API_VERSION="2024-02-01"
 ```
 
 <Info>
-**You can find the list of supported API versions in the [Azure OpenAI documentation](https://learn.microsoft.com/azure/ai-services/openai/reference).**
+**지원되는 API 버전 목록은 [Azure OpenAI 문서](https://learn.microsoft.com/azure/ai-services/openai/reference)에서 확인할 수 있습니다.**
 
 
 </Info>
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
 npm install @langchain/openai @langchain/core
 ```
-See a [usage example](/oss/integrations/llms/azure).
+[사용 예제](/oss/integrations/llms/azure)를 참조하세요.
 
 ```typescript
 import { AzureOpenAI } from "@langchain/openai";
@@ -78,7 +78,7 @@ const model = new AzureOpenAI({
 
 ### Azure OpenAI
 
-See a [usage example](/oss/integrations/text_embedding/azure_openai)
+[사용 예제](/oss/integrations/text_embedding/azure_openai)를 참조하세요
 
 ```typescript
 import { AzureOpenAIEmbeddings } from "@langchain/openai";
@@ -95,37 +95,37 @@ const model = new AzureOpenAIEmbeddings({
 
 ### Azure AI Search
 
-> [Azure AI Search](https://azure.microsoft.com/products/ai-services/ai-search) (formerly known as Azure Search and Azure Cognitive Search) is a distributed, RESTful search engine optimized for speed and relevance on production-scale workloads on Azure. It supports also vector search using the [k-nearest neighbor](https://en.wikipedia.org/wiki/Nearest_neighbor_search) (kNN) algorithm and also [semantic search](https://learn.microsoft.com/azure/search/semantic-search-overview).
+> [Azure AI Search](https://azure.microsoft.com/products/ai-services/ai-search)(이전의 Azure Search 및 Azure Cognitive Search)는 Azure의 프로덕션 규모 워크로드에서 속도와 관련성을 위해 최적화된 분산 RESTful 검색 엔진입니다. [k-nearest neighbor](https://en.wikipedia.org/wiki/Nearest_neighbor_search)(kNN) 알고리즘을 사용한 vector search와 [semantic search](https://learn.microsoft.com/azure/search/semantic-search-overview)도 지원합니다.
 
 
 ```bash npm
 npm install -S @langchain/community @langchain/core @azure/search-documents
 ```
-See a [usage example](/oss/integrations/vectorstores/azure_aisearch).
+[사용 예제](/oss/integrations/vectorstores/azure_aisearch)를 참조하세요.
 
 ```typescript
 import { AzureAISearchVectorStore } from "@langchain/community/vectorstores/azure_aisearch";
 ```
 ### Azure Cosmos DB for NoSQL
 
-> [Azure Cosmos DB for NoSQL](https://learn.microsoft.com/azure/cosmos-db/nosql/) provides support for querying items with flexible schemas and native support for JSON. It now offers vector indexing and search. This feature is designed to handle high-dimensional vectors, enabling efficient and accurate vector search at any scale. You can now store vectors directly in the documents alongside your data. Each document in your database can contain not only traditional schema-free data, but also high-dimensional vectors as other properties of the documents.
+> [Azure Cosmos DB for NoSQL](https://learn.microsoft.com/azure/cosmos-db/nosql/)은 유연한 스키마를 가진 항목 쿼리 지원과 JSON에 대한 기본 지원을 제공합니다. 이제 vector 인덱싱 및 검색을 제공합니다. 이 기능은 고차원 vector를 처리하도록 설계되어 모든 규모에서 효율적이고 정확한 vector 검색을 가능하게 합니다. 이제 데이터와 함께 문서에 vector를 직접 저장할 수 있습니다. 데이터베이스의 각 문서에는 기존의 스키마 없는 데이터뿐만 아니라 문서의 다른 속성으로 고차원 vector도 포함될 수 있습니다.
 
 ```bash npm
 npm install @langchain/azure-cosmosdb @langchain/core
 ```
-See a [usage example](/oss/integrations/vectorstores/azure_cosmosdb_nosql).
+[사용 예제](/oss/integrations/vectorstores/azure_cosmosdb_nosql)를 참조하세요.
 
 ```typescript
 import { AzureCosmosDBNoSQLVectorStore } from "@langchain/azure-cosmosdb";
 ```
 ### Azure Cosmos DB for MongoDB vCore
 
-> [Azure Cosmos DB for MongoDB vCore](https://learn.microsoft.com/azure/cosmos-db/mongodb/vcore/) makes it easy to create a database with full native MongoDB support. You can apply your MongoDB experience and continue to use your favorite MongoDB drivers, SDKs, and tools by pointing your application to the API for MongoDB vCore account's connection string. Use vector search in Azure Cosmos DB for MongoDB vCore to seamlessly integrate your AI-based applications with your data that's stored in Azure Cosmos DB.
+> [Azure Cosmos DB for MongoDB vCore](https://learn.microsoft.com/azure/cosmos-db/mongodb/vcore/)를 사용하면 완전한 네이티브 MongoDB 지원으로 데이터베이스를 쉽게 만들 수 있습니다. MongoDB 경험을 적용하고 애플리케이션을 API for MongoDB vCore 계정의 연결 문자열로 지정하여 즐겨 사용하는 MongoDB 드라이버, SDK 및 도구를 계속 사용할 수 있습니다. Azure Cosmos DB for MongoDB vCore의 vector search를 사용하여 AI 기반 애플리케이션을 Azure Cosmos DB에 저장된 데이터와 원활하게 통합할 수 있습니다.
 
 ```bash npm
 npm install @langchain/azure-cosmosdb @langchain/core
 ```
-See a [usage example](/oss/integrations/vectorstores/azure_cosmosdb_mongodb).
+[사용 예제](/oss/integrations/vectorstores/azure_cosmosdb_mongodb)를 참조하세요.
 
 ```typescript
 import { AzureCosmosDBMongoDBVectorStore } from "@langchain/azure-cosmosdb";
@@ -134,12 +134,12 @@ import { AzureCosmosDBMongoDBVectorStore } from "@langchain/azure-cosmosdb";
 
 ### Azure Cosmos DB NoSQL Semantic Cache
 
-> The Semantic Cache feature is supported with Azure Cosmos DB for NoSQL integration, enabling users to retrieve cached responses based on semantic similarity between the user input and previously cached results. It leverages [AzureCosmosDBNoSQLVectorStore](/oss/integrations/vectorstores/azure_cosmosdb_nosql), which stores vector embeddings of cached prompts. These embeddings enable similarity-based searches, allowing the system to retrieve relevant cached results.
+> Semantic Cache 기능은 Azure Cosmos DB for NoSQL 통합에서 지원되며, 사용자가 사용자 입력과 이전에 캐시된 결과 간의 의미적 유사성을 기반으로 캐시된 응답을 검색할 수 있도록 합니다. 이는 캐시된 프롬프트의 vector embedding을 저장하는 [AzureCosmosDBNoSQLVectorStore](/oss/integrations/vectorstores/azure_cosmosdb_nosql)를 활용합니다. 이러한 embedding은 유사성 기반 검색을 가능하게 하여 시스템이 관련 캐시된 결과를 검색할 수 있도록 합니다.
 
 ```bash npm
 npm install @langchain/azure-cosmosdb @langchain/core
 ```
-See a [usage example](/oss/integrations/llm_caching/azure_cosmosdb_nosql).
+[사용 예제](/oss/integrations/llm_caching/azure_cosmosdb_nosql)를 참조하세요.
 
 ```typescript
 import { AzureCosmosDBNoSQLSemanticCache } from "@langchain/azure-cosmosdb";
@@ -149,30 +149,28 @@ import { AzureCosmosDBNoSQLSemanticCache } from "@langchain/azure-cosmosdb";
 
 ### Azure Blob Storage
 
-> [Azure Blob Storage](https://learn.microsoft.com/azure/storage/blobs/storage-blobs-introduction) is Microsoft's object storage solution for the cloud. Blob Storage is optimized for storing massive amounts of unstructured data. Unstructured data is data that doesn't adhere to a particular data model or definition, such as text or binary data.
+> [Azure Blob Storage](https://learn.microsoft.com/azure/storage/blobs/storage-blobs-introduction)는 클라우드를 위한 Microsoft의 객체 스토리지 솔루션입니다. Blob Storage는 대량의 비정형 데이터를 저장하는 데 최적화되어 있습니다. 비정형 데이터는 텍스트 또는 바이너리 데이터와 같이 특정 데이터 모델이나 정의를 따르지 않는 데이터입니다.
 
-> [Azure Files](https://learn.microsoft.com/azure/storage/files/storage-files-introduction) offers fully managed
-> file shares in the cloud that are accessible via the industry standard Server Message Block (`SMB`) protocol,
-> Network File System (`NFS`) protocol, and `Azure Files REST API`. `Azure Files` are based on the `Azure Blob Storage`.
+> [Azure Files](https://learn.microsoft.com/azure/storage/files/storage-files-introduction)는 업계 표준 Server Message Block(`SMB`) 프로토콜, Network File System(`NFS`) 프로토콜 및 `Azure Files REST API`를 통해 액세스할 수 있는 클라우드에서 완전히 관리되는 파일 공유를 제공합니다. `Azure Files`는 `Azure Blob Storage`를 기반으로 합니다.
 
-`Azure Blob Storage` is designed for:
+`Azure Blob Storage`는 다음을 위해 설계되었습니다:
 
-- Serving images or documents directly to a browser.
-- Storing files for distributed access.
-- Streaming video and audio.
-- Writing to log files.
-- Storing data for backup and restore, disaster recovery, and archiving.
-- Storing data for analysis by an on-premises or Azure-hosted service.
+- 브라우저에 직접 이미지 또는 문서 제공
+- 분산 액세스를 위한 파일 저장
+- 비디오 및 오디오 스트리밍
+- 로그 파일에 쓰기
+- 백업 및 복원, 재해 복구 및 아카이빙을 위한 데이터 저장
+- 온프레미스 또는 Azure 호스팅 서비스에서 분석할 데이터 저장
 
 ```bash npm
 npm install @langchain/community @langchain/core @azure/storage-blob
 ```
-See a [usage example for the Azure Blob Storage](/oss/integrations/document_loaders/web_loaders/azure_blob_storage_container).
+[Azure Blob Storage 사용 예제](/oss/integrations/document_loaders/web_loaders/azure_blob_storage_container)를 참조하세요.
 
 ```typescript
 import { AzureBlobStorageContainerLoader } from "@langchain/community/document_loaders/web/azure_blob_storage_container";
 ```
-See a [usage example for the Azure Files](/oss/integrations/document_loaders/web_loaders/azure_blob_storage_file).
+[Azure Files 사용 예제](/oss/integrations/document_loaders/web_loaders/azure_blob_storage_file)를 참조하세요.
 
 ```typescript
 import { AzureBlobStorageFileLoader } from "@langchain/community/document_loaders/web/azure_blob_storage_file";
@@ -181,12 +179,12 @@ import { AzureBlobStorageFileLoader } from "@langchain/community/document_loader
 
 ### Azure Container Apps Dynamic Sessions
 
-> [Azure Container Apps dynamic sessions](https://learn.microsoft.com/azure/container-apps/sessions) provide fast access to secure sandboxed environments that are ideal for running code or applications that require strong isolation from other workloads.
+> [Azure Container Apps dynamic sessions](https://learn.microsoft.com/azure/container-apps/sessions)는 다른 워크로드와의 강력한 격리가 필요한 코드 또는 애플리케이션을 실행하는 데 이상적인 안전한 샌드박스 환경에 대한 빠른 액세스를 제공합니다.
 
 ```bash npm
 npm install @langchain/azure-dynamic-sessions @langchain/core
 ```
-See a [usage example](/oss/integrations/tools/azure_dynamic_sessions).
+[사용 예제](/oss/integrations/tools/azure_dynamic_sessions)를 참조하세요.
 
 ```typescript
 import { SessionsPythonREPLTool } from "@langchain/azure-dynamic-sessions";

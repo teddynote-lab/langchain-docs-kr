@@ -2,22 +2,22 @@
 title: ZeusDB
 ---
 
->[ZeusDB](https://www.zeusdb.com) is a high-performance vector database powered by Rust, offering advanced features like product quantization, persistent storage, and enterprise-grade logging.
+>[ZeusDB](https://www.zeusdb.com)는 Rust로 구동되는 고성능 vector database로, product quantization, 영구 저장소, 엔터프라이즈급 로깅과 같은 고급 기능을 제공합니다.
 
-This documentation shows how to use ZeusDB to bring enterprise-grade vector search capabilities to your LangChain applications.
+이 문서는 ZeusDB를 사용하여 LangChain 애플리케이션에 엔터프라이즈급 vector 검색 기능을 제공하는 방법을 보여줍니다.
 
 ---
 
 ## Setup
 
-Install the ZeusDB LangChain integration package from PyPi:
+PyPi에서 ZeusDB LangChain integration package를 설치하세요:
 
 ```python
 pip install -qU langchain-zeusdb
 ```
 
-Setup in Jupyter Notebooks
-> 💡 Tip: If you are working inside Jupyter or Google Colab, use the %pip magic command so the package is installed into the active kernel:
+Jupyter Notebook에서 설정하기
+> 💡 팁: Jupyter 또는 Google Colab에서 작업하는 경우, %pip magic command를 사용하여 활성 kernel에 package를 설치하세요:
 >
 ```python
 pip install -qU langchain-zeusdb
@@ -27,9 +27,9 @@ pip install -qU langchain-zeusdb
 
 ## Getting Started
 
-This example uses OpenAIEmbeddings, which requires an OpenAI API key: [Get your OpenAI API key here](https://platform.openai.com/api-keys)
-If you prefer, you can also use this package with any other embedding provider (Hugging Face, Cohere, custom functions, etc.).
-Install the LangChain OpenAI integration package from PyPi:
+이 예제는 OpenAI API key가 필요한 OpenAIEmbeddings를 사용합니다: [여기에서 OpenAI API key를 받으세요](https://platform.openai.com/api-keys)
+원하시면 다른 embedding provider(Hugging Face, Cohere, custom function 등)와 함께 이 package를 사용할 수도 있습니다.
+PyPi에서 LangChain OpenAI integration package를 설치하세요:
 
 ```python
 pip install -qU langchain-openai
@@ -38,10 +38,10 @@ pip install -qU langchain-openai
 #pip install -qU langchain-openai
 ```
 
-#### Please choose an option below for your OpenAI key integration
+#### OpenAI key 통합을 위해 아래 옵션 중 하나를 선택하세요
 
-*Option 1: 🔑 Enter your API key each time*
-Use getpass in Jupyter to securely input your key for the current session:
+*옵션 1: 🔑 매번 API key 입력하기*
+Jupyter에서 getpass를 사용하여 현재 세션에 대한 key를 안전하게 입력하세요:
 
 ```python
 import os
@@ -50,8 +50,8 @@ import getpass
 os.environ["OPENAI_API_KEY"] = getpass.getpass("OpenAI API Key:")
 ```
 
-*Option 2: 🗂️ Use a .env file*
-Keep your key in a local .env file and load it automatically with python-dotenv
+*옵션 2: 🗂️ .env 파일 사용하기*
+로컬 .env 파일에 key를 보관하고 python-dotenv로 자동으로 로드하세요
 
 ```python
 from dotenv import load_dotenv
@@ -60,7 +60,7 @@ load_dotenv()  # reads .env and sets OPENAI_API_KEY
 ```
 
 <Info>
-🎉 Nicely done! You are good to go.
+🎉 잘하셨습니다! 이제 시작할 준비가 되었습니다.
 </Info>
 ---
 
@@ -137,7 +137,7 @@ vector_store.delete(ids=["3"])
 
 ### 3.1 Query directly
 
-Performing a simple similarity search:
+간단한 similarity search 수행하기:
 
 ```python
 results = vector_store.similarity_search(query="high performance database", k=2)
@@ -146,7 +146,7 @@ for doc in results:
     print(f"* {doc.page_content} [{doc.metadata}]")
 ```
 
-If you want to execute a similarity search and receive the corresponding scores:
+similarity search를 실행하고 해당 score를 받고 싶다면:
 
 ```python
 results = vector_store.similarity_search_with_score(query="memory optimization", k=2)
@@ -157,7 +157,7 @@ for doc, score in results:
 
 ### 3.2 Query by turning into retriever
 
-You can also transform the vector store into a retriever for easier usage in your chains:
+vector store를 retriever로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다:
 
 ```python
 retriever = vector_store.as_retriever(search_type="mmr", search_kwargs={"k": 2})
@@ -171,7 +171,7 @@ retriever.invoke("vector database features")
 
 ### 4.1 Memory-Efficient Setup with Product Quantization
 
-For large datasets, use Product Quantization to reduce memory usage:
+대규모 dataset의 경우, Product Quantization을 사용하여 메모리 사용량을 줄이세요:
 
 ```python
 # Create memory-optimized vector store
@@ -191,15 +191,15 @@ print(f"Created quantized store: {quantized_index.info()}")
 
 ### 4.2 Persistence
 
-Save and load your vector store to disk:
-How to Save your vector store
+vector store를 디스크에 저장하고 로드하기:
+vector store 저장하는 방법
 
 ```python
 # Save the vector store
 vector_store.save_index("my_zeusdb_index.zdb")
 ```
 
-How to Load your vector store
+vector store 로드하는 방법
 
 ```python
 # Load the vector store
@@ -214,7 +214,7 @@ print(f"Loaded store with {loaded_store.get_vector_count()} vectors")
 
 ## Usage for retrieval-augmented generation
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+retrieval-augmented generation(RAG)을 위해 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
 
 - [How-to: Question and answer with RAG](https://python.langchain.com/docs/how_to/#qa-with-rag)
 - [Retrieval conceptual docs](https://python.langchain.com/docs/concepts/retrieval/)
@@ -223,4 +223,4 @@ For guides on how to use this vector store for retrieval-augmented generation (R
 
 ## API reference
 
-For detailed documentation of all ZeusDBVectorStore features and configurations head to [ZeusDB Docs](https://docs.zeusdb.com/en/latest/vector_database/integrations/langchain.html).
+모든 ZeusDBVectorStore feature 및 configuration에 대한 자세한 문서는 [ZeusDB Docs](https://docs.zeusdb.com/en/latest/vector_database/integrations/langchain.html)를 참조하세요.

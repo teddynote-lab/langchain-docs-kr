@@ -2,12 +2,12 @@
 title: Typesense
 ---
 
-Vector store that utilizes the Typesense search engine.
+Typesense 검색 엔진을 활용하는 vector store입니다.
 
-### Basic Usage
+### 기본 사용법
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
@@ -118,29 +118,29 @@ vectorStore.deleteDocuments(["document_id_1", "document_id_2"]);
 
 ### Constructor
 
-Before starting, create a schema in Typesense with an id, a field for the vector and a field for the text. Add as many other fields as needed for the metadata.
+시작하기 전에 Typesense에서 id, vector를 위한 필드, text를 위한 필드를 포함하는 schema를 생성하세요. metadata를 위해 필요한 만큼 다른 필드를 추가하세요.
 
-- `constructor(embeddings: Embeddings, config: TypesenseConfig)`: Constructs a new instance of the `Typesense` class.
-  - `embeddings`: An instance of the @[`Embeddings`] class used for embedding documents.
-  - `config`: Configuration object for the Typesense vector store.
-    - `typesenseClient`: Typesense client instance.
-    - `schemaName`: Name of the Typesense schema in which documents will be stored and searched.
-    - `searchParams` (optional): Typesense search parameters. Default is `{ q: '*', per_page: 5, query_by: '' }`.
-    - `columnNames` (optional): Column names configuration.
-      - `vector` (optional): Vector column name. Default is `'vec'`.
-      - `pageContent` (optional): Page content column name. Default is `'text'`.
-      - `metadataColumnNames` (optional): Metadata column names. Default is an empty array `[]`.
-    - `import` (optional): Replace the default import function for importing data to Typesense. This can affect the functionality of updating documents.
+- `constructor(embeddings: Embeddings, config: TypesenseConfig)`: `Typesense` 클래스의 새 인스턴스를 생성합니다.
+  - `embeddings`: 문서를 embedding하는 데 사용되는 @[`Embeddings`] 클래스의 인스턴스입니다.
+  - `config`: Typesense vector store를 위한 구성 객체입니다.
+    - `typesenseClient`: Typesense client 인스턴스입니다.
+    - `schemaName`: 문서가 저장되고 검색될 Typesense schema의 이름입니다.
+    - `searchParams` (선택사항): Typesense 검색 매개변수입니다. 기본값은 `{ q: '*', per_page: 5, query_by: '' }`입니다.
+    - `columnNames` (선택사항): 컬럼 이름 구성입니다.
+      - `vector` (선택사항): Vector 컬럼 이름입니다. 기본값은 `'vec'`입니다.
+      - `pageContent` (선택사항): Page content 컬럼 이름입니다. 기본값은 `'text'`입니다.
+      - `metadataColumnNames` (선택사항): Metadata 컬럼 이름들입니다. 기본값은 빈 배열 `[]`입니다.
+    - `import` (선택사항): Typesense로 데이터를 import하기 위한 기본 import 함수를 대체합니다. 이는 문서 업데이트 기능에 영향을 줄 수 있습니다.
 
 ### Methods
 
-- `async addDocuments(documents: Document[]): Promise<void>`: Adds documents to the vector store. The documents will be updated if there is a document with the same ID.
-- `static async fromDocuments(docs: Document[], embeddings: Embeddings, config: TypesenseConfig): Promise<Typesense>`: Creates a Typesense vector store from a list of documents. Documents are added to the vector store during construction.
-- `static async fromTexts(texts: string[], metadatas: object[], embeddings: Embeddings, config: TypesenseConfig): Promise<Typesense>`: Creates a Typesense vector store from a list of texts and associated metadata. Texts are converted to documents and added to the vector store during construction.
-- `async similaritySearch(query: string, k?: number, filter?: Record<string, unknown>): Promise<Document[]>`: Searches for similar documents based on a query. Returns an array of similar documents.
-- `async deleteDocuments(documentIds: string[]): Promise<void>`: Deletes documents from the vector store based on their IDs.
+- `async addDocuments(documents: Document[]): Promise<void>`: vector store에 문서를 추가합니다. 동일한 ID를 가진 문서가 있으면 업데이트됩니다.
+- `static async fromDocuments(docs: Document[], embeddings: Embeddings, config: TypesenseConfig): Promise<Typesense>`: 문서 목록으로부터 Typesense vector store를 생성합니다. 문서는 생성 중에 vector store에 추가됩니다.
+- `static async fromTexts(texts: string[], metadatas: object[], embeddings: Embeddings, config: TypesenseConfig): Promise<Typesense>`: 텍스트 목록과 관련 metadata로부터 Typesense vector store를 생성합니다. 텍스트는 문서로 변환되어 생성 중에 vector store에 추가됩니다.
+- `async similaritySearch(query: string, k?: number, filter?: Record<string, unknown>): Promise<Document[]>`: query를 기반으로 유사한 문서를 검색합니다. 유사한 문서의 배열을 반환합니다.
+- `async deleteDocuments(documentIds: string[]): Promise<void>`: ID를 기반으로 vector store에서 문서를 삭제합니다.
 
 ## Related
 
-- Vector store [conceptual guide](/oss/integrations/vectorstores)
-- Vector store [how-to guides](/oss/integrations/vectorstores)
+- Vector store [개념 가이드](/oss/integrations/vectorstores)
+- Vector store [사용 방법 가이드](/oss/integrations/vectorstores)

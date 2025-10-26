@@ -2,19 +2,19 @@
 title: RAGatouille
 ---
 
->[RAGatouille](https://github.com/bclavie/RAGatouille) makes it as simple as can be to use `ColBERT`!
+>[RAGatouille](https://github.com/bclavie/RAGatouille)는 `ColBERT`를 가능한 한 간단하게 사용할 수 있도록 해줍니다!
 >
->[ColBERT](https://github.com/stanford-futuredata/ColBERT) is a fast and accurate retrieval model, enabling scalable BERT-based search over large text collections in tens of milliseconds.
+>[ColBERT](https://github.com/stanford-futuredata/ColBERT)는 빠르고 정확한 검색 모델로, 대규모 텍스트 컬렉션에 대해 수십 밀리초 내에 확장 가능한 BERT 기반 검색을 가능하게 합니다.
 >
->See the [ColBERTv2: Effective and Efficient Retrieval via Lightweight Late Interaction](https://arxiv.org/abs/2112.01488) paper.
+>[ColBERTv2: Effective and Efficient Retrieval via Lightweight Late Interaction](https://arxiv.org/abs/2112.01488) 논문을 참조하세요.
 
-We can use this as a [retriever](/oss/langchain/retrieval). It will show functionality specific to this integration. After going through, it may be useful to explore [relevant use-case pages](/oss/langchain/rag) to learn how to use this vector store as part of a larger chain.
+이를 [retriever](/oss/langchain/retrieval)로 사용할 수 있습니다. 이 통합에 특화된 기능을 보여줄 것입니다. 살펴본 후, [관련 사용 사례 페이지](/oss/langchain/rag)를 탐색하여 이 vector store를 더 큰 chain의 일부로 사용하는 방법을 배우는 것이 유용할 수 있습니다.
 
-This page covers how to use [RAGatouille](https://github.com/bclavie/RAGatouille) as a retriever in a LangChain chain.
+이 페이지는 [RAGatouille](https://github.com/bclavie/RAGatouille)를 LangChain chain에서 retriever로 사용하는 방법을 다룹니다.
 
 ## Setup
 
-The integration lives in the `ragatouille` package.
+이 통합은 `ragatouille` package에 포함되어 있습니다.
 
 ```bash
 pip install -U ragatouille
@@ -22,7 +22,7 @@ pip install -U ragatouille
 
 ## Usage
 
-This example is taken from their documentation
+이 예제는 공식 문서에서 가져온 것입니다
 
 ```python
 from ragatouille import RAGPretrainedModel
@@ -213,7 +213,7 @@ results
   'rank': 3}]
 ```
 
-We can then convert easily to a LangChain retriever! We can pass in any kwargs we want when creating (like `k`)
+그런 다음 LangChain retriever로 쉽게 변환할 수 있습니다! 생성할 때 원하는 kwargs를 전달할 수 있습니다 (`k`와 같은)
 
 ```python
 retriever = RAG.as_langchain_retriever(k=3)
@@ -236,7 +236,7 @@ retriever.invoke("What animation studio did Miyazaki found?")
 
 ## Chaining
 
-We can easily combine this retriever in to a chain.
+이 retriever를 chain에 쉽게 결합할 수 있습니다.
 
 ```python
 from langchain.chains import create_retrieval_chain

@@ -2,15 +2,15 @@
 title: Apify Actor
 ---
 
->[Apify Actors](https://docs.apify.com/platform/actors) are cloud programs designed for a wide range of web scraping, crawling, and data extraction tasks. These actors facilitate automated data gathering from the web, enabling users to extract, process, and store information efficiently. Actors can be used to perform tasks like scraping e-commerce sites for product details, monitoring price changes, or gathering search engine results. They integrate seamlessly with [Apify Datasets](https://docs.apify.com/platform/storage/dataset), allowing the structured data collected by actors to be stored, managed, and exported in formats like JSON, CSV, or Excel for further analysis or use.
+>[Apify Actors](https://docs.apify.com/platform/actors)는 웹 스크래핑, 크롤링 및 데이터 추출 작업을 위해 설계된 클라우드 프로그램입니다. 이러한 Actor들은 웹에서 자동화된 데이터 수집을 용이하게 하여 사용자가 정보를 효율적으로 추출, 처리 및 저장할 수 있도록 합니다. Actor는 전자상거래 사이트에서 제품 세부 정보를 스크래핑하거나, 가격 변동을 모니터링하거나, 검색 엔진 결과를 수집하는 등의 작업을 수행하는 데 사용할 수 있습니다. [Apify Datasets](https://docs.apify.com/platform/storage/dataset)와 원활하게 통합되어 Actor가 수집한 구조화된 데이터를 저장, 관리하고 JSON, CSV 또는 Excel과 같은 형식으로 내보내 추가 분석이나 사용에 활용할 수 있습니다.
 
 ## Overview
 
-This notebook walks you through using [Apify Actors](https://docs.apify.com/platform/actors) with LangChain to automate web scraping and data extraction. The `langchain-apify` package integrates Apify's cloud-based tools with LangChain agents, enabling efficient data collection and processing for AI applications.
+이 노트북은 [Apify Actors](https://docs.apify.com/platform/actors)를 LangChain과 함께 사용하여 웹 스크래핑 및 데이터 추출을 자동화하는 방법을 안내합니다. `langchain-apify` 패키지는 Apify의 클라우드 기반 도구를 LangChain agent와 통합하여 AI 애플리케이션을 위한 효율적인 데이터 수집 및 처리를 가능하게 합니다.
 
 ## Setup
 
-This integration lives in the [langchain-apify](https://pypi.org/project/langchain-apify/) package. The package can be installed using pip.
+이 통합은 [langchain-apify](https://pypi.org/project/langchain-apify/) 패키지에 포함되어 있습니다. 이 패키지는 pip를 사용하여 설치할 수 있습니다.
 
 ```python
 pip install langchain-apify
@@ -18,8 +18,8 @@ pip install langchain-apify
 
 ### Prerequisites
 
-- **Apify account**: Register your free Apify account [here](https://console.apify.com/sign-up).
-- **Apify API token**: Learn how to get your API token in the [Apify documentation](https://docs.apify.com/platform/integrations/api).
+- **Apify 계정**: [여기](https://console.apify.com/sign-up)에서 무료 Apify 계정을 등록하세요.
+- **Apify API token**: [Apify 문서](https://docs.apify.com/platform/integrations/api)에서 API token을 얻는 방법을 확인하세요.
 
 ```python
 import os
@@ -30,7 +30,7 @@ os.environ["OPENAI_API_KEY"] = "your-openai-api-key"
 
 ## Instantiation
 
-Here we instantiate the `ApifyActorsTool` to be able to call [RAG Web Browser](https://apify.com/apify/rag-web-browser) Apify Actor. This Actor provides web browsing functionality for AI and LLM applications, similar to the web browsing feature in ChatGPT. Any Actor from the [Apify Store](https://apify.com/store) can be used in this way.
+여기서는 [RAG Web Browser](https://apify.com/apify/rag-web-browser) Apify Actor를 호출할 수 있도록 `ApifyActorsTool`을 인스턴스화합니다. 이 Actor는 ChatGPT의 웹 브라우징 기능과 유사하게 AI 및 LLM 애플리케이션을 위한 웹 브라우징 기능을 제공합니다. [Apify Store](https://apify.com/store)의 모든 Actor를 이러한 방식으로 사용할 수 있습니다.
 
 ```python
 from langchain_apify import ApifyActorsTool
@@ -40,7 +40,7 @@ tool = ApifyActorsTool("apify/rag-web-browser")
 
 ## Invocation
 
-The `ApifyActorsTool` takes a single argument, which is `run_input` - a dictionary that is passed as a run input to the Actor. Run input schema documentation can be found in the input section of the Actor details page. See [RAG Web Browser input schema](https://apify.com/apify/rag-web-browser/input-schema).
+`ApifyActorsTool`은 단일 인수를 받으며, 이는 `run_input`입니다 - Actor에 실행 입력으로 전달되는 dictionary입니다. 실행 입력 스키마 문서는 Actor 세부 정보 페이지의 input 섹션에서 찾을 수 있습니다. [RAG Web Browser input schema](https://apify.com/apify/rag-web-browser/input-schema)를 참조하세요.
 
 ```python
 tool.invoke({"run_input": {"query": "what is apify?", "maxResults": 2}})
@@ -48,7 +48,7 @@ tool.invoke({"run_input": {"query": "what is apify?", "maxResults": 2}})
 
 ## Chaining
 
-We can provide the created tool to an [agent](https://python.langchain.com/docs/tutorials/agents/). When asked to search for information, the agent will call the Apify Actor, which will search the web, and then retrieve the search results.
+생성된 tool을 [agent](https://python.langchain.com/docs/tutorials/agents/)에 제공할 수 있습니다. 정보 검색을 요청받으면 agent는 Apify Actor를 호출하고, Actor는 웹을 검색한 다음 검색 결과를 반환합니다.
 
 ```python
 pip install langgraph langchain-openai
@@ -113,7 +113,7 @@ For more information, you can visit [Apify's official website](https://apify.com
 
 ## API reference
 
-For more information on how to use this integration, see the [git repository](https://github.com/apify/langchain-apify) or the [Apify integration documentation](https://docs.apify.com/platform/integrations/langgraph).
+이 통합을 사용하는 방법에 대한 자세한 내용은 [git repository](https://github.com/apify/langchain-apify) 또는 [Apify integration documentation](https://docs.apify.com/platform/integrations/langgraph)을 참조하세요.
 
 ```python
 

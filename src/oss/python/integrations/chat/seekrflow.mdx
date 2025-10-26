@@ -2,13 +2,13 @@
 title: ChatSeekrFlow
 ---
 
-> [Seekr](https://www.seekr.com/) provides AI-powered solutions for structured, explainable, and transparent AI interactions.
+> [Seekr](https://www.seekr.com/)는 구조화되고 설명 가능하며 투명한 AI 상호작용을 위한 AI 기반 솔루션을 제공합니다.
 
-This guide provides a quick overview for getting started with Seekr [chat models](/oss/langchain/models). For detailed documentation of all `ChatSeekrFlow` features and configurations, head to the [API reference](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.seekrflow.ChatSeekrFlow.html).
+이 가이드는 Seekr [chat models](/oss/langchain/models) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `ChatSeekrFlow` 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.seekrflow.ChatSeekrFlow.html)를 참조하세요.
 
 ## Overview
 
-`ChatSeekrFlow` class wraps a chat model endpoint hosted on SeekrFlow, enabling seamless integration with LangChain applications.
+`ChatSeekrFlow` class는 SeekrFlow에서 호스팅되는 chat model endpoint를 래핑하여 LangChain 애플리케이션과의 원활한 통합을 가능하게 합니다.
 
 ### Integration Details
 
@@ -24,31 +24,31 @@ This guide provides a quick overview for getting started with Seekr [chat models
 
 ### Supported Methods
 
-`ChatSeekrFlow` supports all methods of `ChatModel`, **except async APIs**.
+`ChatSeekrFlow`는 **async API를 제외한** `ChatModel`의 모든 메서드를 지원합니다.
 
 ### Endpoint Requirements
 
-The serving endpoint `ChatSeekrFlow` wraps **must** have OpenAI-compatible chat input/output format. It can be used for:
+`ChatSeekrFlow`가 래핑하는 serving endpoint는 **반드시** OpenAI 호환 chat input/output 형식을 가져야 합니다. 다음과 같은 용도로 사용할 수 있습니다:
 
 1. **Fine-tuned Seekr models**
 2. **Custom SeekrFlow models**
-3. **RAG-enabled models using Seekr's retrieval system**
+3. **Seekr의 retrieval system을 사용하는 RAG-enabled models**
 
-For async usage, please refer to `AsyncChatSeekrFlow` (coming soon).
+async 사용에 대해서는 `AsyncChatSeekrFlow`를 참조하세요 (곧 출시 예정).
 
-# Getting Started with ChatSeekrFlow in LangChain
+# LangChain에서 ChatSeekrFlow 시작하기
 
-This notebook covers how to use SeekrFlow as a chat model in LangChain.
+이 노트북은 LangChain에서 SeekrFlow를 chat model로 사용하는 방법을 다룹니다.
 
 ## Setup
 
-Ensure you have the necessary dependencies installed:
+필요한 dependencies가 설치되어 있는지 확인하세요:
 
 ```bash
 pip install seekrai langchain langchain-community
 ```
 
-You must also have an API key from Seekr to authenticate requests.
+요청을 인증하려면 Seekr의 API key도 필요합니다.
 
 ```python
 # Standard library
@@ -67,11 +67,11 @@ from seekrai import SeekrFlow
 
 ## API Key Setup
 
-You'll need to set your API key as an environment variable to authenticate requests.
+요청을 인증하려면 API key를 environment variable로 설정해야 합니다.
 
-Run the below cell.
+아래 셀을 실행하세요.
 
-Or manually assign it before running queries:
+또는 쿼리를 실행하기 전에 수동으로 할당하세요:
 
 ```python
 SEEKR_API_KEY = "your-api-key-here"

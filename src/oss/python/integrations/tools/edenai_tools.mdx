@@ -2,11 +2,11 @@
 title: Eden AI
 ---
 
-This Jupyter Notebook demonstrates how to use Eden AI tools with an Agent.
+이 Jupyter Notebook은 Agent와 함께 Eden AI 도구를 사용하는 방법을 보여줍니다.
 
-Eden AI is revolutionizing the AI landscape by uniting the best AI providers, empowering users to unlock limitless possibilities and tap into the true potential of artificial intelligence. With an all-in-one comprehensive and hassle-free platform, it allows users to deploy AI features to production lightning fast, enabling effortless access to the full breadth of AI capabilities via a single API. (website: [edenai.co/](https://edenai.co/) )
+Eden AI는 최고의 AI 제공업체를 통합하여 사용자가 무한한 가능성을 열고 인공지능의 진정한 잠재력을 활용할 수 있도록 AI 환경을 혁신하고 있습니다. 올인원 종합 플랫폼으로 사용자가 AI 기능을 프로덕션에 매우 빠르게 배포할 수 있으며, 단일 API를 통해 AI 기능의 전체 범위에 손쉽게 액세스할 수 있습니다. (웹사이트: [edenai.co/](https://edenai.co/) )
 
-By including an Edenai tool in the list of tools provided to an Agent, you can grant your Agent the ability to do multiple tasks, such as:
+Agent에 제공되는 도구 목록에 Edenai 도구를 포함하면 Agent에 다음과 같은 여러 작업을 수행할 수 있는 기능을 부여할 수 있습니다:
 
 - speech to text
 - text to speech
@@ -16,14 +16,14 @@ By including an Edenai tool in the list of tools provided to an Agent, you can g
 - OCR invoice parsing
 - OCR ID parsing
 
-In this example, we will go through the process of utilizing the Edenai tools to create an Agent that can perform some of the tasks listed above.
+이 예제에서는 Edenai 도구를 활용하여 위에 나열된 일부 작업을 수행할 수 있는 Agent를 만드는 과정을 살펴보겠습니다.
 
 ---------------------------------------------------------------------------
-Accessing the EDENAI's API requires an API key,
+EDENAI의 API에 액세스하려면 API key가 필요합니다.
 
-which you can get by creating an account [app.edenai.run/user/register](https://app.edenai.run/user/register)  and heading here [app.edenai.run/admin/account/settings](https://app.edenai.run/admin/account/settings)
+계정을 생성하여 [app.edenai.run/user/register](https://app.edenai.run/user/register)에서 API key를 얻을 수 있으며, [app.edenai.run/admin/account/settings](https://app.edenai.run/admin/account/settings)로 이동하세요.
 
-Once we have a key we'll want to set it as the environment variable `EDENAI_API_KEY` or you can pass the key in directly via the edenai_api_key named parameter when initiating the EdenAI tools, e.g. `EdenAiTextModerationTool(edenai_api_key="...")`
+key를 얻으면 환경 변수 `EDENAI_API_KEY`로 설정하거나 EdenAI 도구를 초기화할 때 edenai_api_key 명명된 매개변수를 통해 직접 key를 전달할 수 있습니다. 예: `EdenAiTextModerationTool(edenai_api_key="...")`
 
 ```python
 pip install -qU langchain-community
@@ -67,7 +67,7 @@ agent_chain = initialize_agent(
 )
 ```
 
-## Example with text
+## text 예제
 
 ```python
 input_ = """i have this text : 'i want to slap you'
@@ -106,7 +106,7 @@ Final Answer: The text contains explicit content of violence with a likelihood o
 > Finished chain.
 ```
 
-you can have more details of the execution by printing the result
+결과를 출력하여 실행에 대한 자세한 내용을 확인할 수 있습니다
 
 ```python
 result["output"]
@@ -129,7 +129,7 @@ result
    'https://d14uq1pz7dzsdq.cloudfront.net/0c825002-b4ef-4165-afa3-a140a5b25c82_.mp3?Expires=1693318351&Signature=V9vjgFe8pV5rnH-B2EUr8UshTEA3I0Xv1v0YwVEAq8w7G5pgex07dZ0M6h6fXusk7G3SW~sXs4IJxnD~DnIDp1XorvzMA2QVMJb8CD90EYvUWx9zfFa3tIegGapg~NC8wEGualccOehC~cSDhiQWrwAjDqPmq2olXnUVOfyl76pKNNR9Sm2xlljlrJcLCClBee2r5yCFEwFI-tnXX1lV2DGc5PNB66Lqrr0Fpe2trVJj2k8cLduIb8dbtqLPNIDCsV0N4QT10utZmhZcPpcSIBsdomw1Os1IjdG4nA8ZTIddAcLMCWJznttzl66vHPk26rjDpG5doMTTsPEz8ZKILQ__&Key-Pair-Id=K1F55BTI9AHGIK')]}
 ```
 
-## Example with images
+## image 예제
 
 ```python
 input_ = """i have this url of an image : "https://static.javatpoint.com/images/objects.jpg"
@@ -198,7 +198,7 @@ result["output"]
 "The image contains objects such as Apple, Backpack, Luggage & bags, and Container. None of them are harmful. The text 'this item is safe' can be found in the audio file at https://d14uq1pz7dzsdq.cloudfront.net/0546db8b-528e-4b63-9a69-d14d43ad1566_.mp3?Expires=1693316753&Signature=N0KZeK9I-1s7wTgiQOAwH7LFlltwyonSJcDnkdnr8JIJmbgSw6fo6RTxWl~VvD2Hg6igJqxtJFFWyrBmmx-f9wWLw3bZSnuMxkhTRqLX9aUA9N-vPJGiRZV5BFredaOm8pwfo8TcXhVjw08iSxv8GSuyZEIwZkiq4PzdiyVTnKKji6eyt"
 ```
 
-you can have more details of the execution by printing the result
+결과를 출력하여 실행에 대한 자세한 내용을 확인할 수 있습니다
 
 ```python
 result
@@ -215,7 +215,7 @@ result
    'https://d14uq1pz7dzsdq.cloudfront.net/0546db8b-528e-4b63-9a69-d14d43ad1566_.mp3?Expires=1693316753&Signature=N0KZeK9I-1s7wTgiQOAwH7LFlltwyonSJcDnkdnr8JIJmbgSw6fo6RTxWl~VvD2Hg6igJqxtJFFWyrBmmx-f9wWLw3bZSnuMxkhTRqLX9aUA9N-vPJGiRZV5BFredaOm8pwfo8TcXhVjw08iSxv8GSuyZEIwZkiq4PzdiyVTnKKji6eytV0CrnHrTs~eXZkSnOdD2Fu0ECaKvFHlsF4IDLI8efRvituSk0X3ygdec4HQojl5vmBXJzi1TuhKWOX8UxeQle8pdjjqUPSJ9thTHpucdPy6UbhZOH0C9rbtLrCfvK5rzrT4D~gKy9woICzG34tKRxNxHYVVUPqx2BiInA__&Key-Pair-Id=K1F55BTI9AHGIK')]}
 ```
 
-## Example with OCR images
+## OCR image 예제
 
 ```python
 input_ = """i have this url of an id: "https://www.citizencard.com/images/citizencard-uk-id-card-2023.jpg"

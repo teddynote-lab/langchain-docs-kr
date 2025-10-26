@@ -2,11 +2,11 @@
 title: URL
 ---
 
-This example covers how to load `HTML` documents from a list of `URLs` into the @[`Document`] format that we can use downstream.
+이 예제는 `URL` 목록에서 `HTML` 문서를 로드하여 다운스트림에서 사용할 수 있는 @[`Document`] 형식으로 변환하는 방법을 다룹니다.
 
 ## Unstructured URL Loader
 
-For the examples below, please install the `unstructured` library and see [this guide](/oss/integrations/providers/unstructured/) for more instructions on setting up Unstructured locally, including setting up required system dependencies:
+아래 예제를 실행하려면 `unstructured` 라이브러리를 설치하고, 필요한 시스템 종속성 설정을 포함하여 Unstructured를 로컬에서 설정하는 방법에 대한 자세한 내용은 [이 가이드](/oss/integrations/providers/unstructured/)를 참조하세요:
 
 ```python
 pip install -qU unstructured
@@ -21,7 +21,7 @@ urls = [
 ]
 ```
 
-Pass in ssl_verify=False with headers=headers to get past ssl_verification errors.
+ssl_verification 오류를 해결하려면 headers=headers와 함께 ssl_verify=False를 전달하세요.
 
 ```python
 loader = UnstructuredURLLoader(urls=urls)
@@ -37,11 +37,11 @@ Document(page_content='Skip to main content\n\nSearch form\n\nHome\n\nWho We Are
 
 ## Selenium URL Loader
 
-This covers how to load HTML documents from a list of URLs using the `SeleniumURLLoader`.
+이 섹션은 `SeleniumURLLoader`를 사용하여 URL 목록에서 HTML 문서를 로드하는 방법을 다룹니다.
 
-Using `Selenium` allows us to load pages that require JavaScript to render.
+`Selenium`을 사용하면 JavaScript 렌더링이 필요한 페이지를 로드할 수 있습니다.
 
-To use the `SeleniumURLLoader`, you have to install `selenium` and `unstructured`.
+`SeleniumURLLoader`를 사용하려면 `selenium`과 `unstructured`를 설치해야 합니다.
 
 ```python
 pip install -qU selenium unstructured
@@ -68,15 +68,15 @@ Document(page_content='Menu\n\nSearch\n\nClose\n\nCollapse side panel\n\n323,527
 
 ## Playwright URL Loader
 
->[Playwright](https://github.com/microsoft/playwright) is an open-source automation tool developed by `Microsoft` that allows you to programmatically control and automate web browsers. It is designed for end-to-end testing, scraping, and automating tasks across various web browsers such as `Chromium`, `Firefox`, and `WebKit`.
+>[Playwright](https://github.com/microsoft/playwright)는 `Microsoft`에서 개발한 오픈 소스 자동화 도구로, 웹 브라우저를 프로그래밍 방식으로 제어하고 자동화할 수 있습니다. `Chromium`, `Firefox`, `WebKit`과 같은 다양한 웹 브라우저에서 엔드 투 엔드 테스트, 스크래핑 및 작업 자동화를 위해 설계되었습니다.
 
-This covers how to load HTML documents from a list of URLs using the `PlaywrightURLLoader`.
+이 섹션은 `PlaywrightURLLoader`를 사용하여 URL 목록에서 HTML 문서를 로드하는 방법을 다룹니다.
 
-[Playwright](https://playwright.dev/) enables reliable end-to-end testing for modern web apps.
+[Playwright](https://playwright.dev/)는 최신 웹 앱을 위한 안정적인 엔드 투 엔드 테스트를 가능하게 합니다.
 
-As in the Selenium case, `Playwright` allows us to load and render the JavaScript pages.
+Selenium의 경우와 마찬가지로, `Playwright`를 사용하면 JavaScript 페이지를 로드하고 렌더링할 수 있습니다.
 
-To use the `PlaywrightURLLoader`, you have to install `playwright` and `unstructured`. Additionally, you have to install the `Playwright Chromium` browser:
+`PlaywrightURLLoader`를 사용하려면 `playwright`와 `unstructured`를 설치해야 합니다. 또한 `Playwright Chromium` 브라우저를 설치해야 합니다:
 
 ```python
 pip install -qU playwright unstructured
@@ -86,7 +86,7 @@ pip install -qU playwright unstructured
 !playwright install
 ```
 
-Currently, nly the async method supported:
+현재는 async 메서드만 지원됩니다:
 
 ```python
 from langchain_community.document_loaders import PlaywrightURLLoader

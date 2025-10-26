@@ -2,19 +2,19 @@
 title: KoboldAI API
 ---
 
-[KoboldAI](https://github.com/KoboldAI/KoboldAI-Client) is a "a browser-based front-end for AI-assisted writing with multiple local & remote AI models...". It has a public and local API that is able to be used in langchain.
+[KoboldAI](https://github.com/KoboldAI/KoboldAI-Client)는 "여러 로컬 및 원격 AI 모델을 사용하는 AI 지원 글쓰기를 위한 브라우저 기반 프론트엔드"입니다. langchain에서 사용할 수 있는 public 및 local API를 제공합니다.
 
-This example goes over how to use LangChain with that API.
+이 예제는 LangChain에서 해당 API를 사용하는 방법을 다룹니다.
 
-Documentation can be found in the browser adding /api to the end of your endpoint (i.e [127.0.0.1/:5000/api](http://127.0.0.1/:5000/api)).
+문서는 endpoint 끝에 /api를 추가하여 브라우저에서 확인할 수 있습니다 (예: [127.0.0.1/:5000/api](http://127.0.0.1/:5000/api)).
 
 ```python
 from langchain_community.llms import KoboldApiLLM
 ```
 
-Replace the endpoint seen below with the one shown in the output after starting the webui with --api or --public-api
+아래에 표시된 endpoint를 --api 또는 --public-api로 webui를 시작한 후 출력에 표시된 것으로 교체하세요
 
-Optionally, you can pass in parameters like temperature or max_length
+선택적으로 temperature 또는 max_length와 같은 parameter를 전달할 수 있습니다
 
 ```python
 llm = KoboldApiLLM(endpoint="http://192.168.1.144:5000", max_length=80)

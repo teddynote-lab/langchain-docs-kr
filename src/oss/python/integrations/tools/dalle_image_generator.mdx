@@ -2,9 +2,9 @@
 title: Dall-E Image Generator
 ---
 
->[OpenAI Dall-E](https://openai.com/dall-e-3) are text-to-image models developed by OpenAI using deep learning methodologies to generate digital images from natural language descriptions, called "prompts".
+>[OpenAI Dall-E](https://openai.com/dall-e-3)는 OpenAI에서 개발한 text-to-image 모델로, 딥러닝 방법론을 사용하여 "prompts"라고 불리는 자연어 설명으로부터 디지털 이미지를 생성합니다.
 
-This notebook shows how you can generate images from a prompt synthesized using an OpenAI LLM. The images are generated using `Dall-E`, which uses the same OpenAI API key as the LLM.
+이 노트북은 OpenAI LLM을 사용하여 합성된 prompt로부터 이미지를 생성하는 방법을 보여줍니다. 이미지는 LLM과 동일한 OpenAI API key를 사용하는 `Dall-E`를 통해 생성됩니다.
 
 ```python
 # Needed if you would like to display images in the notebook
@@ -19,7 +19,7 @@ from langchain_openai import OpenAI
 os.environ["OPENAI_API_KEY"] = "insertapikey"
 ```
 
-## Run as a chain
+## chain으로 실행하기
 
 ```python
 from langchain.chains import LLMChain
@@ -70,7 +70,7 @@ else:
     cv2.destroyAllWindows()
 ```
 
-## Run as a tool with an agent
+## agent와 함께 tool로 실행하기
 
 ```python
 from langchain_community.tools.openai_dalle_image_generation import (

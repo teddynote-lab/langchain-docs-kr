@@ -2,25 +2,25 @@
 title: Kay.ai
 ---
 
->[Kai Data API](https://www.kay.ai/) built for RAG 🕵️ We are curating the world's largest datasets as high-quality embeddings so your AI agents can retrieve context on the fly. Latest models, fast retrieval, and zero infra.
+>[Kai Data API](https://www.kay.ai/)는 RAG를 위해 구축되었습니다 🕵️ 우리는 세계 최대 규모의 데이터셋을 고품질 embedding으로 큐레이션하여 AI agent가 즉시 context를 검색할 수 있도록 합니다. 최신 모델, 빠른 검색, 그리고 인프라 관리 불필요.
 
-This notebook shows you how to retrieve datasets supported by [Kay](https://kay.ai/). You can currently search `SEC Filings` and `Press Releases of US companies`. Visit [kay.ai](https://kay.ai) for the latest data drops. For any questions, join our [discord](https://discord.gg/hAnE4e5T6M) or [tweet at us](https://twitter.com/vishalrohra_)
+이 notebook은 [Kay](https://kay.ai/)에서 지원하는 데이터셋을 검색하는 방법을 보여줍니다. 현재 미국 기업의 `SEC Filings`와 `Press Releases`를 검색할 수 있습니다. 최신 데이터 업데이트는 [kay.ai](https://kay.ai)를 방문하세요. 질문이 있으시면 [discord](https://discord.gg/hAnE4e5T6M)에 참여하거나 [트위터로 문의](https://twitter.com/vishalrohra_)해주세요.
 
 ## Installation
 
-First, install the [`kay` package](https://pypi.org/project/kay/).
+먼저 [`kay` package](https://pypi.org/project/kay/)를 설치합니다.
 
 ```python
 !pip install kay
 ```
 
-You will also need an API key: you can get one for free at [https://kay.ai](https://kay.ai/). Once you have an API key, you must set it as an environment variable `KAY_API_KEY`.
+API key도 필요합니다: [https://kay.ai](https://kay.ai)에서 무료로 받을 수 있습니다. API key를 받은 후에는 환경 변수 `KAY_API_KEY`로 설정해야 합니다.
 
-`KayAiRetriever` has a static `.create()` factory method that takes the following arguments:
+`KayAiRetriever`는 다음 인자를 받는 정적 `.create()` factory method를 가지고 있습니다:
 
-* `dataset_id: string` required -- A Kay dataset id. This is a collection of data about a particular entity such as companies, people, or places. For example, try `"company"`
-* `data_type: List[string]` optional -- This is a category within a  dataset based on its origin or format, such as ‘SEC Filings’, ‘Press Releases’, or ‘Reports’ within the “company” dataset. For example, try ["10-K", "10-Q", "PressRelease"] under the “company” dataset. If left empty, Kay will retrieve the most relevant context across all types.
-* `num_contexts: int` optional, defaults to 6 -- The number of document chunks to retrieve on each call to `get_relevant_documents()`
+* `dataset_id: string` 필수 -- Kay dataset id입니다. 이는 회사, 사람 또는 장소와 같은 특정 entity에 대한 데이터 모음입니다. 예를 들어 `"company"`를 시도해보세요.
+* `data_type: List[string]` 선택 -- 이는 'SEC Filings', 'Press Releases' 또는 'Reports'와 같이 출처나 형식에 따른 dataset 내의 카테고리입니다. 예를 들어 "company" dataset에서 ["10-K", "10-Q", "PressRelease"]를 시도해보세요. 비워두면 Kay는 모든 타입에서 가장 관련성 높은 context를 검색합니다.
+* `num_contexts: int` 선택, 기본값 6 -- `get_relevant_documents()` 호출 시 검색할 document chunk의 수
 
 ## Examples
 

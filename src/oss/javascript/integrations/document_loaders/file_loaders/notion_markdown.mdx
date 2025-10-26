@@ -2,13 +2,13 @@
 title: Notion markdown export
 ---
 
-This example goes over how to load data from your Notion pages exported from the notion dashboard.
+이 예제는 Notion 대시보드에서 내보낸 Notion 페이지에서 데이터를 로드하는 방법을 설명합니다.
 
-First, export your notion pages as **Markdown & CSV** as per the offical explanation [here](https://www.notion.so/help/export-your-content). Make sure to select `include subpages` and `Create folders for subpages.`
+먼저, [공식 설명](https://www.notion.so/help/export-your-content)에 따라 Notion 페이지를 **Markdown & CSV**로 내보내세요. `include subpages`와 `Create folders for subpages`를 선택해야 합니다.
 
-Then, unzip the downloaded file and move the unzipped folder into your repository. It should contain the markdown files of your pages.
+그런 다음, 다운로드한 파일의 압축을 풀고 압축 해제된 폴더를 저장소로 이동하세요. 폴더에는 페이지의 markdown 파일이 포함되어 있어야 합니다.
 
-Once the folder is in your repository, simply run the example below:
+폴더가 저장소에 있으면 아래 예제를 실행하기만 하면 됩니다:
 
 ```typescript
 import { NotionLoader } from "@langchain/community/document_loaders/fs/notion";

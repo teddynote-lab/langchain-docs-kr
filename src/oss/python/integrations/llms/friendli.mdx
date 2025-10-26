@@ -1,21 +1,22 @@
+```markdown
 ---
 title: Friendli
 ---
 
 
-> [Friendli](https://friendli.ai/) enhances AI application performance and optimizes cost savings with scalable, efficient deployment options, tailored for high-demand AI workloads.
+> [Friendli](https://friendli.ai/)는 확장 가능하고 효율적인 배포 옵션을 통해 AI 애플리케이션 성능을 향상시키고 비용 절감을 최적화하며, 높은 수요의 AI 워크로드에 맞춤화되어 있습니다.
 
-This tutorial guides you through integrating `Friendli` with LangChain.
+이 튜토리얼은 `Friendli`를 LangChain과 통합하는 방법을 안내합니다.
 
 ## Setup
 
-Ensure the `langchain_community` and `friendli-client` are installed.
+`langchain_community`와 `friendli-client`가 설치되어 있는지 확인하세요.
 
 ```sh
 pip install -U langchain-community friendli-client
 ```
 
-Sign in to [Friendli Suite](https://suite.friendli.ai/) to create a Personal Access Token, and set it as the `FRIENDLI_TOKEN` environment.
+[Friendli Suite](https://suite.friendli.ai/)에 로그인하여 Personal Access Token을 생성하고, 이를 `FRIENDLI_TOKEN` 환경 변수로 설정하세요.
 
 ```python
 import getpass
@@ -25,8 +26,8 @@ if "FRIENDLI_TOKEN" not in os.environ:
     os.environ["FRIENDLI_TOKEN"] = getpass.getpass("Friendi Personal Access Token: ")
 ```
 
-You can initialize a Friendli chat model with selecting the model you want to use.
-The default model is `meta-llama-3.1-8b-instruct`. You can check the available models at [friendli.ai/docs](https://friendli.ai/docs/guides/serverless_endpoints/pricing#text-generation-models).
+사용하려는 모델을 선택하여 Friendli chat model을 초기화할 수 있습니다.
+기본 모델은 `meta-llama-3.1-8b-instruct`입니다. 사용 가능한 모델은 [friendli.ai/docs](https://friendli.ai/docs/guides/serverless_endpoints/pricing#text-generation-models)에서 확인할 수 있습니다.
 
 ```python
 from langchain_community.llms.friendli import Friendli
@@ -36,9 +37,9 @@ llm = Friendli(model="meta-llama-3.1-8b-instruct", max_tokens=100, temperature=0
 
 ## Usage
 
-`Frienli` supports all methods of [`LLM`](/oss/langchain/models) including async APIs.
+`Frienli`는 async API를 포함한 [`LLM`](/oss/langchain/models)의 모든 메서드를 지원합니다.
 
-You can use functionality of `invoke`, `batch`, `generate`, and `stream`.
+`invoke`, `batch`, `generate`, `stream` 기능을 사용할 수 있습니다.
 
 ```python
 llm.invoke("Tell me a joke.")
@@ -70,7 +71,7 @@ for chunk in llm.stream("Tell me a joke."):
     print(chunk, end="", flush=True)
 ```
 
-You can also use all functionality of async APIs: `ainvoke`, `abatch`, `agenerate`, and `astream`.
+async API의 모든 기능도 사용할 수 있습니다: `ainvoke`, `abatch`, `agenerate`, `astream`.
 
 ```python
 await llm.ainvoke("Tell me a joke.")
@@ -100,4 +101,5 @@ LLMResult(generations=[[Generation(text=" I need a laugh.\nHere's one: Why could
 ```python
 async for chunk in llm.astream("Tell me a joke."):
     print(chunk, end="", flush=True)
+```
 ```

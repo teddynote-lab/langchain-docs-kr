@@ -2,13 +2,13 @@
 title: Pinecone (sparse)
 ---
 
->[Pinecone](https://docs.pinecone.io/docs/overview) is a vector database with broad functionality.
+>[Pinecone](https://docs.pinecone.io/docs/overview)는 광범위한 기능을 제공하는 vector database입니다.
 
-This notebook shows how to use functionality related to the `Pinecone` vector database.
+이 노트북에서는 `Pinecone` vector database와 관련된 기능을 사용하는 방법을 보여줍니다.
 
-## Setup
+## 설정
 
-To use the `PineconeSparseVectorStore` you first need to install the partner package, as well as the other packages used throughout this notebook.
+`PineconeSparseVectorStore`를 사용하려면, 파트너 package와 이 노트북 전반에서 사용하는 다른 package들을 먼저 설치해야 합니다.
 
 ```python
 pip install -qU "langchain-pinecone==0.2.5"
@@ -19,9 +19,9 @@ WARNING: pinecone 6.0.2 does not provide the extra 'async'
 
 ```
 
-### Credentials
+### 자격 증명
 
-Create a new Pinecone account, or sign into your existing one, and create an API key to use in this notebook.
+새로운 Pinecone account를 만들거나 기존 account에 로그인한 뒤, 이 노트북에서 사용할 API key를 생성하세요.
 
 ```python
 import os
@@ -42,9 +42,9 @@ pc = Pinecone()
 Enter your Pinecone API key: ··········
 ```
 
-## Initialization
+## 초기화
 
-Before initializing our vector store, let's connect to a Pinecone index. If one named index_name doesn't exist, it will be created.
+vector store를 초기화하기 전에 Pinecone index에 연결해 보겠습니다. 이름이 index_name인 index가 없다면 새로 생성됩니다.
 
 ```python
 from pinecone import AwsRegion, CloudProvider, Metric, ServerlessSpec
@@ -72,7 +72,7 @@ print(f"Index `{index_name}` host: {index.config.host}")
 Index `langchain-sparse-vector-search` host: https://langchain-sparse-vector-search-yrrgefy.svc.aped-4627-b74a.pinecone.io
 ```
 
-For our sparse embedding model we use [`pinecone-sparse-english-v0`](https://docs.pinecone.io/models/pinecone-sparse-english-v0), we initialize it like so:
+sparse embedding model로 [`pinecone-sparse-english-v0`](https://docs.pinecone.io/models/pinecone-sparse-english-v0)를 사용하며, 다음과 같이 초기화합니다:
 
 ```python
 from langchain_pinecone.embeddings import PineconeSparseEmbeddings
@@ -80,7 +80,7 @@ from langchain_pinecone.embeddings import PineconeSparseEmbeddings
 sparse_embeddings = PineconeSparseEmbeddings(model=model_name)
 ```
 
-Now that our Pinecone index and embedding model are both ready, we can initialize our sparse vector store in LangChain:
+이제 Pinecone index와 embedding model이 준비되었으므로, LangChain에서 sparse vector store를 초기화할 수 있습니다:
 
 ```python
 from langchain_pinecone import PineconeSparseVectorStore
@@ -88,13 +88,13 @@ from langchain_pinecone import PineconeSparseVectorStore
 vector_store = PineconeSparseVectorStore(index=index, embedding=sparse_embeddings)
 ```
 
-## Manage vector store
+## vector store 관리
 
-Once you have created your vector store, we can interact with it by adding and deleting different items.
+vector store를 만들었으면 항목을 추가하거나 삭제하여 상호작용할 수 있습니다.
 
-### Add items to vector store
+### vector store에 항목 추가
 
-We can add items to our vector store by using the `add_documents` function.
+`add_documents` function을 사용해 vector store에 항목을 추가할 수 있습니다.
 
 ```python
 from uuid import uuid4
@@ -162,19 +162,19 @@ vector_store.add_documents(documents=documents, ids=uuids)
  '66cacc6f-b8e2-441b-9f7f-468788aad88f']
 ```
 
-### Delete items from vector store
+### vector store에서 항목 삭제
 
-We can delete records from our vector store using the `delete` method, providing it with a list of document IDs to delete.
+`delete` method를 사용하여 vector store에서 record를 삭제할 수 있으며, 삭제할 document ID 목록을 전달하면 됩니다.
 
 ```python
 vector_store.delete(ids=[uuids[-1]])
 ```
 
-## Query vector store
+## vector store 쿼리
 
-Once we have loaded our documents into the vector store we're most likely ready to begin querying. There are various method for doing this in LangChain.
+document를 vector store에 적재했으면 보통 쿼리를 시작할 준비가 된 것입니다. LangChain에는 이를 위한 다양한 methods가 있습니다.
 
-First, we'll see how to perform a simple vector search by querying our `vector_store` directly via the `similarity_search` method:
+먼저 `similarity_search` method를 통해 `vector_store`를 직접 쿼리하여 간단한 vector search를 수행하는 방법을 보겠습니다:
 
 ```python
 results = vector_store.similarity_search("I'm building a new LangChain project!", k=3)
@@ -189,7 +189,7 @@ for res in results:
 * LangGraph is the best framework for building stateful, agentic applications! [{'source': 'social'}]
 ```
 
-We can also add [metadata filtering](https://docs.pinecone.io/guides/data/understanding-metadata#metadata-query-language) to our query to limit our search based on various criteria. Let's try a simple filter to limit our search to include only records with `source=="social"`:
+쿼리에 [metadata filtering](https://docs.pinecone.io/guides/data/understanding-metadata#metadata-query-language)을 추가하여 다양한 기준에 따라 검색 범위를 제한할 수도 있습니다. `source=="social"`인 record만 포함하도록 검색을 제한하는 간단한 filter를 적용해 보겠습니다:
 
 ```python
 results = vector_store.similarity_search(
@@ -207,11 +207,11 @@ for res in results:
 * LangGraph is the best framework for building stateful, agentic applications! [{'source': 'social'}]
 ```
 
-When comparing these results, we can see that our first query returned a different record from the `"website"` source. In our latter, filtered, query — this is no longer the case.
+이 결과들을 비교해 보면 첫 번째 쿼리는 `"website"` source에서 다른 record를 반환했음을 알 수 있습니다. 이후의 filter가 적용된 쿼리에서는 더 이상 그렇지 않습니다.
 
-### Similarity Search and Scores
+### Similarity Search와 점수
 
-We can also search while returning the similarity score in a list of `(document, score)` tuples. Where the `document` is a LangChain @[`Document`] object containing our text content and metadata.
+검색 시 `(document, score)` tuple 목록과 함께 similarity score를 반환하도록 할 수도 있습니다. 여기서 `document`는 텍스트 내용과 metadata를 포함하는 LangChain @[`Document`] object입니다.
 
 ```python
 results = vector_store.similarity_search_with_score(
@@ -227,9 +227,9 @@ for doc, score in results:
 [SIM=1.942383] LangGraph is the best framework for building stateful, agentic applications! [{'source': 'social'}]
 ```
 
-### As a Retriever
+### Retriever로 사용하기
 
-In our chains and agents we'll often use the vector store as a `VectorStoreRetriever`. To create that, we use the `as_retriever` method:
+chain과 agent에서는 vector store를 `VectorStoreRetriever`로 자주 사용합니다. 이를 생성하려면 `as_retriever` method를 사용합니다:
 
 ```python
 retriever = vector_store.as_retriever(
@@ -243,7 +243,7 @@ retriever
 VectorStoreRetriever(tags=['PineconeSparseVectorStore', 'PineconeSparseEmbeddings'], vectorstore=<langchain_pinecone.vectorstores_sparse.PineconeSparseVectorStore object at 0x7c8087b24290>, search_type='similarity_score_threshold', search_kwargs={'k': 3, 'score_threshold': 0.5})
 ```
 
-We can now query our retriever using the `invoke` method:
+이제 `invoke` method를 사용해 retriever를 쿼리할 수 있습니다:
 
 ```python
 retriever.invoke(
@@ -262,17 +262,17 @@ retriever.invoke(
  Document(id='f9f82811-187c-4b25-85b5-7a42b4da3bff', metadata={'source': 'social'}, page_content='LangGraph is the best framework for building stateful, agentic applications!')]
 ```
 
-## Usage for retrieval-augmented generation
+## retrieval-augmented generation에서의 사용
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+이 vector store를 retrieval-augmented generation(RAG)에 사용하는 방법은 다음 섹션을 참조하세요:
 
-- [Build a RAG app with LangChain](/oss/langchain/rag)
+- [LangChain로 RAG 앱 만들기](/oss/langchain/rag)
 - [Agentic RAG](/oss/langgraph/agentic-rag)
-- [Retrieval docs](/oss/langchain/retrieval)
+- [Retrieval 문서](/oss/langchain/retrieval)
 
 ## API reference
 
-For detailed documentation of all features and configurations head to the API reference:
+모든 기능과 설정에 대한 자세한 문서는 API reference를 확인하세요:
 [python.langchain.com/api_reference/pinecone/vectorstores_sparse/langchain_pinecone.vectorstores_sparse.PineconeSparseVectorStore.html#langchain_pinecone.vectorstores_sparse.PineconeSparseVectorStore](https://python.langchain.com/api_reference/pinecone/vectorstores_sparse/langchain_pinecone.vectorstores_sparse.PineconeSparseVectorStore.html#langchain_pinecone.vectorstores_sparse.PineconeSparseVectorStore)
 
 Sparse Embeddings:

@@ -2,9 +2,9 @@
 title: VoyageAI Reranker
 ---
 
->[Voyage AI](https://www.voyageai.com/) provides cutting-edge embedding/vectorizations models.
+>[Voyage AI](https://www.voyageai.com/)는 최첨단 embedding/vectorization 모델을 제공합니다.
 
-This notebook shows how to use [Voyage AI's rerank endpoint](https://api.voyageai.com/v1/rerank) in a retriever. This builds on top of ideas in the ContextualCompressionRetriever.
+이 노트북은 retriever에서 [Voyage AI의 rerank endpoint](https://api.voyageai.com/v1/rerank)를 사용하는 방법을 보여줍니다. 이는 ContextualCompressionRetriever의 아이디어를 기반으로 합니다.
 
 ```python
 pip install -qU  voyageai
@@ -41,9 +41,9 @@ def pretty_print_docs(docs):
     )
 ```
 
-## Set up the base vector store retriever
+## 기본 vector store retriever 설정하기
 
-Let's start by initializing a simple vector store retriever and storing the 2023 State of the Union speech (in chunks). We can set up the retriever to retrieve a high number (20) of docs. You can use any of the following Embeddings models: ([source](https://docs.voyageai.com/docs/embeddings)):
+간단한 vector store retriever를 초기화하고 2023년 국정연설(청크 단위)을 저장하는 것부터 시작하겠습니다. retriever가 많은 수(20개)의 문서를 검색하도록 설정할 수 있습니다. 다음 Embeddings 모델 중 하나를 사용할 수 있습니다: ([출처](https://docs.voyageai.com/docs/embeddings)):
 
 - `voyage-3`
 - `voyage-3-lite`
@@ -282,9 +282,9 @@ And we will, as one people.
 One America.
 ```
 
-## Doing reranking with VoyageAIRerank
+## VoyageAIRerank로 reranking 수행하기
 
-Now let's wrap our base retriever with a `ContextualCompressionRetriever`. We'll use the Voyage AI reranker to rerank the returned results. You can use any of the following Reranking models: ([source](https://docs.voyageai.com/docs/reranker)):
+이제 기본 retriever를 `ContextualCompressionRetriever`로 래핑해보겠습니다. Voyage AI reranker를 사용하여 반환된 결과를 rerank합니다. 다음 Reranking 모델 중 하나를 사용할 수 있습니다: ([출처](https://docs.voyageai.com/docs/reranker)):
 
 - `rerank-2`
 - `rerank-2-lite`
@@ -336,7 +336,7 @@ I know what works: Investing in crime prevention and community police officers w
 So let’s not abandon our streets. Or choose between safety and equal justice.
 ```
 
-You can of course use this retriever within a QA pipeline
+물론 이 retriever를 QA pipeline 내에서 사용할 수 있습니다
 
 ```python
 from langchain.chains import RetrievalQA

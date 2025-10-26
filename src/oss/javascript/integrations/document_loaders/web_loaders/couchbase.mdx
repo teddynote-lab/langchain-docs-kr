@@ -2,22 +2,22 @@
 title: Couchbase
 ---
 
-[Couchbase](http://couchbase.com/) is an award-winning distributed NoSQL cloud database that delivers unmatched versatility, performance, scalability, and financial value for all of your cloud, mobile, AI, and edge computing applications.
+[Couchbase](http://couchbase.com/)는 수상 경력이 있는 분산 NoSQL 클라우드 데이터베이스로, 모든 클라우드, 모바일, AI 및 엣지 컴퓨팅 애플리케이션에 비할 데 없는 다양성, 성능, 확장성 및 경제적 가치를 제공합니다.
 
-This guide shows how to use load documents from couchbase database.
+이 가이드는 Couchbase 데이터베이스에서 문서를 로드하는 방법을 보여줍니다.
 
-# Installation
+# 설치
 
 ```bash npm
 npm install @langchain/community @langchain/core couchbase
 ```
-## Usage
+## 사용법
 
-### Querying for Documents from Couchbase
+### Couchbase에서 문서 쿼리하기
 
-For more details on connecting to a Couchbase cluster, please check the [Node.js SDK documentation](https://docs.couchbase.com/nodejs-sdk/current/howtos/managing-connections.html#connection-strings).
+Couchbase 클러스터 연결에 대한 자세한 내용은 [Node.js SDK 문서](https://docs.couchbase.com/nodejs-sdk/current/howtos/managing-connections.html#connection-strings)를 확인하세요.
 
-For help with querying for documents using SQL++ (SQL for JSON), please check the [documentation](https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index.html).
+SQL++ (SQL for JSON)를 사용한 문서 쿼리에 대한 도움말은 [문서](https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index.html)를 확인하세요.
 
 ```typescript
 import { CouchbaseDocumentLoader } from "@langchain/community/document_loaders/web/couchbase";
@@ -34,7 +34,7 @@ const query = `
     LIMIT 1
 `;
 ```
-### Connect to Couchbase Cluster
+### Couchbase Cluster에 연결하기
 
 ```typescript
 const couchbaseClient = await Cluster.connect(connectionString, {
@@ -43,7 +43,7 @@ const couchbaseClient = await Cluster.connect(connectionString, {
   configProfile: "wanDevelopment",
 });
 ```
-### Create the Loader
+### Loader 생성하기
 
 ```typescript
 const loader = new CouchbaseDocumentLoader(
@@ -51,9 +51,9 @@ const loader = new CouchbaseDocumentLoader(
   query // A valid SQL++ query which will return the required data
 );
 ```
-### Load Documents
+### 문서 로드하기
 
-You can fetch the documents by calling the `load` method of the loader. It will return a list with all the documents. If you want to avoid this blocking call, you can call `lazy_load` method that returns an Iterator.
+loader의 `load` method를 호출하여 문서를 가져올 수 있습니다. 모든 문서가 포함된 리스트를 반환합니다. 이러한 블로킹 호출을 피하려면 Iterator를 반환하는 `lazy_load` method를 호출할 수 있습니다.
 
 ```typescript
 // using load method
@@ -68,10 +68,10 @@ for await (const doc of this.lazyLoad()) {
 }
 ```
 
-### Specifying Fields with Content and Metadata
+### Content와 Metadata를 포함한 필드 지정하기
 
-The fields that are part of the Document content can be specified using the `pageContentFields` parameter.
-The metadata fields for the Document can be specified using the `metadataFields` parameter.
+Document content의 일부인 필드는 `pageContentFields` parameter를 사용하여 지정할 수 있습니다.
+Document의 metadata 필드는 `metadataFields` parameter를 사용하여 지정할 수 있습니다.
 
 ```typescript
 const loaderWithSelectedFields = new CouchbaseDocumentLoader(

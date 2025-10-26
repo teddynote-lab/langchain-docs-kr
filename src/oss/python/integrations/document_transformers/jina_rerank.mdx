@@ -2,7 +2,7 @@
 title: Jina Reranker
 ---
 
-This notebook shows how to use Jina Reranker for document compression and retrieval.
+이 노트북은 문서 압축 및 검색을 위해 Jina Reranker를 사용하는 방법을 보여줍니다.
 
 ```python
 pip install -qU langchain langchain-openai langchain-community langchain-text-splitters langchainhub
@@ -26,11 +26,11 @@ def pretty_print_docs(docs):
     )
 ```
 
-## Set up the base vector store retriever
+## 기본 vector store retriever 설정하기
 
-Let's start by initializing a simple vector store retriever and storing the 2023 State of the Union speech (in chunks). We can set up the retriever to retrieve a high number (20) of docs.
+간단한 vector store retriever를 초기화하고 2023년 국정연설문을 (청크 단위로) 저장하는 것부터 시작하겠습니다. retriever가 많은 수(20개)의 문서를 검색하도록 설정할 수 있습니다.
 
-##### Set the Jina and OpenAI API keys
+##### Jina 및 OpenAI API key 설정하기
 
 ```python
 import getpass
@@ -60,9 +60,9 @@ docs = retriever.get_relevant_documents(query)
 pretty_print_docs(docs)
 ```
 
-## Doing reranking with JinaRerank
+## JinaRerank로 reranking 수행하기
 
-Now let's wrap our base retriever with a ContextualCompressionRetriever, using Jina Reranker as a compressor.
+이제 기본 retriever를 ContextualCompressionRetriever로 래핑하고, Jina Reranker를 compressor로 사용하겠습니다.
 
 ```python
 from langchain.retrievers import ContextualCompressionRetriever
@@ -82,7 +82,7 @@ compressed_docs = compression_retriever.get_relevant_documents(
 pretty_print_docs(compressed_docs)
 ```
 
-## QA reranking with Jina Reranker
+## Jina Reranker를 사용한 QA reranking
 
 ```python
 from langchain_classic import hub

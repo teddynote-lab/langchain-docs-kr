@@ -1,37 +1,37 @@
 ---
-title: Connect to an external ClickHouse database
-sidebarTitle: Connect to an external ClickHouse database
+title: 외부 ClickHouse 데이터베이스에 연결하기
+sidebarTitle: 외부 ClickHouse 데이터베이스에 연결하기
 ---
 
-ClickHouse is a high-performance, column-oriented database system. It allows for fast ingestion of data and is optimized for analytical queries.
+ClickHouse는 고성능 컬럼 지향 데이터베이스 시스템입니다. 빠른 데이터 수집이 가능하며 분석 쿼리에 최적화되어 있습니다.
 
-LangSmith uses ClickHouse as the primary data store for traces and feedback. By default, self-hosted LangSmith will use an internal ClickHouse database that is bundled with the LangSmith instance. This is run as a stateful set in the same Kubernetes cluster as the LangSmith application or as a Docker container on the same host as the LangSmith application.
+LangSmith는 trace와 feedback의 주요 데이터 저장소로 ClickHouse를 사용합니다. 기본적으로 self-hosted LangSmith는 LangSmith 인스턴스와 함께 번들로 제공되는 내부 ClickHouse 데이터베이스를 사용합니다. 이는 LangSmith 애플리케이션과 동일한 Kubernetes 클러스터에서 stateful set으로 실행되거나 LangSmith 애플리케이션과 동일한 호스트에서 Docker 컨테이너로 실행됩니다.
 
-However, you can configure LangSmith to use an external ClickHouse database for easier management and scaling. By configuring an external ClickHouse database, you can manage backups, scaling, and other operational tasks for your database. While Clickhouse is not yet a native service in Azure, AWS, or Google Cloud, you can run LangSmith with an external ClickHouse database in the following ways:
+그러나 더 쉬운 관리와 확장을 위해 외부 ClickHouse 데이터베이스를 사용하도록 LangSmith를 구성할 수 있습니다. 외부 ClickHouse 데이터베이스를 구성하면 데이터베이스의 백업, 확장 및 기타 운영 작업을 관리할 수 있습니다. Clickhouse는 아직 Azure, AWS 또는 Google Cloud의 네이티브 서비스는 아니지만, 다음과 같은 방법으로 외부 ClickHouse 데이터베이스와 함께 LangSmith를 실행할 수 있습니다:
 
-* [LangSmith-managed ClickHouse](/langsmith/langsmith-managed-clickhouse)
+* [LangSmith 관리형 ClickHouse](/langsmith/langsmith-managed-clickhouse)
 
-* Provision a [ClickHouse Cloud](https://clickhouse.cloud/) either directly or through a cloud provider marketplace:
+* 직접 또는 클라우드 제공업체 마켓플레이스를 통해 [ClickHouse Cloud](https://clickhouse.cloud/)를 프로비저닝:
 
     * [Azure Marketplace](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/clickhouse.clickhouse_cloud?tab=Overview)
   * [Google Cloud Marketplace](https://console.cloud.google.com/marketplace/product/clickhouse-public/clickhouse-cloud)
   * [AWS Marketplace](https://aws.amazon.com/marketplace/pp/prodview-jettukeanwrfc)
 
-* On a VM in your cloud provider
+* 클라우드 제공업체의 VM에서
 
 <Note>
-Using the first two options (LangSmith-managed ClickHouse or ClickHouse Cloud) will provision a Clickhouse service OUTSIDE of your VPC. However, both options support private endpoints, meaning that you can direct traffic to the ClickHouse service without exposing it to the public internet (eg via AWS PrivateLink, or GCP Private Service Connect).
+처음 두 옵션(LangSmith 관리형 ClickHouse 또는 ClickHouse Cloud)을 사용하면 VPC 외부에 Clickhouse 서비스가 프로비저닝됩니다. 그러나 두 옵션 모두 private endpoint를 지원하므로 공용 인터넷에 노출하지 않고 ClickHouse 서비스로 트래픽을 전달할 수 있습니다(예: AWS PrivateLink 또는 GCP Private Service Connect를 통해).
 
-Additionally, sensitive information can be configured to be not stored in Clickhouse. Please reach out to [support@langchain.dev](mailto:support@langchain.dev) for more information.
+또한 민감한 정보가 Clickhouse에 저장되지 않도록 구성할 수 있습니다. 자세한 내용은 [support@langchain.dev](mailto:support@langchain.dev)로 문의하세요.
 </Note>
 
 ## Requirements
 
-* A provisioned ClickHouse instance that your LangSmith application will have network access to (see above for options).
-* A user with admin access to the ClickHouse database. This user will be used to create the necessary tables, indexes, and views.
-* We support both standalone ClickHouse and externally managed clustered deployments. For clustered deployments, ensure all nodes are running the same version. Note that clustered setups are not supported with bundled ClickHouse installations.
-* We only support ClickHouse versions >= 23.9. Use of ClickHouse versions >= 24.2 requires LangSmith v0.6 or later.
-* We rely on a few configuration parameters to be set on your ClickHouse instance. These are detailed below:
+* LangSmith 애플리케이션이 네트워크 액세스할 수 있는 프로비저닝된 ClickHouse 인스턴스(옵션은 위 참조).
+* ClickHouse 데이터베이스에 대한 관리자 액세스 권한이 있는 사용자. 이 사용자는 필요한 테이블, 인덱스 및 뷰를 생성하는 데 사용됩니다.
+* 독립형 ClickHouse와 외부 관리형 클러스터 배포를 모두 지원합니다. 클러스터 배포의 경우 모든 노드가 동일한 버전을 실행하고 있는지 확인하세요. 번들 ClickHouse 설치에서는 클러스터 설정이 지원되지 않습니다.
+* ClickHouse 버전 >= 23.9만 지원합니다. ClickHouse 버전 >= 24.2를 사용하려면 LangSmith v0.6 이상이 필요합니다.
+* ClickHouse 인스턴스에 설정해야 하는 몇 가지 구성 매개변수에 의존합니다. 자세한 내용은 아래와 같습니다:
 
 ```xml
 <profiles>
@@ -49,71 +49,71 @@ Additionally, sensitive information can be configured to be not stored in Clickh
 ```
 
 <Warning>
-Our system has been tuned to work with the above configuration parameters. Changing these parameters may result in unexpected behavior.
+우리 시스템은 위의 구성 매개변수와 함께 작동하도록 조정되었습니다. 이러한 매개변수를 변경하면 예기치 않은 동작이 발생할 수 있습니다.
 </Warning>
 
 ## HA Replicated Clickhouse Cluster
 
 <Warning>
-By default, the setup process above will only work with a single node Clickhouse cluster.
+기본적으로 위의 설정 프로세스는 단일 노드 Clickhouse 클러스터에서만 작동합니다.
 </Warning>
 
-If you would like to use a multi-node Clickhouse cluster for HA, we support this with additional required configuration. This setup can use a Clickhouse cluster with multiple nodes where data replicated via Zookeeper or Clickhouse Keeper. For more information on Clickhouse replication, see [Clickhouse Data Replication Docs](https://clickhouse.com/docs/architecture/replication).
+HA를 위해 다중 노드 Clickhouse 클러스터를 사용하려면 추가 필수 구성과 함께 이를 지원합니다. 이 설정은 Zookeeper 또는 Clickhouse Keeper를 통해 데이터가 복제되는 여러 노드가 있는 Clickhouse 클러스터를 사용할 수 있습니다. Clickhouse 복제에 대한 자세한 내용은 [Clickhouse Data Replication Docs](https://clickhouse.com/docs/architecture/replication)를 참조하세요.
 
-In order to setup LangSmith with a replicated multi-node Clickhouse setup:
+복제된 다중 노드 Clickhouse 설정으로 LangSmith를 설정하려면:
 
-* You need to have a Clickhouse cluster that is setup with Keeper or Zookeeper for data replication and the appropriate settings. See [Clickhouse Replication Setup Docs](https://clickhouse.com/docs/architecture/replication).
-* You need to set the cluster setting in the [LangSmith Configuration](#configuration) section, specifically the `cluster` settings to match your Clickhouse Cluster name. This will use the `Replicated` table engines when running the Clickhouse migrations.
-* If in addition to HA, you would like to load balance among the Clickhouse nodes (to distribute reads or writes), we suggest using a load balancer or DNS load balancing to round robin among your Clickhouse servers.
-* **Note**: You will need to enable your `cluster` setting before launching LangSmith for the first time and running the Clickhouse migrations. This is a requirement since the table engine will need to be created as a `Replicated` table engine vs the non replicated engine type.
+* 데이터 복제를 위해 Keeper 또는 Zookeeper로 설정되고 적절한 설정이 있는 Clickhouse 클러스터가 필요합니다. [Clickhouse Replication Setup Docs](https://clickhouse.com/docs/architecture/replication)를 참조하세요.
+* [LangSmith Configuration](#configuration) 섹션에서 cluster 설정, 특히 `cluster` 설정을 Clickhouse Cluster 이름과 일치하도록 설정해야 합니다. 이렇게 하면 Clickhouse migration을 실행할 때 `Replicated` 테이블 엔진을 사용합니다.
+* HA 외에도 Clickhouse 노드 간에 로드 밸런싱을 하려면(읽기 또는 쓰기를 분산하기 위해) 로드 밸런서 또는 DNS 로드 밸런싱을 사용하여 Clickhouse 서버 간에 라운드 로빈하는 것이 좋습니다.
+* **참고**: LangSmith를 처음 시작하고 Clickhouse migration을 실행하기 전에 `cluster` 설정을 활성화해야 합니다. 테이블 엔진이 복제되지 않은 엔진 유형이 아닌 `Replicated` 테이블 엔진으로 생성되어야 하므로 이는 필수 요구 사항입니다.
 
-When running migrations with `cluster` enabled, the migration will create the `Replicated` table engine flavor. This means that data will be replicated among the servers in the cluster. This is a master-master setup where any server can process reads, writes, or merges.
-
-<Note>
-For an example setup of a replicated ClickHouse cluster, refer to the [replicated ClickHouse section](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/examples/replicated-clickhouse/README.md) in the LangSmith Helm chart repo, under examples.
-</Note>
-
-## LangSmith-managed ClickHouse
-
-* If using LangSmith-managed ClickHouse, you will need to set up a VPC peering connection between the LangSmith VPC and the ClickHouse VPC. Please reach out to [support@langchain.dev](mailto:support@langchain.dev) for more information.
-* You will also need to set up Blob Storage. You can read more about Blob Storage in the [Blob Storage documentation](/langsmith/self-host-blob-storage).
+`cluster`가 활성화된 상태에서 migration을 실행하면 migration은 `Replicated` 테이블 엔진 형식을 생성합니다. 이는 데이터가 클러스터의 서버 간에 복제됨을 의미합니다. 이는 모든 서버가 읽기, 쓰기 또는 병합을 처리할 수 있는 master-master 설정입니다.
 
 <Note>
-ClickHouse installations managed by LangSmith use a SharedMerge engine, which automatically clusters them and separates compute from storage.
+복제된 ClickHouse 클러스터의 예제 설정은 LangSmith Helm chart repo의 examples 아래 [replicated ClickHouse section](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/examples/replicated-clickhouse/README.md)을 참조하세요.
 </Note>
 
-For more information, refer to the [managed ClickHouse](/langsmith/langsmith-managed-clickhouse) page.
+## LangSmith 관리형 ClickHouse
+
+* LangSmith 관리형 ClickHouse를 사용하는 경우 LangSmith VPC와 ClickHouse VPC 간에 VPC peering 연결을 설정해야 합니다. 자세한 내용은 [support@langchain.dev](mailto:support@langchain.dev)로 문의하세요.
+* Blob Storage도 설정해야 합니다. Blob Storage에 대한 자세한 내용은 [Blob Storage documentation](/langsmith/self-host-blob-storage)에서 확인할 수 있습니다.
+
+<Note>
+LangSmith가 관리하는 ClickHouse 설치는 SharedMerge 엔진을 사용하여 자동으로 클러스터링하고 컴퓨팅과 스토리지를 분리합니다.
+</Note>
+
+자세한 내용은 [managed ClickHouse](/langsmith/langsmith-managed-clickhouse) 페이지를 참조하세요.
 
 ## Parameters
 
-You will need to provide several parameters to your LangSmith installation to configure an external ClickHouse database. These parameters include:
+외부 ClickHouse 데이터베이스를 구성하려면 LangSmith 설치에 여러 매개변수를 제공해야 합니다. 이러한 매개변수는 다음과 같습니다:
 
-* Host: The hostname or IP address of the ClickHouse database
-* HTTP Port: The port that the ClickHouse database listens on for HTTP connections
-* Native Port: The port that the ClickHouse database listens on for [native connections](https://clickhouse.com/docs/en/interfaces/tcp)
-* Database: The name of the ClickHouse database that LangSmith should use
-* Username: The username to use to connect to the ClickHouse database
-* Password: The password to use to connect to the ClickHouse database
-* Cluster (Optional): The name of the ClickHouse cluster if using an external Clickhouse cluster. When set, LangSmith will run migrations on the cluster and replicate data across instances.
+* Host: ClickHouse 데이터베이스의 호스트 이름 또는 IP 주소
+* HTTP Port: ClickHouse 데이터베이스가 HTTP 연결을 수신하는 포트
+* Native Port: ClickHouse 데이터베이스가 [native connections](https://clickhouse.com/docs/en/interfaces/tcp)을 수신하는 포트
+* Database: LangSmith가 사용해야 하는 ClickHouse 데이터베이스의 이름
+* Username: ClickHouse 데이터베이스에 연결하는 데 사용할 사용자 이름
+* Password: ClickHouse 데이터베이스에 연결하는 데 사용할 비밀번호
+* Cluster (선택 사항): 외부 Clickhouse 클러스터를 사용하는 경우 ClickHouse 클러스터의 이름. 설정하면 LangSmith는 클러스터에서 migration을 실행하고 인스턴스 간에 데이터를 복제합니다.
 
 <Warning>
-Important considerations for clustered deployments:
+클러스터 배포에 대한 중요 고려 사항:
 
-* Clustered setups must be configured on a fresh schema - existing standalone ClickHouse instances cannot be converted to clustered mode.
+* 클러스터 설정은 새로운 스키마에서 구성되어야 합니다 - 기존 독립형 ClickHouse 인스턴스는 클러스터 모드로 변환할 수 없습니다.
 
-* Clustering is only supported with externally managed ClickHouse deployments. It is not compatible with bundled ClickHouse installations as these do not include required ZooKeeper configurations.
+* 클러스터링은 외부 관리형 ClickHouse 배포에서만 지원됩니다. 필요한 ZooKeeper 구성이 포함되지 않은 번들 ClickHouse 설치와는 호환되지 않습니다.
 
-* When using a clustered deployment, LangSmith will automatically:
+* 클러스터 배포를 사용하는 경우 LangSmith는 자동으로:
 
-* Run database migrations across all nodes in the cluster
-* Configure tables for data replication across the cluster
+* 클러스터의 모든 노드에서 데이터베이스 migration 실행
+* 클러스터 전체에서 데이터 복제를 위한 테이블 구성
 
-Note that while data is replicated across nodes, LangSmith does not configure distributed tables or handle query routing - queries will be directed to the specified host. You will need to handle any load balancing or query distribution at the infrastructure level if desired.
+데이터가 노드 간에 복제되지만 LangSmith는 분산 테이블을 구성하거나 쿼리 라우팅을 처리하지 않습니다 - 쿼리는 지정된 호스트로 전달됩니다. 원하는 경우 인프라 수준에서 로드 밸런싱 또는 쿼리 분산을 처리해야 합니다.
 </Warning>
 
 ## Configuration
 
-With these parameters in hand, you can configure your LangSmith instance to use the provisioned ClickHouse database. You can do this by modifying the `config.yaml` file for your LangSmith Helm Chart installation or the `.env` file for your Docker installation.
+이러한 매개변수를 사용하여 프로비저닝된 ClickHouse 데이터베이스를 사용하도록 LangSmith 인스턴스를 구성할 수 있습니다. LangSmith Helm Chart 설치의 `config.yaml` 파일 또는 Docker 설치의 `.env` 파일을 수정하여 이 작업을 수행할 수 있습니다.
 
 <CodeGroup>
 
@@ -145,4 +145,4 @@ CLICKHOUSE_CLUSTER=my_cluster_name # Optional: Set this if using an external Cli
 
 </CodeGroup>
 
-Once configured, you should be able to reinstall your LangSmith instance. If everything is configured correctly, your LangSmith instance should now be using your external ClickHouse database.
+구성이 완료되면 LangSmith 인스턴스를 재설치할 수 있습니다. 모든 것이 올바르게 구성되면 LangSmith 인스턴스가 이제 외부 ClickHouse 데이터베이스를 사용하게 됩니다.

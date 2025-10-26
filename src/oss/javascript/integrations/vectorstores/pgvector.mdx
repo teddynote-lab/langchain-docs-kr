@@ -3,28 +3,28 @@ title: PGVectorStore
 ---
 
 <Tip>
-**Compatibility**: Only available on Node.js.
+**호환성**: Node.js에서만 사용 가능합니다.
 </Tip>
 
-To enable vector search in generic PostgreSQL databases, LangChain.js supports using the [`pgvector`](https://github.com/pgvector/pgvector) Postgres extension.
+일반 PostgreSQL 데이터베이스에서 벡터 검색을 활성화하기 위해, LangChain.js는 [`pgvector`](https://github.com/pgvector/pgvector) Postgres extension 사용을 지원합니다.
 
-This guide provides a quick overview for getting started with PGVector [vector stores](/oss/integrations/vectorstores). For detailed documentation of all `PGVectorStore` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_pgvector.PGVectorStore.html).
+이 가이드는 PGVector [vector store](/oss/integrations/vectorstores) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `PGVectorStore` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_pgvector.PGVectorStore.html)를 참조하세요.
 
-## Overview
+## 개요
 
-### Integration details
+### Integration 세부 정보
 
 | Class | Package | [PY support](https://python.langchain.com/docs/integrations/vectorstores/pgvector/) | Version |
 | :--- | :--- | :---: | :---: |
 | [`PGVectorStore`](https://api.js.langchain.com/classes/langchain_community_vectorstores_pgvector.PGVectorStore.html) | [`@langchain/community`](https://npmjs.com/@langchain/community) | ✅ | ![NPM - Version](https://img.shields.io/npm/v/@langchain/community?style=flat-square&label=%20&) |
 
-## Setup
+## 설정
 
-To use PGVector vector stores, you'll need to set up a Postgres instance with the [`pgvector`](https://github.com/pgvector/pgvector) extension enabled. You'll also need to install the `@langchain/community` integration package with the [`pg`](https://www.npmjs.com/package/pg) package as a peer dependency.
+PGVector vector store를 사용하려면 [`pgvector`](https://github.com/pgvector/pgvector) extension이 활성화된 Postgres 인스턴스를 설정해야 합니다. 또한 [`pg`](https://www.npmjs.com/package/pg) 패키지를 peer dependency로 사용하여 `@langchain/community` integration 패키지를 설치해야 합니다.
 
-This guide will also use [OpenAI embeddings](/oss/integrations/text_embedding/openai), which require you to install the `@langchain/openai` integration package. You can also use [other supported embeddings models](/oss/integrations/text_embedding) if you wish.
+이 가이드는 [OpenAI embeddings](/oss/integrations/text_embedding/openai)도 사용하며, 이를 위해 `@langchain/openai` integration 패키지를 설치해야 합니다. 원하는 경우 [다른 지원되는 embeddings 모델](/oss/integrations/text_embedding)을 사용할 수도 있습니다.
 
-We'll also use the [`uuid`](https://www.npmjs.com/package/uuid) package to generate ids in the required format.
+또한 필요한 형식으로 id를 생성하기 위해 [`uuid`](https://www.npmjs.com/package/uuid) 패키지를 사용합니다.
 
 <CodeGroup>
 ```bash npm
@@ -38,11 +38,11 @@ pnpm add @langchain/community @langchain/openai @langchain/core pg uuid
 ```
 </CodeGroup>
 
-### Setting up an instance
+### 인스턴스 설정
 
-There are many ways to connect to Postgres depending on how you've set up your instance. Here's one example of a local setup using a prebuilt Docker image provided by the `pgvector` team.
+인스턴스 설정 방법에 따라 Postgres에 연결하는 방법은 여러 가지가 있습니다. 다음은 `pgvector` 팀에서 제공하는 사전 빌드된 Docker 이미지를 사용한 로컬 설정의 한 예입니다.
 
-Create a file with the below content named docker-compose.yml:
+아래 내용으로 docker-compose.yml이라는 파일을 생성하세요:
 
 ```yaml
 # Run this command to start the database:
@@ -60,34 +60,34 @@ services:
       - POSTGRES_PASSWORD=ChangeMe
 ```
 
-And then in the same directory, run `docker compose up` to start the container.
+그런 다음 같은 디렉토리에서 `docker compose up`을 실행하여 컨테이너를 시작하세요.
 
-You can find more information on how to setup pgvector in the [official repository](https://github.com/pgvector/pgvector/).
+pgvector 설정 방법에 대한 자세한 정보는 [공식 저장소](https://github.com/pgvector/pgvector/)에서 확인할 수 있습니다.
 
-### Credentials
+### 자격 증명
 
-To connect to you Postgres instance, you'll need corresponding credentials. For a full list of supported options, see the [`node-postgres` docs](https://node-postgres.com/apis/client).
+Postgres 인스턴스에 연결하려면 해당 자격 증명이 필요합니다. 지원되는 옵션의 전체 목록은 [`node-postgres` docs](https://node-postgres.com/apis/client)를 참조하세요.
 
-If you are using OpenAI embeddings for this guide, you'll need to set your OpenAI key as well:
+이 가이드에서 OpenAI embeddings를 사용하는 경우 OpenAI 키도 설정해야 합니다:
 
 ```typescript
 process.env.OPENAI_API_KEY = "YOUR_API_KEY";
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_TRACING="true"
 // process.env.LANGSMITH_API_KEY="your-api-key"
 ```
 
-## Instantiation
+## 인스턴스화
 
-To instantiate the vector store, call the `.initialize()` static method. This will automatically check for the presence of a table, given by `tableName` in the passed `config`. If it is not there, it will create it with the required columns.
+vector store를 인스턴스화하려면 `.initialize()` static 메서드를 호출하세요. 이는 전달된 `config`의 `tableName`으로 지정된 테이블의 존재 여부를 자동으로 확인합니다. 테이블이 없으면 필요한 컬럼으로 생성합니다.
 
 <Warning>
-**Security**: User-generated data such as usernames should not be used as input for table and column names.
-**This may lead to SQL Injection!**
+**보안**: 사용자 이름과 같은 사용자 생성 데이터는 테이블 및 컬럼 이름의 입력으로 사용해서는 안 됩니다.
+**이는 SQL Injection으로 이어질 수 있습니다!**
 </Warning>
 
 ```typescript
@@ -129,9 +129,9 @@ const vectorStore = await PGVectorStore.initialize(
 );
 ```
 
-## Manage vector store
+## Vector store 관리
 
-### Add items to vector store
+### Vector store에 항목 추가
 
 ```typescript
 import { v4 as uuidv4 } from "uuid";
@@ -164,7 +164,7 @@ const ids = [uuidv4(), uuidv4(), uuidv4(), uuidv4()]
 await vectorStore.addDocuments(documents, { ids: ids });
 ```
 
-### Delete items from vector store
+### Vector store에서 항목 삭제
 
 ```typescript
 const id4 = ids[ids.length - 1];
@@ -172,13 +172,13 @@ const id4 = ids[ids.length - 1];
 await vectorStore.delete({ ids: [id4] });
 ```
 
-## Query vector store
+## Vector store 쿼리
 
-Once your vector store has been created and the relevant documents have been added you will most likely wish to query it during the running of your chain or agent.
+Vector store가 생성되고 관련 문서가 추가되면 chain 또는 agent 실행 중에 쿼리하고 싶을 것입니다.
 
-### Query directly
+### 직접 쿼리
 
-Performing a simple similarity search can be done as follows:
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
 
 ```typescript
 const filter = { source: "https://example.com" };
@@ -195,9 +195,9 @@ for (const doc of similaritySearchResults) {
 * Mitochondria are made out of lipids [{"source":"https://example.com"}]
 ```
 
-The above filter syntax supports exact match, but the following are also supported:
+위의 필터 구문은 정확한 일치를 지원하지만 다음도 지원됩니다:
 
-#### Using the `in` operator
+#### `in` operator 사용
 
 ```json
 {
@@ -207,7 +207,7 @@ The above filter syntax supports exact match, but the following are also support
 }
 ```
 
-#### Using the `notIn` operator
+#### `notIn` operator 사용
 
 ```json
 {
@@ -217,7 +217,7 @@ The above filter syntax supports exact match, but the following are also support
 }
 ```
 
-#### Using the `arrayContains` operator
+#### `arrayContains` operator 사용
 
 ```json
 {
@@ -227,7 +227,7 @@ The above filter syntax supports exact match, but the following are also support
 }
 ```
 
-If you want to execute a similarity search and receive the corresponding scores you can run:
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
 
 ```typescript
 const similaritySearchWithScoreResults = await vectorStore.similaritySearchWithScore("biology", 2, filter)
@@ -242,9 +242,9 @@ for (const [doc, score] of similaritySearchWithScoreResults) {
 * [SIM=0.852] Mitochondria are made out of lipids [{"source":"https://example.com"}]
 ```
 
-### Query by turning into retriever
+### Retriever로 변환하여 쿼리
 
-You can also transform the vector store into a [retriever](/oss/langchain/retrieval) for easier usage in your chains.
+Vector store를 [retriever](/oss/langchain/retrieval)로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
 
 ```typescript
 const retriever = vectorStore.asRetriever({
@@ -270,19 +270,19 @@ await retriever.invoke("biology");
 ]
 ```
 
-### Usage for retrieval-augmented generation
+### Retrieval-augmented generation 사용
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+이 vector store를 retrieval-augmented generation (RAG)에 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
 
-- [Build a RAG app with LangChain](/oss/langchain/rag).
+- [LangChain으로 RAG 앱 구축하기](/oss/langchain/rag)
 - [Agentic RAG](/oss/langgraph/agentic-rag)
-- [Retrieval docs](/oss/langchain/retrieval)
+- [Retrieval 문서](/oss/langchain/retrieval)
 
-## Advanced: reusing connections
+## 고급: 연결 재사용
 
-You can reuse connections by creating a pool, then creating new `PGVectorStore` instances directly via the constructor.
+pool을 생성한 다음 constructor를 통해 직접 새 `PGVectorStore` 인스턴스를 생성하여 연결을 재사용할 수 있습니다.
 
-Note that you should call `.initialize()` to set up your database at least once to set up your tables properly before using the constructor.
+constructor를 사용하기 전에 테이블을 올바르게 설정하려면 최소한 한 번은 `.initialize()`를 호출하여 데이터베이스를 설정해야 합니다.
 
 ```typescript
 import { OpenAIEmbeddings } from "@langchain/openai";
@@ -355,21 +355,21 @@ console.log(results2);
 await reusablePool.end();
 ```
 
-## Create HNSW Index
+## HNSW Index 생성
 
-By default, the extension performs a sequential scan search, with 100% recall. You might consider creating an HNSW index for approximate nearest neighbor (ANN) search to speed up `similaritySearchVectorWithScore` execution time. To create the HNSW index on your vector column, use the `createHnswIndex()` method.
+기본적으로 extension은 100% recall로 순차 스캔 검색을 수행합니다. `similaritySearchVectorWithScore` 실행 시간을 단축하기 위해 approximate nearest neighbor (ANN) 검색을 위한 HNSW index 생성을 고려할 수 있습니다. vector 컬럼에 HNSW index를 생성하려면 `createHnswIndex()` 메서드를 사용하세요.
 
-The method parameters include:
+메서드 매개변수는 다음과 같습니다:
 
-- `dimensions`: Defines the number of dimensions in your vector data type, up to 2000. For example, use 1536 for OpenAI's text-embedding-ada-002 and Amazon's amazon.titan-embed-text-v1 models.
+- `dimensions`: vector 데이터 타입의 차원 수를 정의하며, 최대 2000까지 가능합니다. 예를 들어 OpenAI의 text-embedding-ada-002 및 Amazon의 amazon.titan-embed-text-v1 모델에는 1536을 사용합니다.
 
-- `m?`: The max number of connections per layer (16 by default). Index build time improves with smaller values, while higher values can speed up search queries.
+- `m?`: 레이어당 최대 연결 수 (기본값 16). 값이 작을수록 index 빌드 시간이 개선되며, 값이 클수록 검색 쿼리 속도가 빨라질 수 있습니다.
 
-- `efConstruction?`: The size of the dynamic candidate list for constructing the graph (64 by default). A higher value can potentially improve the index quality at the cost of index build time.
+- `efConstruction?`: 그래프 구성을 위한 동적 후보 목록의 크기 (기본값 64). 값이 높을수록 index 빌드 시간을 희생하여 index 품질이 향상될 수 있습니다.
 
-- `distanceFunction?`: The distance function name you want to use, is automatically selected based on the distanceStrategy.
+- `distanceFunction?`: 사용하려는 거리 함수 이름으로, distanceStrategy에 따라 자동으로 선택됩니다.
 
-For more info, see the [Pgvector GitHub repo](https://github.com/pgvector/pgvector?tab=readme-ov-file#hnsw) and the [HNSW paper from Malkov Yu A. and Yashunin D. A.. 2020. Efficient and robust approximate nearest neighbor search using hierarchical navigable small world graphs](https://arxiv.org/pdf/1603.09320)
+자세한 정보는 [Pgvector GitHub repo](https://github.com/pgvector/pgvector?tab=readme-ov-file#hnsw) 및 [HNSW paper from Malkov Yu A. and Yashunin D. A.. 2020. Efficient and robust approximate nearest neighbor search using hierarchical navigable small world graphs](https://arxiv.org/pdf/1603.09320)를 참조하세요.
 
 ```typescript
 import { OpenAIEmbeddings } from "@langchain/openai";
@@ -428,9 +428,9 @@ console.log(hnswResults);
 await pgvectorStore.end();
 ```
 
-## Closing connections
+## 연결 종료
 
-Make sure you close the connection when you are finished to avoid excessive resource consumption:
+과도한 리소스 소비를 방지하기 위해 작업이 완료되면 연결을 종료해야 합니다:
 
 ```typescript
 await vectorStore.end();
@@ -438,4 +438,4 @@ await vectorStore.end();
 
 ## API reference
 
-For detailed documentation of all `PGVectorStore` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_pgvector.PGVectorStore.html).
+모든 `PGVectorStore` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_pgvector.PGVectorStore.html)를 참조하세요.

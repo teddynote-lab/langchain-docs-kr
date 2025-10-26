@@ -1,18 +1,19 @@
+```markdown
 ---
 title: FalkorDBVectorStore
 ---
 
-<a href="https://docs.falkordb.com/" target="_blank">FalkorDB</a> is an open-source graph database with integrated support for vector similarity search
+<a href="https://docs.falkordb.com/" target="_blank">FalkorDB</a>는 벡터 유사도 검색을 통합 지원하는 오픈소스 그래프 데이터베이스입니다
 
-it supports:
+지원 기능:
 
-- approximate nearest neighbor search
-- Euclidean similarity & Cosine Similarity
-- Hybrid search combining vector and keyword searches
+- 근사 최근접 이웃 검색
+- Euclidean 유사도 & Cosine 유사도
+- 벡터와 키워드 검색을 결합한 하이브리드 검색
 
-This notebook shows how to use the FalkorDB vector index (`FalkorDB`)
+이 노트북은 FalkorDB 벡터 인덱스(`FalkorDB`) 사용 방법을 보여줍니다
 
-See the <a href="https://docs.falkordb.com/" target="_blank">installation instruction</a>
+<a href="https://docs.falkordb.com/" target="_blank">설치 지침</a>을 참조하세요
 
 ## Setup
 
@@ -101,7 +102,7 @@ Requirement already satisfied: MarkupSafe>=2.0 in c:\users\dell\desktop\langchai
 
 ### Credentials
 
-We want to use `HuggingFace` so we have to get the HuggingFace API Key
+`HuggingFace`를 사용하려면 HuggingFace API Key를 가져와야 합니다
 
 ```python
 import getpass
@@ -111,7 +112,7 @@ if "HUGGINGFACE_API_KEY" not in os.environ:
     os.environ["HUGGINGFACE_API_KEY"] = getpass.getpass("HuggingFace API Key:")
 ```
 
-If you want to get automated tracing of your model calls you can also set your LangSmith API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 LangSmith API key를 설정할 수 있습니다:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -126,14 +127,14 @@ from langchain_core.documents import Document
 from langchain_huggingface import HuggingFaceEmbeddings
 ```
 
-You can use FalkorDBVector locally with docker. See <a href="https://docs.falkordb.com/" target="_blank">installation instruction</a>
+docker를 사용하여 FalkorDBVector를 로컬에서 사용할 수 있습니다. <a href="https://docs.falkordb.com/" target="_blank">설치 지침</a>을 참조하세요
 
 ```python
 host = "localhost"
 port = 6379
 ```
 
-Or you can use FalkorDBVector with <a href="https://app.falkordb.cloud">FalkorDB Cloud</a>
+또는 <a href="https://app.falkordb.cloud">FalkorDB Cloud</a>와 함께 FalkorDBVector를 사용할 수 있습니다
 
 ```python
 # E.g
@@ -187,11 +188,11 @@ vector_store.delete(ids=["3"])
 
 ## Query vector store
 
-Once your vector store has been created and the relevant documents have been added you will most likely wish to query it during the running of your chain or agent.
+벡터 저장소가 생성되고 관련 문서가 추가되면, 체인이나 에이전트를 실행하는 동안 이를 쿼리하고 싶을 것입니다.
 
 ### Query directly
 
-Performing a simple similarity search can be done as follows:
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
 
 ```python
 results = vector_store.similarity_search(
@@ -205,7 +206,7 @@ for doc in results:
 * qux [{'text': 'qux', 'id': '1', 'source': 'https://another-example.com'}]
 ```
 
-If you want to execute a similarity search and receive the corresponding scores you can run:
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
 
 ```python
 results = vector_store.similarity_search_with_score(query="bar")
@@ -219,7 +220,7 @@ for doc, score in results:
 
 ### Query by turning into retriever
 
-You can also transform the vector store into a retriever for easier usage in your chains.
+벡터 저장소를 retriever로 변환하여 체인에서 더 쉽게 사용할 수도 있습니다.
 
 ```python
 retriever = vector_store.as_retriever(search_type="mmr", search_kwargs={"k": 1})
@@ -232,4 +233,5 @@ retriever.invoke("thud")
 
 ## API reference
 
-For detailed documentation of all `FalkorDBVector` features and configurations head to the API reference: [python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.falkordb_vector.FalkorDBVector.html](https://python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.falkordb_vector.FalkorDBVector.html)
+모든 `FalkorDBVector` 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.falkordb_vector.FalkorDBVector.html](https://python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.falkordb_vector.FalkorDBVector.html)
+```

@@ -1,17 +1,17 @@
 ---
-title: MCP endpoint in LangGraph Server
-sidebarTitle: MCP endpoint in LangGraph Server
+title: LangGraph Server의 MCP endpoint
+sidebarTitle: LangGraph Server의 MCP endpoint
 ---
 
-The Model Context Protocol (MCP) is an open protocol for describing tools and data sources in a model-agnostic format, enabling LLMs to discover and use them via a structured API.
+Model Context Protocol (MCP)은 모델에 구애받지 않는 형식으로 도구와 데이터 소스를 설명하기 위한 개방형 프로토콜로, LLM이 구조화된 API를 통해 이를 발견하고 사용할 수 있도록 합니다.
 
-[LangGraph Server](/langsmith/langgraph-server) implements MCP using the [Streamable HTTP transport](https://spec.modelcontextprotocol.io/specification/2025-03-26/basic/transports/#streamable-http). This allows LangGraph **agents** to be exposed as **MCP tools**, making them usable with any MCP-compliant client supporting Streamable HTTP.
+[LangGraph Server](/langsmith/langgraph-server)는 [Streamable HTTP transport](https://spec.modelcontextprotocol.io/specification/2025-03-26/basic/transports/#streamable-http)를 사용하여 MCP를 구현합니다. 이를 통해 LangGraph **agent**를 **MCP tool**로 노출할 수 있으며, Streamable HTTP를 지원하는 모든 MCP 호환 클라이언트에서 사용할 수 있습니다.
 
-The MCP endpoint is available at `/mcp` on [LangGraph Server](/langsmith/langgraph-server).
+MCP endpoint는 [LangGraph Server](/langsmith/langgraph-server)의 `/mcp`에서 사용할 수 있습니다.
 
-You can set up [custom authentication middleware](/langsmith/custom-auth) to authenticate a user with an MCP server to get access to user-scoped tools within your LangSmith deployment.
+[사용자 정의 인증 미들웨어](/langsmith/custom-auth)를 설정하여 MCP 서버로 사용자를 인증하고 LangSmith 배포 내에서 사용자 범위 도구에 대한 액세스를 얻을 수 있습니다.
 
-An example architecture for this flow:
+이 흐름에 대한 예시 아키텍처:
 
 ```mermaid
 sequenceDiagram
@@ -49,12 +49,12 @@ sequenceDiagram
 
 ## Requirements
 
-To use MCP, ensure you have the following dependencies installed:
+MCP를 사용하려면 다음 종속성이 설치되어 있는지 확인하세요:
 
 * `langgraph-api >= 0.2.3`
 * `langgraph-sdk >= 0.1.61`
 
-Install them with:
+다음 명령으로 설치하세요:
 
 <CodeGroup>
 ```bash pip
@@ -66,17 +66,17 @@ uv add "langgraph-api>=0.2.3" "langgraph-sdk>=0.1.61"
 ```
 </CodeGroup>
 
-## Usage overview
+## 사용 개요
 
-To enable MCP:
+MCP를 활성화하려면:
 
-* Upgrade to use langgraph-api>=0.2.3. If you are deploying LangSmith, this will be done for you automatically if you create a new revision.
-* MCP tools (agents) will be automatically exposed.
-* Connect with any MCP-compliant client that supports Streamable HTTP.
+* langgraph-api>=0.2.3을 사용하도록 업그레이드하세요. LangSmith를 배포하는 경우 새 revision을 생성하면 자동으로 수행됩니다.
+* MCP tool(agent)이 자동으로 노출됩니다.
+* Streamable HTTP를 지원하는 MCP 호환 클라이언트와 연결하세요.
 
 ### Client
 
-Use an MCP-compliant client to connect to the LangGraph server. The following examples show how to connect using different programming languages.
+MCP 호환 클라이언트를 사용하여 LangGraph 서버에 연결하세요. 다음 예제는 다양한 프로그래밍 언어를 사용하여 연결하는 방법을 보여줍니다.
 
 <Tabs>
     <Tab title="JavaScript/TypeScript">
@@ -84,8 +84,8 @@ Use an MCP-compliant client to connect to the LangGraph server. The following ex
     npm install @modelcontextprotocol/sdk
     ```
 
-        > **Note**
-        > Replace `serverUrl` with your LangGraph server URL and configure authentication headers as needed.
+        > **참고**
+        > `serverUrl`을 LangGraph 서버 URL로 교체하고 필요에 따라 인증 헤더를 구성하세요.
 
     ```js
     import { Client } from "@modelcontextprotocol/sdk/client/index.js";
@@ -119,13 +119,13 @@ Use an MCP-compliant client to connect to the LangGraph server. The following ex
     ```
     </Tab>
     <Tab title="Python">
-    Install the adapter with:
+    다음 명령으로 adapter를 설치하세요:
 
     ```bash
     pip install langchain-mcp-adapters
     ```
 
-    Here is an example of how to connect to a remote MCP endpoint and use an agent as a tool:
+    다음은 원격 MCP endpoint에 연결하고 agent를 tool로 사용하는 예제입니다:
 
     ```python
     # Create server parameters for stdio connection
@@ -166,18 +166,17 @@ Use an MCP-compliant client to connect to the LangGraph server. The following ex
     </Tab>
 </Tabs>
 
-## Expose an agent as MCP tool
+## agent를 MCP tool로 노출하기
 
-When deployed, your agent will appear as a tool in the MCP endpoint
-with this configuration:
+배포되면 agent가 다음 구성으로 MCP endpoint에 tool로 표시됩니다:
 
-* **Tool name**: The agent's name.
-* **Tool description**: The agent's description.
-* **Tool input schema**: The agent's input schema.
+* **Tool name**: agent의 이름.
+* **Tool description**: agent의 설명.
+* **Tool input schema**: agent의 input schema.
 
-### Setting name and description
+### 이름과 설명 설정하기
 
-You can set the name and description of your agent in `langgraph.json`:
+`langgraph.json`에서 agent의 이름과 설명을 설정할 수 있습니다:
 
 ```json
 {
@@ -191,17 +190,17 @@ You can set the name and description of your agent in `langgraph.json`:
 }
 ```
 
-After deployment, you can update the name and description using the LangGraph SDK.
+배포 후 LangGraph SDK를 사용하여 이름과 설명을 업데이트할 수 있습니다.
 
 ### Schema
 
-Define clear, minimal input and output schemas to avoid exposing unnecessary internal complexity to the LLM.
+불필요한 내부 복잡성을 LLM에 노출하지 않도록 명확하고 최소한의 input 및 output schema를 정의하세요.
 
-The default [MessagesState](/oss/langgraph/graph-api#messagesstate) uses `AnyMessage`, which supports many message types but is too general for direct LLM exposure.
+기본 [MessagesState](/oss/langgraph/graph-api#messagesstate)는 `AnyMessage`를 사용하며, 이는 많은 메시지 유형을 지원하지만 LLM에 직접 노출하기에는 너무 일반적입니다.
 
-Instead, define **custom agents or workflows** that use explicitly typed input and output structures.
+대신 명시적으로 타입이 지정된 input 및 output 구조를 사용하는 **사용자 정의 agent 또는 workflow**를 정의하세요.
 
-For example, a workflow answering documentation questions might look like this:
+예를 들어, 문서 질문에 답변하는 workflow는 다음과 같을 수 있습니다:
 
 ```python
 from langgraph.graph import StateGraph, START, END
@@ -235,16 +234,16 @@ graph = builder.compile()
 print(graph.invoke({"question": "hi"}))
 ```
 
-For more details, see the [low-level concepts guide](/oss/langgraph/graph-api#state).
+자세한 내용은 [low-level concepts 가이드](/oss/langgraph/graph-api#state)를 참조하세요.
 
-## Use user-scoped MCP tools in your deployment
+## 배포에서 사용자 범위 MCP tool 사용하기
 
 <Tip>
-**Prerequisites**
-You have added your own [custom auth middleware](/langsmith/custom-auth) that populates the `langgraph_auth_user` object, making it accessible through configurable context for every node in your graph.
+**전제 조건**
+`langgraph_auth_user` 객체를 채우는 자체 [사용자 정의 인증 미들웨어](/langsmith/custom-auth)를 추가하여 graph의 모든 node에 대해 구성 가능한 컨텍스트를 통해 액세스할 수 있도록 해야 합니다.
 </Tip>
 
-To make user-scoped tools available to your LangSmith deployment, start with implementing a snippet like the following:
+LangSmith 배포에서 사용자 범위 도구를 사용할 수 있도록 하려면 다음과 같은 코드 스니펫을 구현하는 것부터 시작하세요:
 
 ```python
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -270,23 +269,23 @@ def mcp_tools_node(state, config):
     return {"messages": tool_messages}
 ```
 
-1. MCP only supports adding headers to requests made to `streamable_http` and `sse` `transport` servers.
-2. Your MCP server URL.
-3. Get available tools from your MCP server.
+1. MCP는 `streamable_http` 및 `sse` `transport` 서버에 대한 요청에만 헤더 추가를 지원합니다.
+2. MCP 서버 URL입니다.
+3. MCP 서버에서 사용 가능한 도구를 가져옵니다.
 
-_This can also be done by [rebuilding your graph at runtime](/langsmith/graph-rebuild) to have a different configuration for a new run_
+_이는 새 실행에 대해 다른 구성을 갖도록 [런타임에 graph를 재구성](/langsmith/graph-rebuild)하여 수행할 수도 있습니다_
 
-## Session behavior
+## Session 동작
 
-The current LangGraph MCP implementation does not support sessions. Each `/mcp` request is stateless and independent.
+현재 LangGraph MCP 구현은 session을 지원하지 않습니다. 각 `/mcp` 요청은 상태 비저장이며 독립적입니다.
 
 ## Authentication
 
-The `/mcp` endpoint uses the same authentication as the rest of the LangGraph API. Refer to the [authentication guide](/langsmith/auth) for setup details.
+`/mcp` endpoint는 LangGraph API의 나머지 부분과 동일한 인증을 사용합니다. 설정 세부 정보는 [인증 가이드](/langsmith/auth)를 참조하세요.
 
-## Disable MCP
+## MCP 비활성화
 
-To disable the MCP endpoint, set `disable_mcp` to `true` in your `langgraph.json` configuration file:
+MCP endpoint를 비활성화하려면 `langgraph.json` 구성 파일에서 `disable_mcp`를 `true`로 설정하세요:
 
 ```json
 {
@@ -296,4 +295,4 @@ To disable the MCP endpoint, set `disable_mcp` to `true` in your `langgraph.json
 }
 ```
 
-This will prevent the server from exposing the `/mcp` endpoint.
+이렇게 하면 서버가 `/mcp` endpoint를 노출하지 않습니다.

@@ -2,24 +2,24 @@
 title: SqlToolkit
 ---
 
-This will help you getting started with the [SqlToolkit](/oss/langchain/tools#toolkits). For detailed documentation of all SqlToolkit features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain.agents_toolkits_sql.SqlToolkit.html). You can also find the documentation for the Python equivalent [here](https://python.langchain.com/docs/integrations/toolkits/sql_database/).
+이 문서는 [SqlToolkit](/oss/langchain/tools#toolkits) 시작하기를 도와드립니다. 모든 SqlToolkit 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain.agents_toolkits_sql.SqlToolkit.html)를 참조하세요. Python 버전에 대한 문서는 [여기](https://python.langchain.com/docs/integrations/toolkits/sql_database/)에서 찾을 수 있습니다.
 
-This toolkit contains a the following tools:
+이 toolkit은 다음 도구들을 포함합니다:
 
 | Name              | Description                                                                                                                                                                                                                               |
 |-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `query-sql`       | Input to this tool is a detailed and correct SQL query, output is a result from the database. If the query is not correct, an error message will be returned. If an error is returned, rewrite the query, check the query, and try again. |
-| `info-sql`        | Input to this tool is a comma-separated list of tables, output is the schema and sample rows for those tables. Be sure that the tables actually exist by calling list-tables-sql first! Example Input: "table1, table2, table3".          |
-| `list-tables-sql` | Input is an empty string, output is a comma-separated list of tables in the database.                                                                                                                                                     |
-| `query-checker`   | Use this tool to double check if your query is correct before executing it. Always use this tool before executing a query with query-sql!                                                                                                 |
+| `query-sql`       | 이 도구의 입력은 상세하고 정확한 SQL 쿼리이며, 출력은 데이터베이스의 결과입니다. 쿼리가 올바르지 않으면 오류 메시지가 반환됩니다. 오류가 반환되면 쿼리를 다시 작성하고, 확인한 후 다시 시도하세요. |
+| `info-sql`        | 이 도구의 입력은 쉼표로 구분된 테이블 목록이며, 출력은 해당 테이블의 스키마와 샘플 행입니다. 먼저 list-tables-sql을 호출하여 테이블이 실제로 존재하는지 확인하세요! 예시 입력: "table1, table2, table3".          |
+| `list-tables-sql` | 입력은 빈 문자열이며, 출력은 데이터베이스의 테이블을 쉼표로 구분한 목록입니다.                                                                                                                                                     |
+| `query-checker`   | 쿼리를 실행하기 전에 쿼리가 올바른지 다시 확인하기 위해 이 도구를 사용하세요. query-sql로 쿼리를 실행하기 전에 항상 이 도구를 사용하세요!                                                                                                 |
 
-This toolkit is useful for asking questions, performing queries, validating queries and more on a SQL database.
+이 toolkit은 SQL 데이터베이스에 대한 질문, 쿼리 수행, 쿼리 검증 등에 유용합니다.
 
 ## Setup
 
-This example uses Chinook database, which is a sample database available for SQL Server, Oracle, MySQL, etc. To set it up, follow [these instructions](https://database.guide/2-sample-databases-sqlite/), placing the `.db` file in the directory where your code lives.
+이 예제는 SQL Server, Oracle, MySQL 등에서 사용할 수 있는 샘플 데이터베이스인 Chinook 데이터베이스를 사용합니다. 설정하려면 [이 지침](https://database.guide/2-sample-databases-sqlite/)을 따라 `.db` 파일을 코드가 있는 디렉토리에 배치하세요.
 
-If you want to get automated tracing from runs of individual tools, you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+개별 도구 실행에서 자동 추적을 받으려면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
 
 ```typescript
 process.env.LANGSMITH_TRACING="true"
@@ -28,7 +28,7 @@ process.env.LANGSMITH_API_KEY="your-api-key"
 
 ### Installation
 
-This toolkit lives in the `langchain` package. You'll also need to install the `typeorm` peer dependency.
+이 toolkit은 `langchain` 패키지에 포함되어 있습니다. `typeorm` peer dependency도 설치해야 합니다.
 
 <CodeGroup>
 ```bash npm
@@ -44,7 +44,7 @@ pnpm add langchain @langchain/core typeorm
 
 ## Instantiation
 
-First, we need to define our LLM to be used in the toolkit.
+먼저, toolkit에서 사용할 LLM을 정의해야 합니다.
 
 ```typescript
 // @lc-docs-hide-cell
@@ -75,7 +75,7 @@ const toolkit = new SqlToolkit(db, llm);
 
 ## Tools
 
-View available tools:
+사용 가능한 도구 보기:
 
 ```typescript
 const tools = toolkit.getTools();
@@ -115,7 +115,7 @@ console.log(tools.map((tool) => ({
 
 ## Use within an agent
 
-First, ensure you have LangGraph installed:
+먼저, LangGraph가 설치되어 있는지 확인하세요:
 
 
 <CodeGroup>
@@ -211,4 +211,4 @@ Here are 10 artists from your database:
 
 ## API reference
 
-For detailed documentation of all SqlToolkit features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain.agents_toolkits_sql.SqlToolkit.html).
+모든 SqlToolkit 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain.agents_toolkits_sql.SqlToolkit.html)를 참조하세요.

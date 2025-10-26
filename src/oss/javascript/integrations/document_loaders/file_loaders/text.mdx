@@ -3,10 +3,10 @@ title: TextLoader
 ---
 
 <Tip>
-**Compatibility**: Only available on Node.js.
+**호환성**: Node.js에서만 사용 가능합니다.
 </Tip>
 
-This notebook provides a quick overview for getting started with `TextLoader` [document loaders](/oss/integrations/document_loaders). For detailed documentation of all `TextLoader` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain.document_loaders_fs_text.TextLoader.html).
+이 노트북은 `TextLoader` [document loaders](/oss/integrations/document_loaders) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `TextLoader` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain.document_loaders_fs_text.TextLoader.html)를 참조하세요.
 
 ## Overview
 
@@ -18,11 +18,11 @@ This notebook provides a quick overview for getting started with `TextLoader` [d
 
 ## Setup
 
-To access `TextLoader` document loader you'll need to install the `langchain` package.
+`TextLoader` document loader에 접근하려면 `langchain` 패키지를 설치해야 합니다.
 
 ### Installation
 
-The LangChain TextLoader integration lives in the `langchain` package:
+LangChain TextLoader integration은 `langchain` 패키지에 포함되어 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -38,7 +38,7 @@ pnpm add langchain
 
 ## Instantiation
 
-Now we can instantiate our model object and load documents:
+이제 model 객체를 인스턴스화하고 document를 로드할 수 있습니다:
 
 ```typescript
 import { TextLoader } from "@langchain/classic/document_loaders/fs/text"
@@ -75,4 +75,4 @@ console.log(docs[0].metadata)
 
 ## API reference
 
-For detailed documentation of all TextLoader features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain.document_loaders_fs_text.TextLoader.html).
+모든 TextLoader 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain.document_loaders_fs_text.TextLoader.html)를 참조하세요.

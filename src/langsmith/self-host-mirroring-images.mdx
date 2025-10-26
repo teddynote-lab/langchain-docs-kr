@@ -1,39 +1,39 @@
 ---
-title: Mirror images for your LangSmith installation
-sidebarTitle: Mirror images for your installation
+title: LangSmith 설치를 위한 이미지 미러링
+sidebarTitle: 설치를 위한 이미지 미러링
 ---
 
-By default, LangSmith will pull images from our public Docker registry. However, if you are running LangSmith in an environment that does not have internet access, or if you would like to use a private Docker registry, you can mirror the images to your own registry and then configure your LangSmith installation to use those images.
+기본적으로 LangSmith는 공개 Docker 레지스트리에서 이미지를 가져옵니다. 그러나 인터넷 액세스가 없는 환경에서 LangSmith를 실행하거나 프라이빗 Docker 레지스트리를 사용하려는 경우, 자체 레지스트리에 이미지를 미러링한 다음 해당 이미지를 사용하도록 LangSmith 설치를 구성할 수 있습니다.
 
-## Requirements
+## 요구사항
 
-* Authenticated access to a Docker registry that your Kubernetes cluster/machine has access to.
-* Docker installed on your local machine or a machine that has access to the Docker registry.
-* A Kubernetes cluster or a machine where you can run LangSmith.
+* Kubernetes 클러스터/머신이 액세스할 수 있는 Docker 레지스트리에 대한 인증된 액세스
+* 로컬 머신 또는 Docker 레지스트리에 액세스할 수 있는 머신에 설치된 Docker
+* LangSmith를 실행할 수 있는 Kubernetes 클러스터 또는 머신
 
-## Mirroring the Images
+## 이미지 미러링
 
-For your convenience, we have provided a script that will mirror the images for you. You can find the script in the [LangSmith Helm Chart repository](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/scripts/mirror_langsmith_images.sh)
+편의를 위해 이미지를 미러링할 수 있는 스크립트를 제공했습니다. 스크립트는 [LangSmith Helm Chart 저장소](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/scripts/mirror_langsmith_images.sh)에서 찾을 수 있습니다.
 
-To use the script, you will need to run the script with the following command specifying your registry and platform:
+스크립트를 사용하려면 레지스트리와 플랫폼을 지정하여 다음 명령으로 스크립트를 실행해야 합니다:
 
 ```bash
 bash mirror_images.sh <your-registry> [<platform>]
 ```
 
-Where `<your-registry>` is the URL of your Docker registry (e.g. `myregistry.com`) and `<platform>` is the platform you are using (e.g. `linux/amd64`, `linux/arm64`, etc.). If you do not specify a platform, it will default to `linux/amd64`.
+여기서 `<your-registry>`는 Docker 레지스트리의 URL(예: `myregistry.com`)이고 `<platform>`은 사용 중인 플랫폼(예: `linux/amd64`, `linux/arm64` 등)입니다. 플랫폼을 지정하지 않으면 기본값은 `linux/amd64`입니다.
 
-For example, if your registry is `myregistry.com`, your platform is `linux/arm64`, and you want to use the latest version of the images, you would run:
+예를 들어, 레지스트리가 `myregistry.com`이고 플랫폼이 `linux/arm64`이며 최신 버전의 이미지를 사용하려는 경우 다음과 같이 실행합니다:
 
 ```bash
 bash mirror_langsmith_images.sh --registry myregistry --platform linux/arm64 --version 0.10.66
 ```
 
-Note that this script will assume that you have Docker installed and that you are authenticated to your registry. It will also push the images to the specified registry with the same repository/tag as the original images.
+이 스크립트는 Docker가 설치되어 있고 레지스트리에 인증되어 있다고 가정합니다. 또한 원본 이미지와 동일한 repository/tag로 지정된 레지스트리에 이미지를 push합니다.
 
-Alternatively, you can pull, mirror, and push the images manually. The images that you will need to mirror are found in the `values.yaml` file of the LangSmith Helm Chart. These can be found here: [LangSmith Helm Chart values.yaml](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/values.yaml#L14)
+또는 이미지를 수동으로 pull, mirror, push할 수 있습니다. 미러링해야 하는 이미지는 LangSmith Helm Chart의 `values.yaml` 파일에서 찾을 수 있습니다. 여기에서 찾을 수 있습니다: [LangSmith Helm Chart values.yaml](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/values.yaml#L14)
 
-Here is an example of how to mirror the images using Docker:
+다음은 Docker를 사용하여 이미지를 미러링하는 예시입니다:
 
 ```bash
 # Pull the images from the public registry
@@ -42,11 +42,11 @@ docker tag langchain/langsmith-backend:latest <your-registry>/langsmith-backend:
 docker push <your-registry>/langsmith-backend:latest
 ```
 
-You will need to repeat this for each image that you want to mirror.
+미러링하려는 각 이미지에 대해 이 작업을 반복해야 합니다.
 
-## Configuration
+## 구성
 
-Once the images are mirrored, you will need to configure your LangSmith installation to use the mirrored images. You can do this by modifying the `values.yaml` file for your LangSmith Helm Chart installation or the `.env` file for your Docker installation. Replace tag with the version you want to use, e.g. `0.10.66` for the latest version at the time of writing.
+이미지가 미러링되면 미러링된 이미지를 사용하도록 LangSmith 설치를 구성해야 합니다. LangSmith Helm Chart 설치의 `values.yaml` 파일 또는 Docker 설치의 `.env` 파일을 수정하여 이 작업을 수행할 수 있습니다. tag를 사용하려는 버전으로 교체하세요. 예를 들어 작성 시점의 최신 버전인 `0.10.66`으로 교체합니다.
 
 <CodeGroup>
 
@@ -103,4 +103,4 @@ _REGISTRY=your-registry # Set this to your registry URL if you mirrored all imag
 
 </CodeGroup>
 
-Once configured, you will need to update your LangSmith installation. You can follow our upgrade guide here: [Upgrading LangSmith](/langsmith/self-host-upgrades).If your upgrade is successful, your LangSmith instance should now be using the mirrored images from your Docker registry.
+구성이 완료되면 LangSmith 설치를 업데이트해야 합니다. 여기에서 업그레이드 가이드를 따를 수 있습니다: [LangSmith 업그레이드](/langsmith/self-host-upgrades). 업그레이드가 성공하면 LangSmith 인스턴스가 이제 Docker 레지스트리의 미러링된 이미지를 사용하게 됩니다.

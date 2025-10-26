@@ -2,9 +2,9 @@
 title: ChatGroq
 ---
 
-[Groq](https://groq.com/) is a company that offers fast AI inference, powered by LPU™ AI inference technology which delivers fast, affordable, and energy efficient AI.
+[Groq](https://groq.com/)는 LPU™ AI inference 기술로 구동되는 빠른 AI inference를 제공하는 회사로, 빠르고 저렴하며 에너지 효율적인 AI를 제공합니다.
 
-This will help you getting started with ChatGroq [chat models](/oss/langchain/models). For detailed documentation of all ChatGroq features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_groq.ChatGroq.html).
+이 문서는 ChatGroq [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 ChatGroq 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_groq.ChatGroq.html)를 참조하세요.
 
 ## Overview
 
@@ -16,7 +16,7 @@ This will help you getting started with ChatGroq [chat models](/oss/langchain/mo
 
 ### Model features
 
-See the links in the table headers below for guides on how to use specific features.
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
@@ -24,18 +24,18 @@ See the links in the table headers below for guides on how to use specific featu
 
 ## Setup
 
-To access ChatGroq models you'll need to create a Groq account, get an API key, and install the `@langchain/groq` integration package.
+ChatGroq 모델에 액세스하려면 Groq 계정을 만들고 API key를 받은 다음 `@langchain/groq` integration package를 설치해야 합니다.
 
 ### Credentials
 
-In order to use the Groq API you'll need an API key. You can sign up for a Groq account and create an API key [here](https://wow.groq.com/).
-Then, you can set the API key as an environment variable in your terminal:
+Groq API를 사용하려면 API key가 필요합니다. [여기](https://wow.groq.com/)에서 Groq 계정에 가입하고 API key를 생성할 수 있습니다.
+그런 다음 터미널에서 API key를 environment variable로 설정할 수 있습니다:
 
 ```bash
 export GROQ_API_KEY="your-api-key"
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```bash
 # export LANGSMITH_TRACING="true"
@@ -44,7 +44,7 @@ If you want to get automated tracing of your model calls you can also set your [
 
 ### Installation
 
-The LangChain ChatGroq integration lives in the `@langchain/groq` package:
+LangChain ChatGroq integration은 `@langchain/groq` package에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -60,7 +60,7 @@ pnpm add @langchain/groq @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```typescript
 import { ChatGroq } from "@langchain/groq"
@@ -144,4 +144,4 @@ console.log({ aiInvokeMsgContent: aiInvokeMsg.content, aiBindMsg: aiBindMsg.cont
 
 ## API reference
 
-For detailed documentation of all ChatGroq features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_groq.ChatGroq.html).
+모든 ChatGroq 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_groq.ChatGroq.html)를 참조하세요.

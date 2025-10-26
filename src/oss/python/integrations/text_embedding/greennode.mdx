@@ -2,9 +2,9 @@
 title: GreenNodeEmbeddings
 ---
 
->[GreenNode](https://greennode.ai/) is a global AI solutions provider and a **NVIDIA Preferred Partner**, delivering full-stack AI capabilities—from infrastructure to application—for enterprises across the US, MENA, and APAC regions. Operating on **world-class infrastructure** (LEED Gold, TIA‑942, Uptime Tier III), GreenNode empowers enterprises, startups, and researchers with a comprehensive suite of AI services
+>[GreenNode](https://greennode.ai/)는 글로벌 AI 솔루션 제공업체이자 **NVIDIA Preferred Partner**로, 미국, MENA, APAC 지역의 기업들에게 인프라부터 애플리케이션까지 풀스택 AI 역량을 제공합니다. **세계적 수준의 인프라**(LEED Gold, TIA‑942, Uptime Tier III)를 기반으로 운영되는 GreenNode는 기업, 스타트업, 연구자들에게 포괄적인 AI 서비스 제품군을 제공합니다.
 
-This guide provides a guide to getting started with `GreenNodeEmbeddings`. It enables you to perform semantic document search using various built-in connectors or your own custom data sources by generating high-quality vector representations of text.
+이 가이드는 `GreenNodeEmbeddings` 시작하기를 위한 안내를 제공합니다. 다양한 내장 connector 또는 사용자 정의 데이터 소스를 사용하여 고품질 텍스트 벡터 표현을 생성함으로써 의미론적 문서 검색을 수행할 수 있습니다.
 
 ## Overview
 
@@ -16,11 +16,11 @@ This guide provides a guide to getting started with `GreenNodeEmbeddings`. It en
 
 ## Setup
 
-To access GreenNode embedding models you'll need to create a GreenNode account, get an API key, and install the `langchain-greennode` integration package.
+GreenNode embedding model에 액세스하려면 GreenNode 계정을 생성하고, API key를 받고, `langchain-greennode` integration package를 설치해야 합니다.
 
 ### Credentials
 
-GreenNode requires an API key for authentication, which can be provided either as the `api_key` parameter during initialization or set as the environment variable `GREENNODE_API_KEY`. You can obtain an API key by registering for an account on [GreenNode Serverless AI](https://aiplatform.console.greennode.ai/playground).
+GreenNode는 인증을 위해 API key가 필요하며, 초기화 시 `api_key` parameter로 제공하거나 환경 변수 `GREENNODE_API_KEY`로 설정할 수 있습니다. [GreenNode Serverless AI](https://aiplatform.console.greennode.ai/playground)에서 계정을 등록하여 API key를 얻을 수 있습니다.
 
 ```python
 import getpass
@@ -30,7 +30,7 @@ if not os.getenv("GREENNODE_API_KEY"):
     os.environ["GREENNODE_API_KEY"] = getpass.getpass("Enter your GreenNode API key: ")
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+model 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```python
 os.environ["LANGSMITH_TRACING"] = "true"
@@ -39,7 +39,7 @@ os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key:
 
 ### Installation
 
-The LangChain GreenNode integration lives in the `langchain-greennode` package:
+LangChain GreenNode integration은 `langchain-greennode` package에 있습니다:
 
 ```python
 pip install -qU langchain-greennode
@@ -51,7 +51,7 @@ Note: you may need to restart the kernel to use updated packages.
 
 ## Instantiation
 
-The `GreenNodeEmbeddings` class can be instantiated with optional parameters for the API key and model name:
+`GreenNodeEmbeddings` class는 API key와 model 이름에 대한 선택적 parameter로 인스턴스화할 수 있습니다:
 
 ```python
 from langchain_greennode import GreenNodeEmbeddings
@@ -65,8 +65,8 @@ embeddings = GreenNodeEmbeddings(
 
 ## Indexing and Retrieval
 
-Embedding models play a key role in retrieval-augmented generation (RAG) workflows by enabling both the indexing of content and its efficient retrieval.
-Below, see how to index and retrieve data using the `embeddings` object we initialized above. In this example, we will index and retrieve a sample document in the `InMemoryVectorStore`.
+Embedding model은 콘텐츠의 indexing과 효율적인 retrieval을 가능하게 함으로써 retrieval-augmented generation (RAG) workflow에서 핵심적인 역할을 합니다.
+아래에서 위에서 초기화한 `embeddings` 객체를 사용하여 데이터를 index하고 retrieve하는 방법을 확인하세요. 이 예제에서는 `InMemoryVectorStore`에서 샘플 문서를 index하고 retrieve합니다.
 
 ```python
 # Create a vector store with a sample text
@@ -95,11 +95,11 @@ retrieved_documents[0].page_content
 
 ## Direct Usage
 
-The `GreenNodeEmbeddings` class can be used independently to generate text embeddings without the need for a vector store. This is useful for tasks such as similarity scoring, clustering, or custom processing pipelines.
+`GreenNodeEmbeddings` class는 vector store 없이도 독립적으로 텍스트 embedding을 생성하는 데 사용할 수 있습니다. 이는 유사도 점수 계산, 클러스터링 또는 사용자 정의 처리 pipeline과 같은 작업에 유용합니다.
 
 ### Embed single texts
 
-You can embed single texts or documents with `embed_query`:
+`embed_query`로 단일 텍스트 또는 문서를 embed할 수 있습니다:
 
 ```python
 single_vector = embeddings.embed_query(text)
@@ -112,7 +112,7 @@ print(str(single_vector)[:100])  # Show the first 100 characters of the vector
 
 ### Embed multiple texts
 
-You can embed multiple texts with `embed_documents`:
+`embed_documents`로 여러 텍스트를 embed할 수 있습니다:
 
 ```python
 text2 = (
@@ -130,7 +130,7 @@ for vector in two_vectors:
 
 ### Async Support
 
-GreenNodeEmbeddings supports async operations:
+GreenNodeEmbeddings는 async 작업을 지원합니다:
 
 ```python
 import asyncio
@@ -202,4 +202,4 @@ Document 4: ['0.5788', '0.6170', '0.3528', '1.0000']
 
 ## API reference
 
-For more details about the GreenNode Serverless AI API, visit the [GreenNode Serverless AI Documentation](https://aiplatform.console.greennode.ai/api-docs/maas).
+GreenNode Serverless AI API에 대한 자세한 내용은 [GreenNode Serverless AI Documentation](https://aiplatform.console.greennode.ai/api-docs/maas)을 참조하세요.

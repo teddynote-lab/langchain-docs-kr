@@ -2,12 +2,12 @@
 title: Clarifai
 ---
 
->[Clarifai](https://www.clarifai.com/) is an AI Platform that provides the full AI lifecycle ranging from data exploration, data labeling, model training, evaluation, and inference.
+>[Clarifai](https://www.clarifai.com/)는 데이터 탐색, 데이터 라벨링, 모델 학습, 평가 및 추론에 이르는 전체 AI 라이프사이클을 제공하는 AI 플랫폼입니다.
 
-This example goes over how to use LangChain to interact with `Clarifai` [models](https://clarifai.com/explore/models).
+이 예제는 LangChain을 사용하여 `Clarifai` [models](https://clarifai.com/explore/models)와 상호작용하는 방법을 다룹니다.
 
-To use Clarifai, you must have an account and a Personal Access Token (PAT) key.
-[Check here](https://clarifai.com/settings/security) to get or create a PAT.
+Clarifai를 사용하려면 계정과 Personal Access Token (PAT) 키가 필요합니다.
+PAT를 얻거나 생성하려면 [여기를 확인하세요](https://clarifai.com/settings/security).
 
 # Dependencies
 
@@ -25,7 +25,7 @@ os.environ["CLARIFAI_PAT"] = "CLARIFAI_PAT_TOKEN"
 
 # Imports
 
-Here we will be setting the personal access token. You can find your PAT under [settings/security](https://clarifai.com/settings/security) in your Clarifai account.
+여기서는 personal access token을 설정합니다. Clarifai 계정의 [settings/security](https://clarifai.com/settings/security)에서 PAT를 찾을 수 있습니다.
 
 ```python
 # Please login and get your API key from  https://clarifai.com/settings/security
@@ -43,7 +43,7 @@ from langchain_core.prompts import PromptTemplate
 
 # Input
 
-Create a prompt template to be used with the LLM Chain:
+LLM Chain과 함께 사용할 prompt template을 생성합니다:
 
 ```python
 template = """Question: {question}
@@ -55,11 +55,11 @@ prompt = PromptTemplate.from_template(template)
 
 # Setup
 
-Setup the user id and app id where the model resides. You can find a list of public models on [clarifai.com/explore/models](https://clarifai.com/explore/models)
+모델이 있는 user id와 app id를 설정합니다. [clarifai.com/explore/models](https://clarifai.com/explore/models)에서 공개 모델 목록을 찾을 수 있습니다.
 
-You will have to also initialize the model id and if needed, the model version id. Some models have many versions, you can choose the one appropriate for your task.
+또한 model id와 필요한 경우 model version id를 초기화해야 합니다. 일부 모델은 여러 버전이 있으며, 작업에 적합한 버전을 선택할 수 있습니다.
 
-Alternatively, You can use the model_url (for ex: "[clarifai.com/anthropic/completion/models/claude-v2](https://clarifai.com/anthropic/completion/models/claude-v2)") for initialization.
+또는 초기화를 위해 model_url(예: "[clarifai.com/anthropic/completion/models/claude-v2](https://clarifai.com/anthropic/completion/models/claude-v2)")을 사용할 수 있습니다.
 
 ```python
 USER_ID = "openai"
@@ -98,9 +98,9 @@ llm_chain.run(question)
 ' Okay, here are the steps to figure this out:\n\n1. Justin Bieber was born on March 1, 1994.\n\n2. The Super Bowl that took place in the year of his birth was Super Bowl XXVIII. \n\n3. Super Bowl XXVIII was played on January 30, 1994.\n\n4. The two teams that played in Super Bowl XXVIII were the Dallas Cowboys and the Buffalo Bills. \n\n5. The Dallas Cowboys defeated the Buffalo Bills 30-13 to win Super Bowl XXVIII.\n\nTherefore, the NFL team that won the Super Bowl in the year Justin Bieber was born was the Dallas Cowboys.'
 ```
 
-## Model Predict with Inference parameters for GPT
+## GPT를 위한 Inference parameter를 사용한 Model Predict
 
-Alternatively you can use GPT models with inference parameters (like temperature, max_tokens etc)
+또는 inference parameter(temperature, max_tokens 등)와 함께 GPT 모델을 사용할 수 있습니다.
 
 ```python
 # Initialize the parameters as dict.
@@ -124,7 +124,7 @@ llm_chain.run(question)
 'Step 1: The first digit can be any even number from 1 to 9, except for 5. So there are 4 choices for the first digit.\n\nStep 2: If the first digit is not 5, then the second digit must be 7. So there is only 1 choice for the second digit.\n\nStep 3: The third digit can be any even number from 0 to 9, except for 5 and 7. So there are '
 ```
 
-Generate responses for list of prompts
+prompt 목록에 대한 응답 생성
 
 ```python
 # We can use _generate to generate the response for list of prompts.

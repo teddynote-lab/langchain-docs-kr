@@ -1,73 +1,73 @@
 ---
-title: Composite evaluators
-sidebarTitle: Composite evaluators
+title: Composite evaluator
+sidebarTitle: Composite evaluator
 ---
 
-_Composite evaluators_ are a way to combine multiple evaluator scores into a single [score](/langsmith/evaluation-concepts#evaluator-outputs). This is useful when you want to evaluate multiple aspects of your application and combine the results into a single result.
+_Composite evaluator_는 여러 evaluator score를 단일 [score](/langsmith/evaluation-concepts#evaluator-outputs)로 결합하는 방법입니다. 이는 애플리케이션의 여러 측면을 평가하고 결과를 단일 결과로 결합하려는 경우에 유용합니다.
 
-## Create a composite evaluator using the UI
+## UI를 사용하여 composite evaluator 생성하기
 
-You can create composite evaluators on a [tracing project](/langsmith/observability-concepts#projects) (for [online evaluations](/langsmith/evaluation-concepts#online-evaluation)) or a [dataset](/langsmith/evaluation-concepts#datasets) (for [offline evaluations](/langsmith/evaluation-concepts#offline-evaluation)). With composite evaluators in the UI, you can compute a weighted average or weighted sum of multiple evaluator scores, with configurable weights.
+[tracing project](/langsmith/observability-concepts#projects)([온라인 평가](/langsmith/evaluation-concepts#online-evaluation)용) 또는 [dataset](/langsmith/evaluation-concepts#datasets)([오프라인 평가](/langsmith/evaluation-concepts#offline-evaluation)용)에서 composite evaluator를 생성할 수 있습니다. UI의 composite evaluator를 사용하면 구성 가능한 가중치로 여러 evaluator score의 가중 평균 또는 가중 합계를 계산할 수 있습니다.
 
 <div style={{ textAlign: 'center' }}>
 <img
     className="block dark:hidden"
     src="/langsmith/images/create_composite_evaluator-light.png"
-    alt="LangSmith UI showing an LLM call trace called ChatOpenAI with a system and human input followed by an AI Output."
+    alt="시스템 및 사용자 입력과 AI 출력이 포함된 ChatOpenAI라는 LLM 호출 trace를 보여주는 LangSmith UI."
 />
 
 <img
     className="hidden dark:block"
     src="/langsmith/images/create_composite_evaluator-dark.png"
-    alt="LangSmith UI showing an LLM call trace called ChatOpenAI with a system and human input followed by an AI Output."
+    alt="시스템 및 사용자 입력과 AI 출력이 포함된 ChatOpenAI라는 LLM 호출 trace를 보여주는 LangSmith UI."
 />
 </div>
 
 
-### 1. Navigate to the tracing project or dataset
+### 1. tracing project 또는 dataset으로 이동
 
-To start configuring a composite evaluator, navigate to the **Tracing Projects** or **Dataset & Experiments** tab and select a project or dataset.
-- From within a tracing project: **+ New** > **Evaluator** > **Composite score**
-- From within a dataset: **+ Evaluator** > **Composite score**
+composite evaluator 구성을 시작하려면 **Tracing Projects** 또는 **Dataset & Experiments** 탭으로 이동하여 project 또는 dataset을 선택합니다.
+- tracing project 내에서: **+ New** > **Evaluator** > **Composite score**
+- dataset 내에서: **+ Evaluator** > **Composite score**
 
-### 2. Configure the composite evaluator
+### 2. composite evaluator 구성
 
-1. Name your evaluator.
-2. Select an aggregation method, either **Average** or **Sum**.
+1. evaluator 이름을 지정합니다.
+2. 집계 방법을 선택합니다. **Average** 또는 **Sum** 중 하나를 선택합니다.
     - **Average**: ∑(weight*score) / ∑(weight).
     - **Sum**: ∑(weight*score).
-3. Add the feedback keys you want to include in the composite score.
-4. Add the weights for the feedback keys. By default, the weights are equal for each feedback key. Adjust the weights to increase or decrease the importance of specific feedback keys in the final score.
-5. Click **Create** to save the evaluator.
+3. composite score에 포함할 feedback key를 추가합니다.
+4. feedback key에 대한 가중치를 추가합니다. 기본적으로 각 feedback key에 대한 가중치는 동일합니다. 최종 score에서 특정 feedback key의 중요도를 높이거나 낮추려면 가중치를 조정합니다.
+5. **Create**를 클릭하여 evaluator를 저장합니다.
 
-<Tip> If you need to adjust the weights for the composite scores, they can be updated after the evaluator is created. The resulting scores will be updated for all runs that have the evaluator configured. </Tip>
+<Tip> composite score의 가중치를 조정해야 하는 경우 evaluator가 생성된 후에 업데이트할 수 있습니다. 결과 score는 evaluator가 구성된 모든 run에 대해 업데이트됩니다. </Tip>
 
-### 3. View composite evaluator results
-Composite scores are attached to a run as **feedback**, similarly to feedback from a single evaluator. How you can view them depends on where the evaluation was run:
+### 3. composite evaluator 결과 보기
+Composite score는 단일 evaluator의 feedback과 유사하게 run에 **feedback**으로 첨부됩니다. 평가가 실행된 위치에 따라 보는 방법이 다릅니다:
 
-**On a tracing project**:
-- Composite scores appear as feedback on runs.
-- [Filter for runs](/langsmith/filter-traces-in-application) with a composite score, or where the composite score meets a certain threshold.
-- [Create a chart](/langsmith/dashboards#custom-dashboards) to visualize trends in the composite score over time.
+**tracing project에서**:
+- Composite score는 run에 대한 feedback으로 나타납니다.
+- composite score가 있거나 composite score가 특정 임계값을 충족하는 [run 필터링](/langsmith/filter-traces-in-application)을 수행합니다.
+- 시간 경과에 따른 composite score의 추세를 시각화하기 위해 [차트 생성](/langsmith/dashboards#custom-dashboards)을 수행합니다.
 
-**On a dataset**:
-- View the composite scores in the experiments tab. You can also filter and sort experiments based on the average composite score of their runs.
-- Click into an experiment to view the composite score for each run.
+**dataset에서**:
+- experiments 탭에서 composite score를 확인합니다. run의 평균 composite score를 기준으로 experiment를 필터링하고 정렬할 수도 있습니다.
+- experiment를 클릭하여 각 run의 composite score를 확인합니다.
 
-<Note> If any of the constituent evaluators are not configured on the run, the composite score will not be calculated for that run. </Note>
+<Note> 구성 evaluator 중 하나라도 run에 구성되지 않은 경우 해당 run에 대한 composite score가 계산되지 않습니다. </Note>
 
-## Create composite feedback with the SDK
+## SDK를 사용하여 composite feedback 생성하기
 
-This guide describes setting up an evaluation that uses multiple evaluators and combines their scores with a custom aggregation function.
+이 가이드는 여러 evaluator를 사용하고 사용자 정의 집계 함수로 score를 결합하는 평가를 설정하는 방법을 설명합니다.
 
-<Note> Requires langsmith>=0.4.29 </Note>
+<Note> langsmith>=0.4.29 필요 </Note>
 
-### 1. Configure evaluators on a dataset
-Start by configuring your evaluators. In this example, the application generates a tweet from a blog introduction and uses three evaluators — summary, tone, and formatting — to assess the output.
+### 1. dataset에 evaluator 구성
+먼저 evaluator를 구성합니다. 이 예제에서 애플리케이션은 블로그 소개에서 트윗을 생성하고 세 가지 evaluator(summary, tone, formatting)를 사용하여 출력을 평가합니다.
 
-If you already have your own dataset with evaluators configured, you can skip this step.
+이미 evaluator가 구성된 자체 dataset이 있는 경우 이 단계를 건너뛸 수 있습니다.
 
-<Accordion title="Configure evaluators on a dataset.">
+<Accordion title="dataset에 evaluator를 구성합니다.">
 
 ```python
 import os
@@ -184,11 +184,11 @@ experiment_name = results.experiment_name
 ```
 </Accordion>
 
-### 2. Create composite feedback
+### 2. composite feedback 생성
 
-Create composite feedback that aggregates the individual evaluator scores using your custom function. This example uses a weighted average of the individual evaluator scores.
+사용자 정의 함수를 사용하여 개별 evaluator score를 집계하는 composite feedback을 생성합니다. 이 예제는 개별 evaluator score의 가중 평균을 사용합니다.
 
-<Accordion title="Create a composite feedback.">
+<Accordion title="composite feedback을 생성합니다.">
 
 ```python
 from typing import Dict
@@ -252,6 +252,3 @@ for example_with_runs in results["examples_with_runs"]:
                 )
 ```
 </Accordion>
-
-
-

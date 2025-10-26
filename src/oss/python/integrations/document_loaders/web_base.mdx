@@ -2,9 +2,9 @@
 title: WebBaseLoader
 ---
 
-This covers how to use `WebBaseLoader` to load all text from `HTML` webpages into a document format that we can use downstream. For more custom logic for loading webpages look at some child class examples such as `IMSDbLoader`, `AZLyricsLoader`, and `CollegeConfidentialLoader`.
+`WebBaseLoader`를 사용하여 `HTML` 웹페이지의 모든 텍스트를 다운스트림에서 사용할 수 있는 document 형식으로 로드하는 방법을 다룹니다. 웹페이지 로딩을 위한 더 맞춤화된 로직은 `IMSDbLoader`, `AZLyricsLoader`, `CollegeConfidentialLoader`와 같은 자식 클래스 예제를 참고하세요.
 
-If you don't want to worry about website crawling, bypassing JS-blocking sites, and data cleaning, consider using `FireCrawlLoader` or the faster option `SpiderLoader`.
+웹사이트 크롤링, JS 차단 사이트 우회, 데이터 정리에 대해 걱정하고 싶지 않다면 `FireCrawlLoader` 또는 더 빠른 옵션인 `SpiderLoader` 사용을 고려하세요.
 
 ## Overview
 
@@ -28,11 +28,11 @@ If you don't want to worry about website crawling, bypassing JS-blocking sites, 
 
 ### Credentials
 
-`WebBaseLoader` does not require any credentials.
+`WebBaseLoader`는 자격 증명이 필요하지 않습니다.
 
 ### Installation
 
-To use the `WebBaseLoader` you first need to install the `langchain-community` python package.
+`WebBaseLoader`를 사용하려면 먼저 `langchain-community` python package를 설치해야 합니다.
 
 ```python
 pip install -qU langchain-community beautifulsoup4
@@ -40,7 +40,7 @@ pip install -qU langchain-community beautifulsoup4
 
 ## Initialization
 
-Now we can instantiate our model object and load documents:
+이제 model object를 인스턴스화하고 document를 로드할 수 있습니다:
 
 ```python
 from langchain_community.document_loaders import WebBaseLoader
@@ -48,13 +48,13 @@ from langchain_community.document_loaders import WebBaseLoader
 loader = WebBaseLoader("https://www.example.com/")
 ```
 
-To bypass SSL verification errors during fetching, you can set the "verify" option:
+가져오는 동안 SSL 검증 오류를 우회하려면 "verify" 옵션을 설정할 수 있습니다:
 
 `loader.requests_kwargs = {'verify':False}`
 
 ### Initialization with multiple pages
 
-You can also pass in a list of pages to load from.
+여러 페이지 목록을 전달하여 로드할 수도 있습니다.
 
 ```python
 loader_multiple_pages = WebBaseLoader(
@@ -84,9 +84,9 @@ print(docs[0].metadata)
 
 ### Load multiple urls concurrently
 
-You can speed up the scraping process by scraping and parsing multiple urls concurrently.
+여러 url을 동시에 스크래핑하고 파싱하여 스크래핑 프로세스를 가속화할 수 있습니다.
 
-There are reasonable limits to concurrent requests, defaulting to 2 per second.  If you aren't concerned about being a good citizen, or you control the server you are scraping and don't care about load, you can change the `requests_per_second` parameter to increase the max concurrent requests.  Note, while this will speed up the scraping process, but may cause the server to block you.  Be careful!
+동시 요청에는 합리적인 제한이 있으며, 기본값은 초당 2개입니다. 좋은 시민이 되는 것에 관심이 없거나, 스크래핑하는 서버를 제어하고 부하를 신경 쓰지 않는다면 `requests_per_second` 매개변수를 변경하여 최대 동시 요청 수를 늘릴 수 있습니다. 이렇게 하면 스크래핑 프로세스가 빨라지지만 서버가 차단할 수 있습니다. 주의하세요!
 
 ```python
 pip install -qU  nest_asyncio
@@ -119,7 +119,7 @@ Fetching pages: 100%|###########################################################
 
 ### Loading a xml file, or using a different BeautifulSoup parser
 
-You can also look at `SitemapLoader` for an example of how to load a sitemap file, which is an example of using this feature.
+xml 파일을 로드하는 예제는 `SitemapLoader`를 참고할 수도 있으며, 이는 이 기능을 사용하는 예제입니다.
 
 ```python
 loader = WebBaseLoader(
@@ -136,7 +136,7 @@ docs
 
 ## Lazy Load
 
-You can use lazy loading to only load one page at a time in order to minimize memory requirements.
+메모리 요구 사항을 최소화하기 위해 lazy loading을 사용하여 한 번에 하나의 페이지만 로드할 수 있습니다.
 
 ```python
 pages = []
@@ -185,7 +185,7 @@ Uniform test method for the measurement of energy efficien
 
 ## Using proxies
 
-Sometimes you might need to use proxies to get around IP blocks. You can pass in a dictionary of proxies to the loader (and `requests` underneath) to use them.
+때때로 IP 차단을 우회하기 위해 proxy를 사용해야 할 수 있습니다. loader(및 내부의 `requests`)에 proxy dictionary를 전달하여 사용할 수 있습니다.
 
 ```python
 loader = WebBaseLoader(
@@ -200,4 +200,4 @@ docs = loader.load()
 
 ## API reference
 
-For detailed documentation of all `WebBaseLoader` features and configurations head to the API reference: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.web_base.WebBaseLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.web_base.WebBaseLoader.html)
+모든 `WebBaseLoader` 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.web_base.WebBaseLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.web_base.WebBaseLoader.html)

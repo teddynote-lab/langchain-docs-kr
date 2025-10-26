@@ -2,15 +2,15 @@
 title: SQLiteVec
 ---
 
-This notebook covers how to get started with the SQLiteVec vector store.
+이 노트북은 SQLiteVec vector store를 시작하는 방법을 다룹니다.
 
->[SQLite-Vec](https://alexgarcia.xyz/sqlite-vec/) is an `SQLite` extension designed for vector search, emphasizing local-first operations and easy integration into applications without external servers. It is the successor to [SQLite-VSS](https://alexgarcia.xyz/sqlite-vss/) by the same author. It is written in zero-dependency C and designed to be easy to build and use.
+>[SQLite-Vec](https://alexgarcia.xyz/sqlite-vec/)는 vector 검색을 위해 설계된 `SQLite` extension으로, 로컬 우선 작업과 외부 서버 없이 애플리케이션에 쉽게 통합할 수 있는 것을 강조합니다. 같은 작성자의 [SQLite-VSS](https://alexgarcia.xyz/sqlite-vss/)의 후속 버전입니다. 의존성이 없는 C로 작성되었으며 빌드하고 사용하기 쉽게 설계되었습니다.
 
-This notebook shows how to use the `SQLiteVec` vector database.
+이 노트북은 `SQLiteVec` vector database를 사용하는 방법을 보여줍니다.
 
 ## Setup
 
-You'll need to install `langchain-community` with `pip install -qU langchain-community` to use this integration
+이 integration을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다
 
 ```python
 # You need to install sqlite-vec as a dependency.
@@ -19,7 +19,7 @@ pip install -qU  sqlite-vec
 
 ### Credentials
 
-SQLiteVec does not require any credentials to use as the vector store is a simple SQLite file.
+SQLiteVec는 vector store가 단순한 SQLite 파일이므로 사용하는 데 자격 증명이 필요하지 않습니다.
 
 ## Initialization
 
@@ -45,11 +45,11 @@ vector_store.add_texts(texts=["Ketanji Brown Jackson is awesome", "foo", "bar"])
 
 ### Update items in vector store
 
-Not supported yet
+아직 지원되지 않습니다
 
 ### Delete items from vector store
 
-Not supported yet
+아직 지원되지 않습니다
 
 ## Query vector store
 
@@ -61,15 +61,15 @@ data = vector_store.similarity_search("Ketanji Brown Jackson", k=4)
 
 ### Query by turning into retriever
 
-Not supported yet
+아직 지원되지 않습니다
 
 ## Usage for retrieval-augmented generation
 
-Refer to the documentation on sqlite-vec at [alexgarcia.xyz/sqlite-vec/](https://alexgarcia.xyz/sqlite-vec/) for more information on how to use it for retrieval-augmented generation.
+retrieval-augmented generation에 사용하는 방법에 대한 자세한 내용은 [alexgarcia.xyz/sqlite-vec/](https://alexgarcia.xyz/sqlite-vec/)의 sqlite-vec 문서를 참조하세요.
 
 ## API reference
 
-For detailed documentation of all SQLiteVec features and configurations head to the API reference: [python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.sqlitevec.SQLiteVec.html](https://python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.sqlitevec.SQLiteVec.html)
+모든 SQLiteVec 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.sqlitevec.SQLiteVec.html](https://python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.sqlitevec.SQLiteVec.html)
 
 ### Other examples
 

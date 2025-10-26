@@ -1,10 +1,11 @@
+```markdown
 ---
 title: Clova Embeddings
 ---
 
-[Clova](https://api.ncloud-docs.com/docs/ai-naver-clovastudio-summary) offers an embeddings service
+[Clova](https://api.ncloud-docs.com/docs/ai-naver-clovastudio-summary)는 embeddings 서비스를 제공합니다
 
-This example goes over how to use LangChain to interact with Clova inference for text embedding.
+이 예제는 LangChain을 사용하여 텍스트 embedding을 위한 Clova inference와 상호작용하는 방법을 다룹니다.
 
 ```python
 import os
@@ -30,4 +31,5 @@ query_result = embeddings.embed_query(query_text)
 ```python
 document_text = ["This is a test doc1.", "This is a test doc2."]
 document_result = embeddings.embed_documents(document_text)
+```
 ```

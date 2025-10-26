@@ -2,28 +2,28 @@
 title: IBM watsonx.ai
 ---
 
->WatsonxToolkit is a wrapper for IBM [watsonx.ai](https://www.ibm.com/products/watsonx-ai) Toolkit.
+>WatsonxToolkit은 IBM [watsonx.ai](https://www.ibm.com/products/watsonx-ai) Toolkit의 wrapper입니다.
 
-This example shows how to use `watsonx.ai` Toolkit using `LangChain`.
+이 예제는 `LangChain`을 사용하여 `watsonx.ai` Toolkit을 사용하는 방법을 보여줍니다.
 
-## Overview
+## 개요
 
-### Integration details
+### Integration 세부 정보
 
 | Class | Package | Serializable | [JS support](https://js.langchain.com/docs/integrations/toolkits/ibm/) | Downloads | Version |
 | :--- | :--- | :---: | :---: | :---: | :---: |
 | [WatsonxToolkit](https://python.langchain.com/api_reference/ibm/agent_toolkits/langchain_ibm.agent_toolkits.utility.toolkit.WatsonxToolkit.html) | [langchain-ibm](https://python.langchain.com/api_reference/ibm/index.html) | ❌ | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-ibm?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-ibm?style=flat-square&label=%20) |
 
-## Setup
+## 설정
 
-To access IBM watsonx.ai toolkit you'll need to create an IBM watsonx.ai account, get an API key, and install the `langchain-ibm` integration package.
+IBM watsonx.ai toolkit에 액세스하려면 IBM watsonx.ai 계정을 생성하고, API key를 받고, `langchain-ibm` integration package를 설치해야 합니다.
 
-### Credentials
+### 자격 증명
 
-This cell defines the WML credentials required to work with watsonx Toolkit.
+이 셀은 watsonx Toolkit을 사용하는 데 필요한 WML 자격 증명을 정의합니다.
 
-**Action:** Provide the IBM Cloud user API key. For details, see
-[documentation](https://cloud.ibm.com/docs/account?topic=account-userapikey&interface=ui).
+**작업:** IBM Cloud 사용자 API key를 제공하세요. 자세한 내용은
+[문서](https://cloud.ibm.com/docs/account?topic=account-userapikey&interface=ui)를 참조하세요.
 
 ```python
 import os
@@ -33,7 +33,7 @@ watsonx_api_key = getpass()
 os.environ["WATSONX_APIKEY"] = watsonx_api_key
 ```
 
-Additionaly you are able to pass additional secrets as an environment variable.
+추가로 환경 변수로 추가 secrets를 전달할 수 있습니다.
 
 ```python
 import os
@@ -45,17 +45,17 @@ os.environ["WATSONX_USERNAME"] = "your username for accessing the CPD cluster"
 os.environ["WATSONX_INSTANCE_ID"] = "your instance_id for accessing the CPD cluster"
 ```
 
-### Installation
+### 설치
 
-The LangChain IBM integration lives in the `langchain-ibm` package:
+LangChain IBM integration은 `langchain-ibm` package에 있습니다:
 
 ```python
 !pip install -qU langchain-ibm
 ```
 
-## Instantiation
+## 인스턴스화
 
-Initialize the `WatsonxToolkit` class.
+`WatsonxToolkit` class를 초기화합니다.
 
 ```python
 from langchain_ibm.agent_toolkits.utility import WatsonxToolkit
@@ -65,9 +65,9 @@ watsonx_toolkit = WatsonxToolkit(
 )
 ```
 
-Alternatively, you can use Cloud Pak for Data credentials. For details, see [watsonx.ai software setup](https://ibm.github.io/watsonx-ai-python-sdk/setup_cpd.html).
+또는 Cloud Pak for Data 자격 증명을 사용할 수 있습니다. 자세한 내용은 [watsonx.ai software setup](https://ibm.github.io/watsonx-ai-python-sdk/setup_cpd.html)을 참조하세요.
 
-For certain requirements, there is an option to pass the IBM's [`APIClient`](https://ibm.github.io/watsonx-ai-python-sdk/base.html#apiclient) object into the `WatsonxToolkit` class.
+특정 요구 사항의 경우, IBM의 [`APIClient`](https://ibm.github.io/watsonx-ai-python-sdk/base.html#apiclient) 객체를 `WatsonxToolkit` class에 전달하는 옵션이 있습니다.
 
 ```python
 from ibm_watsonx_ai import APIClient
@@ -81,16 +81,16 @@ watsonx_toolkit = WatsonxToolkit(
 
 ## Tools
 
-### Get all tools
+### 모든 tools 가져오기
 
-It is possible to get all available tools as a list of `WatsonxTool` objects.
+사용 가능한 모든 tools를 `WatsonxTool` 객체의 list로 가져올 수 있습니다.
 
 ```python
 watsonx_toolkit.get_tools()
 ```
 
 <Note>
-    The list of available tools may vary depending on whether it is IBM watsonx.ai for IBM Cloud or IBM watsonx.ai software.
+    사용 가능한 tools의 list는 IBM Cloud용 IBM watsonx.ai인지 IBM watsonx.ai software인지에 따라 다를 수 있습니다.
 </Note>
 
 ```output
@@ -101,17 +101,17 @@ watsonx_toolkit.get_tools()
  WatsonxTool(name='RAGQuery', description='Search the documents in a vector index.', args_schema=<class 'langchain_ibm.toolkit.ToolArgsSchema'>, agent_description='Search information in documents to provide context to a user query. Useful when asked to ground the answer in specific knowledge about {indexName}', tool_config_schema={'title': 'config schema for RAGQuery tool', 'type': 'object', 'properties': {'vectorIndexId': {'title': 'Vector index identifier', 'type': 'string'}, 'projectId': {'title': 'Project identifier', 'type': 'string'}, 'spaceId': {'title': 'Space identifier', 'type': 'string'}}, 'required': ['vectorIndexId'], 'oneOf': [{'required': ['projectId']}, {'required': ['spaceId']}]}, watsonx_client=<ibm_watsonx_ai.client.APIClient object at 0x127e0f490>)]
 ```
 
-### Get a tool
+### Tool 가져오기
 
-You can also get a specific `WatsonxTool` by name.
+이름으로 특정 `WatsonxTool`을 가져올 수도 있습니다.
 
 ```python
 google_search = watsonx_toolkit.get_tool(tool_name="GoogleSearch")
 ```
 
-## Invocation
+## 호출
 
-### Invoke the tool with a simple input
+### 간단한 input으로 tool 호출하기
 
 ```python
 search_result = google_search.invoke({"q": "IBM"})
@@ -122,7 +122,7 @@ search_result
 {'output': '[{"title":"IBM - United States","description":"Technology & Consulting. From next-generation AI to cutting edge hybrid cloud solutions to the deep expertise of IBM Consulting, IBM has what it takes to help\xa0...","url":"https://www.ibm.com/us-en"},{"title":"IBM - Wikipedia","description":"International Business Machines Corporation (using the trademark IBM), nicknamed Big Blue, is an American multinational technology company headquartered in\xa0...","url":"https://en.wikipedia.org/wiki/IBM"},{"title":"IBM Envizi ESG Suite","description":"Envizi systemizes the capture, transformation and consolidation of disparate sustainability data into a single source of truth and delivers actionable insights.","url":"https://www.ibm.com/products/envizi"},{"title":"IBM Research","description":"Tools + Code · BeeAI Framework. Open-source framework for building, deploying, and serving powerful agentic workflows at scale. · Docling. An open-source tool\xa0...","url":"https://research.ibm.com/"},{"title":"IBM SkillsBuild: Free Skills-Based Learning From Technology Experts","description":"IBM SkillsBuildPower your future in tech with job skills, courses, and credentials—for free. Power your future in tech with job skills, courses, and credentials\xa0...","url":"https://skillsbuild.org/"},{"title":"IBM | LinkedIn","description":"Locations · Primary. International Business Machines Corp. · 590 Madison Ave · 90 Grayston Dr · Plaza Independencia 721 · 388 Phahon Yothin Road · Jalan Prof.","url":"https://www.linkedin.com/company/ibm"},{"title":"International Business Machines Corporation (IBM)","description":"PROFITABILITY_AND_INCOME_STATEMENT · 9.60% · (TTM). 3.06% · (TTM). 24.06% · (TTM). 62.75B · (TTM). 6.02B · (TTM). 6.41. BALANCE_SHEET_AND_CASH_FLOW. (MRQ).","url":"https://finance.yahoo.com/quote/IBM/"},{"title":"Zurich - IBM Research","description":"The location in Zurich is one of IBM\'s 12 global research labs. IBM has maintained a research laboratory in Switzerland since 1956.","url":"https://research.ibm.com/labs/zurich"},{"title":"IBM (@ibm) • Instagram photos and videos","description":"Science, Technology & Engineering. We partner with developers, data scientists, CTOs and other creators to make the world work better.","url":"https://www.instagram.com/ibm/?hl=en"},{"title":"IBM Newsroom","description":"News and press releases from around the IBM world. Media contacts. Sources by topic and by region. IBM Media center. Explore IBM\'s latest and most popular\xa0...","url":"https://newsroom.ibm.com/"}]'}
 ```
 
-To fetch a list of received results, you can execute the below cell.
+받은 결과의 list를 가져오려면 아래 셀을 실행할 수 있습니다.
 
 ```python
 import json
@@ -131,11 +131,11 @@ output = json.loads(search_result.get("output"))
 output
 ```
 
-### Invoke the tool with a configuration
+### 구성과 함께 tool 호출하기
 
-To check if a tool has a config schema and view its properties you can look at the tool's `tool_config_schema`.
+tool에 config schema가 있는지 확인하고 해당 속성을 보려면 tool의 `tool_config_schema`를 확인할 수 있습니다.
 
-In this example, the tool has a config schema that contains `maxResults` parameter to set maximum number of results to be returned.
+이 예제에서 tool은 반환할 최대 결과 수를 설정하는 `maxResults` parameter를 포함하는 config schema를 가지고 있습니다.
 
 ```python
 google_search.tool_config_schema
@@ -150,7 +150,7 @@ google_search.tool_config_schema
    'maximum': 20}}}
 ```
 
-To set `tool_config` parameters, you need to use `set_tool_config()` method and pass correct `dict` according to above `tool_config_schema`.
+`tool_config` parameters를 설정하려면 `set_tool_config()` method를 사용하고 위의 `tool_config_schema`에 따라 올바른 `dict`를 전달해야 합니다.
 
 ```python
 import json
@@ -162,7 +162,7 @@ search_result = google_search.invoke({"q": "IBM"})
 output = json.loads(search_result.get("output"))
 ```
 
-There is supposed to be maximum 3 results.
+최대 3개의 결과가 있어야 합니다.
 
 ```python
 print(len(output))
@@ -172,17 +172,17 @@ print(len(output))
 3
 ```
 
-### Invoke the tool with an input schema
+### Input schema와 함께 tool 호출하기
 
-We need to get another tool (with an input schema) for the example purpose.
+예제 목적으로 다른 tool(input schema가 있는)을 가져와야 합니다.
 
 ```python
 weather_tool = watsonx_toolkit.get_tool("Weather")
 ```
 
-To check if a tool has an input schema and view its properties, you can look at the tool's `tool_input_schema`.
+tool에 input schema가 있는지 확인하고 해당 속성을 보려면 tool의 `tool_input_schema`를 확인할 수 있습니다.
 
-In this example, the tool has an input schema that contains one required and one optional parameter.
+이 예제에서 tool은 하나의 필수 parameter와 하나의 선택적 parameter를 포함하는 input schema를 가지고 있습니다.
 
 ```python
 weather_tool.tool_input_schema
@@ -199,7 +199,7 @@ weather_tool.tool_input_schema
  'required': ['location']}
 ```
 
-To correctly pass an input to `invoke()`, you need to create an `invoke_input` dictionary with required parameter as a key with its value.
+`invoke()`에 input을 올바르게 전달하려면 필수 parameter를 key로 하고 그 값을 가진 `invoke_input` dictionary를 생성해야 합니다.
 
 ```python
 invoke_input = {
@@ -214,7 +214,7 @@ weather_result
 {'output': 'Current weather in New York:\nTemperature: 0°C\nRain: 0mm\nRelative humidity: 63%\nWind: 7.6km/h\n'}
 ```
 
-This time the output is a single string value. To fetch and print it you can execute the below cell.
+이번에는 output이 단일 문자열 값입니다. 이를 가져와서 출력하려면 아래 셀을 실행할 수 있습니다.
 
 ```python
 output = weather_result.get("output")
@@ -229,9 +229,9 @@ Relative humidity: 63%
 Wind: 7.6km/h
 ```
 
-### Invoke the tool with a ToolCall
+### ToolCall로 tool 호출하기
 
-We can also invoke the tool with a ToolCall, in which case a ToolMessage will be returned:
+ToolCall로 tool을 호출할 수도 있으며, 이 경우 ToolMessage가 반환됩니다:
 
 ```python
 invoke_input = {
@@ -250,7 +250,7 @@ weather_tool.invoke(input=tool_call)
 ToolMessage(content='{"output": "Current weather in Los Angeles:\\nTemperature: 8.6°C\\nRain: 0mm\\nRelative humidity: 61%\\nWind: 8.4km/h\\n"}', name='Weather', tool_call_id='1')
 ```
 
-## Use within an agent
+## Agent 내에서 사용하기
 
 ```python
 from langchain_ibm import ChatWatsonx
@@ -302,4 +302,4 @@ The current weather in Boston is -1°C with 0mm of rain, a relative humidity of 
 
 ## API reference
 
-For detailed documentation of all `WatsonxToolkit` features and configurations head to the [API reference](https://python.langchain.com/api_reference/ibm/toolkit/langchain_ibm.toolkit.WatsonxToolkit.html).
+모든 `WatsonxToolkit` 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/ibm/toolkit/langchain_ibm.toolkit.WatsonxToolkit.html)를 참조하세요.

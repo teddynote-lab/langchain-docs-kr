@@ -3,14 +3,14 @@ title: PuppeteerWebBaseLoader
 ---
 
 <Tip>
-**Compatibility**: Only available on Node.js.
+**호환성**: Node.js에서만 사용 가능합니다.
 </Tip>
 
-This notebook provides a quick overview for getting started with [PuppeteerWebBaseLoader](/oss/integrations/document_loaders/). For detailed documentation of all PuppeteerWebBaseLoader features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_web_puppeteer.PuppeteerWebBaseLoader.html).
+이 노트북은 [PuppeteerWebBaseLoader](/oss/integrations/document_loaders/) 시작하기에 대한 간단한 개요를 제공합니다. 모든 PuppeteerWebBaseLoader 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_web_puppeteer.PuppeteerWebBaseLoader.html)를 참조하세요.
 
-Puppeteer is a Node.js library that provides a high-level API for controlling headless Chrome or Chromium. You can use Puppeteer to automate web page interactions, including extracting data from dynamic web pages that require JavaScript to render.
+Puppeteer는 headless Chrome 또는 Chromium을 제어하기 위한 high-level API를 제공하는 Node.js 라이브러리입니다. Puppeteer를 사용하여 웹 페이지 상호작용을 자동화할 수 있으며, JavaScript 렌더링이 필요한 동적 웹 페이지에서 데이터를 추출할 수 있습니다.
 
-If you want a lighterweight solution, and the webpages you want to load do not require JavaScript to render, you can use the [CheerioWebBaseLoader](/oss/integrations/document_loaders/web_loaders/web_cheerio) instead.
+더 가벼운 솔루션을 원하고 로드하려는 웹 페이지가 JavaScript 렌더링을 필요로 하지 않는 경우, [CheerioWebBaseLoader](/oss/integrations/document_loaders/web_loaders/web_cheerio)를 대신 사용할 수 있습니다.
 
 ## Overview
 
@@ -28,11 +28,11 @@ If you want a lighterweight solution, and the webpages you want to load do not r
 
 ## Setup
 
-To access `PuppeteerWebBaseLoader` document loader you'll need to install the `@langchain/community` integration package, along with the `puppeteer` peer dependency.
+`PuppeteerWebBaseLoader` document loader에 액세스하려면 `puppeteer` peer dependency와 함께 `@langchain/community` integration package를 설치해야 합니다.
 
 ### Credentials
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수 있습니다:
 
 ```bash
 # export LANGSMITH_TRACING="true"
@@ -41,7 +41,7 @@ If you want to get automated tracing of your model calls you can also set your [
 
 ### Installation
 
-The LangChain PuppeteerWebBaseLoader integration lives in the `@langchain/community` package:
+LangChain PuppeteerWebBaseLoader integration은 `@langchain/community` package에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -57,7 +57,7 @@ pnpm add @langchain/community @langchain/core puppeteer
 
 ## Instantiation
 
-Now we can instantiate our model object and load documents:
+이제 model object를 인스턴스화하고 document를 로드할 수 있습니다:
 
 ```typescript
 import { PuppeteerWebBaseLoader } from "@langchain/community/document_loaders/web/puppeteer"
@@ -392,7 +392,7 @@ console.log(docs[0].metadata)
 
 ## Options
 
-Here's an explanation of the parameters you can pass to the PuppeteerWebBaseLoader constructor using the PuppeteerWebBaseLoaderOptions interface:
+다음은 PuppeteerWebBaseLoaderOptions interface를 사용하여 PuppeteerWebBaseLoader constructor에 전달할 수 있는 매개변수에 대한 설명입니다:
 
 ```typescript
 type PuppeteerWebBaseLoaderOptions = {
@@ -402,18 +402,18 @@ type PuppeteerWebBaseLoaderOptions = {
 };
 ```
 
-1. `launchOptions`: an optional object that specifies additional options to pass to the puppeteer.launch() method. This can include options such as the headless flag to launch the browser in headless mode, or the slowMo option to slow down Puppeteer's actions to make them easier to follow.
+1. `launchOptions`: puppeteer.launch() method에 전달할 추가 옵션을 지정하는 선택적 객체입니다. 여기에는 브라우저를 headless mode로 실행하기 위한 headless flag 또는 Puppeteer의 동작을 느리게 하여 따라가기 쉽게 만드는 slowMo 옵션과 같은 옵션이 포함될 수 있습니다.
 
-2. `gotoOptions`: an optional object that specifies additional options to pass to the page.goto() method. This can include options such as the timeout option to specify the maximum navigation time in milliseconds, or the waitUntil option to specify when to consider the navigation as successful.
+2. `gotoOptions`: page.goto() method에 전달할 추가 옵션을 지정하는 선택적 객체입니다. 여기에는 최대 탐색 시간을 밀리초 단위로 지정하는 timeout 옵션 또는 탐색을 성공으로 간주할 시점을 지정하는 waitUntil 옵션과 같은 옵션이 포함될 수 있습니다.
 
-3. `evaluate`: an optional function that can be used to evaluate JavaScript code on the page using the page.evaluate() method. This can be useful for extracting data from the page or interacting with page elements. The function should return a Promise that resolves to a string containing the result of the evaluation.
+3. `evaluate`: page.evaluate() method를 사용하여 페이지에서 JavaScript 코드를 평가하는 데 사용할 수 있는 선택적 함수입니다. 이는 페이지에서 데이터를 추출하거나 페이지 요소와 상호작용하는 데 유용할 수 있습니다. 이 함수는 평가 결과를 포함하는 문자열로 resolve되는 Promise를 반환해야 합니다.
 
-By passing these options to the `PuppeteerWebBaseLoader` constructor, you can customize the behavior of the loader and use Puppeteer's powerful features to scrape and interact with web pages.
+이러한 옵션을 `PuppeteerWebBaseLoader` constructor에 전달하면 loader의 동작을 사용자 정의하고 Puppeteer의 강력한 기능을 사용하여 웹 페이지를 스크랩하고 상호작용할 수 있습니다.
 
 ## Screenshots
 
-To take a screenshot of a site, initialize the loader the same as above, and call the `.screenshot()` method.
-This will return an instance of `Document` where the page content is a base64 encoded image, and the metadata contains a `source` field with the URL of the page.
+사이트의 스크린샷을 찍으려면 위와 동일하게 loader를 초기화하고 `.screenshot()` method를 호출하세요.
+이렇게 하면 페이지 콘텐츠가 base64로 인코딩된 이미지이고 metadata에 페이지 URL이 포함된 `source` 필드가 있는 `Document` 인스턴스가 반환됩니다.
 
 ```typescript
 import { PuppeteerWebBaseLoader } from "@langchain/community/document_loaders/web/puppeteer";
@@ -439,4 +439,4 @@ iVBORw0KGgoAAAANSUhEUgAACWAAAAdoCAIAAAA/Q2IJAAAAAXNSR0IArs4c6QAAIABJREFUeJzsvUuz
 
 ## API reference
 
-For detailed documentation of all PuppeteerWebBaseLoader features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_web_puppeteer.PuppeteerWebBaseLoader.html).
+모든 PuppeteerWebBaseLoader 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_web_puppeteer.PuppeteerWebBaseLoader.html)를 참조하세요.

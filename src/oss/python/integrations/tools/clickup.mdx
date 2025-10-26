@@ -2,9 +2,9 @@
 title: ClickUp Toolkit
 ---
 
->[ClickUp](https://clickup.com/) is an all-in-one productivity platform that provides small and large teams across industries with flexible and customizable work management solutions, tools, and functions.
+>[ClickUp](https://clickup.com/)은 모든 규모의 팀에게 유연하고 맞춤 설정 가능한 작업 관리 솔루션, 도구 및 기능을 제공하는 올인원 생산성 플랫폼입니다.
 
->It is a cloud-based project management solution for businesses of all sizes featuring communication and collaboration tools to help achieve organizational goals.
+>조직 목표 달성을 돕는 커뮤니케이션 및 협업 도구를 갖춘 모든 규모의 비즈니스를 위한 클라우드 기반 프로젝트 관리 솔루션입니다.
 
 ```python
 pip install -qU langchain-community
@@ -21,14 +21,14 @@ from langchain_community.utilities.clickup import ClickupAPIWrapper
 from langchain_openai import OpenAI
 ```
 
-## Initializing
+## 초기화
 
-### Get Authenticated
+### 인증 받기
 
-1. Create a [ClickUp App](https://help.clickup.com/hc/en-us/articles/6303422883095-Create-your-own-app-with-the-ClickUp-API)
-2. Follow [these steps](https://clickup.com/api/developer-portal/authentication/) to get your `client_id` and `client_secret`.
-    - *Suggestion: use `https://google.com` as the redirect_uri. This is what we assume in the defaults for this toolkit.*
-3. Copy/paste them and run the next cell to get your `code`
+1. [ClickUp App](https://help.clickup.com/hc/en-us/articles/6303422883095-Create-your-own-app-with-the-ClickUp-API)을 생성합니다
+2. [다음 단계](https://clickup.com/api/developer-portal/authentication/)를 따라 `client_id`와 `client_secret`을 받습니다.
+    - *제안: redirect_uri로 `https://google.com`을 사용하세요. 이것이 이 toolkit의 기본값으로 가정하는 것입니다.*
+3. 복사/붙여넣기하고 다음 셀을 실행하여 `code`를 받습니다
 
 ```python
 # Copilot Sandbox
@@ -45,19 +45,19 @@ Click this link, select your workspace, click `Connect Workspace`
 https://app.clickup.com/api?client_id=ABC...&redirect_uri=https://google.com
 ```
 
-The url should change to something like this [www.google.com/?code=THISISMYCODERIGHTHERE](https://www.google.com/?code=THISISMYCODERIGHTHERE).
+URL이 [www.google.com/?code=THISISMYCODERIGHTHERE](https://www.google.com/?code=THISISMYCODERIGHTHERE)와 같이 변경되어야 합니다.
 
-Next, copy/paste the `CODE` (THISISMYCODERIGHTHERE) generated in the URL in the cell below.
+다음으로, URL에서 생성된 `CODE` (THISISMYCODERIGHTHERE)를 복사/붙여넣기하여 아래 셀에 입력합니다.
 
 ```python
 code = "THISISMYCODERIGHTHERE"
 ```
 
-### Get Access Token
+### Access Token 받기
 
-Then, use the code below to get your `access_token`.
+그런 다음, 아래 코드를 사용하여 `access_token`을 받습니다.
 
-*Important*: Each code is a one time code that will expire after use. The `access_token` can be used for a period of time. Make sure to copy paste the `access_token` once you get it!
+*중요*: 각 code는 사용 후 만료되는 일회용 코드입니다. `access_token`은 일정 기간 동안 사용할 수 있습니다. `access_token`을 받으면 반드시 복사하여 붙여넣으세요!
 
 ```python
 access_token = ClickupAPIWrapper.get_access_token(
@@ -87,7 +87,7 @@ Most request require the team id, so we store it for you in the toolkit, we assu
 Note: If you know this is the wrong ID, you can pass it at initialization.
 ```
 
-### Create Agent
+### Agent 생성
 
 ```python
 llm = OpenAI(temperature=0, openai_api_key="")
@@ -97,7 +97,7 @@ agent = initialize_agent(
 )
 ```
 
-## Use an Agent
+## Agent 사용
 
 ```python
 # helper function for demo
@@ -110,9 +110,9 @@ def print_and_run(command):
     return response
 ```
 
-### Navigation
+### 탐색
 
-You can get the teams, folder and spaces your user has access to
+사용자가 액세스할 수 있는 teams, folder 및 spaces를 가져올 수 있습니다
 
 ```python
 print_and_run("Get all the teams that the user is authorized to access")
@@ -175,15 +175,15 @@ Final Answer: The folders in the team are listed in the observation.
 'The folders in the team are listed in the observation.'
 ```
 
-### Task Operations
+### Task 작업
 
-You can get, ask question about tasks and update them
+tasks에 대해 가져오고, 질문하고, 업데이트할 수 있습니다
 
 ```python
 task_id = "8685mb5fn"
 ```
 
-#### Basic attirbute getting and updating
+#### 기본 속성 가져오기 및 업데이트
 
 ```python
 # We can get a task to inspect it's contents
@@ -320,9 +320,9 @@ Final Answer: The description of task 8685mj6cd has been changed to 'Look ma no 
 "The description of task 8685mj6cd has been changed to 'Look ma no hands'."
 ```
 
-#### Advanced Attributes (Assignees)
+#### 고급 속성 (Assignees)
 
-You can query and update almost every thing about a task!
+task에 대한 거의 모든 것을 쿼리하고 업데이트할 수 있습니다!
 
 ```python
 user_id = 81928627
@@ -414,9 +414,9 @@ Final Answer: User 81928627 has been removed from the assignees of task id 8685m
 'User 81928627 has been removed from the assignees of task id 8685mb5fn.'
 ```
 
-### Creation
+### 생성
 
-You can create tasks, lists and folders
+tasks, lists 및 folders를 생성할 수 있습니다
 
 ```python
 time_str = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
@@ -534,7 +534,7 @@ Final Answer: The list 'Test List - 18/09/2023-10:34:01' with content 'My test l
 "The list 'Test List - 18/09/2023-10:34:01' with content 'My test list' with high priority and status red has been successfully created."
 ```
 
-## Multi-Step Tasks
+## 다단계 Tasks
 
 ```python
 print_and_run(

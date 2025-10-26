@@ -1,28 +1,29 @@
+```mdx
 ---
 title: Azure Container Apps Dynamic Sessions
 ---
 
-> [Azure Container Apps dynamic sessions](https://learn.microsoft.com/azure/container-apps/sessions) provide fast access to secure sandboxed environments that are ideal for running code or applications that require strong isolation from other workloads.
+> [Azure Container Apps dynamic sessions](https://learn.microsoft.com/azure/container-apps/sessions)는 다른 워크로드와의 강력한 격리가 필요한 코드나 애플리케이션을 실행하는 데 이상적인 안전한 샌드박스 환경에 대한 빠른 액세스를 제공합니다.
 
-You can learn more about Azure Container Apps dynamic sessions and its code interpretation capabilities on [this page](https://learn.microsoft.com/azure/container-apps/sessions). If you don't have an Azure account, you can [create a free account](https://azure.microsoft.com/free/) to get started.
+Azure Container Apps dynamic sessions와 코드 해석 기능에 대한 자세한 내용은 [이 페이지](https://learn.microsoft.com/azure/container-apps/sessions)에서 확인할 수 있습니다. Azure 계정이 없다면 [무료 계정을 생성](https://azure.microsoft.com/free/)하여 시작할 수 있습니다.
 
 ## Setup
 
-You'll first need to install the [`@langchain/azure-dynamic-sessions`](https://www.npmjs.com/package/@langchain/azure-dynamic-sessions) package:
+먼저 [`@langchain/azure-dynamic-sessions`](https://www.npmjs.com/package/@langchain/azure-dynamic-sessions) 패키지를 설치해야 합니다:
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
 npm install @langchain/azure-dynamic-sessions @langchain/core
 ```
 
-You'll also need to have a code interpreter session pool instance running. You can deploy a version using [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) following [this guide](https://learn.microsoft.com/azure/container-apps/sessions-code-interpreter).
+또한 실행 중인 code interpreter session pool 인스턴스가 필요합니다. [이 가이드](https://learn.microsoft.com/azure/container-apps/sessions-code-interpreter)를 따라 [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli)를 사용하여 버전을 배포할 수 있습니다.
 
-Once you have your instance running, you need to make sure you have properly set up the Azure Entra authentication for it. You can find the instructions on how to do that [here](https://learn.microsoft.com/azure/container-apps/sessions?tabs=azure-cli#authentication).
+인스턴스가 실행되면 Azure Entra 인증이 올바르게 설정되어 있는지 확인해야 합니다. 이를 수행하는 방법에 대한 지침은 [여기](https://learn.microsoft.com/azure/container-apps/sessions?tabs=azure-cli#authentication)에서 찾을 수 있습니다.
 
-After you've added the role for your identity, you need to retrieve the **session pool management endpoint**. You can find it in the Azure Portal, under the "Overview" section of your instance. Then you need to set the following environment variable:
+ID에 대한 역할을 추가한 후 **session pool management endpoint**를 검색해야 합니다. Azure Portal의 인스턴스 "Overview" 섹션에서 찾을 수 있습니다. 그런 다음 다음 환경 변수를 설정해야 합니다:
 
 ```bash .env example
 AZURE_CONTAINER_APP_SESSION_POOL_MANAGEMENT_ENDPOINT=<your_endpoint>
@@ -30,7 +31,7 @@ AZURE_CONTAINER_APP_SESSION_POOL_MANAGEMENT_ENDPOINT=<your_endpoint>
 
 ## Usage example
 
-Below is a simple example that creates a new Python code interpreter session, invoke the tool and prints the result.
+다음은 새로운 Python code interpreter session을 생성하고, tool을 호출하고, 결과를 출력하는 간단한 예제입니다.
 
 ```typescript
 import { SessionsPythonREPLTool } from "@langchain/azure-dynamic-sessions";
@@ -51,7 +52,7 @@ console.log(result);
 // }
 ```
 
-Here is a complete example where we use an Azure OpenAI chat model to call the Python code interpreter session tool to execute the code and get the result:
+다음은 Azure OpenAI chat model을 사용하여 Python code interpreter session tool을 호출하여 코드를 실행하고 결과를 얻는 완전한 예제입니다:
 
 ```typescript
 import type { ChatPromptTemplate } from "@langchain/core/prompts";
@@ -99,5 +100,6 @@ console.log(result);
 
 ## Related
 
-- Tool [conceptual guide](/oss/langchain/tools)
-- Tool [how-to guides](/oss/langchain/tools)
+- Tool [개념 가이드](/oss/langchain/tools)
+- Tool [사용 방법 가이드](/oss/langchain/tools)
+```

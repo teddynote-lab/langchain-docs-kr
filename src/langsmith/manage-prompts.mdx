@@ -1,47 +1,47 @@
 ---
-title: Manage prompts
-sidebarTitle: Manage prompts
+title: Prompt 관리
+sidebarTitle: Prompt 관리
 ---
 
-LangSmith provides several tools to help you manage your [_prompts_](/langsmith/prompt-engineering-concepts) effectively. This page describes the following features:
+LangSmith는 [_prompt_](/langsmith/prompt-engineering-concepts)를 효과적으로 관리할 수 있는 여러 도구를 제공합니다. 이 페이지에서는 다음 기능을 설명합니다:
 
-- [Commit tags](#commit-tags) for version control and environment management.
-- [Webhook triggers](#trigger-a-webhook-on-prompt-commit) for automating workflows when prompts are updated.
-- [Public prompt hub](#public-prompt-hub) for discovering and using community-created prompts.
+- 버전 관리 및 환경 관리를 위한 [Commit tag](#commit-tags)
+- Prompt가 업데이트될 때 워크플로우를 자동화하기 위한 [Webhook trigger](#trigger-a-webhook-on-prompt-commit)
+- 커뮤니티에서 만든 prompt를 발견하고 사용하기 위한 [Public prompt hub](#public-prompt-hub)
 
 ## Commit tags
 
-[_Commit tags_](/langsmith/prompt-engineering-concepts#tags) are labels that reference a specific [_commit_](/langsmith/prompt-engineering-concepts#commits) in your prompt's version history. They help you mark significant versions and control which versions run in different environments. By referencing tags rather than commit IDs in your code, you can update which version is being used without modifying the code itself.
+[_Commit tag_](/langsmith/prompt-engineering-concepts#tags)는 prompt의 버전 히스토리에서 특정 [_commit_](/langsmith/prompt-engineering-concepts#commits)을 참조하는 레이블입니다. 이를 통해 중요한 버전을 표시하고 다양한 환경에서 실행되는 버전을 제어할 수 있습니다. 코드에서 commit ID 대신 tag를 참조하면 코드 자체를 수정하지 않고도 사용 중인 버전을 업데이트할 수 있습니다.
 
-Each tag references exactly one commit, though you can reassign a tag to point to a different commit.
+각 tag는 정확히 하나의 commit을 참조하지만, tag를 다른 commit을 가리키도록 재할당할 수 있습니다.
 
-Use cases for commit tags can include:
+Commit tag의 사용 사례는 다음과 같습니다:
 
-- **Environment-specific tags**: Mark commits for `production` or `staging` environments, which allows you to switch between different versions without changing your code.
-- **Version control**: Mark stable versions of your prompts, for example, `v1`, `v2`, which lets you reference specific versions in your code and track changes over time.
-- **Collaboration**: Mark versions ready for review, which enables you to share specific versions with collaborators and get feedback.
+- **환경별 tag**: `production` 또는 `staging` 환경에 대한 commit을 표시하여 코드를 변경하지 않고도 다른 버전 간에 전환할 수 있습니다.
+- **버전 관리**: Prompt의 안정적인 버전을 표시합니다(예: `v1`, `v2`). 이를 통해 코드에서 특정 버전을 참조하고 시간 경과에 따른 변경 사항을 추적할 수 있습니다.
+- **협업**: 검토 준비가 완료된 버전을 표시하여 협업자와 특정 버전을 공유하고 피드백을 받을 수 있습니다.
 
-### Create a tag
+### Tag 생성
 
-To create a tag, navigate to the **Commits** tab for a prompt. Click on the tag icon next to the commit you want to tag. Click **New Tag** and enter a name for the tag.
+Tag를 생성하려면 prompt의 **Commits** 탭으로 이동합니다. Tag를 지정할 commit 옆의 tag 아이콘을 클릭합니다. **New Tag**를 클릭하고 tag 이름을 입력합니다.
 
 ![](/langsmith/images/commits-tab.png) ![](/langsmith/images/create-new-prompt-tag.png)
 
-### Move a tag
+### Tag 이동
 
-To point a tag to a different commit, click on the tag icon next to the destination commit, and select the tag you want to move. This will automatically update the tag to point to the new commit.
+Tag를 다른 commit으로 이동하려면 대상 commit 옆의 tag 아이콘을 클릭하고 이동할 tag를 선택합니다. 그러면 tag가 자동으로 새 commit을 가리키도록 업데이트됩니다.
 
 ![](/langsmith/images/move-prompt-tag.png)
 
-### Delete a tag
+### Tag 삭제
 
-To delete a tag, click on the delete icon next to the tag you want to delete. This will delete the tag altogether and it will no longer be associated with any commit.
+Tag를 삭제하려면 삭제할 tag 옆의 삭제 아이콘을 클릭합니다. 그러면 tag가 완전히 삭제되고 더 이상 어떤 commit과도 연결되지 않습니다.
 
-### Use tags in code
+### 코드에서 tag 사용
 
-Tags provide a stable way to reference specific versions of your prompts in code. Instead of using commit hashes directly, you can reference tags that can be updated without changing your code.
+Tag는 코드에서 prompt의 특정 버전을 참조하는 안정적인 방법을 제공합니다. Commit hash를 직접 사용하는 대신 코드를 변경하지 않고도 업데이트할 수 있는 tag를 참조할 수 있습니다.
 
-Here is an example of pulling a prompt by tag in Python:
+다음은 Python에서 tag로 prompt를 가져오는 예제입니다:
 
 ```python
 prompt = client.pull_prompt("joke-generator:prod")
@@ -49,66 +49,65 @@ prompt = client.pull_prompt("joke-generator:prod")
 prompt = client.pull_prompt("joke-generator:a1b2c3d4")
 ```
 
-For more information on how to use prompts in code, refer to [Managing prompts programmatically](/langsmith/manage-prompts-programmatically).
+코드에서 prompt를 사용하는 방법에 대한 자세한 내용은 [프로그래밍 방식으로 prompt 관리하기](/langsmith/manage-prompts-programmatically)를 참조하세요.
 
-## Trigger a webhook on prompt commit
+## Prompt commit 시 webhook 트리거
 
-You can configure a webhook to be triggered whenever a commit is made to a prompt.
+Prompt에 commit이 이루어질 때마다 트리거되도록 webhook을 구성할 수 있습니다.
 
-Some common use cases of this include:
+일반적인 사용 사례는 다음과 같습니다:
 
-* Triggering a CI/CD pipeline when prompts are updated.
-* Synchronizing prompts with a GitHub repository.
-* Notifying team members about prompt modifications.
+* Prompt가 업데이트될 때 CI/CD 파이프라인 트리거
+* GitHub repository와 prompt 동기화
+* Prompt 수정에 대해 팀원에게 알림
 
-### Configure a webhook
+### Webhook 구성
 
-Navigate to the **Prompts** section in the left-hand sidebar or from the application homepage. In the top right corner, click on the `+ Webhook` button.
+왼쪽 사이드바의 **Prompts** 섹션 또는 애플리케이션 홈페이지에서 이동합니다. 오른쪽 상단의 `+ Webhook` 버튼을 클릭합니다.
 
-Add a webhook URL and any required headers.
+Webhook URL과 필요한 header를 추가합니다.
 
 <Note>
-You can only configure one webhook per workspace. If you want to configure multiple per workspace or set up a different webhook for each prompt, let us know in the [LangChain Forum](https://forum.langchain.com/).
+workspace당 하나의 webhook만 구성할 수 있습니다. workspace당 여러 개를 구성하거나 각 prompt에 대해 다른 webhook을 설정하려면 [LangChain Forum](https://forum.langchain.com/)에 알려주세요.
 </Note>
 
-To test out your webhook, click the **Send test notification** button. This will send a test notification to the webhook URL you provided with a sample payload.
+Webhook을 테스트하려면 **Send test notification** 버튼을 클릭합니다. 그러면 제공한 webhook URL로 샘플 payload와 함께 테스트 알림이 전송됩니다.
 
-The sample payload is a JSON object with the following fields:
+샘플 payload는 다음 필드가 포함된 JSON 객체입니다:
 
-- `prompt_id`: The ID of the prompt that was committed.
-- `prompt_name`: The name of the prompt that was committed.
-- `commit_hash`: The commit hash of the prompt.
-- `created_at`: The date of the commit.
-- `created_by`: The author of the commit.
-- `manifest`: The manifest of the prompt.
+- `prompt_id`: Commit된 prompt의 ID
+- `prompt_name`: Commit된 prompt의 이름
+- `commit_hash`: Prompt의 commit hash
+- `created_at`: Commit 날짜
+- `created_by`: Commit 작성자
+- `manifest`: Prompt의 manifest
 
-### Trigger the webhook
+### Webhook 트리거
 
-Commit to a prompt to trigger the webhook you've configured.
+구성한 webhook을 트리거하려면 prompt에 commit합니다.
 
-#### Use the Playground
+#### Playground 사용
 
-If you do this in the Playground, you'll be prompted to deselect the webhooks you'd like to avoid triggering.
+Playground에서 이 작업을 수행하면 트리거를 피하려는 webhook의 선택을 해제하라는 메시지가 표시됩니다.
 
 ![](/langsmith/images/commit-prompt-playground.png)
 
-#### Using the API
+#### API 사용
 
-If you commit via the API, you can specify to skip triggering the webhook by setting the `skip_webhooks` parameter to `true` or to an array of webhook ids to ignore. Refer to the [API docs](https://api.smith.langchain.com/redoc#tag/commits/operation/create_commit_api_v1_commits__owner___repo__post) for more information.
+API를 통해 commit하는 경우 `skip_webhooks` 매개변수를 `true`로 설정하거나 무시할 webhook ID 배열로 설정하여 webhook 트리거를 건너뛸 수 있습니다. 자세한 내용은 [API 문서](https://api.smith.langchain.com/redoc#tag/commits/operation/create_commit_api_v1_commits__owner___repo__post)를 참조하세요.
 
 ## Public prompt hub
 
-LangSmith's public prompt hub is a collection of prompts that have been created by the LangChain community that you can use for reference.
+LangSmith의 public prompt hub는 LangChain 커뮤니티에서 만든 prompt 모음으로 참고용으로 사용할 수 있습니다.
 
 <Note>
-Note that prompts are user-generated and unverified. LangChain does not review or endorse public prompts, use these at your own risk. Use of Prompt Hub is subject to our [Terms of Service](https://www.langchain.com/terms-of-service).
+Prompt는 사용자가 생성한 것이며 검증되지 않았습니다. LangChain은 public prompt를 검토하거나 보증하지 않으므로 본인의 책임 하에 사용하세요. Prompt Hub 사용은 당사의 [서비스 약관](https://www.langchain.com/terms-of-service)이 적용됩니다.
 </Note>
 
-Navigate to the **Prompts** section of the left-hand sidebar and click on **Browse all Public Prompts in the LangChain Hub**.
+왼쪽 사이드바의 **Prompts** 섹션으로 이동하여 **Browse all Public Prompts in the LangChain Hub**를 클릭합니다.
 
-Here you'll find all of the publicly listed prompts in the LangChain Hub. You can search for prompts by name, handle, use cases, descriptions, or models. You can fork prompts to your personal organization, view the prompt's details, and run the prompt in the Playground. You can [pull any public prompt into your code](/langsmith/manage-prompts-programmatically) using the SDK.
+여기에서 LangChain Hub에 공개적으로 나열된 모든 prompt를 찾을 수 있습니다. 이름, handle, 사용 사례, 설명 또는 model로 prompt를 검색할 수 있습니다. Prompt를 개인 organization으로 fork하고, prompt의 세부 정보를 보고, Playground에서 prompt를 실행할 수 있습니다. SDK를 사용하여 [모든 public prompt를 코드로 가져올 수 있습니다](/langsmith/manage-prompts-programmatically).
 
-To view prompts tied to your workspace, visit the **Prompts** tab in the sidebar.
+workspace에 연결된 prompt를 보려면 사이드바의 **Prompts** 탭을 방문하세요.
 
 ![](/langsmith/images/prompts-tab.png)
-

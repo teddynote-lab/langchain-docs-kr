@@ -1,12 +1,13 @@
+```markdown
 ---
 title: Google Translate
 ---
 
-[Google Translate](https://translate.google.com/) is a multilingual neural machine translation service developed by Google to translate text, documents and websites from one language into another.
+[Google Translate](https://translate.google.com/)는 Google에서 개발한 다국어 신경망 기계 번역 서비스로, 텍스트, 문서 및 웹사이트를 한 언어에서 다른 언어로 번역합니다.
 
-The `GoogleTranslateTransformer` allows you to translate text and HTML with the [Google Cloud Translation API](https://cloud.google.com/translate).
+`GoogleTranslateTransformer`를 사용하면 [Google Cloud Translation API](https://cloud.google.com/translate)로 텍스트와 HTML을 번역할 수 있습니다.
 
-To use it, you should have the `google-cloud-translate` python package installed, and a Google Cloud project with the [Translation API enabled](https://cloud.google.com/translate/docs/setup). This transformer uses the [Advanced edition (v3)](https://cloud.google.com/translate/docs/intro-to-v3).
+이를 사용하려면 `google-cloud-translate` python package가 설치되어 있어야 하며, [Translation API가 활성화된](https://cloud.google.com/translate/docs/setup) Google Cloud project가 있어야 합니다. 이 transformer는 [Advanced edition (v3)](https://cloud.google.com/translate/docs/intro-to-v3)을 사용합니다.
 
 - [Google Neural Machine Translation](https://en.wikipedia.org/wiki/Google_Neural_Machine_Translation)
 - [A Neural Network for Machine Translation, at Production Scale](https://blog.research.google/2016/09/a-neural-network-for-machine.html)
@@ -22,7 +23,7 @@ from langchain_google_community import GoogleTranslateTransformer
 
 ## Input
 
-This is the document we'll translate
+다음은 번역할 document입니다
 
 ```python
 sample_text = """[Generated with Google Bard]
@@ -57,14 +58,14 @@ CEO, Cymbal Bank
 """
 ```
 
-When initializing the `GoogleTranslateTransformer`, you can include the following parameters to configure the requests.
+`GoogleTranslateTransformer`를 초기화할 때 다음 parameter들을 포함하여 요청을 구성할 수 있습니다.
 
 - `project_id`: Google Cloud Project ID.
 - `location`: (Optional) Translate model location.
   - Default: `global`
-- `model_id`: (Optional) Translate [model ID][models] to use.
-- `glossary_id`: (Optional) Translate [glossary ID][glossaries] to use.
-- `api_endpoint`: (Optional) [Regional endpoint][endpoints] to use.
+- `model_id`: (Optional) 사용할 Translate [model ID][models].
+- `glossary_id`: (Optional) 사용할 Translate [glossary ID][glossaries].
+- `api_endpoint`: (Optional) 사용할 [Regional endpoint][endpoints].
 
 [models]: https://cloud.google.com/translate/docs/advanced/translating-text-v3#comparing-models
 [glossaries]: https://cloud.google.com/translate/docs/advanced/glossary
@@ -77,15 +78,15 @@ translator = GoogleTranslateTransformer(project_id="<YOUR_PROJECT_ID>")
 
 ## Output
 
-After translating a document, the result will be returned as a new document with the `page_content` translated into the target language.
+document를 번역한 후, 결과는 `page_content`가 대상 언어로 번역된 새로운 document로 반환됩니다.
 
-You can provide the following keyword parameters to the `transform_documents()` method:
+`transform_documents()` method에 다음 keyword parameter들을 제공할 수 있습니다:
 
-- `target_language_code`: [ISO 639][iso-639] language code of the output document.
-  - For supported languages, refer to [Language support][supported-languages].
-- `source_language_code`: (Optional) [ISO 639][iso-639] language code of the input document.
-  - If not provided, language will be auto-detected.
-- `mime_type`: (Optional) [Media Type][media-type] of the input text.
+- `target_language_code`: 출력 document의 [ISO 639][iso-639] language code.
+  - 지원되는 언어는 [Language support][supported-languages]를 참조하세요.
+- `source_language_code`: (Optional) 입력 document의 [ISO 639][iso-639] language code.
+  - 제공되지 않으면 언어가 자동으로 감지됩니다.
+- `mime_type`: (Optional) 입력 텍스트의 [Media Type][media-type].
   - Options: `text/plain` (Default), `text/html`.
 
 [iso-639]: https://en.wikipedia.org/wiki/ISO_639
@@ -135,4 +136,5 @@ Gracias,
 
 Platillo Lewis
 Director ejecutivo, banco de platillos
+```
 ```

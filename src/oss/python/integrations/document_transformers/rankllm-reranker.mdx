@@ -2,9 +2,9 @@
 title: RankLLM Reranker
 ---
 
-**[RankLLM](https://github.com/castorini/rank_llm)** is a **flexible reranking framework** supporting **listwise, pairwise, and pointwise ranking models**. It includes **RankVicuna, RankZephyr, MonoT5, DuoT5, LiT5, and FirstMistral**, with integration for **FastChat, vLLM, SGLang, and TensorRT-LLM** for efficient inference. RankLLM is optimized for **retrieval and ranking tasks**, leveraging both **open-source LLMs** and proprietary rerankers like **RankGPT and RankGemini**. It supports **batched inference, first-token reranking, and retrieval via BM25 and SPLADE**.
+**[RankLLM](https://github.com/castorini/rank_llm)**은 **listwise, pairwise, pointwise ranking model을 지원하는 유연한 reranking framework**입니다. **RankVicuna, RankZephyr, MonoT5, DuoT5, LiT5, FirstMistral**을 포함하며, 효율적인 inference를 위해 **FastChat, vLLM, SGLang, TensorRT-LLM**과 통합됩니다. RankLLM은 **retrieval 및 ranking 작업**에 최적화되어 있으며, **오픈소스 LLM**과 **RankGPT, RankGemini**와 같은 독점 reranker를 모두 활용합니다. **batched inference, first-token reranking, BM25 및 SPLADE를 통한 retrieval**을 지원합니다.
 
-> **Note:** If using the built-in retriever, RankLLM requires **Pyserini, JDK 21, PyTorch, and Faiss** for retrieval functionality.
+> **참고:** 내장 retriever를 사용하는 경우, RankLLM은 retrieval 기능을 위해 **Pyserini, JDK 21, PyTorch, Faiss**가 필요합니다.
 
 ```python
 pip install -qU rank_llm
@@ -36,9 +36,9 @@ def pretty_print_docs(docs):
     )
 ```
 
-## Set up the base vector store retriever
+## 기본 vector store retriever 설정하기
 
-Let's start by initializing a simple vector store retriever and storing the 2023 State of the Union speech (in chunks). We can set up the retriever to retrieve a high number (20) of docs.
+간단한 vector store retriever를 초기화하고 2023년 국정연설문을 (청크 단위로) 저장하는 것부터 시작하겠습니다. retriever가 많은 수(20개)의 문서를 검색하도록 설정할 수 있습니다.
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -62,7 +62,7 @@ retriever = FAISS.from_documents(texts, embedding).as_retriever(search_kwargs={"
 
 # Retrieval + RankLLM Reranking (RankZephyr)
 
-Retrieval without reranking
+reranking 없는 Retrieval
 
 ```python
 query = "What was done to Russia?"
@@ -266,7 +266,7 @@ In fact—our economy created over 6.5 Million new jobs just last year, more job
 than ever before in the history of America.
 ```
 
-RankZephyr performs listwise reranking for improved retrieval quality but requires at least 24GB of VRAM to run efficiently.
+RankZephyr는 향상된 retrieval 품질을 위해 listwise reranking을 수행하지만, 효율적으로 실행하려면 최소 24GB의 VRAM이 필요합니다.
 
 ```python
 import torch
@@ -321,7 +321,7 @@ We are inflicting pain on Russia and supporting the people of Ukraine. Putin is 
 Together with our allies –we are right now enforcing powerful economic sanctions.
 ```
 
-Can be used within a QA pipeline
+QA pipeline 내에서 사용 가능
 
 ```python
 from langchain.chains import RetrievalQA
@@ -343,7 +343,7 @@ chain.invoke({"query": query})
 
 # Retrieval + RankLLM Reranking (RankGPT)
 
-Retrieval without reranking
+reranking 없는 Retrieval
 
 ```python
 query = "What did the president say about Ketanji Brown Jackson"
@@ -564,7 +564,7 @@ And we will, as one people.
 One America.
 ```
 
-Retrieval + Reranking with RankGPT
+RankGPT를 사용한 Retrieval + Reranking
 
 ```python
 from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
@@ -608,7 +608,7 @@ Tonight. I call on the Senate to: Pass the Freedom to Vote Act. Pass the John Le
 Tonight, I’d like to honor someone who has dedicated his life to serve this country: Justice Stephen Breyer—an Army veteran, Constitutional scholar, and retiring Justice of the United States Supreme Court. Justice Breyer, thank you for your service.
 ```
 
-You can use this retriever within a QA pipeline
+이 retriever를 QA pipeline 내에서 사용할 수 있습니다
 
 ```python
 from langchain.chains import RetrievalQA

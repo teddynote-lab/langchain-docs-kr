@@ -3,26 +3,26 @@ title: RedisVectorStore
 ---
 
 <Tip>
-**Compatibility**: Only available on Node.js.
+**호환성**: Node.js에서만 사용 가능합니다.
 </Tip>
 
-[Redis](https://redis.io/) is a fast open source, in-memory data store. As part of the [Redis Stack](https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/), [RediSearch](https://redis.io/docs/latest/develop/interact/search-and-query/) is the module that enables vector similarity semantic search, as well as many other types of searching.
+[Redis](https://redis.io/)는 빠른 오픈 소스 인메모리 데이터 저장소입니다. [Redis Stack](https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/)의 일부인 [RediSearch](https://redis.io/docs/latest/develop/interact/search-and-query/)는 벡터 유사도 의미 검색뿐만 아니라 다양한 유형의 검색을 가능하게 하는 모듈입니다.
 
-This guide provides a quick overview for getting started with Redis [vector stores](/oss/integrations/vectorstores). For detailed documentation of all `RedisVectorStore` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_redis.RedisVectorStore.html).
+이 가이드는 Redis [vector stores](/oss/integrations/vectorstores) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `RedisVectorStore` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_redis.RedisVectorStore.html)를 참조하세요.
 
-## Overview
+## 개요
 
-### Integration details
+### Integration 세부 정보
 
 | Class                                                                                            | Package                                                   | [PY support](https://python.langchain.com/docs/integrations/vectorstores/redis/) |                                           Version                                            |
 | :----------------------------------------------------------------------------------------------- | :-------------------------------------------------------- | :------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------: |
 | [`RedisVectorStore`](https://api.js.langchain.com/classes/langchain_redis.RedisVectorStore.html) | [`@langchain/redis`](https://npmjs.com/@langchain/redis/) |                                        ✅                                        | ![NPM - Version](https://img.shields.io/npm/v/@langchain/redis?style=flat-square&label=%20&) |
 
-## Setup
+## 설정
 
-To use Redis vector stores, you'll need to set up a Redis instance and install the `@langchain/redis` integration package. You can also install the [`node-redis`](https://github.com/redis/node-redis) package to initialize the vector store with a specific client instance.
+Redis vector store를 사용하려면 Redis 인스턴스를 설정하고 `@langchain/redis` integration package를 설치해야 합니다. 특정 client 인스턴스로 vector store를 초기화하기 위해 [`node-redis`](https://github.com/redis/node-redis) package도 설치할 수 있습니다.
 
-This guide will also use [OpenAI embeddings](/oss/integrations/text_embedding/openai), which require you to install the `@langchain/openai` integration package. You can also use [other supported embeddings models](/oss/integrations/text_embedding) if you wish.
+이 가이드는 [OpenAI embeddings](/oss/integrations/text_embedding/openai)도 사용하며, 이를 위해 `@langchain/openai` integration package를 설치해야 합니다. 원하는 경우 [다른 지원되는 embeddings models](/oss/integrations/text_embedding)도 사용할 수 있습니다.
 
 <CodeGroup>
 ```bash npm
@@ -36,30 +36,30 @@ pnpm add @langchain/redis @langchain/core redis @langchain/openai
 ```
 </CodeGroup>
 
-You can set up a Redis instance locally with Docker by following [these instructions](https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/docker/#redisredis-stack).
+[이 지침](https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/docker/#redisredis-stack)을 따라 Docker로 로컬에서 Redis 인스턴스를 설정할 수 있습니다.
 
-### Credentials
+### 자격 증명
 
-Once you've set up an instance, set the `REDIS_URL` environment variable:
+인스턴스를 설정한 후 `REDIS_URL` 환경 변수를 설정하세요:
 
 ```typescript
 process.env.REDIS_URL = "your-redis-url";
 ```
 
-If you are using OpenAI embeddings for this guide, you'll need to set your OpenAI key as well:
+이 가이드에서 OpenAI embeddings를 사용하는 경우 OpenAI key도 설정해야 합니다:
 
 ```typescript
 process.env.OPENAI_API_KEY = "YOUR_API_KEY";
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_TRACING="true"
 // process.env.LANGSMITH_API_KEY="your-api-key"
 ```
 
-## Instantiation
+## 인스턴스화
 
 ```typescript
 import { RedisVectorStore } from "@langchain/redis";
@@ -82,9 +82,9 @@ const vectorStore = new RedisVectorStore(embeddings, {
 });
 ```
 
-## Manage vector store
+## Vector store 관리
 
-### Add items to vector store
+### Vector store에 항목 추가
 
 ```typescript
 import type { Document } from "@langchain/core/documents";
@@ -114,15 +114,15 @@ const documents = [document1, document2, document3, document4];
 await vectorStore.addDocuments(documents);
 ```
 
-Top-level document ids are currently not supported, but you can delete documents by providing their IDs directly to the vector store.
+최상위 document id는 현재 지원되지 않지만, ID를 vector store에 직접 제공하여 문서를 삭제할 수 있습니다.
 
-## Query vector store
+## Vector store 쿼리
 
-Once your vector store has been created and the relevant documents have been added you will most likely wish to query it during the running of your chain or agent.
+Vector store가 생성되고 관련 문서가 추가되면 chain 또는 agent를 실행하는 동안 쿼리하고 싶을 것입니다.
 
-### Query directly
+### 직접 쿼리
 
-Performing a simple similarity search can be done as follows:
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
 
 ```typescript
 const similaritySearchResults = await vectorStore.similaritySearch(
@@ -135,9 +135,9 @@ for (const doc of similaritySearchResults) {
 }
 ```
 
-Filtering will currently look for any metadata key containing the provided string.
+필터링은 현재 제공된 문자열을 포함하는 모든 metadata key를 찾습니다.
 
-If you want to execute a similarity search and receive the corresponding scores you can run:
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
 
 ```typescript
 const similaritySearchWithScoreResults =
@@ -157,9 +157,9 @@ for (const [doc, score] of similaritySearchWithScoreResults) {
 * [SIM=0.852] Mitochondria are made out of lipids [{"type":"example"}]
 ```
 
-### Query by turning into retriever
+### Retriever로 변환하여 쿼리
 
-You can also transform the vector store into a [retriever](/oss/langchain/retrieval) for easier usage in your chains.
+Vector store를 [retriever](/oss/langchain/retrieval)로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
 
 ```typescript
 const retriever = vectorStore.asRetriever({
@@ -183,52 +183,52 @@ await retriever.invoke("biology");
 ]
 ```
 
-### Usage for retrieval-augmented generation
+### Retrieval-augmented generation 사용
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+이 vector store를 retrieval-augmented generation (RAG)에 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
 
-- [Build a RAG app with LangChain](/oss/langchain/rag).
+- [LangChain으로 RAG 앱 만들기](/oss/langchain/rag)
 - [Agentic RAG](/oss/langgraph/agentic-rag)
-- [Retrieval docs](/oss/langchain/retrieval)
+- [Retrieval 문서](/oss/langchain/retrieval)
 
-## Deleting documents
+## 문서 삭제
 
-You can delete documents from the vector store in two ways:
+두 가지 방법으로 vector store에서 문서를 삭제할 수 있습니다:
 
-### Delete all documents
+### 모든 문서 삭제
 
-You can delete an entire index and all its documents with the following command:
+다음 명령으로 전체 index와 모든 문서를 삭제할 수 있습니다:
 
 ```typescript
 await vectorStore.delete({ deleteAll: true });
 ```
 
-### Delete specific documents by ID
+### ID로 특정 문서 삭제
 
-You can also delete specific documents by providing their IDs. Note that the configured key prefix will be automatically added to the IDs you provide:
+ID를 제공하여 특정 문서를 삭제할 수도 있습니다. 구성된 key prefix가 제공한 ID에 자동으로 추가됩니다:
 
 ```typescript
 // The key prefix will be automatically added to each ID
 await vectorStore.delete({ ids: ["doc1", "doc2", "doc3"] });
 ```
 
-## Closing connections
+## 연결 종료
 
-Make sure you close the client connection when you are finished to avoid excessive resource consumption:
+과도한 리소스 소비를 방지하기 위해 작업이 완료되면 client 연결을 종료해야 합니다:
 
 ```typescript
 await client.disconnect();
 ```
 
-## Advanced Features
+## 고급 기능
 
-### Custom Schema and Metadata Filtering
+### 사용자 정의 Schema 및 Metadata 필터링
 
-The Redis vector store supports custom schema definitions for metadata fields, enabling more efficient filtering and searching. This feature allows you to define specific field types and validation rules for your metadata.
+Redis vector store는 metadata 필드에 대한 사용자 정의 schema 정의를 지원하여 더 효율적인 필터링 및 검색을 가능하게 합니다. 이 기능을 사용하면 metadata에 대한 특정 필드 타입과 유효성 검사 규칙을 정의할 수 있습니다.
 
-#### Defining a Custom Schema
+#### 사용자 정의 Schema 정의
 
-You can define a custom schema when creating your vector store to specify field types, validation rules, and indexing options:
+Vector store를 생성할 때 사용자 정의 schema를 정의하여 필드 타입, 유효성 검사 규칙 및 인덱싱 옵션을 지정할 수 있습니다:
 
 ```typescript
 import { RedisVectorStore } from "@langchain/redis";
@@ -280,28 +280,28 @@ const vectorStoreWithSchema = new RedisVectorStore(embeddings, {
 });
 ```
 
-#### Schema Field Types
+#### Schema 필드 타입
 
-The custom schema supports three main field types:
+사용자 정의 schema는 세 가지 주요 필드 타입을 지원합니다:
 
-- **TEXT**: Full-text searchable fields with optional stemming, weighting, and sorting
-- **TAG**: Categorical fields for exact matching, with support for multiple values and custom separators
-- **NUMERIC**: Numeric fields supporting range queries and sorting
+- **TEXT**: 선택적 stemming, weighting 및 sorting이 가능한 전체 텍스트 검색 가능 필드
+- **TAG**: 여러 값과 사용자 정의 separator를 지원하는 정확한 일치를 위한 범주형 필드
+- **NUMERIC**: 범위 쿼리 및 sorting을 지원하는 숫자 필드
 
-#### Field Configuration Options
+#### 필드 구성 옵션
 
-Each field can be configured with various options:
+각 필드는 다양한 옵션으로 구성할 수 있습니다:
 
-- `required`: Whether the field must be present in metadata (default: false)
-- `SORTABLE`: Enable sorting on this field (default: undefined)
-- `SEPARATOR`: For TAG fields, specify the separator for multiple values (default: ",")
-- `CASESENSITIVE`: For TAG fields, enable case-sensitive matching (Redis expects `true`, not boolean)
-- `NOSTEM`: For TEXT fields, disable stemming (Redis expects `true`, not boolean)
-- `WEIGHT`: For TEXT fields, specify search weight (default: 1.0)
+- `required`: metadata에 필드가 반드시 있어야 하는지 여부 (기본값: false)
+- `SORTABLE`: 이 필드에서 sorting 활성화 (기본값: undefined)
+- `SEPARATOR`: TAG 필드의 경우 여러 값에 대한 separator 지정 (기본값: ",")
+- `CASESENSITIVE`: TAG 필드의 경우 대소문자 구분 일치 활성화 (Redis는 boolean이 아닌 `true`를 예상)
+- `NOSTEM`: TEXT 필드의 경우 stemming 비활성화 (Redis는 boolean이 아닌 `true`를 예상)
+- `WEIGHT`: TEXT 필드의 경우 검색 가중치 지정 (기본값: 1.0)
 
-#### Adding Documents with Schema Validation
+#### Schema 유효성 검사로 문서 추가
 
-When using a custom schema, documents are automatically validated against the defined schema:
+사용자 정의 schema를 사용할 때 문서는 정의된 schema에 대해 자동으로 유효성이 검사됩니다:
 
 ```typescript
 import type { Document } from "@langchain/core/documents";
@@ -343,9 +343,9 @@ const documentsWithMetadata: Document[] = [
 await vectorStoreWithSchema.addDocuments(documentsWithMetadata);
 ```
 
-#### Advanced Similarity Search with Metadata Filtering
+#### Metadata 필터링을 사용한 고급 유사도 검색
 
-The custom schema enables powerful metadata filtering capabilities using the `similaritySearchVectorWithScoreAndMetadata` method:
+사용자 정의 schema는 `similaritySearchVectorWithScoreAndMetadata` method를 사용하여 강력한 metadata 필터링 기능을 제공합니다:
 
 ```typescript
 // Search with TAG filtering
@@ -406,9 +406,9 @@ for (const [doc, score] of textFilterResults) {
 }
 ```
 
-#### Numeric Range Query Options
+#### 숫자 범위 쿼리 옵션
 
-For numeric fields, you can specify various range queries:
+숫자 필드의 경우 다양한 범위 쿼리를 지정할 수 있습니다:
 
 ```typescript
 // Exact value match
@@ -424,9 +424,9 @@ For numeric fields, you can specify various range queries:
 { score: { max: 95 } }
 ```
 
-#### Error Handling and Validation
+#### 오류 처리 및 유효성 검사
 
-The custom schema provides automatic validation with helpful error messages:
+사용자 정의 schema는 유용한 오류 메시지와 함께 자동 유효성 검사를 제공합니다:
 
 ```typescript
 try {
@@ -462,19 +462,19 @@ try {
 }
 ```
 
-#### Performance Benefits
+#### 성능 이점
 
-Using custom schema provides several performance advantages:
+사용자 정의 schema 사용은 여러 성능상의 이점을 제공합니다:
 
-1. **Indexed Metadata Fields**: Individual metadata fields are indexed separately, enabling fast filtering
-2. **Type-Optimized Queries**: Numeric and tag fields use optimized query structures
-3. **Reduced Data Transfer**: Only relevant fields are returned in search results
-4. **Better Query Planning**: Redis can optimize queries based on field types and indexes
+1. **인덱싱된 Metadata 필드**: 개별 metadata 필드가 별도로 인덱싱되어 빠른 필터링 가능
+2. **타입 최적화 쿼리**: 숫자 및 tag 필드는 최적화된 쿼리 구조 사용
+3. **데이터 전송 감소**: 검색 결과에서 관련 필드만 반환
+4. **향상된 쿼리 계획**: Redis는 필드 타입과 index를 기반으로 쿼리를 최적화할 수 있음
 
-#### Backward Compatibility
+#### 하위 호환성
 
-The custom schema feature is fully backward compatible. Existing Redis vector stores without custom schemas will continue to work exactly as before. You can gradually migrate to custom schemas for new indexes or when rebuilding existing ones.
+사용자 정의 schema 기능은 완전히 하위 호환됩니다. 사용자 정의 schema가 없는 기존 Redis vector store는 이전과 정확히 동일하게 작동합니다. 새 index에 대해 또는 기존 index를 재구축할 때 사용자 정의 schema로 점진적으로 마이그레이션할 수 있습니다.
 
 ## API reference
 
-For detailed documentation of all `RedisVectorSearch` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_redis.RedisVectorStore.html).
+모든 `RedisVectorSearch` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_redis.RedisVectorStore.html)를 참조하세요.

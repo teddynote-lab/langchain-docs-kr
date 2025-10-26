@@ -2,26 +2,26 @@
 title: MariaDB
 ---
 
-LangChain's MariaDB integration (langchain-mariadb) provides vector capabilities for working with MariaDB version 11.7.1 and above, distributed under the MIT license. Users can use the provided implementations as-is or customize them for specific needs.
- Key features include:
+LangChain의 MariaDB 통합(langchain-mariadb)은 MIT 라이선스로 배포되며, MariaDB 11.7.1 이상에서 작동하는 벡터 기능을 제공합니다. 제공된 구현을 그대로 사용할 수도 있고, 필요에 맞게 커스터마이즈할 수도 있습니다.
+ 주요 기능은 다음과 같습니다:
 
-* Built-in vector similarity search
-* Support for cosine and euclidean distance metrics
-* Robust metadata filtering options
-* Performance optimization through connection pooling
-* Configurable table and column settings
+* 내장된 벡터 유사도 검색
+* cosine 및 euclidean 거리 메트릭 지원
+* 강력한 메타데이터 필터링 옵션
+* connection pooling을 통한 성능 최적화
+* 테이블 및 컬럼 설정 구성 가능
 
-## Setup
+## 설정
 
-Launch a MariaDB Docker container with:
+다음으로 MariaDB Docker 컨테이너를 실행하세요:
 
 ```python
 !docker run --name mariadb-container -e MARIADB_ROOT_PASSWORD=langchain -e MARIADB_DATABASE=langchain -p 3306:3306 -d mariadb:11.7
 ```
 
-### Installing the Package
+### 패키지 설치
 
-The package uses SQLAlchemy but works best with the MariaDB connector, which requires C/C++ components:
+이 패키지는 SQLAlchemy를 사용하지만, C/C++ 구성 요소가 필요한 MariaDB connector와 함께 사용할 때 가장 잘 작동합니다:
 
 ```python
 # Debian, Ubuntu
@@ -34,14 +34,14 @@ The package uses SQLAlchemy but works best with the MariaDB connector, which req
 !pip install -U mariadb
 ```
 
-Then install `langchain-mariadb` package
+그런 다음 `langchain-mariadb` 패키지를 설치하세요
 
 ```python
 pip install -U langchain-mariadb
 
 ```
 
-VectorStore works along with an LLM model, here using `langchain-openai` as example.
+VectorStore는 LLM 모델과 함께 동작하며, 여기서는 예제로 `langchain-openai`를 사용합니다.
 
 ```python
 pip install langchain-openai
@@ -49,7 +49,7 @@ export OPENAI_API_KEY=...
 
 ```
 
-## Initialization
+## 초기화
 
 ```python
 from langchain_core.documents import Document
@@ -68,11 +68,11 @@ vectorstore = MariaDBStore(
 )
 ```
 
-## Manage vector store
+## 벡터 스토어 관리
 
-### Adding Data
+### 데이터 추가
 
-You can add data as documents with metadata:
+메타데이터가 포함된 document 형태로 데이터를 추가할 수 있습니다:
 
 ```python
 docs = [
@@ -89,7 +89,7 @@ docs = [
 vectorstore.add_documents(docs)
 ```
 
-Or as plain text with optional metadata:
+또는 선택적 메타데이터와 함께 일반 텍스트로 추가할 수 있습니다:
 
 ```python
 texts = [
@@ -104,7 +104,7 @@ metadatas = [
 vectorstore.add_texts(texts=texts, metadatas=metadatas)
 ```
 
-## Query vector store
+## 벡터 스토어 쿼리
 
 ```python
 # Basic similarity search
@@ -114,18 +114,18 @@ results = vectorstore.similarity_search("Hello", k=2)
 results = vectorstore.similarity_search("Hello", filter={"category": "greeting"})
 ```
 
-### Filter Options
+### 필터 옵션
 
-The system supports various filtering operations on metadata:
+시스템은 메타데이터에 대한 다양한 필터링 연산을 지원합니다:
 
-* Equality: $eq
-* Inequality: $ne
-* Comparisons: $lt, $lte, $gt, $gte
-* List operations: $in, $nin
-* Text matching: $like, $nlike
-* Logical operations: $and, $or, $not
+* 동등 비교: $eq
+* 비동등 비교: $ne
+* 비교: $lt, $lte, $gt, $gte
+* 리스트 연산: $in, $nin
+* 텍스트 매칭: $like, $nlike
+* 논리 연산: $and, $or, $not
 
-Example:
+예시:
 
 ```python
 # Search with simple filter
@@ -141,10 +141,10 @@ results = vectorstore.similarity_search(
 )
 ```
 
-## Usage for retrieval-augmented generation
+## retrieval-augmented generation(RAG)용 사용법
 
-TODO: document example
+TODO: 예제 문서화
 
-## API reference
+## API 레퍼런스
 
-See the repo [here](https://github.com/mariadb-corporation/langchain-mariadb) for more detail.
+자세한 내용은 [여기](https://github.com/mariadb-corporation/langchain-mariadb)에서 저장소를 확인하세요.

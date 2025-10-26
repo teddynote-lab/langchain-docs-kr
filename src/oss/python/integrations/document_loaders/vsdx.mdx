@@ -2,11 +2,11 @@
 title: Vsdx
 ---
 
-> A [visio file](https://fr.wikipedia.org/wiki/Microsoft_Visio) (with extension .vsdx) is associated with Microsoft Visio, a diagram creation software. It stores information about the structure, layout, and graphical elements of a diagram. This format facilitates the creation and sharing of visualizations in areas such as business, engineering, and computer science.
+> [visio 파일](https://fr.wikipedia.org/wiki/Microsoft_Visio)(확장자 .vsdx)은 다이어그램 생성 소프트웨어인 Microsoft Visio와 연결됩니다. 다이어그램의 구조, 레이아웃 및 그래픽 요소에 대한 정보를 저장합니다. 이 형식은 비즈니스, 엔지니어링 및 컴퓨터 과학과 같은 분야에서 시각화 자료의 생성 및 공유를 용이하게 합니다.
 
-A Visio file can contain multiple pages. Some of them may serve as the background for others, and this can occur across multiple layers. This **loader** extracts the textual content from each page and its associated pages, enabling the extraction of all visible text from each page, similar to what an OCR algorithm would do.
+Visio 파일은 여러 페이지를 포함할 수 있습니다. 일부 페이지는 다른 페이지의 배경으로 사용될 수 있으며, 이는 여러 레이어에 걸쳐 발생할 수 있습니다. 이 **loader**는 각 페이지와 관련 페이지에서 텍스트 콘텐츠를 추출하여 OCR 알고리즘이 수행하는 것과 유사하게 각 페이지에서 모든 가시적인 텍스트를 추출할 수 있습니다.
 
-**WARNING** : Only Visio files with the **.vsdx** extension are compatible with this loader. Files with extensions such as .vsd, ... are not compatible because they cannot be converted to compressed XML.
+**경고** : **.vsdx** 확장자를 가진 Visio 파일만 이 loader와 호환됩니다. .vsd 등의 확장자를 가진 파일은 압축된 XML로 변환할 수 없기 때문에 호환되지 않습니다.
 
 ```python
 from langchain_community.document_loaders import VsdxLoader
@@ -17,7 +17,7 @@ loader = VsdxLoader(file_path="./example_data/fake.vsdx")
 documents = loader.load()
 ```
 
-**Display loaded documents**
+**로드된 문서 표시**
 
 ```python
 for i, doc in enumerate(documents):

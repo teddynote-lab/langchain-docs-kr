@@ -3,37 +3,37 @@ title: LangSmithLoader
 ---
 
 
-This notebook provides a quick overview for getting started with the [LangSmithLoader](/oss/integrations/document_loaders/). For detailed documentation of all `LangSmithLoader` features and configurations head to the [API reference](https://api.js.langchain.com/classes/_langchain_core.document_loaders_langsmith.LangSmithLoader.html).
+이 노트북은 [LangSmithLoader](/oss/integrations/document_loaders/) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `LangSmithLoader` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/_langchain_core.document_loaders_langsmith.LangSmithLoader.html)를 참조하세요.
 
-## Overview
+## 개요
 
-### Integration details
+### Integration 세부 정보
 
 | Class | Package | Local | Serializable | [PY support](https://python.langchain.com/docs/integrations/document_loaders/langsmith)|
 | :--- | :--- | :---: | :---: |  :---: |
 | [LangSmithLoader](https://api.js.langchain.com/classes/_langchain_core.document_loaders_langsmith.LangSmithLoader.html) | [@langchain/community](https://api.js.langchain.com/classes/_langchain_core.html) | ✅ | beta | ✅ |
 
-### Loader features
+### Loader 기능
 
 | Source | Web Loader | Node Envs Only
 | :---: | :---: | :---: |
 | LangSmithLoader | ✅ | ❌ |
 
-## Setup
+## 설정
 
-To access the LangSmith document loader you'll need to install `@langchain/core`, create a [LangSmith](https://langsmith.com/) account and get an API key.
+LangSmith document loader에 액세스하려면 `@langchain/core`를 설치하고, [LangSmith](https://langsmith.com/) 계정을 생성하고, API key를 받아야 합니다.
 
-### Credentials
+### 자격 증명
 
-Sign up at [langsmith.com](https://langsmith.com) and generate an API key. Once you've done this set the `LANGSMITH_API_KEY` environment variable:
+[langsmith.com](https://langsmith.com)에서 가입하고 API key를 생성하세요. 완료한 후 `LANGSMITH_API_KEY` 환경 변수를 설정하세요:
 
 ```bash
 export LANGSMITH_API_KEY="your-api-key"
 ```
 
-### Installation
+### 설치
 
-The `LangSmithLoader` integration lives in the `@langchain/core` package:
+`LangSmithLoader` integration은 `@langchain/core` package에 포함되어 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -47,9 +47,9 @@ pnpm add @langchain/core
 ```
 </CodeGroup>
 
-## Create example dataset
+## 예제 dataset 생성
 
-For this example, we'll create a new dataset which we'll use in our document loader.
+이 예제에서는 document loader에서 사용할 새로운 dataset을 생성합니다.
 
 ```typescript
 import { Client as LangSmithClient } from 'langsmith';
@@ -97,7 +97,7 @@ const loader = new LangSmithLoader({
 })
 ```
 
-## Load
+## 로드
 
 ```typescript
 const docs = await loader.load()
@@ -189,4 +189,4 @@ console.log(Object.keys(docs[0].metadata))
 
 ## API reference
 
-For detailed documentation of all `LangSmithLoader` features and configurations head to the [API reference](https://api.js.langchain.com/classes/_langchain_core.document_loaders_langsmith.LangSmithLoader.html)
+모든 `LangSmithLoader` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/_langchain_core.document_loaders_langsmith.LangSmithLoader.html)를 참조하세요

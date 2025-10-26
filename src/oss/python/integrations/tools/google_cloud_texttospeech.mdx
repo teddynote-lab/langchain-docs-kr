@@ -2,13 +2,13 @@
 title: Google Cloud Text-to-Speech
 ---
 
->[Google Cloud Text-to-Speech](https://cloud.google.com/text-to-speech) enables developers to synthesize natural-sounding speech with 100+ voices, available in multiple languages and variants. It applies DeepMind’s groundbreaking research in WaveNet and Google’s powerful neural networks to deliver the highest fidelity possible.
+>[Google Cloud Text-to-Speech](https://cloud.google.com/text-to-speech)는 개발자가 100개 이상의 음성으로 자연스러운 음성을 합성할 수 있도록 지원하며, 여러 언어와 변형으로 제공됩니다. DeepMind의 획기적인 WaveNet 연구와 Google의 강력한 신경망을 적용하여 가능한 최고의 충실도를 제공합니다.
 >
->It supports multiple languages, including English, German, Polish, Spanish, Italian, French, Portuguese, and Hindi.
+>영어, 독일어, 폴란드어, 스페인어, 이탈리아어, 프랑스어, 포르투갈어, 힌디어를 포함한 여러 언어를 지원합니다.
 
-This notebook shows how to interact with the `Google Cloud Text-to-Speech API` to achieve speech synthesis capabilities.
+이 노트북은 `Google Cloud Text-to-Speech API`와 상호작용하여 음성 합성 기능을 구현하는 방법을 보여줍니다.
 
-First, you need to set up an Google Cloud project. You can follow the instructions [here](https://cloud.google.com/text-to-speech/docs/before-you-begin).
+먼저 Google Cloud 프로젝트를 설정해야 합니다. [여기](https://cloud.google.com/text-to-speech/docs/before-you-begin)의 지침을 따를 수 있습니다.
 
 ```python
 !pip install -U langchain-google-community[texttospeech]
@@ -20,7 +20,7 @@ First, you need to set up an Google Cloud project. You can follow the instructio
 from langchain_google_community import TextToSpeechTool
 ```
 
-## Deprecated GoogleCloudTextToSpeechTool
+## 더 이상 사용되지 않는 GoogleCloudTextToSpeechTool
 
 ```python
 from langchain_community.tools import GoogleCloudTextToSpeechTool
@@ -33,7 +33,7 @@ tts = GoogleCloudTextToSpeechTool()
 tts.name
 ```
 
-We can generate audio, save it to the temporary file and then play it.
+오디오를 생성하고 임시 파일에 저장한 다음 재생할 수 있습니다.
 
 ```python
 speech_file = tts.run(text_to_speak)

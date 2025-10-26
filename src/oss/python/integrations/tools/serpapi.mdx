@@ -2,7 +2,7 @@
 title: SerpAPI
 ---
 
-This notebook goes over how to use the SerpAPI component to search the web.
+이 노트북은 SerpAPI component를 사용하여 웹을 검색하는 방법을 다룹니다.
 
 ```python
 from langchain_community.utilities import SerpAPIWrapper
@@ -22,7 +22,7 @@ search.run("Obama's first name?")
 
 ## Custom Parameters
 
-You can also customize the SerpAPI wrapper with arbitrary parameters. For example, in the below example we will use `bing` instead of `google`.
+임의의 parameter를 사용하여 SerpAPI wrapper를 커스터마이징할 수도 있습니다. 예를 들어, 아래 예제에서는 `google` 대신 `bing`을 사용합니다.
 
 ```python
 params = {

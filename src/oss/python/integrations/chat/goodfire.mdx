@@ -2,7 +2,7 @@
 title: ChatGoodfire
 ---
 
-This will help you get started with Goodfire [chat models](/oss/langchain/models). For detailed documentation of all ChatGoodfire features and configurations head to the [PyPI project page](https://pypi.org/project/langchain-goodfire/), or go directly to the [Goodfire SDK docs](https://docs.goodfire.ai/sdk-reference/example). All of the Goodfire-specific functionality (e.g. SAE features, variants, etc.) is available via the main `goodfire` package. This integration is a wrapper around the Goodfire SDK.
+이 문서는 Goodfire [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 ChatGoodfire 기능과 구성에 대한 자세한 문서는 [PyPI 프로젝트 페이지](https://pypi.org/project/langchain-goodfire/)를 참조하거나, [Goodfire SDK 문서](https://docs.goodfire.ai/sdk-reference/example)로 직접 이동하세요. 모든 Goodfire 전용 기능(예: SAE features, variants 등)은 메인 `goodfire` 패키지를 통해 사용할 수 있습니다. 이 통합은 Goodfire SDK를 래핑한 것입니다.
 
 ## Overview
 
@@ -20,11 +20,11 @@ This will help you get started with Goodfire [chat models](/oss/langchain/models
 
 ## Setup
 
-To access Goodfire models you'll need to create a/an Goodfire account, get an API key, and install the `langchain-goodfire` integration package.
+Goodfire 모델에 액세스하려면 Goodfire 계정을 생성하고, API key를 발급받고, `langchain-goodfire` 통합 패키지를 설치해야 합니다.
 
 ### Credentials
 
-Head to [Goodfire Settings](https://platform.goodfire.ai/organization/settings/api-keys) to sign up to Goodfire and generate an API key. Once you've done this set the GOODFIRE_API_KEY environment variable.
+[Goodfire Settings](https://platform.goodfire.ai/organization/settings/api-keys)로 이동하여 Goodfire에 가입하고 API key를 생성하세요. 완료한 후 GOODFIRE_API_KEY 환경 변수를 설정하세요.
 
 ```python
 import getpass
@@ -34,7 +34,7 @@ if not os.getenv("GOODFIRE_API_KEY"):
     os.environ["GOODFIRE_API_KEY"] = getpass.getpass("Enter your Goodfire API key: ")
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_TRACING"] = "true"
@@ -43,7 +43,7 @@ os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key:
 
 ### Installation
 
-The LangChain Goodfire integration lives in the `langchain-goodfire` package:
+LangChain Goodfire 통합은 `langchain-goodfire` 패키지에 있습니다:
 
 ```python
 pip install -qU langchain-goodfire
@@ -55,7 +55,7 @@ Note: you may need to restart the kernel to use updated packages.
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```python
 import goodfire
@@ -101,9 +101,9 @@ print(ai_msg.content)
 J'adore la programmation.
 ```
 
-## Goodfire-specific functionality
+## Goodfire 전용 기능
 
-To use Goodfire-specific functionality such as SAE features and variants, you can use the `goodfire` package directly.
+SAE features 및 variants와 같은 Goodfire 전용 기능을 사용하려면 `goodfire` 패키지를 직접 사용할 수 있습니다.
 
 ```python
 client = goodfire.Client(api_key=os.environ["GOODFIRE_API_KEY"])
@@ -144,4 +144,4 @@ AIMessage(content='Why did the scarecrow win an award? Because he was outstandin
 
 ## API reference
 
-For detailed documentation of all ChatGoodfire features and configurations head to the [API reference](https://python.langchain.com/api_reference/goodfire/chat_models/langchain_goodfire.chat_models.ChatGoodfire.html)
+모든 ChatGoodfire 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/goodfire/chat_models/langchain_goodfire.chat_models.ChatGoodfire.html)를 참조하세요.

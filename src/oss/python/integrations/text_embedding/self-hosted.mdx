@@ -2,7 +2,7 @@
 title: Self Hosted
 ---
 
-Let's load the `SelfHostedEmbeddings`, `SelfHostedHuggingFaceEmbeddings`, and `SelfHostedHuggingFaceInstructEmbeddings` classes.
+`SelfHostedEmbeddings`, `SelfHostedHuggingFaceEmbeddings`, 그리고 `SelfHostedHuggingFaceInstructEmbeddings` 클래스를 로드해 보겠습니다.
 
 ```python
 import runhouse as rh
@@ -38,13 +38,13 @@ text = "This is a test document."
 query_result = embeddings.embed_query(text)
 ```
 
-And similarly for SelfHostedHuggingFaceInstructEmbeddings:
+`SelfHostedHuggingFaceInstructEmbeddings`도 마찬가지로 사용할 수 있습니다:
 
 ```python
 embeddings = SelfHostedHuggingFaceInstructEmbeddings(hardware=gpu)
 ```
 
-Now let's load an embedding model with a custom load function:
+이제 커스텀 load function을 사용하여 embedding 모델을 로드해 보겠습니다:
 
 ```python
 def get_pipeline():

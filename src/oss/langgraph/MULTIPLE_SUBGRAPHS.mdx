@@ -4,20 +4,20 @@ title: MULTIPLE_SUBGRAPHS
 
 
 
-You are calling subgraphs multiple times within a single LangGraph node with checkpointing enabled for each subgraph.
+단일 LangGraph node 내에서 각 subgraph에 대해 checkpointing이 활성화된 상태로 subgraph를 여러 번 호출하고 있습니다.
 
-This is currently not allowed due to internal restrictions on how checkpoint namespacing for subgraphs works.
+이는 현재 subgraph의 checkpoint namespacing 작동 방식에 대한 내부 제한으로 인해 허용되지 않습니다.
 
 ## Troubleshooting
 
-The following may help resolve this error:
+다음 방법이 이 오류를 해결하는 데 도움이 될 수 있습니다:
 
 :::python
-* If you don't need to interrupt/resume from a subgraph, pass `checkpointer=False` when compiling it like this: `.compile(checkpointer=False)`
+* subgraph에서 interrupt/resume이 필요하지 않은 경우, 다음과 같이 컴파일할 때 `checkpointer=False`를 전달하세요: `.compile(checkpointer=False)`
 :::
 
 :::js
-* If you don't need to interrupt/resume from a subgraph, pass `checkpointer: false` when compiling it like this: `.compile({ checkpointer: false })`
+* subgraph에서 interrupt/resume이 필요하지 않은 경우, 다음과 같이 컴파일할 때 `checkpointer: false`를 전달하세요: `.compile({ checkpointer: false })`
 :::
 
-* Don't imperatively call graphs multiple times in the same node, and instead use the [`Send`](/oss/langgraph/graph-api#send) API.
+* 동일한 node에서 graph를 여러 번 명령적으로 호출하지 말고, 대신 [`Send`](/oss/langgraph/graph-api#send) API를 사용하세요.

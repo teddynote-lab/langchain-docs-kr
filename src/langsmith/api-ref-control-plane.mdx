@@ -1,29 +1,29 @@
 ---
-title: Control plane API reference for LangSmith Deployment
+title: LangSmith Deployment를 위한 Control plane API 레퍼런스
 sidebarTitle: Control plane API
 ---
 
-The control plane API is part of [LangSmith Deployment](/langsmith/deployments). With the control plane API, you can programmatically create, manage, and automate your [LangGraph Server](/langsmith/langgraph-server) deployments—for example, as part of a custom CI/CD workflow.
+Control plane API는 [LangSmith Deployment](/langsmith/deployments)의 일부입니다. Control plane API를 사용하면 [LangGraph Server](/langsmith/langgraph-server) 배포를 프로그래밍 방식으로 생성, 관리 및 자동화할 수 있습니다. 예를 들어 사용자 정의 CI/CD 워크플로우의 일부로 사용할 수 있습니다.
 
-<Card title="API Reference" href="https://api.host.langchain.com/docs" icon="book">
-  View the full Control Plane API reference documentation
+<Card title="API 레퍼런스" href="https://api.host.langchain.com/docs" icon="book">
+  전체 Control Plane API 레퍼런스 문서 보기
 </Card>
 
 ## Host
 
-The control plane hosts for Cloud data regions:
+Cloud 데이터 리전의 control plane host:
 
 | US | EU |
 |----|----|
 | `https://api.host.langchain.com` | `https://eu.api.host.langchain.com` |
 
-**Note**: Self-hosted deployments of LangSmith will have a custom host for the control plane. The control plane APIs can be accessed at the path `/api-host`. For example, `http(s)://<host>/api-host/v2/deployments`. See [here](../langsmith/self-host-usage#configuring-the-application-you-want-to-use-with-langsmith) for more details.
+**참고**: LangSmith의 Self-hosted 배포는 control plane을 위한 사용자 정의 host를 가집니다. Control plane API는 `/api-host` 경로에서 액세스할 수 있습니다. 예를 들어, `http(s)://<host>/api-host/v2/deployments`입니다. 자세한 내용은 [여기](../langsmith/self-host-usage#configuring-the-application-you-want-to-use-with-langsmith)를 참조하세요.
 
 ## Authentication
 
-To authenticate with the control plane API, set the `X-Api-Key` header to a valid LangSmith API key.
+Control plane API로 인증하려면 `X-Api-Key` header를 유효한 LangSmith API key로 설정하세요.
 
-Example `curl` command:
+`curl` 명령 예시:
 
 ```shell
 curl --request GET \
@@ -33,18 +33,18 @@ curl --request GET \
 
 ## Versioning
 
-Each endpoint path is prefixed with a version (e.g. `v1`, `v2`).
+각 endpoint 경로는 버전(예: `v1`, `v2`)으로 접두사가 붙습니다.
 
 ## Quick Start
 
-1. Call `POST /v2/deployments` to create a new Deployment. The response body contains the Deployment ID (`id`) and the ID of the latest (and first) revision (`latest_revision_id`).
-2. Call `GET /v2/deployments/{deployment_id}` to retrieve the Deployment. Set `deployment_id` in the URL to the value of Deployment ID (`id`).
-3. Poll for revision `status` until `status` is `DEPLOYED` by calling `GET /v2/deployments/{deployment_id}/revisions/{latest_revision_id}`.
-4. Call `PATCH /v2/deployments/{deployment_id}` to update the deployment.
+1. `POST /v2/deployments`를 호출하여 새 Deployment를 생성합니다. 응답 본문에는 Deployment ID(`id`)와 최신(그리고 첫 번째) revision의 ID(`latest_revision_id`)가 포함됩니다.
+2. `GET /v2/deployments/{deployment_id}`를 호출하여 Deployment를 조회합니다. URL의 `deployment_id`를 Deployment ID(`id`) 값으로 설정합니다.
+3. `GET /v2/deployments/{deployment_id}/revisions/{latest_revision_id}`를 호출하여 revision `status`가 `DEPLOYED`가 될 때까지 폴링합니다.
+4. `PATCH /v2/deployments/{deployment_id}`를 호출하여 deployment를 업데이트합니다.
 
 ## Example Code
 
-Below is example Python code that demonstrates how to orchestrate the control plane APIs to create a deployment, update the deployment, and delete the deployment.
+다음은 control plane API를 조정하여 deployment를 생성, 업데이트 및 삭제하는 방법을 보여주는 Python 예제 코드입니다.
 
 ```python
 import os

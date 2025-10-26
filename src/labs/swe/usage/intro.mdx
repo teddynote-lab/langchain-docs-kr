@@ -1,49 +1,42 @@
 ---
-title: "Introduction"
-description: "How to use Open SWE"
+title: "소개"
+description: "Open SWE 사용 방법"
 ---
 
-# Using Open SWE
+# Open SWE 사용하기
 
-Open SWE provides two primary ways to interact with the coding agent, each designed for different workflows and use cases. Whether you prefer direct interaction through a web interface or automated triggers through GitHub webhooks, Open SWE adapts to your development process.
+Open SWE는 코딩 에이전트와 상호작용할 수 있는 두 가지 주요 방법을 제공하며, 각각 다른 워크플로우와 사용 사례를 위해 설계되었습니다. 웹 인터페이스를 통한 직접적인 상호작용을 선호하든 GitHub webhook을 통한 자동화된 트리거를 선호하든, Open SWE는 여러분의 개발 프로세스에 맞춰 조정됩니다.
 
-## Usage Methods
+## 사용 방법
 
 <CardGroup cols={2}>
-  <Card title="Web Interface" icon="browser" href="/labs/swe/usage/ui">
-    Interactive chat interface with manual and auto modes for direct agent
-    communication
+  <Card title="웹 인터페이스" icon="browser" href="/labs/swe/usage/ui">
+    직접적인 에이전트 통신을 위한 수동 및 자동 모드가 있는 대화형 채팅 인터페이스
   </Card>
   <Card title="GitHub Webhooks" icon="webhook" href="/labs/swe/usage/github">
-    Automated triggers through GitHub issue labels for seamless repository
-    integration
+    원활한 저장소 통합을 위한 GitHub 이슈 레이블을 통한 자동화된 트리거
   </Card>
 </CardGroup>
 
-## Getting Started
+## 시작하기
 
-### Try the Demo
+### 데모 사용해보기
 
-You can explore Open SWE's capabilities using our hosted demo at [swe.langchain.com](https://swe.langchain.com).
+[swe.langchain.com](https://swe.langchain.com)에서 호스팅되는 데모를 통해 Open SWE의 기능을 탐색할 수 있습니다.
 
 <Note>
-  The demo application requires you to provide your own LLM API keys. For
-  production use or development, we recommend setting up your own instance
-  following our [development setup guide](/labs/swe/setup/development).
+  데모 애플리케이션은 자체 LLM API 키를 제공해야 합니다. 프로덕션 사용 또는 개발을 위해서는 [개발 설정 가이드](/labs/swe/setup/development)를 따라 자체 인스턴스를 설정하는 것을 권장합니다.
 </Note>
 
-### Choose Your Workflow
+### 워크플로우 선택하기
 
-- **Web Interface**: Best for interactive development, experimentation, and when you want direct control over the agent's planning and execution process
-- **GitHub Webhooks**: Ideal for automated workflows, issue-driven development, and team collaboration where coding tasks are tracked through GitHub issues
+- **웹 인터페이스**: 대화형 개발, 실험, 그리고 에이전트의 계획 및 실행 프로세스를 직접 제어하고 싶을 때 가장 적합합니다
+- **GitHub Webhooks**: 자동화된 워크플로우, 이슈 기반 개발, 그리고 GitHub 이슈를 통해 코딩 작업을 추적하는 팀 협업에 이상적입니다
 
-## What's Next?
+## 다음 단계
 
 <Tip>
-  Start with the [Web Interface guide](/labs/swe/usage/ui) to understand Open
-  SWE's core capabilities, then explore [GitHub
-  Webhooks](/labs/swe/usage/github) for automated integration into your
-  development workflow.
+  Open SWE의 핵심 기능을 이해하기 위해 [웹 인터페이스 가이드](/labs/swe/usage/ui)부터 시작한 다음, 개발 워크플로우에 자동화된 통합을 위해 [GitHub Webhooks](/labs/swe/usage/github)를 탐색하세요.
 </Tip>
 
-Both usage methods leverage the same underlying LangGraph agent architecture with specialized graphs for planning, programming, and management, ensuring consistent behavior regardless of how you interact with Open SWE.
+두 가지 사용 방법 모두 계획, 프로그래밍 및 관리를 위한 특수 그래프가 있는 동일한 기본 LangGraph 에이전트 아키텍처를 활용하여, Open SWE와 상호작용하는 방식에 관계없이 일관된 동작을 보장합니다.

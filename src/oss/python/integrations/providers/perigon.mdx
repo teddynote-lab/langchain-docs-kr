@@ -2,28 +2,28 @@
 title: Perigon
 ---
 
->[Perigon](https://perigon.io/) is a comprehensive news API that provides access to real-time contextual information in news articles, stories, metadata and wikipedia pages from thousands of sources worldwide.
+>[Perigon](https://perigon.io/)은 전 세계 수천 개의 소스에서 뉴스 기사, 스토리, 메타데이터 및 위키백과 페이지의 실시간 맥락 정보에 대한 액세스를 제공하는 포괄적인 뉴스 API입니다.
 >
 
 ## Installation and Setup
 
-`Perigon` integration exists in its own [partner package](https://pypi.org/project/langchain-perigon/). You can install it with:
+`Perigon` integration은 자체 [partner package](https://pypi.org/project/langchain-perigon/)로 존재합니다. 다음과 같이 설치할 수 있습니다:
 
 ```python
 pip install -qU langchain-perigon
 ```
 
-In order to use the package, you will also need to set the `PERIGON_API_KEY` environment variable to your Perigon API key.
+패키지를 사용하려면 `PERIGON_API_KEY` 환경 변수를 Perigon API key로 설정해야 합니다.
 
 ## Retrievers
 
-Perigon provides two retrievers:
+Perigon은 두 가지 retriever를 제공합니다:
 
 ### ArticlesRetriever
 
-This retriever retrieves articles based on a given query and optional filters.
+이 retriever는 주어진 query와 선택적 filter를 기반으로 기사를 검색합니다.
 
-See a [full usage example](/oss/integrations/retrievers/perigon#using-articlesretriever).
+[전체 사용 예제](/oss/integrations/retrievers/perigon#using-articlesretriever)를 참조하세요.
 
 ```python
 # Make sure PERIGON_API_KEY environment variable is set to your Perigon API key
@@ -50,13 +50,13 @@ except Exception as e:
     print(f"Error retrieving articles: {e}")
 ```
 
-You can use the `ArticlesRetriever` in a standard retrieval pipeline:
+표준 retrieval pipeline에서 `ArticlesRetriever`를 사용할 수 있습니다:
 
 ### WikipediaRetriever
 
-This retriever retrieves wikipedia pages based on a given query and optional filters.
+이 retriever는 주어진 query와 선택적 filter를 기반으로 위키백과 페이지를 검색합니다.
 
-See a [full usage example](/oss/integrations/retrievers/perigon#using-wikipediaretriever).
+[전체 사용 예제](/oss/integrations/retrievers/perigon#using-wikipediaretriever)를 참조하세요.
 
 ```python
 # Make sure PERIGON_API_KEY environment variable is set to your Perigon API key
@@ -77,4 +77,4 @@ except Exception as e:
     print(f"Error retrieving Wikipedia articles: {e}")
 ```
 
-You can use the `WikipediaRetriever` in a standard retrieval pipeline:
+표준 retrieval pipeline에서 `WikipediaRetriever`를 사용할 수 있습니다:

@@ -1,13 +1,14 @@
+```mdx
 ---
-title: Add metadata and tags to traces
-sidebarTitle: Add metadata and tags to traces
+title: trace에 metadata와 tag 추가하기
+sidebarTitle: trace에 metadata와 tag 추가하기
 ---
 
-LangSmith supports sending arbitrary metadata and tags along with traces.
+LangSmith는 trace와 함께 임의의 metadata와 tag를 전송하는 것을 지원합니다.
 
-Tags are strings that can be used to categorize or label a trace. Metadata is a dictionary of key-value pairs that can be used to store additional information about a trace.
+Tag는 trace를 분류하거나 레이블링하는 데 사용할 수 있는 문자열입니다. Metadata는 trace에 대한 추가 정보를 저장하는 데 사용할 수 있는 key-value 쌍의 dictionary입니다.
 
-Both are useful for associating additional information with a trace, such as the environment in which it was executed, the user who initiated it, or an internal correlation ID. For more information on tags and metadata, see the [Concepts](/langsmith/observability-concepts#tags) page. For information on how to query traces and runs by metadata and tags, see the [Filter traces in the application](/langsmith/filter-traces-in-application) page.
+둘 다 trace와 관련된 추가 정보를 연결하는 데 유용합니다. 예를 들어 실행된 환경, 시작한 사용자 또는 내부 correlation ID 등을 저장할 수 있습니다. tag와 metadata에 대한 자세한 내용은 [Concepts](/langsmith/observability-concepts#tags) 페이지를 참조하세요. metadata와 tag로 trace와 run을 쿼리하는 방법에 대한 정보는 [애플리케이션에서 trace 필터링하기](/langsmith/filter-traces-in-application) 페이지를 참조하세요.
 
 <CodeGroup>
 

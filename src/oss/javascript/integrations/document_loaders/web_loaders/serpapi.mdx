@@ -2,21 +2,21 @@
 title: SerpAPI Loader
 ---
 
-This guide shows how to use SerpAPI with LangChain to load web search results.
+이 가이드는 LangChain에서 SerpAPI를 사용하여 웹 검색 결과를 로드하는 방법을 보여줍니다.
 
 ## Overview
 
-[SerpAPI](https://serpapi.com/) is a real-time API that provides access to search results from various search engines. It is commonly used for tasks like competitor analysis and rank tracking. It empowers businesses to scrape, extract, and make sense of data from all search engines' result pages.
+[SerpAPI](https://serpapi.com/)는 다양한 검색 엔진의 검색 결과에 대한 액세스를 제공하는 실시간 API입니다. 경쟁사 분석 및 순위 추적과 같은 작업에 일반적으로 사용됩니다. 모든 검색 엔진의 결과 페이지에서 데이터를 스크래핑하고, 추출하고, 이해할 수 있도록 비즈니스를 지원합니다.
 
-This guide shows how to load web search results using the `SerpAPILoader` in LangChain. The `SerpAPILoader` simplifies the process of loading and processing web search results from SerpAPI.
+이 가이드는 LangChain의 `SerpAPILoader`를 사용하여 웹 검색 결과를 로드하는 방법을 보여줍니다. `SerpAPILoader`는 SerpAPI에서 웹 검색 결과를 로드하고 처리하는 프로세스를 단순화합니다.
 
 ## Setup
 
-You'll need to sign up and retrieve your [SerpAPI API key](https://serpapi.com/dashboard).
+[SerpAPI API key](https://serpapi.com/dashboard)를 가입하고 받아야 합니다.
 
 ## Usage
 
-Here's an example of how to use the `SerpAPILoader`:
+다음은 `SerpAPILoader`를 사용하는 방법의 예시입니다:
 
 ```typescript
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
@@ -69,4 +69,4 @@ const res = await chain.invoke({
 console.log(res.answer);
 ```
 
-In this example, the `SerpAPILoader` is used to load web search results, which are then stored in memory using `MemoryVectorStore`. A retrieval chain is then used to retrieve the most relevant documents from the memory and answer the question based on these documents. This demonstrates how the `SerpAPILoader` can streamline the process of loading and processing web search results.
+이 예시에서 `SerpAPILoader`는 웹 검색 결과를 로드하는 데 사용되며, 이 결과는 `MemoryVectorStore`를 사용하여 메모리에 저장됩니다. 그런 다음 retrieval chain을 사용하여 메모리에서 가장 관련성 높은 문서를 검색하고 이러한 문서를 기반으로 질문에 답변합니다. 이는 `SerpAPILoader`가 웹 검색 결과를 로드하고 처리하는 프로세스를 어떻게 간소화할 수 있는지 보여줍니다.

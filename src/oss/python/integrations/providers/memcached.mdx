@@ -2,11 +2,10 @@
 title: Memcached
 ---
 
-> [Memcached](https://www.memcached.org/) is a free & open source, high-performance, distributed memory object caching system,
-> generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load.
+> [Memcached](https://www.memcached.org/)는 무료 오픈 소스 고성능 분산 메모리 객체 캐싱 시스템으로,
+> 범용적인 특성을 가지고 있지만 데이터베이스 부하를 줄여 동적 웹 애플리케이션의 속도를 향상시키는 데 사용됩니다.
 
-This page covers how to use Memcached with langchain, using [pymemcache](https://github.com/pinterest/pymemcache) as
-a client to connect to an already running Memcached instance.
+이 페이지에서는 이미 실행 중인 Memcached 인스턴스에 연결하기 위한 클라이언트로 [pymemcache](https://github.com/pinterest/pymemcache)를 사용하여 langchain과 Memcached를 함께 사용하는 방법을 다룹니다.
 
 ## Installation and Setup
 
@@ -22,7 +21,7 @@ uv add pymemcache
 
 ## LLM Cache
 
-To integrate a Memcached Cache into your application:
+애플리케이션에 Memcached Cache를 통합하려면:
 ```python3
 from langchain.globals import set_llm_cache
 from langchain_openai import OpenAI
@@ -39,4 +38,3 @@ llm.invoke("Which city is the most crowded city in the USA?")
 # The second time it is, so it goes faster
 llm.invoke("Which city is the most crowded city in the USA?")
 ```
-

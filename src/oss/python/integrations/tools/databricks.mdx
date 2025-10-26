@@ -2,11 +2,11 @@
 title: Databricks Unity Catalog (UC)
 ---
 
-This notebook shows how to use UC functions as LangChain tools, with both LangChain and LangGraph agent APIs.
+이 노트북은 LangChain과 LangGraph agent API 모두에서 UC function을 LangChain tool로 사용하는 방법을 보여줍니다.
 
-See Databricks documentation ([AWS](https://docs.databricks.com/en/sql/language-manual/sql-ref-syntax-ddl-create-sql-function.html)|[Azure](https://learn.microsoft.com/en-us/azure/databricks/sql/language-manual/sql-ref-syntax-ddl-create-sql-function)|[GCP](https://docs.gcp.databricks.com/en/sql/language-manual/sql-ref-syntax-ddl-create-sql-function.html)) to learn how to create SQL or Python functions in UC. Do not skip function and parameter comments, which are critical for LLMs to call functions properly.
+UC에서 SQL 또는 Python function을 생성하는 방법을 알아보려면 Databricks 문서([AWS](https://docs.databricks.com/en/sql/language-manual/sql-ref-syntax-ddl-create-sql-function.html)|[Azure](https://learn.microsoft.com/en-us/azure/databricks/sql/language-manual/sql-ref-syntax-ddl-create-sql-function)|[GCP](https://docs.gcp.databricks.com/en/sql/language-manual/sql-ref-syntax-ddl-create-sql-function.html))를 참조하세요. LLM이 function을 올바르게 호출하는 데 중요한 function 및 parameter 주석을 생략하지 마세요.
 
-In this example notebook, we create a simple Python function that executes arbitrary code and use it as a LangChain tool:
+이 예제 노트북에서는 임의의 코드를 실행하는 간단한 Python function을 생성하고 이를 LangChain tool로 사용합니다:
 
 ```sql
 CREATE FUNCTION main.tools.python_exec (
@@ -25,7 +25,7 @@ AS $$
 $$
 ```
 
-It runs in a secure and isolated environment within a Databricks SQL warehouse.
+이는 Databricks SQL warehouse 내의 안전하고 격리된 환경에서 실행됩니다.
 
 ```python
 pip install -qU databricks-sdk langchain-community databricks-langchain langgraph mlflow
@@ -58,9 +58,9 @@ tools = UCFunctionToolkit(
 ).tools
 ```
 
-(Optional) To increase the retry time for getting a function execution response, set environment variable UC_TOOL_CLIENT_EXECUTION_TIMEOUT. Default retry time value is 120s.
+(선택사항) function 실행 응답을 받기 위한 재시도 시간을 늘리려면 환경 변수 UC_TOOL_CLIENT_EXECUTION_TIMEOUT을 설정하세요. 기본 재시도 시간 값은 120초입니다.
 
-## LangGraph agent example
+## LangGraph agent 예제
 
 ```python
 import os
@@ -68,7 +68,7 @@ import os
 os.environ["UC_TOOL_CLIENT_EXECUTION_TIMEOUT"] = "200"
 ```
 
-## LangGraph agent example
+## LangGraph agent 예제
 
 ```python
 from langchain.agents import create_agent
@@ -89,7 +89,7 @@ agent.invoke({"messages": [{"role": "user", "content": "36939 * 8922.4"}]})
   AIMessage(content='The result of the multiplication is:\n\n329584533.59999996', additional_kwargs={}, response_metadata={'prompt_tokens': 846, 'completion_tokens': 22, 'total_tokens': 868}, id='run-22772404-611b-46e4-9956-b85e4a385f0f-0')]}
 ```
 
-## LangChain agent example
+## LangChain agent 예제
 
 ```python
 from langchain.agents import AgentExecutor, create_tool_calling_agent

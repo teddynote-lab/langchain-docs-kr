@@ -4,24 +4,24 @@ title: JaguarDB Vector Database
 
 >[JaguarDB Vector Database]([www.jaguardb.com/windex.html](http://www.jaguardb.com/windex.html)
 >
->1. It is a distributed vector database
->2. The “ZeroMove” feature of JaguarDB enables instant horizontal scalability
->3. Multimodal: embeddings, text, images, videos, PDFs, audio, time series, and geospatial
->4. All-masters: allows both parallel reads and writes
->5. Anomaly detection capabilities
->6. RAG support: combines LLM with proprietary and real-time data
->7. Shared metadata: sharing of metadata across multiple vector indexes
->8. Distance metrics: Euclidean, Cosine, InnerProduct, Manhatten, Chebyshev, Hamming, Jeccard, Minkowski
+>1. 분산 vector database입니다
+>2. JaguarDB의 "ZeroMove" 기능은 즉각적인 수평 확장성을 제공합니다
+>3. Multimodal: embeddings, text, images, videos, PDFs, audio, time series, geospatial을 지원합니다
+>4. All-masters: 병렬 읽기 및 쓰기를 모두 지원합니다
+>5. 이상 탐지 기능을 제공합니다
+>6. RAG 지원: LLM을 독점 데이터 및 실시간 데이터와 결합합니다
+>7. Shared metadata: 여러 vector index에서 metadata를 공유합니다
+>8. Distance metrics: Euclidean, Cosine, InnerProduct, Manhatten, Chebyshev, Hamming, Jeccard, Minkowski를 지원합니다
 
 ## Prerequisites
 
-There are two requirements for running the examples in this file.
+이 파일의 예제를 실행하기 위한 두 가지 요구사항이 있습니다.
 
-1. You must install and set up the JaguarDB server and its HTTP gateway server.
-   Please refer to the instructions in:
+1. JaguarDB server와 HTTP gateway server를 설치하고 설정해야 합니다.
+   다음 지침을 참조하세요:
    [www.jaguardb.com](http://www.jaguardb.com)
 
-2. You must install the http client package for JaguarDB:
+2. JaguarDB용 http client package를 설치해야 합니다:
 
    ```
        pip install -U jaguardb-http-client
@@ -29,7 +29,7 @@ There are two requirements for running the examples in this file.
 
 ## RAG With LangChain
 
-This section demonstrates chatting with LLM together with Jaguar in the langchain software stack.
+이 섹션에서는 langchain 소프트웨어 스택에서 Jaguar와 함께 LLM과 대화하는 방법을 보여줍니다.
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -112,7 +112,7 @@ retriever = vectorstore.as_retriever()
 
 ## Interaction With Jaguar Vector Store
 
-Users can interact directly with the Jaguar vector store for similarity search and anomaly detection.
+사용자는 유사도 검색 및 이상 탐지를 위해 Jaguar vector store와 직접 상호작용할 수 있습니다.
 
 ```python
 from langchain_community.vectorstores.jaguar import Jaguar

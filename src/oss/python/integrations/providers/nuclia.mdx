@@ -2,15 +2,14 @@
 title: Nuclia
 ---
 
->[Nuclia](https://nuclia.com) automatically indexes your unstructured data from any internal
-> and external source, providing optimized search results and generative answers.
-> It can handle video and audio transcription, image content extraction, and document parsing.
+>[Nuclia](https://nuclia.com)는 모든 내부 및 외부 소스의 비정형 데이터를 자동으로 인덱싱하여 최적화된 검색 결과와 생성형 답변을 제공합니다.
+> 비디오 및 오디오 전사, 이미지 콘텐츠 추출, 문서 파싱을 처리할 수 있습니다.
 
 
 
 ## Installation and Setup
 
-We need to install the `nucliadb-protos` package to use the `Nuclia Understanding API`
+`Nuclia Understanding API`를 사용하기 위해 `nucliadb-protos` 패키지를 설치해야 합니다
 
 <CodeGroup>
 ```bash pip
@@ -22,20 +21,20 @@ uv add nucliadb-protos
 ```
 </CodeGroup>
 
-We need to have a `Nuclia account`.
-We can create one for free at [https://nuclia.cloud](https://nuclia.cloud),
-and then [create a NUA key](https://docs.nuclia.dev/docs/docs/using/understanding/intro).
+`Nuclia account`가 필요합니다.
+[https://nuclia.cloud](https://nuclia.cloud)에서 무료로 계정을 생성할 수 있으며,
+[NUA key를 생성](https://docs.nuclia.dev/docs/docs/using/understanding/intro)할 수 있습니다.
 
 
 ## Document Transformer
 
 ### Nuclia
 
->`Nuclia Understanding API` document transformer splits text into paragraphs and sentences,
-> identifies entities, provides a summary of the text and generates embeddings for all the sentences.
+>`Nuclia Understanding API` document transformer는 텍스트를 단락과 문장으로 분할하고,
+> 엔티티를 식별하며, 텍스트 요약을 제공하고 모든 문장에 대한 embedding을 생성합니다.
 
-To use the Nuclia document transformer, we need to instantiate a `NucliaUnderstandingAPI`
-tool with `enable_ml` set to `True`:
+Nuclia document transformer를 사용하려면 `enable_ml`을 `True`로 설정하여 `NucliaUnderstandingAPI`
+도구를 인스턴스화해야 합니다:
 
 ```python
 from langchain_community.tools.nuclia import NucliaUnderstandingAPI
@@ -43,7 +42,7 @@ from langchain_community.tools.nuclia import NucliaUnderstandingAPI
 nua = NucliaUnderstandingAPI(enable_ml=True)
 ```
 
-See a [usage example](/oss/integrations/document_transformers/nuclia_transformer).
+[사용 예제](/oss/integrations/document_transformers/nuclia_transformer)를 참조하세요.
 
 ```python
 from langchain_community.document_transformers.nuclia_text_transform import NucliaTextTransformer
@@ -53,7 +52,7 @@ from langchain_community.document_transformers.nuclia_text_transform import Nucl
 
 ### Nuclea loader
 
-See a [usage example](/oss/integrations/document_loaders/nuclia).
+[사용 예제](/oss/integrations/document_loaders/nuclia)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders.nuclia import NucliaLoader
@@ -63,7 +62,7 @@ from langchain_community.document_loaders.nuclia import NucliaLoader
 
 ### NucliaDB
 
-We need to install a python package:
+python 패키지를 설치해야 합니다:
 
 <CodeGroup>
 ```bash pip
@@ -75,7 +74,7 @@ uv add nuclia
 ```
 </CodeGroup>
 
-See a [usage example](/oss/integrations/vectorstores/nucliadb).
+[사용 예제](/oss/integrations/vectorstores/nucliadb)를 참조하세요.
 
 ```python
 from langchain_community.vectorstores.nucliadb import NucliaDB
@@ -85,7 +84,7 @@ from langchain_community.vectorstores.nucliadb import NucliaDB
 
 ### Nuclia Understanding
 
-See a [usage example](/oss/integrations/tools/nuclia).
+[사용 예제](/oss/integrations/tools/nuclia)를 참조하세요.
 
 ```python
 from langchain_community.tools.nuclia import NucliaUnderstandingAPI

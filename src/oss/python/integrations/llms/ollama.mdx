@@ -1,14 +1,15 @@
+```markdown
 ---
 title: Ollama
 ---
 
 <Warning>
-**You are currently on a page documenting the use of Ollama models as text completion models. Many popular Ollama models are [chat completion models](/oss/langchain/models).**
+**현재 Ollama 모델을 text completion 모델로 사용하는 방법을 설명하는 페이지를 보고 계십니다. 많은 인기 있는 Ollama 모델은 [chat completion 모델](/oss/langchain/models)입니다.**
 
-You may be looking for [this page instead](/oss/integrations/chat/ollama/).
+[이 페이지](/oss/integrations/chat/ollama/)를 찾고 계실 수 있습니다.
 </Warning>
 
-This page goes over how to use LangChain to interact with `Ollama` models.
+이 페이지에서는 LangChain을 사용하여 `Ollama` 모델과 상호작용하는 방법을 설명합니다.
 
 ## Installation
 
@@ -19,23 +20,23 @@ pip install -U langchain-ollama
 
 ## Setup
 
-First, follow [these instructions](https://github.com/ollama/ollama?tab=readme-ov-file#ollama) to set up and run a local Ollama instance:
+먼저, [이 지침](https://github.com/ollama/ollama?tab=readme-ov-file#ollama)을 따라 로컬 Ollama 인스턴스를 설정하고 실행하세요:
 
-* [Download](https://ollama.ai/download) and install Ollama onto the available supported platforms (including Windows Subsystem for Linux aka WSL, macOS, and Linux)
-  * macOS users can install via Homebrew with `brew install ollama` and start with `brew services start ollama`
-* Fetch available LLM model via `ollama pull <name-of-model>`
-  * View a list of available models via the [model library](https://ollama.ai/library)
-  * e.g., `ollama pull llama3`
-* This will download the default tagged version of the model. Typically, the default points to the latest, smallest sized-parameter model.
+* 지원되는 플랫폼(Windows Subsystem for Linux(WSL), macOS, Linux 포함)에 Ollama를 [다운로드](https://ollama.ai/download)하고 설치합니다
+  * macOS 사용자는 Homebrew를 통해 `brew install ollama`로 설치하고 `brew services start ollama`로 시작할 수 있습니다
+* `ollama pull <name-of-model>`을 통해 사용 가능한 LLM 모델을 가져옵니다
+  * [모델 라이브러리](https://ollama.ai/library)를 통해 사용 가능한 모델 목록을 확인하세요
+  * 예: `ollama pull llama3`
+* 이렇게 하면 모델의 기본 태그 버전이 다운로드됩니다. 일반적으로 기본값은 최신의 가장 작은 파라미터 크기 모델을 가리킵니다.
 
-> On Mac, the models will be download to `~/.ollama/models`
+> Mac에서는 모델이 `~/.ollama/models`에 다운로드됩니다
 >
-> On Linux (or WSL), the models will be stored at `/usr/share/ollama/.ollama/models`
+> Linux(또는 WSL)에서는 모델이 `/usr/share/ollama/.ollama/models`에 저장됩니다
 
-* Specify the exact version of the model of interest as such `ollama pull vicuna:13b-v1.5-16k-q4_0` (View the [various tags for the `Vicuna`](https://ollama.ai/library/vicuna/tags) model in this instance)
-* To view all pulled models, use `ollama list`
-* To chat directly with a model from the command line, use `ollama run <name-of-model>`
-* View the [Ollama documentation](https://github.com/ollama/ollama/tree/main/docs) for more commands. You can run `ollama help` in the terminal to see available commands.
+* 관심 있는 모델의 정확한 버전을 지정하려면 `ollama pull vicuna:13b-v1.5-16k-q4_0`과 같이 사용합니다 (이 경우 [`Vicuna`의 다양한 태그](https://ollama.ai/library/vicuna/tags)를 확인하세요)
+* 가져온 모든 모델을 보려면 `ollama list`를 사용합니다
+* 명령줄에서 모델과 직접 대화하려면 `ollama run <name-of-model>`을 사용합니다
+* 더 많은 명령어는 [Ollama 문서](https://github.com/ollama/ollama/tree/main/docs)를 참조하세요. 터미널에서 `ollama help`를 실행하여 사용 가능한 명령어를 확인할 수 있습니다.
 
 ## Usage
 
@@ -62,11 +63,11 @@ chain.invoke({"question": "What is LangChain?"})
 
 ## Multi-modal
 
-Ollama has support for multi-modal LLMs, such as [bakllava](https://ollama.com/library/bakllava) and [llava](https://ollama.com/library/llava).
+Ollama는 [bakllava](https://ollama.com/library/bakllava) 및 [llava](https://ollama.com/library/llava)와 같은 multi-modal LLM을 지원합니다.
 
     ollama pull bakllava
 
-Be sure to update Ollama so that you have the most recent version to support multi-modal.
+multi-modal을 지원하는 최신 버전을 사용할 수 있도록 Ollama를 업데이트하세요.
 
 ```python
 pip install pillow
@@ -131,4 +132,5 @@ llm_with_image_context.invoke("What is the dollar based gross retention rate:")
 
 ## API reference
 
-For detailed documentation of all `ChatOllama` features and configurations head to the [API reference](https://python.langchain.com/api_reference/ollama/llms/langchain_ollama.llms.OllamaLLM.html).
+모든 `ChatOllama` 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/ollama/llms/langchain_ollama.llms.OllamaLLM.html)를 참조하세요.
+```

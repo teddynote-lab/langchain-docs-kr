@@ -1,15 +1,15 @@
 ---
-title: Dataset prebuilt JSON schema types
-sidebarTitle: Dataset prebuilt JSON schema types
+title: Dataset 사전 정의 JSON schema 타입
+sidebarTitle: Dataset 사전 정의 JSON schema 타입
 ---
 
-LangSmith recommends that you set a schema on the inputs and outputs of your dataset schemas to ensure data consistency and that your examples are in the right format for downstream processing, like running evals.
+LangSmith는 데이터 일관성을 보장하고 예제가 평가 실행과 같은 다운스트림 처리에 적합한 형식인지 확인하기 위해 dataset schema의 input과 output에 schema를 설정할 것을 권장합니다.
 
-In order to better support LLM workflows, LangSmith has support for a few different predefined prebuilt types. These schemas are hosted publicly by the LangSmith API, and can be defined in your dataset schemas using [JSON Schema references](https://json-schema.org/understanding-json-schema/structuring#dollarref). The table of available schemas can be seen below
+LLM workflow를 더 잘 지원하기 위해 LangSmith는 몇 가지 사전 정의된 prebuilt 타입을 지원합니다. 이러한 schema는 LangSmith API에 의해 공개적으로 호스팅되며, [JSON Schema reference](https://json-schema.org/understanding-json-schema/structuring#dollarref)를 사용하여 dataset schema에서 정의할 수 있습니다. 사용 가능한 schema 표는 아래에서 확인할 수 있습니다
 
 | Type    | JSON Schema Reference Link                                                                                                       | Usage                                                                                                                     |
 | ------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Message | [https://api.smith.langchain.com/public/schemas/v1/message.json](https://api.smith.langchain.com/public/schemas/v1/message.json) | Represents messages sent to a chat model, following the OpenAI standard format.                                           |
-| Tool    | [https://api.smith.langchain.com/public/schemas/v1/tooldef.json](https://api.smith.langchain.com/public/schemas/v1/tooldef.json) | Tool definitions available to chat models for function calling, defined in OpenAI's JSON Schema inspired function format. |
+| Message | [https://api.smith.langchain.com/public/schemas/v1/message.json](https://api.smith.langchain.com/public/schemas/v1/message.json) | OpenAI 표준 형식을 따르는 chat model로 전송되는 message를 나타냅니다.                                           |
+| Tool    | [https://api.smith.langchain.com/public/schemas/v1/tooldef.json](https://api.smith.langchain.com/public/schemas/v1/tooldef.json) | OpenAI의 JSON Schema에서 영감을 받은 function 형식으로 정의된, function calling을 위해 chat model에서 사용 가능한 tool 정의입니다. |
 
-LangSmith lets you define a series of transformations that collect the above prebuilt types from your traces and add them to your dataset. For more info on available transformations, see our [reference](/langsmith/dataset-transformations)
+LangSmith를 사용하면 trace에서 위의 prebuilt 타입을 수집하여 dataset에 추가하는 일련의 변환을 정의할 수 있습니다. 사용 가능한 변환에 대한 자세한 내용은 [reference](/langsmith/dataset-transformations)를 참조하세요

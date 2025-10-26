@@ -2,12 +2,12 @@
 title: JSON Toolkit
 ---
 
-This notebook showcases an agent interacting with large `JSON/dict` objects.
-This is useful when you want to answer questions about a JSON blob that's too large to fit in the context window of an LLM. The agent is able to iteratively explore the blob to find what it needs to answer the user's question.
+이 노트북은 대용량 `JSON/dict` 객체와 상호작용하는 agent를 보여줍니다.
+이는 LLM의 context window에 들어가기에 너무 큰 JSON blob에 대한 질문에 답하고자 할 때 유용합니다. agent는 blob을 반복적으로 탐색하여 사용자의 질문에 답하는 데 필요한 정보를 찾을 수 있습니다.
 
-In the below example, we are using the OpenAPI spec for the OpenAI API, which you can find [here](https://github.com/openai/openai-openapi/blob/master/openapi.yaml).
+아래 예제에서는 OpenAI API의 OpenAPI spec을 사용하며, [여기](https://github.com/openai/openai-openapi/blob/master/openapi.yaml)에서 찾을 수 있습니다.
 
-We will use the JSON agent to answer some questions about the API spec.
+JSON agent를 사용하여 API spec에 대한 몇 가지 질문에 답할 것입니다.
 
 ```python
 pip install -qU langchain-community
@@ -35,7 +35,7 @@ json_agent_executor = create_json_agent(
 
 ## Individual tools
 
-Let's see what individual tools are inside the Jira toolkit.
+Jira toolkit 내부에 어떤 개별 tool들이 있는지 살펴보겠습니다.
 
 ```python
 [(el.name, el.description) for el in json_toolkit.get_tools()]
@@ -48,7 +48,7 @@ Let's see what individual tools are inside the Jira toolkit.
   '\n    Can be used to see value in string format at a given path.\n    Before calling this you should be SURE that the path to this exists.\n    The input is a text representation of the path to the dict in Python syntax (e.g. data["key1"][0]["key2"]).\n    ')]
 ```
 
-## Example: getting the required POST parameters for a request
+## Example: 요청에 필요한 POST parameter 가져오기
 
 ```python
 json_agent_executor.run(

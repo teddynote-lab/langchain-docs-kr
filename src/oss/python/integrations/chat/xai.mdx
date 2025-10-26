@@ -3,9 +3,9 @@ title: ChatXAI
 ---
 
 
-This page will help you get started with xAI [chat models](/oss/langchain/models). For detailed documentation of all `ChatXAI` features and configurations, head to the [API reference](https://python.langchain.com/api_reference/xai/chat_models/langchain_xai.chat_models.ChatXAI.html).
+이 페이지는 xAI [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 `ChatXAI` 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/xai/chat_models/langchain_xai.chat_models.ChatXAI.html)를 참조하세요.
 
-[xAI](https://console.x.ai/) offers an API to interact with Grok models.
+[xAI](https://console.x.ai/)는 Grok 모델과 상호작용할 수 있는 API를 제공합니다.
 
 ## Overview
 
@@ -23,11 +23,11 @@ This page will help you get started with xAI [chat models](/oss/langchain/models
 
 ## Setup
 
-To access xAI models, you'll need to create an xAI account, get an API key, and install the `langchain-xai` integration package.
+xAI 모델에 액세스하려면 xAI 계정을 생성하고 API 키를 받은 다음 `langchain-xai` integration package를 설치해야 합니다.
 
 ### Credentials
 
-Head to [this page](https://console.x.ai/) to sign up for xAI and generate an API key. Once you've done this, set the `XAI_API_KEY` environment variable:
+[이 페이지](https://console.x.ai/)로 이동하여 xAI에 가입하고 API 키를 생성하세요. 완료한 후 `XAI_API_KEY` environment variable을 설정하세요:
 
 ```python
 import getpass
@@ -37,7 +37,7 @@ if "XAI_API_KEY" not in os.environ:
     os.environ["XAI_API_KEY"] = getpass.getpass("Enter your xAI API key: ")
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -46,7 +46,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-The LangChain xAI integration lives in the `langchain-xai` package:
+LangChain xAI integration은 `langchain-xai` package에 있습니다:
 
 ```python
 pip install -qU langchain-xai
@@ -54,7 +54,7 @@ pip install -qU langchain-xai
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```python
 from langchain_xai import ChatXAI
@@ -97,11 +97,11 @@ J'adore programmer.
 
 ## Tool calling
 
-ChatXAI has a [tool calling](https://docs.x.ai/docs#capabilities) (we use "tool calling" and "function calling" interchangeably here) API that lets you describe tools and their arguments, and have the model return a JSON object with a tool to invoke and the inputs to that tool. Tool-calling is extremely useful for building tool-using chains and agents, and for getting structured outputs from models more generally.
+ChatXAI는 도구와 그 인수를 설명하고 모델이 호출할 도구와 해당 도구에 대한 입력이 포함된 JSON 객체를 반환하도록 하는 [tool calling](https://docs.x.ai/docs#capabilities) (여기서는 "tool calling"과 "function calling"을 같은 의미로 사용합니다) API를 제공합니다. Tool-calling은 도구를 사용하는 chain과 agent를 구축하고 모델에서 구조화된 출력을 얻는 데 매우 유용합니다.
 
 ### ChatXAI.bind_tools()
 
-With `ChatXAI.bind_tools`, we can easily pass in Pydantic classes, dict schemas, LangChain tools, or even functions as tools to the model. Under the hood, these are converted to an OpenAI tool schema, which looks like:
+`ChatXAI.bind_tools`를 사용하면 Pydantic class, dict schema, LangChain tool 또는 함수를 모델에 도구로 쉽게 전달할 수 있습니다. 내부적으로 이들은 다음과 같은 OpenAI tool schema로 변환됩니다:
 
 ```
 {
@@ -111,7 +111,7 @@ With `ChatXAI.bind_tools`, we can easily pass in Pydantic classes, dict schemas,
 }
 ```
 
-and passed in every model invocation.
+그리고 모든 모델 호출에 전달됩니다.
 
 ```python
 from pydantic import BaseModel, Field
@@ -139,7 +139,7 @@ AIMessage(content='I am retrieving the current weather for San Francisco.', addi
 
 ## Live Search
 
-xAI supports a [Live Search](https://docs.x.ai/docs/guides/live-search) feature that enables Grok to ground its answers using results from web searches:
+xAI는 Grok이 웹 검색 결과를 사용하여 답변을 근거로 제시할 수 있도록 하는 [Live Search](https://docs.x.ai/docs/guides/live-search) 기능을 지원합니다:
 
 ```python
 from langchain_xai import ChatXAI
@@ -158,8 +158,8 @@ llm = ChatXAI(
 llm.invoke("Provide me a digest of world news in the last 24 hours.")
 ```
 
-See [xAI docs](https://docs.x.ai/docs/guides/live-search) for the full set of web search options.
+전체 웹 검색 옵션은 [xAI docs](https://docs.x.ai/docs/guides/live-search)를 참조하세요.
 
 ## API reference
 
-For detailed documentation of all `ChatXAI` features and configurations, head to the [API reference](https://python.langchain.com/api_reference/xai/chat_models/langchain_xai.chat_models.ChatXAI.html).
+모든 `ChatXAI` 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/xai/chat_models/langchain_xai.chat_models.ChatXAI.html)를 참조하세요.

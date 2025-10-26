@@ -2,20 +2,20 @@
 title: ChatMoonshot
 ---
 
-LangChain.js supports the Moonshot AI family of models.
+LangChain.js는 Moonshot AI 모델 제품군을 지원합니다.
 
 https://platform.moonshot.cn/docs/intro
 
 ## Setup
 
-You'll need to sign up for an Moonshot API key and set it as an environment variable named `MOONSHOT_API_KEY`
+Moonshot API key에 가입하고 `MOONSHOT_API_KEY`라는 이름의 environment variable로 설정해야 합니다.
 
 https://platform.moonshot.cn/console
 
-You'll also need to install the following dependencies:
+다음 dependencies도 설치해야 합니다:
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+[LangChain 패키지 설치에 대한 일반 지침은 이 섹션을 참조하세요](/oss/langchain/install).
 </Tip>
 
 ```bash npm
@@ -24,7 +24,7 @@ npm install @langchain/community @langchain/core
 
 ## Usage
 
-Here's an example:
+다음은 예제입니다:
 
 ```typescript
 import { ChatMoonshot } from "@langchain/community/chat_models/moonshot";
@@ -61,5 +61,5 @@ AIMessage {
 
 ## Related
 
-- Chat model [conceptual guide](/oss/langchain/models)
-- Chat model [how-to guides](/oss/langchain/models)
+- Chat model [개념 가이드](/oss/langchain/models)
+- Chat model [사용 방법 가이드](/oss/langchain/models)

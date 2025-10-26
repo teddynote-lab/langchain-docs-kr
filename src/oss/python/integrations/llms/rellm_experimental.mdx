@@ -2,11 +2,11 @@
 title: RELLM
 ---
 
-[RELLM](https://github.com/r2d4/rellm) is a library that wraps local Hugging Face pipeline models for structured decoding.
+[RELLM](https://github.com/r2d4/rellm)은 구조화된 디코딩을 위해 로컬 Hugging Face pipeline 모델을 래핑하는 라이브러리입니다.
 
-It works by generating tokens one at a time. At each step, it masks tokens that don't conform to the provided partial regular expression.
+한 번에 하나의 토큰을 생성하는 방식으로 작동합니다. 각 단계에서 제공된 부분 정규 표현식에 맞지 않는 토큰을 마스킹합니다.
 
-**Warning - this module is still experimental**
+**경고 - 이 모듈은 아직 실험적입니다**
 
 ```python
 pip install -qU  rellm langchain-huggingface > /dev/null
@@ -14,7 +14,7 @@ pip install -qU  rellm langchain-huggingface > /dev/null
 
 ### Hugging Face Baseline
 
-First, let's establish a qualitative baseline by checking the output of the model without structured decoding.
+먼저, 구조화된 디코딩 없이 모델의 출력을 확인하여 정성적 기준선을 설정해 보겠습니다.
 
 ```python
 import logging
@@ -60,11 +60,11 @@ Setting `pad_token_id` to `eos_token_id`:50256 for open-end generation.
 generations=[[Generation(text=' "What\'s the capital of Maryland?"\n', generation_info=None)]] llm_output=None
 ```
 
-***That's not so impressive, is it? It didn't answer the question and it didn't follow the JSON format at all! Let's try with the structured decoder.***
+***그다지 인상적이지 않죠? 질문에 답하지도 않았고 JSON 형식도 전혀 따르지 않았습니다! 이제 구조화된 디코더를 사용해 보겠습니다.***
 
 ## RELLM LLM Wrapper
 
-Let's try that again, now providing a regex to match the JSON structured format.
+이제 JSON 구조화된 형식과 일치하는 정규 표현식을 제공하여 다시 시도해 보겠습니다.
 
 ```python
 import regex  # Note this is the regex library NOT python's re stdlib module
@@ -94,7 +94,7 @@ print(generated)
 }
 ```
 
-**Voila! Free of parsing errors.**
+**짜잔! 파싱 오류가 없습니다.**
 
 ```python
 

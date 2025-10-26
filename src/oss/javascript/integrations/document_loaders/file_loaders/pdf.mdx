@@ -3,28 +3,28 @@ title: PDFLoader
 ---
 
 <Tip>
-**Compatibility**: Only available on Node.js.
+**호환성**: Node.js에서만 사용 가능합니다.
 </Tip>
 
-This notebook provides a quick overview for getting started with `PDFLoader` [document loaders](/oss/integrations/document_loaders). For detailed documentation of all `PDFLoader` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_fs_pdf.PDFLoader.html).
+이 노트북은 `PDFLoader` [document loaders](/oss/integrations/document_loaders) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `PDFLoader` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_fs_pdf.PDFLoader.html)를 참조하세요.
 
-## Overview
+## 개요
 
-### Integration details
+### Integration 세부 정보
 
 | Class | Package | Compatibility | Local | PY support |
 | :--- | :--- | :---: | :---: |  :---: |
-| [PDFLoader](https://api.js.langchain.com/classes/langchain_community_document_loaders_fs_pdf.PDFLoader.html) | [@langchain/community](https://api.js.langchain.com/modules/langchain_community_document_loaders_fs_pdf.html) | Node-only | ✅ | 🟠 (See note below) |
+| [PDFLoader](https://api.js.langchain.com/classes/langchain_community_document_loaders_fs_pdf.PDFLoader.html) | [@langchain/community](https://api.js.langchain.com/modules/langchain_community_document_loaders_fs_pdf.html) | Node-only | ✅ | 🟠 (아래 참고 사항 참조) |
 
-## Setup
+## 설정
 
-To access `PDFLoader` document loader you'll need to install the `@langchain/community` integration, along with the `pdf-parse` package.
+`PDFLoader` document loader에 액세스하려면 `pdf-parse` 패키지와 함께 `@langchain/community` integration을 설치해야 합니다.
 
-### Credentials
+### 자격 증명
 
-### Installation
+### 설치
 
-The LangChain PDFLoader integration lives in the `@langchain/community` package:
+LangChain PDFLoader integration은 `@langchain/community` 패키지에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -38,9 +38,9 @@ pnpm add @langchain/community @langchain/core pdf-parse
 ```
 </CodeGroup>
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our model object and load documents:
+이제 model object를 인스턴스화하고 document를 로드할 수 있습니다:
 
 ```typescript
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf"
@@ -50,7 +50,7 @@ const nike10kPdfPath = "../../../../data/nke-10k-2023.pdf"
 const loader = new PDFLoader(nike10kPdfPath)
 ```
 
-## Load
+## 로드
 
 ```typescript
 const docs = await loader.load()
@@ -159,7 +159,7 @@ console.log(docs[0].metadata)
 }
 ```
 
-## Usage, one document per file
+## 사용법, 파일당 하나의 document
 
 ```typescript
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
@@ -180,11 +180,11 @@ Washington, D.C. 20549
 FORM 10-K
 ```
 
-## Usage, custom `pdfjs` build
+## 사용법, 커스텀 `pdfjs` 빌드
 
-By default we use the `pdfjs` build bundled with `pdf-parse`, which is compatible with most environments, including Node.js and modern browsers. If you want to use a more recent version of `pdfjs-dist` or if you want to use a custom build of `pdfjs-dist`, you can do so by providing a custom `pdfjs` function that returns a promise that resolves to the `PDFJS` object.
+기본적으로 Node.js 및 최신 브라우저를 포함한 대부분의 환경과 호환되는 `pdf-parse`와 함께 번들로 제공되는 `pdfjs` 빌드를 사용합니다. 더 최신 버전의 `pdfjs-dist`를 사용하거나 커스텀 빌드의 `pdfjs-dist`를 사용하려면 `PDFJS` object로 resolve되는 promise를 반환하는 커스텀 `pdfjs` function을 제공하면 됩니다.
 
-In the following example we use the "legacy" (see [pdfjs docs](https://github.com/mozilla/pdf.js/wiki/Frequently-Asked-Questions#which-browsersenvironments-are-supported)) build of `pdfjs-dist`, which includes several polyfills not included in the default build.
+다음 예제에서는 기본 빌드에 포함되지 않은 여러 polyfill을 포함하는 `pdfjs-dist`의 "legacy" ([pdfjs docs](https://github.com/mozilla/pdf.js/wiki/Frequently-Asked-Questions#which-browsersenvironments-are-supported) 참조) 빌드를 사용합니다.
 
 
 <CodeGroup>
@@ -210,10 +210,9 @@ const customBuildLoader = new PDFLoader(nike10kPdfPath, {
 });
 ```
 
-## Eliminating extra spaces
+## 추가 공백 제거
 
-PDFs come in many varieties, which makes reading them a challenge. The loader parses individual text elements and joins them together with a space by default, but
-if you are seeing excessive spaces, this may not be the desired behavior. In that case, you can override the separator with an empty string like this:
+PDF는 다양한 형태로 제공되므로 읽기가 어려울 수 있습니다. loader는 개별 텍스트 요소를 파싱하고 기본적으로 공백으로 결합하지만, 과도한 공백이 표시되는 경우 이것이 원하는 동작이 아닐 수 있습니다. 이 경우 다음과 같이 빈 문자열로 separator를 재정의할 수 있습니다:
 
 ```typescript
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
@@ -234,7 +233,7 @@ OR
 ☐ TRANSITI
 ```
 
-## Loading directories
+## 디렉토리 로드
 
 ```typescript
 import { DirectoryLoader } from "@langchain/classic/document_loaders/fs/directory";
@@ -362,4 +361,4 @@ Document {
 
 ## API reference
 
-For detailed documentation of all PDFLoader features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_fs_pdf.PDFLoader.html).
+모든 PDFLoader 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_fs_pdf.PDFLoader.html)를 참조하세요.

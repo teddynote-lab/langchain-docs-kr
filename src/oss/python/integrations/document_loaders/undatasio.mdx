@@ -2,9 +2,9 @@
 title: UnDatasIO
 ---
 
-This notebook provides a quick overview for getting started with the __UnDatasIO document loader__. UnDatasIO enables efficient loading and parsing of various document formats including PDF, PNG, JPG, JPEG, and JFIF, with features like document lazy loading and native async support, all through UnDatasIO's secure cloud API. These capabilities make the processed data ready for generative AI workflows like RAG.
+이 노트북은 __UnDatasIO document loader__를 시작하기 위한 빠른 개요를 제공합니다. UnDatasIO는 PDF, PNG, JPG, JPEG, JFIF를 포함한 다양한 문서 형식의 효율적인 로딩 및 파싱을 가능하게 하며, document lazy loading 및 네이티브 async 지원과 같은 기능을 UnDatasIO의 안전한 클라우드 API를 통해 제공합니다. 이러한 기능들은 처리된 데이터를 RAG와 같은 생성형 AI 워크플로우에 바로 사용할 수 있도록 준비합니다.
 
-For detailed documentation on all features and configurations, refer to the official API reference.
+모든 기능 및 구성에 대한 자세한 문서는 공식 API 레퍼런스를 참조하세요.
 
 ## Overview
 
@@ -18,8 +18,8 @@ For detailed documentation on all features and configurations, refer to the offi
 
 ### Credentials
 
-UnDatasIO requires an API token.
-Generate a free token at [undatas.io](https://undatas.io) and set it in the cell below:
+UnDatasIO는 API token이 필요합니다.
+[undatas.io](https://undatas.io)에서 무료 token을 생성하고 아래 셀에 설정하세요:
 
 ```python
 import getpass
@@ -35,7 +35,7 @@ if "UNDATASIO_TOKEN" not in os.environ:
 
 #### Normal Installation
 
-The following packages are required to run the rest of this notebook.
+다음 패키지들은 이 노트북의 나머지 부분을 실행하는 데 필요합니다.
 
 ```python
 # Install package, compatible with API partitioning
@@ -44,7 +44,7 @@ pip install langchain-undatasio
 
 ### Initialization
 
-The __UnDatasIOLoader__ supports single-file upload & parsing via the UnDatasIO cloud API.
+__UnDatasIOLoader__는 UnDatasIO 클라우드 API를 통한 단일 파일 업로드 및 파싱을 지원합니다.
 
 ```python
 from langchain_undatasio import UnDatasIOLoader
@@ -87,7 +87,7 @@ Affiliations:
 
 ### Lazy Load
 
-__UnDatasIOLoader__ supports lazy loading for memory-efficient iteration.
+__UnDatasIOLoader__는 메모리 효율적인 반복을 위한 lazy loading을 지원합니다.
 
 ```python
 pages = []

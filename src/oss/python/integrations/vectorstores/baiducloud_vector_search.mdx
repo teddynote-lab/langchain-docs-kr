@@ -1,25 +1,26 @@
+```mdx
 ---
 title: Baidu Cloud ElasticSearch VectorSearch
 ---
 
->[Baidu Cloud VectorSearch](https://cloud.baidu.com/doc/BES/index.html?from=productToDoc) is a fully managed, enterprise-level distributed search and analysis service which is 100% compatible to open source. Baidu Cloud VectorSearch provides low-cost, high-performance, and reliable retrieval and analysis platform level product services for structured/unstructured data. As a vector database , it supports multiple index types and similarity distance methods.
+>[Baidu Cloud VectorSearch](https://cloud.baidu.com/doc/BES/index.html?from=productToDoc)는 오픈 소스와 100% 호환되는 완전 관리형 엔터프라이즈급 분산 검색 및 분석 서비스입니다. Baidu Cloud VectorSearch는 구조화/비구조화 데이터를 위한 저비용, 고성능, 안정적인 검색 및 분석 플랫폼 수준의 제품 서비스를 제공합니다. vector database로서 다양한 index 유형과 유사도 거리 측정 방법을 지원합니다.
 
->`Baidu Cloud ElasticSearch` provides a privilege management mechanism, for you to  configure the cluster privileges freely, so as to further ensure data security.
+>`Baidu Cloud ElasticSearch`는 권한 관리 메커니즘을 제공하여 cluster 권한을 자유롭게 구성할 수 있으므로 데이터 보안을 더욱 강화할 수 있습니다.
 
-This notebook shows how to use functionality related to the `Baidu Cloud ElasticSearch VectorStore`.
-To run, you should have an [Baidu Cloud ElasticSearch](https://cloud.baidu.com/product/bes.html) instance up and running:
+이 notebook은 `Baidu Cloud ElasticSearch VectorStore`와 관련된 기능을 사용하는 방법을 보여줍니다.
+실행하려면 [Baidu Cloud ElasticSearch](https://cloud.baidu.com/product/bes.html) instance가 실행 중이어야 합니다:
 
-Read the [help document](https://cloud.baidu.com/doc/BES/s/8llyn0hh4 ) to quickly familiarize and configure Baidu Cloud ElasticSearch instance.
+[도움말 문서](https://cloud.baidu.com/doc/BES/s/8llyn0hh4)를 읽고 Baidu Cloud ElasticSearch instance를 빠르게 익히고 구성하세요.
 
-After the instance is up and running, follow these steps to split documents, get embeddings, connect to the baidu cloud elasticsearch instance, index documents, and perform vector retrieval.
+instance가 실행되면 다음 단계에 따라 문서를 분할하고, embedding을 가져오고, baidu cloud elasticsearch instance에 연결하고, 문서를 indexing하고, vector 검색을 수행합니다.
 
-We need to install the following Python packages first.
+먼저 다음 Python package를 설치해야 합니다.
 
 ```python
 pip install -qU langchain-community elasticsearch == 7.11.0
 ```
 
-First, we want to use `QianfanEmbeddings` so we have to get the Qianfan AK and SK. Details for QianFan is related to [Baidu Qianfan Workshop](https://cloud.baidu.com/product/wenxinworkshop)
+먼저 `QianfanEmbeddings`를 사용하려면 Qianfan AK와 SK를 가져와야 합니다. QianFan에 대한 자세한 내용은 [Baidu Qianfan Workshop](https://cloud.baidu.com/product/wenxinworkshop)을 참조하세요.
 
 ```python
 import getpass
@@ -31,7 +32,7 @@ if "QIANFAN_SK" not in os.environ:
     os.environ["QIANFAN_SK"] = getpass.getpass("Your Qianfan SK:")
 ```
 
-Secondly, split documents and get embeddings.
+둘째, 문서를 분할하고 embedding을 가져옵니다.
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -47,7 +48,7 @@ from langchain_community.embeddings import QianfanEmbeddingsEndpoint
 embeddings = QianfanEmbeddingsEndpoint()
 ```
 
-Then, create a Baidu ElasticeSearch accessable instance.
+그런 다음 Baidu ElasticeSearch 접근 가능한 instance를 생성합니다.
 
 ```python
 # Create a bes instance and index docs.
@@ -62,7 +63,7 @@ bes = BESVectorStore.from_documents(
 bes.client.indices.refresh(index="your vector index")
 ```
 
-Finally, Query and retrieve data
+마지막으로 데이터를 쿼리하고 검색합니다.
 
 ```python
 query = "What did the president say about Ketanji Brown Jackson"
@@ -70,4 +71,5 @@ docs = bes.similarity_search(query)
 print(docs[0].page_content)
 ```
 
-Please feel free to contact [liuboyao@baidu.com](mailto:liuboyao@baidu.com) or [chenweixu01@baidu.com](mailto:chenweixu01@baidu.com) if you encounter any problems during use, and we will do our best to support you.
+사용 중 문제가 발생하면 언제든지 [liuboyao@baidu.com](mailto:liuboyao@baidu.com) 또는 [chenweixu01@baidu.com](mailto:chenweixu01@baidu.com)으로 연락 주시면 최선을 다해 지원하겠습니다.
+```

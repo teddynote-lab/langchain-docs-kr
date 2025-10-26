@@ -2,9 +2,9 @@
 title: Outline
 ---
 
->[Outline](https://www.getoutline.com/) is an open-source collaborative knowledge base platform designed for team information sharing.
+>[Outline](https://www.getoutline.com/)은 팀 정보 공유를 위해 설계된 오픈소스 협업 지식 베이스 플랫폼입니다.
 
-This notebook shows how to retrieve documents from your Outline instance into the Document format that is used downstream.
+이 노트북은 Outline 인스턴스에서 문서를 검색하여 다운스트림에서 사용되는 Document 형식으로 가져오는 방법을 보여줍니다.
 
 ## Setup
 
@@ -12,7 +12,7 @@ This notebook shows how to retrieve documents from your Outline instance into th
 pip install -qU langchain langchain-openai
 ```
 
-You first need to [create an api key](https://www.getoutline.com/developers#section/Authentication) for your Outline instance. Then you need to set the following environment variables:
+먼저 Outline 인스턴스에 대한 [api key를 생성](https://www.getoutline.com/developers#section/Authentication)해야 합니다. 그런 다음 다음 환경 변수를 설정해야 합니다:
 
 ```python
 import os
@@ -21,13 +21,13 @@ os.environ["OUTLINE_API_KEY"] = "xxx"
 os.environ["OUTLINE_INSTANCE_URL"] = "https://app.getoutline.com"
 ```
 
-`OutlineRetriever` has these arguments:
+`OutlineRetriever`는 다음과 같은 인자를 가집니다:
 
-- optional `top_k_results`: default=3. Use it to limit number of documents retrieved.
-- optional `load_all_available_meta`: default=False. By default only the most important fields retrieved: `title`, `source` (the url of the document). If True, other fields also retrieved.
-- optional `doc_content_chars_max` default=4000. Use it to limit the number of characters for each document retrieved.
+- optional `top_k_results`: default=3. 검색되는 문서 수를 제한하는 데 사용합니다.
+- optional `load_all_available_meta`: default=False. 기본적으로 가장 중요한 필드만 검색됩니다: `title`, `source` (문서의 url). True인 경우 다른 필드도 검색됩니다.
+- optional `doc_content_chars_max` default=4000. 검색된 각 문서의 문자 수를 제한하는 데 사용합니다.
 
-`get_relevant_documents()` has one argument, `query`: free text which used to find documents in your Outline instance.
+`get_relevant_documents()`는 하나의 인자 `query`를 가집니다: Outline 인스턴스에서 문서를 찾는 데 사용되는 자유 텍스트입니다.
 
 ## Examples
 

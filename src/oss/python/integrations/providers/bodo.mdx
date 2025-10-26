@@ -2,32 +2,26 @@
 title: Bodo DataFrames
 ---
 
-[Bodo DataFrames](https://github.com/bodo-ai/Bodo) is a high performance DataFrame library
-for large scale Python data processing and drop-in replacement for Pandas; simply replace:
+[Bodo DataFrames](https://github.com/bodo-ai/Bodo)는 대규모 Python 데이터 처리를 위한 고성능 DataFrame 라이브러리이며 Pandas를 대체할 수 있습니다. 간단히 다음을:
 
 ```python
 import pandas as pd
 ```
 
-with:
+다음으로 교체하면:
 
 ```python
 import bodo.pandas as pd
 ```
 
-to automatically scale and accelerate Pandas workloads.
-Since Bodo DataFrames is compatible with Pandas, it is an ideal target for LLM code generation
-that's easy to verify, efficient, and scalable beyond the typical limitations of Pandas.
+Pandas 워크로드를 자동으로 확장하고 가속화할 수 있습니다.
+Bodo DataFrames는 Pandas와 호환되므로, 검증이 쉽고 효율적이며 Pandas의 일반적인 한계를 넘어 확장 가능한 LLM 코드 생성의 이상적인 대상입니다.
 
-Our integration package provides a toolkit for asking agents questions about large datasets
-using Bodo DataFrames for efficiency and scalability.
+우리의 통합 패키지는 효율성과 확장성을 위해 Bodo DataFrames를 사용하여 대규모 데이터셋에 대한 질문을 에이전트에게 할 수 있는 toolkit을 제공합니다.
 
-Under the hood, Bodo DataFrames uses lazy evaluation to optimize sequences of Pandas operations,
-streams data through operators to enable processing larger-than-memory datasets, and
-leverages MPI-based high-performance computing technology for efficient parallel execution that can
-easily scale from laptop to large cluster.
+내부적으로 Bodo DataFrames는 lazy evaluation을 사용하여 Pandas 작업 시퀀스를 최적화하고, 메모리보다 큰 데이터셋 처리를 가능하게 하기 위해 operator를 통해 데이터를 스트리밍하며, 노트북에서 대규모 클러스터까지 쉽게 확장할 수 있는 효율적인 병렬 실행을 위해 MPI 기반 고성능 컴퓨팅 기술을 활용합니다.
 
-## Installation and setup
+## 설치 및 설정
 
 ```bash pip
 pip install -U langchain_bodo
@@ -35,19 +29,18 @@ pip install -U langchain_bodo
 
 ## Toolkit
 
-The [langchain-bodo package](https://pypi.org/project/langchain-bodo/) provides functionality for creating agents that can answer questions about large datasets using Bodo DataFrames.
-See the [Bodo DataFrames tools page](/oss/integrations/tools/bodo) for more detailed usage examples.
+[langchain-bodo 패키지](https://pypi.org/project/langchain-bodo/)는 Bodo DataFrames를 사용하여 대규모 데이터셋에 대한 질문에 답할 수 있는 에이전트를 생성하는 기능을 제공합니다.
+더 자세한 사용 예제는 [Bodo DataFrames tools 페이지](/oss/integrations/tools/bodo)를 참조하세요.
 
-**NOTE: This feature uses the `Python` agent under the hood, which executes LLM generated Python code - this can be bad if the LLM generated Python code is harmful. Use cautiously.**
+**참고: 이 기능은 내부적으로 `Python` 에이전트를 사용하며, LLM이 생성한 Python 코드를 실행합니다 - LLM이 생성한 Python 코드가 유해할 경우 위험할 수 있습니다. 주의해서 사용하세요.**
 
 ```python
 from langchain_bodo import create_bodo_dataframes_agent
 ```
 
-### Usage Example
+### 사용 예제
 
-Before running the code below, copy the [titanic dataset](https://raw.githubusercontent.com/pandas-dev/pandas/main/doc/data/titanic.csv)
-and save locally as `titanic.csv`.
+아래 코드를 실행하기 전에 [titanic 데이터셋](https://raw.githubusercontent.com/pandas-dev/pandas/main/doc/data/titanic.csv)을 복사하여 로컬에 `titanic.csv`로 저장하세요.
 
 ```python
 import bodo.pandas as pd

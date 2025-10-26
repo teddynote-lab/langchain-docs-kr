@@ -2,16 +2,16 @@
 title: ScrapeGraph
 ---
 
-This guide provides a quick overview for getting started with ScrapeGraph [tools](/oss/integrations/tools/). For detailed documentation of all ScrapeGraph features and configurations head to the [API reference](https://python.langchain.com/docs/integrations/tools/scrapegraph).
+이 가이드는 ScrapeGraph [tools](/oss/integrations/tools/) 시작하기에 대한 간단한 개요를 제공합니다. 모든 ScrapeGraph 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/docs/integrations/tools/scrapegraph)를 참조하세요.
 
-For more information about ScrapeGraph AI:
+ScrapeGraph AI에 대한 자세한 정보:
 
 - [ScrapeGraph AI Website](https://scrapegraphai.com)
 - [Open Source Project](https://github.com/ScrapeGraphAI/Scrapegraph-ai)
 
-## Overview
+## 개요
 
-### Integration details
+### Integration 세부 정보
 
 | Class | Package | Serializable | JS support | Version |
 | :--- | :--- | :---: | :---: | :---: |
@@ -21,18 +21,18 @@ For more information about ScrapeGraph AI:
 | [AgenticScraperTool](https://python.langchain.com/docs/integrations/tools/scrapegraph) | langchain-scrapegraph | ✅ | ❌ | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-scrapegraph?style=flat-square&label=%20) |
 | [GetCreditsTool](https://python.langchain.com/docs/integrations/tools/scrapegraph) | langchain-scrapegraph | ✅ | ❌ | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-scrapegraph?style=flat-square&label=%20) |
 
-### Tool features
+### Tool 기능
 
 | Tool | Purpose | Input | Output |
 | :--- | :--- | :--- | :--- |
-| SmartScraperTool | Extract structured data from websites | URL + prompt | JSON |
-| SmartCrawlerTool | Extract data from multiple pages with crawling | URL + prompt + crawl options | JSON |
-| MarkdownifyTool | Convert webpages to markdown | URL | Markdown text |
-| GetCreditsTool | Check API credits | None | Credit info |
+| SmartScraperTool | 웹사이트에서 구조화된 데이터 추출 | URL + prompt | JSON |
+| SmartCrawlerTool | 크롤링을 통해 여러 페이지에서 데이터 추출 | URL + prompt + crawl options | JSON |
+| MarkdownifyTool | 웹페이지를 markdown으로 변환 | URL | Markdown text |
+| GetCreditsTool | API 크레딧 확인 | None | Credit info |
 
-## Setup
+## 설정
 
-The integration requires the following packages:
+이 integration에는 다음 패키지가 필요합니다:
 
 ```python
 pip install --quiet -U langchain-scrapegraph
@@ -42,9 +42,9 @@ pip install --quiet -U langchain-scrapegraph
 Note: you may need to restart the kernel to use updated packages.
 ```
 
-### Credentials
+### 자격 증명
 
-You'll need a ScrapeGraph AI API key to use these tools. Get one at [scrapegraphai.com](https://scrapegraphai.com).
+이러한 tool을 사용하려면 ScrapeGraph AI API key가 필요합니다. [scrapegraphai.com](https://scrapegraphai.com)에서 발급받으세요.
 
 ```python
 import getpass
@@ -54,16 +54,16 @@ if not os.environ.get("SGAI_API_KEY"):
     os.environ["SGAI_API_KEY"] = getpass.getpass("ScrapeGraph AI API key:\n")
 ```
 
-It's also helpful (but not needed) to set up [LangSmith](https://smith.langchain.com/) for best-in-class observability:
+최고 수준의 관찰성을 위해 [LangSmith](https://smith.langchain.com/)를 설정하는 것도 유용합니다(필수는 아님):
 
 ```python
 os.environ["LANGSMITH_TRACING"] = "true"
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass()
 ```
 
-## Instantiation
+## 인스턴스화
 
-Here we show how to instantiate instances of the ScrapeGraph tools:
+여기서는 ScrapeGraph tool의 인스턴스를 생성하는 방법을 보여줍니다:
 
 ```python
 from scrapegraph_py.logger import sgai_logger
@@ -84,15 +84,15 @@ markdownify = MarkdownifyTool()
 credits = GetCreditsTool()
 ```
 
-## Invocation
+## 호출
 
-### [Invoke directly with args](/oss/langchain/tools)
+### [인자와 함께 직접 호출](/oss/langchain/tools)
 
-Let's try each tool individually:
+각 tool을 개별적으로 시도해 봅시다:
 
 ### SmartCrawler Tool
 
-The SmartCrawlerTool allows you to crawl multiple pages from a website and extract structured data with advanced crawling options like depth control, page limits, and domain restrictions.
+SmartCrawlerTool을 사용하면 웹사이트의 여러 페이지를 크롤링하고 깊이 제어, 페이지 제한, 도메인 제한과 같은 고급 크롤링 옵션을 사용하여 구조화된 데이터를 추출할 수 있습니다.
 
 ```python
 # SmartScraper
@@ -180,9 +180,9 @@ result = tool.invoke(
 print(json.dumps(result, indent=2))
 ```
 
-### [Invoke with ToolCall](/oss/langchain/tools)
+### [ToolCall과 함께 호출](/oss/langchain/tools)
 
-We can also invoke the tool with a model-generated ToolCall:
+모델이 생성한 ToolCall로 tool을 호출할 수도 있습니다:
 
 ```python
 model_generated_tool_call = {
@@ -201,9 +201,9 @@ smartscraper.invoke(model_generated_tool_call)
 ToolMessage(content='{"main_heading": "Get the data you need from any website", "description": "Easily extract and gather information with just a few lines of code with a simple api. Turn websites into clean and usable structured data."}', name='SmartScraper', tool_call_id='1')
 ```
 
-## Chaining
+## 체이닝
 
-Let's use our tools with an LLM to analyze a website:
+LLM과 함께 tool을 사용하여 웹사이트를 분석해 봅시다:
 
 <ChatModelTabs customVarName="llm" />
 
@@ -259,6 +259,6 @@ AIMessage(content='ScrapeGraph AI is an AI-powered web scraping tool that effici
 
 ## API reference
 
-For detailed documentation of all ScrapeGraph features and configurations head to [the LangChain API reference](https://python.langchain.com/docs/integrations/tools/scrapegraph).
+모든 ScrapeGraph 기능 및 구성에 대한 자세한 문서는 [the LangChain API reference](https://python.langchain.com/docs/integrations/tools/scrapegraph)를 참조하세요.
 
-Or to [the official SDK repo](https://github.com/ScrapeGraphAI/langchain-scrapegraph).
+또는 [the official SDK repo](https://github.com/ScrapeGraphAI/langchain-scrapegraph)를 참조하세요.

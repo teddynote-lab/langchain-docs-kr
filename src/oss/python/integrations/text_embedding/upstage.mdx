@@ -1,12 +1,13 @@
+```markdown
 ---
 title: UpstageEmbeddings
 ---
 
-This notebook covers how to get started with Upstage embedding models.
+이 노트북은 Upstage embedding model을 시작하는 방법을 다룹니다.
 
 ## Installation
 
-Install `langchain-upstage` package.
+`langchain-upstage` package를 설치합니다.
 
 ```bash
 pip install -U langchain-upstage
@@ -14,9 +15,9 @@ pip install -U langchain-upstage
 
 ## Environment Setup
 
-Make sure to set the following environment variables:
+다음 environment variable을 설정해야 합니다:
 
-- `UPSTAGE_API_KEY`: Your Upstage API key from [Upstage console](https://console.upstage.ai/).
+- `UPSTAGE_API_KEY`: [Upstage console](https://console.upstage.ai/)에서 발급받은 Upstage API key
 
 ```python
 import os
@@ -26,7 +27,7 @@ os.environ["UPSTAGE_API_KEY"] = "YOUR_API_KEY"
 
 ## Usage
 
-Initialize `UpstageEmbeddings` class.
+`UpstageEmbeddings` class를 초기화합니다.
 
 ```python
 from langchain_upstage import UpstageEmbeddings
@@ -34,7 +35,7 @@ from langchain_upstage import UpstageEmbeddings
 embeddings = UpstageEmbeddings(model="solar-embedding-1-large")
 ```
 
-Use `embed_documents` to embed list of texts or documents.
+`embed_documents`를 사용하여 text 또는 document list를 embedding합니다.
 
 ```python
 doc_result = embeddings.embed_documents(
@@ -43,14 +44,14 @@ doc_result = embeddings.embed_documents(
 print(doc_result)
 ```
 
-Use `embed_query` to embed query string.
+`embed_query`를 사용하여 query string을 embedding합니다.
 
 ```python
 query_result = embeddings.embed_query("What does Sung do?")
 print(query_result)
 ```
 
-Use `aembed_documents` and `aembed_query` for async operations.
+비동기 작업을 위해 `aembed_documents`와 `aembed_query`를 사용합니다.
 
 ```python
 # async embed query
@@ -66,7 +67,7 @@ await embeddings.aembed_documents(
 
 ## Using with vector store
 
-You can use `UpstageEmbeddings` with vector store component. The following demonstrates a simple example.
+`UpstageEmbeddings`를 vector store component와 함께 사용할 수 있습니다. 다음은 간단한 예제입니다.
 
 ```python
 from langchain_community.vectorstores import DocArrayInMemorySearch
@@ -78,4 +79,5 @@ vectorstore = DocArrayInMemorySearch.from_texts(
 retriever = vectorstore.as_retriever()
 docs = retriever.invoke("Where did Harrison work?")
 print(docs)
+```
 ```

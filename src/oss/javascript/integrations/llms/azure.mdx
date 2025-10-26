@@ -3,24 +3,24 @@ title: Azure OpenAI
 ---
 
 <Warning>
-**You are currently on a page documenting the use of Azure OpenAI text completion models. The latest and most popular Azure OpenAI models are [chat completion models](/oss/langchain/models).**
+**현재 Azure OpenAI 텍스트 completion 모델 사용에 관한 페이지를 보고 계십니다. 최신이자 가장 인기 있는 Azure OpenAI 모델은 [chat completion 모델](/oss/langchain/models)입니다.**
 
 
-Unless you are specifically using `gpt-3.5-turbo-instruct`, you are probably looking for [this page instead](/oss/integrations/chat/azure/).
+특별히 `gpt-3.5-turbo-instruct`를 사용하는 것이 아니라면, [이 페이지](/oss/integrations/chat/azure/)를 찾고 계실 것입니다.
 </Warning>
 
 <Info>
-**Previously, LangChain.js supported integration with Azure OpenAI using the dedicated [Azure OpenAI SDK](https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/openai/openai). This SDK is now deprecated in favor of the new Azure integration in the OpenAI SDK, which allows to access the latest OpenAI models and features the same day they are released, and allows seemless transition between the OpenAI API and Azure OpenAI.**
+**이전에 LangChain.js는 전용 [Azure OpenAI SDK](https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/openai/openai)를 사용하여 Azure OpenAI와의 통합을 지원했습니다. 이 SDK는 이제 OpenAI SDK의 새로운 Azure 통합을 위해 더 이상 사용되지 않습니다. 새로운 통합을 통해 최신 OpenAI 모델과 기능에 출시 당일 접근할 수 있으며, OpenAI API와 Azure OpenAI 간의 원활한 전환이 가능합니다.**
 
 
-If you are using Azure OpenAI with the deprecated SDK, see the [migration guide](#migration-from-azure-openai-sdk) to update to the new API.
+더 이상 사용되지 않는 SDK로 Azure OpenAI를 사용하고 있다면, 새로운 API로 업데이트하기 위해 [마이그레이션 가이드](#migration-from-azure-openai-sdk)를 참조하세요.
 
 </Info>
 
 
-[Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/) is a Microsoft Azure service that provides powerful language models from OpenAI.
+[Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/)는 OpenAI의 강력한 언어 모델을 제공하는 Microsoft Azure 서비스입니다.
 
-This will help you get started with AzureOpenAI completion models (LLMs) using LangChain. For detailed documentation on `AzureOpenAI` features and configuration options, please refer to the [API reference](https://api.js.langchain.com/classes/langchain_openai.AzureOpenAI.html).
+이 문서는 LangChain을 사용하여 AzureOpenAI completion 모델(LLM)을 시작하는 데 도움을 드립니다. `AzureOpenAI` 기능 및 구성 옵션에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_openai.AzureOpenAI.html)를 참조하세요.
 
 ## Overview
 
@@ -32,17 +32,17 @@ This will help you get started with AzureOpenAI completion models (LLMs) using L
 
 ## Setup
 
-To access AzureOpenAI models you'll need to create an Azure account, get an API key, and install the `@langchain/openai` integration package.
+AzureOpenAI 모델에 접근하려면 Azure 계정을 생성하고, API 키를 받고, `@langchain/openai` 통합 패키지를 설치해야 합니다.
 
 ### Credentials
 
-Head to [azure.microsoft.com](https://azure.microsoft.com/) to sign up to AzureOpenAI and generate an API key.
+[azure.microsoft.com](https://azure.microsoft.com/)으로 이동하여 AzureOpenAI에 가입하고 API 키를 생성하세요.
 
-You'll also need to have an Azure OpenAI instance deployed. You can deploy a version on Azure Portal following [this guide](https://learn.microsoft.com/azure/ai-services/openai/how-to/create-resource?pivots=web-portal).
+또한 Azure OpenAI 인스턴스를 배포해야 합니다. [이 가이드](https://learn.microsoft.com/azure/ai-services/openai/how-to/create-resource?pivots=web-portal)를 따라 Azure Portal에서 버전을 배포할 수 있습니다.
 
-Once you have your instance running, make sure you have the name of your instance and key. You can find the key in the Azure Portal, under the "Keys and Endpoint" section of your instance.
+인스턴스가 실행되면 인스턴스 이름과 키를 확인하세요. 키는 Azure Portal의 인스턴스 "Keys and Endpoint" 섹션에서 찾을 수 있습니다.
 
-If you're using Node.js, you can define the following environment variables to use the service:
+Node.js를 사용하는 경우, 서비스를 사용하기 위해 다음 환경 변수를 정의할 수 있습니다:
 
 ```bash
 AZURE_OPENAI_API_INSTANCE_NAME=<YOUR_INSTANCE_NAME>
@@ -51,9 +51,9 @@ AZURE_OPENAI_API_KEY=<YOUR_KEY>
 AZURE_OPENAI_API_VERSION="2024-02-01"
 ```
 
-Alternatively, you can pass the values directly to the `AzureOpenAI` constructor.
+또는 `AzureOpenAI` constructor에 직접 값을 전달할 수 있습니다.
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출의 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
 
 ```bash
 # export LANGSMITH_TRACING="true"
@@ -62,7 +62,7 @@ If you want to get automated tracing of your model calls you can also set your [
 
 ### Installation
 
-The LangChain AzureOpenAI integration lives in the `@langchain/openai` package:
+LangChain AzureOpenAI 통합은 `@langchain/openai` 패키지에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -78,7 +78,7 @@ pnpm add @langchain/openai @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```typescript
 import { AzureOpenAI } from "@langchain/openai"
@@ -112,7 +112,7 @@ provides AI solutions to businesses. They offer a range of services including na
 
 ## Using Azure Managed Identity
 
-If you're using Azure Managed Identity, you can configure the credentials like this:
+Azure Managed Identity를 사용하는 경우, 다음과 같이 자격 증명을 구성할 수 있습니다:
 
 ```typescript
 import {
@@ -138,8 +138,8 @@ const managedIdentityLLM = new AzureOpenAI({
 
 ## Using a different domain
 
-If your instance is hosted under a domain other than the default `openai.azure.com`, you'll need to use the alternate `AZURE_OPENAI_BASE_PATH` environment variable.
-For example, here's how you would connect to the domain `https://westeurope.api.microsoft.com/openai/deployments/{DEPLOYMENT_NAME}`:
+인스턴스가 기본 `openai.azure.com`이 아닌 다른 도메인에서 호스팅되는 경우, 대체 `AZURE_OPENAI_BASE_PATH` 환경 변수를 사용해야 합니다.
+예를 들어, `https://westeurope.api.microsoft.com/openai/deployments/{DEPLOYMENT_NAME}` 도메인에 연결하는 방법은 다음과 같습니다:
 
 ```typescript
 import { AzureOpenAI } from "@langchain/openai";
@@ -156,22 +156,22 @@ const differentDomainLLM = new AzureOpenAI({
 
 ## Migration from Azure OpenAI SDK
 
-If you are using the deprecated Azure OpenAI SDK with the `@langchain/azure-openai` package, you can update your code to use the new Azure integration following these steps:
+`@langchain/azure-openai` 패키지와 함께 더 이상 사용되지 않는 Azure OpenAI SDK를 사용하고 있다면, 다음 단계에 따라 새로운 Azure 통합을 사용하도록 코드를 업데이트할 수 있습니다:
 
-1. Install the new `@langchain/openai` package and remove the previous `@langchain/azure-openai` package:
+1. 새로운 `@langchain/openai` 패키지를 설치하고 이전 `@langchain/azure-openai` 패키지를 제거합니다:
 
    ```bash
    npm install @langchain/openai
    npm uninstall @langchain/azure-openai
    ```
 
-2. Update your imports to use the new `AzureOpenAI` and @[`AzureChatOpenAI`] classes from the `@langchain/openai` package:
+2. `@langchain/openai` 패키지의 새로운 `AzureOpenAI` 및 @[`AzureChatOpenAI`] 클래스를 사용하도록 import를 업데이트합니다:
 
    ```typescript
    import { AzureOpenAI } from "@langchain/openai";
    ```
 
-3. Update your code to use the new `AzureOpenAI` and @[`AzureChatOpenAI`] classes and pass the required parameters:
+3. 새로운 `AzureOpenAI` 및 @[`AzureChatOpenAI`] 클래스를 사용하고 필요한 매개변수를 전달하도록 코드를 업데이트합니다:
 
    ```typescript
    const model = new AzureOpenAI({
@@ -182,12 +182,12 @@ If you are using the deprecated Azure OpenAI SDK with the `@langchain/azure-open
    });
    ```
 
-   Notice that the constructor now requires the `azureOpenAIApiInstanceName` parameter instead of the `azureOpenAIEndpoint` parameter, and adds the `azureOpenAIApiVersion` parameter to specify the API version.
+   이제 constructor가 `azureOpenAIEndpoint` 매개변수 대신 `azureOpenAIApiInstanceName` 매개변수를 요구하고, API 버전을 지정하기 위해 `azureOpenAIApiVersion` 매개변수를 추가한다는 점에 유의하세요.
 
-   - If you were using Azure Managed Identity, you now need to use the `azureADTokenProvider` parameter to the constructor instead of `credentials`, see the [Azure Managed Identity](#using-azure-managed-identity) section for more details.
+   - Azure Managed Identity를 사용하고 있었다면, 이제 `credentials` 대신 constructor에 `azureADTokenProvider` 매개변수를 사용해야 합니다. 자세한 내용은 [Azure Managed Identity](#using-azure-managed-identity) 섹션을 참조하세요.
 
-   - If you were using environment variables, you now have to set the `AZURE_OPENAI_API_INSTANCE_NAME` environment variable instead of `AZURE_OPENAI_API_ENDPOINT`, and add the `AZURE_OPENAI_API_VERSION` environment variable to specify the API version.
+   - 환경 변수를 사용하고 있었다면, 이제 `AZURE_OPENAI_API_ENDPOINT` 대신 `AZURE_OPENAI_API_INSTANCE_NAME` 환경 변수를 설정하고, API 버전을 지정하기 위해 `AZURE_OPENAI_API_VERSION` 환경 변수를 추가해야 합니다.
 
 ## API reference
 
-For detailed documentation of all AzureOpenAI features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_openai.AzureOpenAI.html).
+모든 AzureOpenAI 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_openai.AzureOpenAI.html)를 참조하세요.

@@ -1,32 +1,33 @@
+```markdown
 ---
 title: Ollama Functions
 ---
 
 <Warning>
-**The LangChain Ollama integration package has official support for tool calling. [Click here to view the documentation](/oss/integrations/chat/ollama#tools).**
+**LangChain Ollama 통합 패키지는 tool calling을 공식적으로 지원합니다. [문서를 보려면 여기를 클릭하세요](/oss/integrations/chat/ollama#tools).**
 
 
 </Warning>
 
-LangChain offers an experimental wrapper around open source models run locally via [Ollama](https://github.com/jmorganca/ollama)
-that gives it the same API as OpenAI Functions.
+LangChain은 [Ollama](https://github.com/jmorganca/ollama)를 통해 로컬에서 실행되는 오픈 소스 모델에 대한 실험적 wrapper를 제공하며,
+이는 OpenAI Functions와 동일한 API를 제공합니다.
 
-Note that more powerful and capable models will perform better with complex schema and/or multiple functions. The examples below
-use [Mistral](https://ollama.ai/library/mistral).
+더 강력하고 성능이 뛰어난 모델일수록 복잡한 schema 및/또는 여러 function을 더 잘 처리합니다. 아래 예제는
+[Mistral](https://ollama.ai/library/mistral)을 사용합니다.
 
 <Warning>
-**This is an experimental wrapper that attempts to bolt-on tool calling support to models that do not natively support it. Use with caution.**
+**이것은 tool calling 지원을 기본적으로 제공하지 않는 모델에 이를 추가하려는 실험적 wrapper입니다. 주의해서 사용하세요.**
 
 
 </Warning>
 
 ## Setup
 
-Follow [these instructions](https://github.com/jmorganca/ollama) to set up and run a local Ollama instance.
+로컬 Ollama 인스턴스를 설정하고 실행하려면 [이 지침](https://github.com/jmorganca/ollama)을 따르세요.
 
 ## Initialize model
 
-You can initialize this wrapper the same way you'd initialize a standard `ChatOllama` instance:
+표준 `ChatOllama` 인스턴스를 초기화하는 것과 동일한 방식으로 이 wrapper를 초기화할 수 있습니다:
 
 ```typescript
 import { OllamaFunctions } from "@langchain/community/experimental/chat_models/ollama_functions";
@@ -39,7 +40,7 @@ const model = new OllamaFunctions({
 
 ## Passing in functions
 
-You can now pass in functions the same way as OpenAI:
+이제 OpenAI와 동일한 방식으로 function을 전달할 수 있습니다:
 
 ```typescript
 import { ChatOllama } from "@langchain/ollama";
@@ -172,14 +173,14 @@ console.log(JSON.stringify(response, null, 2));
 ```
 
 <Tip>
-You can see a simple LangSmith trace of this [here](https://smith.langchain.com/public/74692bfc-0224-4221-b187-ddbf20d7ecc0/r)
+[여기](https://smith.langchain.com/public/74692bfc-0224-4221-b187-ddbf20d7ecc0/r)에서 간단한 LangSmith trace를 확인할 수 있습니다
 </Tip>
 
 ## Customization
 
-Behind the scenes, this uses Ollama's JSON mode to constrain output to JSON, then passes tools schemas as JSON schema into the prompt.
+내부적으로 이것은 Ollama의 JSON mode를 사용하여 출력을 JSON으로 제한한 다음, tool schema를 JSON schema로 prompt에 전달합니다.
 
-Because different models have different strengths, it may be helpful to pass in your own system prompt. Here's an example:
+모델마다 강점이 다르기 때문에 자체 system prompt를 전달하는 것이 도움이 될 수 있습니다. 다음은 예제입니다:
 
 ```typescript
 import { ChatOllama } from "@langchain/ollama";
@@ -247,5 +248,6 @@ console.log(response);
 
 ## Related
 
-- Chat model [conceptual guide](/oss/langchain/models)
-- Chat model [how-to guides](/oss/langchain/models)
+- Chat model [개념 가이드](/oss/langchain/models)
+- Chat model [사용 방법 가이드](/oss/langchain/models)
+```

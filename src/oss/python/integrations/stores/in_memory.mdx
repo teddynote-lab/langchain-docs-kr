@@ -2,11 +2,11 @@
 title: InMemoryByteStore
 ---
 
-This guide will help you get started with in-memory [key-value stores](/oss/integrations/stores). For detailed documentation of all `InMemoryByteStore` features and configurations head to the [API reference](https://python.langchain.com/api_reference/core/stores/langchain_core.stores.InMemoryByteStore.html).
+이 가이드는 in-memory [key-value stores](/oss/integrations/stores) 시작하기를 도와드립니다. 모든 `InMemoryByteStore` 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/core/stores/langchain_core.stores.InMemoryByteStore.html)를 참조하세요.
 
 ## Overview
 
-The `InMemoryByteStore` is a non-persistent implementation of a `ByteStore` that stores everything in a Python dictionary. It's intended for demos and cases where you don't need persistence past the lifetime of the Python process.
+`InMemoryByteStore`는 Python dictionary에 모든 것을 저장하는 `ByteStore`의 비영구적 구현입니다. 이는 데모 및 Python 프로세스의 수명을 넘어서는 영속성이 필요하지 않은 경우를 위한 것입니다.
 
 ### Integration details
 
@@ -16,7 +16,7 @@ The `InMemoryByteStore` is a non-persistent implementation of a `ByteStore` that
 
 ### Installation
 
-The LangChain `InMemoryByteStore` integration lives in the `langchain-core` package:
+LangChain `InMemoryByteStore` integration은 `langchain-core` package에 포함되어 있습니다:
 
 ```python
 pip install -qU langchain-core
@@ -24,7 +24,7 @@ pip install -qU langchain-core
 
 ## Instantiation
 
-Now you can instantiate your byte store:
+이제 byte store를 인스턴스화할 수 있습니다:
 
 ```python
 from langchain_core.stores import InMemoryByteStore
@@ -34,7 +34,7 @@ kv_store = InMemoryByteStore()
 
 ## Usage
 
-You can set data under keys like this using the `mset` method:
+`mset` method를 사용하여 다음과 같이 key 아래에 데이터를 설정할 수 있습니다:
 
 ```python
 kv_store.mset(
@@ -56,7 +56,7 @@ kv_store.mget(
 [b'value1', b'value2']
 ```
 
-And you can delete data using the `mdelete` method:
+그리고 `mdelete` method를 사용하여 데이터를 삭제할 수 있습니다:
 
 ```python
 kv_store.mdelete(
@@ -80,4 +80,4 @@ kv_store.mget(
 
 ## API reference
 
-For detailed documentation of all `InMemoryByteStore` features and configurations, head to the API reference: [python.langchain.com/api_reference/core/stores/langchain_core.stores.InMemoryByteStore.html](https://python.langchain.com/api_reference/core/stores/langchain_core.stores.InMemoryByteStore.html)
+모든 `InMemoryByteStore` 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/core/stores/langchain_core.stores.InMemoryByteStore.html](https://python.langchain.com/api_reference/core/stores/langchain_core.stores.InMemoryByteStore.html)

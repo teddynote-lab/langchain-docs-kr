@@ -2,9 +2,9 @@
 title: IBM watsonx.ai
 ---
 
->WatsonxEmbeddings is a wrapper for IBM [watsonx.ai](https://www.ibm.com/products/watsonx-ai) foundation models.
+>WatsonxEmbeddings는 IBM [watsonx.ai](https://www.ibm.com/products/watsonx-ai) foundation model을 위한 wrapper입니다.
 
-This example shows how to communicate with `watsonx.ai` models using `LangChain`.
+이 예제는 `LangChain`을 사용하여 `watsonx.ai` model과 통신하는 방법을 보여줍니다.
 
 ## Overview
 
@@ -14,14 +14,14 @@ This example shows how to communicate with `watsonx.ai` models using `LangChain`
 
 ## Setup
 
-To access IBM watsonx.ai models you'll need to create an IBM watsonx.ai account, get an API key, and install the `langchain-ibm` integration package.
+IBM watsonx.ai model에 액세스하려면 IBM watsonx.ai 계정을 생성하고, API key를 받고, `langchain-ibm` integration package를 설치해야 합니다.
 
 ### Credentials
 
-This cell defines the WML credentials required to work with watsonx Embeddings.
+이 셀은 watsonx Embeddings와 작업하는 데 필요한 WML credential을 정의합니다.
 
-**Action:** Provide the IBM Cloud user API key. For details, see
-[documentation](https://cloud.ibm.com/docs/account?topic=account-userapikey&interface=ui).
+**Action:** IBM Cloud 사용자 API key를 제공하세요. 자세한 내용은
+[documentation](https://cloud.ibm.com/docs/account?topic=account-userapikey&interface=ui)을 참조하세요.
 
 ```python
 import os
@@ -31,7 +31,7 @@ watsonx_api_key = getpass()
 os.environ["WATSONX_APIKEY"] = watsonx_api_key
 ```
 
-Additionaly you are able to pass additional secrets as an environment variable.
+추가로 환경 변수로 추가 secret을 전달할 수 있습니다.
 
 ```python
 import os
@@ -45,7 +45,7 @@ os.environ["WATSONX_INSTANCE_ID"] = "your instance_id for accessing the CPD clus
 
 ### Installation
 
-The LangChain IBM integration lives in the `langchain-ibm` package:
+LangChain IBM integration은 `langchain-ibm` package에 있습니다:
 
 ```python
 !pip install -qU langchain-ibm
@@ -53,7 +53,7 @@ The LangChain IBM integration lives in the `langchain-ibm` package:
 
 ## Instantiation
 
-You might need to adjust model `parameters` for different models.
+다른 model에 대해 model `parameters`를 조정해야 할 수 있습니다.
 
 ```python
 from ibm_watsonx_ai.metanames import EmbedTextParamsMetaNames
@@ -64,16 +64,16 @@ embed_params = {
 }
 ```
 
-Initialize the `WatsonxEmbeddings` class with previously set parameters.
+이전에 설정한 parameter로 `WatsonxEmbeddings` class를 초기화합니다.
 
 **Note**:
 
-- To provide context for the API call, you must add `project_id` or `space_id`. For more information see [documentation](https://www.ibm.com/docs/en/watsonx-as-a-service?topic=projects).
-- Depending on the region of your provisioned service instance, use one of the urls described [here](https://ibm.github.io/watsonx-ai-python-sdk/setup_cloud.html#authentication).
+- API 호출에 대한 context를 제공하려면 `project_id` 또는 `space_id`를 추가해야 합니다. 자세한 내용은 [documentation](https://www.ibm.com/docs/en/watsonx-as-a-service?topic=projects)을 참조하세요.
+- 프로비저닝된 서비스 인스턴스의 지역에 따라 [여기](https://ibm.github.io/watsonx-ai-python-sdk/setup_cloud.html#authentication)에 설명된 url 중 하나를 사용하세요.
 
-In this example, we’ll use the `project_id` and Dallas url.
+이 예제에서는 `project_id`와 Dallas url을 사용합니다.
 
-You need to specify `model_id` that will be used for inferencing.
+추론에 사용될 `model_id`를 지정해야 합니다.
 
 ```python
 from langchain_ibm import WatsonxEmbeddings
@@ -86,7 +86,7 @@ watsonx_embedding = WatsonxEmbeddings(
 )
 ```
 
-Alternatively you can use Cloud Pak for Data credentials. For details, see [documentation](https://ibm.github.io/watsonx-ai-python-sdk/setup_cpd.html).
+또는 Cloud Pak for Data credential을 사용할 수 있습니다. 자세한 내용은 [documentation](https://ibm.github.io/watsonx-ai-python-sdk/setup_cpd.html)을 참조하세요.
 
 ```python
 watsonx_embedding = WatsonxEmbeddings(
@@ -101,7 +101,7 @@ watsonx_embedding = WatsonxEmbeddings(
 )
 ```
 
-For certain requirements, there is an option to pass the IBM's [`APIClient`](https://ibm.github.io/watsonx-ai-python-sdk/base.html#apiclient) object into the `WatsonxEmbeddings` class.
+특정 요구 사항의 경우, IBM의 [`APIClient`](https://ibm.github.io/watsonx-ai-python-sdk/base.html#apiclient) 객체를 `WatsonxEmbeddings` class에 전달하는 옵션이 있습니다.
 
 ```python
 from ibm_watsonx_ai import APIClient
@@ -116,9 +116,9 @@ watsonx_embedding = WatsonxEmbeddings(
 
 ## Indexing and Retrieval
 
-Embedding models are often used in retrieval-augmented generation (RAG) flows, both as part of indexing data as well as later retrieving it. For more detailed instructions, please see our [RAG tutorials](/oss/langchain/rag).
+Embedding model은 데이터 인덱싱과 나중에 검색하는 과정 모두에서 retrieval-augmented generation (RAG) flow에 자주 사용됩니다. 자세한 지침은 [RAG tutorials](/oss/langchain/rag)을 참조하세요.
 
-Below, see how to index and retrieve data using the `embeddings` object we initialized above. In this example, we will index and retrieve a sample document in the `InMemoryVectorStore`.
+아래에서는 위에서 초기화한 `embeddings` 객체를 사용하여 데이터를 인덱싱하고 검색하는 방법을 확인할 수 있습니다. 이 예제에서는 `InMemoryVectorStore`에서 샘플 문서를 인덱싱하고 검색합니다.
 
 ```python
 # Create a vector store with a sample text
@@ -147,13 +147,13 @@ retrieved_documents[0].page_content
 
 ## Direct Usage
 
-Under the hood, the vectorstore and retriever implementations are calling `embeddings.embed_documents(...)` and `embeddings.embed_query(...)` to create embeddings for the text(s) used in `from_texts` and retrieval `invoke` operations, respectively.
+내부적으로 vectorstore와 retriever 구현은 `embeddings.embed_documents(...)`와 `embeddings.embed_query(...)`를 호출하여 각각 `from_texts`와 retrieval `invoke` 작업에 사용되는 텍스트에 대한 embedding을 생성합니다.
 
-You can directly call these methods to get embeddings for your own use cases.
+이러한 method를 직접 호출하여 자신의 사용 사례에 맞는 embedding을 얻을 수 있습니다.
 
 ### Embed single texts
 
-You can embed single texts or documents with `embed_query`:
+`embed_query`로 단일 텍스트나 문서를 embedding할 수 있습니다:
 
 ```python
 text = "This is a test document."
@@ -168,7 +168,7 @@ query_result[:5]
 
 ### Embed multiple texts
 
-You can embed multiple texts with `embed_documents`:
+`embed_documents`로 여러 텍스트를 embedding할 수 있습니다:
 
 ```python
 texts = ["This is a content of the document", "This is another document"]
@@ -183,4 +183,4 @@ doc_result[0][:5]
 
 ## API reference
 
-For detailed documentation of all `WatsonxEmbeddings` features and configurations head to the [API reference](https://python.langchain.com/api_reference/ibm/embeddings/langchain_ibm.embeddings.WatsonxEmbeddings.html).
+모든 `WatsonxEmbeddings` feature와 configuration에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/ibm/embeddings/langchain_ibm.embeddings.WatsonxEmbeddings.html)를 참조하세요.

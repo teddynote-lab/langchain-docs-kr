@@ -1,129 +1,129 @@
 ---
-title: Log LLM calls
-sidebarTitle: Log LLM calls
+title: LLM 호출 로그 남기기
+sidebarTitle: LLM 호출 로그 남기기
 ---
 
-This guide will cover how to log LLM calls to LangSmith when you are using a custom model or a custom input/output format. To make the most of LangSmith's LLM trace processing, you should log your LLM traces in one of the specified formats.
+이 가이드에서는 커스텀 모델이나 커스텀 입력/출력 포맷을 사용할 때 LangSmith에 LLM 호출을 어떻게 로그하는지 다룹니다. LangSmith의 LLM 트레이스 처리 기능을 최대한 활용하려면, 지정된 포맷 중 하나로 LLM 트레이스를 기록해야 합니다.
 
-LangSmith offers the following benefits for LLM traces:
-- Rich, structured rendering of message lists
-- Token and cost tracking per LLM call, per trace and across traces over time
+LangSmith는 LLM 트레이스에 대해 다음과 같은 이점을 제공합니다:
+- 메시지 리스트의 풍부하고 구조화된 렌더링
+- LLM 호출별, 트레이스별, 그리고 시간에 따른 토큰 및 비용 추적
 
-If you don't log your LLM traces in the suggested formats, you will still be able to log the data to LangSmith, but it may not be processed or rendered in expected ways.
+추천된 포맷으로 LLM 트레이스를 기록하지 않더라도 데이터를 LangSmith에 로그할 수 있지만, 예상한 방식으로 처리되거나 렌더링되지 않을 수 있습니다.
 
-If you are using [LangChain OSS](https://python.langchain.com/docs/tutorials/llm_chain/) to call language models or LangSmith wrappers ([OpenAI](/langsmith/trace-openai), [Anthropic](/langsmith/trace-anthropic)), these approaches will automatically log traces in the correct format.
+[LangChain OSS](https://python.langchain.com/docs/tutorials/llm_chain/)를 사용하여 언어 모델을 호출하거나 LangSmith 래퍼([OpenAI](/langsmith/trace-openai), [Anthropic](/langsmith/trace-anthropic))를 사용하는 경우, 이러한 접근 방식은 올바른 포맷으로 트레이스를 자동으로 기록합니다.
 
 <Note>
-The examples on this page use the `traceable` decorator/wrapper to log the model run (which is the recommended approach for Python and JS/TS). However, the same idea applies if you are using the [RunTree](/langsmith/annotate-code#use-the-runtree-api) or [API](https://api.smith.langchain.com/redoc) directly.
+이 페이지의 예제들은 모델 실행을 로그하기 위해 `traceable` 데코레이터/래퍼를 사용합니다(파이썬 및 JS/TS에서 권장되는 방식). 하지만 동일한 아이디어는 [RunTree](/langsmith/annotate-code#use-the-runtree-api)나 [API](https://api.smith.langchain.com/redoc)를 직접 사용할 때도 적용됩니다.
 </Note>
 
 
-## Messages Format
+## 메시지 포맷
 
-When tracing a custom model or a custom input/output format, it must either follow the LangChain format, OpenAI completions format or Anthropic messages format. For more details,  refer to the [OpenAI Chat Completions](https://platform.openai.com/docs/api-reference/chat/create) or [Anthropic Messages](https://docs.claude.com/en/api/messages) documentation. The LangChain format is:
+커스텀 모델이나 커스텀 입력/출력 포맷을 추적할 때는 LangChain 포맷, OpenAI completions 포맷, 또는 Anthropic messages 포맷 중 하나를 따라야 합니다. 자세한 내용은 [OpenAI Chat Completions](https://platform.openai.com/docs/api-reference/chat/create) 또는 [Anthropic Messages](https://docs.claude.com/en/api/messages) 문서를 참고하세요. LangChain 포맷은 다음과 같습니다:
 
 
  <Expandable title="LangChain format">
 
 <ParamField path="messages" type="array" required>
-  A list of messages containing the content of the conversation.
+  대화의 내용을 담고 있는 메시지 리스트입니다.
 
     <ParamField path="role" type="string" required>
-  Identifies the message type. One of: <code>system</code> | <code>reasoning</code> | <code>user</code> | <code>assistant</code> | <code>tool</code>
+  메시지 타입을 식별합니다. 다음 중 하나: <code>system</code> | <code>reasoning</code> | <code>user</code> | <code>assistant</code> | <code>tool</code>
 </ParamField>
 
     <ParamField path="content" type="array" required>
-      Content of the message. List of typed dictionaries.
+      메시지의 내용입니다. 타입이 지정된 딕셔너리 리스트입니다.
 
       <Expandable title="Content options">
         <ParamField path="type" type="string" required>
-          One of: <code>text</code> | <code>image</code> | <code>file</code> | <code>audio</code> | <code>video</code> | <code>tool_call</code> | <code>server_tool_call</code> | <code>server_tool_result</code>.
+          다음 중 하나: <code>text</code> | <code>image</code> | <code>file</code> | <code>audio</code> | <code>video</code> | <code>tool_call</code> | <code>server_tool_call</code> | <code>server_tool_result</code>.
         </ParamField>
 
         <Expandable title="text">
           <ParamField path="type" type="literal('text')" required />
           <ParamField path="text" type="string" required>
-            Text content.
+            텍스트 내용입니다.
           </ParamField>
         <ParamField path="annotations" type="object[]">
-            List of annotations for the text
+            텍스트에 대한 annotation 리스트
         </ParamField>
         <ParamField path="extras" type="object">
-            Additional provider-specific data.
+            추가적인 provider별 데이터입니다.
         </ParamField>
         </Expandable>
 
         <Expandable title="reasoning">
           <ParamField path="type" type="literal('reasoning')" required />
           <ParamField path="text" type="string" required>
-            Text content.
+            텍스트 내용입니다.
           </ParamField>
         <ParamField path="extras" type="object">
-            Additional provider-specific data.
+            추가적인 provider별 데이터입니다.
         </ParamField>
         </Expandable>
 
         <Expandable title="image">
           <ParamField path="type" type="literal('image')" required />
           <ParamField path="url" type="string">
-            URL pointing to the image location.
+            이미지 위치를 가리키는 URL입니다.
           </ParamField>
         <ParamField path="base64" type="string" required>
-            Base64-encoded image data.
+            Base64로 인코딩된 이미지 데이터입니다.
           </ParamField>
           <ParamField path="id" type="string">
-            Reference ID to an externally stored image (e.g., in a provider’s file system or in a bucket).
+            외부에 저장된 이미지의 참조 ID(예: provider의 파일 시스템 또는 버킷).
           </ParamField>
           <ParamField path="mime_type" type="string">
-            Image [MIME type](https://www.iana.org/assignments/media-types/media-types.xhtml#image) (e.g., `image/jpeg`, `image/png`).
+            이미지 [MIME 타입](https://www.iana.org/assignments/media-types/media-types.xhtml#image) (예: `image/jpeg`, `image/png`).
           </ParamField>
         </Expandable>
 
         <Expandable title="file (e.g., PDFs)">
           <ParamField path="type" type="literal('file')" required />
           <ParamField path="url" type="string">
-            URL pointing to the file.
+            파일을 가리키는 URL입니다.
           </ParamField>
         <ParamField path="base64" type="string" required>
-            Base64-encoded file data.
+            Base64로 인코딩된 파일 데이터입니다.
           </ParamField>
           <ParamField path="id" type="string">
-            Reference ID to an externally stored file (e.g., in a provider’s file system or in a bucket).
+            외부에 저장된 파일의 참조 ID(예: provider의 파일 시스템 또는 버킷).
           </ParamField>
           <ParamField path="mime_type" type="string">
-            File [MIME type](https://www.iana.org/assignments/media-types/media-types.xhtml#image) (e.g., `application/pdf`).
+            파일 [MIME 타입](https://www.iana.org/assignments/media-types/media-types.xhtml#image) (예: `application/pdf`).
           </ParamField>
         </Expandable>
 
         <Expandable title="audio">
           <ParamField path="type" type="literal('audio')" required />
           <ParamField path="url" type="string">
-            URL pointing to the audio file.
+            오디오 파일을 가리키는 URL입니다.
           </ParamField>
         <ParamField path="base64" type="string" required>
-            Base64-encoded audio data.
+            Base64로 인코딩된 오디오 데이터입니다.
           </ParamField>
           <ParamField path="id" type="string">
-            Reference ID to an externally stored audio file (e.g., in a provider’s file system or in a bucket).
+            외부에 저장된 오디오 파일의 참조 ID(예: provider의 파일 시스템 또는 버킷).
           </ParamField>
           <ParamField path="mime_type" type="string">
-            Audio [MIME type](https://www.iana.org/assignments/media-types/media-types.xhtml#image) (e.g., `audio/mpeg`, `audio/wav`).
+            오디오 [MIME 타입](https://www.iana.org/assignments/media-types/media-types.xhtml#image) (예: `audio/mpeg`, `audio/wav`).
           </ParamField>
         </Expandable>
 
         <Expandable title="video">
           <ParamField path="type" type="literal('video')" required />
           <ParamField path="url" type="string">
-            URL pointing to the video file.
+            비디오 파일을 가리키는 URL입니다.
           </ParamField>
         <ParamField path="base64" type="string" required>
-            Base64-encoded video data.
+            Base64로 인코딩된 비디오 데이터입니다.
           </ParamField>
           <ParamField path="id" type="string">
-            Reference ID to an externally stored video file (e.g., in a provider’s file system or in a bucket).
+            외부에 저장된 비디오 파일의 참조 ID(예: provider의 파일 시스템 또는 버킷).
           </ParamField>
           <ParamField path="mime_type" type="string">
-            Video [MIME type](https://www.iana.org/assignments/media-types/media-types.xhtml#image) (e.g., `video/mp4`, `video/webm`).
+            비디오 [MIME 타입](https://www.iana.org/assignments/media-types/media-types.xhtml#image) (예: `video/mp4`, `video/webm`).
           </ParamField>
         </Expandable>
 
@@ -131,39 +131,39 @@ When tracing a custom model or a custom input/output format, it must either foll
           <ParamField path="type" type="literal('tool_call')" required />
           <ParamField path="name" type="string" />
           <ParamField path="args" type="object" required>
-            Arguments to pass to the tool.
+            툴에 전달할 인자입니다.
           </ParamField>
           <ParamField path="id" type="string">
-            Unique identifier for this tool call.
+            이 툴 호출의 고유 식별자입니다.
           </ParamField>
         </Expandable>
 
         <Expandable title="server_tool_call">
           <ParamField path="type" type="literal('server_tool_call')" required />
           <ParamField path="id" type="string" required >
-            Unique identifier for this tool call.
+            이 툴 호출의 고유 식별자입니다.
           </ParamField>
           <ParamField path="name" type="string" required>
-            The name of the tool to be called.
+            호출할 툴의 이름입니다.
           </ParamField>
           <ParamField path="args" type="object" required>
-            Arguments to pass to the tool.
+            툴에 전달할 인자입니다.
           </ParamField>
         </Expandable>
 
         <Expandable title="server_tool_result">
           <ParamField path="type" type="literal('server_tool_result')" required />
           <ParamField path="tool_call_id" type="string" required>
-            Identifier of the corresponding server tool call.
+            해당 server tool call의 식별자입니다.
           </ParamField>
           <ParamField path="id" type="string">
-            Unique identifier for this tool call.
+            이 툴 호출의 고유 식별자입니다.
           </ParamField>
         <ParamField path="status" type="string" required>
-            Execution status of the server-side tool. One of: <code>success</code> | <code>error</code>.
+            서버 측 툴의 실행 상태입니다. 다음 중 하나: <code>success</code> | <code>error</code>.
           </ParamField>
           <ParamField path="output">
-            Output of the executed tool.
+            실행된 툴의 출력값입니다.
           </ParamField>
         </Expandable>
 
@@ -172,18 +172,18 @@ When tracing a custom model or a custom input/output format, it must either foll
     </ParamField>
 
     <ParamField path="tool_call_id" type="string">
-    Must match the <code>id</code> of a prior <code>assistant</code> message’s <code>tool_calls[i]</code> entry. Only valid when <code>role</code> is <code>tool</code>.
+    이전 <code>assistant</code> 메시지의 <code>tool_calls[i]</code> 항목의 <code>id</code>와 일치해야 합니다. <code>role</code>이 <code>tool</code>일 때만 유효합니다.
     </ParamField>
 
     <ParamField path="usage_metadata" type="object">
-    Use this field to send token counts and/or costs with your model's output. See [this guide](/langsmith/log-llm-trace#provide-token-and-cost-information) for more details.
+    모델의 출력과 함께 토큰 수 및/또는 비용을 전송하려면 이 필드를 사용하세요. 자세한 내용은 [이 가이드](/langsmith/log-llm-trace#provide-token-and-cost-information)를 참고하세요.
     </ParamField>
 </ParamField>
 
 </Expandable>
 
 
-### Examples
+### 예시
 <CodeGroup>
 
 ```python Text and reasoning
@@ -349,13 +349,13 @@ output = {
 </CodeGroup>
 
 
-## Converting custom I/O formats into LangSmith compatible formats
+## 커스텀 I/O 포맷을 LangSmith 호환 포맷으로 변환하기
 
-If you're using a custom input or output format, you can convert it to a LangSmith compatible format using `process_inputs`/`processInputs` and `process_outputs`/`processOutputs` functions on the [`@traceable` decorator](https://docs.smith.langchain.com/reference/python/run_helpers/langsmith.run_helpers.traceable) (Python) or [`traceable` function](https://docs.smith.langchain.com/reference/js/functions/traceable.traceable) (TS).
+커스텀 입력 또는 출력 포맷을 사용하는 경우, [`@traceable` 데코레이터](https://docs.smith.langchain.com/reference/python/run_helpers/langsmith.run_helpers.traceable)(파이썬) 또는 [`traceable` 함수](https://docs.smith.langchain.com/reference/js/functions/traceable.traceable)(TS)의 `process_inputs`/`processInputs` 및 `process_outputs`/`processOutputs` 함수를 사용하여 LangSmith 호환 포맷으로 변환할 수 있습니다.
 
-`process_inputs`/`processInputs` and `process_outputs`/`processOutputs` accept functions that allow you to transform the inputs and outputs of a specific trace before they are logged to LangSmith. They have access to the trace's inputs and outputs, and can return a new dictionary with the processed data.
+`process_inputs`/`processInputs`와 `process_outputs`/`processOutputs`는 특정 트레이스의 입력과 출력을 LangSmith에 로그하기 전에 변환할 수 있는 함수를 받습니다. 이 함수들은 트레이스의 입력과 출력에 접근할 수 있으며, 처리된 데이터를 담은 새로운 딕셔너리를 반환할 수 있습니다.
 
-Here's a boilerplate example of how to use `process_inputs` and `process_outputs` to convert a custom I/O format into a LangSmith compatible format:
+아래는 커스텀 I/O 포맷을 LangSmith 호환 포맷으로 변환하기 위해 `process_inputs`와 `process_outputs`를 사용하는 기본 예제입니다:
 
 <Expandable title="the code">
 <CodeGroup>
@@ -392,12 +392,12 @@ def chat_model(inputs: dict) -> dict:
 </Expandable>
 
 
-## Identifying a custom model in traces
+## 트레이스에서 커스텀 모델 식별하기
 
-When using a custom model, it is recommended to also provide the following `metadata` fields to identify the model when viewing traces and when filtering.
+커스텀 모델을 사용할 때는 트레이스에서 모델을 식별하고 필터링할 수 있도록 다음과 같은 `metadata` 필드를 함께 제공하는 것이 좋습니다.
 
-* `ls_provider`: The provider of the model, eg "openai", "anthropic", etc.
-* `ls_model_name`: The name of the model, eg "gpt-4o-mini", "claude-3-opus-20240307", etc.
+* `ls_provider`: 모델의 제공자, 예시 "openai", "anthropic" 등
+* `ls_model_name`: 모델의 이름, 예시 "gpt-4o-mini", "claude-3-opus-20240307" 등
 
 <CodeGroup>
 
@@ -486,22 +486,22 @@ await chatModel({ messages });
 
 </CodeGroup>
 
-This code will log the following trace:
+이 코드는 다음과 같은 트레이스를 로그합니다:
 
 <div style={{ textAlign: 'center' }}>
 <img
     className="block dark:hidden"
     src="/langsmith/images/chat-model-light.png"
-    alt="LangSmith UI showing an LLM call trace called ChatOpenAI with a system and human input followed by an AI Output."
+    alt="LangSmith UI에서 ChatOpenAI라는 LLM 호출 트레이스가 system, human 입력과 AI Output으로 표시된 모습."
 />
 
 <img
     className="hidden dark:block"
     src="/langsmith/images/chat-model-dark.png"
-    alt="LangSmith UI showing an LLM call trace called ChatOpenAI with a system and human input followed by an AI Output."
+    alt="LangSmith UI에서 ChatOpenAI라는 LLM 호출 트레이스가 system, human 입력과 AI Output으로 표시된 모습."
 />
 </div>
-If you implement a custom streaming chat_model, you can "reduce" the outputs into the same format as the non-streaming version. This is currently only supported in Python.
+커스텀 스트리밍 chat_model을 구현하는 경우, 출력값을 비스트리밍 버전과 동일한 포맷으로 "reduce"할 수 있습니다. 이는 현재 파이썬에서만 지원됩니다.
 
 ```python
 def _reduce_chunks(chunks: list):
@@ -537,29 +537,29 @@ list(
 ```
 
 <Check>
-If `ls_model_name` is not present in `extra.metadata`, other fields might be used from the `extra.metadata` for estimating token counts. The following fields are used in the order of precedence:
+`ls_model_name`이 `extra.metadata`에 없으면, 토큰 수 추정에 다음 필드들이 우선순위대로 사용될 수 있습니다:
 
 1. `metadata.ls_model_name`
 2. `inputs.model`
 3. `inputs.model_name`
 </Check>
 
-To learn more about how to use the `metadata` fields, refer to the [Add metadata and tags](/langsmith/add-metadata-tags) guide.
+`metadata` 필드 사용법에 대해 더 알고 싶다면 [Add metadata and tags](/langsmith/add-metadata-tags) 가이드를 참고하세요.
 
 
-## Provide token and cost information
+## 토큰 및 비용 정보 제공하기
 
-LangSmith calculates costs automatically by using the [model pricing table](https://smith.langchain.com/settings/workspaces/models) when token counts are provided. To learn how LangSmith calculates token-based costs, see [this guide](/langsmith/calculate-token-based-costs).
+LangSmith는 토큰 수가 제공되면 [모델 가격표](https://smith.langchain.com/settings/workspaces/models)를 사용하여 비용을 자동으로 계산합니다. LangSmith가 토큰 기반 비용을 어떻게 계산하는지 알고 싶다면 [이 가이드](/langsmith/calculate-token-based-costs)를 참고하세요.
 
-Many models include token counts as part of the response. You can provide token counts to LangSmith in one of two ways:
+많은 모델들이 응답에 토큰 수를 포함합니다. LangSmith에 토큰 수를 제공하는 방법은 두 가지입니다:
 
-1. Extract usage within your traced function and set a `usage_metadata` field on the run's metadata.
-2. Return a `usage_metadata` field in your traced function outputs.
+1. 추적된 함수 내에서 사용량을 추출하여 run의 metadata에 `usage_metadata` 필드를 설정합니다.
+2. 추적된 함수의 출력값에 `usage_metadata` 필드를 반환합니다.
 
-In both cases, the usage metadata you send should contain a subset of the following LangSmith-recognized fields:
+두 경우 모두, 전송하는 usage metadata에는 LangSmith가 인식하는 다음 필드 중 일부가 포함되어야 합니다:
 
 <Warning>
-You cannot set any fields other than the ones listed below. You do not need to include all fields.
+아래에 나열된 필드 외에는 설정할 수 없습니다. 모든 필드를 포함할 필요는 없습니다.
 </Warning>
 
 ```python
@@ -586,14 +586,14 @@ class UsageMetadata(TypedDict, total=False):
     """The cost details of the output tokens."""
 ```
 
-Note that the usage data can also include cost information, in case you do not want to rely on LangSmith's token-based cost formula. This is useful for models with pricing that is not linear by token type.
+사용량 데이터에 비용 정보도 포함할 수 있습니다. LangSmith의 토큰 기반 비용 공식에 의존하지 않으려는 경우에 유용합니다. 이는 토큰 타입별로 가격이 선형적이지 않은 모델에 적합합니다.
 
-### Setting run metadata
+### 실행(run) metadata 설정하기
 
-You can [modify the current run's metadata](/langsmith/add-metadata-tags) with usage information within your traced function. The advantage of this approach is that you do not need to change your traced function's runtime outputs. Here's an example:
+추적된 함수 내에서 사용량 정보를 포함하여 [현재 실행의 metadata를 수정](/langsmith/add-metadata-tags)할 수 있습니다. 이 방식의 장점은 함수의 런타임 출력값을 변경할 필요가 없다는 점입니다. 예시는 다음과 같습니다:
 
 <Note>
-Requires `langsmith>=0.3.43` (Python) and `langsmith>=0.3.30` (JS/TS).
+`langsmith>=0.3.43`(파이썬) 및 `langsmith>=0.3.30`(JS/TS)이 필요합니다.
 </Note>
 
 <CodeGroup>
@@ -687,9 +687,9 @@ await chatModel({ messages });
 
 </CodeGroup>
 
-### Setting run outputs
+### 실행(run) 출력값 설정하기
 
-You can add a `usage_metadata` key to the function's response to set manual token counts and costs.
+함수의 응답에 `usage_metadata` 키를 추가하여 토큰 수와 비용을 수동으로 설정할 수 있습니다.
 
 <CodeGroup>
 
@@ -778,12 +778,12 @@ await chatModel({ messages });
 
 </CodeGroup>
 
-## Time-to-first-token
+## 첫 번째 토큰까지의 시간(Time-to-first-token)
 
-If you are using `traceable` or one of our SDK wrappers, LangSmith will automatically populate time-to-first-token for streaming LLM runs.
-However, if you are using the `RunTree` API directly, you will need to add a `new_token` event to the run tree in order to properly populate time-to-first-token.
+`traceable` 또는 SDK 래퍼를 사용하는 경우, LangSmith는 스트리밍 LLM 실행에 대해 첫 번째 토큰까지의 시간을 자동으로 기록합니다.
+하지만 `RunTree` API를 직접 사용하는 경우, 첫 번째 토큰까지의 시간을 올바르게 기록하려면 run tree에 `new_token` 이벤트를 추가해야 합니다.
 
-Here's an example:
+예시는 다음과 같습니다:
 
 <CodeGroup>
 

@@ -1,22 +1,22 @@
 ---
-title: Prevent logging of sensitive data in traces
-sidebarTitle: Prevent logging of sensitive data in traces
+title: trace에서 민감한 데이터 로깅 방지
+sidebarTitle: trace에서 민감한 데이터 로깅 방지
 ---
 
-In some situations, you may need to prevent the inputs and outputs of your traces from being logged for privacy or security reasons. LangSmith provides a way to filter the inputs and outputs of your traces before they are sent to the LangSmith backend.
+일부 상황에서는 개인정보 보호 또는 보안상의 이유로 trace의 입력 및 출력이 로깅되는 것을 방지해야 할 수 있습니다. LangSmith는 trace의 입력 및 출력이 LangSmith 백엔드로 전송되기 전에 필터링할 수 있는 방법을 제공합니다.
 
-If you want to completely hide the inputs and outputs of your traces, you can set the following environment variables when running your application:
+trace의 입력 및 출력을 완전히 숨기려면 애플리케이션을 실행할 때 다음 환경 변수를 설정할 수 있습니다:
 
 ```bash
 LANGSMITH_HIDE_INPUTS=true
 LANGSMITH_HIDE_OUTPUTS=true
 ```
 
-This works for both the LangSmith SDK (Python and TypeScript) and LangChain.
+이는 LangSmith SDK(Python 및 TypeScript)와 LangChain 모두에서 작동합니다.
 
-You can also customize and override this behavior for a given `Client` instance. This can be done by setting the `hide_inputs` and `hide_outputs` parameters on the `Client` object (`hideInputs` and `hideOutputs` in TypeScript).
+특정 `Client` 인스턴스에 대해 이 동작을 사용자 정의하고 재정의할 수도 있습니다. 이는 `Client` 객체에서 `hide_inputs` 및 `hide_outputs` 매개변수를 설정하여 수행할 수 있습니다(TypeScript에서는 `hideInputs` 및 `hideOutputs`).
 
-For the example below, we will simply return an empty object for both `hide_inputs` and `hide_outputs`, but you can customize this to your needs.
+아래 예제에서는 `hide_inputs` 및 `hide_outputs` 모두에 대해 빈 객체를 반환하지만, 필요에 따라 사용자 정의할 수 있습니다.
 
 <CodeGroup>
 
@@ -85,20 +85,20 @@ await openaiClient.chat.completions.create({
 
 </CodeGroup>
 
-## Rule-based masking of inputs and outputs
+## 입력 및 출력의 규칙 기반 마스킹
 
 <Info>
-This feature is available in the following LangSmith SDK versions:
+이 기능은 다음 LangSmith SDK 버전에서 사용할 수 있습니다:
 
-* Python: 0.1.81 and above
-* TypeScript: 0.1.33 and above
+* Python: 0.1.81 이상
+* TypeScript: 0.1.33 이상
 </Info>
 
-To mask specific data in inputs and outputs, you can use the `create_anonymizer` / `createAnonymizer` function and pass the newly created anonymizer when instantiating the client. The anonymizer can be either constructed from a list of regex patterns and the replacement values or from a function that accepts and returns a string value.
+입력 및 출력의 특정 데이터를 마스킹하려면 `create_anonymizer` / `createAnonymizer` 함수를 사용하고 client를 인스턴스화할 때 새로 생성된 anonymizer를 전달할 수 있습니다. anonymizer는 정규식 패턴 목록과 대체 값으로 구성하거나 문자열 값을 받아 반환하는 함수로 구성할 수 있습니다.
 
-The anonymizer will be skipped for inputs if `LANGSMITH_HIDE_INPUTS = true`. Same applies for outputs if `LANGSMITH_HIDE_OUTPUTS = true`.
+`LANGSMITH_HIDE_INPUTS = true`인 경우 입력에 대해 anonymizer가 건너뛰어집니다. `LANGSMITH_HIDE_OUTPUTS = true`인 경우 출력에 대해서도 동일하게 적용됩니다.
 
-However, if inputs or outputs are to be sent to client, the `anonymizer` method will take precedence over functions found in `hide_inputs` and `hide_outputs`. By default, the `create_anonymizer` will only look at maximum of 10 nesting levels deep, which can be configured via the `max_depth` parameter.
+그러나 입력 또는 출력이 client로 전송되는 경우 `anonymizer` 메서드가 `hide_inputs` 및 `hide_outputs`에 있는 함수보다 우선합니다. 기본적으로 `create_anonymizer`는 최대 10개의 중첩 레벨까지만 확인하며, 이는 `max_depth` 매개변수를 통해 구성할 수 있습니다.
 
 <CodeGroup>
 
@@ -150,15 +150,15 @@ const main = traceable(async (inputs: any) => {
 
 </CodeGroup>
 
-Please note, that using the anonymizer might incur a performance hit with complex regular expressions or large payloads, as the anonymizer serializes the payload to JSON before processing.
+anonymizer를 사용하면 복잡한 정규식이나 큰 페이로드의 경우 anonymizer가 처리하기 전에 페이로드를 JSON으로 직렬화하므로 성능 저하가 발생할 수 있습니다.
 
 <Note>
-Improving the performance of `anonymizer` API is on our roadmap! If you are encountering performance issues, please contact us at [support@langchain.dev](mailto:support@langchain.dev).
+`anonymizer` API의 성능 개선은 로드맵에 있습니다! 성능 문제가 발생하는 경우 [support@langchain.dev](mailto:support@langchain.dev)로 문의해 주세요.
 </Note>
 
 ![](/langsmith/images/hide-inputs-outputs.png)
 
-Older versions of LangSmith SDKs can use the `hide_inputs` and `hide_outputs` parameters to achieve the same effect. You can also use these parameters to process the inputs and outputs more efficiently as well.
+이전 버전의 LangSmith SDK는 `hide_inputs` 및 `hide_outputs` 매개변수를 사용하여 동일한 효과를 얻을 수 있습니다. 이러한 매개변수를 사용하여 입력 및 출력을 보다 효율적으로 처리할 수도 있습니다.
 
 <CodeGroup>
 
@@ -257,17 +257,17 @@ await parent(inputs);
 
 </CodeGroup>
 
-## Processing Inputs & Outputs for a Single Function
+## 단일 함수에 대한 입력 및 출력 처리
 
 <Info>
-The `process_outputs` parameter is available in LangSmith SDK version 0.1.98 and above for Python.
+`process_outputs` 매개변수는 Python용 LangSmith SDK 버전 0.1.98 이상에서 사용할 수 있습니다.
 </Info>
 
-In addition to client-level input and output processing, LangSmith provides function-level processing through the `process_inputs` and `process_outputs` parameters of the `@traceable` decorator.
+client 레벨의 입력 및 출력 처리 외에도 LangSmith는 `@traceable` 데코레이터의 `process_inputs` 및 `process_outputs` 매개변수를 통해 함수 레벨 처리를 제공합니다.
 
-These parameters accept functions that allow you to transform the inputs and outputs of a specific function before they are logged to LangSmith. This is useful for reducing payload size, removing sensitive information, or customizing how an object should be serialized and represented in LangSmith for a particular function.
+이러한 매개변수는 특정 함수의 입력 및 출력이 LangSmith에 로깅되기 전에 변환할 수 있는 함수를 받습니다. 이는 페이로드 크기를 줄이거나, 민감한 정보를 제거하거나, 특정 함수에 대해 객체가 직렬화되고 LangSmith에 표시되는 방식을 사용자 정의하는 데 유용합니다.
 
-Here's an example of how to use `process_inputs` and `process_outputs`:
+다음은 `process_inputs` 및 `process_outputs`를 사용하는 방법의 예입니다:
 
 ```python
 from langsmith import traceable
@@ -294,13 +294,13 @@ def my_function(my_cool_key: str) -> int:
 result = my_function("example")
 ```
 
-In this example, `process_inputs` creates a new dictionary with processed input data, and `process_outputs` transforms the output into a specific format before logging to LangSmith.
+이 예제에서 `process_inputs`는 처리된 입력 데이터로 새 딕셔너리를 생성하고, `process_outputs`는 LangSmith에 로깅하기 전에 출력을 특정 형식으로 변환합니다.
 
 <Warning>
-It's recommended to avoid mutating the source objects in the processor functions. Instead, create and return new objects with the processed data.
+프로세서 함수에서 소스 객체를 변경하지 않는 것이 좋습니다. 대신 처리된 데이터로 새 객체를 생성하고 반환하세요.
 </Warning>
 
-For asynchronous functions, the usage is similar:
+비동기 함수의 경우 사용법은 유사합니다:
 
 ```python
 @traceable(process_inputs=process_inputs, process_outputs=process_outputs)
@@ -309,19 +309,19 @@ async def async_function(key: str) -> int:
     return len(key)
 ```
 
-These function-level processors take precedence over client-level processors (`hide_inputs` and `hide_outputs`) when both are defined.
+이러한 함수 레벨 프로세서는 둘 다 정의된 경우 client 레벨 프로세서(`hide_inputs` 및 `hide_outputs`)보다 우선합니다.
 
-## Quick starts
+## 빠른 시작
 
-You can combine rule-based masking with various anonymizers to scrub sensitive information from inputs and outputs. In this how-to-guide, we'll cover working with regex, Microsoft Presidio, and Amazon Comprehend.
+규칙 기반 마스킹을 다양한 anonymizer와 결합하여 입력 및 출력에서 민감한 정보를 제거할 수 있습니다. 이 가이드에서는 regex, Microsoft Presidio 및 Amazon Comprehend 작업을 다룹니다.
 
 ### Regex
 
 <Info>
-The implementation below is not exhaustive and may miss some formats or edge cases. Test any implementation thoroughly before using it in production.
+아래 구현은 완전하지 않으며 일부 형식이나 엣지 케이스를 놓칠 수 있습니다. 프로덕션에서 사용하기 전에 모든 구현을 철저히 테스트하세요.
 </Info>
 
-You can use regex to mask inputs and outputs before they are sent to LangSmith. The implementation below masks email addresses, phone numbers, full names, credit card numbers, and SSNs.
+regex를 사용하여 LangSmith로 전송되기 전에 입력 및 출력을 마스킹할 수 있습니다. 아래 구현은 이메일 주소, 전화번호, 전체 이름, 신용카드 번호 및 SSN을 마스킹합니다.
 
 ```python
 import re
@@ -408,19 +408,19 @@ response_without_anonymization = openai_client.chat.completions.create(
 )
 ```
 
-The anonymized run will look like this in LangSmith: ![Anonymized run](/langsmith/images/regex-anonymized.png)
+익명화된 run은 LangSmith에서 다음과 같이 표시됩니다: ![Anonymized run](/langsmith/images/regex-anonymized.png)
 
-The non-anonymized run will look like this in LangSmith: ![Non-anonymized run](/langsmith/images/regex-not-anonymized.png)
+익명화되지 않은 run은 LangSmith에서 다음과 같이 표시됩니다: ![Non-anonymized run](/langsmith/images/regex-not-anonymized.png)
 
 ### Microsoft Presidio
 
 <Info>
-The implementation below provides a general example of how to anonymize sensitive information in messages exchanged between a user and an LLM. It is not exhaustive and does not account for all cases. Test any implementation thoroughly before using it in production.
+아래 구현은 사용자와 LLM 간에 교환되는 메시지의 민감한 정보를 익명화하는 방법에 대한 일반적인 예제를 제공합니다. 이는 완전하지 않으며 모든 경우를 고려하지 않습니다. 프로덕션에서 사용하기 전에 모든 구현을 철저히 테스트하세요.
 </Info>
 
-Microsoft Presidio is a data protection and de-identification SDK. The implementation below uses Presidio to anonymize inputs and outputs before they are sent to LangSmith. For up to date information, please refer to Presidio's [official documentation](https://microsoft.github.io/presidio/).
+Microsoft Presidio는 데이터 보호 및 비식별화 SDK입니다. 아래 구현은 Presidio를 사용하여 LangSmith로 전송되기 전에 입력 및 출력을 익명화합니다. 최신 정보는 Presidio의 [공식 문서](https://microsoft.github.io/presidio/)를 참조하세요.
 
-To use Presidio and its spaCy model, install the following:
+Presidio와 spaCy 모델을 사용하려면 다음을 설치하세요:
 
 <CodeGroup>
 ```bash pip
@@ -436,7 +436,7 @@ python -m spacy download en_core_web_lg
 ```
 </CodeGroup>
 
-Also, install OpenAI:
+또한 OpenAI를 설치하세요:
 
 <CodeGroup>
 ```bash pip
@@ -518,19 +518,19 @@ response_without_anonymization = openai_client.chat.completions.create(
 )
 ```
 
-The anonymized run will look like this in LangSmith: ![Anonymized run](/langsmith/images/presidio-anonymized.png)
+익명화된 run은 LangSmith에서 다음과 같이 표시됩니다: ![Anonymized run](/langsmith/images/presidio-anonymized.png)
 
-The non-anonymized run will look like this in LangSmith: ![Non-anonymized run](/langsmith/images/presidio-not-anonymized.png)
+익명화되지 않은 run은 LangSmith에서 다음과 같이 표시됩니다: ![Non-anonymized run](/langsmith/images/presidio-not-anonymized.png)
 
 ### Amazon Comprehend
 
 <Info>
-The implementation below provides a general example of how to anonymize sensitive information in messages exchanged between a user and an LLM. It is not exhaustive and does not account for all cases. Test any implementation thoroughly before using it in production.
+아래 구현은 사용자와 LLM 간에 교환되는 메시지의 민감한 정보를 익명화하는 방법에 대한 일반적인 예제를 제공합니다. 이는 완전하지 않으며 모든 경우를 고려하지 않습니다. 프로덕션에서 사용하기 전에 모든 구현을 철저히 테스트하세요.
 </Info>
 
-Comprehend is a natural language processing service that can detect personally identifiable information. The implementation below uses Comprehend to anonymize inputs and outputs before they are sent to LangSmith. For up to date information, please refer to Comprehend's [official documentation](https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DetectPiiEntities.html).
+Comprehend는 개인 식별 정보를 감지할 수 있는 자연어 처리 서비스입니다. 아래 구현은 Comprehend를 사용하여 LangSmith로 전송되기 전에 입력 및 출력을 익명화합니다. 최신 정보는 Comprehend의 [공식 문서](https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DetectPiiEntities.html)를 참조하세요.
 
-To use Comprehend, install [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html):
+Comprehend를 사용하려면 [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html)를 설치하세요:
 
 <CodeGroup>
 ```bash pip
@@ -542,7 +542,7 @@ uv add boto3
 ```
 </CodeGroup>
 
-Also, install OpenAI:
+또한 OpenAI를 설치하세요:
 
 <CodeGroup>
 ```bash pip
@@ -554,7 +554,7 @@ uv add openai
 ```
 </CodeGroup>
 
-You will need to set up credentials in AWS and authenticate using the AWS CLI. Follow the instructions [here](https://docs.aws.amazon.com/comprehend/latest/dg/setting-up.html).
+AWS에서 자격 증명을 설정하고 AWS CLI를 사용하여 인증해야 합니다. [여기](https://docs.aws.amazon.com/comprehend/latest/dg/setting-up.html)의 지침을 따르세요.
 
 ```python
 import openai
@@ -660,6 +660,6 @@ response_without_anonymization = openai_client.chat.completions.create(
 )
 ```
 
-The anonymized run will look like this in LangSmith: ![Anonymized run](/langsmith/images/aws-comprehend-anonymized.png)
+익명화된 run은 LangSmith에서 다음과 같이 표시됩니다: ![Anonymized run](/langsmith/images/aws-comprehend-anonymized.png)
 
-The non-anonymized run will look like this in LangSmith: ![Non-anonymized run](/langsmith/images/aws-comprehend-not-anonymized.png)
+익명화되지 않은 run은 LangSmith에서 다음과 같이 표시됩니다: ![Non-anonymized run](/langsmith/images/aws-comprehend-not-anonymized.png)

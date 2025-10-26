@@ -1,25 +1,25 @@
 ---
 title: 'Agent Configuration'
-description: 'Making your agents configurable in the Open Agent Platform'
+description: 'Open Agent Platform에서 에이전트를 구성 가능하게 만들기'
 ---
 
 # Agent Configuration
 
-To allow your agent to be configurable in Open Agent Platform, you must set custom configuration metadata on your agent's configurable fields. There are currently three types of configurable fields:
+Open Agent Platform에서 에이전트를 구성 가능하게 하려면, 에이전트의 구성 가능한 필드에 사용자 정의 configuration metadata를 설정해야 합니다. 현재 세 가지 유형의 구성 가능한 필드가 있습니다:
 
-1. **General Agent Config:** This consists of general configuration settings like the model name, system prompt, temperature, etc. These are where essentially all of your custom configurable fields should go.
-2. **MCP Tools Config:** This is the config which defines the MCP server and tools to give your agent access to.
-3. **RAG Config:** This is the config which defines the RAG server, and collection name to give your agent access to.
+1. **General Agent Config:** 모델 이름, system prompt, temperature 등과 같은 일반적인 구성 설정으로 구성됩니다. 기본적으로 모든 사용자 정의 구성 가능한 필드는 여기에 포함되어야 합니다.
+2. **MCP Tools Config:** 에이전트에 접근 권한을 부여할 MCP server와 tool을 정의하는 config입니다.
+3. **RAG Config:** 에이전트에 접근 권한을 부여할 RAG server와 collection name을 정의하는 config입니다.
 
 <Note>
-This section assumes you have a basic understanding of configurable fields in LangGraph. If you do not, read the LangGraph documentation ([Python](/oss/langgraph/graph-api/#add-runtime-configuration), [TypeScript](https://langchain-ai.github.io/langgraphjs/how-tos/configuration/)) for more information.
+이 섹션은 LangGraph의 구성 가능한 필드에 대한 기본적인 이해가 있다고 가정합니다. 그렇지 않다면, 자세한 정보는 LangGraph 문서([Python](/oss/langgraph/graph-api/#add-runtime-configuration), [TypeScript](https://langchain-ai.github.io/langgraphjs/how-tos/configuration/))를 참조하세요.
 </Note>
 
 ## General Agent Config
 
-By default, Open Agent Platform will show *all* fields listed in your configurable object as configurable in the UI. Each field will be configurable via a simple text input. To add more complex configurable field types (e.g boolean, dropdown, slider, etc), you should add a `x_oap_ui_config` object to `metadata` on the field.
+기본적으로 Open Agent Platform은 구성 가능한 객체에 나열된 *모든* 필드를 UI에서 구성 가능한 것으로 표시합니다. 각 필드는 간단한 텍스트 입력을 통해 구성할 수 있습니다. 더 복잡한 구성 가능한 필드 유형(예: boolean, dropdown, slider 등)을 추가하려면, 필드의 `metadata`에 `x_oap_ui_config` 객체를 추가해야 합니다.
 
-Inside this object is where you define the custom UI config for that specific field. The available options are:
+이 객체 내부에서 해당 특정 필드에 대한 사용자 정의 UI config를 정의합니다. 사용 가능한 옵션은 다음과 같습니다:
 
 ```typescript
 export type ConfigurableFieldUIType =
@@ -87,7 +87,7 @@ export type ConfigurableFieldUIMetadata = {
 };
 ```
 
-Here's an example in TypeScript of how to define this configuration:
+다음은 TypeScript에서 이 구성을 정의하는 방법의 예시입니다:
 
 ```typescript TypeScript Configurable [expandable]
 import "@langchain/langgraph/zod";
@@ -187,7 +187,7 @@ export const GraphConfiguration = z.object({
 const workflow = new StateGraph(MyStateSchema, GraphConfiguration)
 ```
 
-And in Python, this would look like:
+Python에서는 다음과 같이 작성됩니다:
 
 ```python Python Configurable [expandable]
 from pydantic import BaseModel, Field
@@ -257,9 +257,9 @@ workflow = StateGraph(State, config_schema=GraphConfigPydantic)
 
 ## MCP Tools Config
 
-To allow an agent to be configurable with MCP tools in Open Agent Platform, you must set a specific `x_oap_config_type` metadata field on the configurable field. This field should be set to `oap_mcp_tools_config`. You only need to set this on a single field in your configurable object. Optionally, you can provide a default value for this field, which will be used when the user is creating a new agent.
+Open Agent Platform에서 에이전트가 MCP tool로 구성 가능하도록 하려면, 구성 가능한 필드에 특정 `x_oap_config_type` metadata 필드를 설정해야 합니다. 이 필드는 `oap_mcp_tools_config`로 설정되어야 합니다. 구성 가능한 객체의 단일 필드에만 이것을 설정하면 됩니다. 선택적으로, 이 필드에 기본값을 제공할 수 있으며, 사용자가 새 에이전트를 생성할 때 사용됩니다.
 
-Here's an example in TypeScript:
+다음은 TypeScript의 예시입니다:
 
 ```typescript TypeScript Configurable [expandable]
 export const MCPConfig = z.object({
@@ -303,7 +303,7 @@ export const GraphConfiguration = z.object({
 });
 ```
 
-And in Python:
+Python에서는:
 
 ```python Python Configurable [expandable]
 class MCPConfig(BaseModel):
@@ -344,9 +344,9 @@ class GraphConfigPydantic(BaseModel):
 
 ## RAG Config
 
-Configuring RAG is similar to MCP tools. You need to set a specific `x_oap_config_type` metadata field on the configurable field. This field should be set to `oap_rag_config`. You only need to set this on a single field in your configurable object.
+RAG 구성은 MCP tool과 유사합니다. 구성 가능한 필드에 특정 `x_oap_config_type` metadata 필드를 설정해야 합니다. 이 필드는 `oap_rag_config`로 설정되어야 합니다. 구성 가능한 객체의 단일 필드에만 이것을 설정하면 됩니다.
 
-Here's an example in TypeScript:
+다음은 TypeScript의 예시입니다:
 
 ```typescript TypeScript Configurable [expandable]
 export const RAGConfig = z.object({
@@ -385,7 +385,7 @@ export const GraphConfiguration = z.object({
 });
 ```
 
-And in Python:
+Python에서는:
 
 ```python Python Configurable [expandable]
 class RagConfig(BaseModel):
@@ -419,10 +419,10 @@ class GraphConfigPydantic(BaseModel):
 
 ## Troubleshooting
 
-If your configurable fields aren't showing up correctly in the OAP UI, check the following:
+구성 가능한 필드가 OAP UI에 올바르게 표시되지 않는 경우, 다음을 확인하세요:
 
-1. Make sure you've set the correct metadata fields on your configurable fields.
-2. Ensure your configurable field schema matches the expected schema.
-3. For select fields, make sure the options are formatted correctly.
-4. For validator functions, ensure they're valid JavaScript functions.
-5. If it's still not working, confirm your `x_oap_ui_config` metadata has the proper fields set.
+1. 구성 가능한 필드에 올바른 metadata 필드를 설정했는지 확인하세요.
+2. 구성 가능한 필드 schema가 예상되는 schema와 일치하는지 확인하세요.
+3. select 필드의 경우, option이 올바르게 형식화되었는지 확인하세요.
+4. validator function의 경우, 유효한 JavaScript function인지 확인하세요.
+5. 여전히 작동하지 않는다면, `x_oap_ui_config` metadata에 적절한 필드가 설정되어 있는지 확인하세요.

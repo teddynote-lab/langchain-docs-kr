@@ -2,12 +2,12 @@
 title: GPTRouter
 ---
 
-[GPTRouter](https://github.com/Writesonic/GPTRouter) is an open source LLM API Gateway that offers a universal API for 30+ LLMs, vision, and image models, with smart fallbacks based on uptime and latency, automatic retries, and streaming.
+[GPTRouter](https://github.com/Writesonic/GPTRouter)는 30개 이상의 LLM, vision 및 image model에 대한 범용 API를 제공하는 오픈 소스 LLM API Gateway입니다. 가동 시간과 지연 시간을 기반으로 한 스마트 fallback, 자동 재시도 및 streaming을 지원합니다.
 
-This notebook covers how to get started with using LangChain + the GPTRouter I/O library.
+이 노트북은 LangChain + GPTRouter I/O 라이브러리를 사용하여 시작하는 방법을 다룹니다.
 
-* Set `GPT_ROUTER_API_KEY` environment variable
-* or use the `gpt_router_api_key` keyword argument
+* `GPT_ROUTER_API_KEY` 환경 변수를 설정하거나
+* `gpt_router_api_key` 키워드 인자를 사용하세요
 
 ```python
 pip install -qU  GPTRouter
@@ -60,7 +60,7 @@ chat(messages)
 AIMessage(content=" J'aime programmer.")
 ```
 
-## `GPTRouter` also supports async and streaming functionality
+## `GPTRouter`는 async 및 streaming 기능도 지원합니다
 
 ```python
 from langchain_core.callbacks import CallbackManager, StreamingStdOutCallbackHandler

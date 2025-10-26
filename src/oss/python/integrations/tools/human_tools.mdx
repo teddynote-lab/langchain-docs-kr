@@ -1,9 +1,8 @@
 ---
-title: Human as a tool
+title: Human을 tool로 사용하기
 ---
 
-Human are AGI so they can certainly be used as a tool to help out AI agent
-when it is confused.
+Human은 AGI이므로 AI agent가 혼란스러워할 때 도움을 주는 tool로 확실히 사용될 수 있습니다.
 
 ```python
 pip install -qU  langchain-community
@@ -28,8 +27,8 @@ agent_chain = initialize_agent(
 )
 ```
 
-In the above code you can see the tool takes input directly from command line.
-You can customize `prompt_func` and `input_func` according to your need (as shown below).
+위 코드에서 tool이 command line에서 직접 입력을 받는 것을 볼 수 있습니다.
+필요에 따라 `prompt_func`와 `input_func`를 커스터마이징할 수 있습니다 (아래와 같이).
 
 ```python
 agent_chain.run("What's my friend Eric's surname?")
@@ -59,11 +58,11 @@ Final Answer: Eric's surname is Zhu.
 "Eric's surname is Zhu."
 ```
 
-## Configuring the Input Function
+## Input Function 설정하기
 
-By default, the `HumanInputRun` tool uses the python `input` function to get input from the user.
-You can customize the input_func to be anything you'd like.
-For instance, if you want to accept multi-line input, you could do the following:
+기본적으로 `HumanInputRun` tool은 사용자로부터 입력을 받기 위해 python `input` function을 사용합니다.
+`input_func`를 원하는 대로 커스터마이징할 수 있습니다.
+예를 들어, 여러 줄 입력을 받고 싶다면 다음과 같이 할 수 있습니다:
 
 ```python
 def get_input() -> str:

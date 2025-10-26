@@ -1,67 +1,67 @@
 ---
-title: Calculate token-based costs for traces
-sidebarTitle: Calculate token-based costs for traces
+title: trace에 대한 token 기반 비용 계산
+sidebarTitle: trace에 대한 token 기반 비용 계산
 ---
 
 <Info>
-* [Providing token counts for LLM runs (spans)](/langsmith/log-llm-trace#provide-token-and-cost-information)
+* [LLM run(span)에 대한 token 수 제공하기](/langsmith/log-llm-trace#provide-token-and-cost-information)
 </Info>
 
-LangSmith allows you to track token-based costs for LLM runs. The costs are rolled up to the trace and project level.
+LangSmith를 사용하면 LLM run에 대한 token 기반 비용을 추적할 수 있습니다. 비용은 trace 및 project 수준으로 집계됩니다.
 
-There are two ways costs can be tracked:
+비용을 추적하는 방법은 두 가지가 있습니다:
 
-1. Derived from token counts and model prices
-2. Directly specified as part of the run data
+1. token 수와 model 가격으로부터 도출
+2. run data의 일부로 직접 지정
 
-In most cases it is easier to include token counts in the run data and specify model pricing in LangSmith. LangSmith assumes that costs are linear in token counts, broken down by token type. For the few models with non-linear pricing (e.g., above X input tokens the per-token price changes), we recommend computing costs client-side and sending them as part of the run data.
+대부분의 경우 run data에 token 수를 포함하고 LangSmith에서 model 가격을 지정하는 것이 더 쉽습니다. LangSmith는 비용이 token 유형별로 분류된 token 수에 선형적이라고 가정합니다. 비선형 가격 책정을 사용하는 소수의 model(예: X개 이상의 input token에서 token당 가격이 변경되는 경우)의 경우, 클라이언트 측에서 비용을 계산하고 run data의 일부로 전송하는 것을 권장합니다.
 
-## Send token counts
+## token 수 전송
 
-For LangSmith to accurately derive costs for an LLM run, you need to provide token counts:
+LangSmith가 LLM run에 대한 비용을 정확하게 도출하려면 token 수를 제공해야 합니다:
 
-* If you are using the LangSmith Python or TS/JS SDK with OpenAI or Anthropic models, the [built-in wrappers](/langsmith/annotate-code#wrap-the-openai-client) will automatically send up token counts, model provider and model name data to LangSmith.
-* If you are using the LangSmith SDK's with other model providers, you should carefully read through [this guide](/langsmith/log-llm-trace#provide-token-and-cost-information).
-* If you are using LangChain Python or TS/JS, token counts, model provider, and model name are automatically sent up to LangSmith for most chat model integrations. If there is a chat model integration that is missing token counts and for which the underlying API includes token counts in the model response, please open a GitHub issue in the [LangChain repo](https://github.com/langchain-ai/langchain).
+* OpenAI 또는 Anthropic model과 함께 LangSmith Python 또는 TS/JS SDK를 사용하는 경우, [내장 wrapper](/langsmith/annotate-code#wrap-the-openai-client)가 자동으로 token 수, model provider 및 model name data를 LangSmith로 전송합니다.
+* 다른 model provider와 함께 LangSmith SDK를 사용하는 경우, [이 가이드](/langsmith/log-llm-trace#provide-token-and-cost-information)를 주의 깊게 읽어야 합니다.
+* LangChain Python 또는 TS/JS를 사용하는 경우, 대부분의 chat model integration에 대해 token 수, model provider 및 model name이 자동으로 LangSmith로 전송됩니다. token 수가 누락된 chat model integration이 있고 기본 API가 model response에 token 수를 포함하는 경우, [LangChain repo](https://github.com/langchain-ai/langchain)에 GitHub issue를 열어주세요.
 
-Token counts must be explicitly provided for accurate cost tracking. See the guide on [providing token and cost information](/langsmith/log-llm-trace#provide-token-and-cost-information) for details on how to include token counts.
+정확한 비용 추적을 위해서는 token 수를 명시적으로 제공해야 합니다. token 수를 포함하는 방법에 대한 자세한 내용은 [token 및 비용 정보 제공](/langsmith/log-llm-trace#provide-token-and-cost-information) 가이드를 참조하세요.
 
-## Specify model name
+## model name 지정
 
-LangSmith reads the LLM model name from the `ls_model_name` field in [run metadata](/langsmith/add-metadata-tags). The [SDK built-in wrappers](/langsmith/annotate-code#wrap-the-openai-client) and any LangChain integrations will automatically handle specifying this metadata for you.
+LangSmith는 [run metadata](/langsmith/add-metadata-tags)의 `ls_model_name` 필드에서 LLM model name을 읽습니다. [SDK 내장 wrapper](/langsmith/annotate-code#wrap-the-openai-client) 및 모든 LangChain integration은 이 metadata를 자동으로 지정합니다.
 
-## Set model prices
+## model 가격 설정
 
-To compute costs from token counts and model names, we need to know the per-token prices for the model you're using. LangSmith has a [model pricing table](https://smith.langchain.com/settings/workspaces/models) for this. The table comes with pricing information for most OpenAI, Anthropic, and Gemini models. You can add prices for other models, or overwrite pricing for default models.
+token 수와 model name으로부터 비용을 계산하려면 사용 중인 model의 token당 가격을 알아야 합니다. LangSmith에는 이를 위한 [model pricing table](https://smith.langchain.com/settings/workspaces/models)이 있습니다. 이 table에는 대부분의 OpenAI, Anthropic 및 Gemini model에 대한 가격 정보가 포함되어 있습니다. 다른 model에 대한 가격을 추가하거나 기본 model의 가격을 덮어쓸 수 있습니다.
 
-You can specify prices for prompt (input) and completion (output) tokens. If needed you can provide a more detailed breakdown of prices. For example, some model providers have different pricing for multimodal or cached tokens.
+prompt(input) 및 completion(output) token에 대한 가격을 지정할 수 있습니다. 필요한 경우 더 자세한 가격 분류를 제공할 수 있습니다. 예를 들어, 일부 model provider는 multimodal 또는 cached token에 대해 다른 가격을 책정합니다.
 
 ![](/langsmith/images/model-price-map.png)
 
-Hovering over the `...` next to the prompt/completion prices shows you the price breakdown by token type. You can see, for example, if `audio` and `image` prompt tokens have different prices versus default text prompt tokens.
+prompt/completion 가격 옆의 `...`에 마우스를 올리면 token 유형별 가격 분류를 볼 수 있습니다. 예를 들어, `audio` 및 `image` prompt token이 기본 text prompt token과 다른 가격을 가지는지 확인할 수 있습니다.
 
-To create a *new entry* in the model pricing map, click on the `Add new model` button in the top right corner.
+model pricing map에 *새 항목*을 생성하려면 오른쪽 상단의 `Add new model` 버튼을 클릭하세요.
 
 ![New price map entry interface](/langsmith/images/new-price-map-entry.png)
 
-Here, you can specify the following fields:
+여기에서 다음 필드를 지정할 수 있습니다:
 
-* **Model Name**: The human-readable name of the model.
-* **Match Pattern**: A regex pattern to match the model name. This is used to match the value for `ls_model_name` in the run metadata.
-* **Prompt (Input) Price**: The cost per 1M input tokens for the model. This number is multiplied by the number of tokens in the prompt to calculate the prompt cost.
-* **Completion (Output) Price**: The cost per 1M output tokens for the model. This number is multiplied by the number of tokens in the completion to calculate the completion cost.
-* **Prompt (Input) Price Breakdown** (Optional): The breakdown of price for each different type of prompt token, e.g. `cache_read`, `video`, `audio`, etc.
-* **Completion (Output) Price Breakdown** (Optional): The breakdown of price for each different type of completion token, e.g. `reasoning`, `image`, etc.
-* **Model Activation Date** (Optional): The date from which the pricing is applicable. Only runs after this date will apply this model price.
-* **Provider** (Optional): The provider of the model. If specified, this is matched against `ls_provider` in the run metadata.
+* **Model Name**: model의 사람이 읽을 수 있는 이름입니다.
+* **Match Pattern**: model name과 일치시킬 regex pattern입니다. 이는 run metadata의 `ls_model_name` 값과 일치시키는 데 사용됩니다.
+* **Prompt (Input) Price**: model의 1M input token당 비용입니다. 이 숫자는 prompt의 token 수를 곱하여 prompt 비용을 계산합니다.
+* **Completion (Output) Price**: model의 1M output token당 비용입니다. 이 숫자는 completion의 token 수를 곱하여 completion 비용을 계산합니다.
+* **Prompt (Input) Price Breakdown** (선택사항): 각 다른 유형의 prompt token에 대한 가격 분류입니다. 예: `cache_read`, `video`, `audio` 등.
+* **Completion (Output) Price Breakdown** (선택사항): 각 다른 유형의 completion token에 대한 가격 분류입니다. 예: `reasoning`, `image` 등.
+* **Model Activation Date** (선택사항): 가격이 적용되는 날짜입니다. 이 날짜 이후의 run만 이 model 가격을 적용합니다.
+* **Provider** (선택사항): model의 provider입니다. 지정된 경우 run metadata의 `ls_provider`와 일치합니다.
 
-Once you have set up the model pricing map, LangSmith will automatically calculate and aggregate the token-based costs for traces based on the token counts provided in the LLM invocations.
+model pricing map을 설정하면 LangSmith는 LLM invocation에서 제공된 token 수를 기반으로 trace에 대한 token 기반 비용을 자동으로 계산하고 집계합니다.
 
 <Note>
-Please note that updates to the model pricing map are will not be reflected in the costs for traces already logged. We do not currently support backfilling model pricing changes.
+model pricing map에 대한 업데이트는 이미 로깅된 trace의 비용에 반영되지 않습니다. 현재 model 가격 변경에 대한 backfill을 지원하지 않습니다.
 </Note>
 
-For specifying pricing breakdowns, here are the detailed token count types used by LangChain chat model integrations and LangSmith SDK wrappers:
+가격 분류를 지정하기 위해 LangChain chat model integration 및 LangSmith SDK wrapper에서 사용하는 자세한 token count 유형은 다음과 같습니다:
 
 ```python
 # Standardized
@@ -76,9 +76,9 @@ ephemeral_1h_input_tokens
 ephemeral_5m_input_tokens
 ```
 
-## Cost formula
+## 비용 계산 공식
 
-The cost for a run is computed greedily from most-to-lease specific token type. Suppose we set a price of $2 per 1M prompt tokens with a detailed price of $1 per 1M `cache_read` prompt tokens, and $3 per 1M completion tokens. If we uploaded the following usage metadata:
+run에 대한 비용은 가장 구체적인 token 유형에서 가장 덜 구체적인 token 유형으로 탐욕적으로 계산됩니다. 1M prompt token당 $2의 가격을 설정하고 `cache_read` prompt token 1M당 $1의 세부 가격, completion token 1M당 $3의 가격을 설정했다고 가정합니다. 다음과 같은 usage metadata를 업로드한 경우:
 
 ```python
 {
@@ -90,7 +90,7 @@ The cost for a run is computed greedily from most-to-lease specific token type. 
 }
 ```
 
-then we'd compute the token costs as follows:
+token 비용은 다음과 같이 계산됩니다:
 
 ```python
 # A.K.A. prompt_cost
@@ -102,8 +102,8 @@ output_cost = 10 * 3e-6  # 3e-5
 total_cost = input_cost + output_cost  # 6.5e-5
 ```
 
-## Send costs directly
+## 비용 직접 전송
 
-If you are tracing an LLM call that returns token cost information, are tracing an API with a non-token based pricing scheme, or otherwise have accurate information around costs at runtime, you may instead populate a `usage_metadata` dict while tracing rather than relying on LangSmith's built-in cost calculations.
+token 비용 정보를 반환하는 LLM 호출을 추적하거나, token 기반이 아닌 가격 책정 방식을 사용하는 API를 추적하거나, 런타임에 비용에 대한 정확한 정보를 가지고 있는 경우, LangSmith의 내장 비용 계산에 의존하는 대신 추적하는 동안 `usage_metadata` dict를 채울 수 있습니다.
 
-See [this guide](/langsmith/log-llm-trace#provide-token-and-cost-information) to learn how to manually provide cost information for a run.
+run에 대한 비용 정보를 수동으로 제공하는 방법을 알아보려면 [이 가이드](/langsmith/log-llm-trace#provide-token-and-cost-information)를 참조하세요.

@@ -2,64 +2,64 @@
 title: GOAT
 ---
 
-[GOAT](https://github.com/goat-sdk/goat) is the finance toolkit for AI agents.
+[GOAT](https://github.com/goat-sdk/goat)는 AI agent를 위한 금융 toolkit입니다.
 
 <Warning>
-**This tool exists outside of the main LangChain repository [here](https://github.com/goat-sdk/goat/).**
+**이 tool은 LangChain 메인 repository 외부 [여기](https://github.com/goat-sdk/goat/)에 존재합니다.**
 
-Please use caution when linking wallets to external providers and make sure they are trusted.
+외부 provider에 wallet을 연결할 때는 주의하시고 신뢰할 수 있는지 확인하세요.
 </Warning>
 
 ## Overview
 
-Create agents that can:
+다음과 같은 기능을 수행할 수 있는 agent를 만들 수 있습니다:
 
-- Send and receive payments
-- Purchase physical and digital goods and services
-- Engage in various investment strategies:
-  - Earn yield
-  - Bet on prediction markets
-- Purchase crypto assets
-- Tokenize any asset
-- Get financial insights
+- 결제 송수신
+- 물리적 및 디지털 상품과 서비스 구매
+- 다양한 투자 전략 실행:
+  - 수익률 획득
+  - 예측 시장에 베팅
+- 암호화폐 자산 구매
+- 모든 자산의 토큰화
+- 금융 인사이트 획득
 
-### How it works
+### 작동 방식
 
-GOAT leverages blockchains, cryptocurrencies (such as stablecoins), and wallets as the infrastructure to enable agents to become economic actors:
+GOAT는 blockchain, cryptocurrency(stablecoin 등), wallet을 인프라로 활용하여 agent가 경제 주체가 될 수 있도록 합니다:
 
-1. Give your agent a [wallet](https://github.com/goat-sdk/goat/tree/main#chains-and-wallets)
-2. Allow it to transact [anywhere](https://github.com/goat-sdk/goat/tree/main#chains-and-wallets)
-3. Use more than [+200 tools](https://github.com/goat-sdk/goat/tree/main#tools)
+1. agent에게 [wallet](https://github.com/goat-sdk/goat/tree/main#chains-and-wallets)을 제공하세요
+2. [어디서든](https://github.com/goat-sdk/goat/tree/main#chains-and-wallets) 거래할 수 있도록 허용하세요
+3. [+200개 이상의 tool](https://github.com/goat-sdk/goat/tree/main#tools)을 사용하세요
 
-See everything GOAT supports [here](https://github.com/goat-sdk/goat/tree/main#chains-and-wallets).
+GOAT가 지원하는 모든 것을 [여기](https://github.com/goat-sdk/goat/tree/main#chains-and-wallets)에서 확인하세요.
 
-**Lightweight and extendable**
-Different from other toolkits, GOAT is designed to be lightweight and extendable by keeping its core minimal and allowing you to install only the tools you need.
+**경량화 및 확장 가능**
+다른 toolkit과 달리 GOAT는 핵심을 최소화하고 필요한 tool만 설치할 수 있도록 하여 경량화되고 확장 가능하도록 설계되었습니다.
 
-If you don't find what you need on our more than 200 integrations you can easily:
+200개 이상의 통합에서 필요한 것을 찾지 못한 경우 다음을 쉽게 수행할 수 있습니다:
 
-- Create your own plugin
-- Integrate a new chain
-- Integrate a new wallet
-- Integrate a new agent framework
+- 자체 plugin 생성
+- 새로운 chain 통합
+- 새로운 wallet 통합
+- 새로운 agent framework 통합
 
-See how to do it [here](https://github.com/goat-sdk/goat/tree/main#-contributing).
+방법은 [여기](https://github.com/goat-sdk/goat/tree/main#-contributing)에서 확인하세요.
 
 ## Setup
 
-1. Install the core package and langchain adapter:
+1. core package와 langchain adapter를 설치하세요:
 
 ```bash
 npm i @goat-sdk/core @goat-sdk/adapter-langchain
 ```
 
-2. Install the type of wallet you want to use (e.g solana):
+2. 사용하려는 wallet 유형을 설치하세요 (예: solana):
 
 ```bash
 npm i @goat-sdk/wallet-evm @goat-sdk/wallet-viem
 ```
 
-3. Install the plugins you want to use in that chain:
+3. 해당 chain에서 사용하려는 plugin을 설치하세요:
 
 ```bash
 npm i @goat-sdk/plugin-erc20
@@ -67,7 +67,7 @@ npm i @goat-sdk/plugin-erc20
 
 ## Instantiation
 
-Now we can instantiate our toolkit:
+이제 toolkit을 인스턴스화할 수 있습니다:
 
 ```typescript
 import { http } from "viem";
@@ -111,5 +111,5 @@ const agent = createAgent({ llm: model, tools: tools });
 
 ## Related
 
-- Tool [conceptual guide](/oss/concepts/#tools)
-- Tool [how-to guides](/oss/langchain/tools)
+- Tool [개념 가이드](/oss/concepts/#tools)
+- Tool [how-to 가이드](/oss/langchain/tools)

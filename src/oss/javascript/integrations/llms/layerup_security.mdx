@@ -1,29 +1,30 @@
+```markdown
 ---
 title: Layerup Security
 ---
 
-The [Layerup Security](https://uselayerup.com) integration allows you to secure your calls to any LangChain LLM, LLM chain or LLM agent. The LLM object wraps around any existing LLM object, allowing for a secure layer between your users and your LLMs.
+[Layerup Security](https://uselayerup.com) 통합을 사용하면 모든 LangChain LLM, LLM chain 또는 LLM agent 호출을 보호할 수 있습니다. LLM 객체는 기존 LLM 객체를 감싸서 사용자와 LLM 사이에 보안 계층을 제공합니다.
 
-While the Layerup Security object is designed as an LLM, it is not actually an LLM itself, it simply wraps around an LLM, allowing it to adapt the same functionality as the underlying LLM.
+Layerup Security 객체는 LLM으로 설계되었지만, 실제로는 LLM 자체가 아니며 단순히 LLM을 감싸서 기본 LLM과 동일한 기능을 적용할 수 있도록 합니다.
 
 ## Setup
 
-First, you'll need a Layerup Security account from the Layerup [website](https://uselayerup.com).
+먼저 Layerup [웹사이트](https://uselayerup.com)에서 Layerup Security 계정이 필요합니다.
 
-Next, create a project via the [dashboard](https://dashboard.uselayerup.com), and copy your API key. We recommend putting your API key in your project's environment.
+다음으로 [대시보드](https://dashboard.uselayerup.com)를 통해 프로젝트를 생성하고 API key를 복사하세요. API key는 프로젝트의 환경 변수에 저장하는 것을 권장합니다.
 
-Install the Layerup Security SDK:
+Layerup Security SDK를 설치하세요:
 
 ```bash npm
 npm install @layerup/layerup-security
 ```
-And install LangChain Community:
+그리고 LangChain Community를 설치하세요:
 
 ```bash npm
 npm install @langchain/community @langchain/core
 ```
 
-And now you're ready to start protecting your LLM calls with Layerup Security!
+이제 Layerup Security로 LLM 호출을 보호할 준비가 되었습니다!
 
 ```typescript
 import {
@@ -90,4 +91,5 @@ const response = await layerupSecurity.invoke(
 ## Related
 
 
-- [Models guide](/oss/langchain/models)
+- [Models 가이드](/oss/langchain/models)
+```

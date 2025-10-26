@@ -1,19 +1,19 @@
 ---
-title: Retrievers
+title: Retriever
 ---
 
-A [retriever](/oss/langchain/retrieval) is an interface that returns documents given an unstructured query.
-It is more general than a vector store.
-A retriever does not need to be able to store documents, only to return (or retrieve) them.
+[Retriever](/oss/langchain/retrieval)는 비구조화된 query가 주어졌을 때 문서를 반환하는 interface입니다.
+Vector store보다 더 일반적인 개념입니다.
+Retriever는 문서를 저장할 수 있을 필요는 없으며, 단지 문서를 반환(또는 검색)하기만 하면 됩니다.
 
-Retrievers accept a string query as input and return a list of Documents.
+Retriever는 문자열 query를 입력으로 받아 Document 목록을 반환합니다.
 
-For specifics on how to use retrievers, see the [relevant how-to guides here](/oss/langchain/retrieval).
+Retriever 사용 방법에 대한 자세한 내용은 [관련 how-to 가이드](/oss/langchain/retrieval)를 참조하세요.
 
-Note that all [vector stores](/oss/integrations/vectorstores) can be [cast to retrievers](/oss/langchain/retrieval).
-Refer to the vector store [integration docs](/oss/integrations/vectorstores/) for available vector store retrievers.
+모든 [vector store](/oss/integrations/vectorstores)는 [retriever로 변환](/oss/langchain/retrieval)될 수 있습니다.
+사용 가능한 vector store retriever에 대해서는 vector store [통합 문서](/oss/integrations/vectorstores/)를 참조하세요.
 
-## All retrievers
+## 모든 retriever
 
 <Columns cols={3}>
   <Card
@@ -21,122 +21,122 @@ Refer to the vector store [integration docs](/oss/integrations/vectorstores/) fo
     icon="link"
     href="/oss/integrations/retrievers/alchemystai-retriever"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="ArxivRetriever"
     icon="link"
     href="/oss/integrations/retrievers/arxiv-retriever"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Azion EdgeSQL"
     icon="link"
     href="/oss/integrations/retrievers/azion-edgesql"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Knowledge Bases for Amazon Bedrock"
     icon="link"
     href="/oss/integrations/retrievers/bedrock-knowledge-bases"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="BM25"
     icon="link"
     href="/oss/integrations/retrievers/bm25"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Chaindesk Retriever"
     icon="link"
     href="/oss/integrations/retrievers/chaindesk-retriever"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Dria Retriever"
     icon="link"
     href="/oss/integrations/retrievers/dria"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Exa"
     icon="link"
     href="/oss/integrations/retrievers/exa"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="HyDE Retriever"
     icon="link"
     href="/oss/integrations/retrievers/hyde"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Amazon Kendra Retriever"
     icon="link"
     href="/oss/integrations/retrievers/kendra-retriever"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
   <Card
     title="Metal Retriever"
     icon="link"
     href="/oss/integrations/retrievers/metal-retriever"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
     />
   <Card
     title="Supabase Hybrid Search"
     icon="link"
     href="/oss/integrations/retrievers/supabase-hybrid"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
     />
   <Card
     title="Tavily Search API"
     icon="link"
     href="/oss/integrations/retrievers/tavily"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
     />
   <Card
     title="Time-Weighted Retriever"
     icon="link"
     href="/oss/integrations/retrievers/time-weighted-retriever"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
     />
   <Card
     title="Vespa Retriever"
     icon="link"
     href="/oss/integrations/retrievers/vespa-retriever"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
     />
   <Card
     title="Zep Cloud Retriever"
     icon="link"
     href="/oss/integrations/retrievers/zep-cloud-retriever"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
     />
   <Card
     title="Zep Open Source Retriever"
     icon="link"
     href="/oss/integrations/retrievers/zep-retriever"
     arrow="true"
-    cta="View guide"
+    cta="가이드 보기"
   />
 </Columns>
 
 <Info>
-    If you'd like to contribute an integration, see [Contributing integrations](/oss/contributing#add-a-new-integration).
+    통합을 기여하고 싶으시다면 [통합 기여하기](/oss/contributing#add-a-new-integration)를 참조하세요.
 </Info>

@@ -2,18 +2,18 @@
 title: AI/ML API
 ---
 
->[AI/ML API](https://aimlapi.com/app/?utm_source=langchain&utm_medium=github&utm_campaign=integration) provides a single API for accessing 300+ hosted foundation models (DeepSeek, Gemini, GPT, and more) with enterprise-grade uptime and throughput.
+>[AI/ML API](https://aimlapi.com/app/?utm_source=langchain&utm_medium=github&utm_campaign=integration)는 엔터프라이즈급 가동 시간과 처리량으로 300개 이상의 호스팅된 foundation model(DeepSeek, Gemini, GPT 등)에 액세스할 수 있는 단일 API를 제공합니다.
 
-## Installation and setup
+## Installation 및 setup
 
-- Install the AI/ML API integration package.
+- AI/ML API integration package를 설치합니다.
 
   ```bash
   pip install langchain-aimlapi
   ```
 
-- Create an account at [aimlapi.com](https://aimlapi.com/app/?utm_source=langchain&utm_medium=github&utm_campaign=integration) and generate an API key.
-- Authenticate by setting the `AIMLAPI_API_KEY` environment variable.
+- [aimlapi.com](https://aimlapi.com/app/?utm_source=langchain&utm_medium=github&utm_campaign=integration)에서 계정을 생성하고 API key를 생성합니다.
+- `AIMLAPI_API_KEY` environment variable을 설정하여 인증합니다.
 
 ```python
 import os
@@ -23,7 +23,7 @@ os.environ["AIMLAPI_API_KEY"] = "aimlapi_..."
 
 ## Chat models
 
-See a [usage example](/oss/integrations/chat/aimlapi).
+[사용 예제](/oss/integrations/chat/aimlapi)를 참조하세요.
 
 ```python
 from langchain_aimlapi import ChatAimlapi
@@ -31,7 +31,7 @@ from langchain_aimlapi import ChatAimlapi
 
 ## LLMs
 
-See a [usage example](/oss/integrations/llms/aimlapi).
+[사용 예제](/oss/integrations/llms/aimlapi)를 참조하세요.
 
 ```python
 from langchain_aimlapi import AimlapiLLM
@@ -39,7 +39,7 @@ from langchain_aimlapi import AimlapiLLM
 
 ## Embedding models
 
-See a [usage example](/oss/integrations/text_embedding/aimlapi).
+[사용 예제](/oss/integrations/text_embedding/aimlapi)를 참조하세요.
 
 ```python
 from langchain_aimlapi import AimlapiEmbeddings

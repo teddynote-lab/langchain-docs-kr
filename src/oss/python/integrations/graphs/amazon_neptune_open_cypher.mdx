@@ -1,23 +1,25 @@
 ---
-title: Amazon Neptune with Cypher
+title: Cypher를 사용한 Amazon Neptune
 ---
 
->[Amazon Neptune](https://aws.amazon.com/neptune/) is a high-performance graph analytics and serverless database for superior scalability and availability.
+>[Amazon Neptune](https://aws.amazon.com/neptune/)은 뛰어난 확장성과 가용성을 제공하는 고성능 그래프 분석 및 서버리스 데이터베이스입니다.
 >
->This example shows the QA chain that queries the `Neptune` graph database using `openCypher` and returns a human-readable response.
+>이 예제는 `openCypher`를 사용하여 `Neptune` 그래프 데이터베이스를 쿼리하고 사람이 읽을 수 있는 응답을 반환하는 QA chain을 보여줍니다.
 >
->[Cypher](https://en.wikipedia.org/wiki/Cypher_(query_language)) is a declarative graph query language that allows for expressive and efficient data querying in a property graph.
+>[Cypher](https://en.wikipedia.org/wiki/Cypher_(query_language))는 property graph에서 표현력 있고 효율적인 데이터 쿼리를 가능하게 하는 선언적 그래프 쿼리 언어입니다.
 >
->[openCypher](https://opencypher.org/) is an open-source implementation of Cypher.# Neptune Open Cypher QA Chain
-This QA chain queries Amazon Neptune using openCypher and returns human readable response
+>[openCypher](https://opencypher.org/)는 Cypher의 오픈소스 구현입니다.
 
-LangChain supports both [Neptune Database](https://docs.aws.amazon.com/neptune/latest/userguide/intro.html) and [Neptune Analytics](https://docs.aws.amazon.com/neptune-analytics/latest/userguide/what-is-neptune-analytics.html) with `create_neptune_opencypher_qa_chain`.
+# Neptune Open Cypher QA Chain
+이 QA chain은 openCypher를 사용하여 Amazon Neptune을 쿼리하고 사람이 읽을 수 있는 응답을 반환합니다
 
-Neptune Database is a serverless graph database designed for optimal scalability and availability. It provides a solution for graph database workloads that need to scale to 100,000 queries per second, Multi-AZ high availability, and multi-Region deployments. You can use Neptune Database for social networking, fraud alerting, and Customer 360 applications.
+LangChain은 `create_neptune_opencypher_qa_chain`을 통해 [Neptune Database](https://docs.aws.amazon.com/neptune/latest/userguide/intro.html)와 [Neptune Analytics](https://docs.aws.amazon.com/neptune-analytics/latest/userguide/what-is-neptune-analytics.html) 모두를 지원합니다.
 
-Neptune Analytics is an analytics database engine that can quickly analyze large amounts of graph data in memory to get insights and find trends. Neptune Analytics is a solution for quickly analyzing existing graph databases or graph datasets stored in a data lake. It uses popular graph analytic algorithms and low-latency analytic queries.
+Neptune Database는 최적의 확장성과 가용성을 위해 설계된 서버리스 그래프 데이터베이스입니다. 초당 100,000개의 쿼리로 확장해야 하는 그래프 데이터베이스 워크로드, Multi-AZ 고가용성 및 다중 리전 배포를 위한 솔루션을 제공합니다. Neptune Database는 소셜 네트워킹, 사기 경고 및 Customer 360 애플리케이션에 사용할 수 있습니다.
 
-## Using Neptune Database
+Neptune Analytics는 대량의 그래프 데이터를 메모리에서 빠르게 분석하여 인사이트를 얻고 트렌드를 찾을 수 있는 분석 데이터베이스 엔진입니다. Neptune Analytics는 기존 그래프 데이터베이스 또는 데이터 레이크에 저장된 그래프 데이터셋을 빠르게 분석하기 위한 솔루션입니다. 인기 있는 그래프 분석 알고리즘과 저지연 분석 쿼리를 사용합니다.
+
+## Neptune Database 사용하기
 
 ```python
 from langchain_aws.graphs import NeptuneGraph
@@ -29,7 +31,7 @@ use_https = True
 graph = NeptuneGraph(host=host, port=port, use_https=use_https)
 ```
 
-### Using Neptune Analytics
+### Neptune Analytics 사용하기
 
 ```python
 from langchain_aws.graphs import NeptuneAnalyticsGraph
@@ -37,9 +39,9 @@ from langchain_aws.graphs import NeptuneAnalyticsGraph
 graph = NeptuneAnalyticsGraph(graph_identifier="<neptune-analytics-graph-id>")
 ```
 
-## Using the Neptune openCypher QA Chain
+## Neptune openCypher QA Chain 사용하기
 
-This QA chain queries the Neptune graph database using openCypher and returns a human-readable response.
+이 QA chain은 openCypher를 사용하여 Neptune 그래프 데이터베이스를 쿼리하고 사람이 읽을 수 있는 응답을 반환합니다.
 
 ```python
 from langchain_aws import ChatBedrockConverse
@@ -61,13 +63,13 @@ print(result["result"].content)
 Austin airport has 98 outgoing routes.
 ```
 
-### Adding Message History
+### Message History 추가하기
 
-The Neptune openCypher QA chain has the ability to be wrapped by [`RunnableWithMessageHistory`](https://python.langchain.com/v0.2/api_reference/core/runnables/langchain_core.runnables.history.RunnableWithMessageHistory.html#langchain_core.runnables.history.RunnableWithMessageHistory). This adds message history to the chain, allowing us to create a chatbot that retains conversation state across multiple invocations.
+Neptune openCypher QA chain은 [`RunnableWithMessageHistory`](https://python.langchain.com/v0.2/api_reference/core/runnables/langchain_core.runnables.history.RunnableWithMessageHistory.html#langchain_core.runnables.history.RunnableWithMessageHistory)로 래핑될 수 있는 기능을 가지고 있습니다. 이는 chain에 메시지 히스토리를 추가하여 여러 호출에 걸쳐 대화 상태를 유지하는 챗봇을 만들 수 있게 합니다.
 
-To start, we need a way to store and load the message history. For this purpose, each thread will be created as an instance of [`InMemoryChatMessageHistory`](https://python.langchain.com/api_reference/core/chat_history/langchain_core.chat_history.InMemoryChatMessageHistory.html), and stored into a dictionary for repeated access.
+시작하려면 메시지 히스토리를 저장하고 로드하는 방법이 필요합니다. 이를 위해 각 스레드는 [`InMemoryChatMessageHistory`](https://python.langchain.com/api_reference/core/chat_history/langchain_core.chat_history.InMemoryChatMessageHistory.html)의 인스턴스로 생성되고, 반복적인 액세스를 위해 딕셔너리에 저장됩니다.
 
-(Also see: [python.langchain.com/docs/versions/migrating_memory/chat_history/#chatmessagehistory](https://python.langchain.com/docs/versions/migrating_memory/chat_history/#chatmessagehistory))
+(참고: [python.langchain.com/docs/versions/migrating_memory/chat_history/#chatmessagehistory](https://python.langchain.com/docs/versions/migrating_memory/chat_history/#chatmessagehistory))
 
 ```python
 from langchain_core.chat_history import InMemoryChatMessageHistory
@@ -83,7 +85,7 @@ def get_chat_history(session_id: str) -> InMemoryChatMessageHistory:
     return chat_history
 ```
 
-Now, the QA chain and message history storage can be used to create the new `RunnableWithMessageHistory`. Note that we must set `query` as the input key to match the format expected by the base chain.
+이제 QA chain과 메시지 히스토리 저장소를 사용하여 새로운 `RunnableWithMessageHistory`를 생성할 수 있습니다. 기본 chain에서 예상하는 형식과 일치하도록 `query`를 input key로 설정해야 합니다.
 
 ```python
 from langchain_core.runnables.history import RunnableWithMessageHistory
@@ -95,7 +97,7 @@ runnable_with_history = RunnableWithMessageHistory(
 )
 ```
 
-Before invoking the chain, a unique `session_id` needs to be generated for the conversation that the new `InMemoryChatMessageHistory` will remember.
+chain을 호출하기 전에 새로운 `InMemoryChatMessageHistory`가 기억할 대화를 위한 고유한 `session_id`를 생성해야 합니다.
 
 ```python
 import uuid
@@ -103,7 +105,7 @@ import uuid
 session_id = uuid.uuid4()
 ```
 
-Finally, invoke the message history enabled chain with the `session_id`.
+마지막으로 `session_id`와 함께 메시지 히스토리가 활성화된 chain을 호출합니다.
 
 ```python
 result = runnable_with_history.invoke(
@@ -117,7 +119,7 @@ print(result["result"].content)
 You can fly directly to 98 destinations from Austin airport.
 ```
 
-As the chain continues to be invoked with the same `session_id`, responses will be returned in the context of previous queries in the conversation.
+동일한 `session_id`로 chain이 계속 호출되면 대화의 이전 쿼리 컨텍스트에서 응답이 반환됩니다.
 
 ```python
 result = runnable_with_history.invoke(

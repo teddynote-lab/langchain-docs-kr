@@ -2,9 +2,9 @@
 title: ChatSambaNovaCloud
 ---
 
-This will help you get started with SambaNovaCloud [chat models](/oss/langchain/models/). For detailed documentation of all ChatSambaNovaCloud features and configurations head to the [API reference](https://docs.sambanova.ai/cloud/docs/get-started/overview).
+이 문서는 SambaNovaCloud [chat models](/oss/langchain/models/) 시작하기를 도와드립니다. 모든 ChatSambaNovaCloud 기능과 구성에 대한 자세한 문서는 [API reference](https://docs.sambanova.ai/cloud/docs/get-started/overview)를 참조하세요.
 
-**[SambaNova](https://sambanova.ai/)'s** [SambaNova Cloud](https://cloud.sambanova.ai/) is a platform for performing inference with open-source models
+**[SambaNova](https://sambanova.ai/)**의 [SambaNova Cloud](https://cloud.sambanova.ai/)는 오픈소스 모델로 추론을 수행하기 위한 플랫폼입니다
 
 ## Overview
 
@@ -22,7 +22,7 @@ This will help you get started with SambaNovaCloud [chat models](/oss/langchain/
 
 ## Setup
 
-To access ChatSambaNovaCloud models you will need to create a [SambaNovaCloud](https://cloud.sambanova.ai/) account, get an API key, install the `langchain_sambanova` integration package.
+ChatSambaNovaCloud 모델에 액세스하려면 [SambaNovaCloud](https://cloud.sambanova.ai/) 계정을 생성하고, API key를 받고, `langchain_sambanova` integration package를 설치해야 합니다.
 
 ```bash
 pip install langchain-sambanova
@@ -30,7 +30,7 @@ pip install langchain-sambanova
 
 ### Credentials
 
-Get an API Key from [cloud.sambanova.ai](https://cloud.sambanova.ai/apis) and add it to your environment variables:
+[cloud.sambanova.ai](https://cloud.sambanova.ai/apis)에서 API Key를 받아 환경 변수에 추가하세요:
 
 ``` bash
 export SAMBANOVA_API_KEY="your-api-key-here"
@@ -46,7 +46,7 @@ if not os.getenv("SAMBANOVA_API_KEY"):
     )
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수 있습니다:
 
 ```python
 os.environ["LANGSMITH_TRACING"] = "true"
@@ -55,7 +55,7 @@ os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key:
 
 ### Installation
 
-The LangChain **SambaNovaCloud** integration lives in the `langchain_sambanova` package:
+LangChain **SambaNovaCloud** integration은 `langchain_sambanova` package에 있습니다:
 
 ```python
 pip install -qU langchain-sambanova
@@ -63,7 +63,7 @@ pip install -qU langchain-sambanova
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```python
 from langchain_sambanova import ChatSambaNovaCloud
@@ -309,4 +309,4 @@ The weather in this image is a serene and peaceful atmosphere, with a blue sky a
 
 ## API reference
 
-For detailed documentation of all SambaNovaCloud features and configurations head to the API reference: [docs.sambanova.ai/cloud/docs/get-started/overview](https://docs.sambanova.ai/cloud/docs/get-started/overview)
+모든 SambaNovaCloud 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요: [docs.sambanova.ai/cloud/docs/get-started/overview](https://docs.sambanova.ai/cloud/docs/get-started/overview)

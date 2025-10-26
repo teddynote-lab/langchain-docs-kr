@@ -2,37 +2,37 @@
 title: Microsoft SharePoint
 ---
 
-> [Microsoft SharePoint](https://en.wikipedia.org/wiki/SharePoint) is a website-based collaboration system that uses workflow applications, “list” databases, and other web parts and security features to empower business teams to work together developed by Microsoft.
+> [Microsoft SharePoint](https://en.wikipedia.org/wiki/SharePoint)는 Microsoft에서 개발한 웹사이트 기반 협업 시스템으로, 워크플로우 애플리케이션, "list" 데이터베이스, 기타 웹 파트 및 보안 기능을 사용하여 비즈니스 팀이 함께 작업할 수 있도록 지원합니다.
 
-This notebook covers how to load documents from the [SharePoint Document Library](https://support.microsoft.com/en-us/office/what-is-a-document-library-3b5976dd-65cf-4c9e-bf5a-713c10ca2872). By default the document loader loads `pdf`, `doc`, `docx` and `txt` files. You can load other file types by providing appropriate parsers (see more below).
+이 노트북은 [SharePoint Document Library](https://support.microsoft.com/en-us/office/what-is-a-document-library-3b5976dd-65cf-4c9e-bf5a-713c10ca2872)에서 문서를 로드하는 방법을 다룹니다. 기본적으로 document loader는 `pdf`, `doc`, `docx` 및 `txt` 파일을 로드합니다. 적절한 parser를 제공하여 다른 파일 유형을 로드할 수 있습니다(아래 참조).
 
 ## Prerequisites
 
-1. Register an application with the [Microsoft identity platform](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app) instructions.
-2. When registration finishes, the Azure portal displays the app registration's Overview pane. You see the Application (client) ID. Also called the `client ID`, this value uniquely identifies your application in the Microsoft identity platform.
-3. During the steps you will be following at **item 1**, you can set the redirect URI as `https://login.microsoftonline.com/common/oauth2/nativeclient`
-4. During the steps you will be following at **item 1**, generate a new password (`client_secret`) under Application Secrets section.
-5. Follow the instructions at this [document](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis#add-a-scope) to add the following `SCOPES` (`offline_access` and `Sites.Read.All`) to your application.
-6. To retrieve files from your **Document Library**, you will need its ID. To obtain it, you will need values of `Tenant Name`, `Collection ID`, and `Subsite ID`.
-7. To find your `Tenant Name` follow the instructions at this [document](https://learn.microsoft.com/en-us/azure/active-directory-b2c/tenant-management-read-tenant-name). Once you got this, just remove `.onmicrosoft.com` from the value and hold the rest as your `Tenant Name`.
-8. To obtain your `Collection ID` and `Subsite ID`, you will need your **SharePoint** `site-name`. Your `SharePoint` site URL has the following format `https://<tenant-name>.sharepoint.com/sites/<site-name>`. The last part of this URL is the `site-name`.
-9. To Get the Site `Collection ID`, hit this URL in the browser: `https://<tenant>.sharepoint.com/sites/<site-name>/_api/site/id` and copy the value of the `Edm.Guid` property.
-10. To get the `Subsite ID` (or web ID) use: `https://<tenant>.sharepoint.com/sites/<site-name>/_api/web/id` and copy the value of the `Edm.Guid` property.
-11. The `SharePoint site ID` has the following format: `<tenant-name>.sharepoint.com,<Collection ID>,<subsite ID>`. You can hold that value to use in the next step.
-12. Visit the [Graph Explorer Playground](https://developer.microsoft.com/en-us/graph/graph-explorer) to obtain your `Document Library ID`. The first step is to ensure you are logged in with the account associated with your **SharePoint** site. Then you need to make a request to `https://graph.microsoft.com/v1.0/sites/<SharePoint site ID>/drive` and the response will return a payload with a field `id` that holds the ID of your `Document Library ID`.
+1. [Microsoft identity platform](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app) 지침에 따라 애플리케이션을 등록합니다.
+2. 등록이 완료되면 Azure portal에 앱 등록의 Overview 창이 표시됩니다. Application (client) ID가 표시됩니다. `client ID`라고도 하는 이 값은 Microsoft identity platform에서 애플리케이션을 고유하게 식별합니다.
+3. **항목 1**에서 수행할 단계 중에 redirect URI를 `https://login.microsoftonline.com/common/oauth2/nativeclient`로 설정할 수 있습니다.
+4. **항목 1**에서 수행할 단계 중에 Application Secrets 섹션에서 새 password(`client_secret`)를 생성합니다.
+5. 이 [문서](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis#add-a-scope)의 지침에 따라 애플리케이션에 다음 `SCOPES`(`offline_access` 및 `Sites.Read.All`)를 추가합니다.
+6. **Document Library**에서 파일을 검색하려면 해당 ID가 필요합니다. 이를 얻으려면 `Tenant Name`, `Collection ID` 및 `Subsite ID` 값이 필요합니다.
+7. `Tenant Name`을 찾으려면 이 [문서](https://learn.microsoft.com/en-us/azure/active-directory-b2c/tenant-management-read-tenant-name)의 지침을 따르세요. 이를 얻은 후 값에서 `.onmicrosoft.com`을 제거하고 나머지를 `Tenant Name`으로 보관합니다.
+8. `Collection ID`와 `Subsite ID`를 얻으려면 **SharePoint** `site-name`이 필요합니다. **SharePoint** site URL은 다음 형식을 갖습니다: `https://<tenant-name>.sharepoint.com/sites/<site-name>`. 이 URL의 마지막 부분이 `site-name`입니다.
+9. Site `Collection ID`를 얻으려면 브라우저에서 다음 URL을 방문하세요: `https://<tenant>.sharepoint.com/sites/<site-name>/_api/site/id` 그리고 `Edm.Guid` 속성의 값을 복사합니다.
+10. `Subsite ID`(또는 web ID)를 얻으려면 다음을 사용하세요: `https://<tenant>.sharepoint.com/sites/<site-name>/_api/web/id` 그리고 `Edm.Guid` 속성의 값을 복사합니다.
+11. `SharePoint site ID`는 다음 형식을 갖습니다: `<tenant-name>.sharepoint.com,<Collection ID>,<subsite ID>`. 이 값을 다음 단계에서 사용하기 위해 보관할 수 있습니다.
+12. [Graph Explorer Playground](https://developer.microsoft.com/en-us/graph/graph-explorer)를 방문하여 `Document Library ID`를 얻습니다. 첫 번째 단계는 **SharePoint** 사이트와 연결된 계정으로 로그인되어 있는지 확인하는 것입니다. 그런 다음 `https://graph.microsoft.com/v1.0/sites/<SharePoint site ID>/drive`에 요청을 해야 하며, 응답은 `Document Library ID`의 ID를 포함하는 `id` 필드가 있는 payload를 반환합니다.
 
-## 🧑 Instructions for ingesting your documents from SharePoint Document Library
+## 🧑 SharePoint Document Library에서 문서를 수집하기 위한 지침
 
 ### 🔑 Authentication
 
-By default, the `SharePointLoader` expects that the values of `CLIENT_ID` and `CLIENT_SECRET` must be stored as environment variables named `O365_CLIENT_ID` and `O365_CLIENT_SECRET` respectively. You could pass those environment variables through a `.env` file at the root of your application or using the following command in your script.
+기본적으로 `SharePointLoader`는 `CLIENT_ID`와 `CLIENT_SECRET` 값이 각각 `O365_CLIENT_ID`와 `O365_CLIENT_SECRET`라는 이름의 환경 변수로 저장되어야 합니다. 애플리케이션 루트에 `.env` 파일을 통해 또는 스크립트에서 다음 명령을 사용하여 이러한 환경 변수를 전달할 수 있습니다.
 
 ```python
 os.environ['O365_CLIENT_ID'] = "YOUR CLIENT ID"
 os.environ['O365_CLIENT_SECRET'] = "YOUR CLIENT SECRET"
 ```
 
-This loader uses an authentication called [*on behalf of a user*](https://learn.microsoft.com/en-us/graph/auth-v2-user?context=graph%2Fapi%2F1.0&view=graph-rest-1.0). It is a 2 step authentication with user consent. When you instantiate the loader, it will call will print a url that the user must visit to give consent to the app on the required permissions. The user must then visit this url and give consent to the application. Then the user must copy the resulting page url and paste it back on the console. The method will then return True if the login attempt was succesful.
+이 loader는 [*on behalf of a user*](https://learn.microsoft.com/en-us/graph/auth-v2-user?context=graph%2Fapi%2F1.0&view=graph-rest-1.0)라는 인증을 사용합니다. 사용자 동의가 필요한 2단계 인증입니다. loader를 인스턴스화하면 사용자가 필요한 권한에 대해 앱에 동의하기 위해 방문해야 하는 url을 출력합니다. 그런 다음 사용자는 이 url을 방문하여 애플리케이션에 동의해야 합니다. 그런 다음 사용자는 결과 페이지 url을 복사하여 콘솔에 다시 붙여넣어야 합니다. 그러면 로그인 시도가 성공한 경우 메서드가 True를 반환합니다.
 
 ```python
 from langchain_community.document_loaders.sharepoint import SharePointLoader
@@ -40,7 +40,7 @@ from langchain_community.document_loaders.sharepoint import SharePointLoader
 loader = SharePointLoader(document_library_id="YOUR DOCUMENT LIBRARY ID")
 ```
 
-Once the authentication has been done, the loader will store a token (`o365_token.txt`) at `~/.credentials/` folder. This token could be used later to authenticate without the copy/paste steps explained earlier. To use this token for authentication, you need to change the `auth_with_token` parameter to True in the instantiation of the loader.
+인증이 완료되면 loader는 `~/.credentials/` 폴더에 token(`o365_token.txt`)을 저장합니다. 이 token은 나중에 앞서 설명한 복사/붙여넣기 단계 없이 인증하는 데 사용할 수 있습니다. 인증에 이 token을 사용하려면 loader 인스턴스화 시 `auth_with_token` 매개변수를 True로 변경해야 합니다.
 
 ```python
 from langchain_community.document_loaders.sharepoint import SharePointLoader
@@ -50,9 +50,9 @@ loader = SharePointLoader(document_library_id="YOUR DOCUMENT LIBRARY ID", auth_w
 
 ### 🗂️ Documents loader
 
-#### 📑 Loading documents from a Document Library Directory
+#### 📑 Document Library Directory에서 문서 로드하기
 
-`SharePointLoader` can load documents from a specific folder within your Document Library. For instance, you want to load all documents that are stored at `Documents/marketing` folder within your Document Library.
+`SharePointLoader`는 Document Library 내의 특정 폴더에서 문서를 로드할 수 있습니다. 예를 들어, Document Library 내의 `Documents/marketing` 폴더에 저장된 모든 문서를 로드하려는 경우입니다.
 
 ```python
 from langchain_community.document_loaders.sharepoint import SharePointLoader
@@ -61,7 +61,7 @@ loader = SharePointLoader(document_library_id="YOUR DOCUMENT LIBRARY ID", folder
 documents = loader.load()
 ```
 
-If you are receiving the error `Resource not found for the segment`, try using the `folder_id` instead of the folder path, which can be obtained from the [Microsoft Graph API](https://developer.microsoft.com/en-us/graph/graph-explorer)
+`Resource not found for the segment` 오류가 발생하는 경우, [Microsoft Graph API](https://developer.microsoft.com/en-us/graph/graph-explorer)에서 얻을 수 있는 `folder_id`를 folder path 대신 사용해 보세요.
 
 ```python
 loader = SharePointLoader(document_library_id="YOUR DOCUMENT LIBRARY ID", auth_with_token=True
@@ -69,7 +69,7 @@ loader = SharePointLoader(document_library_id="YOUR DOCUMENT LIBRARY ID", auth_w
 documents = loader.load()
 ```
 
-If you wish to load documents from the root directory, you can omit `folder_id`, `folder_path` and `documents_ids` and loader will load root directory.
+루트 디렉토리에서 문서를 로드하려면 `folder_id`, `folder_path` 및 `documents_ids`를 생략할 수 있으며 loader가 루트 디렉토리를 로드합니다.
 
 ```python
 # loads documents from root directory
@@ -77,7 +77,7 @@ loader = SharePointLoader(document_library_id="YOUR DOCUMENT LIBRARY ID", auth_w
 documents = loader.load()
 ```
 
-Combined with `recursive=True` you can simply load all documents from whole SharePoint:
+`recursive=True`와 결합하면 전체 SharePoint에서 모든 문서를 간단히 로드할 수 있습니다:
 
 ```python
 # loads documents from root directory
@@ -87,11 +87,11 @@ loader = SharePointLoader(document_library_id="YOUR DOCUMENT LIBRARY ID",
 documents = loader.load()
 ```
 
-#### 📑 Loading documents from a list of Documents IDs
+#### 📑 Documents ID 목록에서 문서 로드하기
 
-Another possibility is to provide a list of `object_id` for each document you want to load. For that, you will need to query the [Microsoft Graph API](https://developer.microsoft.com/en-us/graph/graph-explorer) to find all the documents ID that you are interested in. This [link](https://learn.microsoft.com/en-us/graph/api/resources/onedrive?view=graph-rest-1.0#commonly-accessed-resources) provides a list of endpoints that will be helpful to retrieve the documents ID.
+또 다른 가능성은 로드하려는 각 문서에 대한 `object_id` 목록을 제공하는 것입니다. 이를 위해 관심 있는 모든 문서 ID를 찾기 위해 [Microsoft Graph API](https://developer.microsoft.com/en-us/graph/graph-explorer)를 쿼리해야 합니다. 이 [링크](https://learn.microsoft.com/en-us/graph/api/resources/onedrive?view=graph-rest-1.0#commonly-accessed-resources)는 문서 ID를 검색하는 데 도움이 되는 endpoint 목록을 제공합니다.
 
-For instance, to retrieve information about all objects that are stored at `data/finance/` folder, you need make a request to: `https://graph.microsoft.com/v1.0/drives/<document-library-id>/root:/data/finance:/children`. Once you have the list of IDs that you are interested in, then you can instantiate the loader with the following parameters.
+예를 들어, `data/finance/` 폴더에 저장된 모든 객체에 대한 정보를 검색하려면 다음에 요청해야 합니다: `https://graph.microsoft.com/v1.0/drives/<document-library-id>/root:/data/finance:/children`. 관심 있는 ID 목록을 얻은 후 다음 매개변수로 loader를 인스턴스화할 수 있습니다.
 
 ```python
 from langchain_community.document_loaders.sharepoint import SharePointLoader
@@ -100,9 +100,9 @@ loader = SharePointLoader(document_library_id="YOUR DOCUMENT LIBRARY ID", object
 documents = loader.load()
 ```
 
-#### 📑 Choosing supported file types and preffered parsers
+#### 📑 지원되는 파일 유형 및 선호하는 parser 선택하기
 
-By default `SharePointLoader` loads file types defined in [`document_loaders/parsers/registry`](https://github.com/langchain-ai/langchain/blob/master/libs/community/langchain_community/document_loaders/parsers/registry.py#L10-L22) using the default parsers (see below).
+기본적으로 `SharePointLoader`는 기본 parser를 사용하여 [`document_loaders/parsers/registry`](https://github.com/langchain-ai/langchain/blob/master/libs/community/langchain_community/document_loaders/parsers/registry.py#L10-L22)에 정의된 파일 유형을 로드합니다(아래 참조).
 
 ```python
 def _get_default_parser() -> BaseBlobParser:
@@ -120,13 +120,12 @@ def _get_default_parser() -> BaseBlobParser:
     )
 ```
 
-You can override this behavior by passing `handlers` argument to `SharePointLoader`.
-Pass a dictionary mapping either file extensions (like `"doc"`, `"pdf"`, etc.)
-or MIME types (like `"application/pdf"`, `"text/plain"`, etc.) to parsers.
-Note that you must use either file extensions or MIME types exclusively and
-cannot mix them.
+`SharePointLoader`에 `handlers` 인수를 전달하여 이 동작을 재정의할 수 있습니다.
+파일 확장자(`"doc"`, `"pdf"` 등) 또는 MIME type(`"application/pdf"`, `"text/plain"` 등)을 parser에 매핑하는 dictionary를 전달하세요.
+파일 확장자 또는 MIME type 중 하나만 독점적으로 사용해야 하며
+혼합할 수 없습니다.
 
-Do not include the leading dot for file extensions.
+파일 확장자에는 앞의 점을 포함하지 마세요.
 
 ```python
 # using file extensions:
@@ -148,9 +147,9 @@ loader = SharePointLoader(document_library_id="...",
                             )
 ```
 
-In case multiple file extensions map to the same MIME type, the last dictionary item will
-apply.
-Example:
+여러 파일 확장자가 동일한 MIME type에 매핑되는 경우 마지막 dictionary 항목이
+적용됩니다.
+예시:
 
 ```python
 # 'jpg' and 'jpeg' both map to 'image/jpeg' MIME type. SecondParser() will be used

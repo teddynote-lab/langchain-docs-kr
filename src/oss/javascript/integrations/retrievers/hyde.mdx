@@ -2,13 +2,13 @@
 title: HyDE Retriever
 ---
 
-This example shows how to use the HyDE Retriever, which implements Hypothetical Document Embeddings (HyDE) as described in [this paper](https://arxiv.org/abs/2212.10496).
+이 예제는 [이 논문](https://arxiv.org/abs/2212.10496)에 설명된 Hypothetical Document Embeddings (HyDE)를 구현한 HyDE Retriever를 사용하는 방법을 보여줍니다.
 
-At a high level, HyDE is an embedding technique that takes queries, generates a hypothetical answer, and then embeds that generated document and uses that as the final example.
+높은 수준에서 보면, HyDE는 쿼리를 받아 가상의 답변을 생성한 다음, 생성된 문서를 임베딩하고 이를 최종 예제로 사용하는 임베딩 기법입니다.
 
-In order to use HyDE, we therefore need to provide a base embedding model, as well as an LLM that can be used to generate those documents. By default, the HyDE class comes with some default prompts to use (see the paper for more details on them), but we can also create our own, which should have a single input variable `{question}`.
+따라서 HyDE를 사용하려면 기본 embedding model과 해당 문서를 생성하는 데 사용할 수 있는 LLM을 제공해야 합니다. 기본적으로 HyDE class에는 사용할 수 있는 기본 prompt가 포함되어 있지만(자세한 내용은 논문 참조), 단일 입력 변수 `{question}`을 가진 자체 prompt를 만들 수도 있습니다.
 
-## Usage
+## 사용법
 
 ```typescript
 import { OpenAI, OpenAIEmbeddings } from "@langchain/openai";
@@ -44,6 +44,6 @@ console.log(results);
 */
 ```
 
-## Related
+## 관련 문서
 
-- [Retrieval guide](/oss/langchain/retrieval)
+- [Retrieval 가이드](/oss/langchain/retrieval)

@@ -2,11 +2,11 @@
 title: Tencent Cloud VectorDB
 ---
 
->[Tencent Cloud VectorDB](https://cloud.tencent.com/document/product/1709) is a fully managed, self-developed, enterprise-level distributed database service designed for storing, retrieving, and analyzing multi-dimensional vector data. The database supports multiple index types and similarity calculation methods. A single index can support a vector scale of up to 1 billion and can support millions of QPS and millisecond-level query latency. Tencent Cloud Vector Database can not only provide an external knowledge base for large models to improve the accuracy of large model responses but can also be widely used in AI fields such as recommendation systems, NLP services, computer vision, and intelligent customer service.
+>[Tencent Cloud VectorDB](https://cloud.tencent.com/document/product/1709)는 다차원 벡터 데이터를 저장, 검색 및 분석하기 위해 설계된 완전 관리형, 자체 개발 엔터프라이즈급 분산 데이터베이스 서비스입니다. 이 데이터베이스는 여러 인덱스 유형과 유사도 계산 방법을 지원합니다. 단일 인덱스는 최대 10억 개의 벡터 규모를 지원할 수 있으며, 수백만 QPS와 밀리초 수준의 쿼리 지연 시간을 지원할 수 있습니다. Tencent Cloud Vector Database는 대규모 모델의 응답 정확도를 향상시키기 위해 외부 지식 베이스를 제공할 수 있을 뿐만 아니라 추천 시스템, NLP 서비스, 컴퓨터 비전, 지능형 고객 서비스와 같은 AI 분야에서 광범위하게 사용될 수 있습니다.
 
-This notebook shows how to use functionality related to the Tencent vector database.
+이 노트북은 Tencent vector database와 관련된 기능을 사용하는 방법을 보여줍니다.
 
-To run, you should have a [Database instance.](https://cloud.tencent.com/document/product/1709/95101).
+실행하려면 [Database instance](https://cloud.tencent.com/document/product/1709/95101)가 있어야 합니다.
 
 ## Basic Usage
 
@@ -22,7 +22,7 @@ from langchain_community.vectorstores.tencentvectordb import ConnectionParams
 from langchain_text_splitters import CharacterTextSplitter
 ```
 
-load the documents, split them into chunks.
+문서를 로드하고 청크로 분할합니다.
 
 ```python
 loader = TextLoader("../../how_to/state_of_the_union.txt")
@@ -31,17 +31,17 @@ text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
 docs = text_splitter.split_documents(documents)
 ```
 
-we support two ways to embed the documents:
+문서를 임베딩하는 두 가지 방법을 지원합니다:
 
-- Use any Embeddings models compatible with LangChain Embeddings.
-- Specify the Embedding model name of the Tencent VectorStore DB, choices are:
+- LangChain Embeddings와 호환되는 모든 Embeddings 모델을 사용합니다.
+- Tencent VectorStore DB의 Embedding 모델 이름을 지정합니다. 선택 가능한 옵션은 다음과 같습니다:
   - `bge-base-zh`, dimension: 768
   - `m3e-base`, dimension: 768
   - `text2vec-large-chinese`, dimension: 1024
   - `e5-large-v2`, dimension: 1024
   - `multilingual-e5-base`, dimension: 768
 
-flowing code shows both ways to embed the documents, you can choose one of them by commenting the other:
+다음 코드는 문서를 임베딩하는 두 가지 방법을 모두 보여주며, 다른 하나를 주석 처리하여 하나를 선택할 수 있습니다:
 
 ```python
 ##  you can use a LangChain Embeddings model, like OpenAIEmbeddings:
@@ -57,7 +57,7 @@ t_vdb_embedding = "bge-base-zh"  # bge-base-zh is the default model
 embeddings = None
 ```
 
-now we can create a TencentVectorDB instance, you must provide at least one of the `embeddings` or `t_vdb_embedding` parameters. if both are provided, the `embeddings` parameter will be used:
+이제 TencentVectorDB 인스턴스를 생성할 수 있습니다. `embeddings` 또는 `t_vdb_embedding` 매개변수 중 하나 이상을 제공해야 합니다. 둘 다 제공되면 `embeddings` 매개변수가 사용됩니다:
 
 ```python
 conn_params = ConnectionParams(
@@ -97,9 +97,9 @@ docs[0].page_content
 
 ## Metadata and filtering
 
-Tencent VectorDB supports metadata and [filtering](https://cloud.tencent.com/document/product/1709/95099#c6f6d3a3-02c5-4891-b0a1-30fe4daf18d8). You can add metadata to the documents and filter the search results based on the metadata.
+Tencent VectorDB는 metadata와 [filtering](https://cloud.tencent.com/document/product/1709/95099#c6f6d3a3-02c5-4891-b0a1-30fe4daf18d8)을 지원합니다. 문서에 metadata를 추가하고 metadata를 기반으로 검색 결과를 필터링할 수 있습니다.
 
-now we will create a new TencentVectorDB collection with metadata and demonstrate how to filter the search results based on the metadata:
+이제 metadata가 포함된 새로운 TencentVectorDB collection을 생성하고 metadata를 기반으로 검색 결과를 필터링하는 방법을 시연하겠습니다:
 
 ```python
 from langchain_community.vectorstores.tencentvectordb import (

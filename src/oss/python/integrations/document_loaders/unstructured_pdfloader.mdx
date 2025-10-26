@@ -2,17 +2,17 @@
 title: UnstructuredPDFLoader
 ---
 
-[Unstructured](https://unstructured-io.github.io/unstructured/) supports a common interface for working with unstructured or semi-structured file formats, such as Markdown or PDF. LangChain's [UnstructuredPDFLoader](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.UnstructuredPDFLoader.html) integrates with Unstructured to parse PDF documents into LangChain [Document](https://python.langchain.com/api_reference/core/documents/langchain_core.documents.base.Document.html) objects.
+[Unstructured](https://unstructured-io.github.io/unstructured/)는 Markdown이나 PDF와 같은 비구조화 또는 반구조화 파일 형식을 다루기 위한 공통 인터페이스를 지원합니다. LangChain의 [UnstructuredPDFLoader](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.UnstructuredPDFLoader.html)는 Unstructured와 통합되어 PDF 문서를 LangChain [Document](https://python.langchain.com/api_reference/core/documents/langchain_core.documents.base.Document.html) 객체로 파싱합니다.
 
-Please see [this page](/oss/integrations/providers/unstructured/) for more information on installing system requirements.
+시스템 요구사항 설치에 대한 자세한 내용은 [이 페이지](/oss/integrations/providers/unstructured/)를 참조하세요.
 
-### Integration details
+### Integration 세부사항
 
 | Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/document_loaders/file_loaders/unstructured/)|
 | :--- | :--- | :---: | :---: |  :---: |
 | [UnstructuredPDFLoader](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.UnstructuredPDFLoader.html) | [langchain_community](https://python.langchain.com/api_reference/community/index.html) | ✅ | ❌ | ✅ |
 
-### Loader features
+### Loader 기능
 
 | Source | Document Lazy Loading | Native Async Support
 | :---: | :---: | :---: |
@@ -22,9 +22,9 @@ Please see [this page](/oss/integrations/providers/unstructured/) for more infor
 
 ### Credentials
 
-No credentials are needed to use this loader.
+이 loader를 사용하는 데 필요한 credentials는 없습니다.
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -33,7 +33,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-Install **langchain_community** and **unstructured**.
+**langchain_community**와 **unstructured**를 설치합니다.
 
 ```python
 pip install -qU langchain-community unstructured
@@ -41,7 +41,7 @@ pip install -qU langchain-community unstructured
 
 ## Initialization
 
-Now we can initialize our loader:
+이제 loader를 초기화할 수 있습니다:
 
 ```python
 from langchain_community.document_loaders import UnstructuredPDFLoader
@@ -71,7 +71,7 @@ print(docs[0].metadata)
 
 ### Retain Elements
 
-Under the hood, Unstructured creates different "elements" for different chunks of text. By default we combine those together, but you can easily keep that separation by specifying `mode="elements"`.
+내부적으로 Unstructured는 텍스트의 다른 청크에 대해 서로 다른 "elements"를 생성합니다. 기본적으로 이들을 결합하지만, `mode="elements"`를 지정하여 쉽게 분리 상태를 유지할 수 있습니다.
 
 ```python
 file_path = "./example_data/layout-parser-paper.pdf"
@@ -85,7 +85,7 @@ data[0]
 Document(metadata={'source': './example_data/layout-parser-paper.pdf', 'coordinates': {'points': ((16.34, 213.36), (16.34, 253.36), (36.34, 253.36), (36.34, 213.36)), 'system': 'PixelSpace', 'layout_width': 612, 'layout_height': 792}, 'file_directory': './example_data', 'filename': 'layout-parser-paper.pdf', 'languages': ['eng'], 'last_modified': '2024-07-25T21:28:58', 'page_number': 1, 'filetype': 'application/pdf', 'category': 'UncategorizedText', 'element_id': 'd3ce55f220dfb75891b4394a18bcb973'}, page_content='1 2 0 2')
 ```
 
-See the full set of element types for this particular document:
+이 특정 문서에 대한 전체 element 유형 세트를 확인하세요:
 
 ```python
 set(doc.metadata["category"] for doc in data)
@@ -95,11 +95,11 @@ set(doc.metadata["category"] for doc in data)
 {'ListItem', 'NarrativeText', 'Title', 'UncategorizedText'}
 ```
 
-### Fetching remote PDFs using Unstructured
+### Unstructured를 사용하여 원격 PDF 가져오기
 
-This covers how to load online PDFs into a document format that we can use downstream. This can be used for various online PDF sites such as [open.umn.edu/opentextbooks/textbooks/](https://open.umn.edu/opentextbooks/textbooks/) and [arxiv.org/archive/](https://arxiv.org/archive/)
+이 섹션에서는 온라인 PDF를 다운스트림에서 사용할 수 있는 document 형식으로 로드하는 방법을 다룹니다. 이는 [open.umn.edu/opentextbooks/textbooks/](https://open.umn.edu/opentextbooks/textbooks/) 및 [arxiv.org/archive/](https://arxiv.org/archive/)와 같은 다양한 온라인 PDF 사이트에 사용할 수 있습니다.
 
-Note: all other PDF loaders can also be used to fetch remote PDFs, but `OnlinePDFLoader` is a legacy function, and works specifically with `UnstructuredPDFLoader`.
+참고: 다른 모든 PDF loader도 원격 PDF를 가져오는 데 사용할 수 있지만, `OnlinePDFLoader`는 레거시 함수이며 `UnstructuredPDFLoader`와 함께 특별히 작동합니다.
 
 ```python
 from langchain_community.document_loaders import OnlinePDFLoader
@@ -128,4 +128,4 @@ for doc in loader.lazy_load():
 
 ## API reference
 
-For detailed documentation of all UnstructuredPDFLoader features and configurations head to the API reference: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.UnstructuredPDFLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.UnstructuredPDFLoader.html)
+모든 UnstructuredPDFLoader 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.UnstructuredPDFLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.UnstructuredPDFLoader.html)

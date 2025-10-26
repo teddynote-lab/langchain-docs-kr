@@ -2,13 +2,13 @@
 title: Azure AI Search
 ---
 
-[Azure AI Search](https://learn.microsoft.com/azure/search/search-what-is-azure-search) (formerly known as `Azure Cognitive Search`) is a Microsoft cloud search service that gives developers infrastructure, APIs, and tools for information retrieval of vector, keyword, and hybrid queries at scale.
+[Azure AI Search](https://learn.microsoft.com/azure/search/search-what-is-azure-search) (이전 명칭 `Azure Cognitive Search`)는 Microsoft 클라우드 검색 서비스로, 개발자에게 대규모 벡터, 키워드 및 하이브리드 쿼리의 정보 검색을 위한 인프라, API 및 도구를 제공합니다.
 
-`AzureAISearchRetriever` is an integration module that returns documents from an unstructured query. It's based on the BaseRetriever class and it targets the 2023-11-01 stable REST API version of Azure AI Search, which means it supports vector indexing and queries.
+`AzureAISearchRetriever`는 비구조화된 쿼리에서 문서를 반환하는 통합 모듈입니다. BaseRetriever 클래스를 기반으로 하며 Azure AI Search의 2023-11-01 안정 REST API 버전을 대상으로 하므로 벡터 인덱싱 및 쿼리를 지원합니다.
 
-This guide will help you get started with the Azure AI Search [retriever](/oss/langchain/retrieval). For detailed documentation of all `AzureAISearchRetriever` features and configurations head to the [API reference](https://python.langchain.com/api_reference/community/retrievers/langchain_community.retrievers.azure_ai_search.AzureAISearchRetriever.html).
+이 가이드는 Azure AI Search [retriever](/oss/langchain/retrieval)를 시작하는 데 도움을 드립니다. 모든 `AzureAISearchRetriever` 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/retrievers/langchain_community.retrievers.azure_ai_search.AzureAISearchRetriever.html)를 참조하세요.
 
-`AzureAISearchRetriever` replaces `AzureCognitiveSearchRetriever`, which will soon be deprecated. We recommend switching to the newer version that's based on the most recent stable version of the search APIs.
+`AzureAISearchRetriever`는 곧 deprecated될 `AzureCognitiveSearchRetriever`를 대체합니다. 최신 안정 버전의 검색 API를 기반으로 하는 새 버전으로 전환하는 것을 권장합니다.
 
 ### Integration details
 
@@ -16,19 +16,19 @@ This guide will help you get started with the Azure AI Search [retriever](/oss/l
 
 ## Setup
 
-To use this module, you need:
+이 모듈을 사용하려면 다음이 필요합니다:
 
-+ An Azure AI Search service. You can [create one](https://learn.microsoft.com/azure/search/search-create-service-portal) for free if you sign up for the Azure trial. A free service has lower quotas, but it's sufficient for running the code in this notebook.
++ Azure AI Search 서비스. Azure 평가판에 가입하면 [무료로 생성](https://learn.microsoft.com/azure/search/search-create-service-portal)할 수 있습니다. 무료 서비스는 할당량이 낮지만 이 노트북의 코드를 실행하기에는 충분합니다.
 
-+ An existing index with vector fields. There are several ways to create one, including using the [vector store module](../vectorstores/azuresearch.ipynb). Or, [try the Azure AI Search REST APIs](https://learn.microsoft.com/azure/search/search-get-started-vector).
++ vector 필드가 있는 기존 인덱스. [vector store 모듈](../vectorstores/azuresearch.ipynb)을 사용하는 것을 포함하여 여러 가지 생성 방법이 있습니다. 또는 [Azure AI Search REST API를 사용해보세요](https://learn.microsoft.com/azure/search/search-get-started-vector).
 
-+ An API key or Azure AD Token.
-  + API keys are generated when you create the search service. If you're just querying an index, you can use the query API key, otherwise use an admin API key. See [Find your API keys](https://learn.microsoft.com/azure/search/search-security-api-keys?tabs=rest-use%2Cportal-find%2Cportal-query#find-existing-keys) for details.
-  + Azure AD Token can be used with Azure Managed Identity. See [Connect your app to Azure AI Search using identities](https://learn.microsoft.com/en-us/azure/search/keyless-connections?tabs=python%2Cazure-cli) for details.
++ API key 또는 Azure AD Token.
+  + API key는 검색 서비스를 생성할 때 생성됩니다. 인덱스만 쿼리하는 경우 query API key를 사용할 수 있으며, 그렇지 않으면 admin API key를 사용하세요. 자세한 내용은 [Find your API keys](https://learn.microsoft.com/azure/search/search-security-api-keys?tabs=rest-use%2Cportal-find%2Cportal-query#find-existing-keys)를 참조하세요.
+  + Azure AD Token은 Azure Managed Identity와 함께 사용할 수 있습니다. 자세한 내용은 [Connect your app to Azure AI Search using identities](https://learn.microsoft.com/en-us/azure/search/keyless-connections?tabs=python%2Cazure-cli)를 참조하세요.
 
-We can then set the search service name, index name, and API key as environment variables (alternatively, you can pass them as arguments to `AzureAISearchRetriever`). The search index provides the searchable content.
+그런 다음 검색 서비스 이름, 인덱스 이름 및 API key를 환경 변수로 설정할 수 있습니다(또는 `AzureAISearchRetriever`에 인수로 전달할 수 있습니다). 검색 인덱스는 검색 가능한 콘텐츠를 제공합니다.
 
-With an API Key
+API Key 사용
 
 ```python
 import os
@@ -38,7 +38,7 @@ os.environ["AZURE_AI_SEARCH_INDEX_NAME"] = "<YOUR_SEARCH_INDEX_NAME>"
 os.environ["AZURE_AI_SEARCH_API_KEY"] = "<YOUR_API_KEY>"
 ```
 
-With an Azure AD Token
+Azure AD Token 사용
 
 ```python
 import os
@@ -48,7 +48,7 @@ os.environ["AZURE_AI_SEARCH_INDEX_NAME"] = "<YOUR_SEARCH_INDEX_NAME>"
 os.environ["AZURE_AI_SEARCH_AD_TOKEN"] = "<YOUR_AZURE_AD_TOKEN>"
 ```
 
-If you want to get automated tracing from individual queries, you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+개별 쿼리에서 자동 추적을 받으려면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -57,7 +57,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-This retriever lives in the `langchain-community` package. We will need some additional dependencies as well:
+이 retriever는 `langchain-community` 패키지에 있습니다. 몇 가지 추가 종속성도 필요합니다:
 
 ```python
 pip install -qU langchain-community
@@ -68,7 +68,7 @@ pip install -qU  azure-identity
 
 ## Instantiation
 
-For `AzureAISearchRetriever`, provide an `index_name`, `content_key`, and `top_k` set to the number of number of results you'd like to retrieve. Setting `top_k` to zero (the default) returns all results.
+`AzureAISearchRetriever`의 경우 `index_name`, `content_key` 및 검색하려는 결과 수로 설정된 `top_k`를 제공하세요. `top_k`를 0(기본값)으로 설정하면 모든 결과가 반환됩니다.
 
 ```python
 from langchain_community.retrievers import AzureAISearchRetriever
@@ -80,8 +80,8 @@ retriever = AzureAISearchRetriever(
 
 ## Usage
 
-Now you can use it to retrieve documents from Azure AI Search.
-This is the method you would call to do so. It will return all documents relevant to the query.
+이제 Azure AI Search에서 문서를 검색하는 데 사용할 수 있습니다.
+이것이 그렇게 하기 위해 호출할 메서드입니다. 쿼리와 관련된 모든 문서를 반환합니다.
 
 ```python
 retriever.invoke("here is my unstructured query string")
@@ -89,9 +89,9 @@ retriever.invoke("here is my unstructured query string")
 
 ## Example
 
-This section demonstrates using the retriever over built-in sample data. You can skip this step if you already have a vector index on your search service.
+이 섹션에서는 내장된 샘플 데이터에 대해 retriever를 사용하는 방법을 보여줍니다. 검색 서비스에 이미 vector 인덱스가 있는 경우 이 단계를 건너뛸 수 있습니다.
 
-Start by providing the endpoints and keys. Since we're creating a vector index in this step, specify a text embedding model to get a vector representation of the text. This example assumes Azure OpenAI with a deployment of text-embedding-ada-002. Because this step creates an index, be sure to use an admin API key for your search service.
+먼저 endpoint와 key를 제공합니다. 이 단계에서 vector 인덱스를 생성하므로 텍스트의 벡터 표현을 얻기 위해 text embedding 모델을 지정하세요. 이 예제는 text-embedding-ada-002 배포가 있는 Azure OpenAI를 가정합니다. 이 단계에서는 인덱스를 생성하므로 검색 서비스에 대한 admin API key를 사용해야 합니다.
 
 ```python
 import os
@@ -111,7 +111,7 @@ azure_openai_api_version: str = "2023-05-15"
 azure_deployment: str = "text-embedding-ada-002"
 ```
 
-We'll use an embedding model from Azure OpenAI to turn our documents into embeddings stored in the Azure AI Search vector store. We'll also set the index name to `langchain-vector-demo`. This will create a new vector store associated with that index name.
+Azure OpenAI의 embedding 모델을 사용하여 문서를 Azure AI Search vector store에 저장된 embedding으로 변환합니다. 또한 인덱스 이름을 `langchain-vector-demo`로 설정합니다. 이렇게 하면 해당 인덱스 이름과 연결된 새 vector store가 생성됩니다.
 
 ```python
 embeddings = AzureOpenAIEmbeddings(
@@ -128,7 +128,7 @@ vector_store: AzureSearch = AzureSearch(
 )
 ```
 
-Next, we'll load data into our newly created vector store. For this example, we load the `state_of_the_union.txt` file. We'll split the text in 400 token chunks with no overlap. Finally, the documents are added to our vector store as emeddings.
+다음으로 새로 생성된 vector store에 데이터를 로드합니다. 이 예제에서는 `state_of_the_union.txt` 파일을 로드합니다. 텍스트를 겹치지 않는 400개의 토큰 청크로 분할합니다. 마지막으로 문서가 embedding으로 vector store에 추가됩니다.
 
 ```python
 from langchain_community.document_loaders import TextLoader
@@ -143,7 +143,7 @@ docs = text_splitter.split_documents(documents)
 vector_store.add_documents(documents=docs)
 ```
 
-Next, we'll create a retriever. The current `index_name` variable is `langchain-vector-demo` from the last step. If you skipped vector store creation, provide your index name in the parameter. In this query, the top result is returned.
+다음으로 retriever를 생성합니다. 현재 `index_name` 변수는 마지막 단계의 `langchain-vector-demo`입니다. vector store 생성을 건너뛴 경우 매개변수에 인덱스 이름을 제공하세요. 이 쿼리에서는 상위 결과가 반환됩니다.
 
 ```python
 retriever = AzureAISearchRetriever(
@@ -151,7 +151,7 @@ retriever = AzureAISearchRetriever(
 )
 ```
 
-Now we can retrieve the data that is relevant to our query from the documents we uploaded.
+이제 업로드한 문서에서 쿼리와 관련된 데이터를 검색할 수 있습니다.
 
 ```python
 retriever.invoke("does the president have a plan for covid-19?")
@@ -194,4 +194,4 @@ chain.invoke("does the president have a plan for covid-19?")
 
 ## API reference
 
-For detailed documentation of all `AzureAISearchRetriever` features and configurations head to the [API reference](https://python.langchain.com/api_reference/community/retrievers/langchain_community.retrievers.azure_ai_search.AzureAISearchRetriever.html).
+모든 `AzureAISearchRetriever` 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/retrievers/langchain_community.retrievers.azure_ai_search.AzureAISearchRetriever.html)를 참조하세요.

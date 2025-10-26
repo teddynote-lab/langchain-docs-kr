@@ -2,18 +2,18 @@
 title: Browserbase
 ---
 
-[Browserbase](https://browserbase.com) is a developer platform to reliably run, manage, and monitor headless browsers.
+[Browserbase](https://browserbase.com)는 headless browser를 안정적으로 실행, 관리 및 모니터링할 수 있는 개발자 플랫폼입니다.
 
-Power your AI data retrievals with:
-- [Serverless Infrastructure](https://docs.browserbase.com/under-the-hood) providing reliable browsers to extract data from complex UIs
-- [Stealth Mode](https://docs.browserbase.com/features/stealth-mode) with included fingerprinting tactics and automatic captcha solving
-- [Session Debugger](https://docs.browserbase.com/features/sessions) to inspect your Browser Session with networks timeline and logs
-- [Live Debug](https://docs.browserbase.com/guides/session-debug-connection/browser-remote-control) to quickly debug your automation
+다음 기능으로 AI 데이터 검색을 강화하세요:
+- 복잡한 UI에서 데이터를 추출할 수 있는 안정적인 브라우저를 제공하는 [Serverless Infrastructure](https://docs.browserbase.com/under-the-hood)
+- 핑거프린팅 전술과 자동 captcha 해결 기능이 포함된 [Stealth Mode](https://docs.browserbase.com/features/stealth-mode)
+- 네트워크 타임라인 및 로그와 함께 Browser Session을 검사할 수 있는 [Session Debugger](https://docs.browserbase.com/features/sessions)
+- 자동화를 빠르게 디버깅할 수 있는 [Live Debug](https://docs.browserbase.com/guides/session-debug-connection/browser-remote-control)
 
 ## Installation and Setup
 
-- Get an API key and Project ID from [browserbase.com](https://browserbase.com) and set it in environment variables (`BROWSERBASE_API_KEY`, `BROWSERBASE_PROJECT_ID`).
-- Install the [Browserbase SDK](http://github.com/browserbase/python-sdk):
+- [browserbase.com](https://browserbase.com)에서 API key와 Project ID를 받아 환경 변수(`BROWSERBASE_API_KEY`, `BROWSERBASE_PROJECT_ID`)에 설정하세요.
+- [Browserbase SDK](http://github.com/browserbase/python-sdk)를 설치하세요:
 
 ```python
 pip install browserbase
@@ -21,7 +21,7 @@ pip install browserbase
 
 ## Document loader
 
-See a [usage example](/oss/integrations/document_loaders/browserbase).
+[사용 예제](/oss/integrations/document_loaders/browserbase)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import BrowserbaseLoader
@@ -29,7 +29,7 @@ from langchain_community.document_loaders import BrowserbaseLoader
 
 ## Multi-Modal
 
-See a [usage example](/oss/integrations/document_loaders/browserbase).
+[사용 예제](/oss/integrations/document_loaders/browserbase)를 참조하세요.
 
 ```python
 from browserbase.helpers.gpt4 import GPT4VImage, GPT4VImageDetail

@@ -2,26 +2,26 @@
 title: Amazon MemoryDB
 ---
 
->[Vector Search](https://docs.aws.amazon.com/memorydb/latest/devguide/vector-search.html/) introduction and langchain integration guide.
+>[Vector Search](https://docs.aws.amazon.com/memorydb/latest/devguide/vector-search.html/) 소개 및 langchain 통합 가이드.
 
-## What is Amazon MemoryDB?
+## Amazon MemoryDB란?
 
-MemoryDB is compatible with Redis OSS, a popular open source data store, enabling you to quickly build applications using the same flexible and friendly Redis OSS data structures, APIs, and commands that they already use today. With MemoryDB, all of your data is stored in memory, which enables you to achieve microsecond read and single-digit millisecond write latency and high throughput. MemoryDB also stores data durably across multiple Availability Zones (AZs) using a Multi-AZ transactional log to enable fast failover, database recovery, and node restarts.
+MemoryDB는 널리 사용되는 오픈 소스 데이터 스토어인 Redis OSS와 호환되며, 오늘날 이미 사용 중인 유연하고 친숙한 Redis OSS 데이터 구조, API, 명령을 그대로 사용해 애플리케이션을 빠르게 구축할 수 있게 해줍니다. MemoryDB에서는 모든 데이터가 메모리에 저장되어 마이크로초 대의 읽기 지연, 한 자리 밀리초 대의 쓰기 지연, 그리고 높은 처리량을 달성할 수 있습니다. 또한 MemoryDB는 Multi-AZ transactional log를 사용해 여러 Availability Zones(AZs)에 걸쳐 데이터를 내구성 있게 저장하여 빠른 장애 조치, 데이터베이스 복구, 노드 재시작을 가능하게 합니다.
 
-## Vector search for MemoryDB
+## MemoryDB의 Vector search
 
-Vector search for MemoryDB extends the functionality of MemoryDB. Vector search can be used in conjunction with existing MemoryDB functionality. Applications that do not use vector search are unaffected by its presence. Vector search is available in all Regions that MemoryDB is available. You can use your existing MemoryDB data or Redis OSS API to build machine learning and generative AI use cases, such as retrieval-augmented generation, anomaly detection, document retrieval, and real-time recommendations.
+MemoryDB의 Vector search는 MemoryDB의 기능을 확장합니다. Vector search는 기존의 MemoryDB 기능과 함께 사용할 수 있습니다. Vector search를 사용하지 않는 애플리케이션은 그 존재에 의해 영향을 받지 않습니다. Vector search는 MemoryDB가 제공되는 모든 리전에서 사용할 수 있습니다. 기존의 MemoryDB 데이터 또는 Redis OSS API를 사용해 retrieval-augmented generation, 이상 탐지, 문서 검색, 실시간 추천과 같은 머신 러닝 및 생성형 AI 활용 사례를 구축할 수 있습니다.
 
-* Indexing of multiple fields in Redis hashes and `JSON`
-* Vector similarity search (with `HNSW` (ANN) or `FLAT` (KNN))
-* Vector Range Search (e.g. find all vectors within a radius of a query vector)
-* Incremental indexing without performance loss
+* Redis hashes 및 `JSON`의 여러 필드 인덱싱
+* Vector similarity search (`HNSW`(ANN) 또는 `FLAT`(KNN) 사용)
+* Vector Range Search(예: 쿼리 벡터의 반경 내 모든 벡터 찾기)
+* 성능 저하 없이 점진적 인덱싱
 
-## Setting up
+## 설정하기
 
-### Install Redis Python client
+### Redis Python client 설치하기
 
-`Redis-py` is a python  client that can be used to connect to MemoryDB
+`Redis-py`는 MemoryDB에 연결하는 데 사용할 수 있는 python client입니다.
 
 ```python
 pip install -qU  redis langchain-aws
@@ -33,18 +33,18 @@ from langchain_aws.embeddings import BedrockEmbeddings
 embeddings = BedrockEmbeddings()
 ```
 
-### MemoryDB Connection
+### MemoryDB 연결
 
-Valid Redis Url schemas are:
+유효한 Redis URL 스키마는 다음과 같습니다:
 
-1. `redis://`  - Connection to Redis cluster, unencrypted
-2. `rediss://` - Connection to Redis cluster, with TLS encryption
+1. `redis://`  - Redis 클러스터에 비암호화 연결
+2. `rediss://` - TLS 암호화를 사용한 Redis 클러스터 연결
 
-More information about additional connection parameters can be found in the [redis-py documentation](https://redis-py.readthedocs.io/en/stable/connections.html).
+추가 연결 매개변수에 대한 자세한 내용은 [redis-py documentation](https://redis-py.readthedocs.io/en/stable/connections.html)에서 확인할 수 있습니다.
 
-### Sample data
+### 샘플 데이터
 
-First we will describe some sample data so that the various attributes of the Redis vector store can be demonstrated.
+먼저 Redis vector store의 다양한 속성을 시연하기 위해 일부 샘플 데이터를 설명합니다.
 
 ```python
 metadata = [
@@ -83,13 +83,13 @@ texts = ["foo", "foo", "foo", "bar", "bar"]
 index_name = "users"
 ```
 
-### Create MemoryDB vector store
+### MemoryDB vector store 생성하기
 
-The InMemoryVectorStore instance can be initialized using the below methods
-* `InMemoryVectorStore.__init__` - Initialize directly
-* `InMemoryVectorStore.from_documents` - Initialize from a list of `LangChain.docstore.Document` objects
-* `InMemoryVectorStore.from_texts` - Initialize from a list of texts (optionally with metadata)
-* `InMemoryVectorStore.from_existing_index` - Initialize from an existing MemoryDB index
+InMemoryVectorStore 인스턴스는 아래 방법으로 초기화할 수 있습니다
+* `InMemoryVectorStore.__init__` - 직접 초기화
+* `InMemoryVectorStore.from_documents` - `LangChain.docstore.Document` 객체 리스트로부터 초기화
+* `InMemoryVectorStore.from_texts` - 텍스트 리스트(선택적으로 metadata 포함)로부터 초기화
+* `InMemoryVectorStore.from_existing_index` - 기존 MemoryDB 인덱스에서 초기화
 
 ```python
 from langchain_aws.vectorstores.inmemorydb import InMemoryVectorStore
@@ -108,15 +108,15 @@ vds.index_name
 'users'
 ```
 
-## Querying
+## 쿼리하기
 
-There are multiple ways to query the `InMemoryVectorStore`  implementation based on what use case you have:
+사용 사례에 따라 `InMemoryVectorStore` 구현을 쿼리하는 여러 방법이 있습니다:
 
-* `similarity_search`: Find the most similar vectors to a given vector.
-* `similarity_search_with_score`: Find the most similar vectors to a given vector and return the vector distance
-* `similarity_search_limit_score`: Find the most similar vectors to a given vector and limit the number of results to the `score_threshold`
-* `similarity_search_with_relevance_scores`: Find the most similar vectors to a given vector and return the vector similarities
-* `max_marginal_relevance_search`: Find the most similar vectors to a given vector while also optimizing for diversity
+* `similarity_search`: 주어진 벡터와 가장 유사한 벡터를 찾습니다.
+* `similarity_search_with_score`: 주어진 벡터와 가장 유사한 벡터를 찾고 벡터 거리를 반환합니다.
+* `similarity_search_limit_score`: 주어진 벡터와 가장 유사한 벡터를 찾고 결과 수를 `score_threshold`로 제한합니다.
+* `similarity_search_with_relevance_scores`: 주어진 벡터와 가장 유사한 벡터를 찾고 벡터 유사도를 반환합니다.
+* `max_marginal_relevance_search`: 다양성도 함께 최적화하면서 주어진 벡터와 가장 유사한 벡터를 찾습니다.
 
 ```python
 results = vds.similarity_search("foo")
@@ -182,11 +182,11 @@ vds.add_texts(new_document, new_metadata)
 ['doc:users:b9c71d62a0a34241a37950b448dafd38']
 ```
 
-## MemoryDB as Retriever
+## Retriever로서의 MemoryDB
 
-Here we go over different options for using the vector store as a retriever.
+여기서는 vector store를 retriever로 사용하는 다양한 옵션을 살펴봅니다.
 
-There are three different search methods we can use to do retrieval. By default, it will use semantic similarity.
+검색에는 세 가지 서로 다른 방법을 사용할 수 있습니다. 기본적으로 semantic similarity를 사용합니다.
 
 ```python
 query = "foo"
@@ -218,7 +218,7 @@ docs
  Document(page_content='bar', metadata={'id': 'doc:users_modified:01ef6caac12b42c28ad870aefe574253', 'user': 'tyler', 'job': 'engineer', 'credit_score': 'high', 'age': '100'})]
 ```
 
-There is also the `similarity_distance_threshold` retriever which allows the user to specify the vector distance
+또한 사용자가 vector distance를 지정할 수 있게 해주는 `similarity_distance_threshold` retriever도 있습니다.
 
 ```python
 retriever = vds.as_retriever(
@@ -238,7 +238,7 @@ docs
  Document(page_content='foo', metadata={'id': 'doc:users_modified:7087cee9be5b4eca93c30fbdd09a2731', 'user': 'nancy', 'job': 'doctor', 'credit_score': 'high', 'age': '94'})]
 ```
 
-Lastly, the `similarity_score_threshold` allows the user to define the minimum score for similar documents
+마지막으로, `similarity_score_threshold`는 유사한 문서의 최소 점수를 사용자가 정의할 수 있게 해줍니다.
 
 ```python
 retriever = vds.as_retriever(
@@ -268,9 +268,9 @@ retriever.invoke("foo")
  Document(page_content='foo', metadata={'id': 'doc:users:d6200ab3764c466082fde3eaab972a2a', 'user': 'derrick', 'job': 'doctor', 'credit_score': 'low', 'age': '45'})]
 ```
 
-## Delete  index
+## 인덱스 삭제
 
-To delete your entries you have to address them by their keys.
+항목을 삭제하려면 해당 키로 지정해야 합니다.
 
 ```python
 # delete the indices too

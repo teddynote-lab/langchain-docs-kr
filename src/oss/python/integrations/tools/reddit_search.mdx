@@ -2,17 +2,17 @@
 title: Reddit Search
 ---
 
-In this notebook, we learn how the Reddit search tool works.
-First make sure that you have installed praw with the command below:
+이 노트북에서는 Reddit search tool이 어떻게 작동하는지 알아봅니다.
+먼저 아래 명령어로 praw를 설치했는지 확인하세요:
 
 ```python
 pip install -qU  praw
 ```
 
-Then you need to set you need to set up the proper API keys and environment variables. You would need to create a Reddit user account and get credentials. So, create a Reddit user account by going to [www.reddit.com](https://www.reddit.com)  and signing up.
-Then get your credentials by going to [www.reddit.com/prefs/apps](https://www.reddit.com/prefs/apps) and creating an app.
-You should have your client_id and secret from creating the app. Now, you can paste those strings in client_id and client_secret variable.
-Note: You can put any string for user_agent
+그런 다음 적절한 API key와 environment variable을 설정해야 합니다. Reddit 사용자 계정을 만들고 credential을 받아야 합니다. [www.reddit.com](https://www.reddit.com)에 가서 가입하여 Reddit 사용자 계정을 만드세요.
+그런 다음 [www.reddit.com/prefs/apps](https://www.reddit.com/prefs/apps)에 가서 앱을 만들어 credential을 받으세요.
+앱을 만들면 client_id와 secret을 받게 됩니다. 이제 이 문자열들을 client_id와 client_secret 변수에 붙여넣으면 됩니다.
+참고: user_agent에는 아무 문자열이나 넣어도 됩니다
 
 ```python
 client_id = ""
@@ -33,7 +33,7 @@ search = RedditSearchRun(
 )
 ```
 
-You can then set your queries for example, what subreddit you want to query, how many posts you want to be returned, how you would like the result to be sorted etc.
+그런 다음 쿼리를 설정할 수 있습니다. 예를 들어, 어떤 subreddit을 쿼리할지, 몇 개의 게시물을 반환받을지, 결과를 어떻게 정렬할지 등을 설정합니다.
 
 ```python
 from langchain_community.tools.reddit_search.tool import RedditSearchSchema
@@ -43,7 +43,7 @@ search_params = RedditSearchSchema(
 )
 ```
 
-Finally run the search and get your results
+마지막으로 검색을 실행하고 결과를 받습니다
 
 ```python
 result = search.run(tool_input=search_params.dict())
@@ -53,8 +53,8 @@ result = search.run(tool_input=search_params.dict())
 print(result)
 ```
 
-Here is an example of printing the result.
-Note: You may get different output depending on the newest post in the subreddit but the formatting should be similar.
+다음은 결과를 출력하는 예시입니다.
+참고: subreddit의 최신 게시물에 따라 다른 출력을 받을 수 있지만 형식은 비슷해야 합니다.
 
 > Searching r/python found 2 posts:
 > Post Title: 'Setup Github Copilot in Visual Studio Code'
@@ -84,11 +84,11 @@ Note: You may get different output depending on the newest post in the subreddit
 > Post Category: N/A.
  > Score: 1
 
-## Using tool with an agent chain
+## agent chain과 함께 tool 사용하기
 
-Reddit search functionality is also provided as a multi-input tool. In this example, we adapt [existing code from the docs](https://python.langchain.com/v0.1/docs/modules/memory/agent_with_memory/), and use ChatOpenAI to create an agent chain with memory. This agent chain is able to pull information from Reddit and use these posts to respond to subsequent input.
+Reddit search 기능은 multi-input tool로도 제공됩니다. 이 예시에서는 [문서의 기존 코드](https://python.langchain.com/v0.1/docs/modules/memory/agent_with_memory/)를 수정하고, ChatOpenAI를 사용하여 memory가 있는 agent chain을 만듭니다. 이 agent chain은 Reddit에서 정보를 가져와 이러한 게시물을 사용하여 후속 입력에 응답할 수 있습니다.
 
-To run the example, add your reddit API access information and also get an OpenAI key from the [OpenAI API](https://help.openai.com/en/articles/4936850-where-do-i-find-my-api-key).
+예시를 실행하려면 Reddit API 접근 정보를 추가하고 [OpenAI API](https://help.openai.com/en/articles/4936850-where-do-i-find-my-api-key)에서 OpenAI key를 받으세요.
 
 ```python
 # Adapted code from /docs/modules/agents/how_to/sharedmemory_for_tools

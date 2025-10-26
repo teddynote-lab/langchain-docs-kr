@@ -1,11 +1,12 @@
+```mdx
 ---
-title: Log multimodal traces
-sidebarTitle: Log multimodal traces
+title: 멀티모달 trace 로깅하기
+sidebarTitle: 멀티모달 trace 로깅하기
 ---
 
-LangSmith supports logging and rendering images as part of traces. This is currently supported for multimodal LLM runs.
+LangSmith는 trace의 일부로 이미지를 로깅하고 렌더링하는 것을 지원합니다. 이는 현재 멀티모달 LLM run에서 지원됩니다.
 
-In order to log images, use `wrap_openai`/ `wrapOpenAI` in Python or TypeScript respectively and pass an image URL or base64 encoded image as part of the input.
+이미지를 로깅하려면 Python 또는 TypeScript에서 각각 `wrap_openai`/ `wrapOpenAI`를 사용하고 input의 일부로 이미지 URL 또는 base64로 인코딩된 이미지를 전달하세요.
 
 <CodeGroup>
 
@@ -60,6 +61,7 @@ console.log(response.choices[0]);
 
 </CodeGroup>
 
-The image will be rendered as part of the trace in the LangSmith UI.
+이미지는 LangSmith UI의 trace 일부로 렌더링됩니다.
 
 ![](/langsmith/images/multimodal.png)
+```

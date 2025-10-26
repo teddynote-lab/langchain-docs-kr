@@ -2,25 +2,25 @@
 title: Valyu Deep Search
 ---
 
->[Valyu](https://www.valyu.network/) allows AI applications and agents to search the internet and proprietary data sources for relevant LLM ready information.
+>[Valyu](https://www.valyu.network/)는 AI 애플리케이션과 agent가 인터넷과 독점 데이터 소스에서 LLM에 적합한 관련 정보를 검색할 수 있도록 합니다.
 
-This notebook goes over how to use Valyu in LangChain.
+이 노트북은 LangChain에서 Valyu를 사용하는 방법을 다룹니다.
 
-First, get an Valyu API key and add it as an environment variable. Get $10 free credit  by [signing up here](https://platform.valyu.network/).
+먼저 Valyu API key를 받아서 환경 변수로 추가하세요. [여기에서 가입](https://platform.valyu.network/)하여 $10 무료 크레딧을 받으세요.
 
 ## Setup
 
-The integration lives in the `langchain-valyu` package.
+이 integration은 `langchain-valyu` package에 포함되어 있습니다.
 
 ```python
 pip install -qU langchain-valyu
 ```
 
-In order to use the package, you will also need to set the `VALYU_API_KEY` environment variable to your Valyu API key.
+package를 사용하려면 `VALYU_API_KEY` 환경 변수를 Valyu API key로 설정해야 합니다.
 
 ## Context Retriever
 
-You can use the [`ValyuContextRetriever`](https://pypi.org/project/langchain-valyu/) in a standard retrieval pipeline.
+표준 retrieval pipeline에서 [`ValyuContextRetriever`](https://pypi.org/project/langchain-valyu/)를 사용할 수 있습니다.
 
 ```python
 from langchain_valyu import ValyuRetriever
@@ -49,7 +49,7 @@ for doc in docs:
 
 ## Context Search Tool
 
-You can use the `ValyuSearchTool` for advanced search queries.
+고급 검색 쿼리를 위해 `ValyuSearchTool`을 사용할 수 있습니다.
 
 ```python
 from langchain_valyu import ValyuSearchTool

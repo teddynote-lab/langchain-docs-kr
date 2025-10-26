@@ -2,7 +2,7 @@
 title: OpenAPI Toolkit
 ---
 
-We can construct agents to consume arbitrary APIs, here APIs conformant to the `OpenAPI`/`Swagger` specification.
+임의의 API를 사용하는 agent를 구성할 수 있으며, 여기서는 `OpenAPI`/`Swagger` 사양을 준수하는 API를 다룹니다.
 
 ```python
 # NOTE: In this example. We must set `allow_dangerous_request=True` to enable the OpenAPI Agent to automatically use the Request Tool.
@@ -10,17 +10,17 @@ We can construct agents to consume arbitrary APIs, here APIs conformant to the `
 ALLOW_DANGEROUS_REQUEST = True
 ```
 
-## 1st example: hierarchical planning agent
+## 1번째 예제: hierarchical planning agent
 
-In this example, we'll consider an approach called hierarchical planning, common in robotics and appearing in recent works for LLMs X robotics. We'll see it's a viable approach to start working with a massive API spec AND to assist with user queries that require multiple steps against the API.
+이 예제에서는 로봇 공학에서 일반적이며 최근 LLM X 로봇 공학 연구에서 등장하는 hierarchical planning이라는 접근 방식을 살펴보겠습니다. 이는 대규모 API 사양 작업을 시작하고 API에 대해 여러 단계가 필요한 사용자 쿼리를 지원하는 데 유용한 접근 방식임을 알 수 있습니다.
 
-The idea is simple: to get coherent agent behavior over long sequences behavior & to save on tokens, we'll separate concerns: a "planner" will be responsible for what endpoints to call and a "controller" will be responsible for how to call them.
+아이디어는 간단합니다: 긴 시퀀스 동작에 걸쳐 일관된 agent 동작을 얻고 토큰을 절약하기 위해 관심사를 분리합니다. "planner"는 호출할 endpoint를 담당하고 "controller"는 호출 방법을 담당합니다.
 
-In the initial implementation, the planner is an LLM chain that has the name and a short description for each endpoint in context. The controller is an LLM agent that is instantiated with documentation for only the endpoints for a particular plan. There's a lot left to get this working very robustly :)
+초기 구현에서 planner는 각 endpoint의 이름과 간단한 설명을 컨텍스트에 포함하는 LLM chain입니다. controller는 특정 계획에 대한 endpoint의 문서만으로 인스턴스화되는 LLM agent입니다. 이것을 매우 견고하게 작동시키기 위해서는 아직 할 일이 많습니다 :)
 
 ---
 
-### To start, let's collect some OpenAPI specs
+### 시작하기 위해 몇 가지 OpenAPI spec을 수집해 보겠습니다
 
 ```python
 import os
@@ -28,7 +28,7 @@ import os
 import yaml
 ```
 
-You will be able to get OpenAPI specs from here: [APIs-guru/openapi-directory](https://github.com/APIs-guru/openapi-directory)
+여기에서 OpenAPI spec을 얻을 수 있습니다: [APIs-guru/openapi-directory](https://github.com/APIs-guru/openapi-directory)
 
 ```python
 !wget https://raw.githubusercontent.com/openai/openai-openapi/master/openapi.yaml -O openai_openapi.yaml
@@ -91,10 +91,10 @@ spotify_api_spec = reduce_openapi_spec(raw_spotify_api_spec)
 
 ---
 
-We'll work with the Spotify API as one of the examples of a somewhat complex API. There's a bit of auth-related setup to do if you want to replicate this.
+다소 복잡한 API의 예제 중 하나로 Spotify API를 사용하겠습니다. 이를 재현하려면 인증 관련 설정이 필요합니다.
 
-- You'll have to set up an application in the Spotify developer console, documented [here](https://developer.spotify.com/documentation/general/guides/authorization/), to get credentials: `CLIENT_ID`, `CLIENT_SECRET`, and `REDIRECT_URI`.
-- To get an access tokens (and keep them fresh), you can implement the oauth flows, or you can use `spotipy`. If you've set your Spotify creedentials as environment variables `SPOTIPY_CLIENT_ID`, `SPOTIPY_CLIENT_SECRET`, and `SPOTIPY_REDIRECT_URI`, you can use the helper functions below:
+- `CLIENT_ID`, `CLIENT_SECRET`, `REDIRECT_URI` 자격 증명을 얻으려면 [여기](https://developer.spotify.com/documentation/general/guides/authorization/)에 문서화된 대로 Spotify 개발자 콘솔에서 애플리케이션을 설정해야 합니다.
+- access token을 얻고 최신 상태로 유지하려면 oauth flow를 구현하거나 `spotipy`를 사용할 수 있습니다. Spotify 자격 증명을 환경 변수 `SPOTIPY_CLIENT_ID`, `SPOTIPY_CLIENT_SECRET`, `SPOTIPY_REDIRECT_URI`로 설정한 경우 아래의 헬퍼 함수를 사용할 수 있습니다:
 
 ```python
 import spotipy.util as util
@@ -116,7 +116,7 @@ headers = construct_spotify_auth_headers(raw_spotify_api_spec)
 requests_wrapper = RequestsWrapper(headers=headers)
 ```
 
-### How big is this spec?
+### 이 spec의 크기는 얼마나 될까요?
 
 ```python
 endpoints = [
@@ -149,9 +149,9 @@ count_tokens(yaml.dump(raw_spotify_api_spec))
 80326
 ```
 
-### Let's see some examples
+### 몇 가지 예제를 살펴보겠습니다
 
-Starting with GPT-4. (Some robustness iterations under way for GPT-3 family.)
+GPT-4부터 시작합니다. (GPT-3 제품군에 대한 견고성 개선 작업이 진행 중입니다.)
 
 ```python
 from langchain_community.agent_toolkits.openapi import planner
@@ -286,7 +286,7 @@ Final Answer: The recommended blues song for you is "Get Away Jordan" with the t
 'The recommended blues song for you is "Get Away Jordan" with the track ID: 03lXHmokj9qsXspNsPoirR.'
 ```
 
-#### Try another API
+#### 다른 API 시도하기
 
 ```python
 headers = {"Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"}
@@ -390,11 +390,11 @@ Final Answer: A short piece of advice for improving communication skills is to m
 'A short piece of advice for improving communication skills is to make sure to listen.'
 ```
 
-Takes awhile to get there!
+도달하는 데 시간이 좀 걸립니다!
 
-## 2nd example: "json explorer" agent
+## 2번째 예제: "json explorer" agent
 
-Here's an agent that's not particularly practical, but neat! The agent has access to 2 toolkits. One comprises tools to interact with json: one tool to list the keys of a json object and another tool to get the value for a given key. The other toolkit comprises `requests` wrappers to send GET and POST requests. This agent consumes a lot calls to the language model, but does a surprisingly decent job.
+여기 특별히 실용적이지는 않지만 멋진 agent가 있습니다! 이 agent는 2개의 toolkit에 액세스할 수 있습니다. 하나는 json과 상호 작용하는 도구로 구성됩니다: json 객체의 key를 나열하는 도구와 주어진 key의 값을 가져오는 도구입니다. 다른 toolkit은 GET 및 POST 요청을 보내는 `requests` wrapper로 구성됩니다. 이 agent는 언어 모델에 대한 많은 호출을 소비하지만 놀랍도록 괜찮은 작업을 수행합니다.
 
 ```python
 from langchain_community.agent_toolkits import OpenAPIToolkit, create_openapi_agent

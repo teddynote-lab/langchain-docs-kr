@@ -2,15 +2,15 @@
 title: NASA Toolkit
 ---
 
-This notebook shows how to use agents to interact with the NASA toolkit. The toolkit provides access to the NASA Image and Video Library API, with potential to expand and include other accessible NASA APIs in future iterations.
+이 노트북은 agent를 사용하여 NASA toolkit과 상호작용하는 방법을 보여줍니다. 이 toolkit은 NASA Image and Video Library API에 대한 액세스를 제공하며, 향후 반복에서 다른 접근 가능한 NASA API를 확장하고 포함할 가능성이 있습니다.
 
-**Note: NASA Image and Video Library search queries can result in large responses when the number of desired media results is not specified. Consider this prior to using the agent with LLM token credits.**
+**참고: NASA Image and Video Library 검색 쿼리는 원하는 미디어 결과 수가 지정되지 않은 경우 대용량 응답을 생성할 수 있습니다. LLM 토큰 크레딧으로 agent를 사용하기 전에 이 점을 고려하세요.**
 
-## Example Use
+## 사용 예시
 
 ---
 
-### Initializing the agent
+### Agent 초기화
 
 ```python
 pip install -qU langchain-community
@@ -30,7 +30,7 @@ agent = initialize_agent(
 )
 ```
 
-### Querying media assets
+### 미디어 자산 쿼리
 
 ```python
 agent.run(
@@ -38,7 +38,7 @@ agent.run(
 )
 ```
 
-### Querying details about media assets
+### 미디어 자산에 대한 세부 정보 쿼리
 
 ```python
 output = agent.run(

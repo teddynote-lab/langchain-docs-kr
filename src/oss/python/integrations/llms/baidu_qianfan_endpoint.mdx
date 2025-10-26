@@ -2,31 +2,30 @@
 title: Baidu Qianfan
 ---
 
-Baidu AI Cloud Qianfan Platform is a one-stop large model development and service operation platform for enterprise developers. Qianfan not only provides including the model of Wenxin Yiyan (ERNIE-Bot) and the third-party open-source models, but also provides various AI development tools and the whole set of development environment, which facilitates customers to use and develop large model applications easily.
+Baidu AI Cloud Qianfan Platform은 기업 개발자를 위한 원스톱 대규모 모델 개발 및 서비스 운영 플랫폼입니다. Qianfan은 Wenxin Yiyan(ERNIE-Bot) 모델과 서드파티 오픈소스 모델을 제공할 뿐만 아니라, 다양한 AI 개발 도구와 전체 개발 환경을 제공하여 고객이 대규모 모델 애플리케이션을 쉽게 사용하고 개발할 수 있도록 합니다.
 
-Basically, those model are split into the following type:
+기본적으로 이러한 모델은 다음 유형으로 분류됩니다:
 
 - Embedding
 - Chat
 - Completion
 
-In this notebook, we will introduce how to use langchain with [Qianfan](https://cloud.baidu.com/doc/WENXINWORKSHOP/index.html) mainly in `Completion` corresponding
- to the package `langchain/llms` in langchain:
+이 노트북에서는 langchain의 `langchain/llms` 패키지에 해당하는 `Completion`을 중심으로 [Qianfan](https://cloud.baidu.com/doc/WENXINWORKSHOP/index.html)과 함께 langchain을 사용하는 방법을 소개합니다:
 
-## API Initialization
+## API 초기화
 
-To use the LLM services based on Baidu Qianfan, you have to initialize these parameters:
+Baidu Qianfan 기반 LLM 서비스를 사용하려면 다음 매개변수를 초기화해야 합니다:
 
-You could either choose to init the AK,SK in environment variables or init params:
+환경 변수에서 AK, SK를 초기화하거나 init params에서 초기화할 수 있습니다:
 
 ```base
 export QIANFAN_AK=XXX
 export QIANFAN_SK=XXX
 ```
 
-## Current supported models
+## 현재 지원되는 모델
 
-- ERNIE-Bot-turbo (default models)
+- ERNIE-Bot-turbo (기본 모델)
 - ERNIE-Bot
 - BLOOMZ-7B
 - Llama-2-7b-chat
@@ -116,12 +115,12 @@ Mountains are the symbols
 't know how to climb, you should learn first, or seek help from professionals. Enjoy the beautiful scenery of mountains, but also pay attention to safety.
 ```
 
-## Use different models in Qianfan
+## Qianfan에서 다른 모델 사용하기
 
-In the case you want to deploy your own model based on EB or serval open sources model, you could follow these steps:
+EB 기반 또는 여러 오픈소스 모델을 기반으로 자체 모델을 배포하려는 경우 다음 단계를 따르세요:
 
-- 1. （Optional, if the model are included in the default models, skip it）Deploy your model in Qianfan Console, get your own customized deploy endpoint.
-- 2. Set up the field called `endpoint` in the initialization:
+- 1. (선택사항, 모델이 기본 모델에 포함된 경우 건너뛰기) Qianfan Console에서 모델을 배포하고 사용자 정의 배포 endpoint를 가져옵니다.
+- 2. 초기화 시 `endpoint` 필드를 설정합니다:
 
 ```python
 llm = QianfanLLMEndpoint(
@@ -138,7 +137,7 @@ res = llm.invoke("hi")
 
 ## Model Params
 
-For now, only `ERNIE-Bot` and `ERNIE-Bot-turbo` support model params below, we might support more models in the future.
+현재 `ERNIE-Bot`과 `ERNIE-Bot-turbo`만 아래 모델 매개변수를 지원하며, 향후 더 많은 모델을 지원할 수 있습니다.
 
 - temperature
 - top_p

@@ -2,7 +2,7 @@
 title: DigitalOcean Gradient
 ---
 
-This will help you getting started with DigitalOcean Gradient [chat models](/oss/langchain/models).
+이 문서는 DigitalOcean Gradient [chat models](/oss/langchain/models) 시작하기를 도와드립니다.
 
 ## Overview
 ### Integration details
@@ -14,19 +14,19 @@ This will help you getting started with DigitalOcean Gradient [chat models](/oss
 
 ## Setup
 
-langchain-gradient uses DigitalOcean Gradient Platform.
+langchain-gradient는 DigitalOcean Gradient Platform을 사용합니다.
 
-Create an account on DigitalOcean, acquire a `DIGITALOCEAN_INFERENCE_KEY` API key from the Gradient Platform, and install the `langchain-gradient` integration package.
+DigitalOcean에 계정을 생성하고, Gradient Platform에서 `DIGITALOCEAN_INFERENCE_KEY` API key를 획득한 후, `langchain-gradient` integration package를 설치하세요.
 
 ### Credentials
 
-Head to [DigitalOcean Gradient](https://www.digitalocean.com/products/gradient)
+[DigitalOcean Gradient](https://www.digitalocean.com/products/gradient)로 이동하세요
 
-1. Sign up/Login to DigitalOcean Cloud Console
-2. Go to the Gradient Platform and navigate to Serverless Inference.
-3. Click on Create model access key, enter a name, and create the key.
+1. DigitalOcean Cloud Console에 가입/로그인합니다
+2. Gradient Platform으로 이동하여 Serverless Inference로 이동합니다.
+3. Create model access key를 클릭하고, 이름을 입력한 후 key를 생성합니다.
 
-Once you've done this set the `DIGITALOCEAN_INFERENCE_KEY` environment variable:
+완료되면 `DIGITALOCEAN_INFERENCE_KEY` environment variable을 설정하세요:
 
 ```python
 import os
@@ -35,7 +35,7 @@ os.environ["DIGITALOCEAN_INFERENCE_KEY"] = "your-api-key"
 
 ### Installation
 
-The LangChain Gradient integration is in the `langchain-gradient` package:
+LangChain Gradient integration은 `langchain-gradient` package에 있습니다:
 
 <CodeGroup>
 ```bash pip

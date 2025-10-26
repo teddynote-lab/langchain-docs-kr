@@ -2,11 +2,11 @@
 title: Natural Language API Toolkits
 ---
 
-`Natural Language API` Toolkits (`NLAToolkits`) permit LangChain Agents to efficiently plan and combine calls across endpoints.
+`Natural Language API` Toolkits (`NLAToolkits`)는 LangChain Agent가 endpoint 간 호출을 효율적으로 계획하고 결합할 수 있도록 합니다.
 
-This notebook demonstrates a sample composition of the `Speak`, `Klarna`, and `Spoonacluar` APIs.
+이 notebook은 `Speak`, `Klarna`, `Spoonacluar` API의 샘플 구성을 보여줍니다.
 
-### First, import dependencies and load the LLM
+### 먼저, dependency를 import하고 LLM을 로드합니다
 
 ```python
 from langchain.agents import AgentType, initialize_agent
@@ -22,7 +22,7 @@ llm = OpenAI(
 )  # You can swap between different core LLM's here.
 ```
 
-### Next, load the Natural Language API Toolkits
+### 다음으로, Natural Language API Toolkits를 로드합니다
 
 ```python
 speak_toolkit = NLAToolkit.from_llm_and_url(llm, "https://api.speak.com/openapi.yaml")
@@ -37,7 +37,7 @@ Attempting to load an OpenAPI 3.0.1 spec.  This may result in degraded performan
 Attempting to load an OpenAPI 3.0.1 spec.  This may result in degraded performance. Convert your OpenAPI spec to 3.1.* spec for better support.
 ```
 
-### Create the Agent
+### Agent를 생성합니다
 
 ```python
 # Slightly tweak the instructions from the default agent
@@ -88,16 +88,16 @@ Final Answer: You can buy two products from the Alé brand in Italian Blue for y
 'You can buy two products from the Alé brand in Italian Blue for your end of year party. The Alé Colour Block Short Sleeve Jersey Men - Italian Blue costs $86.49, and the Alé Dolid Flash Jersey Men - Italian Blue costs $40.00.'
 ```
 
-### Use Auth and add more Endpoints
+### Auth를 사용하고 더 많은 Endpoint를 추가합니다
 
-Some endpoints may require user authentication via things like access tokens. Here we show how to pass in the authentication information via the `Requests` wrapper object.
+일부 endpoint는 access token과 같은 것을 통한 사용자 인증이 필요할 수 있습니다. 여기서는 `Requests` wrapper 객체를 통해 인증 정보를 전달하는 방법을 보여줍니다.
 
-Since each NLATool exposes a concisee natural language interface to its wrapped API, the top level conversational agent has an easier job incorporating each endpoint to satisfy a user's request.
+각 NLATool은 래핑된 API에 대한 간결한 자연어 인터페이스를 제공하므로, 최상위 대화형 agent는 사용자의 요청을 충족하기 위해 각 endpoint를 더 쉽게 통합할 수 있습니다.
 
-**Adding the Spoonacular endpoints.**
+**Spoonacular endpoint를 추가합니다.**
 
-1. Go to the [Spoonacular API Console](https://spoonacular.com/food-api/console#Profile) and make a free account.
-2. Click on `Profile` and copy your API key below.
+1. [Spoonacular API Console](https://spoonacular.com/food-api/console#Profile)로 이동하여 무료 계정을 만드세요.
+2. `Profile`을 클릭하고 아래에 API key를 복사하세요.
 
 ```python
 spoonacular_api_key = ""  # Copy from the API Console
@@ -192,7 +192,7 @@ Final Answer: To present for your Italian language class, you could wear an Ital
 'To present for your Italian language class, you could wear an Italian Gold Sparkle Perfectina Necklace - Gold, an Italian Design Miami Cuban Link Chain Necklace - Gold, or an Italian Gold Miami Cuban Link Chain Necklace - Gold. For a recipe, you could make Turkey Tomato Cheese Pizza, Broccolini Quinoa Pilaf, Bruschetta Style Pork & Pasta, Salmon Quinoa Risotto, Italian Tuna Pasta, Roasted Brussels Sprouts With Garlic, Asparagus Lemon Risotto, Italian Steamed Artichokes, Crispy Italian Cauliflower Poppers Appetizer, or Pappa Al Pomodoro.'
 ```
 
-## Thank you
+## 감사합니다
 
 ```python
 natural_language_api_tools[1].run(

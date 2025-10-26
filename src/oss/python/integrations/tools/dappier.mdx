@@ -2,21 +2,21 @@
 title: Dappier
 ---
 
-[Dappier](https://dappier.com) connects any LLM or your Agentic AI to real-time, rights-cleared, proprietary data from trusted sources, making your AI an expert in anything. Our specialized models include Real-Time Web Search, News, Sports, Financial Stock Market Data, Crypto Data, and exclusive content from premium publishers. Explore a wide range of data models in our marketplace at [marketplace.dappier.com](https://marketplace.dappier.com).
+[Dappier](https://dappier.com)는 모든 LLM 또는 Agentic AI를 신뢰할 수 있는 출처의 실시간, 권리가 확보된 독점 데이터에 연결하여 AI를 모든 분야의 전문가로 만듭니다. 우리의 특화된 모델에는 실시간 웹 검색, 뉴스, 스포츠, 금융 주식 시장 데이터, 암호화폐 데이터, 그리고 프리미엄 퍼블리셔의 독점 콘텐츠가 포함됩니다. [marketplace.dappier.com](https://marketplace.dappier.com)의 마켓플레이스에서 다양한 데이터 모델을 탐색해보세요.
 
-[Dappier](https://dappier.com) delivers enriched, prompt-ready, and contextually relevant data strings, optimized for seamless integration with LangChain. Whether you're building conversational AI, recommendation engines, or intelligent search, Dappier's LLM-agnostic RAG models ensure your AI has access to verified, up-to-date data—without the complexity of building and managing your own retrieval pipeline.
+[Dappier](https://dappier.com)는 LangChain과의 원활한 통합을 위해 최적화된 풍부하고, 프롬프트 준비가 완료된, 맥락적으로 관련성 있는 데이터 문자열을 제공합니다. 대화형 AI, 추천 엔진 또는 지능형 검색을 구축하든, Dappier의 LLM 독립적인 RAG 모델은 자체 검색 파이프라인을 구축하고 관리하는 복잡성 없이 검증되고 최신 데이터에 대한 액세스를 보장합니다.
 
 # Dappier Tool
 
-This will help you get started with the Dappier [tool](/oss/langchain/tools). For detailed documentation of all DappierRetriever features and configurations head to the [API reference](https://python.langchain.com/en/latest/tools/langchain_dappier.tools.Dappier.DappierRealTimeSearchTool.html).
+이 문서는 Dappier [tool](/oss/langchain/tools) 시작하기를 도와드립니다. 모든 DappierRetriever 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/en/latest/tools/langchain_dappier.tools.Dappier.DappierRealTimeSearchTool.html)를 참조하세요.
 
 ## Overview
 
-The DappierRealTimeSearchTool and DappierAIRecommendationTool empower AI applications with real-time data and AI-driven insights. The former provides access to up-to-date information across news, weather, travel, and financial markets, while the latter supercharges applications with factual, premium content from diverse domains like News, Finance, and Sports, all powered by Dappier's pre-trained RAG models and natural language APIs.
+DappierRealTimeSearchTool과 DappierAIRecommendationTool은 실시간 데이터와 AI 기반 인사이트로 AI 애플리케이션을 강화합니다. 전자는 뉴스, 날씨, 여행, 금융 시장 전반에 걸친 최신 정보에 대한 액세스를 제공하며, 후자는 Dappier의 사전 학습된 RAG 모델과 자연어 API로 구동되는 뉴스, 금융, 스포츠와 같은 다양한 도메인의 사실적이고 프리미엄 콘텐츠로 애플리케이션을 강화합니다.
 
 ### Setup
 
-This tool lives in the `langchain-dappier` package.
+이 tool은 `langchain-dappier` 패키지에 있습니다.
 
 ```python
 pip install -qU langchain-dappier
@@ -24,7 +24,7 @@ pip install -qU langchain-dappier
 
 ### Credentials
 
-We also need to set our Dappier API credentials, which can be generated at the [Dappier site.](https://platform.dappier.com/profile/api-keys).
+또한 [Dappier 사이트](https://platform.dappier.com/profile/api-keys)에서 생성할 수 있는 Dappier API 자격 증명을 설정해야 합니다.
 
 ```python
 import getpass
@@ -34,7 +34,7 @@ if not os.environ.get("DAPPIER_API_KEY"):
     os.environ["DAPPIER_API_KEY"] = getpass.getpass("Dappier API key:\n")
 ```
 
-If you want to get automated tracing from individual queries, you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+개별 쿼리에서 자동화된 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -43,17 +43,17 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ## DappierRealTimeSearchTool
 
-Access real-time Google search results, including the latest news, weather, travel, and deals, along with up-to-date financial news, stock prices, and trades from polygon.io, all powered by AI insights to keep you informed.
+최신 뉴스, 날씨, 여행, 거래를 포함한 실시간 Google 검색 결과와 polygon.io의 최신 금융 뉴스, 주가, 거래에 액세스하며, 모두 AI 인사이트로 구동되어 정보를 제공합니다.
 
 ### Instantiation
 
 - ai_model_id: str
-    The AI model ID to use for the query. The AI model ID always starts
-    with the prefix "am_".
+    쿼리에 사용할 AI 모델 ID입니다. AI 모델 ID는 항상
+    "am_" 접두사로 시작합니다.
 
-    Defaults to "am_01j06ytn18ejftedz6dyhz2b15".
+    기본값은 "am_01j06ytn18ejftedz6dyhz2b15"입니다.
 
-    Multiple AI model IDs are available, which can be found at:
+    여러 AI 모델 ID를 사용할 수 있으며, 다음에서 찾을 수 있습니다:
     [marketplace.dappier.com/marketplace](https://marketplace.dappier.com/marketplace)
 
 ```python
@@ -69,9 +69,9 @@ tool = DappierRealTimeSearchTool(
 
 ### Invocation
 
-#### [Invoke directly with args](/oss/langchain/tools)
+#### [인자와 함께 직접 호출](/oss/langchain/tools)
 
-The `DappierRealTimeSearchTool` takes a single "query" argument, which should be a natural language query:
+`DappierRealTimeSearchTool`은 자연어 쿼리여야 하는 단일 "query" 인자를 받습니다:
 
 ```python
 tool.invoke({"query": "What happened at the last wimbledon"})
@@ -81,9 +81,9 @@ tool.invoke({"query": "What happened at the last wimbledon"})
 "At the last Wimbledon in 2024, Carlos Alcaraz won the title by defeating Novak Djokovic. This victory marked Alcaraz's fourth Grand Slam title at just 21 years old! 🎉🏆🎾"
 ```
 
-### [Invoke with ToolCall](/oss/langchain/tools)
+### [ToolCall로 호출](/oss/langchain/tools)
 
-We can also invoke the tool with a model-generated ToolCall, in which case a ToolMessage will be returned:
+모델이 생성한 ToolCall로 tool을 호출할 수도 있으며, 이 경우 ToolMessage가 반환됩니다:
 
 ```python
 # This is usually generated by a model, but we'll create a tool call directly for demo purposes.
@@ -105,7 +105,7 @@ Euro 2024 is being hosted by Germany! 🇩🇪 The tournament runs from June 14 
 
 ### Chaining
 
-We can use our tool in a chain by first binding it to a [tool-calling model](/oss/langchain/tools/) and then calling it:
+먼저 [tool-calling model](/oss/langchain/tools/)에 바인딩한 다음 호출하여 chain에서 tool을 사용할 수 있습니다:
 
 <ChatModelTabs customVarName="llm" />
 
@@ -157,25 +157,25 @@ AIMessage(content="Barbora Krejčíková won the women's singles title at Wimble
 
 ## DappierAIRecommendationTool
 
-Supercharge your AI applications with Dappier's pre-trained RAG models and natural language APIs, delivering factual and up-to-date responses from premium content providers across verticals like News, Finance, Sports, Weather, and more.
+Dappier의 사전 학습된 RAG 모델과 자연어 API로 AI 애플리케이션을 강화하여 뉴스, 금융, 스포츠, 날씨 등과 같은 분야의 프리미엄 콘텐츠 제공업체로부터 사실적이고 최신 응답을 제공합니다.
 
 ### Instantiation
 
 - data_model_id: str
-  The data model ID to use for recommendations. Data model IDs always start with the prefix "dm_". Defaults to "dm_01j0pb465keqmatq9k83dthx34".
-  Multiple data model IDs are available, which can be found at [Dappier marketplace](https://marketplace.dappier.com/marketplace).
+  추천에 사용할 데이터 모델 ID입니다. 데이터 모델 ID는 항상 "dm_" 접두사로 시작합니다. 기본값은 "dm_01j0pb465keqmatq9k83dthx34"입니다.
+  여러 데이터 모델 ID를 사용할 수 있으며, [Dappier marketplace](https://marketplace.dappier.com/marketplace)에서 찾을 수 있습니다.
 
 - similarity_top_k: int
-  The number of top documents to retrieve based on similarity. Defaults to "9".
+  유사성을 기반으로 검색할 상위 문서의 수입니다. 기본값은 "9"입니다.
 
 - ref: Optional[str]
-  The site domain where AI recommendations should be displayed. Defaults to "None".
+  AI 추천이 표시되어야 하는 사이트 도메인입니다. 기본값은 "None"입니다.
 
 - num_articles_ref: int
-  The minimum number of articles to return from the specified reference domain ("ref"). The remaining articles will come from other sites in the RAG model. Defaults to "0".
+  지정된 참조 도메인("ref")에서 반환할 최소 기사 수입니다. 나머지 기사는 RAG 모델의 다른 사이트에서 가져옵니다. 기본값은 "0"입니다.
 
 - search_algorithm: Literal["most_recent", "semantic", "most_recent_semantic", "trending"]
-  The search algorithm to use for retrieving articles. Defaults to "most_recent".
+  기사 검색에 사용할 검색 알고리즘입니다. 기본값은 "most_recent"입니다.
 
 ```python
 from langchain_dappier import DappierAIRecommendationTool
@@ -194,9 +194,9 @@ tool = DappierAIRecommendationTool(
 
 ### Invocation
 
-#### [Invoke directly with args](/oss/langchain/tools)
+#### [인자와 함께 직접 호출](/oss/langchain/tools)
 
-The `DappierAIRecommendationTool` takes a single "query" argument, which should be a natural language query:
+`DappierAIRecommendationTool`은 자연어 쿼리여야 하는 단일 "query" 인자를 받습니다:
 
 ```python
 tool.invoke({"query": "latest sports news"})
@@ -223,9 +223,9 @@ tool.invoke({"query": "latest sports news"})
   'title': 'Rangers score 3 times in 3rd period for stirring 5-3 comeback win against Utah to close road trip'}]
 ```
 
-### [Invoke with ToolCall](/oss/langchain/tools)
+### [ToolCall로 호출](/oss/langchain/tools)
 
-We can also invoke the tool with a model-generated ToolCall, in which case a ToolMessage will be returned:
+모델이 생성한 ToolCall로 tool을 호출할 수도 있으며, 이 경우 ToolMessage가 반환됩니다:
 
 ```python
 # This is usually generated by a model, but we'll create a tool call directly for demo purposes.
@@ -247,4 +247,4 @@ print(tool_msg.content[:400])
 
 ## API reference
 
-For detailed documentation of all DappierRealTimeSearchTool features and configurations head to the [API reference](https://python.langchain.com/api_reference/community/tools/langchain_dappier.tools.dappier.tool.DappierRealTimeSearchTool.html)
+모든 DappierRealTimeSearchTool 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/tools/langchain_dappier.tools.dappier.tool.DappierRealTimeSearchTool.html)를 참조하세요

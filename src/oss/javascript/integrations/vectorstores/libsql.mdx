@@ -2,11 +2,11 @@
 title: libSQL
 ---
 
-[Turso](https://turso.tech) is a SQLite-compatible database built on [libSQL](https://docs.turso.tech/libsql), the Open Contribution fork of SQLite. Vector Similiarity Search is built into Turso and libSQL as a native datatype, enabling you to store and query vectors directly in the database.
+[Turso](https://turso.tech)는 SQLite의 Open Contribution fork인 [libSQL](https://docs.turso.tech/libsql)을 기반으로 구축된 SQLite 호환 데이터베이스입니다. Vector Similarity Search는 Turso와 libSQL에 네이티브 데이터 타입으로 내장되어 있어, 데이터베이스에서 직접 벡터를 저장하고 쿼리할 수 있습니다.
 
-LangChain.js supports using a local libSQL, or remote Turso database as a vector store, and provides a simple API to interact with it.
+LangChain.js는 로컬 libSQL 또는 원격 Turso 데이터베이스를 vector store로 사용하는 것을 지원하며, 이와 상호작용할 수 있는 간단한 API를 제공합니다.
 
-This guide provides a quick overview for getting started with libSQL vector stores. For detailed documentation of all libSQL features and configurations head to the API reference.
+이 가이드는 libSQL vector store를 시작하기 위한 빠른 개요를 제공합니다. 모든 libSQL 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요.
 
 ## Overview
 
@@ -18,47 +18,47 @@ This guide provides a quick overview for getting started with libSQL vector stor
 
 ## Setup
 
-To use libSQL vector stores, you'll need to create a Turso account or set up a local SQLite database, and install the `@langchain/community` integration package.
+libSQL vector store를 사용하려면 Turso 계정을 생성하거나 로컬 SQLite 데이터베이스를 설정하고, `@langchain/community` integration package를 설치해야 합니다.
 
-This guide will also use OpenAI embeddings, which require you to install the `@langchain/openai` integration package. You can also use other supported embeddings models if you wish.
+이 가이드는 OpenAI embeddings도 사용하므로 `@langchain/openai` integration package를 설치해야 합니다. 원하는 경우 다른 지원되는 embeddings model을 사용할 수도 있습니다.
 
-You can use local SQLite when working with the libSQL vector store, or use a hosted Turso Database.
+libSQL vector store를 사용할 때 로컬 SQLite를 사용하거나 호스팅된 Turso Database를 사용할 수 있습니다.
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain package 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
 npm install @libsql/client @langchain/openai @langchain/community
 ```
-Now it's time to create a database. You can create one locally, or use a hosted Turso database.
+이제 데이터베이스를 생성할 차례입니다. 로컬로 생성하거나 호스팅된 Turso 데이터베이스를 사용할 수 있습니다.
 
 ### Local libSQL
 
-Create a new local SQLite file and connect to the shell:
+새로운 로컬 SQLite 파일을 생성하고 shell에 연결합니다:
 
 ```bash
 sqlite3 file.db
 ```
 ### Hosted Turso
 
-Visit [sqlite.new](https://sqlite.new) to create a new database, give it a name, and create a database auth token.
+[sqlite.new](https://sqlite.new)를 방문하여 새 데이터베이스를 생성하고, 이름을 지정한 후 database auth token을 생성합니다.
 
-Make sure to copy the database auth token, and the database URL, it should look something like:
+database auth token과 database URL을 복사해두세요. 다음과 같은 형식이어야 합니다:
 
 ```text
 libsql://[database-name]-[your-username].turso.io
 ```
 ### Setup the table and index
 
-Execute the following SQL command to create a new table or add the embedding column to an existing table.
+다음 SQL 명령을 실행하여 새 테이블을 생성하거나 기존 테이블에 embedding column을 추가합니다.
 
-Make sure to modify the following parts of the SQL:
+SQL의 다음 부분을 수정해야 합니다:
 
-- `TABLE_NAME` is the name of the table you want to create.
-- `content` is used to store the `Document.pageContent` values.
-- `metadata` is used to store the `Document.metadata` object.
-- `EMBEDDING_COLUMN` is used to store the vector values, use the dimensions size used by the model you plan to use (1536 for OpenAI).
+- `TABLE_NAME`은 생성하려는 테이블의 이름입니다.
+- `content`는 `Document.pageContent` 값을 저장하는 데 사용됩니다.
+- `metadata`는 `Document.metadata` 객체를 저장하는 데 사용됩니다.
+- `EMBEDDING_COLUMN`은 벡터 값을 저장하는 데 사용되며, 사용할 모델의 차원 크기를 사용합니다 (OpenAI의 경우 1536).
 
 ```sql
 CREATE TABLE IF NOT EXISTS TABLE_NAME (
@@ -68,16 +68,16 @@ CREATE TABLE IF NOT EXISTS TABLE_NAME (
     EMBEDDING_COLUMN F32_BLOB(1536) -- 1536-dimensional f32 vector for OpenAI
 );
 ```
-Now create an index on the `EMBEDDING_COLUMN` column - the index name is important!:
+이제 `EMBEDDING_COLUMN` column에 index를 생성합니다 - index 이름이 중요합니다!:
 
 ```sql
 CREATE INDEX IF NOT EXISTS idx_TABLE_NAME_EMBEDDING_COLUMN ON TABLE_NAME(libsql_vector_idx(EMBEDDING_COLUMN));
 ```
-Make sure to replace the `TABLE_NAME` and `EMBEDDING_COLUMN` with the values you used in the previous step.
+이전 단계에서 사용한 값으로 `TABLE_NAME`과 `EMBEDDING_COLUMN`을 반드시 교체하세요.
 
 ## Instantiation
 
-To initialize a new `LibSQL` vector store, you need to provide the database URL and Auth Token when working remotely, or by passing the filename for a local SQLite.
+새로운 `LibSQL` vector store를 초기화하려면, 원격으로 작업할 때는 database URL과 Auth Token을 제공하거나, 로컬 SQLite의 경우 filename을 전달해야 합니다.
 
 ```typescript
 import { LibSQLVectorStore } from "@langchain/community/vectorstores/libsql";
@@ -125,11 +125,11 @@ await vectorStore.deleteDocuments({ ids: [1, 2] });
 ```
 ## Query vector store
 
-Once you have inserted the documents, you can query the vector store.
+문서를 삽입한 후에는 vector store를 쿼리할 수 있습니다.
 
 ### Query directly
 
-Performing a simple similarity search can be done as follows:
+간단한 similarity search는 다음과 같이 수행할 수 있습니다:
 
 ```typescript
 const resultOne = await vectorStore.similaritySearch("hola", 1);
@@ -138,7 +138,7 @@ for (const doc of similaritySearchResults) {
   console.log(`${doc.pageContent} [${JSON.stringify(doc.metadata, null)}]`);
 }
 ```
-For similarity search with scores:
+점수와 함께 similarity search를 수행하려면:
 
 ```typescript
 const similaritySearchWithScoreResults =
@@ -153,9 +153,9 @@ for (const [doc, score] of similaritySearchWithScoreResults) {
 
 ## API reference
 
-For detailed documentation of all `LibSQLVectorStore` features and configurations head to the API reference.
+모든 `LibSQLVectorStore` 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요.
 
 ## Related
 
-- Vector store [conceptual guide](/oss/integrations/vectorstores)
-- Vector store [how-to guides](/oss/integrations/vectorstores)
+- Vector store [개념 가이드](/oss/integrations/vectorstores)
+- Vector store [how-to 가이드](/oss/integrations/vectorstores)

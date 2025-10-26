@@ -1,13 +1,13 @@
 ---
-title: Trace with Google ADK
+title: Google ADK로 추적하기
 sidebarTitle: Google ADK
 ---
 
-LangSmith supports tracing Google Agent Development Kit (ADK) applications through the OpenTelemetry integration. This guide shows you how to automatically capture traces from your [Google ADK](https://github.com/google/adk-python) agents and send them to LangSmith for monitoring and analysis.
+LangSmith는 OpenTelemetry 통합을 통해 Google Agent Development Kit (ADK) 애플리케이션 추적을 지원합니다. 이 가이드는 [Google ADK](https://github.com/google/adk-python) 에이전트에서 자동으로 trace를 캡처하고 모니터링 및 분석을 위해 LangSmith로 전송하는 방법을 보여줍니다.
 
-## Installation
+## 설치
 
-Install the required packages using your preferred package manager:
+선호하는 패키지 매니저를 사용하여 필요한 패키지를 설치하세요:
 
 <CodeGroup>
 
@@ -22,14 +22,14 @@ uv add langsmith google-adk
 </CodeGroup>
 
 <Info>
-Requires LangSmith Python SDK version `langsmith>=0.4.26` for optimal OpenTelemetry support.
+최적의 OpenTelemetry 지원을 위해 LangSmith Python SDK 버전 `langsmith>=0.4.26`이 필요합니다.
 </Info>
 
-## Setup
+## 설정
 
-### 1. Configure environment variables
+### 1. 환경 변수 구성
 
-Set your LangSmith API key and project name:
+LangSmith API key와 프로젝트 이름을 설정하세요:
 
 <CodeGroup>
 
@@ -40,9 +40,9 @@ export LANGSMITH_PROJECT=<your_project_name>
 
 </CodeGroup>
 
-### 2. Configure OpenTelemetry integration
+### 2. OpenTelemetry 통합 구성
 
-In your Google ADK application, import and configure the LangSmith OpenTelemetry integration. This will automatically instrument Google ADK spans for OpenTelemetry.
+Google ADK 애플리케이션에서 LangSmith OpenTelemetry 통합을 import하고 구성하세요. 이렇게 하면 OpenTelemetry용 Google ADK span이 자동으로 계측됩니다.
 
 ```python
 from langsmith.integrations.otel import configure
@@ -51,7 +51,7 @@ from langsmith.integrations.otel import configure
 configure(project_name="adk-example")  # Optional: can also use LANGSMITH_PROJECT and LANGSMITH_API_KEY environment variables
 ```
 
-Alternatively, you can use the Openinference GoogleADKInstrumentor:
+또는 Openinference GoogleADKInstrumentor를 사용할 수 있습니다:
 
 ```python
 from langsmith.integrations.otel import configure
@@ -65,14 +65,14 @@ GoogleADKInstrumentor().instrument()
 ```
 
 <Note>
-You do not need to set any OpenTelemetry environment variables or configure exporters manually—`configure()` handles everything automatically.
+OpenTelemetry 환경 변수를 설정하거나 exporter를 수동으로 구성할 필요가 없습니다—`configure()`가 모든 것을 자동으로 처리합니다.
 </Note>
 
-### 3. Create and run your ADK agent
+### 3. ADK 에이전트 생성 및 실행
 
-Once configured, your Google ADK application will automatically send traces to LangSmith:
+구성이 완료되면 Google ADK 애플리케이션이 자동으로 LangSmith에 trace를 전송합니다:
 
-This example includes a minimal app that sets up an agent, session, and runner, then sends a message and streams events.
+이 예제는 에이전트, 세션, runner를 설정한 다음 메시지를 보내고 이벤트를 스트리밍하는 최소한의 앱을 포함합니다.
 
 ```python
 import asyncio
@@ -153,21 +153,21 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-## View traces in LangSmith
+## LangSmith에서 trace 보기
 
-- **Agent conversations**: Complete conversation flows between users and your ADK agents.
-- **Tool calls**: Individual function calls made by your agents.
-- **Model interactions**: LLM requests and responses using Gemini models.
-- **Session information**: User and session context for organizing related traces.
-- **Model interactions**: LLM requests and responses using Gemini models
+- **Agent 대화**: 사용자와 ADK 에이전트 간의 완전한 대화 흐름.
+- **Tool 호출**: 에이전트가 수행한 개별 함수 호출.
+- **Model 상호작용**: Gemini 모델을 사용한 LLM 요청 및 응답.
+- **Session 정보**: 관련 trace를 구성하기 위한 사용자 및 세션 컨텍스트.
+- **Model 상호작용**: Gemini 모델을 사용한 LLM 요청 및 응답
 
-![LangSmith dashboard with raw input from run and trace information.](/langsmith/images/adk.png)
+![실행의 원시 입력 및 trace 정보가 포함된 LangSmith 대시보드.](/langsmith/images/adk.png)
 
-## Advanced usage
+## 고급 사용법
 
-### Custom metadata and tags
+### 사용자 정의 metadata 및 tag
 
-You can add custom metadata to your traces by setting span attributes in your ADK application:
+ADK 애플리케이션에서 span attribute를 설정하여 trace에 사용자 정의 metadata를 추가할 수 있습니다:
 
 ```python
 from opentelemetry import trace

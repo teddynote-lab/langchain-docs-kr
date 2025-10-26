@@ -1,29 +1,29 @@
 ---
-title: How to evaluate your agent with trajectory evaluations
-sidebarTitle: Evaluate agent trajectories
+title: trajectory 평가로 에이전트를 평가하는 방법
+sidebarTitle: 에이전트 trajectory 평가하기
 ---
 
-Many agent behaviors only emerge when using a real LLM, such as which tool the agent decides to call, how it formats responses, or whether a prompt modification affects the entire execution trajectory. LangChain's [`agentevals`](https://github.com/langchain-ai/agentevals) package provides evaluators specifically designed for testing agent trajectories with live models.
+많은 에이전트 동작은 실제 LLM을 사용할 때만 나타납니다. 예를 들어 에이전트가 어떤 도구를 호출할지, 응답을 어떻게 포맷할지, 또는 프롬프트 수정이 전체 실행 trajectory에 영향을 미치는지 등입니다. LangChain의 [`agentevals`](https://github.com/langchain-ai/agentevals) 패키지는 실제 모델로 에이전트 trajectory를 테스트하기 위해 특별히 설계된 evaluator를 제공합니다.
 
 <Note>
-This guide covers the open source [LangChain](/oss/langchain/overview) `agentevals` package, which integrates with LangSmith for trajectory evaluation.
+이 가이드는 오픈 소스 [LangChain](/oss/langchain/overview) `agentevals` 패키지를 다루며, 이는 trajectory 평가를 위해 LangSmith와 통합됩니다.
 </Note>
 
-AgentEvals allows you to evaluate the trajectory of your agent (the exact sequence of messages, including tool calls) by performing a _trajectory match_ or by using an _LLM judge_:
+AgentEvals를 사용하면 _trajectory match_ 또는 _LLM judge_를 사용하여 에이전트의 trajectory(도구 호출을 포함한 정확한 메시지 시퀀스)를 평가할 수 있습니다:
 
 <Card title="Trajectory match" icon="equals" arrow="true" href="#trajectory-match-evaluator">
-Hard-code a reference trajectory for a given input and validate the run via a step-by-step comparison.
+주어진 입력에 대한 참조 trajectory를 하드코딩하고 단계별 비교를 통해 실행을 검증합니다.
 
-Ideal for testing well-defined workflows where you know the expected behavior. Use when you have specific expectations about which tools should be called and in what order. This approach is deterministic, fast, and cost-effective since it doesn't require additional LLM calls.
+예상되는 동작을 알고 있는 잘 정의된 워크플로우를 테스트하는 데 이상적입니다. 어떤 도구가 어떤 순서로 호출되어야 하는지에 대한 구체적인 기대가 있을 때 사용하세요. 이 접근 방식은 추가 LLM 호출이 필요하지 않으므로 결정론적이고 빠르며 비용 효율적입니다.
 </Card>
 
 <Card title="LLM-as-judge" icon="gavel" arrow="true" href="#llm-as-judge-evaluator">
-Use a LLM to qualitatively validate your agent's execution trajectory. The "judge" LLM reviews the agent's decisions against a prompt rubric (which can include a reference trajectory).
+LLM을 사용하여 에이전트의 실행 trajectory를 정성적으로 검증합니다. "judge" LLM은 프롬프트 루브릭(참조 trajectory를 포함할 수 있음)에 대해 에이전트의 결정을 검토합니다.
 
-More flexible and can assess nuanced aspects like efficiency and appropriateness, but requires an LLM call and is less deterministic. Use when you want to evaluate the overall quality and reasonableness of the agent's trajectory without strict tool call or ordering requirements.
+더 유연하며 효율성과 적절성과 같은 미묘한 측면을 평가할 수 있지만, LLM 호출이 필요하고 덜 결정론적입니다. 엄격한 도구 호출이나 순서 요구 사항 없이 에이전트 trajectory의 전반적인 품질과 합리성을 평가하고자 할 때 사용하세요.
 </Card>
 
-## Installing AgentEvals
+## AgentEvals 설치하기
 
 <CodeGroup>
 
@@ -37,24 +37,24 @@ npm install agentevals @langchain/core
 
 </CodeGroup>
 
-Or, clone the [AgentEvals repository](https://github.com/langchain-ai/agentevals) directly.
+또는 [AgentEvals repository](https://github.com/langchain-ai/agentevals)를 직접 클론하세요.
 
 ## Trajectory match evaluator
 
-AgentEvals offers the `create_trajectory_match_evaluator` function in Python and `createTrajectoryMatchEvaluator` in TypeScript to match your agent's trajectory against a reference trajectory.
+AgentEvals는 Python에서 `create_trajectory_match_evaluator` 함수를, TypeScript에서 `createTrajectoryMatchEvaluator`를 제공하여 에이전트의 trajectory를 참조 trajectory와 매칭합니다.
 
-You can use the following modes:
+다음 모드를 사용할 수 있습니다:
 
-| Mode | Description | Use Case |
+| 모드 | 설명 | 사용 사례 |
 |------|-------------|----------|
-| [`strict`](#strict-match) | Exact match of messages and tool calls in the same order | Testing specific sequences (e.g., policy lookup before authorization) |
-| [`unordered`](#unordered-match) | Same tool calls allowed in any order | Verifying information retrieval when order doesn't matter |
-| [`subset`](#subset-and-superset-match) | Agent calls only tools from reference (no extras) | Ensuring agent doesn't exceed expected scope |
-| [`superset`](#subset-and-superset-match) | Agent calls at least the reference tools (extras allowed) | Verifying minimum required actions are taken |
+| [`strict`](#strict-match) | 동일한 순서로 메시지와 도구 호출의 정확한 일치 | 특정 시퀀스 테스트 (예: 권한 부여 전 정책 조회) |
+| [`unordered`](#unordered-match) | 동일한 도구 호출이 임의의 순서로 허용됨 | 순서가 중요하지 않을 때 정보 검색 검증 |
+| [`subset`](#subset-and-superset-match) | 에이전트가 참조의 도구만 호출 (추가 없음) | 에이전트가 예상 범위를 초과하지 않도록 보장 |
+| [`superset`](#subset-and-superset-match) | 에이전트가 최소한 참조 도구를 호출 (추가 허용) | 최소 필수 작업이 수행되는지 검증 |
 
 ### Strict match
 
-The `strict` mode ensures trajectories contain identical messages in the same order with the same tool calls, though it allows for differences in message content. This is useful when you need to enforce a specific sequence of operations, such as requiring a policy lookup before authorizing an action.
+`strict` 모드는 trajectory가 동일한 순서로 동일한 도구 호출과 함께 동일한 메시지를 포함하도록 보장하지만, 메시지 내용의 차이는 허용합니다. 이는 작업 권한 부여 전에 정책 조회를 요구하는 것과 같이 특정 작업 시퀀스를 강제해야 할 때 유용합니다.
 
 <CodeGroup>
 
@@ -166,7 +166,7 @@ async function testWeatherToolCalledStrict() {
 
 ### Unordered match
 
-The `unordered` mode allows the same tool calls in any order, which is helpful when you want to verify that the correct set of tools are being invoked but don't care about the sequence. For example, an agent might need to check both weather and events for a city, but the order doesn't matter.
+`unordered` 모드는 동일한 도구 호출을 임의의 순서로 허용하며, 올바른 도구 세트가 호출되는지 확인하고 싶지만 시퀀스는 중요하지 않을 때 유용합니다. 예를 들어, 에이전트가 도시의 날씨와 이벤트를 모두 확인해야 할 수 있지만 순서는 중요하지 않습니다.
 
 <CodeGroup>
 
@@ -297,14 +297,14 @@ async function testMultipleToolsAnyOrder() {
 
 </CodeGroup>
 
-### Subset and superset match
+### Subset과 superset match
 
-The `superset` and `subset` modes focus on which tools are called rather than the order of tool calls, allowing you to control how strictly the agent's tool calls must align with the reference.
+`superset`과 `subset` 모드는 도구 호출의 순서보다는 어떤 도구가 호출되는지에 초점을 맞추며, 에이전트의 도구 호출이 참조와 얼마나 엄격하게 일치해야 하는지를 제어할 수 있습니다.
 
-- Use `superset` mode when you want to verify that a few key tools are called in the execution, but you're okay with the agent calling additional tools. The agent's trajectory must include at least all the tool calls in the reference trajectory, and may include additional tool calls beyond the reference.
-- Use `subset` mode to ensure agent efficiency by verifying that the agent did not call any irrelevant or unnecessary tools beyond those in the reference. The agent's trajectory must include only tool calls that appear in the reference trajectory.
+- `superset` 모드는 실행에서 몇 가지 핵심 도구가 호출되는지 확인하고 싶지만 에이전트가 추가 도구를 호출하는 것은 괜찮을 때 사용하세요. 에이전트의 trajectory는 참조 trajectory의 모든 도구 호출을 최소한 포함해야 하며, 참조를 넘어서는 추가 도구 호출을 포함할 수 있습니다.
+- `subset` 모드는 에이전트가 참조를 넘어서는 관련 없거나 불필요한 도구를 호출하지 않았는지 확인하여 에이전트 효율성을 보장하는 데 사용하세요. 에이전트의 trajectory는 참조 trajectory에 나타나는 도구 호출만 포함해야 합니다.
 
-The following example demonstrates `superset` mode, where the reference trajectory only requires the `get_weather` tool, but the agent can call additional tools:
+다음 예제는 `superset` 모드를 보여주며, 참조 trajectory는 `get_weather` 도구만 필요하지만 에이전트는 추가 도구를 호출할 수 있습니다:
 
 <CodeGroup>
 
@@ -433,18 +433,18 @@ async function testAgentCallsRequiredToolsPlusExtra() {
 </CodeGroup>
 
 <Info>
-You can also customize how the evaluator considers equality between tool calls in the actual trajectory vs. the reference by setting the `tool_args_match_mode` (Python) or `toolArgsMatchMode` (TypeScript) property, as well as the `tool_args_match_overrides` (Python) or `toolArgsMatchOverrides` (TypeScript) property. By default, only tool calls with the same arguments to the same tool are considered equal. Visit the [repository](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#tool-args-match-modes) for more details.
+`tool_args_match_mode` (Python) 또는 `toolArgsMatchMode` (TypeScript) 속성과 `tool_args_match_overrides` (Python) 또는 `toolArgsMatchOverrides` (TypeScript) 속성을 설정하여 실제 trajectory와 참조 간의 도구 호출 간 동등성을 evaluator가 고려하는 방식을 사용자 정의할 수도 있습니다. 기본적으로 동일한 도구에 대한 동일한 인수를 가진 도구 호출만 동등한 것으로 간주됩니다. 자세한 내용은 [repository](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#tool-args-match-modes)를 참조하세요.
 </Info>
 
 ## LLM-as-judge evaluator
 
 <Note>
-This section covers the trajectory-specific LLM-as-a-judge evaluator from the `agentevals` package. For general-purpose LLM-as-a-judge evaluators in LangSmith, refer to the [LLM-as-a-judge evaluator](/langsmith/llm-as-judge).
+이 섹션은 `agentevals` 패키지의 trajectory 전용 LLM-as-a-judge evaluator를 다룹니다. LangSmith의 범용 LLM-as-a-judge evaluator에 대해서는 [LLM-as-a-judge evaluator](/langsmith/llm-as-judge)를 참조하세요.
 </Note>
 
-You can also use an LLM to evaluate the agent's execution path. Unlike the trajectory match evaluators, it doesn't require a reference trajectory, but one can be provided if available.
+LLM을 사용하여 에이전트의 실행 경로를 평가할 수도 있습니다. trajectory match evaluator와 달리 참조 trajectory가 필요하지 않지만, 사용 가능한 경우 제공할 수 있습니다.
 
-### Without reference trajectory
+### 참조 trajectory 없이
 
 <CodeGroup>
 
@@ -530,9 +530,9 @@ async function testTrajectoryQuality() {
 
 </CodeGroup>
 
-### With reference trajectory
+### 참조 trajectory와 함께
 
-If you have a reference trajectory, you can add an extra variable to your prompt and pass in the reference trajectory. Below, we use the prebuilt `TRAJECTORY_ACCURACY_PROMPT_WITH_REFERENCE` prompt and configure the `reference_outputs` variable:
+참조 trajectory가 있는 경우 프롬프트에 추가 변수를 추가하고 참조 trajectory를 전달할 수 있습니다. 아래에서는 사전 구축된 `TRAJECTORY_ACCURACY_PROMPT_WITH_REFERENCE` 프롬프트를 사용하고 `reference_outputs` 변수를 구성합니다:
 
 <CodeGroup>
 
@@ -564,14 +564,14 @@ const evaluation = await evaluator({
 </CodeGroup>
 
 <Info>
-For more configurability over how the LLM evaluates the trajectory, visit the [repository](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#trajectory-llm-as-judge).
+LLM이 trajectory를 평가하는 방식에 대한 더 많은 구성 가능성을 원하시면 [repository](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#trajectory-llm-as-judge)를 참조하세요.
 </Info>
 
-## Async support (Python)
+## Async 지원 (Python)
 
-All `agentevals` evaluators support Python asyncio. For evaluators that use factory functions, async versions are available by adding `async` after `create_` in the function name.
+모든 `agentevals` evaluator는 Python asyncio를 지원합니다. factory 함수를 사용하는 evaluator의 경우, 함수 이름의 `create_` 뒤에 `async`를 추가하여 async 버전을 사용할 수 있습니다.
 
-Here's an example using the async judge and evaluator:
+다음은 async judge와 evaluator를 사용하는 예제입니다:
 
 ```python
 from agentevals.trajectory.llm import create_async_trajectory_llm_as_judge, TRAJECTORY_ACCURACY_PROMPT

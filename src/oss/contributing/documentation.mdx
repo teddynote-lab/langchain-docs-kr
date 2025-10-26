@@ -1,109 +1,109 @@
 ---
-title: Contributing to documentation
-sidebarTitle: Documentation
+title: 문서 기여하기
+sidebarTitle: 문서
 ---
 
-Accessible documentation is a vital part of LangChain. We welcome both documentation for new features/[integrations](/oss/contributing/publish-langchain#adding-documentation), as well as community improvements to existing docs.
+접근 가능한 문서는 LangChain의 핵심 요소입니다. 새로운 기능/[통합](/oss/contributing/publish-langchain#adding-documentation)에 대한 문서뿐만 아니라 기존 문서에 대한 커뮤니티 개선도 환영합니다.
 
 <Note>
-    We generally do not merge new tutorials from outside contributors without an acute need. If you feel that a certain topic is missing from docs or is not sufficiently covered, please [open a new issue](https://github.com/langchain-ai/docs/issues).
+    일반적으로 긴급한 필요가 없는 한 외부 기여자의 새로운 튜토리얼은 병합하지 않습니다. 특정 주제가 문서에서 누락되었거나 충분히 다루어지지 않았다고 생각되면 [새 이슈를 열어주세요](https://github.com/langchain-ai/docs/issues).
 </Note>
 
-All documentation falls under one of four categories:
+모든 문서는 네 가지 카테고리 중 하나에 속합니다:
 
 <CardGroup cols={2}>
-    <Card title="Conceptual guides" icon="lightbulb" href="#conceptual-guides">
-        Explanations that provide deeper understanding and insights
+    <Card title="개념 가이드" icon="lightbulb" href="#conceptual-guides">
+        더 깊은 이해와 통찰력을 제공하는 설명
     </Card>
 
-    <Card title="References" icon="book" href="#references">
-        Technical descriptions of APIs and implementation details
+    <Card title="레퍼런스" icon="book" href="#references">
+        API 및 구현 세부 사항에 대한 기술적 설명
     </Card>
 
-    <Card title="Tutorials (Learn)" icon="graduation-cap" href="/oss/learn">
-        Lessons that guide users through practical activities to build understanding
+    <Card title="튜토리얼 (Learn)" icon="graduation-cap" href="/oss/learn">
+        이해를 구축하기 위한 실용적인 활동을 안내하는 레슨
     </Card>
 
-    <Card title="How-to guides" icon="wrench">
-        Task-oriented instructions for users who know what they want to accomplish
+    <Card title="How-to 가이드" icon="wrench">
+        달성하고자 하는 목표를 알고 있는 사용자를 위한 작업 중심 지침
     </Card>
 </CardGroup>
 
 ---
 
-## Getting started
+## 시작하기
 
-### Quick edit: fix a typo
+### 빠른 수정: 오타 수정
 
-For simple changes like fixing typos, you can edit directly on GitHub without setting up a local development environment:
+오타 수정과 같은 간단한 변경의 경우, 로컬 개발 환경을 설정하지 않고 GitHub에서 직접 편집할 수 있습니다:
 
 <Info>
-    **Prerequisites:**
-    - A [GitHub](https://github.com/) account
-    - Basic familiarity of the [fork-and-pull workflow](https://graphite.dev/guides/understanding-git-fork-pull-request-workflow) for contributing
+    **사전 요구사항:**
+    - [GitHub](https://github.com/) 계정
+    - 기여를 위한 [fork-and-pull 워크플로우](https://graphite.dev/guides/understanding-git-fork-pull-request-workflow)에 대한 기본적인 이해
 </Info>
 
 <Steps>
-    <Step title="Find the page">
-        Navigate to any documentation page, scroll to the bottom of the page, and click the link "Edit the source of this page on GitHub"
+    <Step title="페이지 찾기">
+        문서 페이지로 이동하여 페이지 하단으로 스크롤한 다음 "Edit the source of this page on GitHub" 링크를 클릭합니다
     </Step>
 
-    <Step title="Fork the repository">
-        GitHub will prompt you to fork the repository to your account. Make sure to fork into your <Tooltip tip="If you clone to an organization, maintainers are unable to make edits.">personal account</Tooltip>
+    <Step title="저장소 포크하기">
+        GitHub에서 저장소를 계정으로 포크하라는 메시지가 표시됩니다. <Tooltip tip="조직으로 클론하면 관리자가 편집할 수 없습니다.">개인 계정</Tooltip>으로 포크해야 합니다
     </Step>
 
-    <Step title="Make your changes">
-        Correct the typo directly in GitHub's web editor
+    <Step title="변경 사항 작성">
+        GitHub의 웹 에디터에서 직접 오타를 수정합니다
     </Step>
 
-    <Step title="Commit your changes">
-        Click `Commit changes...` and give your commit a descriptive title like `fix(docs): summary of change`. If applicable, add an [extended description](https://www.gitkraken.com/learn/git/best-practices/git-commit-message#git-commit-message-structure)
+    <Step title="변경 사항 커밋">
+        `Commit changes...`를 클릭하고 `fix(docs): summary of change`와 같이 설명적인 제목을 커밋에 부여합니다. 해당되는 경우 [확장 설명](https://www.gitkraken.com/learn/git/best-practices/git-commit-message#git-commit-message-structure)을 추가합니다
     </Step>
 
-    <Step title="Create pull request">
-        GitHub will redirect you to create a pull request. Give it a title (often the same as the commit) and follow the PR template checklist, if present
+    <Step title="Pull request 생성">
+        GitHub가 pull request를 생성하도록 리디렉션합니다. 제목을 지정하고(종종 커밋과 동일) PR 템플릿 체크리스트가 있는 경우 따릅니다
     </Step>
 </Steps>
 
 <Note>
-    Docs PRs are typically reviewed within a few days. Keep an eye on your PR to address any feedback from maintainers. Do not bump the PR unless you have new information to provide - maintainers will address it as their availability permits.
+    문서 PR은 일반적으로 며칠 내에 검토됩니다. 관리자의 피드백을 처리하기 위해 PR을 주시하세요. 제공할 새로운 정보가 없는 한 PR을 재촉하지 마세요 - 관리자가 가능한 시간에 처리할 것입니다.
 </Note>
 
-### Full development IDE setup
+### 전체 개발 IDE 설정
 
-For larger changes or ongoing contributions, it's important to set up a local development environment on your machine. Our documentation build pipeline offers local preview and live reload as you edit, important for ensuring your changes appear as intended before submitting.
+더 큰 변경 사항이나 지속적인 기여를 위해서는 컴퓨터에 로컬 개발 환경을 설정하는 것이 중요합니다. 우리의 문서 빌드 파이프라인은 편집하는 동안 로컬 미리보기와 실시간 리로드를 제공하며, 이는 제출하기 전에 변경 사항이 의도한 대로 나타나는지 확인하는 데 중요합니다.
 
-Please review the steps to set up your environment outlined in the docs repo [`README.md`](https://github.com/langchain-ai/docs?tab=readme-ov-file#contributing).
+문서 저장소 [`README.md`](https://github.com/langchain-ai/docs?tab=readme-ov-file#contributing)에 설명된 환경 설정 단계를 검토하세요.
 
 ---
 
-## Documentation types
+## 문서 유형
 
 <Note>
-    Where applicable, all documentation must have translations in both Python and JavaScript/TypeScript. See [our localization guide](#localization) for details.
+    해당되는 경우, 모든 문서는 Python과 JavaScript/TypeScript 모두에서 번역이 있어야 합니다. 자세한 내용은 [현지화 가이드](#localization)를 참조하세요.
 </Note>
 
-### Conceptual guides
+### 개념 가이드
 
-Conceptual guide cover core concepts abstractly, providing deep understanding.
+개념 가이드는 핵심 개념을 추상적으로 다루며 깊은 이해를 제공합니다.
 
 <AccordionGroup>
-    <Accordion title="Characteristics">
-        - **Understanding-focused**: Explain why things work as they do
-        - **Broad perspective**: Higher and wider view than other types
-        - **Design-oriented**: Explain decisions and trade-offs
-        - **Context-rich**: Use analogies and comparisons
+    <Accordion title="특징">
+        - **이해 중심**: 작동 방식과 이유를 설명
+        - **광범위한 관점**: 다른 유형보다 더 높고 넓은 시야
+        - **설계 지향**: 결정과 트레이드오프를 설명
+        - **풍부한 맥락**: 비유와 비교 사용
     </Accordion>
 
-    <Accordion title="Tips">
-        - Explain design decisions - *"why does concept X exist?"*
-        - Use analogies and reference alternatives
-        - Avoid blending in too much reference content
-        - Link to related tutorials and how-to guides
-        - Focus on the **"why"** rather than the "how"
+    <Accordion title="팁">
+        - 설계 결정 설명 - *"개념 X가 왜 존재하는가?"*
+        - 비유를 사용하고 대안을 참조
+        - 너무 많은 레퍼런스 콘텐츠를 혼합하지 않기
+        - 관련 튜토리얼 및 how-to 가이드에 링크
+        - "어떻게"보다 **"왜"**에 초점
     </Accordion>
 
-    <Accordion title="Examples">
+    <Accordion title="예시">
         <Columns cols={3}>
             <Card title="Memory" href="/oss/concepts/memory" icon="brain" />
             <Card title="Context" href="/oss/concepts/context" icon="file-lines" />
@@ -111,90 +111,90 @@ Conceptual guide cover core concepts abstractly, providing deep understanding.
     </Accordion>
 </AccordionGroup>
 
-### References
+### 레퍼런스
 
-Reference documentation contains detailed, low-level information describing exactly what functionality exists and how to use it.
+레퍼런스 문서는 존재하는 기능과 사용 방법을 정확하게 설명하는 상세하고 낮은 수준의 정보를 포함합니다.
 
 :::python
-<Card title="Python reference" href="https://reference.langchain.com/python/" icon="python" arrow />
+<Card title="Python 레퍼런스" href="https://reference.langchain.com/python/" icon="python" arrow />
 :::
 
 :::js
-<Card title="JavaScript/TypeScript reference" href="https://reference.langchain.com/javascript/" icon="js" arrow />
+<Card title="JavaScript/TypeScript 레퍼런스" href="https://reference.langchain.com/javascript/" icon="js" arrow />
 :::
 
-A good reference should:
-- Describe what exists (all parameters, options, return values)
-- Be comprehensive and structured for easy lookup
-- Serve as the authoritative source for technical details
+좋은 레퍼런스는 다음을 수행해야 합니다:
+- 존재하는 것을 설명 (모든 매개변수, 옵션, 반환 값)
+- 쉬운 조회를 위해 포괄적이고 구조화됨
+- 기술적 세부 사항에 대한 권위 있는 소스 역할
 
 <AccordionGroup>
-    <Accordion title="Contributing to references">
+    <Accordion title="레퍼런스에 기여하기">
         :::python
-        See the contributing guide for [Python reference docs](https://github.com/langchain-ai/docs/blob/main/reference/python/README.md).
+        [Python 레퍼런스 문서](https://github.com/langchain-ai/docs/blob/main/reference/python/README.md)의 기여 가이드를 참조하세요.
         :::
         :::js
-        See the contributing guide for [JavaScript/TypeScript reference docs](https://github.com/langchain-ai/docs/blob/main/reference/javascript/README.md).
+        [JavaScript/TypeScript 레퍼런스 문서](https://github.com/langchain-ai/docs/blob/main/reference/javascript/README.md)의 기여 가이드를 참조하세요.
         :::
     </Accordion>
 
-    <Accordion title="LangChain reference best practices">
-        - **Be consistent**; follow existing patterns for provider-specific documentation
-        - Include both basic usage (code snippets) and common edge cases/failure modes
-        - Note when features require specific versions
+    <Accordion title="LangChain 레퍼런스 모범 사례">
+        - **일관성 유지**; 제공자별 문서의 기존 패턴을 따르기
+        - 기본 사용법(코드 스니펫)과 일반적인 엣지 케이스/실패 모드 모두 포함
+        - 특정 버전이 필요한 기능을 명시
     </Accordion>
 
-    <Accordion title="When to create new reference documentation">
-        - New integrations or providers need dedicated reference pages
-        - Complex configuration options require detailed explanation
-        - API changes introduce new parameters or behavior
-        - Community frequently asks questions about specific functionality
+    <Accordion title="새 레퍼런스 문서를 만들어야 하는 경우">
+        - 새로운 통합 또는 제공자에는 전용 레퍼런스 페이지가 필요
+        - 복잡한 구성 옵션에는 상세한 설명이 필요
+        - API 변경으로 새로운 매개변수 또는 동작이 도입됨
+        - 커뮤니티에서 특정 기능에 대해 자주 질문함
     </Accordion>
 </AccordionGroup>
 
 ---
 
-## Writing standard
+## 작성 표준
 
 <Warning>
     :::python
-    Reference documentation has different standards - see the [reference docs contributing guide](https://github.com/langchain-ai/docs/blob/main/reference/python/README.md) for details.
+    레퍼런스 문서는 다른 표준을 가지고 있습니다 - 자세한 내용은 [레퍼런스 문서 기여 가이드](https://github.com/langchain-ai/docs/blob/main/reference/python/README.md)를 참조하세요.
     :::
     :::js
-    Reference documentation has different standards - see the [reference docs contributing guide](https://github.com/langchain-ai/docs/blob/main/reference/javascript/README.md) for details.
+    레퍼런스 문서는 다른 표준을 가지고 있습니다 - 자세한 내용은 [레퍼런스 문서 기여 가이드](https://github.com/langchain-ai/docs/blob/main/reference/javascript/README.md)를 참조하세요.
     :::
 </Warning>
 
-### Mintlify components
+### Mintlify 컴포넌트
 
-Use appropriate [Mintlify components](https://mintlify.com/docs/text) to enhance readability:
+가독성을 향상시키기 위해 적절한 [Mintlify 컴포넌트](https://mintlify.com/docs/text)를 사용하세요:
 
 <Tabs>
-    <Tab title="Callouts">
-    - `<Note>` for helpful supplementary information
-    - `<Warning>` for important cautions and breaking changes
-    - `<Tip>` for best practices and advice
-    - `<Info>` for neutral contextual information
-    - `<Check>` for success confirmations
+    <Tab title="콜아웃">
+    - `<Note>` 유용한 보충 정보용
+    - `<Warning>` 중요한 주의사항 및 주요 변경 사항용
+    - `<Tip>` 모범 사례 및 조언용
+    - `<Info>` 중립적인 맥락 정보용
+    - `<Check>` 성공 확인용
 </Tab>
 
-<Tab title="Structure">
-    - `<Steps>` for sequential procedures
-    - `<Tabs>` for platform-specific content
-    - `<AccordionGroup>` and `<Accordion>` for progressive disclosure
-    - `<CardGroup>` and `<Card>` for highlighting content
+<Tab title="구조">
+    - `<Steps>` 순차적 절차용
+    - `<Tabs>` 플랫폼별 콘텐츠용
+    - `<AccordionGroup>` 및 `<Accordion>` 점진적 공개용
+    - `<CardGroup>` 및 `<Card>` 콘텐츠 강조용
 </Tab>
 
-<Tab title="Code">
-    - `<CodeGroup>` for multiple language examples
-    - Always specify language tags on code blocks
-    - Titles for code blocks (e.g. `Success`, `Error Response`)
+<Tab title="코드">
+    - `<CodeGroup>` 여러 언어 예제용
+    - 코드 블록에 항상 언어 태그 지정
+    - 코드 블록에 제목 추가 (예: `Success`, `Error Response`)
     </Tab>
 </Tabs>
 
-### Page structure
+### 페이지 구조
 
-Every documentation page must begin with YAML frontmatter:
+모든 문서 페이지는 YAML frontmatter로 시작해야 합니다:
 
 ```yaml
 ---
@@ -202,9 +202,9 @@ title: "Clear, specific title"
 ---
 ```
 
-### Localization
+### 현지화
 
-All documentation must be localized in both Python and JavaScript/TypeScript when possible. To do so, we use a custom in-line syntax to differentiate between sections that should appear in one or both languages:
+가능한 경우 모든 문서는 Python과 JavaScript/TypeScript 모두에서 현지화되어야 합니다. 이를 위해 한 언어 또는 두 언어 모두에 나타나야 하는 섹션을 구분하기 위해 사용자 정의 인라인 구문을 사용합니다:
 
 ```mdx
 \:::python
@@ -219,113 +219,113 @@ Content for both languages (not wrapped)
 ```
 
 <Note>
-    We don't want a lack of parity to block contributions. If a feature is only available in one language, it's okay to have documentation only in that language until the other language catches up. In such cases, please include a note indicating that the feature is not yet available in the other language.
+    동등성 부족이 기여를 막는 것을 원하지 않습니다. 기능이 한 언어에서만 사용 가능한 경우, 다른 언어가 따라잡을 때까지 해당 언어로만 문서를 작성해도 괜찮습니다. 이러한 경우 다른 언어에서는 아직 사용할 수 없다는 메모를 포함하세요.
 </Note>
 <Note>
-    If you need help translating content between Python and JavaScript/TypeScript, please ask in the [community slack](https://www.langchain.com/join-community) or tag a maintainer in your PR.
+    Python과 JavaScript/TypeScript 간 콘텐츠 번역에 도움이 필요한 경우 [커뮤니티 슬랙](https://www.langchain.com/join-community)에서 문의하거나 PR에서 관리자를 태그하세요.
 </Note>
 
 ---
 
-## Quality standards
+## 품질 표준
 
-### General guidelines
+### 일반 지침
 
 <AccordionGroup>
-    <Accordion title="Avoid duplication">
-        Multiple pages covering the same material are difficult to maintain and cause confusion. There should be only one canonical page for each concept or feature. Link to other guides instead of re-explaining.
+    <Accordion title="중복 방지">
+        동일한 자료를 다루는 여러 페이지는 유지 관리가 어렵고 혼란을 야기합니다. 각 개념이나 기능에 대해 하나의 표준 페이지만 있어야 합니다. 다시 설명하는 대신 다른 가이드에 링크하세요.
     </Accordion>
 
-    <Accordion title="Link frequently">
-        Documentation sections don't exist in a vacuum. Link to other sections frequently to allow users to learn about unfamiliar topics. This includes linking to API references and conceptual sections.
+    <Accordion title="자주 링크하기">
+        문서 섹션은 진공 상태로 존재하지 않습니다. 사용자가 익숙하지 않은 주제에 대해 배울 수 있도록 다른 섹션에 자주 링크하세요. 여기에는 API 레퍼런스 및 개념 섹션에 대한 링크가 포함됩니다.
     </Accordion>
 
-    <Accordion title="Be concise">
-        Take a less-is-more approach. If another section with a good explanation exists, link to it rather than re-explain, unless your content presents a new angle.
+    <Accordion title="간결하게 작성">
+        적을수록 좋다는 접근 방식을 취하세요. 좋은 설명이 있는 다른 섹션이 있다면, 새로운 관점을 제시하지 않는 한 다시 설명하는 대신 링크하세요.
     </Accordion>
 </AccordionGroup>
 
-### Accessibility requirements
+### 접근성 요구사항
 
-Ensure documentation is accessible to all users:
+모든 사용자가 문서에 접근할 수 있도록 보장하세요:
 
-- Structure content for easy scanning with headers and lists
-- Use specific, actionable link text instead of "click here"
-- Include descriptive alt text for all images and diagrams
+- 헤더와 목록을 사용하여 쉽게 스캔할 수 있도록 콘텐츠 구조화
+- "여기를 클릭"하는 대신 구체적이고 실행 가능한 링크 텍스트 사용
+- 모든 이미지와 다이어그램에 설명적인 대체 텍스트 포함
 
-### Testing and validation
+### 테스트 및 검증
 
-Before submitting documentation:
+문서를 제출하기 전에:
 
 <Steps>
-    <Step title="Test all code">
-        Run all code examples to ensure they work correctly
+    <Step title="모든 코드 테스트">
+        모든 코드 예제를 실행하여 올바르게 작동하는지 확인
     </Step>
 
-    <Step title="Check formatting">
+    <Step title="포맷 확인">
         ```bash
         make lint
         make format
         ```
     </Step>
 
-    <Step title="Build locally">
+    <Step title="로컬 빌드">
         ```bash
         docs build
         ```
-        Verify the build completes without errors
+        빌드가 오류 없이 완료되는지 확인
     </Step>
 
-    <Step title="Review links">
-        Check that all internal links work correctly
+    <Step title="링크 검토">
+        모든 내부 링크가 올바르게 작동하는지 확인
     </Step>
 </Steps>
 
 ---
 
-## In-code documentation
+## 코드 내 문서
 
-### Language and style
+### 언어 및 스타일
 
 <Info>
-    Use [Google-style docstrings](https://google.github.io/styleguide/pyguide.html) with complete type hints for all public functions.
+    모든 공개 함수에 대해 완전한 타입 힌트와 함께 [Google 스타일 docstring](https://google.github.io/styleguide/pyguide.html)을 사용하세요.
 </Info>
 
-Follow these standards for all documentation:
+모든 문서에 대해 다음 표준을 따르세요:
 
-- **Voice**: Use second person ("you") for instructions
-- **Tense**: Use active voice and present tense
-- **Clarity**: Write clear, direct language for technical audiences
-- **Consistency**: Use consistent terminology throughout
-- **Conciseness**: Keep sentences concise while providing necessary context
+- **어조**: 지침에 2인칭("당신") 사용
+- **시제**: 능동태와 현재 시제 사용
+- **명확성**: 기술 청중을 위한 명확하고 직접적인 언어 작성
+- **일관성**: 전체적으로 일관된 용어 사용
+- **간결성**: 필요한 맥락을 제공하면서 문장을 간결하게 유지
 
-### Code examples
+### 코드 예제
 
 <Warning>
-    Always test code examples before publishing. Never include real API keys or secrets.
+    게시하기 전에 항상 코드 예제를 테스트하세요. 실제 API 키나 비밀을 포함하지 마세요.
 </Warning>
 
-Requirements for code examples:
+코드 예제에 대한 요구사항:
 
 <Steps>
-    <Step title="Completeness">
-        Include complete, runnable examples that users can copy and execute without errors
+    <Step title="완전성">
+        사용자가 오류 없이 복사하고 실행할 수 있는 완전하고 실행 가능한 예제 포함
     </Step>
 
-    <Step title="Realism">
-        Use realistic data instead of placeholder values like "foo" or "example"
+    <Step title="현실성">
+        "foo" 또는 "example"과 같은 플레이스홀더 값 대신 현실적인 데이터 사용
     </Step>
 
-    <Step title="Error handling">
-        Show proper error handling and edge case management
+    <Step title="오류 처리">
+        적절한 오류 처리 및 엣지 케이스 관리 표시
     </Step>
 
-    <Step title="Documentation">
-        Add explanatory comments for complex logic
+    <Step title="문서화">
+        복잡한 로직에 대한 설명 주석 추가
     </Step>
 </Steps>
 
-Example of a well-documented function:
+잘 문서화된 함수의 예:
 
 ```python
 def filter_unknown_users(users: list[str], known_users: set[str]) -> list[str]:
@@ -344,10 +344,10 @@ def filter_unknown_users(users: list[str], known_users: set[str]) -> list[str]:
     return [user for user in users if user not in known_users]
 ```
 
-## Getting help
+## 도움 받기
 
-Our goal is to have the simplest developer setup possible. Should you experience any difficulty getting setup, please ask in the [community slack](https://www.langchain.com/join-community) or open a [forum post](https://forum.langchain.com/).
+우리의 목표는 가능한 한 가장 간단한 개발자 설정을 갖는 것입니다. 설정하는 데 어려움이 있는 경우 [커뮤니티 슬랙](https://www.langchain.com/join-community)에서 문의하거나 [포럼 게시물](https://forum.langchain.com/)을 여세요.
 
 <Check>
-    You now have everything you need to contribute high-quality documentation to LangChain! 🎤🦜
+    이제 LangChain에 고품질 문서를 기여하는 데 필요한 모든 것을 갖추었습니다! 🎤🦜
 </Check>

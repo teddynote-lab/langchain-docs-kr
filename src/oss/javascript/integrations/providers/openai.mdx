@@ -1,26 +1,26 @@
+```markdown
 ---
-title: Overview
+title: 개요
 ---
 
-All functionality related to OpenAI
+OpenAI와 관련된 모든 기능
 
-> [OpenAI](https://en.wikipedia.org/wiki/OpenAI) is American artificial intelligence (AI) research laboratory
-> consisting of the non-profit `OpenAI Incorporated`
-> and its for-profit subsidiary corporation `OpenAI Limited Partnership`.
-> OpenAI conducts AI research with the declared intention of promoting and developing a friendly AI.
-> OpenAI systems run on an `Azure`-based supercomputing platform from `Microsoft`.
+> [OpenAI](https://en.wikipedia.org/wiki/OpenAI)는 비영리 조직인 `OpenAI Incorporated`와
+> 영리 자회사인 `OpenAI Limited Partnership`으로 구성된 미국의 인공지능(AI) 연구소입니다.
+> OpenAI는 친화적인 AI를 촉진하고 개발한다는 선언된 의도로 AI 연구를 수행합니다.
+> OpenAI 시스템은 `Microsoft`의 `Azure` 기반 슈퍼컴퓨팅 플랫폼에서 실행됩니다.
 
-> The [OpenAI API](https://platform.openai.com/docs/models) is powered by a diverse set of models with different capabilities and price points.
+> [OpenAI API](https://platform.openai.com/docs/models)는 다양한 기능과 가격대를 가진 다양한 모델 세트로 구동됩니다.
 >
-> [ChatGPT](https://chat.openai.com) is the Artificial Intelligence (AI) chatbot developed by `OpenAI`.
+> [ChatGPT](https://chat.openai.com)는 `OpenAI`가 개발한 인공지능(AI) 챗봇입니다.
 
-## Installation and Setup
+## 설치 및 설정
 
-- Get an OpenAI api key and set it as an environment variable (`OPENAI_API_KEY`)
+- OpenAI API key를 발급받아 환경 변수(`OPENAI_API_KEY`)로 설정하세요
 
 ## Chat model
 
-See a [usage example](/oss/integrations/chat/openai).
+[사용 예제](/oss/integrations/chat/openai)를 참조하세요.
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -28,10 +28,10 @@ import { ChatOpenAI } from "@langchain/openai";
 
 ## LLM
 
-See a [usage example](/oss/integrations/llms/openai).
+[사용 예제](/oss/integrations/llms/openai)를 참조하세요.
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
@@ -43,7 +43,7 @@ import { OpenAI } from "@langchain/openai";
 
 ## Text Embedding Model
 
-See a [usage example](/oss/integrations/text_embedding/openai)
+[사용 예제](/oss/integrations/text_embedding/openai)를 참조하세요
 
 ```typescript
 import { OpenAIEmbeddings } from "@langchain/openai";
@@ -53,4 +53,5 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 
 ```typescript
 import { OpenAIModerationChain } from "@langchain/classic/chains";
+```
 ```

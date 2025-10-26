@@ -4,67 +4,67 @@ sidebarTitle: Regions FAQ
 ---
 
 <Note>
-See the [cloud architecture reference](/langsmith/cloud#architecture) for additional details.
+추가 세부 정보는 [cloud architecture reference](/langsmith/cloud#architecture)를 참조하세요.
 </Note>
 
-## Legal and compliance
+## 법률 및 규정 준수
 
-#### *What privacy and data protection frameworks does LangSmith, including its EU instance, comply with?*
+#### *LangSmith는 EU 인스턴스를 포함하여 어떤 개인정보 보호 및 데이터 보호 프레임워크를 준수하나요?*
 
-LangSmith complies with the General Data Protection Regulation (GDPR) and other laws and regulations applicable to the LangSmith service. We are also SOC 2 Type 2 certified and are HIPAA compliant. You can request more information about our security policies and posture at [trust.langchain.com](https://trust.langchain.com). If you would like to sign a Data Processing Addendum (DPA) with us, please reach out to [support@langchain.dev](mailto:support@langchain.dev). Please note we only enter into Business Associate Agreements (BAAs) with customers on our Enterprise plan.
+LangSmith는 일반 데이터 보호 규정(GDPR) 및 LangSmith 서비스에 적용되는 기타 법률 및 규정을 준수합니다. 또한 SOC 2 Type 2 인증을 받았으며 HIPAA를 준수합니다. 당사의 보안 정책 및 태세에 대한 자세한 정보는 [trust.langchain.com](https://trust.langchain.com)에서 요청할 수 있습니다. 데이터 처리 부속 계약(DPA)을 체결하고자 하는 경우 [support@langchain.dev](mailto:support@langchain.dev)로 문의해 주세요. Business Associate Agreement(BAA)는 Enterprise 플랜 고객과만 체결한다는 점을 참고해 주세요.
 
-#### *My company isn't based in the EU, can I still have my data hosted there?*
+#### *우리 회사가 EU에 기반을 두고 있지 않은데도 EU에 데이터를 호스팅할 수 있나요?*
 
-Yes, you can host your LangSmith data in the EU instance independent of your location.
+예, 위치와 관계없이 EU 인스턴스에 LangSmith 데이터를 호스팅할 수 있습니다.
 
-#### *Do you have a legal entity in the EU that we can contract with?*
+#### *고객 계약을 체결할 수 있는 EU 내 법인이 있나요?*
 
-We do not have a legal entity in the EU for customer contracting today.
+현재 고객 계약을 위한 EU 내 법인은 없습니다.
 
-#### *Do different legal terms apply if I choose the EU region?*
+#### *EU 리전을 선택하면 다른 법적 조건이 적용되나요?*
 
-The terms are the same for the EU and US regions.
+EU와 US 리전의 조건은 동일합니다.
 
-## Features
+## 기능
 
-#### *How do I use the EU instance?*
+#### *EU 인스턴스는 어떻게 사용하나요?*
 
-Follow the instructions [here](/langsmith/create-account-api-key) to create an account and an API key (make sure to change the region to EU in the dropdown)
+계정과 API key를 생성하려면 [여기](/langsmith/create-account-api-key)의 지침을 따르세요 (드롭다운에서 리전을 EU로 변경해야 합니다)
 
-#### *Are there any functional differences between US and EU cloud-managed LangSmith?*
+#### *US와 EU 클라우드 관리형 LangSmith 간에 기능적 차이가 있나요?*
 
-There may be a small delay between launches to each region depending on the feature. Besides that, they are functionally equivalent - all features supported in the US are supported in the EU and vice versa.
+기능에 따라 각 리전에 출시되는 시점 간에 약간의 지연이 있을 수 있습니다. 그 외에는 기능적으로 동등합니다 - US에서 지원되는 모든 기능은 EU에서도 지원되며 그 반대도 마찬가지입니다.
 
-#### *Can an organization have workspaces in different regions?*
+#### *조직이 서로 다른 리전에 workspace를 가질 수 있나요?*
 
-LangSmith does not support this at the moment, but if you are interested, please contact [support@langchain.dev](mailto:support@langchain.dev) and share your use case.
+LangSmith는 현재 이를 지원하지 않지만, 관심이 있으시다면 [support@langchain.dev](mailto:support@langchain.dev)로 연락하여 사용 사례를 공유해 주세요.
 
-#### *Can I connect an EU organization to a US organization and share billing?*
+#### *EU 조직을 US 조직에 연결하고 청구를 공유할 수 있나요?*
 
-LangSmith does not support this at the moment, but if you are interested, please contact [support@langchain.dev](mailto:support@langchain.dev) and share your use case.
+LangSmith는 현재 이를 지원하지 않지만, 관심이 있으시다면 [support@langchain.dev](mailto:support@langchain.dev)로 연락하여 사용 사례를 공유해 주세요.
 
-#### *What data will be stored in my selected region?*
+#### *선택한 리전에 어떤 데이터가 저장되나요?*
 
-See the [cloud architecture reference](/langsmith/cloud#architecture) for details.
+자세한 내용은 [cloud architecture reference](/langsmith/cloud#architecture)를 참조하세요.
 
-#### *How can I see my organization's region?*
+#### *내 조직의 리전을 어떻게 확인할 수 있나요?*
 
-Check your URL - any organizations on [https://eu.smith.langchain.com](https://eu.smith.langchain.com) are in the EU, and any on [https://smith.langchain.com](https://smith.langchain.com) are in the US.
+URL을 확인하세요 - [https://eu.smith.langchain.com](https://eu.smith.langchain.com)에 있는 조직은 EU에 있고, [https://smith.langchain.com](https://smith.langchain.com)에 있는 조직은 US에 있습니다.
 
-#### *Can I switch my organization from the US to EU or vice versa?*
+#### *조직을 US에서 EU로 또는 그 반대로 전환할 수 있나요?*
 
-We do not support migration between regions at this time, but if you are interested in this feature, please reach out to [support@langchain.dev](mailto:support@langchain.dev).
+현재 리전 간 마이그레이션을 지원하지 않지만, 이 기능에 관심이 있으시다면 [support@langchain.dev](mailto:support@langchain.dev)로 문의해 주세요.
 
-## Plans and pricing
+## 플랜 및 가격
 
-#### *Is the EU region available on all LangSmith plans?*
+#### *EU 리전은 모든 LangSmith 플랜에서 사용할 수 있나요?*
 
-Yes, you can sign up for the EU region on all plans including free plans.
+예, 무료 플랜을 포함한 모든 플랜에서 EU 리전에 가입할 수 있습니다.
 
-#### *Is pricing different for the EU region compared to the US region?*
+#### *EU 리전의 가격이 US 리전과 다른가요?*
 
-No, pricing is the same for the EU and US regions.
+아니요, EU와 US 리전의 가격은 동일합니다.
 
-#### *What currency is used for payment if I use the EU region?*
+#### *EU 리전을 사용하는 경우 어떤 통화로 결제하나요?*
 
-All LangSmith plans are paid in USD.
+모든 LangSmith 플랜은 USD로 결제됩니다.

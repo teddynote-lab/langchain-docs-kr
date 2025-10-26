@@ -2,58 +2,56 @@
 title: Apify Dataset
 ---
 
-This guide shows how to use [Apify](https://apify.com) with LangChain to load documents from an Apify Dataset.
+이 가이드는 [Apify](https://apify.com)를 LangChain과 함께 사용하여 Apify Dataset에서 문서를 로드하는 방법을 보여줍니다.
 
 ## Overview
 
-[Apify](https://apify.com) is a cloud platform for web scraping and data extraction,
-which provides an [ecosystem](https://apify.com/store) of more than two thousand
-ready-made apps called _Actors_ for various web scraping, crawling, and data extraction use cases.
+[Apify](https://apify.com)는 웹 스크래핑 및 데이터 추출을 위한 클라우드 플랫폼으로,
+다양한 웹 스크래핑, 크롤링 및 데이터 추출 사용 사례를 위한 2천 개 이상의
+즉시 사용 가능한 앱(_Actors_)으로 구성된 [생태계](https://apify.com/store)를 제공합니다.
 
-This guide shows how to load documents
-from an [Apify Dataset](https://docs.apify.com/platform/storage/dataset) — a scalable append-only
-storage built for storing structured web scraping results,
-such as a list of products or Google SERPs, and then export them to various
-formats like JSON, CSV, or Excel.
+이 가이드는 [Apify Dataset](https://docs.apify.com/platform/storage/dataset)에서 문서를 로드하는 방법을 보여줍니다.
+Apify Dataset은 제품 목록이나 Google SERP와 같은 구조화된 웹 스크래핑 결과를 저장하기 위해 구축된
+확장 가능한 추가 전용 스토리지이며, JSON, CSV 또는 Excel과 같은 다양한 형식으로 내보낼 수 있습니다.
 
-Datasets are typically used to save results of different Actors.
-For example, [Website Content Crawler](https://apify.com/apify/website-content-crawler) Actor
-deeply crawls websites such as documentation, knowledge bases, help centers, or blogs,
-and then stores the text content of webpages into a dataset,
-from which you can feed the documents into a vector database and use it for information retrieval.
-Another example is the [RAG Web Browser](https://apify.com/apify/rag-web-browser) Actor,
-which queries Google Search, scrapes the top N pages from the results, and returns the cleaned
-content in Markdown format for further processing by a large language model.
+Dataset은 일반적으로 다양한 Actor의 결과를 저장하는 데 사용됩니다.
+예를 들어, [Website Content Crawler](https://apify.com/apify/website-content-crawler) Actor는
+문서, 지식 베이스, 헬프 센터 또는 블로그와 같은 웹사이트를 깊이 크롤링한 다음,
+웹페이지의 텍스트 콘텐츠를 dataset에 저장하여 벡터 데이터베이스에 문서를 공급하고
+정보 검색에 사용할 수 있습니다.
+또 다른 예로 [RAG Web Browser](https://apify.com/apify/rag-web-browser) Actor가 있는데,
+이는 Google Search를 쿼리하고 결과에서 상위 N개 페이지를 스크래핑한 다음,
+대규모 언어 모델의 추가 처리를 위해 Markdown 형식으로 정리된 콘텐츠를 반환합니다.
 
 ## Setup
 
-You'll first need to install the official Apify client:
+먼저 공식 Apify client를 설치해야 합니다:
 
 ```bash npm
 npm install apify-client
 ```
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
 npm install hnswlib-node @langchain/openai @langchain/community @langchain/core
 ```
 
-You'll also need to sign up and retrieve your [Apify API token](https://console.apify.com/settings/integrations).
+또한 가입하고 [Apify API token](https://console.apify.com/settings/integrations)을 받아야 합니다.
 
 ## Usage
 
-### From a New Dataset (Crawl a Website and Store the data in Apify Dataset)
+### 새 Dataset에서 (웹사이트 크롤링 및 Apify Dataset에 데이터 저장)
 
-If you don't already have an existing dataset on the Apify platform, you'll need to initialize the document loader by calling an Actor and waiting for the results.
-In the example below, we use the [Website Content Crawler](https://apify.com/apify/website-content-crawler) Actor to crawl
-LangChain documentation, store the results in Apify Dataset, and then load the dataset using the `ApifyDatasetLoader`.
-For this demonstration, we'll use a fast Cheerio crawler type and limit the number of crawled pages to 10.
+Apify 플랫폼에 기존 dataset이 없는 경우, Actor를 호출하고 결과를 기다려서 document loader를 초기화해야 합니다.
+아래 예제에서는 [Website Content Crawler](https://apify.com/apify/website-content-crawler) Actor를 사용하여
+LangChain 문서를 크롤링하고, 결과를 Apify Dataset에 저장한 다음, `ApifyDatasetLoader`를 사용하여 dataset을 로드합니다.
+이 데모에서는 빠른 Cheerio crawler 타입을 사용하고 크롤링할 페이지 수를 10개로 제한합니다.
 
-**Note:** Running the Website Content Crawler may take some time, depending on the size of the website. For large sites, it can take several hours or even days!
+**참고:** Website Content Crawler 실행은 웹사이트의 크기에 따라 시간이 걸릴 수 있습니다. 대규모 사이트의 경우 몇 시간 또는 며칠이 걸릴 수 있습니다!
 
-Here's an example:
+다음은 예제입니다:
 
 ```typescript
 import { ApifyDatasetLoader } from "@langchain/community/document_loaders/web/apify_dataset";
@@ -141,9 +139,9 @@ console.log(res.context.map((doc) => doc.metadata.source));
 */
 ```
 
-## From an Existing Dataset
+## 기존 Dataset에서
 
-If you've already run an Actor and have an existing dataset on the Apify platform, you can initialize the document loader directly using the constructor
+이미 Actor를 실행했고 Apify 플랫폼에 기존 dataset이 있는 경우, constructor를 사용하여 document loader를 직접 초기화할 수 있습니다
 
 ```typescript
 import { ApifyDatasetLoader } from "@langchain/community/document_loaders/web/apify_dataset";

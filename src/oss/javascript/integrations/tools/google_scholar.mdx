@@ -2,7 +2,7 @@
 title: Google Scholar Tool
 ---
 
-This notebook provides a quick overview for getting started with [`SERPGoogleScholarTool`](https://api.js.langchain.com/classes/_langchain_community.tools_google_scholar.SERPGoogleScholarAPITool.html). For detailed documentation of all `SERPGoogleScholarAPITool` features and configurations, head to the [API reference](https://api.js.langchain.com/classes/_langchain_community.tools_google_scholar.SERPGoogleScholarAPITool.html).
+이 노트북은 [`SERPGoogleScholarTool`](https://api.js.langchain.com/classes/_langchain_community.tools_google_scholar.SERPGoogleScholarAPITool.html) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `SERPGoogleScholarAPITool` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/_langchain_community.tools_google_scholar.SERPGoogleScholarAPITool.html)를 참조하세요.
 
 ## Overview
 
@@ -14,13 +14,13 @@ This notebook provides a quick overview for getting started with [`SERPGoogleSch
 
 ### Tool features
 
-- Retrieve academic publications by topic, author, or query.
-- Fetch metadata such as title, author, and publication year.
-- Advanced search filters, including citation count and journal name.
+- 주제, 저자 또는 쿼리로 학술 출판물을 검색합니다.
+- 제목, 저자 및 출판 연도와 같은 메타데이터를 가져옵니다.
+- 인용 횟수 및 저널 이름을 포함한 고급 검색 필터를 제공합니다.
 
 ## Setup
 
-The integration lives in the `@langchain/community` package.
+이 integration은 `@langchain/community` 패키지에 포함되어 있습니다.
 
 ```bash
 npm install @langchain/community
@@ -28,13 +28,13 @@ npm install @langchain/community
 
 ### Credentials
 
-Ensure you have the appropriate API key to access Google Scholar. Set it in your environment variables:
+Google Scholar에 액세스하기 위한 적절한 API key가 있는지 확인하세요. 환경 변수에 설정하세요:
 
 ```typescript
 process.env.GOOGLE_SCHOLAR_API_KEY="your-serp-api-key"
 ```
 
-It's also helpful to set up [LangSmith](https://smith.langchain.com/) for best-in-class observability:
+최고 수준의 observability를 위해 [LangSmith](https://smith.langchain.com/)를 설정하는 것도 유용합니다:
 
 ```typescript
 process.env.LANGSMITH_TRACING="true"
@@ -43,7 +43,7 @@ process.env.LANGSMITH_API_KEY="your-langchain-api-key"
 
 ## Instantiation
 
-You can import and instantiate an instance of the `SERPGoogleScholarAPITool` tool like this:
+다음과 같이 `SERPGoogleScholarAPITool` tool의 인스턴스를 import하고 인스턴스화할 수 있습니다:
 
 ```python
 import { SERPGoogleScholarAPITool } from "@langchain/community/tools/google_scholar";
@@ -57,7 +57,7 @@ const tool = new SERPGoogleScholarAPITool({
 
 ### Invoke directly with args
 
-You can invoke the tool directly with query arguments:
+쿼리 인수로 tool을 직접 호출할 수 있습니다:
 
 ```python
 const results = await tool.invoke({
@@ -70,7 +70,7 @@ console.log(results);
 
 ### Invoke with ToolCall
 
-We can also invoke the tool with a model-generated `ToolCall`:
+모델이 생성한 `ToolCall`로 tool을 호출할 수도 있습니다:
 
 ```python
 const modelGeneratedToolCall = {
@@ -84,4 +84,4 @@ await tool.invoke(modelGeneratedToolCall);
 
 ## API reference
 
-For detailed documentation of all `SERPGoogleScholarAPITool` features and configurations, head to the [API reference](https://api.js.langchain.com/classes/_langchain_community.tools_google_scholar.SERPGoogleScholarAPITool.html).
+모든 `SERPGoogleScholarAPITool` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/_langchain_community.tools_google_scholar.SERPGoogleScholarAPITool.html)를 참조하세요.

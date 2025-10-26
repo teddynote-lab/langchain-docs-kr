@@ -2,9 +2,9 @@
 title: JSONLoader
 ---
 
-This guide provides a quick overview for getting started with JSON [document loader](https://python.langchain.com/docs/concepts/document_loaders). For detailed documentation of all JSONLoader features and configurations head to the [API reference](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.json_loader.JSONLoader.html).
+이 가이드는 JSON [document loader](https://python.langchain.com/docs/concepts/document_loaders) 시작하기에 대한 간단한 개요를 제공합니다. JSONLoader의 모든 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.json_loader.JSONLoader.html)를 참조하세요.
 
-- TODO: Add any other relevant links, like information about underlying API, etc.
+- TODO: 기본 API에 대한 정보 등 기타 관련 링크를 추가하세요.
 
 ## Overview
 
@@ -22,13 +22,13 @@ This guide provides a quick overview for getting started with JSON [document loa
 
 ## Setup
 
-To access JSON document loader you'll need to install the `langchain-community` integration package as well as the `jq` python package.
+JSON document loader에 접근하려면 `langchain-community` integration package와 `jq` python package를 설치해야 합니다.
 
 ### Credentials
 
-No credentials are required to use the `JSONLoader` class.
+`JSONLoader` class를 사용하는 데 필요한 자격 증명은 없습니다.
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -37,7 +37,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-Install **langchain-community** and **jq**:
+**langchain-community**와 **jq**를 설치하세요:
 
 ```python
 pip install -qU langchain-community jq
@@ -45,9 +45,9 @@ pip install -qU langchain-community jq
 
 ## Initialization
 
-Now we can instantiate our model object and load documents:
+이제 model object를 인스턴스화하고 document를 로드할 수 있습니다:
 
-- TODO: Update model instantiation with relevant params.
+- TODO: 관련 매개변수로 모델 인스턴스화를 업데이트하세요.
 
 ```python
 from langchain_community.document_loaders import JSONLoader
@@ -91,10 +91,10 @@ for doc in loader.lazy_load():
         pages = []
 ```
 
-## Read from JSON Lines file
+## JSON Lines 파일에서 읽기
 
-If you want to load documents from a JSON Lines file, you pass `json_lines=True`
-and specify `jq_schema` to extract `page_content` from a single JSON object.
+JSON Lines 파일에서 document를 로드하려면 `json_lines=True`를 전달하고
+단일 JSON object에서 `page_content`를 추출하기 위해 `jq_schema`를 지정하세요.
 
 ```python
 loader = JSONLoader(
@@ -112,9 +112,9 @@ print(docs[0])
 page_content='Bye!' metadata={'source': '/Users/isaachershenson/Documents/langchain/docs/docs/integrations/document_loaders/example_data/facebook_chat_messages.jsonl', 'seq_num': 1}
 ```
 
-## Read specific content keys
+## 특정 content key 읽기
 
-Another option is to set `jq_schema='.'` and provide a `content_key` in order to only load specific content:
+또 다른 옵션은 `jq_schema='.'`를 설정하고 특정 content만 로드하기 위해 `content_key`를 제공하는 것입니다:
 
 ```python
 loader = JSONLoader(
@@ -132,9 +132,9 @@ print(docs[0])
 page_content='User 2' metadata={'source': '/Users/isaachershenson/Documents/langchain/docs/docs/integrations/document_loaders/example_data/facebook_chat_messages.jsonl', 'seq_num': 1}
 ```
 
-## JSON file with jq schema `content_key`
+## jq schema `content_key`를 사용한 JSON 파일
 
-To load documents from a JSON file using the `content_key` within the jq schema, set `is_content_key_jq_parsable=True`. Ensure that `content_key` is compatible and can be parsed using the jq schema.
+jq schema 내에서 `content_key`를 사용하여 JSON 파일에서 document를 로드하려면 `is_content_key_jq_parsable=True`를 설정하세요. `content_key`가 호환되고 jq schema를 사용하여 파싱될 수 있는지 확인하세요.
 
 ```python
 loader = JSONLoader(
@@ -152,19 +152,19 @@ print(docs[0])
 page_content='Bye!' metadata={'source': '/Users/isaachershenson/Documents/langchain/docs/docs/integrations/document_loaders/example_data/facebook_chat.json', 'seq_num': 1}
 ```
 
-## Extracting metadata
+## Metadata 추출
 
-Generally, we want to include metadata available in the JSON file into the documents that we create from the content.
+일반적으로 JSON 파일에서 사용 가능한 metadata를 content에서 생성하는 document에 포함하려고 합니다.
 
-The following demonstrates how metadata can be extracted using the `JSONLoader`.
+다음은 `JSONLoader`를 사용하여 metadata를 추출하는 방법을 보여줍니다.
 
-There are some key changes to be noted. In the previous example where we didn't collect the metadata, we managed to directly specify in the schema where the value for the `page_content` can be extracted from.
+주목해야 할 몇 가지 주요 변경 사항이 있습니다. metadata를 수집하지 않았던 이전 예제에서는 `page_content`의 값을 추출할 수 있는 위치를 schema에서 직접 지정할 수 있었습니다.
 
-In this example, we have to tell the loader to iterate over the records in the `messages` field. The jq_schema then has to be `.messages[]`
+이 예제에서는 loader에게 `messages` field의 record를 반복하도록 지시해야 합니다. 그러면 jq_schema는 `.messages[]`가 되어야 합니다.
 
-This allows us to pass the records (dict) into the `metadata_func` that has to be implemented. The `metadata_func` is responsible for identifying which pieces of information in the record should be included in the metadata stored in the final @[`Document`] object.
+이를 통해 구현해야 하는 `metadata_func`에 record(dict)를 전달할 수 있습니다. `metadata_func`는 record의 어떤 정보가 최종 @[`Document`] object에 저장된 metadata에 포함되어야 하는지 식별하는 역할을 합니다.
 
-Additionally, we now have to explicitly specify in the loader, via the `content_key` argument, the key from the record where the value for the `page_content` needs to be extracted from.
+또한 이제 loader에서 `content_key` 인수를 통해 `page_content`의 값을 추출해야 하는 record의 key를 명시적으로 지정해야 합니다.
 
 ```python
 # Define the metadata extraction function.
@@ -192,4 +192,4 @@ print(docs[0].metadata)
 
 ## API reference
 
-For detailed documentation of all JSONLoader features and configurations head to the API reference: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.json_loader.JSONLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.json_loader.JSONLoader.html)
+JSONLoader의 모든 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.json_loader.JSONLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.json_loader.JSONLoader.html)

@@ -1,13 +1,13 @@
 ---
-title: Trace Claude Agent SDK
+title: Claude Agent SDK 추적하기
 sidebarTitle: Claude Agent SDK
 ---
 
-The [Claude Agent SDK](https://docs.claude.com/en/api/agent-sdk/overview) is an SDK for building agentic applications with Claude. LangSmith provides native integration with the Claude Agent SDK to automatically trace your agent executions, tool calls, and interactions with Claude models.
+[Claude Agent SDK](https://docs.claude.com/en/api/agent-sdk/overview)는 Claude를 사용하여 에이전트 애플리케이션을 구축하기 위한 SDK입니다. LangSmith는 Claude Agent SDK와의 네이티브 통합을 제공하여 에이전트 실행, tool 호출 및 Claude 모델과의 상호작용을 자동으로 추적합니다.
 
-## Installation
+## 설치
 
-Install the LangSmith integration for Claude Agent SDK
+Claude Agent SDK용 LangSmith 통합을 설치합니다
 
 <CodeGroup>
 ```bash pip
@@ -19,9 +19,9 @@ uv add "langsmith[claude-agent-sdk]"
 ```
 </CodeGroup>
 
-## Quickstart
+## 빠른 시작
 
-To enable LangSmith tracing for your Claude Agent SDK application, call `configure_claude_agent_sdk()` at the start of your application:
+Claude Agent SDK 애플리케이션에서 LangSmith 추적을 활성화하려면 애플리케이션 시작 시 `configure_claude_agent_sdk()`를 호출하세요:
 
 ```python
 import asyncio
@@ -87,8 +87,8 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-Once configured, all Claude Agent SDK operations will be automatically traced to LangSmith, including:
-- Agent queries and responses
-- Tool invocations and results
-- Claude model interactions
-- MCP server operations
+설정이 완료되면 다음을 포함한 모든 Claude Agent SDK 작업이 자동으로 LangSmith에 추적됩니다:
+- Agent 쿼리 및 응답
+- Tool 호출 및 결과
+- Claude 모델 상호작용
+- MCP server 작업

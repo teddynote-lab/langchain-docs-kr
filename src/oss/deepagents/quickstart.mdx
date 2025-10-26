@@ -1,15 +1,15 @@
 ---
-title: Quickstart
-description: Build your first deep agent in minutes
+title: 빠른 시작
+description: 몇 분 만에 첫 번째 deep agent 만들기
 ---
 
-This guide walks you through creating your first deep agent with planning, file system tools, and subagent capabilities. You'll build a research agent that can conduct research and write reports.
+이 가이드는 계획, 파일 시스템 도구, 그리고 subagent 기능을 갖춘 첫 번째 deep agent를 만드는 과정을 안내합니다. 연구를 수행하고 보고서를 작성할 수 있는 연구 agent를 구축하게 됩니다.
 
-## Prerequisites
+## 사전 요구사항
 
-Before you begin, make sure you have an API key from a model provider (e.g., Anthropic, OpenAI).
+시작하기 전에 모델 제공자(예: Anthropic, OpenAI)로부터 API key를 받았는지 확인하세요.
 
-### Step 1: Install dependencies
+### Step 1: 의존성 설치
 
 <CodeGroup>
     ```bash pip
@@ -25,14 +25,14 @@ Before you begin, make sure you have an API key from a model provider (e.g., Ant
     ```
 </CodeGroup>
 
-### Step 2: Set up your API keys
+### Step 2: API key 설정
 
 ```bash
 export ANTHROPIC_API_KEY="your-api-key"
 export TAVILY_API_KEY="your-tavily-api-key"
 ```
 
-### Step 3: Create a search tool
+### Step 3: 검색 도구 생성
 
 :::python
 ```python
@@ -65,7 +65,7 @@ def internet_search(
 ```
 :::
 
-### Step 4: Create a deep agent
+### Step 4: Deep agent 생성
 
 ```python
 # System prompt to steer the agent to be an expert researcher
@@ -84,7 +84,7 @@ agent = create_deep_agent(
 )
 ```
 
-### Step 5: Run the agent
+### Step 5: Agent 실행
 
 ```python
 result = agent.invoke({"messages": [{"role": "user", "content": "What is langgraph?"}]})
@@ -93,21 +93,21 @@ result = agent.invoke({"messages": [{"role": "user", "content": "What is langgra
 print(result["messages"][-1].content)
 ```
 
-## What happened?
+## 무슨 일이 일어났나요?
 
-Your deep agent automatically:
+Deep agent가 자동으로 다음을 수행했습니다:
 
-1. **Planned its approach**: Used the built-in `write_todos` tool to break down the research task
-2. **Conducted research**: Called the `internet_search` tool to gather information
-3. **Managed context**: Used file system tools (`write_file`, `read_file`) to offload large search results
-4. **Spawned subagents** (if needed): Delegated complex subtasks to specialized subagents
-5. **Synthesized a report**: Compiled findings into a coherent response
+1. **접근 방식 계획**: 내장된 `write_todos` 도구를 사용하여 연구 작업을 세분화
+2. **연구 수행**: `internet_search` 도구를 호출하여 정보 수집
+3. **컨텍스트 관리**: 파일 시스템 도구(`write_file`, `read_file`)를 사용하여 대용량 검색 결과 오프로드
+4. **Subagent 생성** (필요한 경우): 복잡한 하위 작업을 전문화된 subagent에 위임
+5. **보고서 종합**: 조사 결과를 일관성 있는 응답으로 컴파일
 
-## Next steps
+## 다음 단계
 
-Now that you've built your first deep agent:
+첫 번째 deep agent를 구축했으니 이제:
 
-- **Customize your agent**: Learn about [customization options](/oss/deepagents/customization), including custom system prompts, tools, and subagents.
-- **Understand middleware**: Dive into the [middleware architecture](/oss/deepagents/middleware) that powers deep agents.
-- **Add long-term memory**: Enable [persistent memory](/oss/deepagents/long-term-memory) across conversations.
-- **Deploy to production**: Learn about [deployment options](/oss/langgraph/deploy) for LangGraph applications.
+- **Agent 커스터마이징**: 커스텀 system prompt, 도구, subagent를 포함한 [커스터마이징 옵션](/oss/deepagents/customization)에 대해 알아보세요.
+- **Middleware 이해하기**: Deep agent를 구동하는 [middleware 아키텍처](/oss/deepagents/middleware)를 자세히 살펴보세요.
+- **장기 메모리 추가**: 대화 전반에 걸친 [영구 메모리](/oss/deepagents/long-term-memory)를 활성화하세요.
+- **프로덕션 배포**: LangGraph 애플리케이션을 위한 [배포 옵션](/oss/langgraph/deploy)에 대해 알아보세요.

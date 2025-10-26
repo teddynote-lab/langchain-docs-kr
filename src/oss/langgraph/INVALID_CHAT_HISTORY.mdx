@@ -5,58 +5,58 @@ title: INVALID_CHAT_HISTORY
 
 
 :::python
-This error is raised in the prebuilt @[create_agent][create_agent] when the `call_model` graph node receives a malformed list of messages. Specifically, it is malformed when there are `AIMessages` with `tool_calls` (LLM requesting to call a tool) that do not have a corresponding @[`ToolMessage`] (result of a tool invocation to return to the LLM).
+이 오류는 prebuilt @[create_agent][create_agent]에서 `call_model` graph node가 잘못된 형식의 메시지 목록을 받을 때 발생합니다. 구체적으로, `tool_calls`를 가진 `AIMessages` (LLM이 도구 호출을 요청함)가 있지만 해당하는 @[`ToolMessage`] (LLM에 반환할 도구 호출 결과)가 없을 때 잘못된 형식입니다.
 :::
 
 :::js
-This error is raised in the prebuilt @[createAgent][create_agent] when the `callModel` graph node receives a malformed list of messages. Specifically, it is malformed when there are `AIMessage`s with `tool_calls` (LLM requesting to call a tool) that do not have a corresponding @[`ToolMessage`] (result of a tool invocation to return to the LLM).
+이 오류는 prebuilt @[createAgent][create_agent]에서 `callModel` graph node가 잘못된 형식의 메시지 목록을 받을 때 발생합니다. 구체적으로, `tool_calls`를 가진 `AIMessage`들 (LLM이 도구 호출을 요청함)이 있지만 해당하는 @[`ToolMessage`] (LLM에 반환할 도구 호출 결과)가 없을 때 잘못된 형식입니다.
 :::
 
-There could be a few reasons you're seeing this error:
+이 오류가 발생하는 몇 가지 이유가 있을 수 있습니다:
 
 :::python
-1. You manually passed a malformed list of messages when invoking the graph, e.g. `graph.invoke({'messages': [AIMessage(..., tool_calls=[...])]})`
-2. The graph was interrupted before receiving updates from the `tools` node (i.e. a list of @[`ToolMessage`])
-  and you invoked it with an input that is not None or a ToolMessage,
-  e.g. `graph.invoke({'messages': [HumanMessage(...)]}, config)`.
-  This interrupt could have been triggered in one of the following ways:
-    * You manually set `interrupt_before = ['tools']` in `create_agent`
-  * One of the tools raised an error that wasn't handled by the @[`ToolNode`] (`"tools"`)
+1. graph를 호출할 때 수동으로 잘못된 형식의 메시지 목록을 전달한 경우, 예: `graph.invoke({'messages': [AIMessage(..., tool_calls=[...])]})`
+2. `tools` node로부터 업데이트(@[`ToolMessage`] 목록)를 받기 전에 graph가 중단되었고,
+  None이나 ToolMessage가 아닌 입력으로 호출한 경우,
+  예: `graph.invoke({'messages': [HumanMessage(...)]}, config)`.
+  이 중단은 다음 방법 중 하나로 트리거될 수 있습니다:
+    * `create_agent`에서 수동으로 `interrupt_before = ['tools']`를 설정한 경우
+  * 도구 중 하나가 @[`ToolNode`] (`"tools"`)에서 처리되지 않은 오류를 발생시킨 경우
 :::
 
 :::js
-1. You manually passed a malformed list of messages when invoking the graph, e.g. `graph.invoke({messages: [new AIMessage({..., tool_calls: [...]})]})`
-2. The graph was interrupted before receiving updates from the `tools` node (i.e. a list of @[`ToolMessage`])
-  and you invoked it with an input that is not null or a ToolMessage,
-  e.g. `graph.invoke({messages: [new HumanMessage(...)]}, config)`.
-  This interrupt could have been triggered in one of the following ways:
-  * You manually set `interruptBefore: ['tools']` in `createAgent`
-  * One of the tools raised an error that wasn't handled by the @[`ToolNode`] (`"tools"`)
+1. graph를 호출할 때 수동으로 잘못된 형식의 메시지 목록을 전달한 경우, 예: `graph.invoke({messages: [new AIMessage({..., tool_calls: [...]})]})`
+2. `tools` node로부터 업데이트(@[`ToolMessage`] 목록)를 받기 전에 graph가 중단되었고,
+  null이나 ToolMessage가 아닌 입력으로 호출한 경우,
+  예: `graph.invoke({messages: [new HumanMessage(...)]}, config)`.
+  이 중단은 다음 방법 중 하나로 트리거될 수 있습니다:
+  * `createAgent`에서 수동으로 `interruptBefore: ['tools']`를 설정한 경우
+  * 도구 중 하나가 @[`ToolNode`] (`"tools"`)에서 처리되지 않은 오류를 발생시킨 경우
 :::
 
 ## Troubleshooting
 
-To resolve this, you can do one of the following:
+이 문제를 해결하려면 다음 중 하나를 수행할 수 있습니다:
 
-1. Don't invoke the graph with a malformed list of messages
-2. In case of an interrupt (manual or due to an error) you can:
+1. 잘못된 형식의 메시지 목록으로 graph를 호출하지 마세요
+2. 중단(수동 또는 오류로 인한)의 경우 다음을 수행할 수 있습니다:
 
 :::python
-* provide @[`ToolMessage`] objects that match existing tool calls and call `graph.invoke({'messages': [ToolMessage(...)]})`.
-  **NOTE**: this will append the messages to the history and run the graph from the START node.
-  * manually update the state and resume the graph from the interrupt:
-    1. get the list of most recent messages from the graph state with `graph.get_state(config)`
-    2. modify the list of messages to either remove unanswered tool calls from AIMessages
+* 기존 tool call과 일치하는 @[`ToolMessage`] 객체를 제공하고 `graph.invoke({'messages': [ToolMessage(...)]})`를 호출합니다.
+  **참고**: 이렇게 하면 메시지가 히스토리에 추가되고 START node부터 graph가 실행됩니다.
+  * 수동으로 state를 업데이트하고 중단 지점부터 graph를 재개합니다:
+    1. `graph.get_state(config)`로 graph state에서 가장 최근 메시지 목록을 가져옵니다
+    2. 메시지 목록을 수정하여 AIMessages에서 응답되지 않은 tool call을 제거하거나
 
-or add @[`ToolMessage`] objects with `tool_call_ids` that match unanswered tool calls 3. call `graph.update_state(config, {'messages': ...})` with the modified list of messages 4. resume the graph, e.g. call `graph.invoke(None, config)`
+응답되지 않은 tool call과 일치하는 `tool_call_ids`를 가진 @[`ToolMessage`] 객체를 추가합니다 3. 수정된 메시지 목록으로 `graph.update_state(config, {'messages': ...})`를 호출합니다 4. graph를 재개합니다, 예: `graph.invoke(None, config)`를 호출합니다
 :::
 
 :::js
-* provide `ToolMessage` objects that match existing tool calls and call `graph.invoke({messages: [new ToolMessage(...)]})`.
-  **NOTE**: this will append the messages to the history and run the graph from the START node.
-  * manually update the state and resume the graph from the interrupt:
-    1. get the list of most recent messages from the graph state with `graph.getState(config)`
-    2. modify the list of messages to either remove unanswered tool calls from AIMessages
+* 기존 tool call과 일치하는 `ToolMessage` 객체를 제공하고 `graph.invoke({messages: [new ToolMessage(...)]})`를 호출합니다.
+  **참고**: 이렇게 하면 메시지가 히스토리에 추가되고 START node부터 graph가 실행됩니다.
+  * 수동으로 state를 업데이트하고 중단 지점부터 graph를 재개합니다:
+    1. `graph.getState(config)`로 graph state에서 가장 최근 메시지 목록을 가져옵니다
+    2. 메시지 목록을 수정하여 AIMessages에서 응답되지 않은 tool call을 제거하거나
 
-or add `ToolMessage` objects with `toolCallId`s that match unanswered tool calls 3. call `graph.updateState(config, {messages: ...})` with the modified list of messages 4. resume the graph, e.g. call `graph.invoke(null, config)`
+응답되지 않은 tool call과 일치하는 `toolCallId`를 가진 `ToolMessage` 객체를 추가합니다 3. 수정된 메시지 목록으로 `graph.updateState(config, {messages: ...})`를 호출합니다 4. graph를 재개합니다, 예: `graph.invoke(null, config)`를 호출합니다
 :::

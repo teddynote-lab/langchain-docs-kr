@@ -2,31 +2,31 @@
 title: Pipeshift
 ---
 
-> [Pipeshift](https://pipeshift.com) is a fine-tuning and inference platform for open-source LLMs
+> [Pipeshift](https://pipeshift.com)는 오픈소스 LLM을 위한 fine-tuning 및 inference 플랫폼입니다
 
-- You bring your datasets. Fine-tune multiple LLMs. Start inferencing in one-click and watch them scale to millions.
+- 데이터셋을 가져오세요. 여러 LLM을 fine-tune하세요. 원클릭으로 inference를 시작하고 수백만 규모로 확장되는 것을 확인하세요.
 
-## Installation and Setup
+## Installation 및 Setup
 
-- Install the Pipeshift integration package.
+- Pipeshift integration package를 설치하세요.
 
   ```bash
   pip install langchain-pipeshift
   ```
 
-- Get your Pipeshift API key by signing up at [Pipeshift](https://pipeshift.com).
+- [Pipeshift](https://pipeshift.com)에 가입하여 Pipeshift API key를 받으세요.
 
 ### Authentication
 
-You can perform authentication using your Pipeshift API key in any of the following ways:
+다음 방법 중 하나로 Pipeshift API key를 사용하여 인증을 수행할 수 있습니다:
 
-1. Adding API key to the environment variable as `PIPESHIFT_API_KEY`.
+1. API key를 환경 변수 `PIPESHIFT_API_KEY`로 추가합니다.
 
     ```python
     os.environ["PIPESHIFT_API_KEY"] = "<your_api_key>"
     ```
 
-2. By passing `api_key` to the pipeshift LLM module or chat module
+2. pipeshift LLM module 또는 chat module에 `api_key`를 전달합니다.
 
     ```python
     llm = Pipeshift(api_key="<your_api_key>", model="meta-llama/Meta-Llama-3.1-8B-Instruct", max_tokens=512)
@@ -38,14 +38,14 @@ You can perform authentication using your Pipeshift API key in any of the follow
 
 ## Chat models
 
-See an [example](/oss/integrations/chat/pipeshift).
+[예제](/oss/integrations/chat/pipeshift)를 참조하세요.
 
 ```python
 from langchain_pipeshift import ChatPipeshift
 ```
 ## LLMs
 
-See an [example](/oss/integrations/llms/pipeshift).
+[예제](/oss/integrations/llms/pipeshift)를 참조하세요.
 
 ```python
 from langchain_pipeshift import Pipeshift

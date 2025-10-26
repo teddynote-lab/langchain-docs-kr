@@ -3,39 +3,39 @@ title: UpTrain
 ---
 
 <a target="_blank" href="https://colab.research.google.com/github/langchain-ai/langchain/blob/v0.3/docs/docs/integrations/callbacks/uptrain.ipynb">
-    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab에서 열기"/>
 </a>
 
-> UpTrain [[github](https://github.com/uptrain-ai/uptrain) || [website](https://uptrain.ai/) || [docs](https://docs.uptrain.ai/getting-started/introduction)] is an open-source platform to evaluate and improve LLM applications. It provides grades for 20+ preconfigured checks (covering language, code, embedding use cases), performs root cause analyses on instances of failure cases and provides guidance for resolving them.
+> UpTrain [[github](https://github.com/uptrain-ai/uptrain) || [website](https://uptrain.ai/) || [docs](https://docs.uptrain.ai/getting-started/introduction)]은 LLM 애플리케이션을 평가하고 개선하기 위한 오픈소스 플랫폼입니다. 20개 이상의 사전 구성된 검사(언어, 코드, embedding 사용 사례 포함)에 대한 등급을 제공하고, 실패 사례에 대한 근본 원인 분석을 수행하며, 이를 해결하기 위한 가이드를 제공합니다.
 
 ## UpTrain Callback Handler
 
-This notebook showcases the UpTrain callback handler seamlessly integrating into your pipeline, facilitating diverse evaluations. We have chosen a few evaluations that we deemed apt for evaluating the chains. These evaluations run automatically, with results displayed in the output. More details on UpTrain's evaluations can be found [here](https://github.com/uptrain-ai/uptrain?tab=readme-ov-file#pre-built-evaluations-we-offer-).
+이 노트북은 UpTrain callback handler가 파이프라인에 원활하게 통합되어 다양한 평가를 용이하게 하는 방법을 보여줍니다. 우리는 chain을 평가하는 데 적합하다고 판단한 몇 가지 평가를 선택했습니다. 이러한 평가는 자동으로 실행되며 결과가 출력에 표시됩니다. UpTrain의 평가에 대한 자세한 내용은 [여기](https://github.com/uptrain-ai/uptrain?tab=readme-ov-file#pre-built-evaluations-we-offer-)에서 확인할 수 있습니다.
 
-Selected retrievers from LangChain are highlighted for demonstration:
+시연을 위해 LangChain의 선택된 retriever들이 강조됩니다:
 
 ### 1. **Vanilla RAG**
 
-RAG plays a crucial role in retrieving context and generating responses. To ensure its performance and response quality, we conduct the following evaluations:
+RAG는 context를 검색하고 응답을 생성하는 데 중요한 역할을 합니다. 성능과 응답 품질을 보장하기 위해 다음 평가를 수행합니다:
 
-- **[Context Relevance](https://docs.uptrain.ai/predefined-evaluations/context-awareness/context-relevance)**: Determines if the context extracted from the query is relevant to the response.
-- **[Factual Accuracy](https://docs.uptrain.ai/predefined-evaluations/context-awareness/factual-accuracy)**: Assesses if the LLM is hallcuinating or providing incorrect information.
-- **[Response Completeness](https://docs.uptrain.ai/predefined-evaluations/response-quality/response-completeness)**: Checks if the response contains all the information requested by the query.
+- **[Context Relevance](https://docs.uptrain.ai/predefined-evaluations/context-awareness/context-relevance)**: 쿼리에서 추출한 context가 응답과 관련이 있는지 확인합니다.
+- **[Factual Accuracy](https://docs.uptrain.ai/predefined-evaluations/context-awareness/factual-accuracy)**: LLM이 환각을 일으키거나 잘못된 정보를 제공하는지 평가합니다.
+- **[Response Completeness](https://docs.uptrain.ai/predefined-evaluations/response-quality/response-completeness)**: 응답이 쿼리에서 요청한 모든 정보를 포함하는지 확인합니다.
 
 ### 2. **Multi Query Generation**
 
-MultiQueryRetriever creates multiple variants of a question having a similar meaning to the original question. Given the complexity, we include the previous evaluations and add:
+MultiQueryRetriever는 원래 질문과 유사한 의미를 가진 질문의 여러 변형을 생성합니다. 복잡성을 고려하여 이전 평가를 포함하고 다음을 추가합니다:
 
-- **[Multi Query Accuracy](https://docs.uptrain.ai/predefined-evaluations/query-quality/multi-query-accuracy)**: Assures that the multi-queries generated mean the same as the original query.
+- **[Multi Query Accuracy](https://docs.uptrain.ai/predefined-evaluations/query-quality/multi-query-accuracy)**: 생성된 multi-query들이 원래 쿼리와 동일한 의미를 갖는지 확인합니다.
 
 ### 3. **Context Compression and Reranking**
 
-Re-ranking involves reordering nodes based on relevance to the query and choosing top n nodes. Since the number of nodes can reduce once the re-ranking is complete, we perform the following evaluations:
+Re-ranking은 쿼리와의 관련성을 기반으로 노드를 재정렬하고 상위 n개의 노드를 선택하는 것을 포함합니다. re-ranking이 완료되면 노드 수가 줄어들 수 있으므로 다음 평가를 수행합니다:
 
-- **[Context Reranking](https://docs.uptrain.ai/predefined-evaluations/context-awareness/context-reranking)**: Checks if the order of re-ranked nodes is more relevant to the query than the original order.
-- **[Context Conciseness](https://docs.uptrain.ai/predefined-evaluations/context-awareness/context-conciseness)**: Examines whether the reduced number of nodes still provides all the required information.
+- **[Context Reranking](https://docs.uptrain.ai/predefined-evaluations/context-awareness/context-reranking)**: 재정렬된 노드의 순서가 원래 순서보다 쿼리와 더 관련이 있는지 확인합니다.
+- **[Context Conciseness](https://docs.uptrain.ai/predefined-evaluations/context-awareness/context-conciseness)**: 줄어든 노드 수가 여전히 필요한 모든 정보를 제공하는지 검사합니다.
 
-These evaluations collectively ensure the robustness and effectiveness of the RAG, MultiQueryRetriever, and the Reranking process in the chain.
+이러한 평가는 chain에서 RAG, MultiQueryRetriever 및 Reranking 프로세스의 견고성과 효과를 종합적으로 보장합니다.
 
 ## Install Dependencies
 
@@ -54,7 +54,7 @@ WARNING: There was an error checking the latest version of pip.
 Note: you may need to restart the kernel to use updated packages.
 ```
 
-NOTE: that you can also install `faiss-gpu` instead of `faiss-cpu` if you want to use the GPU enabled version of the library.
+참고: 라이브러리의 GPU 지원 버전을 사용하려면 `faiss-cpu` 대신 `faiss-gpu`를 설치할 수도 있습니다.
 
 ## Import Libraries
 
@@ -107,20 +107,20 @@ llm = ChatOpenAI(temperature=0, model="gpt-4")
 
 ## Setup
 
-UpTrain provides you with:
+UpTrain은 다음을 제공합니다:
 
-1. Dashboards with advanced drill-down and filtering options
-1. Insights and common topics among failing cases
-1. Observability and real-time monitoring of production data
-1. Regression testing via seamless integration with your CI/CD pipelines
+1. 고급 드릴다운 및 필터링 옵션이 있는 대시보드
+1. 실패 사례 간의 인사이트 및 공통 주제
+1. 프로덕션 데이터의 관찰 가능성 및 실시간 모니터링
+1. CI/CD 파이프라인과의 원활한 통합을 통한 회귀 테스트
 
-You can choose between the following options for evaluating using UpTrain:
+UpTrain을 사용하여 평가하기 위해 다음 옵션 중에서 선택할 수 있습니다:
 
-### 1. **UpTrain's Open-Source Software (OSS)**
+### 1. **UpTrain의 Open-Source Software (OSS)**
 
-You can use the open-source evaluation service to evaluate your model. In this case, you will need to provie an OpenAI API key. UpTrain uses the GPT models to evaluate the responses generated by the LLM. You can get yours [here](https://platform.openai.com/account/api-keys).
+오픈소스 평가 서비스를 사용하여 모델을 평가할 수 있습니다. 이 경우 OpenAI API key를 제공해야 합니다. UpTrain은 GPT 모델을 사용하여 LLM이 생성한 응답을 평가합니다. API key는 [여기](https://platform.openai.com/account/api-keys)에서 얻을 수 있습니다.
 
-In order to view your evaluations in the UpTrain dashboard, you will need to set it up by running the following commands in your terminal:
+UpTrain 대시보드에서 평가를 보려면 터미널에서 다음 명령을 실행하여 설정해야 합니다:
 
 ```bash
 git clone https://github.com/uptrain-ai/uptrain
@@ -128,7 +128,7 @@ cd uptrain
 bash run_uptrain.sh
 ```
 
-This will start the UpTrain dashboard on your local machine. You can access it at `http://localhost:3000/dashboard`.
+이렇게 하면 로컬 머신에서 UpTrain 대시보드가 시작됩니다. `http://localhost:3000/dashboard`에서 액세스할 수 있습니다.
 
 Parameters:
 
@@ -138,14 +138,14 @@ Parameters:
 
 ### 2. **UpTrain Managed Service and Dashboards**
 
-Alternatively, you can use UpTrain's managed service to evaluate your model. You can create a free UpTrain account [here](https://uptrain.ai/) and get free trial credits. If you want more trial credits, [book a call with the maintainers of UpTrain here](https://calendly.com/uptrain-sourabh/30min).
+또는 UpTrain의 관리형 서비스를 사용하여 모델을 평가할 수 있습니다. [여기](https://uptrain.ai/)에서 무료 UpTrain 계정을 만들고 무료 평가판 크레딧을 받을 수 있습니다. 더 많은 평가판 크레딧을 원하시면 [여기에서 UpTrain 관리자와 통화를 예약하세요](https://calendly.com/uptrain-sourabh/30min).
 
-The benefits of using the managed service are:
+관리형 서비스를 사용하면 다음과 같은 이점이 있습니다:
 
-1. No need to set up the UpTrain dashboard on your local machine.
-1. Access to many LLMs without needing their API keys.
+1. 로컬 머신에 UpTrain 대시보드를 설정할 필요가 없습니다.
+1. API key 없이도 많은 LLM에 액세스할 수 있습니다.
 
-Once you perform the evaluations, you can view them in the UpTrain dashboard at `https://dashboard.uptrain.ai/dashboard`
+평가를 수행한 후 `https://dashboard.uptrain.ai/dashboard`에서 UpTrain 대시보드에서 확인할 수 있습니다.
 
 Parameters:
 
@@ -153,11 +153,11 @@ Parameters:
 - api_key="UPTRAIN_API_KEY"
 - project_name="PROJECT_NAME"
 
-**Note:** The `project_name` will be the project name under which the evaluations performed will be shown in the UpTrain dashboard.
+**참고:** `project_name`은 수행된 평가가 UpTrain 대시보드에 표시될 프로젝트 이름입니다.
 
 ## Set the API key
 
-The notebook will prompt you to enter the API key. You can choose between the OpenAI API key or the UpTrain API key by changing the `key_type` parameter in the cell below.
+노트북에서 API key를 입력하라는 메시지가 표시됩니다. 아래 셀의 `key_type` 매개변수를 변경하여 OpenAI API key 또는 UpTrain API key 중에서 선택할 수 있습니다.
 
 ```python
 KEY_TYPE = "openai"  # or "uptrain"
@@ -166,11 +166,11 @@ API_KEY = getpass()
 
 # 1. Vanilla RAG
 
-UpTrain callback handler will automatically capture the query, context and response once generated and will run the following three evaluations *(Graded from 0 to 1)* on the response:
+UpTrain callback handler는 생성된 쿼리, context 및 응답을 자동으로 캡처하고 응답에 대해 다음 세 가지 평가를 실행합니다 *(0에서 1까지 등급 부여)*:
 
-- **[Context Relevance](https://docs.uptrain.ai/predefined-evaluations/context-awareness/context-relevance)**: Check if the context extractedfrom the query is relevant to the response.
-- **[Factual Accuracy](https://docs.uptrain.ai/predefined-evaluations/context-awareness/factual-accuracy)**: Check how factually accurate the response is.
-- **[Response Completeness](https://docs.uptrain.ai/predefined-evaluations/response-quality/response-completeness)**: Check if the response contains all the information that the query is asking for.
+- **[Context Relevance](https://docs.uptrain.ai/predefined-evaluations/context-awareness/context-relevance)**: 쿼리에서 추출한 context가 응답과 관련이 있는지 확인합니다.
+- **[Factual Accuracy](https://docs.uptrain.ai/predefined-evaluations/context-awareness/factual-accuracy)**: 응답이 얼마나 사실적으로 정확한지 확인합니다.
+- **[Response Completeness](https://docs.uptrain.ai/predefined-evaluations/response-quality/response-completeness)**: 응답이 쿼리에서 요청하는 모든 정보를 포함하는지 확인합니다.
 
 ```python
 # Create the RAG prompt
@@ -212,11 +212,11 @@ Response Completeness Score: 1.0
 
 # 2. Multi Query Generation
 
-The **MultiQueryRetriever** is used to tackle the problem that the RAG pipeline might not return the best set of documents based on the query. It generates multiple queries that mean the same as the original query and then fetches documents for each.
+**MultiQueryRetriever**는 RAG 파이프라인이 쿼리를 기반으로 최상의 문서 세트를 반환하지 못할 수 있는 문제를 해결하는 데 사용됩니다. 원래 쿼리와 동일한 의미를 가진 여러 쿼리를 생성한 다음 각각에 대한 문서를 가져옵니다.
 
-To evaluate this retriever, UpTrain will run the following evaluation:
+이 retriever를 평가하기 위해 UpTrain은 다음 평가를 실행합니다:
 
-- **[Multi Query Accuracy](https://docs.uptrain.ai/predefined-evaluations/query-quality/multi-query-accuracy)**: Checks if the multi-queries generated mean the same as the original query.
+- **[Multi Query Accuracy](https://docs.uptrain.ai/predefined-evaluations/query-quality/multi-query-accuracy)**: 생성된 multi-query들이 원래 쿼리와 동일한 의미를 갖는지 확인합니다.
 
 ```python
 # Create the retriever
@@ -273,10 +273,10 @@ Response Completeness Score: 1.0
 
 # 3. Context Compression and Reranking
 
-The reranking process involves reordering nodes based on relevance to the query and choosing the top n nodes. Since the number of nodes can reduce once the reranking is complete, we perform the following evaluations:
+reranking 프로세스는 쿼리와의 관련성을 기반으로 노드를 재정렬하고 상위 n개의 노드를 선택하는 것을 포함합니다. reranking이 완료되면 노드 수가 줄어들 수 있으므로 다음 평가를 수행합니다:
 
-- **[Context Reranking](https://docs.uptrain.ai/predefined-evaluations/context-awareness/context-reranking)**: Check if the order of re-ranked nodes is more relevant to the query than the original order.
-- **[Context Conciseness](https://docs.uptrain.ai/predefined-evaluations/context-awareness/context-conciseness)**: Check if the reduced number of nodes still provides all the required information.
+- **[Context Reranking](https://docs.uptrain.ai/predefined-evaluations/context-awareness/context-reranking)**: 재정렬된 노드의 순서가 원래 순서보다 쿼리와 더 관련이 있는지 확인합니다.
+- **[Context Conciseness](https://docs.uptrain.ai/predefined-evaluations/context-awareness/context-conciseness)**: 줄어든 노드 수가 여전히 필요한 모든 정보를 제공하는지 확인합니다.
 
 ```python
 # Create the retriever
@@ -322,6 +322,6 @@ Response Completeness Score: 0.5
 
 # UpTrain's Dashboard and Insights
 
-Here's a short video showcasing the dashboard and the insights:
+다음은 대시보드와 인사이트를 보여주는 짧은 비디오입니다:
 
 ![langchain_uptrain.gif](https://uptrain-assets.s3.ap-south-1.amazonaws.com/images/langchain/langchain_uptrain.gif)

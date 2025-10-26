@@ -3,14 +3,14 @@ title: OpenAI
 ---
 
 <Warning>
-**You are currently on a page documenting the use of OpenAI text completion models. The latest and most popular OpenAI models are [chat completion models](/oss/langchain/models).**
+**현재 OpenAI text completion model 사용에 관한 페이지를 보고 계십니다. 최신이자 가장 인기 있는 OpenAI model은 [chat completion model](/oss/langchain/models)입니다.**
 
-Unless you are specifically using `gpt-3.5-turbo-instruct`, you are probably looking for [this page instead](/oss/integrations/chat/openai/).
+`gpt-3.5-turbo-instruct`를 특별히 사용하는 경우가 아니라면, [이 페이지](/oss/integrations/chat/openai/)를 찾고 계실 것입니다.
 </Warning>
 
-[OpenAI](https://platform.openai.com/docs/introduction) offers a spectrum of models with different levels of power suitable for different tasks.
+[OpenAI](https://platform.openai.com/docs/introduction)는 다양한 작업에 적합한 여러 수준의 성능을 가진 다양한 model을 제공합니다.
 
-This example goes over how to use LangChain to interact with OpenAI [models](https://platform.openai.com/docs/models)
+이 예제는 LangChain을 사용하여 OpenAI [model](https://platform.openai.com/docs/models)과 상호작용하는 방법을 다룹니다.
 
 ## Overview
 
@@ -22,11 +22,11 @@ This example goes over how to use LangChain to interact with OpenAI [models](htt
 
 ## Setup
 
-To access OpenAI models you'll need to create an OpenAI account, get an API key, and install the `langchain-openai` integration package.
+OpenAI model에 액세스하려면 OpenAI 계정을 생성하고, API key를 발급받고, `langchain-openai` integration package를 설치해야 합니다.
 
 ### Credentials
 
-Head to [platform.openai.com](https://platform.openai.com) to sign up to OpenAI and generate an API key. Once you've done this set the OPENAI_API_KEY environment variable:
+[platform.openai.com](https://platform.openai.com)으로 이동하여 OpenAI에 가입하고 API key를 생성하세요. 완료한 후 OPENAI_API_KEY environment variable을 설정하세요:
 
 ```python
 import getpass
@@ -36,7 +36,7 @@ if "OPENAI_API_KEY" not in os.environ:
     os.environ["OPENAI_API_KEY"] = getpass.getpass("Enter your OpenAI API key: ")
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+model 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -45,15 +45,15 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-The LangChain OpenAI integration lives in the `langchain-openai` package:
+LangChain OpenAI integration은 `langchain-openai` package에 있습니다:
 
 ```python
 pip install -qU langchain-openai
 ```
 
-Should you need to specify your organization ID, you can use the following cell. However, it is not required if you are only part of a single organization or intend to use your default organization. You can check your default organization [here](https://platform.openai.com/account/api-keys).
+organization ID를 지정해야 하는 경우 다음 셀을 사용할 수 있습니다. 그러나 단일 organization에만 속해 있거나 기본 organization을 사용하려는 경우에는 필수가 아닙니다. 기본 organization은 [여기](https://platform.openai.com/account/api-keys)에서 확인할 수 있습니다.
 
-To specify your organization, you can use this:
+organization을 지정하려면 다음을 사용할 수 있습니다:
 
 ```python
 OPENAI_ORGANIZATION = getpass()
@@ -63,7 +63,7 @@ os.environ["OPENAI_ORGANIZATION"] = OPENAI_ORGANIZATION
 
 ## Instantiation
 
-Now we can instantiate our model object and generate chat completions:
+이제 model 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
 
 ```python
 from langchain_openai import OpenAI
@@ -103,7 +103,7 @@ chain.invoke(
 
 ## Using a proxy
 
-If you are behind an explicit proxy, you can specify the http_client to pass through
+명시적인 proxy 뒤에 있는 경우, 통과할 http_client를 지정할 수 있습니다:
 
 ```python
 pip install httpx
@@ -118,4 +118,4 @@ openai = OpenAI(
 
 ## API reference
 
-For detailed documentation of all @[`OpenAI`] llm features and configurations head to the API reference: [python.langchain.com/api_reference/openai/llms/langchain_openai.llms.base.OpenAI.html](https://python.langchain.com/api_reference/openai/llms/langchain_openai.llms.base.OpenAI.html)
+모든 @[`OpenAI`] llm feature 및 configuration에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/openai/llms/langchain_openai.llms.base.OpenAI.html](https://python.langchain.com/api_reference/openai/llms/langchain_openai.llms.base.OpenAI.html)

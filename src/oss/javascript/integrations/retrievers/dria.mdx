@@ -2,28 +2,28 @@
 title: Dria Retriever
 ---
 
-The [Dria](https://dria.co/) retriever allows an agent to perform a text-based search across a comprehensive knowledge hub.
+[Dria](https://dria.co/) retriever는 에이전트가 포괄적인 지식 허브에서 텍스트 기반 검색을 수행할 수 있도록 합니다.
 
 ## Setup
 
-To use Dria retriever, first install Dria JS client:
+Dria retriever를 사용하려면 먼저 Dria JS client를 설치하세요:
 
 ```bash npm
 npm install dria
 ```
-You need to provide two things to the retriever:
+retriever에 두 가지를 제공해야 합니다:
 
-- **API Key**: you can get yours at your [profile page](https://dria.co/) when you create an account.
-- **Contract ID**: accessible at the top of the page when viewing a knowledge or in its URL.
-  For example, the Bitcoin whitepaper is uploaded on Dria at https://dria.co/knowledge/2KxNbEb040GKQ1DSDNDsA-Fsj_BlQIEAlzBNuiapBR0, so its contract ID is `2KxNbEb040GKQ1DSDNDsA-Fsj_BlQIEAlzBNuiapBR0`.
-    Contract ID can be omitted during instantiation, and later be set via `dria.contractId = "your-contract"`
+- **API Key**: 계정을 생성한 후 [프로필 페이지](https://dria.co/)에서 받을 수 있습니다.
+- **Contract ID**: 지식을 볼 때 페이지 상단이나 URL에서 확인할 수 있습니다.
+  예를 들어, Bitcoin 백서는 Dria에 https://dria.co/knowledge/2KxNbEb040GKQ1DSDNDsA-Fsj_BlQIEAlzBNuiapBR0 에 업로드되어 있으므로, contract ID는 `2KxNbEb040GKQ1DSDNDsA-Fsj_BlQIEAlzBNuiapBR0`입니다.
+    Contract ID는 인스턴스화 시 생략할 수 있으며, 나중에 `dria.contractId = "your-contract"`를 통해 설정할 수 있습니다.
 
-Dria retriever exposes the underlying [Dria client](https://npmjs.com/package/dria) as well, refer to the [Dria documentation](https://github.com/firstbatchxyz/dria-js-client?tab=readme-ov-file#usage) to learn more about the client.
+Dria retriever는 기본 [Dria client](https://npmjs.com/package/dria)도 노출합니다. client에 대해 자세히 알아보려면 [Dria 문서](https://github.com/firstbatchxyz/dria-js-client?tab=readme-ov-file#usage)를 참조하세요.
 
 ## Usage
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
@@ -49,4 +49,4 @@ console.log(docs);
 
 ## Related
 
-- [Retrieval guide](/oss/langchain/retrieval)
+- [Retrieval 가이드](/oss/langchain/retrieval)

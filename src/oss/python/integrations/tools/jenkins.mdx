@@ -2,16 +2,15 @@
 title: Jenkins
 ---
 
-Tools for interacting with [Jenkins](https://www.jenkins.io/).
+[Jenkins](https://www.jenkins.io/)와 상호작용하기 위한 도구입니다.
 
 ## Overview
 
-The `langchain-jenkins` package allows you to execute and control CI/CD pipelines with
-Jenkins.
+`langchain-jenkins` 패키지를 사용하면 Jenkins로 CI/CD 파이프라인을 실행하고 제어할 수 있습니다.
 
 ### Setup
 
-Install `langchain-jenkins`:
+`langchain-jenkins`를 설치합니다:
 
 ```python
 pip install -qU langchain-jenkins
@@ -19,7 +18,7 @@ pip install -qU langchain-jenkins
 
 ### Credentials
 
-You'll need to setup or obtain authorization to access Jenkins server.
+Jenkins 서버에 액세스하기 위한 권한을 설정하거나 획득해야 합니다.
 
 ```python
 import getpass
@@ -36,7 +35,7 @@ _set_env("PASSWORD")
 
 ## Instantiation
 
-To disable the SSL Verify, set `os.environ["PYTHONHTTPSVERIFY"] = "0"`
+SSL 검증을 비활성화하려면 `os.environ["PYTHONHTTPSVERIFY"] = "0"`으로 설정하세요.
 
 ```python
 from langchain_jenkins import JenkinsAPIWrapper, JenkinsJobRun
@@ -54,9 +53,9 @@ tools = [
 
 ## Invocation
 
-You can now call invoke and pass arguments.
+이제 invoke를 호출하고 인자를 전달할 수 있습니다.
 
-1. Create the Jenkins job
+1. Jenkins job 생성
 
 ```python
 jenkins_job_content = ""
@@ -66,13 +65,13 @@ with open(src_file) as fread:
 tools[0].invoke({"job": "job01", "config_xml": jenkins_job_content, "action": "create"})
 ```
 
-2. Run the Jenkins Job
+2. Jenkins Job 실행
 
 ```python
 tools[0].invoke({"job": "job01", "parameters": {}, "action": "run"})
 ```
 
-3. Get job info
+3. job 정보 가져오기
 
 ```python
 resp = tools[0].invoke({"job": "job01", "number": 1, "action": "status"})
@@ -80,7 +79,7 @@ if not resp["inProgress"]:
     print(resp["result"])
 ```
 
-4. Delete the jenkins job
+4. jenkins job 삭제
 
 ```python
 tools[0].invoke({"job": "job01", "action": "delete"})
@@ -92,4 +91,4 @@ TODO.
 
 ## API reference
 
-For detailed documentation [API reference](https://python.langchain.com/docs/integrations/tools/jenkins/)
+자세한 문서는 [API reference](https://python.langchain.com/docs/integrations/tools/jenkins/)를 참조하세요.

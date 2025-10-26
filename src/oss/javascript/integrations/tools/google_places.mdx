@@ -2,19 +2,16 @@
 title: Google Places Tool
 ---
 
-The Google Places Tool allows your agent to utilize the Google Places API in order to find addresses,
-phone numbers, website, etc. from text about a location listed on Google Places.
+Google Places Tool은 agent가 Google Places API를 활용하여 Google Places에 등록된 위치에 대한 텍스트로부터 주소, 전화번호, 웹사이트 등을 찾을 수 있도록 합니다.
 
 ## Setup
 
-You will need to get an API key from [Google here](https://developers.google.com/maps/documentation/places/web-service/overview)
-and [enable the new Places API](https://console.cloud.google.com/apis/library/places.googleapis.com). Then, set your API key
-as `process.env.GOOGLE_PLACES_API_KEY` or pass it in as an `apiKey` constructor argument.
+[Google에서 API 키](https://developers.google.com/maps/documentation/places/web-service/overview)를 발급받고 [새로운 Places API를 활성화](https://console.cloud.google.com/apis/library/places.googleapis.com)해야 합니다. 그런 다음 API 키를 `process.env.GOOGLE_PLACES_API_KEY`로 설정하거나 `apiKey` constructor argument로 전달하세요.
 
 ## Usage
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
@@ -48,5 +45,5 @@ export async function run() {
 
 ## Related
 
-- Tool [conceptual guide](/oss/langchain/tools)
-- Tool [how-to guides](/oss/langchain/tools)
+- Tool [개념 가이드](/oss/langchain/tools)
+- Tool [사용 방법 가이드](/oss/langchain/tools)

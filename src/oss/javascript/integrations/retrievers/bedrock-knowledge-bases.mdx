@@ -4,23 +4,23 @@ title: Knowledge Bases for Amazon Bedrock
 
 ## Overview
 
-This will help you getting started with the [AmazonKnowledgeBaseRetriever](/oss/langchain/retrieval). For detailed documentation of all AmazonKnowledgeBaseRetriever features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_aws.AmazonKnowledgeBaseRetriever.html).
+이 문서는 [AmazonKnowledgeBaseRetriever](/oss/langchain/retrieval) 시작하기를 도와드립니다. 모든 AmazonKnowledgeBaseRetriever 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_aws.AmazonKnowledgeBaseRetriever.html)를 참조하세요.
 
-Knowledge Bases for Amazon Bedrock is a fully managed support for end-to-end RAG workflow provided by Amazon Web Services (AWS).
-It provides an entire ingestion workflow of converting your documents into embeddings (vector) and storing the embeddings in a specialized vector database.
-Knowledge Bases for Amazon Bedrock supports popular databases for vector storage, including vector engine for Amazon OpenSearch Serverless, Pinecone, Redis Enterprise Cloud, Amazon Aurora (coming soon), and MongoDB (coming soon).
+Knowledge Bases for Amazon Bedrock은 Amazon Web Services (AWS)에서 제공하는 end-to-end RAG workflow를 위한 완전 관리형 지원 서비스입니다.
+문서를 embedding(vector)으로 변환하고 특수한 vector database에 embedding을 저장하는 전체 수집 workflow를 제공합니다.
+Knowledge Bases for Amazon Bedrock은 vector engine for Amazon OpenSearch Serverless, Pinecone, Redis Enterprise Cloud, Amazon Aurora (출시 예정), MongoDB (출시 예정)를 포함한 인기 있는 vector 저장용 database를 지원합니다.
 
 ### Integration details
 
 | Retriever | Self-host | Cloud offering | Package | [Py support](https://python.langchain.com/docs/integrations/retrievers/bedrock/) |
 | :--- | :--- | :---: | :---: | :---: |
-[AmazonKnowledgeBaseRetriever](https://api.js.langchain.com/classes/langchain_aws.AmazonKnowledgeBaseRetriever.html) | 🟠 (see details below) | ✅ | @langchain/aws | ✅ |
+[AmazonKnowledgeBaseRetriever](https://api.js.langchain.com/classes/langchain_aws.AmazonKnowledgeBaseRetriever.html) | 🟠 (아래 세부 정보 참조) | ✅ | @langchain/aws | ✅ |
 
-> AWS Knowledge Base Retriever can be 'self hosted' in the sense you can run it on your own AWS infrastructure. However it is not possible to run on another cloud provider or on-premises.
+> AWS Knowledge Base Retriever는 자체 AWS 인프라에서 실행할 수 있다는 의미에서 'self hosted'가 가능합니다. 그러나 다른 클라우드 제공업체나 on-premises에서는 실행할 수 없습니다.
 
 ## Setup
 
-In order to use the AmazonKnowledgeBaseRetriever, you need to have an AWS account, where you can manage your indexes and documents. Once you've setup your account, set the following environment variables:
+AmazonKnowledgeBaseRetriever를 사용하려면 index와 문서를 관리할 수 있는 AWS 계정이 필요합니다. 계정을 설정한 후 다음 환경 변수를 설정하세요:
 
 ```bash
 process.env.AWS_KNOWLEDGE_BASE_ID=your-knowledge-base-id
@@ -28,7 +28,7 @@ process.env.AWS_ACCESS_KEY_ID=your-access-key-id
 process.env.AWS_SECRET_ACCESS_KEY=your-secret-access-key
 ```
 
-If you want to get automated tracing from individual queries, you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+개별 쿼리에서 자동화된 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_API_KEY = "<YOUR API KEY HERE>";
@@ -37,7 +37,7 @@ If you want to get automated tracing from individual queries, you can also set y
 
 ### Installation
 
-This retriever lives in the `@langchain/aws` package:
+이 retriever는 `@langchain/aws` package에 있습니다:
 
 <CodeGroup>
 ```bash npm
@@ -53,7 +53,7 @@ pnpm add @langchain/aws @langchain/core
 
 ## Instantiation
 
-Now we can instantiate our retriever:
+이제 retriever를 인스턴스화할 수 있습니다:
 
 ```typescript
 import { AmazonKnowledgeBaseRetriever } from "@langchain/aws";
@@ -81,4 +81,4 @@ await retriever.invoke(query);
 
 ## API reference
 
-For detailed documentation of all AmazonKnowledgeBaseRetriever features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_aws.AmazonKnowledgeBaseRetriever.html).
+모든 AmazonKnowledgeBaseRetriever 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_aws.AmazonKnowledgeBaseRetriever.html)를 참조하세요.

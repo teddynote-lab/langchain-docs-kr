@@ -1,20 +1,21 @@
+```mdx
 ---
 title: Azure AI Services Toolkit
 ---
 
-This toolkit is used to interact with the `Azure AI Services API` to achieve some multimodal capabilities.
+이 toolkit은 `Azure AI Services API`와 상호작용하여 일부 multimodal 기능을 구현하는 데 사용됩니다.
 
-Currently There are five tools bundled in this toolkit:
+현재 이 toolkit에는 다섯 가지 tool이 포함되어 있습니다:
 
-- **AzureAiServicesImageAnalysisTool**: used to extract caption, objects, tags, and text from images.
-- **AzureAiServicesDocumentIntelligenceTool**: used to extract text, tables, and key-value pairs from documents.
-- **AzureAiServicesSpeechToTextTool**: used to transcribe speech to text.
-- **AzureAiServicesTextToSpeechTool**: used to synthesize text to speech.
-- **AzureAiServicesTextAnalyticsForHealthTool**: used to extract healthcare entities.
+- **AzureAiServicesImageAnalysisTool**: 이미지에서 캡션, 객체, 태그 및 텍스트를 추출하는 데 사용됩니다.
+- **AzureAiServicesDocumentIntelligenceTool**: 문서에서 텍스트, 표 및 키-값 쌍을 추출하는 데 사용됩니다.
+- **AzureAiServicesSpeechToTextTool**: 음성을 텍스트로 변환하는 데 사용됩니다.
+- **AzureAiServicesTextToSpeechTool**: 텍스트를 음성으로 합성하는 데 사용됩니다.
+- **AzureAiServicesTextAnalyticsForHealthTool**: 의료 entity를 추출하는 데 사용됩니다.
 
-First, you need to set up an Azure account and create an AI Services resource. You can follow the instructions [here](https://learn.microsoft.com/en-us/azure/ai-services/multi-service-resource) to create a resource.
+먼저 Azure 계정을 설정하고 AI Services 리소스를 생성해야 합니다. 리소스를 생성하려면 [여기](https://learn.microsoft.com/en-us/azure/ai-services/multi-service-resource)의 지침을 따르세요.
 
-Then, you need to get the endpoint, key and region of your resource, and set them as environment variables. You can find them in the "Keys and Endpoint" page of your resource.
+그런 다음 리소스의 endpoint, key 및 region을 가져와서 환경 변수로 설정해야 합니다. 리소스의 "Keys and Endpoint" 페이지에서 찾을 수 있습니다.
 
 ```python
 pip install -qU  azure-ai-formrecognizer > /dev/null
@@ -33,7 +34,7 @@ os.environ["AZURE_AI_SERVICES_ENDPOINT"] = ""
 os.environ["AZURE_AI_SERVICES_REGION"] = ""
 ```
 
-## Create the Toolkit
+## Toolkit 생성하기
 
 ```python
 from langchain_community.agent_toolkits import AzureAiServicesToolkit
@@ -53,7 +54,7 @@ toolkit = AzureAiServicesToolkit()
  'azure_ai_services_text_analytics_for_health']
 ```
 
-## Use within an Agent
+## Agent 내에서 사용하기
 
 ```python
 from langchain_classic import hub
@@ -183,4 +184,5 @@ Action:
 ```output
 {'input': "\nThe patient is a 54-year-old gentleman with a history of progressive angina over the past several months.\nThe patient had a cardiac catheterization in July of this year revealing total occlusion of the RCA and 50% left main disease ,\nwith a strong family history of coronary artery disease with a brother dying at the age of 52 from a myocardial infarction and\nanother brother who is status post coronary artery bypass grafting. The patient had a stress echocardiogram done on July , 2001 ,\nwhich showed no wall motion abnormalities , but this was a difficult study due to body habitus. The patient went for six minutes with\nminimal ST depressions in the anterior lateral leads , thought due to fatigue and wrist pain , his anginal equivalent. Due to the patient's\nincreased symptoms and family history and history left main disease with total occasional of his RCA was referred for revascularization with open heart surgery.\n\nList all the diagnoses.\n",
  'output': "The patient's diagnoses include progressive angina, total occlusion of the RCA, 50% left main disease, coronary artery disease, myocardial infarction, and a family history of coronary artery disease."}
+```
 ```

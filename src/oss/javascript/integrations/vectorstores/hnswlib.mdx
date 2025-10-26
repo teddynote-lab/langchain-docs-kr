@@ -3,26 +3,26 @@ title: HNSWLib
 ---
 
 <Tip>
-**Compatibility**: Only available on Node.js.
+**호환성**: Node.js에서만 사용 가능합니다.
 </Tip>
 
-HNSWLib is an in-memory vector store that can be saved to a file. It uses the [HNSWLib library](https://github.com/nmslib/hnswlib).
+HNSWLib은 파일로 저장할 수 있는 인메모리 vector store입니다. [HNSWLib 라이브러리](https://github.com/nmslib/hnswlib)를 사용합니다.
 
-This guide provides a quick overview for getting started with HNSWLib [vector stores](/oss/integrations/vectorstores). For detailed documentation of all `HNSWLib` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_hnswlib.HNSWLib.html).
+이 가이드는 HNSWLib [vector store](/oss/integrations/vectorstores) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `HNSWLib` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_hnswlib.HNSWLib.html)를 참조하세요.
 
-## Overview
+## 개요
 
-### Integration details
+### Integration 세부 정보
 
 | Class | Package | PY support |  Version |
 | :--- | :--- | :---: | :---: |
 | [`HNSWLib`](https://api.js.langchain.com/classes/langchain_community_vectorstores_hnswlib.HNSWLib.html) | [`@langchain/community`](https://npmjs.com/@langchain/community) | ❌ |  ![NPM - Version](https://img.shields.io/npm/v/@langchain/community?style=flat-square&label=%20&) |
 
-## Setup
+## 설정
 
-To use HNSWLib vector stores, you'll need to install the `@langchain/community` integration package with the [`hnswlib-node`](https://www.npmjs.com/package/hnswlib-node) package as a peer dependency.
+HNSWLib vector store를 사용하려면 `@langchain/community` integration package와 peer dependency로 [`hnswlib-node`](https://www.npmjs.com/package/hnswlib-node) package를 설치해야 합니다.
 
-This guide will also use [OpenAI embeddings](/oss/integrations/text_embedding/openai), which require you to install the `@langchain/openai` integration package. You can also use [other supported embeddings models](/oss/integrations/text_embedding) if you wish.
+이 가이드는 [OpenAI embeddings](/oss/integrations/text_embedding/openai)도 사용하며, 이를 위해 `@langchain/openai` integration package를 설치해야 합니다. 원하는 경우 [다른 지원되는 embeddings 모델](/oss/integrations/text_embedding)을 사용할 수도 있습니다.
 
 <CodeGroup>
 ```bash npm
@@ -38,28 +38,28 @@ pnpm add @langchain/community hnswlib-node @langchain/openai @langchain/core
 
 
 <Warning>
-**On Windows**, you might need to install [Visual Studio](https://visualstudio.microsoft.com/downloads/) first in order to properly build the `hnswlib-node` package.**
+**Windows에서는** `hnswlib-node` package를 올바르게 빌드하기 위해 먼저 [Visual Studio](https://visualstudio.microsoft.com/downloads/)를 설치해야 할 수 있습니다.
 </Warning>
 
 
-### Credentials
+### 자격 증명
 
-Because HNSWLib runs locally, you do not need any credentials to use it.
+HNSWLib은 로컬에서 실행되므로 사용하기 위한 자격 증명이 필요하지 않습니다.
 
-If you are using OpenAI embeddings for this guide, you'll need to set your OpenAI key as well:
+이 가이드에서 OpenAI embeddings를 사용하는 경우 OpenAI key도 설정해야 합니다:
 
 ```typescript
 process.env.OPENAI_API_KEY = "YOUR_API_KEY";
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
 
 ```typescript
 // process.env.LANGSMITH_TRACING="true"
 // process.env.LANGSMITH_API_KEY="your-api-key"
 ```
 
-## Instantiation
+## 인스턴스화
 
 ```typescript
 import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
@@ -72,9 +72,9 @@ const embeddings = new OpenAIEmbeddings({
 const vectorStore = await HNSWLib.fromDocuments([], embeddings);
 ```
 
-## Manage vector store
+## Vector store 관리
 
-### Add items to vector store
+### Vector store에 항목 추가
 
 ```typescript
 import type { Document } from "@langchain/core/documents";
@@ -104,15 +104,15 @@ const documents = [document1, document2, document3, document4];
 await vectorStore.addDocuments(documents);
 ```
 
-Deletion and ids for individual documents are not currently supported.
+개별 문서에 대한 삭제 및 id는 현재 지원되지 않습니다.
 
-## Query vector store
+## Vector store 쿼리
 
-Once your vector store has been created and the relevant documents have been added you will most likely wish to query it during the running of your chain or agent.
+Vector store가 생성되고 관련 문서가 추가되면 chain 또는 agent를 실행하는 동안 쿼리하고 싶을 것입니다.
 
-### Query directly
+### 직접 쿼리
 
-Performing a simple similarity search can be done as follows:
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
 
 ```typescript
 const filter = (doc) => doc.metadata.source === "https://example.com";
@@ -129,9 +129,9 @@ for (const doc of similaritySearchResults) {
 * Mitochondria are made out of lipids [{"source":"https://example.com"}]
 ```
 
-The filter is optional, and must be a predicate function that takes a document as input, and returns `true` or `false` depending on whether the document should be returned.
+filter는 선택 사항이며, 문서를 입력으로 받아 문서를 반환해야 하는지 여부에 따라 `true` 또는 `false`를 반환하는 predicate function이어야 합니다.
 
-If you want to execute a similarity search and receive the corresponding scores you can run:
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
 
 ```typescript
 const similaritySearchWithScoreResults = await vectorStore.similaritySearchWithScore("biology", 2, filter)
@@ -146,9 +146,9 @@ for (const [doc, score] of similaritySearchWithScoreResults) {
 * [SIM=0.852] Mitochondria are made out of lipids [{"source":"https://example.com"}]
 ```
 
-### Query by turning into retriever
+### Retriever로 변환하여 쿼리
 
-You can also transform the vector store into a [retriever](/oss/langchain/retrieval) for easier usage in your chains.
+Vector store를 [retriever](/oss/langchain/retrieval)로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
 
 ```typescript
 const retriever = vectorStore.asRetriever({
@@ -172,17 +172,17 @@ await retriever.invoke("biology");
 ]
 ```
 
-### Usage for retrieval-augmented generation
+### Retrieval-augmented generation 사용
 
-For guides on how to use this vector store for retrieval-augmented generation (RAG), see the following sections:
+이 vector store를 retrieval-augmented generation (RAG)에 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
 
-- [Build a RAG app with LangChain](/oss/langchain/rag).
+- [LangChain으로 RAG 앱 구축하기](/oss/langchain/rag)
 - [Agentic RAG](/oss/langgraph/agentic-rag)
-- [Retrieval docs](/oss/langchain/retrieval)
+- [Retrieval 문서](/oss/langchain/retrieval)
 
-## Save to/load from file
+## 파일로 저장/로드
 
-HNSWLib supports saving your index to a file, then reloading it at a later date:
+HNSWLib은 인덱스를 파일로 저장한 다음 나중에 다시 로드하는 것을 지원합니다:
 
 ```typescript
 // Save the vector store to a directory
@@ -196,9 +196,9 @@ const loadedVectorStore = await HNSWLib.load(directory, new OpenAIEmbeddings());
 await loadedVectorStore.similaritySearch("hello world", 1);
 ```
 
-### Delete a saved index
+### 저장된 인덱스 삭제
 
-You can use the `.delete` method to clear an index saved to a given directory:
+`.delete` 메서드를 사용하여 특정 디렉토리에 저장된 인덱스를 지울 수 있습니다:
 
 ```typescript
 // Load the vector store from the same directory
@@ -209,4 +209,4 @@ await savedVectorStore.delete({ directory });
 
 ## API reference
 
-For detailed documentation of all `HNSWLib` features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_hnswlib.HNSWLib.html).
+모든 `HNSWLib` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_vectorstores_hnswlib.HNSWLib.html)를 참조하세요.

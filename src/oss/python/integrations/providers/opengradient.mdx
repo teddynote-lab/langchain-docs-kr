@@ -1,29 +1,30 @@
+```mdx
 ---
 title: OpenGradient
 ---
 
-[OpenGradient](https://www.opengradient.ai/) is a decentralized AI computing network enabling globally accessible, permissionless, and verifiable ML model inference.
+[OpenGradient](https://www.opengradient.ai/)는 전 세계적으로 접근 가능하고, 무허가이며, 검증 가능한 ML 모델 추론을 가능하게 하는 탈중앙화 AI 컴퓨팅 네트워크입니다.
 
-The OpenGradient langchain package currently offers a toolkit that allows developers to build their own custom ML inference tools for models on the OpenGradient network. This was previously a challenge because of the context-window polluting nature of large model parameters -- imagine having to give your agent a 200x200 array of floating-point data!
+OpenGradient langchain 패키지는 현재 개발자가 OpenGradient 네트워크의 모델에 대한 자체 맞춤형 ML 추론 도구를 구축할 수 있도록 하는 toolkit을 제공합니다. 이는 이전에는 대규모 모델 파라미터의 context-window 오염 특성 때문에 어려운 과제였습니다 -- 에이전트에게 200x200 부동 소수점 데이터 배열을 제공해야 한다고 상상해보세요!
 
-The toolkit solves this problem by encapsulating all data processing logic within the tool definition itself. This approach keeps the agent's context window clean while giving developers complete flexibility to implement custom data processing and live-data retrieval for their ML models.
+이 toolkit은 모든 데이터 처리 로직을 도구 정의 자체 내에 캡슐화하여 이 문제를 해결합니다. 이 접근 방식은 에이전트의 context window를 깨끗하게 유지하면서 개발자에게 ML 모델에 대한 맞춤형 데이터 처리 및 실시간 데이터 검색을 구현할 수 있는 완전한 유연성을 제공합니다.
 
-## Installation and Setup
+## 설치 및 설정
 
-Ensure that you have an OpenGradient API key in order to access the OpenGradient network. If you already have an API key, simply set the environment variable:
+OpenGradient 네트워크에 액세스하려면 OpenGradient API key가 있는지 확인하세요. 이미 API key가 있는 경우 환경 변수를 설정하기만 하면 됩니다:
 
 ```python
 !export OPENGRADIENT_PRIVATE_KEY="your-api-key"
 ```
 
-If you need to set up a new API key, download the opengradient SDK and follow the instructions to initialize a new configuration.
+새 API key를 설정해야 하는 경우 opengradient SDK를 다운로드하고 지침에 따라 새 구성을 초기화하세요.
 
 ```python
 !pip install opengradient
 !opengradient config init
 ```
 
-Once you have set up your API key, install the langchain-opengradient package.
+API key를 설정한 후 langchain-opengradient 패키지를 설치하세요.
 
 ```python
 pip install -U langchain-opengradient
@@ -31,20 +32,21 @@ pip install -U langchain-opengradient
 
 ## OpenGradient Toolkit
 
-The OpenGradientToolkit empowers developers to create specialized tools based on [ML models](https://hub.opengradient.ai/models) and [workflows](https://docs.opengradient.ai/developers/sdk/ml_workflows.html) deployed on the OpenGradient decentralized network. This integration enables LangChain agents to access powerful ML capabilities while maintaining efficient context usage.
+OpenGradientToolkit은 개발자가 OpenGradient 탈중앙화 네트워크에 배포된 [ML models](https://hub.opengradient.ai/models) 및 [workflows](https://docs.opengradient.ai/developers/sdk/ml_workflows.html)를 기반으로 특화된 도구를 만들 수 있도록 지원합니다. 이 통합을 통해 LangChain 에이전트는 효율적인 context 사용을 유지하면서 강력한 ML 기능에 액세스할 수 있습니다.
 
-### Key Benefits
+### 주요 이점
 
-* 🔄 Real-time data integration - Process live data feeds within your tools
+* 🔄 실시간 데이터 통합 - 도구 내에서 실시간 데이터 피드 처리
 
-* 🎯 Dynamic processing - Custom data pipelines that adapt to specific agent inputs
+* 🎯 동적 처리 - 특정 에이전트 입력에 적응하는 맞춤형 데이터 파이프라인
 
-* 🧠 Context efficiency - Handle complex ML operations without flooding your context window
+* 🧠 Context 효율성 - context window를 넘치게 하지 않고 복잡한 ML 작업 처리
 
-* 🔌 Seamless deployment - Easy integration with models already on the OpenGradient network
+* 🔌 원활한 배포 - OpenGradient 네트워크에 이미 있는 모델과의 간편한 통합
 
-* 🔧 Full customization - Create and deploy your own specific models through the [OpenGradient SDK](https://docs.opengradient.ai/developers/sdk/model_management.html), then build custom tools from them
+* 🔧 완전한 맞춤화 - [OpenGradient SDK](https://docs.opengradient.ai/developers/sdk/model_management.html)를 통해 자체 특정 모델을 생성 및 배포한 다음 이를 기반으로 맞춤형 도구 구축
 
-* 🔐 Verifiable inference - All inferences run on the decentralized OpenGradient network, allowing users to choose various flavors of security such as ZKML and TEE for trustless, verifiable model execution
+* 🔐 검증 가능한 추론 - 모든 추론은 탈중앙화된 OpenGradient 네트워크에서 실행되므로 사용자는 신뢰할 수 없는 검증 가능한 모델 실행을 위해 ZKML 및 TEE와 같은 다양한 보안 방식을 선택할 수 있습니다
 
-For detailed examples and implementation guides, check out our [comprehensive tutorial](/oss/integrations/tools/opengradient_toolkit.ipynb).
+자세한 예제 및 구현 가이드는 [종합 튜토리얼](/oss/integrations/tools/opengradient_toolkit.ipynb)을 확인하세요.
+```

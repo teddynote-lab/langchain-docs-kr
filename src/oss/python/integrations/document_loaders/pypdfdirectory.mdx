@@ -2,7 +2,7 @@
 title: PyPDFDirectoryLoader
 ---
 
-This loader loads all PDF files from a specific directory.
+이 loader는 특정 디렉토리에서 모든 PDF 파일을 로드합니다.
 
 ## Overview
 
@@ -22,9 +22,9 @@ This loader loads all PDF files from a specific directory.
 
 ### Credentials
 
-No credentials are needed for this loader.
+이 loader에는 credential이 필요하지 않습니다.
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출에 대한 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
 
 ```python
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
@@ -33,7 +33,7 @@ os.environ["LANGSMITH_TRACING"] = "true"
 
 ### Installation
 
-Install **langchain-community**.
+**langchain-community**를 설치합니다.
 
 ```python
 pip install -qU langchain-community pypdf pillow
@@ -45,7 +45,7 @@ Note: you may need to restart the kernel to use updated packages.
 
 ## Initialization
 
-Now we can instantiate our model object and load documents:
+이제 model object를 인스턴스화하고 document를 로드할 수 있습니다:
 
 ```python
 from langchain_community.document_loaders import PyPDFDirectoryLoader
@@ -90,7 +90,7 @@ for doc in loader.lazy_load():
 
 ## API reference
 
-For detailed documentation of all PyPDFDirectoryLoader features and configurations head to the API reference: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PyPDFDirectoryLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PyPDFDirectoryLoader.html)
+모든 PyPDFDirectoryLoader feature와 configuration에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PyPDFDirectoryLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PyPDFDirectoryLoader.html)
 
 ```python
 

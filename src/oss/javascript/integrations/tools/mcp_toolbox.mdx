@@ -1,38 +1,29 @@
 ---
-title: MCP Toolbox For Databases
+title: 데이터베이스용 MCP Toolbox
 ---
 
-[MCP Toolbox for Databases](https://github.com/googleapis/genai-toolbox) is an open source MCP server for databases. It was designed with enterprise-grade and production-quality in mind. It enables you to develop tools easier, faster, and more securely by handling the complexities such as connection pooling, authentication, and more.
+[MCP Toolbox for Databases](https://github.com/googleapis/genai-toolbox)는 데이터베이스를 위한 오픈 소스 MCP 서버입니다. 엔터프라이즈급 및 프로덕션 품질을 염두에 두고 설계되었습니다. 연결 풀링, 인증 등과 같은 복잡한 작업을 처리하여 더 쉽고, 빠르고, 안전하게 도구를 개발할 수 있도록 지원합니다.
 
-Toolbox Tools can be seemlessly integrated with LangChain applications. For more
-information on [getting
-started](https://googleapis.github.io/genai-toolbox/getting-started/local_quickstart_js/) or
-[configuring](https://googleapis.github.io/genai-toolbox/getting-started/configure/)
-Toolbox, see the
-[documentation](https://googleapis.github.io/genai-toolbox/getting-started/introduction/).
+Toolbox Tools는 LangChain 애플리케이션과 원활하게 통합될 수 있습니다. Toolbox [시작하기](https://googleapis.github.io/genai-toolbox/getting-started/local_quickstart_js/) 또는 [구성](https://googleapis.github.io/genai-toolbox/getting-started/configure/)에 대한 자세한 내용은 [문서](https://googleapis.github.io/genai-toolbox/getting-started/introduction/)를 참조하세요.
 
-### Configure and deploy
+### 구성 및 배포
 
-Toolbox is an open source server that you deploy and manage yourself. For more
-instructions on deploying and configuring, see the official Toolbox
-documentation:
+Toolbox는 직접 배포하고 관리하는 오픈 소스 서버입니다. 배포 및 구성에 대한 자세한 지침은 공식 Toolbox 문서를 참조하세요:
 
-- [Installing the Server](https://googleapis.github.io/genai-toolbox/getting-started/introduction/#installing-the-server)
-- [Configuring Toolbox](https://googleapis.github.io/genai-toolbox/getting-started/configure/)
+- [서버 설치](https://googleapis.github.io/genai-toolbox/getting-started/introduction/#installing-the-server)
+- [Toolbox 구성](https://googleapis.github.io/genai-toolbox/getting-started/configure/)
 
-### Install client SDK
+### client SDK 설치
 
-LangChain relies on the `@toolbox-sdk/core` node package to use Toolbox. Install the
-package before getting started:
+LangChain은 Toolbox를 사용하기 위해 `@toolbox-sdk/core` node package에 의존합니다. 시작하기 전에 패키지를 설치하세요:
 
 ```shell
 npm install @toolbox-sdk/core
 ```
 
-### Loading Toolbox Tools
+### Toolbox Tools 로드하기
 
-Once your Toolbox server is configured and up and running, you can load tools
-from your server using the SDK:
+Toolbox 서버가 구성되고 실행 중이면 SDK를 사용하여 서버에서 도구를 로드할 수 있습니다:
 
 ```javascript
 import { ChatVertexAI } from "@langchain/google-vertexai"
@@ -65,11 +56,11 @@ let response = await agent.invoke(inputs);
 console.log(response);
 ```
 
-### Advanced Toolbox Features
+### 고급 Toolbox 기능
 
-Toolbox has a variety of features to make developing Gen AI tools for databases seamless.
-For more information, read more about the following:
+Toolbox는 데이터베이스용 Gen AI 도구를 원활하게 개발할 수 있도록 다양한 기능을 제공합니다.
+자세한 내용은 다음을 참조하세요:
 
-- [Authenticated Parameters](https://googleapis.github.io/genai-toolbox/resources/tools/#authenticated-parameters): bind tool inputs to values from OIDC tokens automatically, making it easy to run sensitive queries without potentially leaking data
-- [Authorized Invocations](https://googleapis.github.io/genai-toolbox/resources/tools/#authorized-invocations): restrict access to use a tool based on the users Auth token
-- [OpenTelemetry](https://googleapis.github.io/genai-toolbox/how-to/export_telemetry/): get metrics and tracing from Toolbox with [OpenTelemetry](https://opentelemetry.io/docs/)
+- [Authenticated Parameters](https://googleapis.github.io/genai-toolbox/resources/tools/#authenticated-parameters): tool input을 OIDC 토큰의 값에 자동으로 바인딩하여 데이터 유출 가능성 없이 민감한 쿼리를 쉽게 실행할 수 있습니다
+- [Authorized Invocations](https://googleapis.github.io/genai-toolbox/resources/tools/#authorized-invocations): 사용자의 Auth 토큰을 기반으로 도구 사용 액세스를 제한합니다
+- [OpenTelemetry](https://googleapis.github.io/genai-toolbox/how-to/export_telemetry/): [OpenTelemetry](https://opentelemetry.io/docs/)를 사용하여 Toolbox에서 메트릭 및 추적을 가져옵니다

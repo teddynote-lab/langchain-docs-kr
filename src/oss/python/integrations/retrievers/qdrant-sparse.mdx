@@ -2,11 +2,11 @@
 title: Qdrant Sparse Vector
 ---
 
->[Qdrant](https://qdrant.tech/) is an open-source, high-performance vector search engine/database.
+>[Qdrant](https://qdrant.tech/)는 오픈소스 고성능 vector search engine/database입니다.
 
->`QdrantSparseVectorRetriever` uses [sparse vectors](https://qdrant.tech/articles/sparse-vectors/) introduced in `Qdrant` [v1.7.0](https://qdrant.tech/articles/qdrant-1.7.x/) for document retrieval.
+>`QdrantSparseVectorRetriever`는 문서 검색을 위해 `Qdrant` [v1.7.0](https://qdrant.tech/articles/qdrant-1.7.x/)에서 도입된 [sparse vectors](https://qdrant.tech/articles/sparse-vectors/)를 사용합니다.
 
-Install the 'qdrant_client' package:
+'qdrant_client' package를 설치하세요:
 
 ```python
 pip install -qU  qdrant_client
@@ -43,7 +43,7 @@ from langchain_community.retrievers import (
 from langchain_core.documents import Document
 ```
 
-Create a demo encoder function:
+데모 encoder function을 생성하세요:
 
 ```python
 import random
@@ -65,7 +65,7 @@ retriever = QdrantSparseVectorRetriever(
 )
 ```
 
-Add some documents:
+문서를 추가하세요:
 
 ```python
 docs = [
@@ -107,7 +107,7 @@ docs = [
 ]
 ```
 
-Perform a retrieval:
+검색을 수행하세요:
 
 ```python
 retriever.add_documents(docs)

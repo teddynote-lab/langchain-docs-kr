@@ -1,130 +1,121 @@
 ---
-title: "From Github"
-description: "How to use Open SWE from Github"
+title: "Github에서 사용하기"
+description: "Github에서 Open SWE를 사용하는 방법"
 ---
 
 <Warning>
-  GitHub webhooks are _not_ available via the demo application. To use GitHub webhooks, you must set up your own instance of Open SWE following the [development setup guide](/labs/swe/setup/development).
+  GitHub webhook은 데모 애플리케이션에서는 사용할 수 _없습니다_. GitHub webhook을 사용하려면 [개발 설정 가이드](/labs/swe/setup/development)를 따라 자체 Open SWE 인스턴스를 설정해야 합니다.
 </Warning>
 
-# GitHub Webhook Integration
+# GitHub Webhook 통합
 
-Open SWE integrates seamlessly with GitHub through webhooks, allowing you to trigger automated code changes directly from GitHub issues. This provides a streamlined workflow where you can request code changes by simply adding labels to issues in repositories where Open SWE is installed.
+Open SWE는 webhook을 통해 GitHub와 원활하게 통합되어 GitHub issue에서 직접 자동화된 코드 변경을 트리거할 수 있습니다. 이를 통해 Open SWE가 설치된 저장소의 issue에 레이블을 추가하기만 하면 코드 변경을 요청할 수 있는 간소화된 워크플로우를 제공합니다.
 
-## Triggering Runs with Labels
+## 레이블로 실행 트리거하기
 
-Open SWE monitors GitHub issues for specific labels that trigger automated runs. When you add one of these labels to an issue, Open SWE will automatically create a new run to process your request.
+Open SWE는 자동 실행을 트리거하는 특정 레이블에 대해 GitHub issue를 모니터링합니다. 이러한 레이블 중 하나를 issue에 추가하면 Open SWE가 자동으로 새 실행을 생성하여 요청을 처리합니다.
 
-### Label Types
+### 레이블 유형
 
-Open SWE supports three types of labels that control how the agent operates:
+Open SWE는 에이전트 작동 방식을 제어하는 세 가지 유형의 레이블을 지원합니다:
 
 **Manual Mode (`open-swe`)**
 
-- Requires manual approval of the generated plan before code execution
-- Gives you full control over what changes will be made
-- Ideal for complex or sensitive changes where you want to review the approach first
+- 코드 실행 전에 생성된 계획의 수동 승인 필요
+- 어떤 변경이 이루어질지 완전히 제어 가능
+- 먼저 접근 방식을 검토하고 싶은 복잡하거나 민감한 변경에 이상적
 
 **Auto Mode (`open-swe-auto`)**
 
-- Automatically approves and executes the generated plan
-- Provides faster turnaround for straightforward requests
-- Best for simple changes or when you trust the agent to proceed autonomously
+- 생성된 계획을 자동으로 승인하고 실행
+- 간단한 요청에 대해 더 빠른 처리 제공
+- 간단한 변경이나 에이전트가 자율적으로 진행하도록 신뢰할 때 최적
 
-**Max Mode (`open-swe-max` and `open-swe-max-auto`)**
+**Max Mode (`open-swe-max` 및 `open-swe-max-auto`)**
 
-- Uses Claude Opus 4.1 for both planning and programming tasks
-- Provides enhanced performance and reasoning capabilities for complex problems
-- `open-swe-max`: Requires manual plan approval with premium model performance
-- `open-swe-max-auto`: Combines automatic execution with premium model capabilities
-- Ideal for challenging tasks that benefit from the most advanced AI reasoning
-
-<Note>
-  In development environments, the labels are `open-swe-dev`,
-  `open-swe-auto-dev`, `open-swe-max-dev`, and `open-swe-max-auto-dev`
-  respectively. The system automatically uses the appropriate labels based on
-  the `NODE_ENV` environment variable.
-</Note>
-
-## Automatic Run Creation
-
-When you add a supported label to a GitHub issue, Open SWE's webhook handler automatically:
-
-1. **Validates the request** - Verifies webhook signatures and authentication
-2. **Extracts issue context** - Captures the issue title, description, and metadata
-3. **Creates a new thread** - Generates a unique thread ID for the conversation
-4. **Starts the Manager Graph** - Initiates the agent workflow with the issue content
-5. **Configures execution mode** - Sets auto-accept based on the label type used
-
-The entire process happens within seconds of adding the label, providing immediate feedback through issue comments.
-
-## Issue Comments and Run Links
-
-Once a run is created, Open SWE automatically posts a comment on the triggering issue to confirm processing has started. This comment includes:
-
-- **Status confirmation** - "🤖 Open SWE has been triggered for this issue. Processing..."
-- **Run link** - Direct URL to view the run in the Open SWE web interface
-- **Access restriction notice** - Clarifies that only the issue creator can access the run
-- **Development metadata** - Run ID and thread ID for debugging (in a collapsible section)
-
-<Tip>
-  The run link allows you to monitor progress in real-time, view the generated
-  plan, and interact with the agent if needed. You can switch between manual and
-  auto mode even after the run has started.
-</Tip>
-
-## User Access Restrictions
-
-Open SWE implements strict access controls to ensure security and privacy:
-
-### Issue Creator Access
-
-- **Only the user who created the issue** can access the generated run URL
-- This prevents unauthorized users from viewing or modifying runs triggered by others
-- Access is enforced through GitHub authentication and user verification
-
-### Repository Permissions
-
-- Open SWE respects GitHub's repository permissions
-- Users must have appropriate access to the repository to trigger runs
-- The GitHub App installation determines which repositories can use Open SWE
+- 계획 및 프로그래밍 작업 모두에 Claude Opus 4.1 사용
+- 복잡한 문제에 대한 향상된 성능 및 추론 기능 제공
+- `open-swe-max`: 프리미엄 모델 성능으로 수동 계획 승인 필요
+- `open-swe-max-auto`: 자동 실행과 프리미엄 모델 기능 결합
+- 가장 고급 AI 추론의 이점을 받을 수 있는 어려운 작업에 이상적
 
 <Note>
-  If you need to share access to a run with team members, you can do so through
-  the Open SWE web interface after the run is created, or by having team members
-  with repository access create their own issues.
+  개발 환경에서는 레이블이 각각 `open-swe-dev`, `open-swe-auto-dev`, `open-swe-max-dev`, `open-swe-max-auto-dev`입니다. 시스템은 `NODE_ENV` 환경 변수를 기반으로 적절한 레이블을 자동으로 사용합니다.
 </Note>
 
-## Pull Request Integration
+## 자동 실행 생성
 
-When Open SWE successfully completes code changes, it automatically creates pull requests that are linked back to the original issue:
+지원되는 레이블을 GitHub issue에 추가하면 Open SWE의 webhook handler가 자동으로:
 
-### Automatic PR Creation
+1. **요청 검증** - webhook 서명 및 인증 확인
+2. **issue 컨텍스트 추출** - issue 제목, 설명 및 메타데이터 캡처
+3. **새 thread 생성** - 대화를 위한 고유한 thread ID 생성
+4. **Manager Graph 시작** - issue 내용으로 에이전트 워크플로우 시작
+5. **실행 모드 구성** - 사용된 레이블 유형에 따라 auto-accept 설정
 
-- **Generated after plan execution** - PRs are created once the Programmer Graph completes its work
-- **Linked to triggering issue** - PRs reference the original issue in their description
-- **Preserves commit history** - All intermediate commits are maintained for transparency
+전체 프로세스는 레이블 추가 후 몇 초 내에 발생하며 issue 댓글을 통해 즉각적인 피드백을 제공합니다.
 
-### Issue Resolution
+## Issue 댓글 및 실행 링크
 
-- **Automatic closure** - When the generated PR is merged, GitHub automatically closes the linked issue
-- **Clear audit trail** - The connection between issue, run, and PR provides complete traceability
-- **Status updates** - Issue comments track the progress from request to completion
+실행이 생성되면 Open SWE는 처리가 시작되었음을 확인하기 위해 트리거한 issue에 자동으로 댓글을 게시합니다. 이 댓글에는 다음이 포함됩니다:
+
+- **상태 확인** - "🤖 Open SWE has been triggered for this issue. Processing..."
+- **실행 링크** - Open SWE 웹 인터페이스에서 실행을 볼 수 있는 직접 URL
+- **액세스 제한 안내** - issue 작성자만 실행에 액세스할 수 있음을 명시
+- **개발 메타데이터** - 디버깅을 위한 실행 ID 및 thread ID (접을 수 있는 섹션에)
 
 <Tip>
-  You can review the generated PR before merging, even in auto mode. The
-  auto-accept setting only applies to plan approval, not PR merging, giving you
-  final control over what code enters your repository.
+  실행 링크를 통해 실시간으로 진행 상황을 모니터링하고, 생성된 계획을 보고, 필요한 경우 에이전트와 상호 작용할 수 있습니다. 실행이 시작된 후에도 manual 모드와 auto 모드 간에 전환할 수 있습니다.
 </Tip>
 
-## Getting Started
+## 사용자 액세스 제한
 
-To start using Open SWE with webhooks:
+Open SWE는 보안과 개인정보 보호를 위해 엄격한 액세스 제어를 구현합니다:
 
-1. **Ensure Open SWE is installed** on your repository as a GitHub App
-2. **Create a detailed issue** describing the changes you want
-3. **Add the appropriate label** (`open-swe` for manual mode or `open-swe-auto` for automatic mode)
-4. **Monitor the issue comments** for the run link and status updates
-5. **Review and merge the PR** when Open SWE completes the changes
+### Issue 작성자 액세스
 
-For setup instructions, see the [Development Setup](/labs/swe/setup/development) guide.
+- **issue를 생성한 사용자만** 생성된 실행 URL에 액세스 가능
+- 이는 권한이 없는 사용자가 다른 사용자가 트리거한 실행을 보거나 수정하는 것을 방지
+- 액세스는 GitHub 인증 및 사용자 확인을 통해 시행
+
+### 저장소 권한
+
+- Open SWE는 GitHub의 저장소 권한을 존중
+- 사용자는 실행을 트리거하려면 저장소에 대한 적절한 액세스 권한이 있어야 함
+- GitHub App 설치가 Open SWE를 사용할 수 있는 저장소를 결정
+
+<Note>
+  팀 구성원과 실행에 대한 액세스를 공유해야 하는 경우, 실행이 생성된 후 Open SWE 웹 인터페이스를 통해 공유하거나 저장소 액세스 권한이 있는 팀 구성원이 자체 issue를 생성하도록 할 수 있습니다.
+</Note>
+
+## Pull Request 통합
+
+Open SWE가 코드 변경을 성공적으로 완료하면 원래 issue에 다시 연결된 pull request를 자동으로 생성합니다:
+
+### 자동 PR 생성
+
+- **계획 실행 후 생성** - Programmer Graph가 작업을 완료하면 PR이 생성됨
+- **트리거한 issue에 연결** - PR이 설명에서 원래 issue를 참조
+- **commit 기록 보존** - 투명성을 위해 모든 중간 commit이 유지됨
+
+### Issue 해결
+
+- **자동 종료** - 생성된 PR이 병합되면 GitHub가 연결된 issue를 자동으로 종료
+- **명확한 감사 추적** - issue, 실행 및 PR 간의 연결이 완전한 추적 가능성 제공
+- **상태 업데이트** - Issue 댓글이 요청부터 완료까지의 진행 상황을 추적
+
+<Tip>
+  auto 모드에서도 병합하기 전에 생성된 PR을 검토할 수 있습니다. auto-accept 설정은 계획 승인에만 적용되며 PR 병합에는 적용되지 않으므로 저장소에 들어가는 코드에 대한 최종 제어권을 갖게 됩니다.
+</Tip>
+
+## 시작하기
+
+webhook과 함께 Open SWE를 사용하려면:
+
+1. **Open SWE가 설치되어 있는지 확인** - GitHub App으로 저장소에 설치
+2. **상세한 issue 생성** - 원하는 변경 사항을 설명
+3. **적절한 레이블 추가** (manual 모드의 경우 `open-swe`, 자동 모드의 경우 `open-swe-auto`)
+4. **issue 댓글 모니터링** - 실행 링크 및 상태 업데이트 확인
+5. **PR 검토 및 병합** - Open SWE가 변경을 완료하면
+
+설정 지침은 [개발 설정](/labs/swe/setup/development) 가이드를 참조하세요.

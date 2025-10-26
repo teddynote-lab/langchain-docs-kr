@@ -2,21 +2,21 @@
 title: ValyuContext
 ---
 
->[Valyu](https://www.valyu.network/) allows AI applications and agents to search the internet and proprietary data sources for relevant LLM ready information.
+>[Valyu](https://www.valyu.network/)는 AI 애플리케이션과 에이전트가 인터넷과 독점 데이터 소스를 검색하여 LLM에 적합한 관련 정보를 찾을 수 있도록 합니다.
 
-This notebook goes over how to use Valyu deep search tool in LangChain.
+이 노트북은 LangChain에서 Valyu deep search 도구를 사용하는 방법을 다룹니다.
 
-First, get an Valyu API key and add it as an environment variable. Get $10 free credit  by [signing up here](https://platform.valyu.network/).
+먼저 Valyu API 키를 받아서 환경 변수로 추가하세요. [여기에서 가입](https://platform.valyu.network/)하여 $10 무료 크레딧을 받으세요.
 
 ## Setup
 
-The integration lives in the `langchain-valyu` package.
+이 통합은 `langchain-valyu` 패키지에 포함되어 있습니다.
 
 ```python
 pip install -qU langchain-valyu
 ```
 
-In order to use the package, you will also need to set the `VALYU_API_KEY` environment variable to your Valyu API key.
+패키지를 사용하려면 `VALYU_API_KEY` 환경 변수를 Valyu API 키로 설정해야 합니다.
 
 ```python
 import os
@@ -26,32 +26,32 @@ valyu_api_key = os.environ["VALYU_API_KEY"]
 
 ## Instantiation
 
-Now we can instantiate our retriever:
-The `ValyuContextRetriever` can be configured with several parameters:
+이제 retriever를 인스턴스화할 수 있습니다:
+`ValyuContextRetriever`는 여러 매개변수로 구성할 수 있습니다:
 
 - `k: int = 5`
-  The number of top results to return for each query.
+  각 쿼리에 대해 반환할 상위 결과의 수입니다.
 
 - `search_type: str = "all"`
-  The type of search to perform: 'all', 'proprietary', or 'web'. Defaults to 'all'.
+  수행할 검색 유형: 'all', 'proprietary', 또는 'web'. 기본값은 'all'입니다.
 
 - `relevance_threshold: float = 0.5`
-  The minimum relevance score (between 0 and 1) required for a document to be considered relevant. Defaults to 0.5.
+  문서가 관련성이 있다고 간주되기 위해 필요한 최소 관련성 점수(0과 1 사이)입니다. 기본값은 0.5입니다.
 
 - `max_price: float = 20.0`
-  The maximum price (in USD) you are willing to spend per query. Defaults to 20.0.
+  쿼리당 지불할 의향이 있는 최대 가격(USD)입니다. 기본값은 20.0입니다.
 
 - `start_date: Optional[str] = None`
-  Start date for time filtering in YYYY-MM-DD format (optional).
+  YYYY-MM-DD 형식의 시간 필터링을 위한 시작 날짜(선택 사항)입니다.
 
 - `end_date: Optional[str] = None`
-  End date for time filtering in YYYY-MM-DD format (optional).
+  YYYY-MM-DD 형식의 시간 필터링을 위한 종료 날짜(선택 사항)입니다.
 
 - `client: Optional[Valyu] = None`
-  An optional custom Valyu client instance. If not provided, a new client will be created internally.
+  선택적 사용자 정의 Valyu client 인스턴스입니다. 제공되지 않으면 내부적으로 새 client가 생성됩니다.
 
 - `valyu_api_key: Optional[str] = None`
-  Your Valyu API key. If not provided, the retriever will look for the `VALYU_API_KEY` environment variable.
+  Valyu API 키입니다. 제공되지 않으면 retriever는 `VALYU_API_KEY` 환경 변수를 찾습니다.
 
 ```python
 from langchain_valyu import ValyuRetriever
@@ -81,7 +81,7 @@ for doc in docs:
 
 ## Use within a chain
 
-We can easily combine this retriever in to a chain.
+이 retriever를 chain에 쉽게 결합할 수 있습니다.
 
 ```python
 from langchain_core.output_parsers import StrOutputParser
@@ -114,4 +114,4 @@ chain = (
 
 ## API reference
 
-For detailed documentation of all Valyu Context API features and configurations head to the API reference: [docs.valyu.network/overview](https://docs.valyu.network/overview)
+모든 Valyu Context API 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [docs.valyu.network/overview](https://docs.valyu.network/overview)

@@ -2,37 +2,37 @@
 title: Timescale Vector (Postgres)
 ---
 
->[Timescale Vector](https://www.timescale.com/ai?utm_campaign=vectorlaunch&utm_source=langchain&utm_medium=referral) is `PostgreSQL++` vector database for AI applications.
+>[Timescale Vector](https://www.timescale.com/ai?utm_campaign=vectorlaunch&utm_source=langchain&utm_medium=referral)는 AI 애플리케이션을 위한 `PostgreSQL++` vector database입니다.
 
-This notebook shows how to use the Postgres vector database `Timescale Vector`. You'll learn how to use TimescaleVector for (1) semantic search, (2) time-based vector search, (3) self-querying, and (4) how to create indexes to speed up queries.
+이 노트북은 Postgres vector database인 `Timescale Vector`를 사용하는 방법을 보여줍니다. 이 예제에서는 TimescaleVector를 사용하여 (1) semantic search, (2) 시간 기반 vector search, (3) self-querying, (4) 쿼리 속도를 높이기 위한 인덱스 생성 방법을 학습합니다.
 
-## What is Timescale Vector?
+## Timescale Vector란?
 
-`Timescale Vector` enables you to efficiently store and query millions of vector embeddings in `PostgreSQL`.
+`Timescale Vector`는 `PostgreSQL`에서 수백만 개의 vector embeddings를 효율적으로 저장하고 쿼리할 수 있게 합니다.
 
-- Enhances `pgvector` with faster and more accurate similarity search on 100M+ vectors via `DiskANN` inspired indexing algorithm.
-- Enables fast time-based vector search via automatic time-based partitioning and indexing.
-- Provides a familiar SQL interface for querying vector embeddings and relational data.
+- `pgvector`를 강화하여 `DiskANN`에서 영감을 받은 인덱싱 알고리즘으로 1억+ 벡터에서 더 빠르고 정확한 similarity search를 제공합니다.
+- 자동 시간 기반 파티셔닝과 인덱싱을 통해 빠른 시간 기반 vector search를 가능하게 합니다.
+- vector embeddings와 관계형 데이터를 쿼리하기 위한 친숙한 SQL 인터페이스를 제공합니다.
 
-`Timescale Vector` is cloud `PostgreSQL` for AI that scales with you from POC to production:
+`Timescale Vector`는 POC부터 프로덕션까지 확장 가능한 클라우드 `PostgreSQL` 기반 AI 데이터베이스입니다:
 
-- Simplifies operations by enabling you to store relational metadata, vector embeddings, and time-series data in a single database.
-- Benefits from rock-solid PostgreSQL foundation with enterprise-grade features like streaming backups and replication, high availability and row-level security.
-- Enables a worry-free experience with enterprise-grade security and compliance.
+- 관계형 메타데이터, vector embeddings, 시계열 데이터를 하나의 데이터베이스에 저장하여 운영을 단순화합니다.
+- 스트리밍 백업과 복제, 고가용성, row-level security 등 엔터프라이즈급 기능을 갖춘 견고한 PostgreSQL 기반의 이점을 제공합니다.
+- 엔터프라이즈급 보안과 컴플라이언스로 걱정 없는 사용 경험을 제공합니다.
 
-## How to access Timescale Vector
+## Timescale Vector 접근 방법
 
-`Timescale Vector` is available on [Timescale](https://www.timescale.com/ai?utm_campaign=vectorlaunch&utm_source=langchain&utm_medium=referral), the cloud PostgreSQL platform. (There is no self-hosted version at this time.)
+`Timescale Vector`는 클라우드 PostgreSQL 플랫폼인 [Timescale](https://www.timescale.com/ai?utm_campaign=vectorlaunch&utm_source=langchain&utm_medium=referral)에서 사용할 수 있습니다. (현재 자체 호스팅 버전은 없습니다.)
 
-LangChain users get a 90-day free trial for Timescale Vector.
+LangChain 사용자는 Timescale Vector를 90일 동안 무료로 체험할 수 있습니다.
 
-- To get started, [signup](https://console.cloud.timescale.com/signup?utm_campaign=vectorlaunch&utm_source=langchain&utm_medium=referral) to Timescale, create a new database and follow this notebook!
-- See the [Timescale Vector explainer blog](https://www.timescale.com/blog/how-we-made-postgresql-the-best-vector-database/?utm_campaign=vectorlaunch&utm_source=langchain&utm_medium=referral) for more details and performance benchmarks.
-- See the [installation instructions](https://github.com/timescale/python-vector) for more details on using Timescale Vector in Python.
+- 시작하려면 Timescale에 [가입](https://console.cloud.timescale.com/signup?utm_campaign=vectorlaunch&utm_source=langchain&utm_medium=referral)하여 새 데이터베이스를 만들고 이 노트북을 따라 하세요!
+- 자세한 내용과 성능 벤치마크는 [Timescale Vector 설명 블로그](https://www.timescale.com/blog/how-we-made-postgresql-the-best-vector-database/?utm_campaign=vectorlaunch&utm_source=langchain&utm_medium=referral)를 참고하세요.
+- Python에서 Timescale Vector를 사용하는 방법은 [설치 안내](https://github.com/timescale/python-vector)를 참고하세요.
 
-## Setup
+## 설정
 
-Follow these steps to get ready to follow this tutorial.
+이 튜토리얼을 따라갈 준비를 위해 다음 단계를 수행하세요.
 
 ```python
 # Pip install necessary packages
@@ -41,7 +41,7 @@ pip install -qU  langchain-openai langchain-community
 pip install -qU  tiktoken
 ```
 
-In this example, we'll use `OpenAIEmbeddings`, so let's load your OpenAI API key.
+이 예제에서는 `OpenAIEmbeddings`를 사용하므로, OpenAI API 키를 로드하겠습니다.
 
 ```python
 import os
@@ -66,7 +66,7 @@ OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 from typing import Tuple
 ```
 
-Next we'll import the needed Python libraries and libraries from LangChain. Note that we import the `timescale-vector` library as well as the TimescaleVector LangChain vectorstore.
+다음으로 필요한 Python 라이브러리와 LangChain 라이브러리를 임포트합니다. `timescale-vector` 라이브러리와 LangChain의 TimescaleVector vectorstore를 함께 임포트하는 점에 유의하세요.
 
 ```python
 from datetime import datetime, timedelta
@@ -79,9 +79,9 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import CharacterTextSplitter
 ```
 
-## 1. Similarity Search with Euclidean Distance (Default)
+## 1. Euclidean Distance(기본값)를 사용한 Similarity Search
 
-First, we'll look at an example of doing a similarity search query on the State of the Union speech to find the most similar sentences to a given query sentence. We'll use the [Euclidean distance](https://en.wikipedia.org/wiki/Euclidean_distance) as our similarity metric.
+먼저, State of the Union 연설에 대해 similarity search 쿼리를 수행하여 주어진 질의 문장과 가장 유사한 문장을 찾는 예제를 살펴봅니다. 유사도 측도로 [Euclidean distance](https://en.wikipedia.org/wiki/Euclidean_distance)를 사용합니다.
 
 ```python
 # Load the text and split it into chunks
@@ -93,13 +93,13 @@ docs = text_splitter.split_documents(documents)
 embeddings = OpenAIEmbeddings()
 ```
 
-Next, we'll load the service URL for our Timescale database.
+다음으로 Timescale 데이터베이스의 서비스 URL을 로드합니다.
 
-If you haven't already, [signup for Timescale](https://console.cloud.timescale.com/signup?utm_campaign=vectorlaunch&utm_source=langchain&utm_medium=referral), and create a new database.
+아직 하지 않았다면 [Timescale에 가입](https://console.cloud.timescale.com/signup?utm_campaign=vectorlaunch&utm_source=langchain&utm_medium=referral)하고 새 데이터베이스를 생성하세요.
 
-Then, to connect to your PostgreSQL database, you'll need your service URI, which can be found in the cheatsheet or `.env` file you downloaded after creating a new database.
+그런 다음 PostgreSQL 데이터베이스에 연결하려면 서비스 URI가 필요합니다. 이는 새 데이터베이스를 만든 후 다운로드한 cheatsheet 또는 `.env` 파일에서 확인할 수 있습니다.
 
-The URI will look something like this: `postgres://tsdbadmin:<password>@<id>.tsdb.cloud.timescale.com:<port>/tsdb?sslmode=require`.
+URI는 다음과 같은 형태입니다: `postgres://tsdbadmin:<password>@<id>.tsdb.cloud.timescale.com:<port>/tsdb?sslmode=require`.
 
 ```python
 # Timescale Vector needs the service url to your cloud database. You can see this as soon as you create the
@@ -114,9 +114,9 @@ SERVICE_URL = os.environ["TIMESCALE_SERVICE_URL"]
 # SERVICE_URL = os.environ.get("TIMESCALE_SERVICE_URL", "")
 ```
 
-Next we create a TimescaleVector vectorstore. We specify a collection name, which will be the name of the table our data is stored in.
+다음으로 TimescaleVector vectorstore를 생성합니다. 데이터가 저장될 테이블 이름이 되는 collection name을 지정합니다.
 
-Note: When creating a new instance of TimescaleVector, the TimescaleVector Module will try to create a table with the name of the collection. So, make sure that the collection name is unique (i.e it doesn't already exist).
+참고: 새 TimescaleVector 인스턴스를 만들면, TimescaleVector 모듈은 collection 이름과 동일한 테이블을 생성하려고 시도합니다. 따라서 collection name이 고유한지(즉, 이미 존재하지 않는지) 확인하세요.
 
 ```python
 # The TimescaleVector Module will create a table with the name of the collection.
@@ -131,7 +131,7 @@ db = TimescaleVector.from_documents(
 )
 ```
 
-Now that we've loaded our data, we can perform a similarity search.
+데이터를 로드했으므로 similarity search를 수행할 수 있습니다.
 
 ```python
 query = "What did the president say about Ketanji Brown Jackson"
@@ -197,9 +197,9 @@ We’re securing commitments and supporting partners in South and Central Americ
 --------------------------------------------------------------------------------
 ```
 
-### Using a Timescale Vector as a Retriever
+### Retriever로서 Timescale Vector 사용하기
 
-After initializing a TimescaleVector store, you can use it as a [retriever](/oss/langchain/retrieval).
+TimescaleVector store를 초기화한 후에는 이를 [retriever](/oss/langchain/retrieval)로 사용할 수 있습니다.
 
 ```python
 # Use TimescaleVector as a retriever
@@ -214,11 +214,11 @@ print(retriever)
 tags=['TimescaleVector', 'OpenAIEmbeddings'] metadata=None vectorstore=<langchain_community.vectorstores.timescalevector.TimescaleVector object at 0x10fc8d070> search_type='similarity' search_kwargs={}
 ```
 
-Let's look at an example of using Timescale Vector as a retriever with the RetrievalQA chain and the stuff documents chain.
+RetrievalQA 체인과 stuff documents 체인을 사용하여 Timescale Vector를 retriever로 사용하는 예제를 살펴보겠습니다.
 
-In this example, we'll ask the same query as above, but this time we'll pass the relevant documents returned from Timescale Vector to an LLM to use as context to answer our question.
+이 예제에서는 위와 동일한 질의를 수행하지만, 이번에는 Timescale Vector가 반환한 관련 문서를 LLM에 컨텍스트로 전달하여 질문에 답하도록 합니다.
 
-First we'll create our stuff chain:
+먼저 stuff 체인을 생성합니다:
 
 ```python
 # Initialize GPT3.5 model
@@ -256,28 +256,28 @@ print(response)
 The President said that he nominated Circuit Court of Appeals Judge Ketanji Brown Jackson, who is one of our nation's top legal minds and will continue Justice Breyer's legacy of excellence. He also mentioned that since her nomination, she has received a broad range of support from various groups, including the Fraternal Order of Police and former judges appointed by Democrats and Republicans.
 ```
 
-## 2. Similarity Search with time-based filtering
+## 2. 시간 기반 필터링을 사용한 Similarity Search
 
-A key use case for Timescale Vector is efficient time-based vector search. Timescale Vector enables this by automatically partitioning vectors (and associated metadata) by time. This allows you to efficiently query vectors by both similarity to a query vector and time.
+Timescale Vector의 핵심 사용 사례 중 하나는 효율적인 시간 기반 vector search입니다. Timescale Vector는 벡터(및 관련 메타데이터)를 자동으로 시간 기준으로 파티셔닝함으로써 이를 가능하게 합니다. 이를 통해 질의 벡터와의 유사도뿐 아니라 시간 기준으로도 벡터를 효율적으로 쿼리할 수 있습니다.
 
-Time-based vector search functionality is helpful for applications like:
+시간 기반 vector search 기능은 다음과 같은 애플리케이션에 유용합니다:
 
-- Storing and retrieving LLM response history (e.g. chatbots)
-- Finding the most recent embeddings that are similar to a query vector (e.g recent news).
-- Constraining similarity search to a relevant time range (e.g asking time-based questions about a knowledge base)
+- LLM 응답 히스토리 저장 및 검색(예: 챗봇)
+- 질의 벡터와 유사한 최신 embeddings 찾기(예: 최신 뉴스)
+- 관련 시간 범위로 similarity search를 제한하기(예: 지식 베이스에 대한 시간 기반 질의)
 
-To illustrate how to use TimescaleVector's time-based vector search functionality, we'll ask questions about the git log history for TimescaleDB . We'll illustrate how to add documents with a time-based uuid and how run similarity searches with time range filters.
+TimescaleVector의 시간 기반 vector search 사용법을 보여주기 위해, TimescaleDB의 git log 히스토리에 대해 질문을 해보겠습니다. 시간 기반 uuid와 함께 문서를 추가하는 방법과 시간 범위 필터를 사용하여 similarity search를 실행하는 방법을 설명합니다.
 
-### Extract content and metadata from git log JSON
+### git log JSON에서 콘텐츠와 메타데이터 추출
 
-First lets load in the git log data into a new collection in our PostgreSQL database named `timescale_commits`.
+먼저 `timescale_commits`라는 이름의 PostgreSQL 데이터베이스 내 새 collection에 git log 데이터를 로드합니다.
 
 ```python
 ```
 
-We'll define a helper function to create a uuid for a document and associated vector embedding based on its timestamp. We'll use this function to create a uuid for each git log entry.
+타임스탬프를 기반으로 문서와 관련 vector embedding을 위한 uuid를 생성하는 helper function을 정의합니다. 이 함수를 사용하여 각 git log 항목에 대한 uuid를 생성합니다.
 
-Important note: If you are working with documents and want the current date and time associated with vector for time-based search, you can skip this step. A uuid will be automatically generated when the documents are ingested by default.
+중요 참고: 문서를 다루면서 시간 기반 검색을 위해 벡터에 현재 날짜와 시간을 연관시키고 싶다면, 이 단계를 건너뛸 수 있습니다. 문서가 적재될 때 uuid는 기본적으로 자동 생성됩니다.
 
 ```python
 from timescale_vector import client
@@ -293,7 +293,7 @@ def create_uuid(date_string: str):
     return str(uuid)
 ```
 
-Next, we'll define a metadata function to extract the relevant metadata from the JSON record. We'll pass this function to the JSONLoader. See the [JSON document loader docs](/oss/integrations/document_loaders/json) for more details.
+다음으로 JSON 레코드에서 관련 메타데이터를 추출하는 metadata function을 정의합니다. 이 함수를 JSONLoader에 전달합니다. 자세한 내용은 [JSON document loader 문서](/oss/integrations/document_loaders/json)를 참고하세요.
 
 ```python
 # Helper function to split name and email given an author string consisting of Name Lastname <email>
@@ -355,9 +355,9 @@ def extract_metadata(record: dict, metadata: dict) -> dict:
     return metadata
 ```
 
-Next, you'll need to [download the sample dataset](https://s3.amazonaws.com/assets.timescale.com/ai/ts_git_log.json) and place it in the same directory as this notebook.
+다음으로, [샘플 데이터셋을 다운로드](https://s3.amazonaws.com/assets.timescale.com/ai/ts_git_log.json)하여 이 노트북과 동일한 디렉터리에 배치해야 합니다.
 
-You can use following command:
+다음 명령을 사용할 수 있습니다:
 
 ```python
 # Download the file using curl and save it as commit_history.csv
@@ -365,7 +365,7 @@ You can use following command:
 !curl -O https://s3.amazonaws.com/assets.timescale.com/ai/ts_git_log.json
 ```
 
-Finally we can initialize the JSON loader to parse the JSON records. We also remove empty records for simplicity.
+마지막으로 JSON 로더를 초기화하여 JSON 레코드를 파싱합니다. 단순화를 위해 빈 레코드는 제거합니다.
 
 ```python
 # Define path to the JSON file relative to this notebook
@@ -393,18 +393,18 @@ print(documents[0])
 page_content='{"commit": "44e41c12ab25e36c202f58e068ced262eadc8d16", "author": "Lakshmi Narayanan Sreethar[lakshmi@timescale.com](mailto:lakshmi@timescale.com)", "date": "Tue Sep 5 21:03:21 2023 +0530", "change summary": "Fix segfault in set_integer_now_func", "change details": "When an invalid function oid is passed to set_integer_now_func, it finds out that the function oid is invalid but before throwing the error, it calls ReleaseSysCache on an invalid tuple causing a segfault. Fixed that by removing the invalid call to ReleaseSysCache.  Fixes #6037 "}' metadata={'source': '/Users/avtharsewrathan/sideprojects2023/timescaleai/tsv-langchain/ts_git_log.json', 'seq_num': 1, 'id': '8b407680-4c01-11ee-96a6-b82284ddccc6', 'date': '2023-09-5 21:03:21+0850', 'author_name': 'Lakshmi Narayanan Sreethar', 'author_email': 'lakshmi@timescale.com', 'commit_hash': '44e41c12ab25e36c202f58e068ced262eadc8d16'}
 ```
 
-### Load documents and metadata into TimescaleVector vectorstore
+### TimescaleVector vectorstore에 문서와 메타데이터 로드
 
-Now that we have prepared our documents, let's process them and load them, along with their vector embedding representations into our TimescaleVector vectorstore.
+문서를 준비했으므로, 이를 처리한 뒤 vector embedding 표현과 함께 TimescaleVector vectorstore에 로드하겠습니다.
 
-Since this is a demo, we will only load the first 500 records. In practice, you can load as many records as you want.
+데모이므로 처음 500개 레코드만 로드합니다. 실제로는 원하는 만큼 많은 레코드를 로드할 수 있습니다.
 
 ```python
 NUM_RECORDS = 500
 documents = documents[:NUM_RECORDS]
 ```
 
-Then we use the CharacterTextSplitter to split the documents into smaller chunks if needed for easier embedding. Note that this splitting process retains the metadata for each document.
+그다음 CharacterTextSplitter를 사용해 필요 시 문서를 더 작은 청크로 분할하여 embedding을 용이하게 합니다. 이 분할 과정은 각 문서의 메타데이터를 유지한다는 점에 유의하세요.
 
 ```python
 # Split the documents into chunks for embedding
@@ -415,13 +415,13 @@ text_splitter = CharacterTextSplitter(
 docs = text_splitter.split_documents(documents)
 ```
 
-Next we'll create a Timescale Vector instance from the collection of documents that we finished pre-processsing.
+이제 전처리를 마친 문서 컬렉션에서 Timescale Vector 인스턴스를 생성합니다.
 
-First, we'll define a collection name, which will be the name of our table in the PostgreSQL database.
+먼저 PostgreSQL 데이터베이스에서 테이블 이름이 될 collection name을 정의합니다.
 
-We'll also define a time delta, which we pass to the `time_partition_interval` argument, which will be used to as the interval for partitioning the data by time. Each partition will consist of data for the specified length of time. We'll use 7 days for simplicity, but you can pick whatever value make sense for your use case -- for example if you query recent vectors frequently you might want to use a smaller time delta like 1 day, or if you query vectors over a decade long time period then you might want to use a larger time delta like 6 months or 1 year.
+또한 `time_partition_interval` 인자로 전달할 time delta를 정의합니다. 이는 데이터를 시간 기준으로 파티셔닝할 때 사용하는 간격입니다. 각 파티션은 지정된 기간의 데이터로 구성됩니다. 여기서는 단순화를 위해 7일을 사용하지만, 사용 사례에 맞는 값을 선택할 수 있습니다. 예를 들어 최근 벡터를 자주 조회한다면 1일 같은 더 작은 time delta를, 수년 단위의 긴 기간을 조회한다면 6개월 또는 1년 같은 더 큰 time delta를 사용할 수 있습니다.
 
-Finally, we'll create the TimescaleVector instance. We specify the `ids` argument to be the `uuid` field in our metadata that we created in the pre-processing step above. We do this because we want the time part of our uuids to reflect dates in the past (i.e when the commit was made). However, if we wanted the current date and time to be associated with our document, we can remove the id argument and uuid's will be automatically created with the current date and time.
+마지막으로 TimescaleVector 인스턴스를 생성합니다. 위 전처리 단계에서 메타데이터에 만든 `uuid` 필드를 `ids` 인자로 지정합니다. 이렇게 하는 이유는 uuid의 시간 부분이 과거 날짜(예: 커밋이 이루어진 시점)를 반영하길 원하기 때문입니다. 반대로 문서에 현재 날짜와 시간을 연관시키고 싶다면 id 인자를 제거하면 uuid가 현재 날짜와 시간으로 자동 생성됩니다.
 
 ```python
 # Define collection name
@@ -439,13 +439,13 @@ db = TimescaleVector.from_documents(
 )
 ```
 
-### Querying vectors by time and similarity
+### 시간과 유사도로 벡터 쿼리하기
 
-Now that we have loaded our documents into TimescaleVector, we can query them by time and similarity.
+문서를 TimescaleVector에 로드했으니, 이제 시간과 유사도를 기준으로 쿼리할 수 있습니다.
 
-TimescaleVector provides multiple methods for querying vectors by doing similarity search with time-based filtering.
+TimescaleVector는 시간 기반 필터링을 적용한 similarity search로 벡터를 쿼리하는 여러 방법을 제공합니다.
 
-Let's take a look at each method below:
+아래에서 각 방법을 살펴보겠습니다:
 
 ```python
 # Time filter variables
@@ -456,7 +456,7 @@ td = timedelta(days=7)  # Time delta = 7 days
 query = "What's new with TimescaleDB functions?"
 ```
 
-Method 1: Filter within a provided start date and end date.
+방법 1: 시작일과 종료일을 지정한 범위로 필터링합니다.
 
 ```python
 # Method 1: Query for vectors between start_date and end_date
@@ -495,9 +495,9 @@ Date:  2023-08-9 15:26:03+0500
 --------------------------------------------------------------------------------
 ```
 
-Note how the query only returns results within the specified date range.
+쿼리가 지정된 날짜 범위 내의 결과만 반환하는 점을 확인하세요.
 
-Method 2: Filter within a provided start date, and a time delta later.
+방법 2: 시작일과 그로부터 특정 time delta 이후까지의 범위로 필터링합니다.
 
 ```python
 # Method 2: Query for vectors between start_dt and a time delta td later
@@ -537,9 +537,9 @@ Date:  2023-08-2 20:24:14+0140
 --------------------------------------------------------------------------------
 ```
 
-Once again, notice how we get results within the specified time filter, different from the previous query.
+역시 이전 쿼리와 다른, 지정된 시간 필터 내의 결과를 얻습니다.
 
-Method 3: Filter within a provided end date and a time delta earlier.
+방법 3: 종료일과 그로부터 특정 time delta 이전까지의 범위로 필터링합니다.
 
 ```python
 # Method 3: Query for vectors between end_dt and a time delta td earlier
@@ -577,9 +577,9 @@ Date:  2023-08-27 13:20:04+0320
 --------------------------------------------------------------------------------
 ```
 
-Method 4: We can also filter for all vectors after a given date by only specifying a start date in our query.
+방법 4: 쿼리에서 시작일만 지정하여 특정 날짜 이후의 모든 벡터를 필터링할 수 있습니다.
 
-Method 5: Similarly, we can filter for or all vectors before a given date by only specify an end date in our query.
+방법 5: 유사하게, 쿼리에서 종료일만 지정하여 특정 날짜 이전의 모든 벡터를 필터링할 수 있습니다.
 
 ```python
 # Method 4: Query all vectors after start_date
@@ -651,9 +651,9 @@ Date:  2023-08-29 18:13:24+0320
 --------------------------------------------------------------------------------
 ```
 
-The main takeaway is that in each result above, only vectors within the specified time range are returned. These queries are very efficient as they only need to search the relevant partitions.
+핵심은 위의 각 결과에서 지정된 시간 범위 내 벡터만 반환된다는 점입니다. 이러한 쿼리는 관련 파티션만 검색하면 되므로 매우 효율적입니다.
 
-We can also use this functionality for question answering, where we want to find the most relevant vectors within a specified time range to use as context for answering a question. Let's take a look at an example below, using Timescale Vector as a retriever:
+또한 이 기능을 질문 응답에도 사용할 수 있습니다. 특정 시간 범위 내에서 가장 관련성이 높은 벡터를 찾아 질문에 답할 컨텍스트로 사용하고자 할 때 유용합니다. 아래에서는 Timescale Vector를 retriever로 사용한 예제를 살펴보겠습니다:
 
 ```python
 # Set timescale vector as a retriever and specify start and end dates via kwargs
@@ -693,21 +693,21 @@ The following changes were made to the timescaledb functions:
 4. "Move partitioning functions to _timescaledb_functions schema" - This change was made on Tue Aug 29 10:49:47 2023 +0200.
 ```
 
-Note that the context the LLM uses to compose an answer are from retrieved documents only within the specified date range.
+LLM이 답변을 구성할 때 사용하는 컨텍스트는 지정된 날짜 범위 내에서 검색된 문서들에서만 온다는 점에 주의하세요.
 
-This shows how you can use Timescale Vector to enhance retrieval augmented generation by retrieving documents within time ranges relevant to your query.
+이는 Timescale Vector를 사용하여, 질의와 관련된 시간 범위 내 문서를 검색함으로써 retrieval augmented generation을 향상할 수 있음을 보여줍니다.
 
-## 3. Using ANN Search Indexes to Speed Up Queries
+## 3. ANN Search Index를 사용해 쿼리 가속화
 
-You can speed up similarity queries by creating an index on the embedding column. You should only do this once you have ingested a large part of your data.
+embedding 컬럼에 인덱스를 생성하면 similarity 쿼리를 가속화할 수 있습니다. 이는 데이터의 상당 부분을 적재한 후에 수행하는 것이 좋습니다.
 
-Timescale Vector supports the following indexes:
+Timescale Vector는 다음 인덱스를 지원합니다:
 
-- timescale_vector index (tsv): a disk-ann inspired graph index for fast similarity search (default).
-- pgvector's HNSW index: a hierarchical navigable small world graph index for fast similarity search.
-- pgvector's IVFFLAT index: an inverted file index for fast similarity search.
+- timescale_vector index (tsv): 빠른 similarity search를 위한 disk-ann에서 영감을 받은 그래프 인덱스(기본값).
+- pgvector의 HNSW 인덱스: 빠른 similarity search를 위한 hierarchical navigable small world 그래프 인덱스.
+- pgvector의 IVFFLAT 인덱스: 빠른 similarity search를 위한 inverted file 인덱스.
 
-Important note: In PostgreSQL, each table can only have one index on a particular column. So if you'd like to test the performance of different index types, you can do so either by (1) creating multiple tables with different indexes, (2) creating multiple vector columns in the same table and creating different indexes on each column, or (3) by dropping and recreating the index on the same column and comparing results.
+중요 참고: PostgreSQL에서 각 테이블은 특정 컬럼에 대해 하나의 인덱스만 가질 수 있습니다. 따라서 서로 다른 인덱스 유형의 성능을 테스트하려면 (1) 서로 다른 인덱스를 가진 여러 테이블을 만들거나, (2) 동일한 테이블에 여러 vector 컬럼을 만들고 각 컬럼에 서로 다른 인덱스를 생성하거나, (3) 동일 컬럼의 인덱스를 삭제 후 다른 유형으로 재생성하여 결과를 비교할 수 있습니다.
 
 ```python
 # Initialize an existing TimescaleVector store
@@ -720,7 +720,7 @@ db = TimescaleVector(
 )
 ```
 
-Using the `create_index()` function without additional arguments will create a timescale_vector_index by default, using the default parameters.
+추가 인자를 지정하지 않고 `create_index()` 함수를 사용하면 기본값으로 timescale_vector_index가 생성되며, 기본 파라미터가 적용됩니다.
 
 ```python
 # create an index
@@ -728,9 +728,9 @@ Using the `create_index()` function without additional arguments will create a t
 db.create_index()
 ```
 
-You can also specify the parameters for the index. See the Timescale Vector documentation for a full discussion of the different parameters and their effects on performance.
+인덱스의 파라미터를 지정할 수도 있습니다. 다양한 파라미터와 성능에 미치는 영향에 대한 자세한 내용은 Timescale Vector 문서를 참고하세요.
 
-Note: You don't need to specify parameters as we set smart defaults. But you can always specify your own parameters if you want to experiment eek out more performance for your specific dataset.
+참고: 스마트 기본값을 제공하므로 파라미터를 지정할 필요는 없습니다. 하지만 특정 데이터셋에서 성능을 더 끌어올리고 싶다면 언제든 직접 파라미터를 지정해 실험할 수 있습니다.
 
 ```python
 # drop the old index
@@ -741,7 +741,7 @@ db.drop_index()
 db.create_index(index_type="tsv", max_alpha=1.0, num_neighbors=50)
 ```
 
-Timescale Vector also supports the HNSW ANN indexing algorithm, as well as the ivfflat ANN indexing algorithm. Simply specify in the `index_type` argument which index you'd like to create, and optionally specify the parameters for the index.
+Timescale Vector는 HNSW ANN 인덱싱 알고리즘과 ivfflat ANN 인덱싱 알고리즘도 지원합니다. 생성하려는 인덱스를 `index_type` 인자로 지정하고, 필요하면 인덱스 파라미터를 선택적으로 지정하세요.
 
 ```python
 # drop the old index
@@ -761,7 +761,7 @@ db.drop_index()
 db.create_index(index_type="ivfflat", num_lists=20, num_records=1000)
 ```
 
-In general, we recommend using the default timescale vector index, or the HNSW index.
+일반적으로는 기본 timescale vector 인덱스 또는 HNSW 인덱스를 사용하는 것을 권장합니다.
 
 ```python
 # drop the old index
@@ -770,11 +770,11 @@ db.drop_index()
 db.create_index()
 ```
 
-## 4. Self Querying Retriever with Timescale Vector
+## 4. Timescale Vector로 Self Querying Retriever 사용하기
 
-Timescale Vector also supports the self-querying retriever functionality, which gives it the ability to query itself. Given a natural language query with a query statement and filters (single or composite), the retriever uses a query constructing LLM chain to write a SQL query and then applies it to the underlying PostgreSQL database in the Timescale Vector vectorstore.
+Timescale Vector는 self-querying retriever 기능도 지원하여, 스스로를 쿼리할 수 있는 능력을 제공합니다. 질의문과 필터(단일 또는 합성)가 포함된 자연어 질의가 주어지면, retriever는 쿼리를 구성하는 LLM 체인을 사용해 SQL 쿼리를 작성한 뒤, Timescale Vector vectorstore의 기반 PostgreSQL 데이터베이스에 이를 적용합니다.
 
-To illustrate self-querying with Timescale Vector, we'll use the same gitlog dataset from Part 3.
+Timescale Vector에서 self-querying을 설명하기 위해, 3부에서 사용한 동일한 gitlog 데이터셋을 사용하겠습니다.
 
 ```python
 COLLECTION_NAME = "timescale_commits"
@@ -785,7 +785,7 @@ vectorstore = TimescaleVector(
 )
 ```
 
-Next we'll create our self-querying retriever. To do this we'll need to provide some information upfront about the metadata fields that our documents support and a short description of the document contents.
+다음으로 self-querying retriever를 생성합니다. 이를 위해 문서가 지원하는 메타데이터 필드 정보와 문서 내용에 대한 간단한 설명을 사전에 제공해야 합니다.
 
 ```python
 from langchain.chains.query_constructor.base import AttributeInfo
@@ -829,11 +829,11 @@ retriever = SelfQueryRetriever.from_llm(
 )
 ```
 
-Now let's test out the self-querying retriever on our gitlog dataset.
+이제 gitlog 데이터셋에서 self-querying retriever를 테스트해봅시다.
 
-Run the queries below and note how you can specify a query, query with a filter, and query with a composite filter (filters with AND, OR) in natural language and the self-query retriever will translate that query into SQL and perform the search on the Timescale Vector PostgreSQL vectorstore.
+아래 쿼리를 실행해 보면, 자연어로 질의, 필터와 함께하는 질의, 합성 필터(AND, OR가 있는 필터)를 포함한 질의를 지정하면 self-query retriever가 해당 질의를 SQL로 변환해 Timescale Vector PostgreSQL vectorstore에서 검색을 수행하는 것을 확인할 수 있습니다.
 
-This illustrates the power of the self-query retriever. You can use it to perform complex searches over your vectorstore without you or your users having to write any SQL directly!
+이는 self-query retriever의 강력함을 보여줍니다. 사용자나 당신이 직접 SQL을 작성하지 않고도 vectorstore에서 복잡한 검색을 수행할 수 있습니다!
 
 ```python
 # This example specifies a relevant query
@@ -917,11 +917,11 @@ query='hierarchical continuous aggregates' filter=None limit=2
  Document(page_content='{"commit": " 3749953e9704e45df8f621607989ada0714ce28d", "author": "Fabr\\u00edzio de Royes Mello[fabriziomello@gmail.com](mailto:fabriziomello@gmail.com)", "date": "Wed Oct 5 18:45:40 2022 -0300", "change summary": "Hierarchical Continuous Aggregates", "change details": "Enable users create Hierarchical Continuous Aggregates (aka Continuous Aggregates on top of another Continuous Aggregates).  With this PR users can create levels of aggregation granularity in Continuous Aggregates making the refresh process even faster.  A problem with this feature can be in upper levels we can end up with the \\"average of averages\\". But to get the \\"real average\\" we can rely on \\"stats_aggs\\" TimescaleDB Toolkit function that calculate and store the partials that can be finalized with other toolkit functions like \\"average\\" and \\"sum\\".  Closes #1400 "}', metadata={'id': '0df31a00-44f7-11ed-9794-ebcc1227340f', 'date': '2022-10-5 18:45:40+-500', 'source': '/Users/avtharsewrathan/sideprojects2023/timescaleai/tsv-langchain/langchain/docs/docs/modules/ts_git_log.json', 'seq_num': 470, 'author_name': 'Fabrízio de Royes Mello', 'commit_hash': ' 3749953e9704e45df8f621607989ada0714ce28d', 'author_email': 'fabriziomello@gmail.com'})]
 ```
 
-## 5. Working with an existing TimescaleVector vectorstore
+## 5. 기존 TimescaleVector vectorstore와 작업하기
 
-In the examples above, we created a vectorstore from a collection of documents. However, often we want to work insert data into and query data from an existing vectorstore. Let's see how to initialize, add documents to, and query an existing collection of documents in a TimescaleVector vector store.
+위 예제들에서는 문서 컬렉션에서 vectorstore를 생성했습니다. 그러나 기존 vectorstore에 데이터를 삽입하고 쿼리해야 하는 경우가 자주 있습니다. TimescaleVector vector store에서 기존 문서 컬렉션을 초기화하고, 문서를 추가하고, 쿼리하는 방법을 살펴보겠습니다.
 
-To work with an existing Timescale Vector store, we need to know the name of the table we want to query (`COLLECTION_NAME`) and the URL of the cloud PostgreSQL database (`SERVICE_URL`).
+기존 Timescale Vector store로 작업하려면, 쿼리할 테이블의 이름(`COLLECTION_NAME`)과 클라우드 PostgreSQL 데이터베이스의 URL(`SERVICE_URL`)을 알아야 합니다.
 
 ```python
 # Initialize the existing
@@ -934,11 +934,11 @@ vectorstore = TimescaleVector(
 )
 ```
 
-To load new data into the table, we use the `add_document()` function. This function takes a list of documents and a list of metadata. The metadata must contain a unique id for each document.
+테이블에 새 데이터를 로드하려면 `add_document()` 함수를 사용합니다. 이 함수는 문서 목록과 메타데이터 목록을 받습니다. 메타데이터에는 각 문서에 대한 고유 id가 포함되어야 합니다.
 
-If you want your documents to be associated with the current date and time, you do not need to create a list of ids. A uuid will be automatically generated for each document.
+문서를 현재 날짜와 시간과 연관시키고 싶다면 id 목록을 생성할 필요가 없습니다. 문서마다 uuid가 자동으로 생성됩니다.
 
-If you want your documents to be associated with a past date and time, you can create a list of ids using the `uuid_from_time` function in the `timecale-vector` python library, as shown in Section 2 above. This function takes a datetime object and returns a uuid with the date and time encoded in the uuid.
+문서를 과거의 특정 날짜와 시간과 연관시키고 싶다면, 위 2절에서 보여준 것처럼 `timecale-vector` Python 라이브러리의 `uuid_from_time` 함수를 사용해 id 목록을 만들 수 있습니다. 이 함수는 datetime 객체를 받아 날짜와 시간이 인코딩된 uuid를 반환합니다.
 
 ```python
 # Add documents to a collection in TimescaleVector
@@ -972,9 +972,9 @@ docs_with_score[1]
  0.23607668446580354)
 ```
 
-### Deleting Data
+### 데이터 삭제
 
-You can delete data by uuid or by a filter on the metadata.
+uuid 또는 메타데이터 필터로 데이터를 삭제할 수 있습니다.
 
 ```python
 ids = vectorstore.add_documents([Document(page_content="Bar")])
@@ -986,7 +986,7 @@ vectorstore.delete(ids)
 True
 ```
 
-Deleting using metadata is especially useful if you want to periodically update information scraped from a particular source, or particular date or some other metadata attribute.
+메타데이터를 사용한 삭제는 특정 소스에서 주기적으로 스크래핑한 정보, 특정 날짜, 기타 메타데이터 속성에 기반해 정보를 주기적으로 갱신하고자 할 때 특히 유용합니다.
 
 ```python
 vectorstore.add_documents(
@@ -1012,9 +1012,9 @@ vectorstore.add_documents(
 ['c6367004-53d7-11ee-8cc3-de1e4b2a0118']
 ```
 
-### Overriding a vectorstore
+### vectorstore 덮어쓰기
 
-If you have an existing collection, you override it by doing `from_documents` and setting `pre_delete_collection` = True
+기존 collection이 있다면, `from_documents`를 수행하고 `pre_delete_collection` = True로 설정하여 덮어쓸 수 있습니다.
 
 ```python
 db = TimescaleVector.from_documents(

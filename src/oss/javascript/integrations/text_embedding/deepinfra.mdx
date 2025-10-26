@@ -2,14 +2,14 @@
 title: DeepInfra Embeddings
 ---
 
-The `DeepInfraEmbeddings` class utilizes the DeepInfra API to generate embeddings for given text inputs. This guide will walk you through the setup and usage of the `DeepInfraEmbeddings` class, helping you integrate it into your project seamlessly.
+`DeepInfraEmbeddings` 클래스는 DeepInfra API를 활용하여 주어진 텍스트 입력에 대한 embedding을 생성합니다. 이 가이드는 `DeepInfraEmbeddings` 클래스의 설정 및 사용 방법을 안내하여 프로젝트에 원활하게 통합할 수 있도록 도와줍니다.
 
 ## Installation
 
-Install the `@langchain/community` package as shown below:
+아래와 같이 `@langchain/community` 패키지를 설치하세요:
 
 <Tip>
-See [this section for general instructions on installing LangChain packages](/oss/langchain/install).
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
 </Tip>
 
 ```bash npm
@@ -17,15 +17,15 @@ npm i @langchain/community @langchain/core
 ```
 ## Initialization
 
-With this integration, you can use the DeepInfra embeddings model to get embeddings for your text data. Here is the [link](https://deepinfra.com/models/embeddings) to the embeddings models.
+이 통합을 통해 DeepInfra embeddings 모델을 사용하여 텍스트 데이터에 대한 embedding을 얻을 수 있습니다. embeddings 모델에 대한 [링크](https://deepinfra.com/models/embeddings)는 여기에 있습니다.
 
-First, you need to sign up on the DeepInfra website and get the API token from [here](https://deepinfra.com/dash/api_keys). You can copy names from the model cards and start using them in your code.
+먼저 DeepInfra 웹사이트에 가입하고 [여기](https://deepinfra.com/dash/api_keys)에서 API 토큰을 받아야 합니다. 모델 카드에서 이름을 복사하여 코드에서 바로 사용할 수 있습니다.
 
-To use the `DeepInfraEmbeddings` class, you need an API token from DeepInfra. You can pass this token directly to the constructor or set it as an environment variable (`DEEPINFRA_API_TOKEN`).
+`DeepInfraEmbeddings` 클래스를 사용하려면 DeepInfra의 API 토큰이 필요합니다. 이 토큰을 생성자에 직접 전달하거나 환경 변수(`DEEPINFRA_API_TOKEN`)로 설정할 수 있습니다.
 
 ### Basic Usage
 
-Here’s how to create an instance of `DeepInfraEmbeddings`:
+다음은 `DeepInfraEmbeddings` 인스턴스를 생성하는 방법입니다:
 
 ```typescript
 import { DeepInfraEmbeddings } from "@langchain/community/embeddings/deepinfra";
@@ -36,13 +36,13 @@ const embeddings = new DeepInfraEmbeddings({
   batchSize: 1024, // Optional, defaults to 1024
 });
 ```
-If the `apiToken` is not provided, it will be read from the `DEEPINFRA_API_TOKEN` environment variable.
+`apiToken`이 제공되지 않으면 `DEEPINFRA_API_TOKEN` 환경 변수에서 읽어옵니다.
 
 ## Generating Embeddings
 
 ### Embedding a Single Query
 
-To generate embeddings for a single text query, use the `embedQuery` method:
+단일 텍스트 쿼리에 대한 embedding을 생성하려면 `embedQuery` 메서드를 사용하세요:
 
 ```typescript
 const embedding = await embeddings.embedQuery(
@@ -52,7 +52,7 @@ console.log(embedding);
 ```
 ### Embedding Multiple Documents
 
-To generate embeddings for multiple documents, use the `embedDocuments` method. This method will handle batching automatically based on the `batchSize` parameter:
+여러 문서에 대한 embedding을 생성하려면 `embedDocuments` 메서드를 사용하세요. 이 메서드는 `batchSize` 매개변수를 기반으로 자동으로 배치 처리를 수행합니다:
 
 ```typescript
 const documents = [
@@ -66,7 +66,7 @@ console.log(embeddingsArray);
 ```
 ## Customizing Requests
 
-You can customize the base URL the SDK sends requests to by passing a `configuration` parameter:
+`configuration` 매개변수를 전달하여 SDK가 요청을 보내는 base URL을 사용자 정의할 수 있습니다:
 
 ```typescript
 const customEmbeddings = new DeepInfraEmbeddings({
@@ -76,11 +76,11 @@ const customEmbeddings = new DeepInfraEmbeddings({
   },
 });
 ```
-This allows you to route requests through a custom endpoint if needed.
+이를 통해 필요한 경우 사용자 정의 endpoint를 통해 요청을 라우팅할 수 있습니다.
 
 ## Error Handling
 
-If the API token is not provided and cannot be found in the environment variables, an error will be thrown:
+API 토큰이 제공되지 않고 환경 변수에서도 찾을 수 없는 경우 오류가 발생합니다:
 
 ```typescript
 try {
@@ -91,7 +91,7 @@ try {
 ```
 ## Example
 
-Here’s a complete example of how to set up and use the `DeepInfraEmbeddings` class:
+다음은 `DeepInfraEmbeddings` 클래스를 설정하고 사용하는 전체 예제입니다:
 
 ```typescript
 import { DeepInfraEmbeddings } from "@langchain/community/embeddings/deepinfra";
@@ -116,9 +116,9 @@ runExample();
 
 ## Feedback and Support
 
-For feedback or questions, please contact [feedback@deepinfra.com](mailto:feedback@deepinfra.com).
+피드백이나 질문이 있으시면 [feedback@deepinfra.com](mailto:feedback@deepinfra.com)으로 문의하세요.
 
 ## Related
 
-- Embedding model [conceptual guide](/oss/integrations/text_embedding)
-- Embedding model [how-to guides](/oss/integrations/text_embedding)
+- Embedding model [개념 가이드](/oss/integrations/text_embedding)
+- Embedding model [사용 방법 가이드](/oss/integrations/text_embedding)

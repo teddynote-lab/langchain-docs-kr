@@ -1,15 +1,16 @@
+```markdown
 ---
 title: Jina AI
 ---
 
->[Jina AI](https://jina.ai/about-us) is a search AI company. `Jina` helps businesses and developers unlock multimodal data with a better search.
+>[Jina AI](https://jina.ai/about-us)는 검색 AI 회사입니다. `Jina`는 기업과 개발자가 더 나은 검색을 통해 멀티모달 데이터를 활용할 수 있도록 돕습니다.
 
 <Warning>
-For proper compatibility, please ensure you are using the `openai` SDK at version **0.x**.
+적절한 호환성을 위해 `openai` SDK 버전 **0.x**를 사용하고 있는지 확인하세요.
 </Warning>
 
 ## Installation and Setup
-- Get a Jina AI API token from [here](https://jina.ai/embeddings/) and set it as an environment variable (`JINA_API_TOKEN`)
+- [여기](https://jina.ai/embeddings/)에서 Jina AI API 토큰을 받아 환경 변수(`JINA_API_TOKEN`)로 설정하세요
 
 ## Chat Models
 
@@ -17,17 +18,17 @@ For proper compatibility, please ensure you are using the `openai` SDK at versio
 from langchain_community.chat_models import JinaChat
 ```
 
-See a [usage examples](/oss/integrations/chat/jinachat).
+[사용 예제](/oss/integrations/chat/jinachat)를 참조하세요.
 
 ## Embedding Models
 
-You can check the list of available models from [here](https://jina.ai/embeddings/)
+사용 가능한 모델 목록은 [여기](https://jina.ai/embeddings/)에서 확인할 수 있습니다
 
 ```python
 from langchain_community.embeddings import JinaEmbeddings
 ```
 
-See a [usage examples](/oss/integrations/text_embedding/jina).
+[사용 예제](/oss/integrations/text_embedding/jina)를 참조하세요.
 
 ## Document Transformers
 
@@ -37,4 +38,5 @@ See a [usage examples](/oss/integrations/text_embedding/jina).
 from langchain_community.document_compressors import JinaRerank
 ```
 
-See a [usage examples](/oss/integrations/document_transformers/jina_rerank).
+[사용 예제](/oss/integrations/document_transformers/jina_rerank)를 참조하세요.
+```

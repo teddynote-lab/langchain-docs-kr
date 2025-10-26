@@ -2,12 +2,12 @@
 title: Friendli AI
 ---
 
-> [FriendliAI](https://friendli.ai/) enhances AI application performance and optimizes
-> cost savings with scalable, efficient deployment options, tailored for high-demand AI workloads.
+> [FriendliAI](https://friendli.ai/)는 높은 수요의 AI 워크로드에 맞춤화된 확장 가능하고 효율적인 배포 옵션으로
+> AI 애플리케이션 성능을 향상시키고 비용 절감을 최적화합니다.
 
-## Installation and setup
+## 설치 및 설정
 
-Install the `friendli-client` python package.
+`friendli-client` python 패키지를 설치합니다.
 
 <CodeGroup>
 ```bash pip
@@ -19,13 +19,13 @@ uv add langchain_community friendli-client
 ```
 </CodeGroup>
 
-Sign in to [Friendli Suite](https://suite.friendli.ai/) to create a Personal Access Token,
-and set it as the `FRIENDLI_TOKEN` environment variable.
+[Friendli Suite](https://suite.friendli.ai/)에 로그인하여 Personal Access Token을 생성하고,
+이를 `FRIENDLI_TOKEN` 환경 변수로 설정합니다.
 
 
 ## Chat models
 
-See a [usage example](/oss/integrations/chat/friendli).
+[사용 예제](/oss/integrations/chat/friendli)를 참조하세요.
 
 ```python
 from langchain_community.chat_models.friendli import ChatFriendli
@@ -38,7 +38,7 @@ for m in chat.stream("Tell me fun things to do in NYC"):
 
 ## LLMs
 
-See a [usage example](/oss/integrations/llms/friendli).
+[사용 예제](/oss/integrations/llms/friendli)를 참조하세요.
 
 ```python
 from langchain_community.llms.friendli import Friendli

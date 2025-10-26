@@ -1,19 +1,19 @@
 ---
-title: How to add semantic search to your agent deployment
-sidebarTitle: Add semantic search to your agent deployment
+title: 에이전트 배포에 시맨틱 검색 추가하는 방법
+sidebarTitle: 에이전트 배포에 시맨틱 검색 추가하기
 ---
 
-This guide explains how to add semantic search to your deployment's cross-thread [store](/oss/langgraph/persistence#memory-store), so that your agent can search for memories and other documents by semantic similarity.
+이 가이드는 배포의 크로스 스레드 [store](/oss/langgraph/persistence#memory-store)에 시맨틱 검색을 추가하는 방법을 설명합니다. 이를 통해 에이전트가 시맨틱 유사도를 기반으로 메모리 및 기타 문서를 검색할 수 있습니다.
 
-## Prerequisites
+## 사전 요구 사항
 
-* A deployment (refer to [how to set up an application for deployment](/langsmith/setup-app-requirements-txt)) and details on [hosting options](/langsmith/hosting).
-* API keys for your embedding provider (in this case, OpenAI).
-* `langchain >= 0.3.8` (if you specify using the string format below).
+* 배포 환경 ([배포를 위한 애플리케이션 설정 방법](/langsmith/setup-app-requirements-txt) 참조) 및 [호스팅 옵션](/langsmith/hosting)에 대한 세부 정보
+* 임베딩 제공자의 API 키 (이 경우 OpenAI)
+* `langchain >= 0.3.8` (아래의 문자열 형식을 사용하는 경우)
 
-## Steps
+## 단계
 
-1. Update your `langgraph.json` configuration file to include the store configuration:
+1. `langgraph.json` 설정 파일을 업데이트하여 store 구성을 포함시킵니다:
 
 ```json
 {
@@ -28,13 +28,13 @@ This guide explains how to add semantic search to your deployment's cross-thread
 }
 ```
 
-This configuration:
+이 구성은:
 
-* Uses OpenAI's text-embedding-3-small model for generating embeddings
-* Sets the embedding dimension to 1536 (matching the model's output)
-* Indexes all fields in your stored data (`["$"]` means index everything, or specify specific fields like `["text", "metadata.title"]`)
+* 임베딩 생성을 위해 OpenAI의 text-embedding-3-small 모델을 사용합니다
+* 임베딩 차원을 1536으로 설정합니다 (모델의 출력과 일치)
+* 저장된 데이터의 모든 필드를 인덱싱합니다 (`["$"]`는 모든 것을 인덱싱한다는 의미이며, `["text", "metadata.title"]`과 같이 특정 필드를 지정할 수도 있습니다)
 
-1. To use the string embedding format above, make sure your dependencies include `langchain >= 0.3.8`:
+1. 위의 문자열 임베딩 형식을 사용하려면 종속성에 `langchain >= 0.3.8`이 포함되어 있는지 확인하세요:
 
 ```toml
 # In pyproject.toml
@@ -44,15 +44,15 @@ dependencies = [
 ]
 ```
 
-Or if using [requirements.txt](/langsmith/setup-app-requirements-txt):
+또는 [requirements.txt](/langsmith/setup-app-requirements-txt)를 사용하는 경우:
 
 ```
 langchain>=0.3.8
 ```
 
-## Usage
+## 사용법
 
-Once configured, you can use semantic search in your [nodes](/oss/langgraph/graph-api#nodes). The store requires a namespace tuple to organize memories:
+구성이 완료되면 [nodes](/oss/langgraph/graph-api#nodes)에서 시맨틱 검색을 사용할 수 있습니다. store는 메모리를 구성하기 위해 namespace tuple이 필요합니다:
 
 ```python
 def search_memory(state: State, *, store: BaseStore):
@@ -67,9 +67,9 @@ def search_memory(state: State, *, store: BaseStore):
     return results
 ```
 
-## Custom Embeddings
+## 커스텀 임베딩
 
-If you want to use custom embeddings, you can pass a path to a custom embedding function:
+커스텀 임베딩을 사용하려면 커스텀 임베딩 함수의 경로를 전달할 수 있습니다:
 
 ```json
 {
@@ -84,7 +84,7 @@ If you want to use custom embeddings, you can pass a path to a custom embedding 
 }
 ```
 
-The deployment will look for the function in the specified path. The function must be async and accept a list of strings:
+배포는 지정된 경로에서 함수를 찾습니다. 함수는 async여야 하며 문자열 리스트를 받아야 합니다:
 
 ```python
 # path/to/embedding_function.py
@@ -105,9 +105,9 @@ async def aembed_texts(texts: list[str]) -> list[list[float]]:
     return [e.embedding for e in response.data]
 ```
 
-## Querying via the API
+## API를 통한 쿼리
 
-You can also query the store using the LangGraph SDK. Since the SDK uses async operations:
+LangGraph SDK를 사용하여 store를 쿼리할 수도 있습니다. SDK는 async 작업을 사용하므로:
 
 ```python
 from langgraph_sdk import get_client

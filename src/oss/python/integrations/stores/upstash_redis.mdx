@@ -2,13 +2,13 @@
 title: UpstashRedisByteStore
 ---
 
-This will help you get started with Upstash redis [key-value stores](/oss/integrations/stores). For detailed documentation of all `UpstashRedisByteStore` features and configurations head to the [API reference](https://python.langchain.com/api_reference/community/storage/langchain_community.storage.upstash_redis.UpstashRedisByteStore.html).
+이 문서는 Upstash redis [key-value stores](/oss/integrations/stores) 시작하기를 도와드립니다. 모든 `UpstashRedisByteStore` 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/storage/langchain_community.storage.upstash_redis.UpstashRedisByteStore.html)를 참조하세요.
 
 ## Overview
 
-The `UpstashRedisStore` is an implementation of `ByteStore` that stores everything in your [Upstash](https://upstash.com/)-hosted Redis instance.
+`UpstashRedisStore`는 [Upstash](https://upstash.com/)에서 호스팅하는 Redis 인스턴스에 모든 것을 저장하는 `ByteStore`의 구현입니다.
 
-To use the base `RedisStore` instead, see [this guide](/oss/integrations/stores/redis/).
+대신 기본 `RedisStore`를 사용하려면 [이 가이드](/oss/integrations/stores/redis/)를 참조하세요.
 
 ### Integration details
 
@@ -18,11 +18,11 @@ To use the base `RedisStore` instead, see [this guide](/oss/integrations/stores/
 
 ## Setup
 
-You'll first need to [sign up for an Upstash account](https://upstash.com/docs/redis/overall/getstarted). Next, you'll need to create a Redis database to connect to.
+먼저 [Upstash 계정에 가입](https://upstash.com/docs/redis/overall/getstarted)해야 합니다. 다음으로 연결할 Redis 데이터베이스를 생성해야 합니다.
 
 ### Credentials
 
-Once you've created your database, get your database URL (don't forget the `https://`!) and token:
+데이터베이스를 생성한 후, 데이터베이스 URL(`https://`를 잊지 마세요!)과 token을 가져오세요:
 
 ```python
 from getpass import getpass
@@ -33,7 +33,7 @@ TOKEN = getpass("Enter your Upstash REST token")
 
 ### Installation
 
-The LangChain Upstash integration lives in the `langchain-community` package. You'll also need to install the `upstash-redis` package as a peer dependency:
+LangChain Upstash integration은 `langchain-community` 패키지에 포함되어 있습니다. peer dependency로 `upstash-redis` 패키지도 설치해야 합니다:
 
 ```python
 pip install -qU langchain-community upstash-redis
@@ -41,7 +41,7 @@ pip install -qU langchain-community upstash-redis
 
 ## Instantiation
 
-Now we can instantiate our byte store:
+이제 byte store를 인스턴스화할 수 있습니다:
 
 ```python
 from langchain_community.storage import UpstashRedisByteStore
@@ -53,7 +53,7 @@ kv_store = UpstashRedisByteStore(client=redis_client, ttl=None, namespace="test-
 
 ## Usage
 
-You can set data under keys like this using the `mset` method:
+`mset` 메서드를 사용하여 다음과 같이 key 아래에 데이터를 설정할 수 있습니다:
 
 ```python
 kv_store.mset(
@@ -75,7 +75,7 @@ kv_store.mget(
 [b'value1', b'value2']
 ```
 
-And you can delete data using the `mdelete` method:
+그리고 `mdelete` 메서드를 사용하여 데이터를 삭제할 수 있습니다:
 
 ```python
 kv_store.mdelete(
@@ -99,4 +99,4 @@ kv_store.mget(
 
 ## API reference
 
-For detailed documentation of all `UpstashRedisByteStore` features and configurations, head to the API reference: [python.langchain.com/api_reference/community/storage/langchain_community.storage.upstash_redis.UpstashRedisByteStore.html](https://python.langchain.com/api_reference/community/storage/langchain_community.storage.upstash_redis.UpstashRedisByteStore.html)
+모든 `UpstashRedisByteStore` 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/storage/langchain_community.storage.upstash_redis.UpstashRedisByteStore.html](https://python.langchain.com/api_reference/community/storage/langchain_community.storage.upstash_redis.UpstashRedisByteStore.html)

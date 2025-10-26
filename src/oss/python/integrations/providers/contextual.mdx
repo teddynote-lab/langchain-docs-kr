@@ -1,48 +1,49 @@
+```mdx
 ---
 title: Contextual AI
 ---
 
-Contextual AI provides state-of-the-art RAG components designed specifically for accurate and reliable enterprise AI applications. Our LangChain integration exposes standalone API endpoints for our specialized models:
+Contextual AI는 정확하고 신뢰할 수 있는 엔터프라이즈 AI 애플리케이션을 위해 특별히 설계된 최첨단 RAG 컴포넌트를 제공합니다. 우리의 LangChain 통합은 특화된 모델을 위한 독립형 API endpoint를 제공합니다:
 
-- Grounded Language Model (GLM): The world's most grounded language model, engineered to minimize hallucinations by prioritizing faithfulness to retrieved knowledge. GLM delivers exceptional factual accuracy with inline attributions, making it ideal for enterprise RAG and agentic applications where reliability is critical.
+- Grounded Language Model (GLM): 검색된 지식에 대한 충실성을 우선시하여 환각을 최소화하도록 설계된 세계에서 가장 근거 있는 언어 모델입니다. GLM은 인라인 출처 표시와 함께 뛰어난 사실 정확도를 제공하여, 신뢰성이 중요한 엔터프라이즈 RAG 및 에이전트 애플리케이션에 이상적입니다.
 
-- Instruction-Following Reranker: The first reranker that follows custom instructions to intelligently prioritize documents based on specific criteria like recency, source, or document type. Outperforming competitors on industry benchmarks, our reranker resolves conflicting information challenges in enterprise knowledge bases.
+- Instruction-Following Reranker: 최신성, 출처 또는 문서 유형과 같은 특정 기준에 따라 문서를 지능적으로 우선순위화하는 맞춤 지시사항을 따르는 최초의 reranker입니다. 업계 벤치마크에서 경쟁사를 능가하며, 우리의 reranker는 엔터프라이즈 지식 베이스에서 상충되는 정보 문제를 해결합니다.
 
-Founded by the inventors of RAG technology, Contextual AI's specialized components help innovative teams accelerate the development of production-ready RAG agents that deliver responses with exceptional accuracy.
+RAG 기술의 발명자들이 설립한 Contextual AI의 특화된 컴포넌트는 혁신적인 팀이 뛰어난 정확도로 응답을 제공하는 프로덕션 준비 RAG 에이전트 개발을 가속화하도록 돕습니다.
 
 ## Grounded Language Model (GLM)
 
-The Grounded Language Model (GLM) is engineered specifically to minimize hallucinations in enterprise RAG and agentic applications. The GLM delivers:
+Grounded Language Model (GLM)은 엔터프라이즈 RAG 및 에이전트 애플리케이션에서 환각을 최소화하도록 특별히 설계되었습니다. GLM은 다음을 제공합니다:
 
-- Strong performance with 88% factual accuracy on the FACTS benchmark ([See benchmark results](https://venturebeat.com/ai/contextual-ais-new-ai-model-crushes-gpt-4o-in-accuracy-heres-why-it-matters/))
-- Responses strictly grounded in provided knowledge sources with inline attributions ([Read product details](https://contextual.ai/blog/introducing-grounded-language-model/))
-- Precise source citations integrated directly within generated responses
-- Prioritization of retrieved context over parametric knowledge ([View technical overview](https://contextual.ai/blog/platform-benchmarks-2025/))
-- Clear acknowledgment of uncertainty when information is unavailable
+- FACTS 벤치마크에서 88%의 사실 정확도로 강력한 성능 ([벤치마크 결과 보기](https://venturebeat.com/ai/contextual-ais-new-ai-model-crushes-gpt-4o-in-accuracy-heres-why-it-matters/))
+- 인라인 출처 표시와 함께 제공된 지식 소스에 엄격하게 근거한 응답 ([제품 세부정보 읽기](https://contextual.ai/blog/introducing-grounded-language-model/))
+- 생성된 응답 내에 직접 통합된 정확한 출처 인용
+- 파라메트릭 지식보다 검색된 컨텍스트의 우선순위화 ([기술 개요 보기](https://contextual.ai/blog/platform-benchmarks-2025/))
+- 정보를 사용할 수 없을 때 불확실성에 대한 명확한 인정
 
-GLM serves as a drop-in replacement for general-purpose LLMs in RAG pipelines, dramatically improving reliability for mission-critical enterprise applications.
+GLM은 RAG 파이프라인에서 범용 LLM의 드롭인 대체품으로 사용되어, 미션 크리티컬 엔터프라이즈 애플리케이션의 신뢰성을 극적으로 향상시킵니다.
 
 ## Instruction-Following Reranker
 
-The world's first Instruction-Following Reranker revolutionizes document ranking with unprecedented control and accuracy. Key capabilities include:
+세계 최초의 Instruction-Following Reranker는 전례 없는 제어와 정확도로 문서 순위를 혁신합니다. 주요 기능은 다음과 같습니다:
 
-- Natural language instructions to prioritize documents based on recency, source, metadata, and more ([See how it works](https://contextual.ai/blog/introducing-instruction-following-reranker/))
-- Superior performance on the BEIR benchmark with a score of 61.2, outperforming competitors by significant margins ([View benchmark data](https://contextual.ai/blog/platform-benchmarks-2025/))
-- Intelligent resolution of conflicting information from multiple knowledge sources
-- Seamless integration as a drop-in replacement for existing rerankers
-- Dynamic control over document ranking through natural language commands
+- 최신성, 출처, 메타데이터 등을 기반으로 문서의 우선순위를 지정하는 자연어 지시사항 ([작동 방식 보기](https://contextual.ai/blog/introducing-instruction-following-reranker/))
+- BEIR 벤치마크에서 61.2점으로 경쟁사를 상당한 차이로 능가하는 우수한 성능 ([벤치마크 데이터 보기](https://contextual.ai/blog/platform-benchmarks-2025/))
+- 여러 지식 소스의 상충되는 정보를 지능적으로 해결
+- 기존 reranker의 드롭인 대체품으로 원활한 통합
+- 자연어 명령을 통한 문서 순위의 동적 제어
 
-The reranker excels at handling enterprise knowledge bases with potentially contradictory information, allowing you to specify exactly which sources should take precedence in various scenarios.
+이 reranker는 잠재적으로 모순되는 정보가 있는 엔터프라이즈 지식 베이스를 처리하는 데 탁월하며, 다양한 시나리오에서 어떤 소스가 우선되어야 하는지 정확하게 지정할 수 있습니다.
 
-## Using Contextual AI with LangChain
+## LangChain과 함께 Contextual AI 사용하기
 
-See details [here](/oss/integrations/chat/contextual).
+자세한 내용은 [여기](/oss/integrations/chat/contextual)를 참조하세요.
 
-This integration allows you to easily incorporate Contextual AI's GLM and Instruction-Following Reranker into your LangChain workflows. The GLM ensures your applications deliver strictly grounded responses, while the reranker significantly improves retrieval quality by intelligently prioritizing the most relevant documents.
+이 통합을 통해 Contextual AI의 GLM과 Instruction-Following Reranker를 LangChain 워크플로우에 쉽게 통합할 수 있습니다. GLM은 애플리케이션이 엄격하게 근거한 응답을 제공하도록 보장하며, reranker는 가장 관련성 높은 문서를 지능적으로 우선순위화하여 검색 품질을 크게 향상시킵니다.
 
-Whether you're building applications for regulated industries or security-conscious environments, Contextual AI provides the accuracy, control, and reliability your enterprise use cases demand.
+규제 산업이나 보안에 민감한 환경을 위한 애플리케이션을 구축하든, Contextual AI는 엔터프라이즈 사용 사례가 요구하는 정확성, 제어 및 신뢰성을 제공합니다.
 
-Get started with a free trial today and experience the most grounded language model and instruction-following reranker for enterprise AI applications.
+오늘 무료 평가판을 시작하고 엔터프라이즈 AI 애플리케이션을 위한 가장 근거 있는 언어 모델과 instruction-following reranker를 경험하세요.
 
 ### Grounded Language Model
 
@@ -150,4 +151,5 @@ reranked_documents = compressor.compress_documents(
     instruction=instruction,
     documents=documents,
 )
+```
 ```

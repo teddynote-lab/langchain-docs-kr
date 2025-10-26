@@ -2,12 +2,12 @@
 title: DashVector
 ---
 
-> [DashVector](https://help.aliyun.com/document_detail/2510225.html) is a fully-managed vectorDB service that supports high-dimension dense and sparse vectors, real-time insertion and filtered search. It is built to scale automatically and can adapt to different application requirements.
+> [DashVector](https://help.aliyun.com/document_detail/2510225.html)는 고차원 dense 및 sparse vector를 지원하고, 실시간 삽입 및 필터링된 검색을 지원하는 완전 관리형 vectorDB 서비스입니다. 자동으로 확장되도록 구축되었으며 다양한 애플리케이션 요구사항에 적응할 수 있습니다.
 
-This notebook shows how to use functionality related to the `DashVector` vector database.
+이 노트북은 `DashVector` vector database와 관련된 기능을 사용하는 방법을 보여줍니다.
 
-To use DashVector, you must have an API key.
-Here are the [installation instructions](https://help.aliyun.com/document_detail/2510223.html).
+DashVector를 사용하려면 API key가 필요합니다.
+[설치 지침](https://help.aliyun.com/document_detail/2510223.html)은 여기에서 확인하세요.
 
 ## Install
 
@@ -15,7 +15,7 @@ Here are the [installation instructions](https://help.aliyun.com/document_detail
 pip install -qU  langchain-community dashvector dashscope
 ```
 
-We want to use `DashScopeEmbeddings` so we also have to get the Dashscope API Key.
+`DashScopeEmbeddings`를 사용하려면 Dashscope API Key도 가져와야 합니다.
 
 ```python
 import getpass
@@ -46,7 +46,7 @@ docs = text_splitter.split_documents(documents)
 embeddings = DashScopeEmbeddings()
 ```
 
-We can create DashVector from documents.
+문서로부터 DashVector를 생성할 수 있습니다.
 
 ```python
 dashvector = DashVector.from_documents(docs, embeddings)
@@ -56,7 +56,7 @@ docs = dashvector.similarity_search(query)
 print(docs)
 ```
 
-We can add texts with meta datas and ids, and search with meta filter.
+메타데이터와 id를 포함한 텍스트를 추가하고, 메타 필터로 검색할 수 있습니다.
 
 ```python
 texts = ["foo", "bar", "baz"]
@@ -73,9 +73,9 @@ print(docs)
 [Document(page_content='baz', metadata={'key': 2})]
 ```
 
-### Operating band `partition` parameters
+### `partition` parameter 작동
 
-The `partition` parameter defaults to default, and if a non-existent `partition` parameter is passed in, the `partition` will be created automatically.
+`partition` parameter는 기본적으로 default로 설정되며, 존재하지 않는 `partition` parameter가 전달되면 `partition`이 자동으로 생성됩니다.
 
 ```python
 texts = ["foo", "bar", "baz"]
