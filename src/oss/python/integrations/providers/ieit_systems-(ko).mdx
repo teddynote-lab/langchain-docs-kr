@@ -1,0 +1,39 @@
+---
+title: IEIT Systems
+---
+
+>[IEIT Systems](https://en.ieisystem.com/)는 1999년에 설립된 중국의 정보 기술 회사입니다.
+> IT 인프라 제품, 솔루션 및 서비스를 제공하며, 클라우드 컴퓨팅,
+> 빅데이터 및 인공지능 분야의 혁신적인 IT 제품과 솔루션을 제공합니다.
+
+
+## LLMs
+
+[사용 예제](/oss/integrations/llms/yuan2)를 참조하세요.
+
+```python
+from langchain_community.llms.yuan2 import Yuan2
+```
+
+## Chat models
+
+[설치 지침](/oss/integrations/chat/yuan2/#setting-up-your-api-server)을 참조하세요.
+
+Yuan2.0은 OpenAI 호환 API를 제공하며, ChatYuan2는 `OpenAI client`를 사용하여 langchain에 통합되었습니다.
+따라서 `openai` 패키지가 설치되어 있는지 확인하세요.
+
+<CodeGroup>
+```bash pip
+pip install openai
+```
+
+```bash uv
+uv add openai
+```
+</CodeGroup>
+
+[사용 예제](/oss/integrations/chat/yuan2)를 참조하세요.
+
+```python
+from langchain_community.chat_models import ChatYuan2
+```

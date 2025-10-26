@@ -1,0 +1,31 @@
+---
+title: Diffbot
+---
+
+> [Diffbot](https://docs.diffbot.com/docs)은 웹 데이터를 쉽게 구조화하고 통합할 수 있도록 하는 ML 기반 제품 모음입니다.
+
+## Installation and Setup
+
+[무료 Diffbot API token을 받고](https://app.diffbot.com/get-started/) [다음 지침에 따라](https://docs.diffbot.com/reference/authentication) 요청을 인증하세요.
+
+## Document Loader
+
+Diffbot의 [Extract API](https://docs.diffbot.com/reference/extract-introduction)는 웹 페이지의 데이터를 구조화하고 정규화하는 서비스입니다.
+
+기존의 웹 스크래핑 도구와 달리, `Diffbot Extract`는 페이지의 콘텐츠를 읽기 위해 어떤 규칙도 필요하지 않습니다. 컴퓨터 비전 모델을 사용하여 페이지를 20가지 가능한 유형 중 하나로 분류한 다음, 원시 HTML 마크업을 JSON으로 변환합니다. 결과로 생성된 구조화된 JSON은 일관된 [타입 기반 온톨로지](https://docs.diffbot.com/docs/ontology)를 따르므로, 동일한 스키마로 여러 다른 웹 소스에서 데이터를 쉽게 추출할 수 있습니다.
+
+[사용 예제](/oss/integrations/document_loaders/diffbot)를 참조하세요.
+
+```python
+from langchain_community.document_loaders import DiffbotLoader
+```
+
+## Graphs
+
+Diffbot의 [Natural Language Processing API](https://www.diffbot.com/products/natural-language/)는 비구조화된 텍스트 데이터에서 엔티티, 관계 및 의미론적 의미를 추출할 수 있습니다.
+
+[사용 예제](/oss/integrations/graphs/diffbot)를 참조하세요.
+
+```python
+from langchain_experimental.graph_transformers.diffbot import DiffbotGraphTransformer
+```

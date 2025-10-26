@@ -1,0 +1,43 @@
+---
+title: 반복 실행으로 평가하는 방법
+sidebarTitle: 반복 실행으로 평가하기
+---
+
+여러 번의 반복 실행은 LLM 출력이 결정론적이지 않기 때문에 시스템 성능에 대한 보다 정확한 추정치를 제공할 수 있습니다. 출력은 반복 실행마다 달라질 수 있습니다. 반복 실행은 에이전트와 같이 높은 변동성을 보이는 시스템에서 노이즈를 줄이는 방법입니다.
+
+## 실험에서 반복 실행 구성하기
+
+`evaluate` / `aevaluate` 함수([Python](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate), [TypeScript](https://docs.smith.langchain.com/reference/js/interfaces/evaluation.EvaluateOptions#numrepetitions))에 선택적 `num_repetitions` 매개변수를 추가하여 데이터셋의 각 예제를 몇 번 평가할지 지정할 수 있습니다. 예를 들어, 데이터셋에 5개의 예제가 있고 `num_repetitions=5`로 설정하면 각 예제가 5번씩 실행되어 총 25번의 실행이 이루어집니다.
+
+<CodeGroup>
+
+```python Python
+from langsmith import evaluate
+
+results = evaluate(
+    lambda inputs: label_text(inputs["text"]),
+    data=dataset_name,
+    evaluators=[correct_label],
+    experiment_prefix="Toxic Queries",
+    num_repetitions=3,
+)
+```
+
+```typescript TypeScript
+import { evaluate } from "langsmith/evaluation";
+
+await evaluate((inputs) => labelText(inputs["input"]), {
+  data: datasetName,
+  evaluators: [correctLabel],
+  experimentPrefix: "Toxic Queries",
+  numRepetitions: 3,
+});
+```
+
+</CodeGroup>
+
+## 반복 실행으로 실행된 실험 결과 보기
+
+[반복 실행](/langsmith/evaluation-concepts#repetitions)으로 실험을 실행한 경우, 출력 결과 열에 화살표가 표시되어 테이블에서 출력을 볼 수 있습니다. 반복 실행의 각 실행을 보려면 출력 셀 위에 마우스를 올리고 확장 보기를 클릭하세요. 반복 실행으로 실험을 실행하면 LangSmith는 테이블에 각 피드백 점수의 평균을 표시합니다. 피드백 점수를 클릭하면 개별 실행의 피드백 점수를 보거나 반복 실행 간의 표준 편차를 확인할 수 있습니다.
+
+![Repetitions](/langsmith/images/repetitions.png)

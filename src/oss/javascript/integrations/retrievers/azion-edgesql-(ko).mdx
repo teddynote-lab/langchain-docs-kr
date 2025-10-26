@@ -1,0 +1,116 @@
+```markdown
+---
+title: AzionRetriever
+---
+
+## 개요
+
+이 문서는 [AzionRetriever](/oss/langchain/retrieval) 시작하기를 도와드립니다. 모든 AzionRetriever 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/_langchain_community.retrievers_azion_edgesql.AzionRetriever.html)를 참조하세요.
+
+### Integration 세부 정보
+
+| Retriever | Self-host | Cloud offering | Package | [Py support] |
+| :--- | :---: | :---: | :---: | :---: |
+[AzionRetriever](https://api.js.langchain.com/classes/_langchain_community.retrievers_azion_edgesql.AzionRetriever.html) | ❌ | ❌ | @langchain/community | ❌ |
+
+## 설정
+
+AzionRetriever를 사용하려면 AZION_TOKEN 환경 변수를 설정해야 합니다.
+
+```typescript
+process.env.AZION_TOKEN = "your-api-key"
+```
+
+이 가이드에서 OpenAI embeddings를 사용하는 경우 OpenAI key도 설정해야 합니다:
+
+```typescript
+process.env.OPENAI_API_KEY = "YOUR_API_KEY";
+```
+
+개별 쿼리에서 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
+
+```typescript
+// process.env.LANGSMITH_API_KEY = "<YOUR API KEY HERE>";
+// process.env.LANGSMITH_TRACING = "true";
+```
+
+### 설치
+
+이 retriever는 `@langchain/community/retrievers/azion_edgesql` package에 있습니다:
+
+<CodeGroup>
+```bash npm
+npm install azion @langchain/openai @langchain/community
+```
+```bash yarn
+yarn add azion @langchain/openai @langchain/community
+```
+```bash pnpm
+pnpm add azion @langchain/openai @langchain/community
+```
+</CodeGroup>
+
+## 인스턴스화
+
+이제 retriever를 인스턴스화할 수 있습니다:
+
+```typescript
+import { AzionRetriever } from "@langchain/community/retrievers/azion_edgesql";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { ChatOpenAI } from "@langchain/openai";
+
+const embeddingModel = new OpenAIEmbeddings({
+  model: "text-embedding-3-small"
+})
+
+const chatModel = new ChatOpenAI({
+  model: "gpt-4o-mini",
+  apiKey: process.env.OPENAI_API_KEY
+})
+
+const retriever = new AzionRetriever(embeddingModel,
+  {dbName:"langchain",
+   vectorTable:"documents", // table where the vector embeddings are stored
+   ftsTable:"documents_fts", // table where the fts index is stored
+   searchType:"hybrid", // search type to use for the retriever
+   ftsK:2, // number of results to return from the fts index
+   similarityK:2, // number of results to return from the vector index
+   metadataItems:["language","topic"],
+   filters: [{ operator: "=", column: "language", value: "en" }],
+   entityExtractor:chatModel
+
+}) // number of results to return from the vector index
+```
+
+## 사용법
+
+```typescript
+const query = "Australia"
+
+await retriever.invoke(query);
+```
+
+```output
+[
+  Document {
+    pageContent: 'Australia s indigenous people have inhabited the continent for over 65,000 years',
+    metadata: { language: 'en', topic: 'history', searchtype: 'similarity' },
+    id: '3'
+  },
+  Document {
+    pageContent: 'Australia is a leader in solar energy adoption and renewable technology',
+    metadata: { language: 'en', topic: 'technology', searchtype: 'similarity' },
+    id: '5'
+  },
+  Document {
+    pageContent: 'Australia s tech sector is rapidly growing with innovation hubs in major cities',
+    metadata: { language: 'en', topic: 'technology', searchtype: 'fts' },
+    id: '7'
+  }
+]
+```
+
+## API reference
+
+모든 AzionRetriever 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/_langchain_community.retrievers_azion_edgesql.AzionRetriever.html)를 참조하세요.
+```

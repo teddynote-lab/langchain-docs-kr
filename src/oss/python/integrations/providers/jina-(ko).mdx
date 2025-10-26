@@ -1,0 +1,42 @@
+```markdown
+---
+title: Jina AI
+---
+
+>[Jina AI](https://jina.ai/about-us)는 검색 AI 회사입니다. `Jina`는 기업과 개발자가 더 나은 검색을 통해 멀티모달 데이터를 활용할 수 있도록 돕습니다.
+
+<Warning>
+적절한 호환성을 위해 `openai` SDK 버전 **0.x**를 사용하고 있는지 확인하세요.
+</Warning>
+
+## Installation and Setup
+- [여기](https://jina.ai/embeddings/)에서 Jina AI API 토큰을 받아 환경 변수(`JINA_API_TOKEN`)로 설정하세요
+
+## Chat Models
+
+```python
+from langchain_community.chat_models import JinaChat
+```
+
+[사용 예제](/oss/integrations/chat/jinachat)를 참조하세요.
+
+## Embedding Models
+
+사용 가능한 모델 목록은 [여기](https://jina.ai/embeddings/)에서 확인할 수 있습니다
+
+```python
+from langchain_community.embeddings import JinaEmbeddings
+```
+
+[사용 예제](/oss/integrations/text_embedding/jina)를 참조하세요.
+
+## Document Transformers
+
+### Jina Rerank
+
+```python
+from langchain_community.document_compressors import JinaRerank
+```
+
+[사용 예제](/oss/integrations/document_transformers/jina_rerank)를 참조하세요.
+```

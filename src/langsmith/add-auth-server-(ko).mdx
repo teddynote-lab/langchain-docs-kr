@@ -1,0 +1,281 @@
+---
+title: 인증 제공자 연결하기
+sidebarTitle: 인증 제공자 연결하기
+---
+[이전 튜토리얼](/langsmith/resource-auth)에서는 사용자에게 비공개 대화를 제공하기 위해 리소스 권한 부여를 추가했습니다. 하지만 여전히 하드코딩된 토큰을 인증에 사용하고 있어 안전하지 않습니다. 이제 [OAuth2](/langsmith/deployment-quickstart)를 사용하여 실제 사용자 계정으로 해당 토큰을 교체하겠습니다.
+
+동일한 [`Auth`](/langsmith/langgraph-python-sdk#langgraph_sdk.auth.Auth) 객체와 [리소스 수준 접근 제어](/langsmith/auth#single-owner-resources)를 유지하되, Supabase를 identity provider로 사용하도록 인증을 업그레이드합니다. 이 튜토리얼에서는 Supabase를 사용하지만, 개념은 모든 OAuth2 제공자에 적용됩니다. 다음 내용을 배우게 됩니다:
+
+1. 테스트 토큰을 실제 JWT 토큰으로 교체하기
+2. 안전한 사용자 인증을 위해 OAuth2 제공자와 통합하기
+3. 기존 권한 부여 로직을 유지하면서 사용자 세션 및 메타데이터 처리하기
+
+## 배경
+
+OAuth2는 세 가지 주요 역할을 포함합니다:
+
+1. **Authorization server**: 사용자 인증을 처리하고 토큰을 발급하는 identity provider (예: Supabase, Auth0, Google)
+2. **Application backend**: LangGraph 애플리케이션. 토큰을 검증하고 보호된 리소스(대화 데이터)를 제공합니다
+3. **Client application**: 사용자가 서비스와 상호작용하는 웹 또는 모바일 앱
+
+표준 OAuth2 흐름은 다음과 같이 작동합니다:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Client
+    participant AuthServer
+    participant LangGraph Backend
+
+    User->>Client: Initiate login
+    User->>AuthServer: Enter credentials
+    AuthServer->>Client: Send tokens
+    Client->>LangGraph Backend: Request with token
+    LangGraph Backend->>AuthServer: Validate token
+    AuthServer->>LangGraph Backend: Token valid
+    LangGraph Backend->>Client: Serve request (e.g., run agent or graph)
+```
+
+## 사전 요구사항
+
+이 튜토리얼을 시작하기 전에 다음을 확인하세요:
+
+* [두 번째 튜토리얼의 봇](/langsmith/resource-auth)이 오류 없이 실행되고 있어야 합니다.
+* 인증 서버로 사용할 [Supabase 프로젝트](https://supabase.com/dashboard)가 필요합니다.
+
+## 1. 의존성 설치
+
+필요한 의존성을 설치합니다. `custom-auth` 디렉토리에서 시작하고 `langgraph-cli`가 설치되어 있는지 확인하세요:
+
+<CodeGroup>
+```bash pip
+cd custom-auth
+pip install -U "langgraph-cli[inmem]"
+```
+
+```bash uv
+cd custom-auth
+uv add langgraph-cli[inmem]
+```
+</CodeGroup>
+
+<a id="setup-auth-provider"></a>
+## 2. 인증 제공자 설정
+
+다음으로 인증 서버의 URL과 인증을 위한 private key를 가져옵니다.
+Supabase를 사용하고 있으므로 Supabase 대시보드에서 이 작업을 수행할 수 있습니다:
+
+1. 왼쪽 사이드바에서 ⚙️ "Project Settings"를 클릭한 다음 "API"를 클릭합니다
+2. 프로젝트 URL을 복사하여 `.env` 파일에 추가합니다
+  ```shell
+  echo "SUPABASE_URL=your-project-url" >> .env
+  ```
+3. service role secret key를 복사하여 `.env` 파일에 추가합니다:
+  ```shell
+  echo "SUPABASE_SERVICE_KEY=your-service-role-key" >> .env
+  ```
+4. "anon public" key를 복사하여 기록해 둡니다. 이는 나중에 클라이언트 코드를 설정할 때 사용됩니다.
+  ```bash
+  SUPABASE_URL=your-project-url
+  SUPABASE_SERVICE_KEY=your-service-role-key
+  ```
+
+## 3. 토큰 검증 구현
+
+이전 튜토리얼에서는 [`Auth`](/langsmith/langgraph-python-sdk#langgraph_sdk.auth.Auth) 객체를 사용하여 [하드코딩된 토큰을 검증](/langsmith/set-up-custom-auth)하고 [리소스 소유권을 추가](/langsmith/resource-auth)했습니다.
+
+이제 Supabase의 실제 JWT 토큰을 검증하도록 인증을 업그레이드합니다. 주요 변경 사항은 모두 [`@auth.authenticate`](/langsmith/langgraph-python-sdk#langgraph_sdk.auth.Auth.authenticate) 데코레이터가 적용된 함수에 있습니다:
+
+* 하드코딩된 토큰 목록을 확인하는 대신 Supabase에 HTTP 요청을 보내 토큰을 검증합니다.
+* 검증된 토큰에서 실제 사용자 정보(ID, 이메일)를 추출합니다.
+* 기존 리소스 권한 부여 로직은 변경되지 않습니다.
+
+이를 구현하기 위해 `src/security/auth.py`를 업데이트합니다:
+
+```python {highlight={8-9,20-30}} title="src/security/auth.py"
+import os
+import httpx
+from langgraph_sdk import Auth
+
+auth = Auth()
+
+# This is loaded from the `.env` file you created above
+SUPABASE_URL = os.environ["SUPABASE_URL"]
+SUPABASE_SERVICE_KEY = os.environ["SUPABASE_SERVICE_KEY"]
+
+
+@auth.authenticate
+async def get_current_user(authorization: str | None):
+    """Validate JWT tokens and extract user information."""
+    assert authorization
+    scheme, token = authorization.split()
+    assert scheme.lower() == "bearer"
+
+    try:
+        # Verify token with auth provider
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{SUPABASE_URL}/auth/v1/user",
+                headers={
+                    "Authorization": authorization,
+                    "apiKey": SUPABASE_SERVICE_KEY,
+                },
+            )
+            assert response.status_code == 200
+            user = response.json()
+            return {
+                "identity": user["id"],  # Unique user identifier
+                "email": user["email"],
+                "is_authenticated": True,
+            }
+    except Exception as e:
+        raise Auth.exceptions.HTTPException(status_code=401, detail=str(e))
+
+# ... the rest is the same as before
+
+# Keep our resource authorization from the previous tutorial
+@auth.on
+async def add_owner(ctx, value):
+    """Make resources private to their creator using resource metadata."""
+    filters = {"owner": ctx.user.identity}
+    metadata = value.setdefault("metadata", {})
+    metadata.update(filters)
+    return filters
+```
+
+가장 중요한 변경 사항은 이제 실제 인증 서버로 토큰을 검증한다는 것입니다. 인증 핸들러는 Supabase 프로젝트의 private key를 가지고 있으며, 이를 사용하여 사용자의 토큰을 검증하고 정보를 추출할 수 있습니다.
+
+## 4. 인증 흐름 테스트
+
+새로운 인증 흐름을 테스트해 봅시다. 파일이나 노트북에서 다음 코드를 실행할 수 있습니다. 다음을 제공해야 합니다:
+
+* 유효한 이메일 주소
+* Supabase 프로젝트 URL ([위](#setup-auth-provider)에서 가져옴)
+* Supabase anon **public key** ([위](#setup-auth-provider)에서 가져옴)
+
+```python
+import os
+import httpx
+from getpass import getpass
+from langgraph_sdk import get_client
+
+
+# Get email from command line
+email = getpass("Enter your email: ")
+base_email = email.split("@")
+password = "secure-password"  # CHANGEME
+email1 = f"{base_email[0]}+1@{base_email[1]}"
+email2 = f"{base_email[0]}+2@{base_email[1]}"
+
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+if not SUPABASE_URL:
+    SUPABASE_URL = getpass("Enter your Supabase project URL: ")
+
+# This is your PUBLIC anon key (which is safe to use client-side)
+# Do NOT mistake this for the secret service role key
+SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY")
+if not SUPABASE_ANON_KEY:
+    SUPABASE_ANON_KEY = getpass("Enter your public Supabase anon  key: ")
+
+
+async def sign_up(email: str, password: str):
+    """Create a new user account."""
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{SUPABASE_URL}/auth/v1/signup",
+            json={"email": email, "password": password},
+            headers={"apiKey": SUPABASE_ANON_KEY},
+        )
+        assert response.status_code == 200
+        return response.json()
+
+# Create two test users
+print(f"Creating test users: {email1} and {email2}")
+await sign_up(email1, password)
+await sign_up(email2, password)
+```
+
+⚠️ 계속하기 전에: 이메일을 확인하고 두 확인 링크를 모두 클릭하세요. Supabase는 사용자의 이메일을 확인한 후에만 `/login` 요청을 수락합니다.
+
+이제 사용자가 자신의 데이터만 볼 수 있는지 테스트합니다. 계속하기 전에 서버가 실행 중인지 확인하세요(`langgraph dev` 실행). 다음 스니펫은 [인증 제공자 설정](#setup-auth-provider) 중에 Supabase 대시보드에서 복사한 "anon public" key가 필요합니다.
+
+```python
+async def login(email: str, password: str):
+    """Get an access token for an existing user."""
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{SUPABASE_URL}/auth/v1/token?grant_type=password",
+            json={
+                "email": email,
+                "password": password
+            },
+            headers={
+                "apikey": SUPABASE_ANON_KEY,
+                "Content-Type": "application/json"
+            },
+        )
+        assert response.status_code == 200
+        return response.json()["access_token"]
+
+
+# Log in as user 1
+user1_token = await login(email1, password)
+user1_client = get_client(
+    url="http://localhost:2024", headers={"Authorization": f"Bearer {user1_token}"}
+)
+
+# Create a thread as user 1
+thread = await user1_client.threads.create()
+print(f"✅ User 1 created thread: {thread['thread_id']}")
+
+# Try to access without a token
+unauthenticated_client = get_client(url="http://localhost:2024")
+try:
+    await unauthenticated_client.threads.create()
+    print("❌ Unauthenticated access should fail!")
+except Exception as e:
+    print("✅ Unauthenticated access blocked:", e)
+
+# Try to access user 1's thread as user 2
+user2_token = await login(email2, password)
+user2_client = get_client(
+    url="http://localhost:2024", headers={"Authorization": f"Bearer {user2_token}"}
+)
+
+try:
+    await user2_client.threads.get(thread["thread_id"])
+    print("❌ User 2 shouldn't see User 1's thread!")
+except Exception as e:
+    print("✅ User 2 blocked from User 1's thread:", e)
+```
+
+출력은 다음과 같아야 합니다:
+
+```shell
+✅ User 1 created thread: d6af3754-95df-4176-aa10-dbd8dca40f1a
+✅ Unauthenticated access blocked: Client error '403 Forbidden' for url 'http://localhost:2024/threads'
+✅ User 2 blocked from User 1's thread: Client error '404 Not Found' for url 'http://localhost:2024/threads/d6af3754-95df-4176-aa10-dbd8dca40f1a'
+```
+
+인증과 권한 부여가 함께 작동하고 있습니다:
+
+1. 사용자는 봇에 액세스하려면 로그인해야 합니다
+2. 각 사용자는 자신의 thread만 볼 수 있습니다
+
+모든 사용자는 Supabase 인증 제공자에 의해 관리되므로 추가 사용자 관리 로직을 구현할 필요가 없습니다.
+
+## 다음 단계
+
+LangGraph 애플리케이션을 위한 프로덕션 준비 인증 시스템을 성공적으로 구축했습니다! 달성한 내용을 검토해 봅시다:
+
+1. 인증 제공자 설정 (이 경우 Supabase)
+2. 이메일/비밀번호 인증을 사용한 실제 사용자 계정 추가
+3. LangGraph 서버에 JWT 토큰 검증 통합
+4. 사용자가 자신의 데이터만 액세스할 수 있도록 적절한 권한 부여 구현
+5. 다음 인증 과제를 처리할 준비가 된 기반 구축 🚀
+
+이제 프로덕션 인증을 갖추었으므로 다음을 고려해 보세요:
+
+1. 선호하는 프레임워크로 웹 UI 구축 (예제는 [Custom Auth](https://github.com/langchain-ai/custom-auth) 템플릿 참조)
+2. [인증에 대한 개념 가이드](/langsmith/auth)에서 인증 및 권한 부여의 다른 측면에 대해 자세히 알아보기
+3. [참조 문서](/langsmith/langgraph-python-sdk#langgraph_sdk.auth.Auth)를 읽은 후 핸들러와 설정을 추가로 사용자 정의하기

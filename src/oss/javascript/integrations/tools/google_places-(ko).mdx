@@ -1,0 +1,49 @@
+---
+title: Google Places Tool
+---
+
+Google Places Tool은 agent가 Google Places API를 활용하여 Google Places에 등록된 위치에 대한 텍스트로부터 주소, 전화번호, 웹사이트 등을 찾을 수 있도록 합니다.
+
+## Setup
+
+[Google에서 API 키](https://developers.google.com/maps/documentation/places/web-service/overview)를 발급받고 [새로운 Places API를 활성화](https://console.cloud.google.com/apis/library/places.googleapis.com)해야 합니다. 그런 다음 API 키를 `process.env.GOOGLE_PLACES_API_KEY`로 설정하거나 `apiKey` constructor argument로 전달하세요.
+
+## Usage
+
+<Tip>
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install @langchain/openai @langchain/community @langchain/core
+```
+
+```typescript
+import { GooglePlacesAPI } from "@langchain/community/tools/google_places";
+import { OpenAI } from "@langchain/openai";
+import { initializeAgentExecutorWithOptions } from "@langchain/classic/agents";
+
+export async function run() {
+  const model = new OpenAI({
+    temperature: 0,
+  });
+
+  const tools = [new GooglePlacesAPI()];
+
+  const executor = await initializeAgentExecutorWithOptions(tools, model, {
+    agentType: "zero-shot-react-description",
+    verbose: true,
+  });
+
+  const res = await executor.invoke({
+    input: "Where is the University of Toronto - Scarborough? ",
+  });
+
+  console.log(res.output);
+}
+```
+
+## Related
+
+- Tool [개념 가이드](/oss/langchain/tools)
+- Tool [사용 방법 가이드](/oss/langchain/tools)

@@ -1,0 +1,67 @@
+```mdx
+---
+title: Serverless 환경에서 JS 함수 추적하기
+sidebarTitle: Serverless 환경에서 JS 함수 추적하기
+---
+
+<Note>
+이 섹션은 LangSmith JS SDK 버전 0.2.0 이상을 사용하는 경우에 해당합니다. Serverless 환경에서 LangChain.js 또는 LangGraph.js를 사용하여 추적하는 경우 [이 가이드](https://js.langchain.com/docs/how_to/callbacks_serverless)를 참조하세요.
+</Note>
+
+JavaScript 함수를 추적할 때, LangSmith는 지연 시간을 추가하지 않기 위해 기본적으로 백그라운드에서 실행을 추적합니다. 실행 컨텍스트가 갑자기 종료될 수 있는 serverless 환경에서는 함수가 완료되기 전에 모든 추적 데이터가 제대로 플러시되도록 하는 것이 중요합니다.
+
+이를 확실히 하기 위해 다음 중 하나를 수행할 수 있습니다:
+
+* `LANGSMITH_TRACING_BACKGROUND`라는 환경 변수를 `"false"`로 설정합니다. 이렇게 하면 추적된 함수가 반환되기 전에 추적이 완료될 때까지 대기합니다.
+  * LangSmith는 LangChain 없이도 사용할 수 있기 때문에 LangChain.js의 [환경 변수](https://js.langchain.com/docs/how_to/callbacks_serverless)와 이름이 다르게 지정되어 있습니다.
+* 추적된 실행에 커스텀 client를 전달하고 `client.awaitPendingTraceBatches();` 메서드를 `await`합니다.
+
+다음은 [`traceable`](/langsmith/annotate-code) 메서드와 함께 `awaitPendingTraceBatches`를 사용하는 예제입니다:
+
+```typescript
+import { Client } from "langsmith";
+import { traceable } from "langsmith/traceable";
+const langsmithClient = new Client({});
+const tracedFn = traceable(
+  async () => {
+    return "Some return value";
+  },
+  {
+    client: langsmithClient,
+  }
+);
+const res = await tracedFn();
+await langsmithClient.awaitPendingTraceBatches();
+```
+
+## 높은 동시성에서의 Rate limit[](#rate-limits-at-high-concurrency "Direct link to Rate limits at high concurrency")
+
+기본적으로 LangSmith client는 추적된 실행이 진행됨에 따라 작업을 배치 처리하여 몇 밀리초마다 새 배치를 전송합니다.
+
+이는 대부분의 상황에서 잘 작동하지만, 추적된 함수가 오래 실행되고 동시성이 매우 높은 경우 전체 요청 수와 관련된 rate limit에 도달할 수 있습니다.
+
+이와 관련된 rate limit 오류가 발생하는 경우 다음과 같이 client에서 `manualFlushMode: true`를 설정해 볼 수 있습니다:
+
+```typescript
+import { Client } from "langsmith";
+const langsmithClient = new Client({  manualFlushMode: true,});
+const myTracedFunc = traceable(
+  async () => {
+    // Your logic here...
+  },
+  { client: langsmithClient }
+);
+```
+
+그런 다음 serverless 함수가 종료되기 전에 다음과 같이 `client.flush()`를 수동으로 호출합니다:
+
+```typescript
+try {
+  await myTracedFunc();
+} finally {
+  await langsmithClient.flush();
+}
+```
+
+이렇게 하면 `.flush()`를 호출할 때까지 실행이 LangSmith UI에 나타나지 않습니다.
+```

@@ -1,0 +1,38 @@
+---
+title: OceanBase
+---
+
+[OceanBase Database](https://github.com/oceanbase/oceanbase)는 분산 관계형 데이터베이스입니다.
+Ant Group에서 전적으로 개발했습니다. OceanBase Database는 일반 서버 클러스터 위에 구축됩니다.
+Paxos 프로토콜과 분산 구조를 기반으로 OceanBase Database는 높은 가용성과 선형 확장성을 제공합니다.
+
+OceanBase는 현재 벡터 저장 기능을 갖추고 있습니다. 사용자는 SQL을 사용하여 다음 작업을 쉽게 수행할 수 있습니다:
+
+- 벡터 타입 필드를 포함하는 테이블 생성;
+- HNSW 알고리즘 기반 벡터 인덱스 테이블 생성;
+- 벡터 근사 최근접 이웃 쿼리 수행;
+- ...
+
+## Installation
+
+<CodeGroup>
+```bash pip
+pip install -U langchain-oceanbase
+```
+
+```bash uv
+uv add langchain-oceanbase
+```
+</CodeGroup>
+
+Docker를 사용하여 OceanBase를 배포하는 것을 권장합니다:
+
+```shell
+docker run --name=ob433 -e MODE=slim -p 2881:2881 -d oceanbase/oceanbase-ce:4.3.3.0-100000132024100711
+```
+
+[OceanBase 클러스터를 배포하는 더 많은 방법](https://github.com/oceanbase/oceanbase-doc/blob/V4.3.1/en-US/400.deploy/500.deploy-oceanbase-database-community-edition/100.deployment-overview.md)
+
+### Usage
+
+OceanBase Wrapper에 대한 더 자세한 안내는 [이 노트북](https://github.com/oceanbase/langchain-oceanbase/blob/main/docs/vectorstores.ipynb)을 참조하세요

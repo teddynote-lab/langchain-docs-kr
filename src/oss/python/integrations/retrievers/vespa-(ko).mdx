@@ -1,0 +1,51 @@
+---
+title: Vespa
+---
+
+>[Vespa](https://vespa.ai/)는 완전한 기능을 갖춘 검색 엔진이자 vector database입니다. 동일한 query에서 vector search (ANN), lexical search, 그리고 구조화된 데이터 검색을 모두 지원합니다.
+
+이 notebook은 `Vespa.ai`를 LangChain retriever로 사용하는 방법을 보여줍니다.
+
+retriever를 생성하기 위해 [pyvespa](https://pyvespa.readthedocs.io/en/latest/index.html)를 사용하여
+`Vespa` service에 대한 연결을 생성합니다.
+
+```python
+pip install -qU  pyvespa
+```
+
+```python
+from vespa.application import Vespa
+
+vespa_app = Vespa(url="https://doc-search.vespa.oath.cloud")
+```
+
+이것은 `Vespa` service에 대한 연결을 생성하며, 여기서는 Vespa documentation search service입니다.
+`pyvespa` package를 사용하여 [Vespa Cloud instance](https://pyvespa.readthedocs.io/en/latest/deploy-vespa-cloud.html)
+또는 로컬 [Docker instance](https://pyvespa.readthedocs.io/en/latest/deploy-docker.html)에도 연결할 수 있습니다.
+
+service에 연결한 후 retriever를 설정할 수 있습니다:
+
+```python
+from langchain_community.retrievers import VespaRetriever
+
+vespa_query_body = {
+    "yql": "select content from paragraph where userQuery()",
+    "hits": 5,
+    "ranking": "documentation",
+    "locale": "en-us",
+}
+vespa_content_field = "content"
+retriever = VespaRetriever(vespa_app, vespa_query_body, vespa_content_field)
+```
+
+이것은 Vespa application에서 document를 가져오는 LangChain retriever를 설정합니다.
+여기서는 `paragraph` document type의 `content` field에서 최대 5개의 결과를 가져오며,
+`doumentation`을 ranking method로 사용합니다. `userQuery()`는 LangChain에서 전달된 실제 query로 대체됩니다.
+
+자세한 내용은 [pyvespa documentation](https://pyvespa.readthedocs.io/en/latest/getting-started-pyvespa.html#Query)을 참조하세요.
+
+이제 결과를 반환하고 LangChain에서 결과를 계속 사용할 수 있습니다.
+
+```python
+retriever.invoke("what is vespa?")
+```

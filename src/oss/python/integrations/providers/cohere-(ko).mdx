@@ -1,0 +1,164 @@
+---
+title: Cohere
+---
+
+>[Cohere](https://cohere.ai/about)는 기업이 인간과 기계의 상호작용을 개선할 수 있도록 자연어 처리 모델을 제공하는 캐나다 스타트업입니다.
+
+## Installation and Setup
+- Python SDK 설치:
+<CodeGroup>
+```bash pip
+pip install langchain-cohere
+```
+
+```bash uv
+uv add langchain-cohere
+```
+</CodeGroup>
+
+[Cohere api key](https://dashboard.cohere.ai/)를 발급받아 환경 변수(`COHERE_API_KEY`)로 설정하세요.
+
+## Cohere langchain integrations
+
+|API|설명|Endpoint 문서|Import|사용 예시|
+|---|---|---|---|---|
+|Chat|챗봇 구축|[chat](https://docs.cohere.com/reference/chat)|`from langchain_cohere import ChatCohere`|[cohere.ipynb](/oss/integrations/chat/cohere)|
+|LLM|텍스트 생성|[generate](https://docs.cohere.com/reference/generate)|`from langchain_cohere.llms import Cohere`|[cohere.ipynb](/oss/integrations/llms/cohere)|
+|RAG Retriever|외부 데이터 소스 연결|[chat + rag](https://docs.cohere.com/reference/chat)|`from langchain.retrievers import CohereRagRetriever`|[cohere.ipynb](/oss/integrations/retrievers/cohere)|
+|Text Embedding|문자열을 벡터로 임베딩|[embed](https://docs.cohere.com/reference/embed)|`from langchain_cohere import CohereEmbeddings`|[cohere.ipynb](/oss/integrations/text_embedding/cohere)|
+|Rerank Retriever|관련성에 따라 문자열 순위 지정|[rerank](https://docs.cohere.com/reference/rerank)|`from langchain.retrievers.document_compressors import CohereRerank`|[cohere.ipynb](/oss/integrations/retrievers/cohere-reranker)|
+
+## Quick copy examples
+
+### Chat
+
+```python
+from langchain_cohere import ChatCohere
+from langchain.messages import HumanMessage
+chat = ChatCohere()
+messages = [HumanMessage(content="knock knock")]
+print(chat.invoke(messages))
+```
+
+Cohere [chat model](/oss/integrations/chat/cohere) 사용법
+
+### LLM
+
+
+```python
+from langchain_cohere.llms import Cohere
+
+llm = Cohere()
+print(llm.invoke("Come up with a pet name"))
+```
+
+Cohere (레거시) [LLM model](/oss/integrations/llms/cohere) 사용법
+
+### Tool calling
+```python
+from langchain_cohere import ChatCohere
+from langchain.messages import (
+    HumanMessage,
+    ToolMessage,
+)
+from langchain.tools import tool
+
+@tool
+def magic_function(number: int) -> int:
+    """Applies a magic operation to an integer
+
+    Args:
+        number: Number to have magic operation performed on
+    """
+    return number + 10
+
+def invoke_tools(tool_calls, messages):
+    for tool_call in tool_calls:
+        selected_tool = {"magic_function":magic_function}[
+            tool_call["name"].lower()
+        ]
+        tool_output = selected_tool.invoke(tool_call["args"])
+        messages.append(ToolMessage(tool_output, tool_call_id=tool_call["id"]))
+    return messages
+
+tools = [magic_function]
+
+llm = ChatCohere()
+llm_with_tools = llm.bind_tools(tools=tools)
+messages = [
+    HumanMessage(
+        content="What is the value of magic_function(2)?"
+    )
+]
+
+res = llm_with_tools.invoke(messages)
+while res.tool_calls:
+    messages.append(res)
+    messages = invoke_tools(res.tool_calls, messages)
+    res = llm_with_tools.invoke(messages)
+
+print(res.content)
+```
+Cohere LLM을 사용한 Tool calling은 위와 같이 필요한 tool을 llm에 바인딩하여 수행할 수 있습니다.
+다른 방법으로는 아래와 같이 ReAct agent를 사용하여 multi hop tool calling을 지원하는 것입니다.
+
+### ReAct Agent
+
+이 agent는 논문
+[ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)을 기반으로 합니다.
+
+```python
+from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_cohere import ChatCohere, create_cohere_react_agent
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.agents import AgentExecutor
+
+llm = ChatCohere()
+
+internet_search = TavilySearchResults(max_results=4)
+internet_search.name = "internet_search"
+internet_search.description = "Route a user query to the internet"
+
+prompt = ChatPromptTemplate.from_template("{input}")
+
+agent = create_cohere_react_agent(
+    llm,
+    [internet_search],
+    prompt
+)
+
+agent_executor = AgentExecutor(agent=agent, tools=[internet_search], verbose=True)
+
+agent_executor.invoke({
+    "input": "In what year was the company that was founded as Sound of Music added to the S&P 500?",
+})
+```
+ReAct agent는 여러 tool을 순차적으로 호출하는 데 사용할 수 있습니다.
+
+### RAG Retriever
+
+```python
+from langchain_cohere import ChatCohere
+from langchain.retrievers import CohereRagRetriever
+from langchain_core.documents import Document
+
+rag = CohereRagRetriever(llm=ChatCohere())
+print(rag.invoke("What is cohere ai?"))
+```
+
+Cohere [RAG Retriever](/oss/integrations/retrievers/cohere) 사용법
+
+### Text Embedding
+
+```python
+from langchain_cohere import CohereEmbeddings
+
+embeddings = CohereEmbeddings(model="embed-english-light-v3.0")
+print(embeddings.embed_documents(["This is a test document."]))
+```
+
+Cohere [Text Embeddings model](/oss/integrations/text_embedding/cohere) 사용법
+
+### Reranker
+
+Cohere [Reranker](/oss/integrations/retrievers/cohere-reranker) 사용법

@@ -1,0 +1,108 @@
+---
+title: "커스텀 프레임워크 구성"
+description: "커스텀 라이브러리를 위한 OpenSWE 구성 및 커스터마이징 방법"
+---
+
+Open SWE는 **LangGraph Engineer** 토글을 통해 LangGraph 개발 지원을 포함합니다. 이 기능은 LangGraph 에이전트 및 워크플로우 구축을 위한 프레임워크별 프롬프트와 MCP 도구를 추가합니다.
+
+유사한 접근 방식을 사용하여 자신만의 커스터마이징을 구축할 수 있습니다.
+
+## LangGraph Engineer 구성
+
+### UI에서 구성 설정하기
+
+메인 입력 영역에서 **LangGraph Engineer** 토글을 활성화하면 특정 LangGraph 프롬프트가 추가되고 LangGraph 문서 액세스가 허용됩니다.
+
+이는 다음 구성을 설정합니다:
+
+```typescript
+const config = {
+  configurable: {
+    customFramework: true
+  }
+}
+```
+
+## 커스텀 프레임워크 구성 작동 방식
+
+구성은 모든 에이전트 노드에 전달되며 특수 프롬프트를 조건부로 포함하는 데 사용됩니다:
+
+```typescript
+// In prompt formatting functions
+.replace(
+  "{CUSTOM_FRAMEWORK_PROMPT}",
+  shouldUseCustomFramework(config) ? CUSTOM_FRAMEWORK_PROMPT : "",
+)
+```
+
+`shouldUseCustomFramework(config)` 함수는 `config.configurable?.customFramework === true`인지 확인합니다.
+
+## 커스텀 프레임워크 파일
+
+`customFramework`가 `true`일 때, 에이전트에 일련의 커스텀 프롬프트와 도구를 주입합니다. 아래 표는 LangGraph가 아닌 다른 프레임워크를 위해 커스터마이징하는 경우 업데이트해야 하는 코드베이스의 모든 위치를 보여줍니다.
+
+### 프롬프트 파일
+
+| Component | File | Prompt Constant | Description |
+|-----------|------|-----------------|-------------|
+| Planner | [prompt.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/graphs/planner/nodes/generate-message/prompt.ts) | `EXTERNAL_FRAMEWORK_DOCUMENTATION_PROMPT` | 프레임워크 문서 액세스 지침 추가 |
+| Planner | [prompt.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/graphs/planner/nodes/generate-message/prompt.ts) | `EXTERNAL_FRAMEWORK_PLAN_PROMPT` | 프레임워크별 계획 요구사항 제공 |
+| Programmer | [prompt.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/graphs/programmer/nodes/generate-message/prompt.ts) | `CUSTOM_FRAMEWORK_PROMPT` | 포괄적인 프레임워크 구현 패턴 및 모범 사례 |
+| Reviewer | [prompt.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/graphs/reviewer/nodes/generate-review-actions/prompt.ts) | `CUSTOM_FRAMEWORK_PROMPT` | 프레임워크 검증 및 테스트 요구사항 |
+
+### Agent 및 UI 구성 파일
+
+| Component | File | Description |
+|-----------|------|-------------|
+| Toggle Button | [default-view.tsx](https://github.com/langchain-ai/open-swe/tree/main/apps/web/src/components/v2/default-view.tsx) | LangGraph Engineer 토글 버튼 포함 - 자신만의 버튼을 추가하거나 기존 버튼을 변경하려면 이 파일을 수정하세요 |
+| Framework Logic | [should-use-custom-framework.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/utils/should-use-custom-framework.ts) | 커스텀 프레임워크 기능을 활성화할 시기를 결정하는 로직 함수. 현재 UI 토글을 기반으로 한 boolean 값 |
+| Documentation | [constants.ts](https://github.com/langchain-ai/open-swe/tree/main/packages/shared/src/constants.ts) | 프레임워크 문서 액세스를 위한 MCP 서버 구성 |
+
+
+## 자신만의 프레임워크를 위한 커스터마이징
+
+자신만의 프레임워크를 위해 Open SWE를 적응시키려면 다음 단계를 따르세요:
+
+### 프롬프트 상수 수정
+
+1. 위 표의 **프롬프트 파일을 업데이트**하여 LangGraph 특정 콘텐츠를 교체하세요:
+   - `CUSTOM_FRAMEWORK_PROMPT`를 자신의 프레임워크 패턴으로 교체
+   - `EXTERNAL_FRAMEWORK_DOCUMENTATION_PROMPT`를 자신의 문서 액세스 지침으로 업데이트
+   - `EXTERNAL_FRAMEWORK_PLAN_PROMPT`를 자신의 계획 요구사항으로 수정
+
+### UI 구성 업데이트
+
+1. [`default-view.tsx`](https://github.com/langchain-ai/open-swe/tree/main/apps/web/src/components/v2/default-view.tsx)에서 **토글 버튼 수정**:
+   - 버튼 텍스트를 "LangGraph Engineer"에서 자신의 프레임워크 이름으로 변경
+   - 툴팁 텍스트 및 설명 업데이트
+
+2. **선택사항**: LangGraph 토글을 유지하면서 자신의 프레임워크를 위한 새 토글 버튼 생성
+
+### 프레임워크 로직 구성
+
+다음 중 하나를 선택할 수 있습니다:
+
+- **기존 `customFramework: true` 구성을 재사용**하고 프롬프트를 LangGraph 대신 자신의 프레임워크에 맞게 수정 (추가 코드 변경 불필요)
+- graph 구성에 새 필드를 추가하여 **별도의 config 변수 생성** (예: `yourFramework: true`) 및 [`should-use-custom-framework.ts`](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/utils/should-use-custom-framework.ts)와 유사한 감지 로직 추가
+
+### 문서 액세스 추가
+
+1. [`constants.ts`](https://github.com/langchain-ai/open-swe/tree/main/packages/shared/src/constants.ts)에서 **MCP 서버 구성**:
+   ```typescript
+   export const DEFAULT_MCP_SERVERS = {
+     "your-framework-docs-mcp": {
+       command: "uvx",
+       args: ["your-framework-docs-mcp"],
+     },
+   };
+   ```
+
+### 빌드 및 테스트
+
+1. **애플리케이션 재빌드**:
+   ```bash
+   cd apps/open-swe
+   yarn build
+   ```
+
+2. 토글을 활성화하고 프레임워크별 프롬프트가 사용되는지 확인하여 **커스터마이징 테스트**

@@ -1,0 +1,57 @@
+---
+title: AWS Lambda 통합 에이전트
+---
+
+전체 문서는 여기에서 확인하세요: https://docs.aws.amazon.com/lambda/index.html
+
+**AWS Lambda**는 Amazon Web Services(AWS)에서 제공하는 서버리스 컴퓨팅 서비스로, 개발자가 서버를 프로비저닝하거나 관리할 필요 없이 애플리케이션과 서비스를 구축하고 실행할 수 있도록 설계되었습니다. 이 서버리스 아키텍처를 통해 코드 작성 및 배포에 집중할 수 있으며, AWS가 애플리케이션 실행에 필요한 인프라의 확장, 패치 및 관리를 자동으로 처리합니다.
+
+Agent에 제공되는 tool 목록에 AWSLambda를 포함하면, Agent가 필요한 목적을 위해 AWS Cloud에서 실행되는 코드를 호출할 수 있는 기능을 부여할 수 있습니다.
+
+Agent가 AWSLambda tool을 사용할 때, `string` 타입의 argument를 제공하며, 이는 `event` parameter를 통해 Lambda function으로 전달됩니다.
+
+이 빠른 시작 가이드는 Agent가 [Amazon Simple Email Service](https://aws.amazon.com/ses/)를 통해 이메일을 보내기 위해 Lambda function을 사용하는 방법을 보여줍니다. 이메일을 보내는 Lambda 코드는 제공되지 않지만, 이를 수행하는 방법을 알고 싶다면 [여기](https://repost.aws/knowledge-center/lambda-send-email-ses)를 참조하세요. 이것은 의도적으로 간단한 예제라는 점을 명심하세요. Lambda는 거의 무한한 수의 다른 목적(더 많은 Langchain 실행 포함)을 위해 코드를 실행하는 데 사용될 수 있습니다!
+
+### 자격 증명에 대한 참고사항:
+
+- AWS CLI를 통해 [`aws configure`](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)를 실행하지 않은 경우, `region`, `accessKeyId`, `secretAccessKey`를 AWSLambda constructor에 제공해야 합니다.
+- 해당 자격 증명에 대응하는 IAM role은 Lambda function을 호출할 수 있는 권한이 있어야 합니다.
+
+<Tip>
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install @langchain/openai @langchain/core
+```
+```typescript
+import { OpenAI } from "@langchain/openai";
+import { SerpAPI } from "@langchain/classic/tools";
+import { AWSLambda } from "@langchain/classic/tools/aws_lambda";
+import { initializeAgentExecutorWithOptions } from "@langchain/classic/agents";
+
+const model = new OpenAI({ temperature: 0 });
+const emailSenderTool = new AWSLambda({
+  name: "email-sender",
+  // tell the Agent precisely what the tool does
+  description:
+    "Sends an email with the specified content to testing123@gmail.com",
+  region: "us-east-1", // optional: AWS region in which the function is deployed
+  accessKeyId: "abc123", // optional: access key id for a IAM user with invoke permissions
+  secretAccessKey: "xyz456", // optional: secret access key for that IAM user
+  functionName: "SendEmailViaSES", // the function name as seen in AWS Console
+});
+const tools = [emailSenderTool, new SerpAPI("api_key_goes_here")];
+const executor = await initializeAgentExecutorWithOptions(tools, model, {
+  agentType: "zero-shot-react-description",
+});
+
+const input = `Find out the capital of Croatia. Once you have it, email the answer to testing123@gmail.com.`;
+const result = await executor.invoke({ input });
+console.log(result);
+```
+
+## 관련 항목
+
+- Tool [개념 가이드](/oss/langchain/tools)
+- Tool [사용 방법 가이드](/oss/langchain/tools)

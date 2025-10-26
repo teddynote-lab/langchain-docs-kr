@@ -1,0 +1,95 @@
+---
+title: Generator 함수 추적하기
+sidebarTitle: Generator 함수 추적하기
+---
+
+대부분의 LLM 애플리케이션에서는 사용자가 첫 번째 토큰을 보기까지의 시간을 최소화하기 위해 출력을 스트리밍하고 싶을 것입니다.
+
+LangSmith의 추적 기능은 `generator` 함수를 통해 스트리밍된 출력을 기본적으로 지원합니다. 아래는 예제입니다.
+
+<CodeGroup>
+
+```python Python
+from langsmith import traceable
+@traceable
+def my_generator():
+  for chunk in ["Hello", "World", "!"]:
+      yield chunk
+# Stream to the user
+for output in my_generator():
+  print(output)
+# It also works with async functions
+import asyncio
+@traceable
+async def my_async_generator():
+  for chunk in ["Hello", "World", "!"]:
+      yield chunk
+# Stream to the user
+async def main():
+  async for output in my_async_generator():
+      print(output)
+asyncio.run(main())
+```
+
+```typescript TypeScript
+import { traceable } from "langsmith/traceable";
+const myGenerator = traceable(function* () {
+  for (const chunk of ["Hello", "World", "!"]) {
+      yield chunk;
+  }
+});
+for (const output of myGenerator()) {
+  console.log(output);
+}
+```
+
+</CodeGroup>
+
+## 결과 집계하기[](#aggregate-results "Direct link to Aggregate Results")
+
+기본적으로 추적된 함수의 `outputs`는 LangSmith에서 단일 배열로 집계됩니다. 저장 방식을 사용자 정의하려면(예: 출력을 단일 문자열로 연결), `aggregate` 옵션(python에서는 `reduce_fn`)을 사용할 수 있습니다. 이는 스트리밍된 LLM 출력을 집계하는 데 특히 유용합니다.
+
+<Note>
+출력 집계는 출력의 추적된 표현에**만** 영향을 미칩니다. 함수가 반환하는 값을 변경하지 않습니다.
+</Note>
+
+<CodeGroup>
+
+```python Python
+from langsmith import traceable
+def concatenate_strings(outputs: list):
+  return "".join(outputs)
+@traceable(reduce_fn=concatenate_strings)
+def my_generator():
+  for chunk in ["Hello", "World", "!"]:
+      yield chunk
+# Stream to the user
+for output in my_generator():
+  print(output)
+# It also works with async functions
+import asyncio
+@traceable(reduce_fn=concatenate_strings)
+async def my_async_generator():
+  for chunk in ["Hello", "World", "!"]:
+      yield chunk
+# Stream to the user
+async def main():
+  async for output in my_async_generator():
+      print(output)
+asyncio.run(main())
+```
+
+```typescript TypeScript
+import { traceable } from "langsmith/traceable";
+const concatenateStrings = (outputs: string[]) => outputs.join("");
+const myGenerator = traceable(function* () {
+  for (const chunk of ["Hello", "World", "!"]) {
+      yield chunk;
+  }
+}, { aggregator: concatenateStrings });
+for (const output of await myGenerator()) {
+  console.log(output);
+}
+```
+
+</CodeGroup>

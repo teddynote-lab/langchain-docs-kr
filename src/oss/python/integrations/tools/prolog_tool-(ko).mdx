@@ -1,0 +1,163 @@
+---
+title: Prolog
+---
+
+Prolog 규칙을 사용하여 답변을 생성하는 LangChain 도구입니다.
+
+## Overview
+
+PrologTool 클래스는 Prolog 규칙을 사용하여 답변을 생성하는 langchain 도구를 생성할 수 있게 해줍니다.
+
+## Setup
+
+family.pl 파일에 다음 Prolog 규칙을 사용해 보겠습니다:
+
+parent(john, bianca, mary).\
+parent(john, bianca, michael).\
+parent(peter, patricia, jennifer).\
+partner(X, Y) :- parent(X, Y, _).
+
+```python
+#!pip install langchain-prolog
+
+from langchain_prolog import PrologConfig, PrologRunnable, PrologTool
+
+TEST_SCRIPT = "family.pl"
+```
+
+## Instantiation
+
+먼저 Prolog 도구를 생성합니다:
+
+```python
+schema = PrologRunnable.create_schema("parent", ["men", "women", "child"])
+config = PrologConfig(
+    rules_file=TEST_SCRIPT,
+    query_schema=schema,
+)
+prolog_tool = PrologTool(
+    prolog_config=config,
+    name="family_query",
+    description="""
+        Query family relationships using Prolog.
+        parent(X, Y, Z) implies only that Z is a child of X and Y.
+        Input can be a query string like 'parent(john, X, Y)' or 'john, X, Y'"
+        You have to specify 3 parameters: men, woman, child. Do not use quotes.
+    """,
+)
+```
+
+## Invocation
+
+### LLM 및 function calling과 함께 Prolog 도구 사용하기
+
+```python
+#!pip install python-dotenv
+
+from dotenv import find_dotenv, load_dotenv
+
+load_dotenv(find_dotenv(), override=True)
+
+#!pip install langchain-openai
+
+from langchain.messages import HumanMessage
+from langchain_openai import ChatOpenAI
+```
+
+도구를 사용하려면 LLM 모델에 바인딩합니다:
+
+```python
+model = ChatOpenAI(model="gpt-4o-mini")
+model_with_tools = model.bind_tools([prolog_tool])
+```
+
+그런 다음 모델에 쿼리합니다:
+
+```python
+query = "Who are John's children?"
+messages = [HumanMessage(query)]
+response = model_with_tools.invoke(messages)
+```
+
+LLM은 tool call 요청으로 응답합니다:
+
+```python
+messages.append(response)
+response.tool_calls[0]
+```
+
+```output
+{'name': 'family_query',
+ 'args': {'men': 'john', 'women': None, 'child': None},
+ 'id': 'call_gH8rWamYXITrkfvRP2s5pkbF',
+ 'type': 'tool_call'}
+```
+
+도구는 이 요청을 받아 Prolog 데이터베이스에 쿼리합니다:
+
+```python
+tool_msg = prolog_tool.invoke(response.tool_calls[0])
+```
+
+도구는 쿼리에 대한 모든 솔루션이 포함된 리스트를 반환합니다:
+
+```python
+messages.append(tool_msg)
+tool_msg
+```
+
+```output
+ToolMessage(content='[{"Women": "bianca", "Child": "mary"}, {"Women": "bianca", "Child": "michael"}]', name='family_query', tool_call_id='call_gH8rWamYXITrkfvRP2s5pkbF')
+```
+
+그런 다음 이를 LLM에 전달하면, LLM은 도구 응답을 사용하여 원래 쿼리에 답변합니다:
+
+```python
+answer = model_with_tools.invoke(messages)
+print(answer.content)
+```
+
+```output
+John has two children: Mary and Michael, with Bianca as their mother.
+```
+
+## Chaining
+
+### agent와 함께 Prolog Tool 사용하기
+
+agent와 함께 prolog 도구를 사용하려면 agent의 constructor에 전달합니다:
+
+```python
+#!pip install langgraph
+
+from langchain.agents import create_agent
+
+
+agent_executor = create_agent(model, [prolog_tool])
+```
+
+agent는 쿼리를 받아 필요한 경우 Prolog 도구를 사용합니다:
+
+```python
+messages = agent_executor.invoke({"messages": [("human", query)]})
+```
+
+그런 다음 agent는 도구 응답을 받아 답변을 생성합니다:
+
+```python
+messages["messages"][-1].pretty_print()
+```
+
+```output
+================================== Ai Message ==================================
+
+John has two children: Mary and Michael, with Bianca as their mother.
+```
+
+## API reference
+
+자세한 내용은 [langchain-prolog.readthedocs.io/en/latest/modules.html](https://langchain-prolog.readthedocs.io/en/latest/modules.html)을 참조하세요.
+
+```python
+
+```

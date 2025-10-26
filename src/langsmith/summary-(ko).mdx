@@ -1,0 +1,164 @@
+---
+title: summary evaluator 정의하는 방법
+sidebarTitle: Summary evaluator
+---
+
+일부 메트릭은 실험의 개별 실행이 아닌 전체 실험 수준에서만 정의할 수 있습니다. 예를 들어, 데이터셋의 모든 예제에 걸쳐 평가 대상의 전체 통과율이나 f1 점수를 계산하고 싶을 수 있습니다. 이러한 것들을 summary evaluator라고 합니다.
+
+## 기본 예제
+
+여기서는 precision과 recall의 조합인 f1-score를 계산하겠습니다.
+
+이러한 종류의 메트릭은 실험의 모든 예제에 걸쳐서만 계산할 수 있으므로, evaluator는 outputs 목록과 reference_outputs 목록을 입력으로 받습니다.
+
+<CodeGroup>
+
+```python Python
+def f1_score_summary_evaluator(outputs: list[dict], reference_outputs: list[dict]) -> dict:
+    true_positives = 0
+    false_positives = 0
+    false_negatives = 0
+
+    for output_dict, reference_output_dict in zip(outputs, reference_outputs):
+        output = output_dict["class"]
+        reference_output = reference_output_dict["class"]
+
+        if output == "Toxic" and reference_output == "Toxic":
+            true_positives += 1
+        elif output == "Toxic" and reference_output == "Not toxic":
+            false_positives += 1
+        elif output == "Not toxic" and reference_output == "Toxic":
+            false_negatives += 1
+
+    if true_positives == 0:
+        return {"key": "f1_score", "score": 0.0}
+
+    precision = true_positives / (true_positives + false_positives)
+    recall = true_positives / (true_positives + false_negatives)
+    f1_score = 2 * (precision * recall) / (precision + recall)
+
+    return {"key": "f1_score", "score": f1_score}
+```
+
+```typescript TypeScript
+function f1ScoreSummaryEvaluator({ outputs, referenceOutputs }: {
+    outputs: Record<string, any>[],
+    referenceOutputs: Record<string, any>[]
+}) {
+    let truePositives = 0;
+    let falsePositives = 0;
+    let falseNegatives = 0;
+
+    for (let i = 0; i < outputs.length; i++) {
+        const output = outputs[i]["class"];
+        const referenceOutput = referenceOutputs[i]["class"];
+
+        if (output === "Toxic" && referenceOutput === "Toxic") {
+            truePositives += 1;
+        } else if (output === "Toxic" && referenceOutput === "Not toxic") {
+            falsePositives += 1;
+        } else if (output === "Not toxic" && referenceOutput === "Toxic") {
+            falseNegatives += 1;
+        }
+    }
+
+    if (truePositives === 0) {
+        return { key: "f1_score", score: 0.0 };
+    }
+
+    const precision = truePositives / (truePositives + falsePositives);
+    const recall = truePositives / (truePositives + falseNegatives);
+    const f1Score = 2 * (precision * recall) / (precision + recall);
+
+    return { key: "f1_score", score: f1Score };
+}
+```
+
+</CodeGroup>
+
+그런 다음 이 evaluator를 다음과 같이 `evaluate` 메서드에 전달할 수 있습니다:
+
+<CodeGroup>
+
+```python Python
+from langsmith import Client
+
+ls_client = Client()
+dataset = ls_client.clone_public_dataset(
+    "https://smith.langchain.com/public/3d6831e6-1680-4c88-94df-618c8e01fc55/d"
+)
+
+def bad_classifier(inputs: dict) -> dict:
+    return {"class": "Not toxic"}
+
+def correct(outputs: dict, reference_outputs: dict) -> bool:
+    """Row-level correctness evaluator."""
+    return outputs["class"] == reference_outputs["label"]
+
+results = ls_client.evaluate(
+    bad_classified,
+    data=dataset,
+    evaluators=[correct],
+    summary_evaluators=[pass_50],
+)
+```
+
+```typescript TypeScript
+import { Client } from "langsmith";
+import { evaluate } from "langsmith/evaluation";
+import type { EvaluationResult } from "langsmith/evaluation";
+
+const client = new Client();
+const datasetName = "Toxic queries";
+const dataset = await client.clonePublicDataset(
+    "https://smith.langchain.com/public/3d6831e6-1680-4c88-94df-618c8e01fc55/d",
+    { datasetName: datasetName }
+);
+
+function correct({ outputs, referenceOutputs }: {
+    outputs: Record<string, any>,
+    referenceOutputs?: Record<string, any>
+}): EvaluationResult {
+    const score = outputs["class"] === referenceOutputs?.["label"];
+    return { key: "correct", score };
+}
+
+function badClassifier(inputs: Record<string, any>): { class: string } {
+    return { class: "Not toxic" };
+}
+
+await evaluate(badClassifier, {
+    data: datasetName,
+    evaluators: [correct],
+    summaryEvaluators: [summaryEval],
+    experimentPrefix: "Toxic Queries",
+});
+```
+
+</CodeGroup>
+
+LangSmith UI에서 해당 키와 함께 summary evaluator의 점수가 표시됩니다.
+
+![summary_eval.png](/langsmith/images/summary-eval.png)
+
+## Summary evaluator 인자
+
+Summary evaluator 함수는 특정 인자 이름을 가져야 합니다. 다음 인자들의 하위 집합을 받을 수 있습니다:
+
+* `inputs: list[dict]`: 데이터셋의 단일 예제에 해당하는 입력 목록입니다.
+* `outputs: list[dict]`: 주어진 입력에 대해 각 실험이 생성한 dict 출력 목록입니다.
+* `reference_outputs/referenceOutputs: list[dict]`: 사용 가능한 경우, 예제와 연관된 참조 출력 목록입니다.
+* `runs: list[Run]`: 주어진 예제에 대해 두 실험이 생성한 전체 [Run](/langsmith/run-data-format) 객체 목록입니다. 각 실행의 중간 단계나 메타데이터에 접근해야 하는 경우 사용합니다.
+* `examples: list[Example]`: 예제 입력, 출력(사용 가능한 경우), 메타데이터(사용 가능한 경우)를 포함한 모든 데이터셋 [Example](/langsmith/example-data-format) 객체입니다.
+
+## Summary evaluator 출력
+
+Summary evaluator는 다음 타입 중 하나를 반환해야 합니다:
+
+Python과 JS/TS
+
+* `dict`: `{"score": ..., "name": ...}` 형태의 dict를 사용하면 숫자 또는 boolean 점수와 메트릭 이름을 전달할 수 있습니다.
+
+현재 Python만 지원
+
+* `int | float | bool`: 이것은 평균을 내거나 정렬할 수 있는 연속 메트릭으로 해석됩니다. 함수 이름이 메트릭의 이름으로 사용됩니다.

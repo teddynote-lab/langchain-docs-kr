@@ -1,0 +1,243 @@
+---
+title: "Tools 및 Toolkits"
+---
+
+[Tools](/oss/langchain/tools)는 모델이 호출하도록 설계된 유틸리티입니다. 이들의 입력은 모델이 생성하기 쉽도록, 출력은 모델에 다시 전달하기 쉽도록 설계되어 있습니다.
+
+Toolkit은 함께 사용하도록 설계된 tool의 모음입니다.
+
+## 검색
+
+다음 표는 온라인 검색을 다양한 방식으로 수행하는 tool을 보여줍니다:
+
+| Tool/Toolkit | 무료/유료 | 반환 데이터 |
+|-------------|-----------|-------------|
+| [Bing Search](/oss/integrations/tools/bing_search) | 유료 | URL, Snippet, Title |
+| [Brave Search](/oss/integrations/tools/brave_search) | 무료 | URL, Snippet, Title |
+| [DuckDuckgoSearch](/oss/integrations/tools/ddg) | 무료 | URL, Snippet, Title |
+| [Exa Search](/oss/integrations/tools/exa_search) | 월 1000회 무료 검색 | URL, Author, Title, Published Date |
+| [Google Search](/oss/integrations/tools/google_search) | 유료 | URL, Snippet, Title |
+| [Google Serper](/oss/integrations/tools/google_serper) | 무료 | URL, Snippet, Title, Search Rank, Site Links |
+| [Jina Search](/oss/integrations/tools/jina_search) | 1M Response Tokens 무료 | URL, Snippet, Title, Page Content |
+| [Mojeek Search](/oss/integrations/tools/mojeek_search) | 유료 | URL, Snippet, Title |
+| [SearchApi](/oss/integrations/tools/searchapi) | 가입 시 100회 무료 검색 | URL, Snippet, Title, Search Rank, Site Links, Authors |
+| [SearxNG Search](/oss/integrations/tools/searx_search) | 무료 | URL, Snippet, Title, Category |
+| [SerpAPI](/oss/integrations/tools/serpapi) | 월 100회 무료 검색 | Answer |
+| [Tavily Search](/oss/integrations/tools/tavily_search) | 월 1000회 무료 검색 | URL, Content, Title, Images, Answer |
+| [You.com Search](/oss/integrations/tools/you) | 60일간 무료 | URL, Title, Page Content |
+
+## Code Interpreter
+
+다음 표는 code interpreter로 사용할 수 있는 tool을 보여줍니다:
+
+| Tool/Toolkit | 지원 언어 | Sandbox 지속 시간 | 파일 업로드 지원 | 반환 타입 | Self-Hosting 지원 |
+|-------------|-------------------|-----------------|---------------------|--------------|-------------------|
+| [Azure Container Apps dynamic sessions](/oss/integrations/tools/azure_dynamic_sessions) | Python | 1 Hour | ✅ | Text, Images | ❌ |
+| [Bearly Code Interpreter](/oss/integrations/tools/bearly) | Python | 실행 시 초기화됨 | ✅ | Text | ❌ |
+| [Riza Code Interpreter](/oss/integrations/tools/riza) | Python, JavaScript, PHP, Ruby | 실행 시 초기화됨 | ✅ | Text | ✅ |
+
+## 생산성
+
+다음 표는 생산성 도구에서 작업을 자동화하는 데 사용할 수 있는 tool을 보여줍니다:
+
+| Tool/Toolkit | 가격 |
+|-------------|---------|
+| [Github Toolkit](/oss/integrations/tools/github) | 무료 |
+| [Gitlab Toolkit](/oss/integrations/tools/gitlab) | 개인 프로젝트 무료 |
+| [Gmail Toolkit](/oss/integrations/tools/gmail) | 무료, 사용자당 초당 250 quota units 제한 |
+| [Infobip Tool](/oss/integrations/tools/infobip) | 무료 체험, 이후 변동 가격 |
+| [Jira Toolkit](/oss/integrations/tools/jira) | 무료, [rate limits](https://developer.atlassian.com/cloud/jira/platform/rate-limiting/) 적용 |
+| [Office365 Toolkit](/oss/integrations/tools/office365) | Office365 포함 무료, [rate limits](https://learn.microsoft.com/en-us/graph/throttling-limits) 적용 |
+| [Slack Toolkit](/oss/integrations/tools/slack) | 무료 |
+| [Twilio Tool](/oss/integrations/tools/twilio) | 무료 체험, 이후 [pay-as-you-go pricing](https://www.twilio.com/en-us/pricing) |
+
+## 웹 브라우징
+
+다음 표는 웹 브라우저에서 작업을 자동화하는 데 사용할 수 있는 tool을 보여줍니다:
+
+| Tool/Toolkit | 가격 | 브라우저 상호작용 지원 |
+|-------------|---------|---------------------------------------|
+| [AgentQL Toolkit](/oss/integrations/tools/agentql) | 무료 체험, 이후 pay-as-you-go 및 정액제 플랜 | ✅ |
+| [Hyperbrowser Browser Agent Tools](/oss/integrations/tools/hyperbrowser_browser_agent_tools) | 무료 체험, 이후 정액제 플랜 및 선불 크레딧 | ✅ |
+| [Hyperbrowser Web Scraping Tools](/oss/integrations/tools/hyperbrowser_web_scraping_tools) | 무료 체험, 이후 정액제 플랜 및 선불 크레딧 | ❌ |
+| [MultiOn Toolkit](/oss/integrations/tools/multion) | 일 40회 무료 요청 | ✅ |
+| [Oxylabs Web Scraper API](/oss/integrations/tools/oxylabs) | 무료 체험, 이후 정액제 플랜 및 선불 크레딧 | ❌ |
+| [PlayWright Browser Toolkit](/oss/integrations/tools/playwright) | 무료 | ✅ |
+| [Requests Toolkit](/oss/integrations/tools/requests) | 무료 | ❌ |
+
+## 데이터베이스
+
+다음 표는 데이터베이스에서 작업을 자동화하는 데 사용할 수 있는 tool을 보여줍니다:
+
+| Tool/Toolkit | 허용 작업 |
+|-------------|-------------------|
+| [Cassandra Database Toolkit](/oss/integrations/tools/cassandra_database) | SELECT 및 schema introspection |
+| [MCP Toolbox](/oss/integrations/tools/toolbox) | Any SQL operation |
+| [SQLDatabase Toolkit](/oss/integrations/tools/sql_database) | Any SQL operation |
+| [Spark SQL Toolkit](/oss/integrations/tools/spark_sql) | Any SQL operation |
+
+## 금융
+
+다음 표는 결제, 구매 등 금융 트랜잭션을 수행할 수 있는 tool을 보여줍니다:
+
+| Tool/Toolkit | 가격 | 기능 |
+|-------------|---------|--------------|
+| [GOAT](/oss/integrations/tools/goat) | 무료 | 결제를 생성·수신하고, 실물 상품을 구매하고, 투자 등을 수행할 수 있습니다. |
+
+## 통합 플랫폼
+
+다음 플랫폼은 통합 인터페이스를 통해 여러 tool과 서비스에 접근할 수 있게 해줍니다:
+
+| Tool/Toolkit | 통합 수 | 가격 | 핵심 기능 |
+|-------------|----------------------|---------|--------------|
+| [Composio](/oss/integrations/tools/composio) | 500+ | 무료 등급 제공 | OAuth handling, event-driven workflows, multi-user support |
+
+## 모든 Tools 및 Toolkits
+
+<Columns cols={3}>
+<Card title="ADS4GPTs" icon="link" href="/oss/integrations/tools/ads4gpts" arrow="true" cta="가이드 보기" />
+<Card title="AgentQL" icon="link" href="/oss/integrations/tools/agentql" arrow="true" cta="가이드 보기" />
+<Card title="AINetwork Toolkit" icon="link" href="/oss/integrations/tools/ainetwork" arrow="true" cta="가이드 보기" />
+<Card title="Alpha Vantage" icon="link" href="/oss/integrations/tools/alpha_vantage" arrow="true" cta="가이드 보기" />
+<Card title="Amadeus Toolkit" icon="link" href="/oss/integrations/tools/amadeus" arrow="true" cta="가이드 보기" />
+<Card title="Anchor Browser" icon="link" href="/oss/integrations/tools/anchor_browser" arrow="true" cta="가이드 보기" />
+<Card title="Apify Actor" icon="link" href="/oss/integrations/tools/apify_actors" arrow="true" cta="가이드 보기" />
+<Card title="ArXiv" icon="link" href="/oss/integrations/tools/arxiv" arrow="true" cta="가이드 보기" />
+<Card title="AskNews" icon="link" href="/oss/integrations/tools/asknews" arrow="true" cta="가이드 보기" />
+<Card title="AWS Lambda" icon="link" href="/oss/integrations/tools/awslambda" arrow="true" cta="가이드 보기" />
+<Card title="Azure AI Services Toolkit" icon="link" href="/oss/integrations/tools/azure_ai_services" arrow="true" cta="가이드 보기" />
+<Card title="Azure Cognitive Services Toolkit" icon="link" href="/oss/integrations/tools/azure_cognitive_services" arrow="true" cta="가이드 보기" />
+<Card title="Azure Container Apps Dynamic Sessions" icon="link" href="/oss/integrations/tools/azure_dynamic_sessions" arrow="true" cta="가이드 보기" />
+<Card title="Shell (bash)" icon="link" href="/oss/integrations/tools/bash" arrow="true" cta="가이드 보기" />
+<Card title="Bearly Code Interpreter" icon="link" href="/oss/integrations/tools/bearly" arrow="true" cta="가이드 보기" />
+<Card title="Bing Search" icon="link" href="/oss/integrations/tools/bing_search" arrow="true" cta="가이드 보기" />
+<Card title="Bodo DataFrames" icon="link" href="/oss/integrations/tools/bodo" arrow="true" cta="가이드 보기" />
+<Card title="Brave Search" icon="link" href="/oss/integrations/tools/brave_search" arrow="true" cta="가이드 보기" />
+<Card title="BrightData Web Scraper API" icon="link" href="/oss/integrations/tools/brightdata-webscraperapi" arrow="true" cta="가이드 보기" />
+<Card title="BrightData SERP" icon="link" href="/oss/integrations/tools/brightdata_serp" arrow="true" cta="가이드 보기" />
+<Card title="BrightData Unlocker" icon="link" href="/oss/integrations/tools/brightdata_unlocker" arrow="true" cta="가이드 보기" />
+<Card title="Cassandra Database Toolkit" icon="link" href="/oss/integrations/tools/cassandra_database" arrow="true" cta="가이드 보기" />
+<Card title="CDP" icon="link" href="/oss/integrations/tools/cdp_agentkit" arrow="true" cta="가이드 보기" />
+<Card title="ChatGPT Plugins" icon="link" href="/oss/integrations/tools/chatgpt_plugins" arrow="true" cta="가이드 보기" />
+<Card title="ClickUp Toolkit" icon="link" href="/oss/integrations/tools/clickup" arrow="true" cta="가이드 보기" />
+<Card title="Cogniswitch Toolkit" icon="link" href="/oss/integrations/tools/cogniswitch" arrow="true" cta="가이드 보기" />
+<Card title="Compass DeFi Toolkit" icon="link" href="/oss/integrations/tools/compass" arrow="true" cta="가이드 보기" />
+<Card title="Composio" icon="link" href="/oss/integrations/tools/composio" arrow="true" cta="가이드 보기" />
+<Card title="Connery Toolkit" icon="link" href="/oss/integrations/tools/connery" arrow="true" cta="가이드 보기" />
+<Card title="Dall-E Image Generator" icon="link" href="/oss/integrations/tools/dalle_image_generator" arrow="true" cta="가이드 보기" />
+<Card title="Dappier" icon="link" href="/oss/integrations/tools/dappier" arrow="true" cta="가이드 보기" />
+<Card title="Databricks Unity Catalog" icon="link" href="/oss/integrations/tools/databricks" arrow="true" cta="가이드 보기" />
+<Card title="DataForSEO" icon="link" href="/oss/integrations/tools/dataforseo" arrow="true" cta="가이드 보기" />
+<Card title="Dataherald" icon="link" href="/oss/integrations/tools/dataherald" arrow="true" cta="가이드 보기" />
+<Card title="DuckDuckGo Search" icon="link" href="/oss/integrations/tools/ddg" arrow="true" cta="가이드 보기" />
+<Card title="Discord" icon="link" href="/oss/integrations/tools/discord" arrow="true" cta="가이드 보기" />
+<Card title="E2B Data Analysis" icon="link" href="/oss/integrations/tools/e2b_data_analysis" arrow="true" cta="가이드 보기" />
+<Card title="Eden AI" icon="link" href="/oss/integrations/tools/edenai_tools" arrow="true" cta="가이드 보기" />
+<Card title="ElevenLabs Text2Speech" icon="link" href="/oss/integrations/tools/eleven_labs_tts" arrow="true" cta="가이드 보기" />
+<Card title="Exa Search" icon="link" href="/oss/integrations/tools/exa_search" arrow="true" cta="가이드 보기" />
+<Card title="File System" icon="link" href="/oss/integrations/tools/filesystem" arrow="true" cta="가이드 보기" />
+<Card title="Financial Datasets Toolkit" icon="link" href="/oss/integrations/tools/financial_datasets" arrow="true" cta="가이드 보기" />
+<Card title="FMP Data" icon="link" href="/oss/integrations/tools/fmp-data" arrow="true" cta="가이드 보기" />
+<Card title="Github Toolkit" icon="link" href="/oss/integrations/tools/github" arrow="true" cta="가이드 보기" />
+<Card title="Gitlab Toolkit" icon="link" href="/oss/integrations/tools/gitlab" arrow="true" cta="가이드 보기" />
+<Card title="Gmail Toolkit" icon="link" href="/oss/integrations/tools/gmail" arrow="true" cta="가이드 보기" />
+<Card title="GOAT" icon="link" href="/oss/integrations/tools/goat" arrow="true" cta="가이드 보기" />
+<Card title="Golden Query" icon="link" href="/oss/integrations/tools/golden_query" arrow="true" cta="가이드 보기" />
+<Card title="Google Books" icon="link" href="/oss/integrations/tools/google_books" arrow="true" cta="가이드 보기" />
+<Card title="Google Calendar Toolkit" icon="link" href="/oss/integrations/tools/google_calendar" arrow="true" cta="가이드 보기" />
+<Card title="Google Cloud Text-to-Speech" icon="link" href="/oss/integrations/tools/google_cloud_texttospeech" arrow="true" cta="가이드 보기" />
+<Card title="Google Drive" icon="link" href="/oss/integrations/tools/google_drive" arrow="true" cta="가이드 보기" />
+<Card title="Google Finance" icon="link" href="/oss/integrations/tools/google_finance" arrow="true" cta="가이드 보기" />
+<Card title="Google Imagen" icon="link" href="/oss/integrations/tools/google_imagen" arrow="true" cta="가이드 보기" />
+<Card title="Google Jobs" icon="link" href="/oss/integrations/tools/google_jobs" arrow="true" cta="가이드 보기" />
+<Card title="Google Lens" icon="link" href="/oss/integrations/tools/google_lens" arrow="true" cta="가이드 보기" />
+<Card title="Google Places" icon="link" href="/oss/integrations/tools/google_places" arrow="true" cta="가이드 보기" />
+<Card title="Google Scholar" icon="link" href="/oss/integrations/tools/google_scholar" arrow="true" cta="가이드 보기" />
+<Card title="Google Search" icon="link" href="/oss/integrations/tools/google_search" arrow="true" cta="가이드 보기" />
+<Card title="Google Serper" icon="link" href="/oss/integrations/tools/google_serper" arrow="true" cta="가이드 보기" />
+<Card title="Google Trends" icon="link" href="/oss/integrations/tools/google_trends" arrow="true" cta="가이드 보기" />
+<Card title="Gradio" icon="link" href="/oss/integrations/tools/gradio_tools" arrow="true" cta="가이드 보기" />
+<Card title="GraphQL" icon="link" href="/oss/integrations/tools/graphql" arrow="true" cta="가이드 보기" />
+<Card title="HuggingFace Hub Tools" icon="link" href="/oss/integrations/tools/huggingface_tools" arrow="true" cta="가이드 보기" />
+<Card title="Human as a Tool" icon="link" href="/oss/integrations/tools/human_tools" arrow="true" cta="가이드 보기" />
+<Card title="Hyperbrowser Browser Agent Tools" icon="link" href="/oss/integrations/tools/hyperbrowser_browser_agent_tools" arrow="true" cta="가이드 보기" />
+<Card title="Hyperbrowser Web Scraping Tools" icon="link" href="/oss/integrations/tools/hyperbrowser_web_scraping_tools" arrow="true" cta="가이드 보기" />
+<Card title="IBM watsonx.ai" icon="link" href="/oss/integrations/tools/ibm_watsonx" arrow="true" cta="가이드 보기" />
+<Card title="IFTTT WebHooks" icon="link" href="/oss/integrations/tools/ifttt" arrow="true" cta="가이드 보기" />
+<Card title="Infobip" icon="link" href="/oss/integrations/tools/infobip" arrow="true" cta="가이드 보기" />
+<Card title="Ionic Shopping Tool" icon="link" href="/oss/integrations/tools/ionic_shopping" arrow="true" cta="가이드 보기" />
+<Card title="Jenkins" icon="link" href="/oss/integrations/tools/jenkins" arrow="true" cta="가이드 보기" />
+<Card title="Jina Search" icon="link" href="/oss/integrations/tools/jina_search" arrow="true" cta="가이드 보기" />
+<Card title="Jira Toolkit" icon="link" href="/oss/integrations/tools/jira" arrow="true" cta="가이드 보기" />
+<Card title="JSON Toolkit" icon="link" href="/oss/integrations/tools/json" arrow="true" cta="가이드 보기" />
+<Card title="Lemon Agent" icon="link" href="/oss/integrations/tools/lemonai" arrow="true" cta="가이드 보기" />
+<Card title="Linkup Search Tool" icon="link" href="/oss/integrations/tools/linkup_search" arrow="true" cta="가이드 보기" />
+<Card title="Memgraph" icon="link" href="/oss/integrations/tools/memgraph" arrow="true" cta="가이드 보기" />
+<Card title="Memorize" icon="link" href="/oss/integrations/tools/memorize" arrow="true" cta="가이드 보기" />
+<Card title="Mojeek Search" icon="link" href="/oss/integrations/tools/mojeek_search" arrow="true" cta="가이드 보기" />
+<Card title="MultiOn Toolkit" icon="link" href="/oss/integrations/tools/multion" arrow="true" cta="가이드 보기" />
+<Card title="NASA Toolkit" icon="link" href="/oss/integrations/tools/nasa" arrow="true" cta="가이드 보기" />
+<Card title="Naver Search" icon="link" href="/oss/integrations/tools/naver_search" arrow="true" cta="가이드 보기" />
+<Card title="Nuclia Understanding" icon="link" href="/oss/integrations/tools/nuclia" arrow="true" cta="가이드 보기" />
+<Card title="NVIDIA Riva" icon="link" href="/oss/integrations/tools/nvidia_riva" arrow="true" cta="가이드 보기" />
+<Card title="Office365 Toolkit" icon="link" href="/oss/integrations/tools/office365" arrow="true" cta="가이드 보기" />
+<Card title="OpenAPI Toolkit" icon="link" href="/oss/integrations/tools/openapi" arrow="true" cta="가이드 보기" />
+<Card title="Natural Language API Toolkits" icon="link" href="/oss/integrations/tools/openapi_nla" arrow="true" cta="가이드 보기" />
+<Card title="OpenGradient" icon="link" href="/oss/integrations/tools/opengradient_toolkit" arrow="true" cta="가이드 보기" />
+<Card title="OpenWeatherMap" icon="link" href="/oss/integrations/tools/openweathermap" arrow="true" cta="가이드 보기" />
+<Card title="Oracle AI Vector Search" icon="link" href="/oss/integrations/tools/oracleai" arrow="true" cta="가이드 보기" />
+<Card title="Oxylabs" icon="link" href="/oss/integrations/tools/oxylabs" arrow="true" cta="가이드 보기" />
+<Card title="Pandas Dataframe" icon="link" href="/oss/integrations/tools/pandas" arrow="true" cta="가이드 보기" />
+<Card title="Passio NutritionAI" icon="link" href="/oss/integrations/tools/passio_nutrition_ai" arrow="true" cta="가이드 보기" />
+<Card title="Permit" icon="link" href="/oss/integrations/tools/permit" arrow="true" cta="가이드 보기" />
+<Card title="PlayWright Browser Toolkit" icon="link" href="/oss/integrations/tools/playwright" arrow="true" cta="가이드 보기" />
+<Card title="Polygon IO Toolkit" icon="link" href="/oss/integrations/tools/polygon" arrow="true" cta="가이드 보기" />
+<Card title="PowerBI Toolkit" icon="link" href="/oss/integrations/tools/powerbi" arrow="true" cta="가이드 보기" />
+<Card title="Prolog" icon="link" href="/oss/integrations/tools/prolog_tool" arrow="true" cta="가이드 보기" />
+<Card title="PubMed" icon="link" href="/oss/integrations/tools/pubmed" arrow="true" cta="가이드 보기" />
+<Card title="Python REPL" icon="link" href="/oss/integrations/tools/python" arrow="true" cta="가이드 보기" />
+<Card title="Reddit Search" icon="link" href="/oss/integrations/tools/reddit_search" arrow="true" cta="가이드 보기" />
+<Card title="Requests Toolkit" icon="link" href="/oss/integrations/tools/requests" arrow="true" cta="가이드 보기" />
+<Card title="Riza Code Interpreter" icon="link" href="/oss/integrations/tools/riza" arrow="true" cta="가이드 보기" />
+<Card title="Robocorp Toolkit" icon="link" href="/oss/integrations/tools/robocorp" arrow="true" cta="가이드 보기" />
+<Card title="Salesforce" icon="link" href="/oss/integrations/tools/salesforce" arrow="true" cta="가이드 보기" />
+<Card title="SceneXplain" icon="link" href="/oss/integrations/tools/sceneXplain" arrow="true" cta="가이드 보기" />
+<Card title="ScrapeGraph" icon="link" href="/oss/integrations/tools/scrapegraph" arrow="true" cta="가이드 보기" />
+<Card title="Scrapeless Crawl" icon="link" href="/oss/integrations/tools/scrapeless_crawl" arrow="true" cta="가이드 보기" />
+<Card title="Scrapeless Scraping API" icon="link" href="/oss/integrations/tools/scrapeless_scraping_api" arrow="true" cta="가이드 보기" />
+<Card title="Scrapeless Universal Scraping" icon="link" href="/oss/integrations/tools/scrapeless_universal_scraping" arrow="true" cta="가이드 보기" />
+<Card title="SearchApi" icon="link" href="/oss/integrations/tools/searchapi" arrow="true" cta="가이드 보기" />
+<Card title="SearxNG Search" icon="link" href="/oss/integrations/tools/searx_search" arrow="true" cta="가이드 보기" />
+<Card title="Semantic Scholar API" icon="link" href="/oss/integrations/tools/semanticscholar" arrow="true" cta="가이드 보기" />
+<Card title="SerpAPI" icon="link" href="/oss/integrations/tools/serpapi" arrow="true" cta="가이드 보기" />
+<Card title="Slack Toolkit" icon="link" href="/oss/integrations/tools/slack" arrow="true" cta="가이드 보기" />
+<Card title="Spark SQL Toolkit" icon="link" href="/oss/integrations/tools/spark_sql" arrow="true" cta="가이드 보기" />
+<Card title="SQLDatabase Toolkit" icon="link" href="/oss/integrations/tools/sql_database" arrow="true" cta="가이드 보기" />
+<Card title="StackExchange" icon="link" href="/oss/integrations/tools/stackexchange" arrow="true" cta="가이드 보기" />
+<Card title="Steam Toolkit" icon="link" href="/oss/integrations/tools/steam" arrow="true" cta="가이드 보기" />
+<Card title="Stripe" icon="link" href="/oss/integrations/tools/stripe" arrow="true" cta="가이드 보기" />
+<Card title="Tableau" icon="link" href="/oss/integrations/tools/tableau" arrow="true" cta="가이드 보기" />
+<Card title="Taiga" icon="link" href="/oss/integrations/tools/taiga" arrow="true" cta="가이드 보기" />
+<Card title="Tavily Extract" icon="link" href="/oss/integrations/tools/tavily_extract" arrow="true" cta="가이드 보기" />
+<Card title="Tavily Search" icon="link" href="/oss/integrations/tools/tavily_search" arrow="true" cta="가이드 보기" />
+<Card title="Tilores" icon="link" href="/oss/integrations/tools/tilores" arrow="true" cta="가이드 보기" />
+<Card title="MCP Toolbox" icon="link" href="/oss/integrations/tools/toolbox" arrow="true" cta="가이드 보기" />
+<Card title="Twilio" icon="link" href="/oss/integrations/tools/twilio" arrow="true" cta="가이드 보기" />
+<Card title="Upstage" icon="link" href="/oss/integrations/tools/upstage_groundedness_check" arrow="true" cta="가이드 보기" />
+<Card title="Valthera" icon="link" href="/oss/integrations/tools/valthera" arrow="true" cta="가이드 보기" />
+<Card title="ValyuContext" icon="link" href="/oss/integrations/tools/valyu_search" arrow="true" cta="가이드 보기" />
+<Card title="Vectara" icon="link" href="/oss/integrations/tools/vectara" arrow="true" cta="가이드 보기" />
+<Card title="Wikidata" icon="link" href="/oss/integrations/tools/wikidata" arrow="true" cta="가이드 보기" />
+<Card title="Wikipedia" icon="link" href="/oss/integrations/tools/wikipedia" arrow="true" cta="가이드 보기" />
+<Card title="Wolfram Alpha" icon="link" href="/oss/integrations/tools/wolfram_alpha" arrow="true" cta="가이드 보기" />
+<Card title="WRITER Tools" icon="link" href="/oss/integrations/tools/writer" arrow="true" cta="가이드 보기" />
+<Card title="Yahoo Finance News" icon="link" href="/oss/integrations/tools/yahoo_finance_news" arrow="true" cta="가이드 보기" />
+<Card title="You.com Search" icon="link" href="/oss/integrations/tools/you" arrow="true" cta="가이드 보기" />
+<Card title="YouTube" icon="link" href="/oss/integrations/tools/youtube" arrow="true" cta="가이드 보기" />
+<Card title="Zapier Natural Language Actions" icon="link" href="/oss/integrations/tools/zapier" arrow="true" cta="가이드 보기" />
+<Card title="ZenGuard AI" icon="link" href="/oss/integrations/tools/zenguard" arrow="true" cta="가이드 보기" />
+</Columns>
+
+<Info>
+    통합을 기여하고 싶다면 [Contributing integrations](/oss/contributing#add-a-new-integration)를 참고하세요.
+</Info>

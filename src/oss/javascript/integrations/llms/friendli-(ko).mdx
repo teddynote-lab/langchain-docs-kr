@@ -1,0 +1,78 @@
+```markdown
+---
+title: Friendli
+---
+
+> [Friendli](https://friendli.ai/)는 높은 수요의 AI 워크로드에 맞춰진 확장 가능하고 효율적인 배포 옵션으로 AI 애플리케이션 성능을 향상시키고 비용 절감을 최적화합니다.
+
+이 튜토리얼은 `Friendli`를 LangChain과 통합하는 방법을 안내합니다.
+
+## Setup
+
+`@langchain/community`가 설치되어 있는지 확인하세요.
+
+<Tip>
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install @langchain/community @langchain/core
+```
+
+[Friendli Suite](https://suite.friendli.ai/)에 로그인하여 Personal Access Token을 생성하고, 이를 `FRIENDLI_TOKEN` 환경 변수로 설정하세요.
+team id를 `FRIENDLI_TEAM` 환경 변수로 설정할 수 있습니다.
+
+사용하려는 모델을 선택하여 Friendli chat model을 초기화할 수 있습니다. 기본 모델은 `mixtral-8x7b-instruct-v0-1`입니다. 사용 가능한 모델은 [docs.friendli.ai](https://docs.friendli.ai/guides/serverless_endpoints/pricing#text-generation-models)에서 확인할 수 있습니다.
+
+## Usage
+
+```typescript
+import { Friendli } from "@langchain/community/llms/friendli";
+
+const model = new Friendli({
+  model: "mixtral-8x7b-instruct-v0-1", // Default value
+  friendliToken: process.env.FRIENDLI_TOKEN,
+  friendliTeam: process.env.FRIENDLI_TEAM,
+  maxTokens: 18,
+  temperature: 0.75,
+  topP: 0.25,
+  frequencyPenalty: 0,
+  stop: [],
+});
+
+const response = await model.invoke(
+  "Check the Grammar: She dont like to eat vegetables, but she loves fruits."
+);
+
+console.log(response);
+
+/*
+Correct: She doesn't like to eat vegetables, but she loves fruits
+*/
+
+const stream = await model.stream(
+  "Check the Grammar: She dont like to eat vegetables, but she loves fruits."
+);
+
+for await (const chunk of stream) {
+  console.log(chunk);
+}
+
+/*
+Cor
+rect
+:
+ She
+ doesn
+...
+she
+ loves
+ fruits
+*/
+```
+
+## Related
+
+
+- [Models 가이드](/oss/langchain/models)
+```

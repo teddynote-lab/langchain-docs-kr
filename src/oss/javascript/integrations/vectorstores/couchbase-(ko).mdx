@@ -1,0 +1,421 @@
+---
+title: Couchbase
+---
+
+[Couchbase](http://couchbase.com/)는 수상 경력이 있는 분산 NoSQL 클라우드 데이터베이스로, 모든 클라우드, 모바일, AI 및 엣지 컴퓨팅 애플리케이션에 비할 데 없는 다양성, 성능, 확장성 및 경제적 가치를 제공합니다. Couchbase는 개발자를 위한 코딩 지원과 애플리케이션을 위한 vector search를 통해 AI를 수용합니다.
+
+Vector Search는 Couchbase의 [Full Text Search Service](https://docs.couchbase.com/server/current/learn/services-and-indexes/services/search-service.html) (Search Service)의 일부입니다.
+
+이 튜토리얼은 Couchbase에서 Vector Search를 사용하는 방법을 설명합니다. [Couchbase Capella](https://www.couchbase.com/products/capella/)와 자체 관리형 Couchbase Server 모두에서 작업할 수 있습니다.
+
+## Installation
+
+Couchbase vector store를 사용하려면 couchbase와 langchain community가 필요합니다. 이 튜토리얼에서는 OpenAI embeddings를 사용합니다.
+
+```bash npm
+npm install couchbase @langchain/openai @langchain/community @langchain/core
+```
+## Create Couchbase Connection Object
+
+먼저 Couchbase 클러스터에 대한 연결을 생성한 다음 cluster object를 Vector Store에 전달합니다. 여기서는 username과 password를 사용하여 연결합니다.
+클러스터에 연결하는 다른 지원되는 방법을 사용할 수도 있습니다.
+
+Couchbase 클러스터 연결에 대한 자세한 내용은 [Node SDK documentation](https://docs.couchbase.com/nodejs-sdk/current/hello-world/start-using-sdk.html#connect)을 확인하세요.
+
+```typescript
+import { Cluster } from "couchbase";
+
+const connectionString = "couchbase://localhost"; // or couchbases://localhost if you are using TLS
+const dbUsername = "Administrator"; // valid database user with read access to the bucket being queried
+const dbPassword = "Password"; // password for the database user
+
+const couchbaseClient = await Cluster.connect(connectionString, {
+  username: dbUsername,
+  password: dbPassword,
+  configProfile: "wanDevelopment",
+});
+```
+## Create the Search Index
+
+현재 Search index는 Couchbase Capella 또는 Server UI에서 생성하거나 REST interface를 사용하여 생성해야 합니다.
+
+이 예제에서는 UI의 Search Service에서 Import Index 기능을 사용하겠습니다.
+
+testing bucket에 `vector-index`라는 이름의 Search index를 정의하겠습니다.
+`testing` bucket의 `_default` scope의 `_default` collection에 index를 정의하며, vector field는 `embedding`으로 1536 차원으로 설정하고 text field는 `text`로 설정합니다.
+또한 문서의 `metadata` 아래의 모든 field를 dynamic mapping으로 indexing하고 저장하여 다양한 문서 구조를 처리합니다. similarity metric은 `dot_product`로 설정됩니다.
+
+### Full Text Search service에 Index를 Import하는 방법
+
+- [Couchbase Server](https://docs.couchbase.com/server/current/search/import-search-index.html)
+  - Search -> Add Index -> Import 클릭
+  - Import 화면에 다음 Index definition을 복사
+  - Create Index를 클릭하여 index 생성
+- [Couchbase Capella](https://docs.couchbase.com/cloud/search/import-search-index.html)
+  - 다음 index definition을 새 파일 `index.json`에 복사
+  - 문서의 지침에 따라 Capella에서 파일 import
+  - Create Index를 클릭하여 index 생성
+
+### Index Definition
+
+```json
+{
+  "name": "vector-index",
+  "type": "fulltext-index",
+  "params": {
+    "doc_config": {
+      "docid_prefix_delim": "",
+      "docid_regexp": "",
+      "mode": "type_field",
+      "type_field": "type"
+    },
+    "mapping": {
+      "default_analyzer": "standard",
+      "default_datetime_parser": "dateTimeOptional",
+      "default_field": "_all",
+      "default_mapping": {
+        "dynamic": true,
+        "enabled": true,
+        "properties": {
+          "metadata": {
+            "dynamic": true,
+            "enabled": true
+          },
+          "embedding": {
+            "enabled": true,
+            "dynamic": false,
+            "fields": [
+              {
+                "dims": 1536,
+                "index": true,
+                "name": "embedding",
+                "similarity": "dot_product",
+                "type": "vector",
+                "vector_index_optimized_for": "recall"
+              }
+            ]
+          },
+          "text": {
+            "enabled": true,
+            "dynamic": false,
+            "fields": [
+              {
+                "index": true,
+                "name": "text",
+                "store": true,
+                "type": "text"
+              }
+            ]
+          }
+        }
+      },
+      "default_type": "_default",
+      "docvalues_dynamic": false,
+      "index_dynamic": true,
+      "store_dynamic": true,
+      "type_field": "_type"
+    },
+    "store": {
+      "indexType": "scorch",
+      "segmentVersion": 16
+    }
+  },
+  "sourceType": "gocbcore",
+  "sourceName": "testing",
+  "sourceParams": {},
+  "planParams": {
+    "maxPartitionsPerPIndex": 103,
+    "indexPartitions": 10,
+    "numReplicas": 0
+  }
+}
+```
+Vector field를 지원하는 search index 생성 방법에 대한 자세한 내용은 다음 문서를 참조하세요:
+
+- [Couchbase Capella](https://docs.couchbase.com/cloud/search/create-search-indexes.html)
+- [Couchbase Server](https://docs.couchbase.com/server/current/search/create-search-indexes.html)
+
+이 vector store를 사용하려면 CouchbaseVectorStoreArgs를 구성해야 합니다.
+textKey와 embeddingKey는 선택적 field이며, 특정 key를 사용하려는 경우 필요합니다.
+
+```typescript
+const couchbaseConfig: CouchbaseVectorStoreArgs = {
+  cluster: couchbaseClient,
+  bucketName: "testing",
+  scopeName: "_default",
+  collectionName: "_default",
+  indexName: "vector-index",
+  textKey: "text",
+  embeddingKey: "embedding",
+};
+```
+## Create Vector Store
+
+클러스터 정보와 search index 이름으로 vector store object를 생성합니다.
+
+```typescript
+const store = await CouchbaseVectorStore.initialize(
+  embeddings, // embeddings object to create embeddings from text
+  couchbaseConfig
+);
+```
+## Basic Vector Search Example
+
+다음 예제는 couchbase vector search를 사용하고 similarity search를 수행하는 방법을 보여줍니다.
+이 예제에서는 TextLoader를 통해 "state_of_the_union.txt" 파일을 로드하고,
+텍스트를 overlap 없이 500자 chunk로 나누고 이 모든 chunk를 Couchbase에 indexing합니다.
+
+데이터가 indexing된 후, "What did president say about Ketanji Brown Jackson" 쿼리와 유사한 상위 4개의 chunk를 찾기 위해 간단한 쿼리를 수행합니다.
+마지막에는 similarity score를 얻는 방법도 보여줍니다.
+
+```ts
+import { OpenAIEmbeddings } from "@langchain/openai";
+import {
+  CouchbaseVectorStoreArgs,
+  CouchbaseVectorStore,
+} from "@langchain/community/vectorstores/couchbase";
+import { Cluster } from "couchbase";
+import { TextLoader } from "@langchain/classic/document_loaders/fs/text";
+import { CharacterTextSplitter } from "@langchain/textsplitters";
+
+const connectionString =
+  process.env.COUCHBASE_DB_CONN_STR ?? "couchbase://localhost";
+const databaseUsername = process.env.COUCHBASE_DB_USERNAME ?? "Administrator";
+const databasePassword = process.env.COUCHBASE_DB_PASSWORD ?? "Password";
+
+// Load documents from file
+const loader = new TextLoader("./state_of_the_union.txt");
+const rawDocuments = await loader.load();
+const splitter = new CharacterTextSplitter({
+  chunkSize: 500,
+  chunkOverlap: 0,
+});
+const docs = await splitter.splitDocuments(rawDocuments);
+
+const couchbaseClient = await Cluster.connect(connectionString, {
+  username: databaseUsername,
+  password: databasePassword,
+  configProfile: "wanDevelopment",
+});
+
+// Open AI API Key is required to use OpenAIEmbeddings, some other embeddings may also be used
+const embeddings = new OpenAIEmbeddings({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const couchbaseConfig: CouchbaseVectorStoreArgs = {
+  cluster: couchbaseClient,
+  bucketName: "testing",
+  scopeName: "_default",
+  collectionName: "_default",
+  indexName: "vector-index",
+  textKey: "text",
+  embeddingKey: "embedding",
+};
+
+const store = await CouchbaseVectorStore.fromDocuments(
+  docs,
+  embeddings,
+  couchbaseConfig
+);
+
+const query = "What did president say about Ketanji Brown Jackson";
+
+const resultsSimilaritySearch = await store.similaritySearch(query);
+console.log("resulting documents: ", resultsSimilaritySearch[0]);
+
+// Similarity Search With Score
+const resultsSimilaritySearchWithScore = await store.similaritySearchWithScore(
+  query,
+  1
+);
+console.log("resulting documents: ", resultsSimilaritySearchWithScore[0][0]);
+console.log("resulting scores: ", resultsSimilaritySearchWithScore[0][1]);
+
+const result = await store.similaritySearch(query, 1, {
+  fields: ["metadata.source"],
+});
+console.log(result[0]);
+```
+## Specifying Fields to Return
+
+검색 중 filter의 `fields` parameter를 사용하여 문서에서 반환할 field를 지정할 수 있습니다.
+이러한 field는 `metadata` object의 일부로 반환됩니다. index에 저장된 모든 field를 가져올 수 있습니다.
+문서의 `textKey`는 문서의 `pageContent`의 일부로 반환됩니다.
+
+가져올 field를 지정하지 않으면 index에 저장된 모든 field가 반환됩니다.
+
+metadata의 field 중 하나를 가져오려면 `.`을 사용하여 지정해야 합니다.
+예를 들어, metadata의 `source` field를 가져오려면 `metadata.source`를 사용해야 합니다.
+
+```typescript
+const result = await store.similaritySearch(query, 1, {
+  fields: ["metadata.source"],
+});
+console.log(result[0]);
+```
+## Hybrid Search
+
+Couchbase를 사용하면 vector search 결과를 `metadata` object와 같은 문서의 non-vector field에 대한 검색과 결합하여 hybrid search를 수행할 수 있습니다.
+
+결과는 vector search와 full text search service에서 지원하는 검색의 결과 조합을 기반으로 합니다.
+각 component search의 score가 합산되어 결과의 총 score가 됩니다.
+
+hybrid search를 수행하려면 모든 similarity search에 전달할 수 있는 `fields` parameter의 선택적 key인 `searchOptions`가 있습니다.
+`searchOptions`에 대한 다양한 search/query 가능성은 [여기](https://docs.couchbase.com/server/current/search/search-request-params.html#query-object)에서 찾을 수 있습니다.
+
+### Create Diverse Metadata for Hybrid Search
+
+hybrid search를 시뮬레이션하기 위해 기존 문서에서 일부 무작위 metadata를 생성하겠습니다.
+metadata에 세 개의 field를 균일하게 추가합니다: 2010년과 2020년 사이의 `date`, 1과 5 사이의 `rating`, John Doe 또는 Jane Doe로 설정된 `author`.
+또한 몇 가지 샘플 쿼리를 선언합니다.
+
+```typescript
+for (let i = 0; i < docs.length; i += 1) {
+  docs[i].metadata.date = `${2010 + (i % 10)}-01-01`;
+  docs[i].metadata.rating = 1 + (i % 5);
+  docs[i].metadata.author = ["John Doe", "Jane Doe"][i % 2];
+}
+
+const store = await CouchbaseVectorStore.fromDocuments(
+  docs,
+  embeddings,
+  couchbaseConfig
+);
+
+const query = "What did the president say about Ketanji Brown Jackson";
+const independenceQuery = "Any mention about independence?";
+```
+### Example: Search by Exact Value
+
+`metadata` object의 author와 같은 텍스트 field에서 정확히 일치하는 항목을 검색할 수 있습니다.
+
+```typescript
+const exactValueResult = await store.similaritySearch(query, 4, {
+  fields: ["metadata.author"],
+  searchOptions: {
+    query: { field: "metadata.author", match: "John Doe" },
+  },
+});
+console.log(exactValueResult[0]);
+```
+### Example: Search by Partial Match
+
+검색에 대한 fuzziness를 지정하여 부분 일치를 검색할 수 있습니다. 이는 검색 쿼리의 약간의 변형이나 철자 오류를 검색하려는 경우 유용합니다.
+
+여기서 "Johny"는 "John Doe"에 가깝습니다(fuzziness 1).
+
+```typescript
+const partialMatchResult = await store.similaritySearch(query, 4, {
+  fields: ["metadata.author"],
+  searchOptions: {
+    query: { field: "metadata.author", match: "Johny", fuzziness: 1 },
+  },
+});
+console.log(partialMatchResult[0]);
+```
+### Example: Search by Date Range Query
+
+`metadata.date`와 같은 date field에서 날짜 범위 쿼리 내에 있는 문서를 검색할 수 있습니다.
+
+```typescript
+const dateRangeResult = await store.similaritySearch(independenceQuery, 4, {
+  fields: ["metadata.date", "metadata.author"],
+  searchOptions: {
+    query: {
+      start: "2016-12-31",
+      end: "2017-01-02",
+      inclusiveStart: true,
+      inclusiveEnd: false,
+      field: "metadata.date",
+    },
+  },
+});
+console.log(dateRangeResult[0]);
+```
+### Example: Search by Numeric Range Query
+
+`metadata.rating`과 같은 numeric field에 대해 범위 내에 있는 문서를 검색할 수 있습니다.
+
+```typescript
+const ratingRangeResult = await store.similaritySearch(independenceQuery, 4, {
+  fields: ["metadata.rating"],
+  searchOptions: {
+    query: {
+      min: 3,
+      max: 5,
+      inclusiveMin: false,
+      inclusiveMax: true,
+      field: "metadata.rating",
+    },
+  },
+});
+console.log(ratingRangeResult[0]);
+```
+### Example: Combining Multiple Search Conditions
+
+AND (conjuncts) 또는 OR (disjuncts) operator를 사용하여 다양한 쿼리를 결합할 수 있습니다.
+
+이 예제에서는 rating이 3과 4 사이이고 날짜가 2015년과 2018년 사이인 문서를 확인합니다.
+
+```typescript
+const multipleConditionsResult = await store.similaritySearch(texts[0], 4, {
+  fields: ["metadata.rating", "metadata.date"],
+  searchOptions: {
+    query: {
+      conjuncts: [
+        { min: 3, max: 4, inclusive_max: true, field: "metadata.rating" },
+        { start: "2016-12-31", end: "2017-01-02", field: "metadata.date" },
+      ],
+    },
+  },
+});
+console.log(multipleConditionsResult[0]);
+```
+
+### Other Queries
+
+마찬가지로 `filter` parameter의 `searchOptions` Key에서 Geo Distance, Polygon Search, Wildcard, Regular Expressions 등과 같은 지원되는 Query method를 사용할 수 있습니다.
+사용 가능한 query method와 구문에 대한 자세한 내용은 문서를 참조하세요.
+
+- [Couchbase Capella](https://docs.couchbase.com/cloud/search/search-request-params.html#query-object)
+- [Couchbase Server](https://docs.couchbase.com/server/current/search/search-request-params.html#query-object)
+
+<br />
+<br />
+
+# Frequently Asked Questions
+
+## Question: CouchbaseVectorStore object를 생성하기 전에 Search index를 생성해야 하나요?
+
+예, 현재 `CouchbaseVectorStore` object를 생성하기 전에 Search index를 생성해야 합니다.
+
+## Question: 검색 결과에서 지정한 모든 field가 표시되지 않습니다.
+
+Couchbase에서는 Search index에 저장된 field만 반환할 수 있습니다. 검색 결과에서 액세스하려는 field가 Search index의 일부인지 확인하세요.
+
+이를 처리하는 한 가지 방법은 index에서 문서의 field를 동적으로 indexing하고 저장하는 것입니다.
+
+- Capella에서는 "Advanced Mode"로 이동한 다음 "General Settings" 펼침 메뉴에서 "[X] Store Dynamic Fields" 또는 "[X] Index Dynamic Fields"를 선택할 수 있습니다.
+- Couchbase Server에서는 Index Editor(Quick Editor가 아님)의 "Advanced" 펼침 메뉴에서 "[X] Store Dynamic Fields" 또는 "[X] Index Dynamic Fields"를 선택할 수 있습니다.
+
+이러한 옵션은 index의 크기를 증가시킵니다.
+
+dynamic mapping에 대한 자세한 내용은 [문서](https://docs.couchbase.com/cloud/search/customize-index.html)를 참조하세요.
+
+## Question: 검색 결과에서 metadata object를 볼 수 없습니다.
+
+이는 문서의 `metadata` field가 Couchbase Search index에 의해 indexing 및/또는 저장되지 않았기 때문일 가능성이 높습니다. 문서의 `metadata` field를 indexing하려면 child mapping으로 index에 추가해야 합니다.
+
+mapping에서 모든 field를 매핑하도록 선택하면 모든 metadata field로 검색할 수 있습니다. 또는 index를 최적화하기 위해 indexing할 `metadata` object 내의 특정 field를 선택할 수 있습니다.
+child mapping indexing에 대한 자세한 내용은 [문서](https://docs.couchbase.com/cloud/search/customize-index.html)를 참조하세요.
+
+Child Mapping을 생성하려면 다음 문서를 참조하세요 -
+
+- [Couchbase Capella](https://docs.couchbase.com/cloud/search/create-child-mapping.html)
+- [Couchbase Server](https://docs.couchbase.com/server/current/fts/fts-creating-index-from-UI-classic-editor-dynamic.html)
+
+## Related
+
+- Vector store [conceptual guide](/oss/integrations/vectorstores)
+- Vector store [how-to guides](/oss/integrations/vectorstores)

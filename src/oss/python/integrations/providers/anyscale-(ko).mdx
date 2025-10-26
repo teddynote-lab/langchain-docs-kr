@@ -1,0 +1,41 @@
+---
+title: Anyscale
+---
+
+>[Anyscale](https://www.anyscale.com)은 프로덕션 준비가 완료된 API를 통해 LLM을 실행, 미세 조정 및 확장할 수 있는 플랫폼입니다.
+> [Anyscale Endpoints](https://docs.anyscale.com/endpoints/overview)는 비용 효율적인 방식으로 다양한 오픈 소스 모델을 제공합니다.
+
+`Anyscale`은 또한 고급 채팅 에이전트를 위해 `LangChain`과 `Anyscale`을 설정하는 방법에 대한 [예제](https://docs.anyscale.com/endpoints/model-serving/examples/langchain-integration)를 제공합니다.
+
+## Installation and Setup
+
+- Anyscale Service URL, route 및 API key를 받아서 환경 변수로 설정하세요 (`ANYSCALE_SERVICE_URL`,`ANYSCALE_SERVICE_ROUTE`, `ANYSCALE_SERVICE_TOKEN`).
+- 자세한 내용은 [Anyscale 문서](https://www.anyscale.com/get-started)를 참조하세요.
+
+`openai` package를 설치해야 합니다:
+
+<CodeGroup>
+```bash pip
+pip install openai
+```
+
+```bash uv
+uv add openai
+```
+</CodeGroup>
+
+## LLM
+
+[사용 예제](/oss/integrations/llms/anyscale)를 참조하세요.
+
+```python
+from langchain_community.llms.anyscale import Anyscale
+```
+
+## Embeddings
+
+[사용 예제](/oss/integrations/text_embedding/anyscale)를 참조하세요.
+
+```python
+from langchain_community.embeddings import AnyscaleEmbeddings
+```

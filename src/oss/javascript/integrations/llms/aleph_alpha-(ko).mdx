@@ -1,0 +1,38 @@
+---
+title: AlephAlpha
+---
+
+LangChain.js는 AlephAlpha의 Luminous 모델 제품군을 지원합니다. [해당 웹사이트](https://www.aleph-alpha.com/)에서 API key를 발급받아야 합니다.
+
+예시는 다음과 같습니다:
+
+<Tip>
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install @langchain/community @langchain/core
+```
+
+```typescript
+import { AlephAlpha } from "@langchain/community/llms/aleph_alpha";
+
+const model = new AlephAlpha({
+  aleph_alpha_api_key: "YOUR_ALEPH_ALPHA_API_KEY", // Or set as process.env.ALEPH_ALPHA_API_KEY
+});
+
+const res = await model.invoke(`Is cereal soup?`);
+
+console.log({ res });
+
+/*
+  {
+    res: "\nIs soup a cereal? I don’t think so, but it is delicious."
+  }
+ */
+```
+
+## Related
+
+
+- [Models 가이드](/oss/langchain/models)

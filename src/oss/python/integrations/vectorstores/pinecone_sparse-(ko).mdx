@@ -1,0 +1,279 @@
+---
+title: Pinecone (sparse)
+---
+
+>[Pinecone](https://docs.pinecone.io/docs/overview)는 광범위한 기능을 제공하는 vector database입니다.
+
+이 노트북에서는 `Pinecone` vector database와 관련된 기능을 사용하는 방법을 보여줍니다.
+
+## 설정
+
+`PineconeSparseVectorStore`를 사용하려면, 파트너 package와 이 노트북 전반에서 사용하는 다른 package들을 먼저 설치해야 합니다.
+
+```python
+pip install -qU "langchain-pinecone==0.2.5"
+```
+
+```output
+WARNING: pinecone 6.0.2 does not provide the extra 'async'
+
+```
+
+### 자격 증명
+
+새로운 Pinecone account를 만들거나 기존 account에 로그인한 뒤, 이 노트북에서 사용할 API key를 생성하세요.
+
+```python
+import os
+from getpass import getpass
+
+from pinecone import Pinecone
+
+# get API key at app.pinecone.io
+os.environ["PINECONE_API_KEY"] = os.getenv("PINECONE_API_KEY") or getpass(
+    "Enter your Pinecone API key: "
+)
+
+# initialize client
+pc = Pinecone()
+```
+
+```output
+Enter your Pinecone API key: ··········
+```
+
+## 초기화
+
+vector store를 초기화하기 전에 Pinecone index에 연결해 보겠습니다. 이름이 index_name인 index가 없다면 새로 생성됩니다.
+
+```python
+from pinecone import AwsRegion, CloudProvider, Metric, ServerlessSpec
+
+index_name = "langchain-sparse-vector-search"  # change if desired
+model_name = "pinecone-sparse-english-v0"
+
+if not pc.has_index(index_name):
+    pc.create_index_for_model(
+        name=index_name,
+        cloud=CloudProvider.AWS,
+        region=AwsRegion.US_EAST_1,
+        embed={
+            "model": model_name,
+            "field_map": {"text": "chunk_text"},
+            "metric": Metric.DOTPRODUCT,
+        },
+    )
+
+index = pc.Index(index_name)
+print(f"Index `{index_name}` host: {index.config.host}")
+```
+
+```output
+Index `langchain-sparse-vector-search` host: https://langchain-sparse-vector-search-yrrgefy.svc.aped-4627-b74a.pinecone.io
+```
+
+sparse embedding model로 [`pinecone-sparse-english-v0`](https://docs.pinecone.io/models/pinecone-sparse-english-v0)를 사용하며, 다음과 같이 초기화합니다:
+
+```python
+from langchain_pinecone.embeddings import PineconeSparseEmbeddings
+
+sparse_embeddings = PineconeSparseEmbeddings(model=model_name)
+```
+
+이제 Pinecone index와 embedding model이 준비되었으므로, LangChain에서 sparse vector store를 초기화할 수 있습니다:
+
+```python
+from langchain_pinecone import PineconeSparseVectorStore
+
+vector_store = PineconeSparseVectorStore(index=index, embedding=sparse_embeddings)
+```
+
+## vector store 관리
+
+vector store를 만들었으면 항목을 추가하거나 삭제하여 상호작용할 수 있습니다.
+
+### vector store에 항목 추가
+
+`add_documents` function을 사용해 vector store에 항목을 추가할 수 있습니다.
+
+```python
+from uuid import uuid4
+
+from langchain_core.documents import Document
+
+documents = [
+    Document(
+        page_content="I had chocolate chip pancakes and scrambled eggs for breakfast this morning.",
+        metadata={"source": "social"},
+    ),
+    Document(
+        page_content="The weather forecast for tomorrow is cloudy and overcast, with a high of 62 degrees.",
+        metadata={"source": "news"},
+    ),
+    Document(
+        page_content="Building an exciting new project with LangChain - come check it out!",
+        metadata={"source": "social"},
+    ),
+    Document(
+        page_content="Robbers broke into the city bank and stole $1 million in cash.",
+        metadata={"source": "news"},
+    ),
+    Document(
+        page_content="Wow! That was an amazing movie. I can't wait to see it again.",
+        metadata={"source": "social"},
+    ),
+    Document(
+        page_content="Is the new iPhone worth the price? Read this review to find out.",
+        metadata={"source": "website"},
+    ),
+    Document(
+        page_content="The top 10 soccer players in the world right now.",
+        metadata={"source": "website"},
+    ),
+    Document(
+        page_content="LangGraph is the best framework for building stateful, agentic applications!",
+        metadata={"source": "social"},
+    ),
+    Document(
+        page_content="The stock market is down 500 points today due to fears of a recession.",
+        metadata={"source": "news"},
+    ),
+    Document(
+        page_content="I have a bad feeling I am going to get deleted :(",
+        metadata={"source": "social"},
+    ),
+]
+
+uuids = [str(uuid4()) for _ in range(len(documents))]
+
+vector_store.add_documents(documents=documents, ids=uuids)
+```
+
+```output
+['95b598af-c3dc-4a8a-bdb7-5d21283e5a86',
+ '838614a5-5635-4efd-9ac3-5237a37a542b',
+ '093fd11f-c85b-4c83-83f0-117df64ff442',
+ 'fb3ba32f-f802-410a-ad79-56f7bce938fe',
+ '75cde9bf-7e91-4f06-8bae-c824dab16a08',
+ '9de8f769-d604-4e56-b677-ee333cbc8e34',
+ 'f5f4ae97-88e6-4669-bcf7-87072bb08550',
+ 'f9f82811-187c-4b25-85b5-7a42b4da3bff',
+ 'ce45957c-e8fc-41ef-819b-1bd52b6fc815',
+ '66cacc6f-b8e2-441b-9f7f-468788aad88f']
+```
+
+### vector store에서 항목 삭제
+
+`delete` method를 사용하여 vector store에서 record를 삭제할 수 있으며, 삭제할 document ID 목록을 전달하면 됩니다.
+
+```python
+vector_store.delete(ids=[uuids[-1]])
+```
+
+## vector store 쿼리
+
+document를 vector store에 적재했으면 보통 쿼리를 시작할 준비가 된 것입니다. LangChain에는 이를 위한 다양한 methods가 있습니다.
+
+먼저 `similarity_search` method를 통해 `vector_store`를 직접 쿼리하여 간단한 vector search를 수행하는 방법을 보겠습니다:
+
+```python
+results = vector_store.similarity_search("I'm building a new LangChain project!", k=3)
+
+for res in results:
+    print(f"* {res.page_content} [{res.metadata}]")
+```
+
+```output
+* Building an exciting new project with LangChain - come check it out! [{'source': 'social'}]
+* Building an exciting new project with LangChain - come check it out! [{'source': 'social'}]
+* LangGraph is the best framework for building stateful, agentic applications! [{'source': 'social'}]
+```
+
+쿼리에 [metadata filtering](https://docs.pinecone.io/guides/data/understanding-metadata#metadata-query-language)을 추가하여 다양한 기준에 따라 검색 범위를 제한할 수도 있습니다. `source=="social"`인 record만 포함하도록 검색을 제한하는 간단한 filter를 적용해 보겠습니다:
+
+```python
+results = vector_store.similarity_search(
+    "I'm building a new LangChain project!",
+    k=3,
+    filter={"source": "social"},
+)
+for res in results:
+    print(f"* {res.page_content} [{res.metadata}]")
+```
+
+```output
+* Building an exciting new project with LangChain - come check it out! [{'source': 'social'}]
+* Building an exciting new project with LangChain - come check it out! [{'source': 'social'}]
+* LangGraph is the best framework for building stateful, agentic applications! [{'source': 'social'}]
+```
+
+이 결과들을 비교해 보면 첫 번째 쿼리는 `"website"` source에서 다른 record를 반환했음을 알 수 있습니다. 이후의 filter가 적용된 쿼리에서는 더 이상 그렇지 않습니다.
+
+### Similarity Search와 점수
+
+검색 시 `(document, score)` tuple 목록과 함께 similarity score를 반환하도록 할 수도 있습니다. 여기서 `document`는 텍스트 내용과 metadata를 포함하는 LangChain @[`Document`] object입니다.
+
+```python
+results = vector_store.similarity_search_with_score(
+    "I'm building a new LangChain project!", k=3, filter={"source": "social"}
+)
+for doc, score in results:
+    print(f"[SIM={score:3f}] {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+[SIM=12.959961] Building an exciting new project with LangChain - come check it out! [{'source': 'social'}]
+[SIM=12.959961] Building an exciting new project with LangChain - come check it out! [{'source': 'social'}]
+[SIM=1.942383] LangGraph is the best framework for building stateful, agentic applications! [{'source': 'social'}]
+```
+
+### Retriever로 사용하기
+
+chain과 agent에서는 vector store를 `VectorStoreRetriever`로 자주 사용합니다. 이를 생성하려면 `as_retriever` method를 사용합니다:
+
+```python
+retriever = vector_store.as_retriever(
+    search_type="similarity_score_threshold",
+    search_kwargs={"k": 3, "score_threshold": 0.5},
+)
+retriever
+```
+
+```output
+VectorStoreRetriever(tags=['PineconeSparseVectorStore', 'PineconeSparseEmbeddings'], vectorstore=<langchain_pinecone.vectorstores_sparse.PineconeSparseVectorStore object at 0x7c8087b24290>, search_type='similarity_score_threshold', search_kwargs={'k': 3, 'score_threshold': 0.5})
+```
+
+이제 `invoke` method를 사용해 retriever를 쿼리할 수 있습니다:
+
+```python
+retriever.invoke(
+    input="I'm building a new LangChain project!", filter={"source": "social"}
+)
+```
+
+```output
+/usr/local/lib/python3.11/dist-packages/langchain_core/vectorstores/base.py:1082: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='093fd11f-c85b-4c83-83f0-117df64ff442', metadata={'source': 'social'}, page_content='Building an exciting new project with LangChain - come check it out!'), 6.97998045), (Document(id='54f8f645-9f77-4aab-b9fa-709fd91ae3b3', metadata={'source': 'social'}, page_content='Building an exciting new project with LangChain - come check it out!'), 6.97998045), (Document(id='f9f82811-187c-4b25-85b5-7a42b4da3bff', metadata={'source': 'social'}, page_content='LangGraph is the best framework for building stateful, agentic applications!'), 1.471191405)]
+  self.vectorstore.similarity_search_with_relevance_scores(
+```
+
+```output
+[Document(id='093fd11f-c85b-4c83-83f0-117df64ff442', metadata={'source': 'social'}, page_content='Building an exciting new project with LangChain - come check it out!'),
+ Document(id='54f8f645-9f77-4aab-b9fa-709fd91ae3b3', metadata={'source': 'social'}, page_content='Building an exciting new project with LangChain - come check it out!'),
+ Document(id='f9f82811-187c-4b25-85b5-7a42b4da3bff', metadata={'source': 'social'}, page_content='LangGraph is the best framework for building stateful, agentic applications!')]
+```
+
+## retrieval-augmented generation에서의 사용
+
+이 vector store를 retrieval-augmented generation(RAG)에 사용하는 방법은 다음 섹션을 참조하세요:
+
+- [LangChain로 RAG 앱 만들기](/oss/langchain/rag)
+- [Agentic RAG](/oss/langgraph/agentic-rag)
+- [Retrieval 문서](/oss/langchain/retrieval)
+
+## API reference
+
+모든 기능과 설정에 대한 자세한 문서는 API reference를 확인하세요:
+[python.langchain.com/api_reference/pinecone/vectorstores_sparse/langchain_pinecone.vectorstores_sparse.PineconeSparseVectorStore.html#langchain_pinecone.vectorstores_sparse.PineconeSparseVectorStore](https://python.langchain.com/api_reference/pinecone/vectorstores_sparse/langchain_pinecone.vectorstores_sparse.PineconeSparseVectorStore.html#langchain_pinecone.vectorstores_sparse.PineconeSparseVectorStore)
+
+Sparse Embeddings:
+[python.langchain.com/api_reference/pinecone/embeddings/langchain_pinecone.embeddings.PineconeSparseEmbeddings.html](https://python.langchain.com/api_reference/pinecone/embeddings/langchain_pinecone.embeddings.PineconeSparseEmbeddings.html)

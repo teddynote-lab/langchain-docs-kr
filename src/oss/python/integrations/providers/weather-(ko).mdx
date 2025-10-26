@@ -1,0 +1,29 @@
+---
+title: Weather
+---
+
+>[OpenWeatherMap](https://openweathermap.org/)은 오픈소스 날씨 서비스 제공업체입니다.
+
+
+
+## Installation and Setup
+
+<CodeGroup>
+```bash pip
+pip install pyowm
+```
+
+```bash uv
+uv add pyowm
+```
+</CodeGroup>
+
+`OpenWeatherMap API token`을 설정해야 합니다.
+
+## Document Loader
+
+[사용 예시](/oss/integrations/document_loaders/weather)를 참조하세요.
+
+```python
+from langchain_community.document_loaders import WeatherDataLoader
+```

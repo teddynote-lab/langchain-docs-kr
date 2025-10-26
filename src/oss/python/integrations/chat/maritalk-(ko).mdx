@@ -1,0 +1,155 @@
+---
+
+title: Maritalk
+---
+
+<a href="https://colab.research.google.com/github/langchain-ai/langchain/blob/v0.3/docs/docs/integrations/chat/maritalk.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
+MariTalk은 브라질 회사 [Maritaca AI](https://www.maritaca.ai)에서 개발한 어시스턴트입니다.
+MariTalk은 포르투갈어를 잘 이해하도록 특별히 훈련된 언어 모델을 기반으로 합니다.
+
+이 노트북은 두 가지 예제를 통해 LangChain과 함께 MariTalk을 사용하는 방법을 보여줍니다:
+
+1. MariTalk을 사용하여 작업을 수행하는 간단한 예제.
+2. LLM + RAG: 두 번째 예제는 MariTalk의 token 제한에 맞지 않는 긴 문서에서 답변을 찾는 질문에 답하는 방법을 보여줍니다. 이를 위해 간단한 검색기(BM25)를 사용하여 먼저 문서에서 가장 관련성 높은 섹션을 검색한 다음 MariTalk에 제공하여 답변을 생성합니다.
+
+## 설치
+
+먼저 다음 명령을 사용하여 LangChain 라이브러리(및 모든 종속성)를 설치합니다:
+
+```python
+!pip install langchain langchain-core langchain-community httpx
+```
+
+## API Key
+
+chat.maritaca.ai("Chaves da API" 섹션)에서 얻을 수 있는 API key가 필요합니다.
+
+### 예제 1 - 반려동물 이름 제안
+
+언어 모델인 ChatMaritalk을 정의하고 API key로 구성해 보겠습니다.
+
+```python
+from langchain_community.chat_models import ChatMaritalk
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts.chat import ChatPromptTemplate
+
+llm = ChatMaritalk(
+    model="sabia-2-medium",  # Available models: sabia-2-small and sabia-2-medium
+    api_key="",  # Insert your API key here
+    temperature=0.7,
+    max_tokens=100,
+)
+
+output_parser = StrOutputParser()
+
+chat_prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You are an assistant specialized in suggesting pet names. Given the animal, you must suggest 4 names.",
+        ),
+        ("human", "I have a {animal}"),
+    ]
+)
+
+chain = chat_prompt | llm | output_parser
+
+response = chain.invoke({"animal": "dog"})
+print(response)  # should answer something like "1. Max\n2. Bella\n3. Charlie\n4. Rocky"
+```
+
+### Stream 생성
+
+광범위한 기사 작성이나 대용량 문서 번역과 같이 긴 텍스트를 생성하는 작업의 경우, 전체 텍스트를 기다리는 대신 텍스트가 생성되는 대로 부분적으로 응답을 받는 것이 유리할 수 있습니다. 이는 특히 생성된 텍스트가 광범위할 때 애플리케이션을 더 반응적이고 효율적으로 만듭니다. 이러한 요구를 충족하기 위해 동기식과 비동기식의 두 가지 접근 방식을 제공합니다.
+
+#### 동기식
+
+```python
+from langchain.messages import HumanMessage
+
+messages = [HumanMessage(content="Suggest 3 names for my dog")]
+
+for chunk in llm.stream(messages):
+    print(chunk.content, end="", flush=True)
+```
+
+#### 비동기식
+
+```python
+from langchain.messages import HumanMessage
+
+
+async def async_invoke_chain(animal: str):
+    messages = [HumanMessage(content=f"Suggest 3 names for my {animal}")]
+    async for chunk in llm._astream(messages):
+        print(chunk.message.content, end="", flush=True)
+
+
+await async_invoke_chain("dog")
+```
+
+### 예제 2 - RAG + LLM: UNICAMP 2024 입학시험 질문 답변 시스템
+
+이 예제를 위해 몇 가지 추가 라이브러리를 설치해야 합니다:
+
+```python
+!pip install unstructured rank_bm25 pdf2image pdfminer-six pikepdf pypdf unstructured_inference fastapi kaleido uvicorn "pillow<10.1.0" pillow_heif -q
+```
+
+#### 데이터베이스 로드
+
+첫 번째 단계는 공고 정보로 데이터베이스를 만드는 것입니다. 이를 위해 COMVEST 웹사이트에서 공고를 다운로드하고 추출된 텍스트를 500자 윈도우로 분할합니다.
+
+```python
+from langchain_community.document_loaders import OnlinePDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+# Loading the COMVEST 2024 notice
+loader = OnlinePDFLoader(
+    "https://www.comvest.unicamp.br/wp-content/uploads/2023/10/31-2023-Dispoe-sobre-o-Vestibular-Unicamp-2024_com-retificacao.pdf"
+)
+data = loader.load()
+
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=500, chunk_overlap=100, separators=["\n", " ", ""]
+)
+texts = text_splitter.split_documents(data)
+```
+
+#### 검색기 생성
+
+이제 데이터베이스가 있으므로 검색기가 필요합니다. 이 예제에서는 검색 시스템으로 간단한 BM25를 사용하지만, 다른 검색기(예: embedding을 통한 검색)로 대체할 수 있습니다.
+
+```python
+from langchain_community.retrievers import BM25Retriever
+
+retriever = BM25Retriever.from_documents(texts)
+```
+
+#### 검색 시스템 + LLM 결합
+
+이제 검색기가 있으므로 작업을 지정하는 prompt를 구현하고 chain을 호출하기만 하면 됩니다.
+
+```python
+from langchain.chains.question_answering import load_qa_chain
+
+prompt = """Baseado nos seguintes documentos, responda a pergunta abaixo.
+
+{context}
+
+Pergunta: {query}
+"""
+
+qa_prompt = ChatPromptTemplate.from_messages([("human", prompt)])
+
+chain = load_qa_chain(llm, chain_type="stuff", verbose=True, prompt=qa_prompt)
+
+query = "Qual o tempo máximo para realização da prova?"
+
+docs = retriever.invoke(query)
+
+chain.invoke(
+    {"input_documents": docs, "query": query}
+)  # Should output something like: "O tempo máximo para realização da prova é de 5 horas."
+```

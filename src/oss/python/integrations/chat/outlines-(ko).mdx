@@ -1,0 +1,188 @@
+---
+title: ChatOutlines
+---
+
+이 문서는 Outlines [chat models](/oss/langchain/models/)를 시작하는 데 도움을 드립니다. 모든 ChatOutlines 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.outlines.ChatOutlines.html)를 참조하세요.
+
+[Outlines](https://github.com/outlines-dev/outlines)는 제약 조건이 있는 언어 생성을 위한 라이브러리입니다. 다양한 backend를 사용하는 대규모 언어 모델(LLM)을 사용하면서 생성된 출력에 제약 조건을 적용할 수 있습니다.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | JS support | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [ChatOutlines](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.outlines.ChatOutlines.html) | [langchain-community](https://python.langchain.com/api_reference/community/index.html) | ✅ | ❌ | ❌ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-community?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-community?style=flat-square&label=%20) |
+
+### Model features
+
+| [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
+| :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
+
+## Setup
+
+Outlines 모델에 액세스하려면 huggingface에서 모델 가중치를 다운로드하기 위한 인터넷 연결이 필요합니다. 사용하는 backend에 따라 필요한 종속성을 설치해야 합니다([Outlines docs](https://dottxt-ai.github.io/outlines/latest/installation/) 참조).
+
+### Credentials
+
+Outlines에는 내장된 인증 메커니즘이 없습니다.
+
+### Installation
+
+LangChain Outlines integration은 `langchain-community` 패키지에 포함되어 있으며 `outlines` 라이브러리가 필요합니다:
+
+```python
+pip install -qU langchain-community outlines
+```
+
+## Instantiation
+
+이제 model 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
+
+```python
+from langchain_community.chat_models.outlines import ChatOutlines
+
+# For llamacpp backend
+model = ChatOutlines(model="TheBloke/phi-2-GGUF/phi-2.Q4_K_M.gguf", backend="llamacpp")
+
+# For vllm backend (not available on Mac)
+model = ChatOutlines(model="meta-llama/Llama-3.2-1B", backend="vllm")
+
+# For mlxlm backend (only available on Mac)
+model = ChatOutlines(model="mistralai/Ministral-8B-Instruct-2410", backend="mlxlm")
+
+# For huggingface transformers backend
+model = ChatOutlines(model="microsoft/phi-2")  # defaults to transformers backend
+```
+
+## Invocation
+
+```python
+from langchain.messages import HumanMessage
+
+messages = [HumanMessage(content="What will the capital of mars be called?")]
+response = model.invoke(messages)
+
+response.content
+```
+
+## Streaming
+
+ChatOutlines는 token streaming을 지원합니다:
+
+```python
+messages = [HumanMessage(content="Count to 10 in French:")]
+
+for chunk in model.stream(messages):
+    print(chunk.content, end="", flush=True)
+```
+
+## Chaining
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+
+prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You are a helpful assistant that translates {input_language} to {output_language}.",
+        ),
+        ("human", "{input}"),
+    ]
+)
+
+chain = prompt | model
+chain.invoke(
+    {
+        "input_language": "English",
+        "output_language": "German",
+        "input": "I love programming.",
+    }
+)
+```
+
+## Constrained Generation
+
+ChatOutlines를 사용하면 생성된 출력에 다양한 제약 조건을 적용할 수 있습니다:
+
+### Regex Constraint
+
+```python
+model.regex = r"((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)"
+
+response = model.invoke("What is the IP address of Google's DNS server?")
+
+response.content
+```
+
+### Type Constraints
+
+```python
+model.type_constraints = int
+response = model.invoke("What is the answer to life, the universe, and everything?")
+
+response.content
+```
+
+### Pydantic and JSON Schemas
+
+```python
+from pydantic import BaseModel
+
+
+class Person(BaseModel):
+    name: str
+
+
+model.json_schema = Person
+response = model.invoke("Who are the main contributors to LangChain?")
+person = Person.model_validate_json(response.content)
+
+person
+```
+
+### Context Free Grammars
+
+```python
+model.grammar = """
+?start: expression
+?expression: term (("+" | "-") term)*
+?term: factor (("*" | "/") factor)*
+?factor: NUMBER | "-" factor | "(" expression ")"
+%import common.NUMBER
+%import common.WS
+%ignore WS
+"""
+response = model.invoke("Give me a complex arithmetic expression:")
+
+response.content
+```
+
+## LangChain's Structured Output
+
+LangChain의 Structured Output을 ChatOutlines와 함께 사용할 수도 있습니다:
+
+```python
+from pydantic import BaseModel
+
+
+class AnswerWithJustification(BaseModel):
+    answer: str
+    justification: str
+
+
+_model = model.with_structured_output(AnswerWithJustification)
+result = _model.invoke("What weighs more, a pound of bricks or a pound of feathers?")
+
+result
+```
+
+## API reference
+
+모든 ChatOutlines 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.outlines.ChatOutlines.html](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.outlines.ChatOutlines.html)
+
+## Full Outlines Documentation
+
+[dottxt-ai.github.io/outlines/latest/](https://dottxt-ai.github.io/outlines/latest/)

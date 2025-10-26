@@ -1,0 +1,21 @@
+---
+title: SemaDB
+---
+
+>[SemaDB](https://semafind.com/)는 복잡하지 않은 벡터 유사도 검색 엔진입니다. AI 애플리케이션을 쉽게 구축할 수 있도록 저렴한 클라우드 호스팅 버전을 제공합니다.
+
+호스팅 버전인 SemaDB Cloud를 사용하면 pod 크기 계산, schema 정의, partition 설정, parameter 튜닝, 검색 알고리즘 튜닝, 복잡한 설치, 복잡한 API가 필요 없습니다. [RapidAPI](https://rapidapi.com/semafind-semadb/api/semadb)와 통합되어 투명한 요금 청구, 자동 sharding 및 대화형 API playground를 제공합니다.
+
+## Installation
+
+별도의 설치가 필요 없으며, [RapidAPI](https://rapidapi.com/semafind-semadb/api/semadb)에서 SemaDB Cloud를 바로 시작할 수 있습니다.
+
+## Vector Store
+
+`SemaDB` collection을 vectorstore로 사용할 수 있는 기본 wrapper가 있습니다.
+
+```python
+from langchain_community.vectorstores import SemaDB
+```
+
+[이 노트북](/oss/integrations/vectorstores/semadb)에서 wrapper 사용 방법에 대한 튜토리얼을 확인할 수 있습니다.

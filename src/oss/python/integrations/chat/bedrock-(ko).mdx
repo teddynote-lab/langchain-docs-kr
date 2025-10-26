@@ -1,0 +1,336 @@
+---
+title: ChatBedrock
+---
+
+이 문서는 AWS Bedrock [chat models](/oss/langchain/models) 시작하기를 도와드립니다. Amazon Bedrock은 AI21 Labs, Anthropic, Cohere, Meta, Stability AI, Amazon과 같은 주요 AI 기업의 고성능 foundation models(FMs)을 단일 API를 통해 제공하는 완전 관리형 서비스입니다. 보안, 프라이버시, 책임 있는 AI를 갖춘 생성형 AI 애플리케이션을 구축하는 데 필요한 광범위한 기능을 제공합니다. Amazon Bedrock을 사용하면 사용 사례에 맞는 최고의 FM을 쉽게 실험하고 평가할 수 있으며, fine-tuning 및 Retrieval Augmented Generation(RAG)과 같은 기술을 사용하여 데이터로 비공개로 커스터마이징하고, 엔터프라이즈 시스템 및 데이터 소스를 사용하여 작업을 실행하는 agent를 구축할 수 있습니다. Amazon Bedrock은 서버리스이므로 인프라를 관리할 필요가 없으며, 이미 익숙한 AWS 서비스를 사용하여 생성형 AI 기능을 애플리케이션에 안전하게 통합하고 배포할 수 있습니다.
+
+AWS Bedrock은 Bedrock 모델에 대한 통합된 대화형 인터페이스를 제공하는 [Converse API](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_Converse.html)를 유지 관리합니다. 이 API는 아직 custom model을 지원하지 않습니다. [여기에서 지원되는 모든 모델 목록](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html)을 확인할 수 있습니다.
+
+<Info>
+**custom model을 사용할 필요가 없는 사용자에게는 Converse API를 권장합니다. [ChatBedrockConverse](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock_converse.ChatBedrockConverse.html)를 사용하여 액세스할 수 있습니다.**
+
+</Info>
+
+모든 Bedrock 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock_converse.ChatBedrockConverse.html)를 참조하세요.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/chat/bedrock) | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [ChatBedrock](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock.ChatBedrock.html) | [langchain-aws](https://python.langchain.com/api_reference/aws/index.html) | ❌ | beta | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-aws?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-aws?style=flat-square&label=%20) |
+| [ChatBedrockConverse](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock_converse.ChatBedrockConverse.html) | [langchain-aws](https://python.langchain.com/api_reference/aws/index.html) | ❌ | beta | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-aws?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-aws?style=flat-square&label=%20) |
+
+### Model features
+
+아래 내용은 `ChatBedrock`과 `ChatBedrockConverse` 모두에 적용됩니다.
+
+| [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
+| :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ | ❌ |
+
+## Setup
+
+Bedrock 모델에 액세스하려면 AWS 계정을 생성하고, Bedrock API 서비스를 설정하고, access key ID와 secret key를 받고, `langchain-aws` integration package를 설치해야 합니다.
+
+### Credentials
+
+AWS에 가입하고 자격 증명을 설정하려면 [AWS docs](https://docs.aws.amazon.com/bedrock/latest/userguide/setting-up.html)를 참조하세요.
+
+또는 `ChatBedrockConverse`는 기본적으로 다음 환경 변수에서 읽습니다:
+
+```python
+# os.environ["AWS_ACCESS_KEY_ID"] = "..."
+# os.environ["AWS_SECRET_ACCESS_KEY"] = "..."
+
+# Not required unless using temporary credentials.
+# os.environ["AWS_SESSION_TOKEN"] = "..."
+```
+
+또한 [이 지침](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html)에 따라 계정에 대한 모델 액세스를 활성화해야 합니다.
+
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
+
+```python
+os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
+os.environ["LANGSMITH_TRACING"] = "true"
+```
+
+### Installation
+
+LangChain Bedrock integration은 `langchain-aws` package에 있습니다:
+
+```python
+pip install -qU langchain-aws
+```
+
+## Instantiation
+
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
+
+```python
+from langchain_aws import ChatBedrockConverse
+
+llm = ChatBedrockConverse(
+    model_id="anthropic.claude-3-5-sonnet-20240620-v1:0",
+    # region_name=...,
+    # aws_access_key_id=...,
+    # aws_secret_access_key=...,
+    # aws_session_token=...,
+    # temperature=...,
+    # max_tokens=...,
+    # other params...
+)
+```
+
+## Invocation
+
+```python
+messages = [
+    (
+        "system",
+        "You are a helpful assistant that translates English to French. Translate the user sentence.",
+    ),
+    ("human", "I love programming."),
+]
+ai_msg = llm.invoke(messages)
+ai_msg
+```
+
+```output
+AIMessage(content="J'adore la programmation.", additional_kwargs={}, response_metadata={'ResponseMetadata': {'RequestId': 'b07d1630-06f2-44b1-82bf-e82538dd2215', 'HTTPStatusCode': 200, 'HTTPHeaders': {'date': 'Wed, 16 Apr 2025 19:35:34 GMT', 'content-type': 'application/json', 'content-length': '206', 'connection': 'keep-alive', 'x-amzn-requestid': 'b07d1630-06f2-44b1-82bf-e82538dd2215'}, 'RetryAttempts': 0}, 'stopReason': 'end_turn', 'metrics': {'latencyMs': [488]}, 'model_name': 'anthropic.claude-3-5-sonnet-20240620-v1:0'}, id='run-d09ed928-146a-4336-b1fd-b63c9e623494-0', usage_metadata={'input_tokens': 29, 'output_tokens': 11, 'total_tokens': 40, 'input_token_details': {'cache_creation': 0, 'cache_read': 0}})
+```
+
+```python
+print(ai_msg.content)
+```
+
+```output
+J'adore la programmation.
+```
+
+### Streaming
+
+`ChatBedrockConverse`는 streaming 중에 content block을 방출합니다:
+
+```python
+for chunk in llm.stream(messages):
+    print(chunk)
+```
+
+```output
+content=[] additional_kwargs={} response_metadata={} id='run-d0e0836e-7146-4c3d-97c7-ad23dac6febd'
+content=[{'type': 'text', 'text': 'J', 'index': 0}] additional_kwargs={} response_metadata={} id='run-d0e0836e-7146-4c3d-97c7-ad23dac6febd'
+content=[{'type': 'text', 'text': "'adore la", 'index': 0}] additional_kwargs={} response_metadata={} id='run-d0e0836e-7146-4c3d-97c7-ad23dac6febd'
+content=[{'type': 'text', 'text': ' programmation.', 'index': 0}] additional_kwargs={} response_metadata={} id='run-d0e0836e-7146-4c3d-97c7-ad23dac6febd'
+content=[{'index': 0}] additional_kwargs={} response_metadata={} id='run-d0e0836e-7146-4c3d-97c7-ad23dac6febd'
+content=[] additional_kwargs={} response_metadata={'stopReason': 'end_turn'} id='run-d0e0836e-7146-4c3d-97c7-ad23dac6febd'
+content=[] additional_kwargs={} response_metadata={'metrics': {'latencyMs': 600}, 'model_name': 'anthropic.claude-3-5-sonnet-20240620-v1:0'} id='run-d0e0836e-7146-4c3d-97c7-ad23dac6febd' usage_metadata={'input_tokens': 29, 'output_tokens': 11, 'total_tokens': 40, 'input_token_details': {'cache_creation': 0, 'cache_read': 0}}
+```
+
+출력에서 [.text](https://python.langchain.com/api_reference/core/messages/langchain_core.messages.ai.AIMessage.html#langchain_core.messages.ai.AIMessage.text) property를 사용하여 텍스트로 필터링할 수 있습니다:
+
+```python
+for chunk in llm.stream(messages):
+    print(chunk.text, end="|")
+```
+
+```output
+|J|'adore la| programmation.||||
+```
+
+## Extended Thinking
+
+이 가이드는 LangChain의 `ChatBedrockConverse` integration과 함께 AWS Bedrock을 사용하여 Extended Thinking을 구현하는 데 중점을 둡니다.
+
+### Supported Models
+
+Extended Thinking은 AWS Bedrock의 다음 Claude 모델에서 사용할 수 있습니다:
+
+| Model | Model ID |
+|-------|----------|
+| **Claude Opus 4** | `anthropic.claude-opus-4-20250514-v1:0` |
+| **Claude Sonnet 4** | `anthropic.claude-sonnet-4-20250514-v1:0` |
+| **Claude 3.7 Sonnet** | `us.anthropic.claude-3-7-sonnet-20250219-v1:0` |
+
+```python
+from langchain_aws import ChatBedrockConverse
+
+llm = ChatBedrockConverse(
+    model_id="us.anthropic.claude-sonnet-4-20250514-v1:0",
+    region_name="us-west-2",
+    max_tokens=4096,
+    additional_model_request_fields={
+        "thinking": {"type": "enabled", "budget_tokens": 1024},
+    },
+)
+
+ai_msg = llm.invoke(messages)
+ai_msg.content_blocks
+```
+
+```output
+[{'type': 'reasoning',
+  'reasoning': 'The user wants me to translate "I love programming" from English to French.\n\n"I love" translates to "J\'aime" in French.\n"Programming" translates to "la programmation" in French.\n\nSo the full translation would be "J\'aime la programmation."',
+  'extras': {'signature': 'EpkDCkgIBxABGAIqQGI0KGz8LoVaFwqSAYPN7N+FecI1ZGtb0zpfPr5F8Sb1yxtQHQlmbKUS8JByenWCFGpRKigNaQh1+rLZ59GEX/sSDB+6gxZAT24DJrq4pxoMySVhzwALI6FEC+1UIjDcozOIznjRTYlDWPcYUNYvpt8rwF9IHE38Ha2uqVY8ROJa1tjOMk3OEnbSoV13Pa8q/gETsz+1UwxNX5tgxOa+38jLEryhdFyyAk2JDLrmluZBM6TMrtyzALQvVbZqjpkKAXdtcVCrsz8zUo/LZT1B/92Ukux2dE0O1ZOdcW3tORK+NFLSBaWuqigcFUTDH9XNQoHd2WpQNhl+ypnCItbL2wDRscN/tEBkgGMQugvPmL0LAuLKBmsRKStKRi/RMYGJb3Ft2yEDsRnYNJBJ6TtgxXFvjDwqc/UaI9cIcTxdoVVlsPFsYccpVwirzwAOiz6CSQ1oOQTYJVT90eQ71QW74n1ubbFIZAvDBKk0KG8jK1FGx4FpuuZyFhBpXtfrgOCdrlVSAO/EE9fKCbP9FlhPbRgB'}},
+ {'type': 'text', 'text': "J'aime la programmation."}]
+```
+
+### How extended thinking works
+
+extended thinking이 켜져 있으면 Claude는 내부 추론을 출력하는 thinking content block을 생성합니다. Claude는 최종 응답을 작성하기 전에 이 추론의 통찰력을 통합합니다. API 응답에는 thinking content block이 포함되고 그 다음에 text content block이 포함됩니다.
+
+```python
+next_messages = messages + [("ai", ai_msg.content), ("human", "I love AI")]
+
+ai_msg = llm.invoke(next_messages)
+ai_msg.content_blocks
+```
+
+```output
+[{'type': 'reasoning',
+  'reasoning': 'The user wants me to translate "I love AI" from English to French. \n\n"I love" translates to "J\'aime" in French.\n"AI" stands for "Artificial Intelligence" which in French is "Intelligence Artificielle" or "IA" (the French abbreviation).\n\nSo the translation would be "J\'aime l\'IA" or "J\'aime l\'intelligence artificielle".\n\nI think using the abbreviation "IA" would be more natural and concise, similar to how the user used "AI" in English.',
+  'extras': {'signature': 'EuAECkgIBxABGAIqQLWbkzJ8RzfxhVN1BhfRj5+On8/M9Utt0yH9kvj9P2zlQkO5xloq6I/AiEeArwwdJeqJVcLRjqLtinh6HIBbSDwSDFwt0GL409TqjSZNBhoMPQtJdZmx/uiPrLHUIjCJXyyjgSK3vzbcSEnsvo7pdpoo+waUFrAPDCGL/CIN5u7c8ueLCuCn8W0qGGc+BNgqxQO6UbV11RnMdnUyFmVgTPJErfzBr6U6KyUHd5dJmFWIUVpbbxT2C9vawpbKMPThaRW3BhItEafWGUpPqztzFhqJpSegXtXehIn5iY4yHzTUZ5FPdkNIuAmTsFNNGxiKr9H/gqknvQ2B7I4ushRHLg+drU4cH18EGZlAo5Tu1O9yH5GbweIEew4Uv7oWje+R8TIku0OFVhrbnQqqqukBicMV2JRifUYuz6dYM1UDYS8SfxQ1MmcVY5t1L9LDpoL4F/CtpL8/6YDsB/FosU37Qc1qm+D+pKEPTYnyxaP5tRXqTBfqUIiNJGqr9Egl17Akoy6NIv234rPfuf8HjTcu5scZoPGhOreG5rWxJ7AbTCIXgGWqpcf2TqDtniOac3jW4OtnlID9fsloKNq6Y5twgXHDR47c4Jh6vWmucZiIlL6hkklQzt5To6vOnqcTOGUtuCis8Y2wRzlNGeR2d8A+ocYm7mBvR/Y5DvDgstJwB/vCLoQlIL+jm6+h8k6EX/24GqOsh5hxsS5IsNIob/p8tr4TBbc9noCoUSYkMhbQPi2xpRrNML9GUIo7Skbh1ni67uqeShj1xuUrFG+cN6x4yzDaRb59LCAYAQ=='}},
+ {'type': 'text', 'text': "J'aime l'IA."}]
+```
+
+## Prompt caching
+
+Bedrock은 message 및 tool을 포함한 prompt 요소의 [caching](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html)을 지원합니다. 이를 통해 대용량 문서, 지침, [few-shot documents](/langsmith/create-few-shot-evaluators) 및 기타 데이터를 재사용하여 지연 시간과 비용을 줄일 수 있습니다.
+
+<Note>
+**모든 모델이 prompt caching을 지원하는 것은 아닙니다. [여기](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html#prompt-caching-models)에서 지원되는 모델을 확인하세요.**
+
+</Note>
+
+prompt 요소에서 caching을 활성화하려면 `cachePoint` key를 사용하여 관련 content block을 표시하세요. 아래 예제를 참조하세요:
+
+```python
+import requests
+from langchain_aws import ChatBedrockConverse
+
+llm = ChatBedrockConverse(model="us.anthropic.claude-3-7-sonnet-20250219-v1:0")
+
+# Pull LangChain readme
+get_response = requests.get(
+    "https://raw.githubusercontent.com/langchain-ai/langchain/master/README.md"
+)
+readme = get_response.text
+
+messages = [
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "What's LangChain, according to its README?",
+            },
+            {
+                "type": "text",
+                "text": f"{readme}",
+            },
+            {
+                "cachePoint": {"type": "default"},
+            },
+        ],
+    },
+]
+
+response_1 = llm.invoke(messages)
+response_2 = llm.invoke(messages)
+
+usage_1 = response_1.usage_metadata["input_token_details"]
+usage_2 = response_2.usage_metadata["input_token_details"]
+
+print(f"First invocation:\n{usage_1}")
+print(f"\nSecond:\n{usage_2}")
+```
+
+```output
+First invocation:
+{'cache_creation': 1528, 'cache_read': 0}
+
+Second:
+{'cache_creation': 0, 'cache_read': 1528}
+```
+
+## Citations
+
+Citation은 입력 문서에서 활성화된 경우 생성될 수 있습니다. 문서는 Bedrock의
+[native format](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_DocumentBlock.html)
+또는 LangChain의 [standard types](/oss/langchain/messages#multimodal)로 지정할 수 있습니다:
+
+<CodeGroup>
+```python Bedrock format
+from langchain_aws import ChatBedrockConverse
+
+llm = ChatBedrockConverse(model="us.anthropic.claude-sonnet-4-20250514-v1:0")
+
+pdf_path = "path/to/your/file.pdf"
+
+with open(pdf_path, "rb") as f:
+    pdf_bytes = f.read()
+
+document = {
+    "document": {
+        "format": "pdf",
+        "source": {"bytes": pdf_bytes},
+        "name": "my-pdf",
+        "citations": {"enabled": True},  # [!code highlight]
+    },
+}
+
+response = llm.invoke(
+    [
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "Describe this document."},
+                document,
+            ]
+        },
+    ]
+)
+response.content_blocks
+```
+
+```python LangChain standard format
+import base64
+from langchain_aws import ChatBedrockConverse
+
+llm = ChatBedrockConverse(model="us.anthropic.claude-sonnet-4-20250514-v1:0")
+
+pdf_path = "path/to/your/file.pdf"
+
+with open(pdf_path, "rb") as f:
+    pdf_base64 = base64.b64encode(f.read()).decode("utf-8")
+
+document = {
+    "type": "file",
+    "mime_type": "application/pdf",
+    "base64": pdf_base64,
+    "name": "my-pdf",  # Converse requires a filename
+    "citations": {"enabled": True},  # [!code highlight]
+}
+
+response = llm.invoke(
+    [
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "Describe this document."},
+                document,
+            ]
+        },
+    ]
+)
+response.content_blocks
+```
+</CodeGroup>
+
+## API reference
+
+모든 ChatBedrock 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock.ChatBedrock.html](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock.ChatBedrock.html)
+
+모든 ChatBedrockConverse 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock_converse.ChatBedrockConverse.html](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock_converse.ChatBedrockConverse.html)

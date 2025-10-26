@@ -1,0 +1,49 @@
+---
+title: Docling
+---
+
+> [Docling](https://github.com/DS4SD/docling)은 PDF, DOCX, PPTX, HTML 및 기타 형식을 문서 레이아웃, 표 등을 포함한 풍부한 통합 표현으로 파싱하여 RAG와 같은 생성형 AI 워크플로우에 바로 사용할 수 있도록 합니다.
+>
+> 이 통합은 `DoclingLoader` document loader를 통해 Docling의 기능을 제공합니다.
+
+## Installation and Setup
+
+pip과 같은 패키지 매니저에서 `langchain-docling`을 간단히 설치하세요:
+
+<CodeGroup>
+```bash pip
+pip install langchain-docling
+```
+
+```bash uv
+uv add langchain-docling
+```
+</CodeGroup>
+
+## Document Loader
+
+`langchain-docling`의 `DoclingLoader` class는 Docling을 LangChain에 원활하게 통합하여 다음을 가능하게 합니다:
+- 다양한 문서 유형을 LLM 애플리케이션에서 쉽고 빠르게 사용할 수 있습니다.
+- Docling의 풍부한 표현을 활용하여 고급 문서 기반 grounding을 수행할 수 있습니다.
+
+기본 사용법은 다음과 같습니다:
+
+```python
+from langchain_docling import DoclingLoader
+
+FILE_PATH = ["https://arxiv.org/pdf/2408.09869"]  # Docling Technical Report
+
+loader = DoclingLoader(file_path=FILE_PATH)
+
+docs = loader.load()
+```
+
+전체 사용 예제는
+[이 예제](/oss/integrations/document_loaders/docling)를 확인하세요.
+
+## Additional Resources
+
+- [LangChain Docling integration GitHub](https://github.com/DS4SD/docling-langchain)
+- [LangChain Docling integration PyPI package](https://pypi.org/project/langchain-docling/)
+- [Docling GitHub](https://github.com/DS4SD/docling)
+- [Docling docs](https://ds4sd.github.io/docling/)

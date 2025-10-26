@@ -1,0 +1,167 @@
+---
+title: Cloud에 앱 배포하기
+sidebarTitle: Cloud 빠른 시작
+---
+
+LangSmith Cloud에 첫 번째 애플리케이션을 배포하기 위한 빠른 시작 가이드입니다.
+
+<Tip>
+모든 구성 옵션이 포함된 포괄적인 Cloud 배포 가이드는 [Cloud 배포 설정 가이드](/langsmith/deploy-to-cloud)를 참조하세요.
+</Tip>
+
+## 사전 요구사항
+
+시작하기 전에 다음 사항을 준비해야 합니다:
+
+* [GitHub 계정](https://github.com/)
+* [LangSmith 계정](https://smith.langchain.com/) (무료 가입 가능)
+
+## 1. GitHub에 repository 생성하기
+
+**LangSmith**에 애플리케이션을 배포하려면 애플리케이션 코드가 GitHub repository에 있어야 합니다. public 및 private repository 모두 지원됩니다. 이 빠른 시작에서는 애플리케이션을 위해 [`new-langgraph-project` template](https://github.com/langchain-ai/react-agent)을 사용합니다:
+
+1. [`new-langgraph-project` repository](https://github.com/langchain-ai/new-langgraph-project) 또는 [`new-langgraphjs-project` template](https://github.com/langchain-ai/new-langgraphjs-project)로 이동합니다.
+2. 오른쪽 상단의 `Fork` 버튼을 클릭하여 repository를 GitHub 계정으로 fork합니다.
+3. **Create fork**를 클릭합니다.
+
+## 2. LangSmith에 배포하기
+
+1. [LangSmith](https://smith.langchain.com/)에 로그인합니다.
+2. 왼쪽 사이드바에서 **Deployments**를 선택합니다.
+3. **+ New Deployment** 버튼을 클릭합니다. 필수 필드를 입력할 수 있는 창이 열립니다.
+4. 처음 사용하는 사용자이거나 이전에 연결되지 않은 private repository를 추가하는 경우 **Import from GitHub** 버튼을 클릭하고 지침에 따라 GitHub 계정을 연결합니다.
+5. New LangGraph Project repository를 선택합니다.
+6. **Submit**을 클릭하여 배포합니다.
+  완료하는 데 약 15분이 소요될 수 있습니다. **Deployment details** 보기에서 상태를 확인할 수 있습니다.
+
+## 3. Studio에서 애플리케이션 테스트하기
+
+애플리케이션이 배포되면:
+
+1. 방금 생성한 deployment를 선택하여 자세한 내용을 확인합니다.
+2. 오른쪽 상단의 **Studio** 버튼을 클릭합니다. [Studio](/langsmith/studio)가 열리고 graph가 표시됩니다.
+
+## 4. deployment의 API URL 가져오기
+
+1. **Deployment details** 보기에서 **API URL**을 클릭하여 클립보드에 복사합니다.
+2. `URL`을 클릭하여 클립보드에 복사합니다.
+
+## 5. API 테스트하기
+
+이제 API를 테스트할 수 있습니다:
+
+<Tabs>
+    <Tab title="Python SDK (Async)">
+    1. LangGraph Python SDK를 설치합니다:
+      ```shell
+      pip install langgraph-sdk
+      ```
+    2. assistant에게 메시지를 보냅니다 (threadless run):
+      ```python
+      from langgraph_sdk import get_client
+
+      client = get_client(url="your-deployment-url", api_key="your-langsmith-api-key")
+
+      async for chunk in client.runs.stream(
+          None,  # Threadless run
+          "agent", # Name of assistant. Defined in langgraph.json.
+          input={
+              "messages": [{
+                  "role": "human",
+                  "content": "What is LangGraph?",
+              }],
+          },
+          stream_mode="updates",
+      ):
+          print(f"Receiving new event of type: {chunk.event}...")
+          print(chunk.data)
+          print("\n\n")
+      ```
+    </Tab>
+    <Tab title="Python SDK (Sync)">
+    1. LangGraph Python SDK를 설치합니다:
+      ```shell
+      pip install langgraph-sdk
+      ```
+    2. assistant에게 메시지를 보냅니다 (threadless run):
+      ```python
+      from langgraph_sdk import get_sync_client
+
+      client = get_sync_client(url="your-deployment-url", api_key="your-langsmith-api-key")
+
+      for chunk in client.runs.stream(
+          None,  # Threadless run
+          "agent", # Name of assistant. Defined in langgraph.json.
+          input={
+              "messages": [{
+                  "role": "human",
+                  "content": "What is LangGraph?",
+              }],
+          },
+          stream_mode="updates",
+      ):
+          print(f"Receiving new event of type: {chunk.event}...")
+          print(chunk.data)
+          print("\n\n")
+      ```
+    </Tab>
+    <Tab title="JavaScript SDK">
+    1. LangGraph JS SDK를 설치합니다
+      ```shell
+      npm install @langchain/langgraph-sdk
+      ```
+    2. assistant에게 메시지를 보냅니다 (threadless run):
+      ```js
+      const { Client } = await import("@langchain/langgraph-sdk");
+
+      const client = new Client({ apiUrl: "your-deployment-url", apiKey: "your-langsmith-api-key" });
+
+      const streamResponse = client.runs.stream(
+          null, // Threadless run
+          "agent", // Assistant ID
+          {
+              input: {
+                  "messages": [
+                      { "role": "user", "content": "What is LangGraph?"}
+                  ]
+              },
+              streamMode: "messages",
+          }
+      );
+
+      for await (const chunk of streamResponse) {
+          console.log(`Receiving new event of type: ${chunk.event}...`);
+          console.log(JSON.stringify(chunk.data));
+          console.log("\n\n");
+      }
+      ```
+    </Tab>
+    <Tab title="Rest API">
+    ```bash
+    curl -s --request POST \
+        --url <DEPLOYMENT_URL>/runs/stream \
+        --header 'Content-Type: application/json' \
+        --header "X-Api-Key: <LANGSMITH API KEY> \
+        --data "{
+            \"assistant_id\": \"agent\",
+            \"input\": {
+                \"messages\": [
+                    {
+                        \"role\": \"human\",
+                        \"content\": \"What is LangGraph?\"
+                    }
+                ]
+            },
+            \"stream_mode\": \"updates\"
+        }"
+    ```
+    </Tab>
+</Tabs>
+
+## 다음 단계
+
+LangSmith Cloud에 애플리케이션을 성공적으로 배포했습니다. 다음 단계는 다음과 같습니다:
+
+- **Studio 탐색**: [Studio](/langsmith/studio)를 사용하여 graph를 대화형으로 시각화하고 디버그합니다.
+- **앱 모니터링**: trace, dashboard 및 alert를 통해 [observability](/langsmith/observability)를 설정합니다.
+- **Cloud에 대해 자세히 알아보기**: 모든 구성 옵션은 [전체 Cloud 설정 가이드](/langsmith/deploy-to-cloud)를 참조하세요.

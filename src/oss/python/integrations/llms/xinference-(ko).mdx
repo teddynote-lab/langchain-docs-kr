@@ -1,0 +1,81 @@
+---
+title: Xorbits Inference (Xinference)
+---
+
+[Xinference](https://github.com/xorbitsai/inference)는 노트북에서도 LLM,
+음성 인식 모델, 멀티모달 모델을 서빙할 수 있도록 설계된 강력하고 다재다능한 라이브러리입니다. chatglm, baichuan, whisper, vicuna, orca 등 GGML과 호환되는 다양한 모델을 지원합니다. 이 노트북은 Xinference를 LangChain과 함께 사용하는 방법을 보여줍니다.
+
+## Installation
+
+PyPI를 통해 `Xinference`를 설치합니다:
+
+```python
+pip install -qU  "xinference[all]"
+```
+
+## 로컬 또는 분산 클러스터에 Xinference 배포하기
+
+로컬 배포의 경우 `xinference`를 실행합니다.
+
+클러스터에 Xinference를 배포하려면 먼저 `xinference-supervisor`를 사용하여 Xinference supervisor를 시작합니다. -p 옵션으로 포트를 지정하고 -H 옵션으로 호스트를 지정할 수 있습니다. 기본 포트는 9997입니다.
+
+그런 다음 실행하려는 각 서버에서 `xinference-worker`를 사용하여 Xinference worker를 시작합니다.
+
+자세한 내용은 [Xinference](https://github.com/xorbitsai/inference)의 README 파일을 참조하세요.
+
+## Wrapper
+
+LangChain과 함께 Xinference를 사용하려면 먼저 모델을 실행해야 합니다. command line interface (CLI)를 사용하여 실행할 수 있습니다:
+
+```python
+!xinference launch -n vicuna-v1.3 -f ggmlv3 -q q4_0
+```
+
+```output
+Model uid: 7167b2b0-2a04-11ee-83f0-d29396a3f064
+```
+
+사용할 수 있는 model UID가 반환됩니다. 이제 LangChain과 함께 Xinference를 사용할 수 있습니다:
+
+```python
+from langchain_community.llms import Xinference
+
+llm = Xinference(
+    server_url="http://0.0.0.0:9997", model_uid="7167b2b0-2a04-11ee-83f0-d29396a3f064"
+)
+
+llm(
+    prompt="Q: where can we visit in the capital of France? A:",
+    generate_config={"max_tokens": 1024, "stream": True},
+)
+```
+
+```output
+' You can visit the Eiffel Tower, Notre-Dame Cathedral, the Louvre Museum, and many other historical sites in Paris, the capital of France.'
+```
+
+### LLMChain과 통합하기
+
+```python
+from langchain.chains import LLMChain
+from langchain_core.prompts import PromptTemplate
+
+template = "Where can we visit in the capital of {country}?"
+
+prompt = PromptTemplate.from_template(template)
+
+llm_chain = LLMChain(prompt=prompt, llm=llm)
+
+generated = llm_chain.run(country="France")
+print(generated)
+```
+
+```output
+A: You can visit many places in Paris, such as the Eiffel Tower, the Louvre Museum, Notre-Dame Cathedral, the Champs-Elysées, Montmartre, Sacré-Cœur, and the Palace of Versailles.
+```
+
+마지막으로, 더 이상 사용하지 않을 때 모델을 종료합니다:
+
+```python
+!xinference terminate --model-uid "7167b2b0-2a04-11ee-83f0-d29396a3f064"
+```

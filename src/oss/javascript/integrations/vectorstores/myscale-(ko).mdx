@@ -1,0 +1,90 @@
+---
+title: MyScale
+---
+
+<Tip>
+**호환성**
+
+Node.js에서만 사용 가능합니다.
+</Tip>
+
+[MyScale](https://myscale.com/)은 vector search와 SQL 분석의 강력함을 조화롭게 결합하여 관리되고 효율적이며 반응성 있는 경험을 제공하는 새로운 AI 데이터베이스입니다.
+
+## Setup
+
+1. [MyScale의 Web Console](https://console.myscale.com/)을 통해 클러스터를 시작하세요. 자세한 내용은 [MyScale의 공식 문서](https://docs.myscale.com/en/quickstart/)를 참조하세요.
+2. 클러스터를 시작한 후, 클러스터의 `Actions` 메뉴에서 `Connection Details`를 확인하세요. host, port, username, password가 필요합니다.
+3. 작업 공간에 필요한 Node.js peer dependency를 설치하세요.
+
+<Tip>
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install -S @langchain/openai @clickhouse/client @langchain/community @langchain/core
+```
+
+## Index and Query Docs
+
+```typescript
+import { MyScaleStore } from "@langchain/community/vectorstores/myscale";
+import { OpenAIEmbeddings } from "@langchain/openai";
+
+const vectorStore = await MyScaleStore.fromTexts(
+  ["Hello world", "Bye bye", "hello nice world"],
+  [
+    { id: 2, name: "2" },
+    { id: 1, name: "1" },
+    { id: 3, name: "3" },
+  ],
+  new OpenAIEmbeddings(),
+  {
+    host: process.env.MYSCALE_HOST || "localhost",
+    port: process.env.MYSCALE_PORT || "8443",
+    username: process.env.MYSCALE_USERNAME || "username",
+    password: process.env.MYSCALE_PASSWORD || "password",
+    database: "default", // defaults to "default"
+    table: "your_table", // defaults to "vector_table"
+  }
+);
+
+const results = await vectorStore.similaritySearch("hello world", 1);
+console.log(results);
+
+const filteredResults = await vectorStore.similaritySearch("hello world", 1, {
+  whereStr: "metadata.name = '1'",
+});
+console.log(filteredResults);
+```
+
+## 기존 Collection에서 문서 쿼리하기
+
+```typescript
+import { MyScaleStore } from "@langchain/community/vectorstores/myscale";
+import { OpenAIEmbeddings } from "@langchain/openai";
+
+const vectorStore = await MyScaleStore.fromExistingIndex(
+  new OpenAIEmbeddings(),
+  {
+    host: process.env.MYSCALE_HOST || "localhost",
+    port: process.env.MYSCALE_PORT || "8443",
+    username: process.env.MYSCALE_USERNAME || "username",
+    password: process.env.MYSCALE_PASSWORD || "password",
+    database: "default", // defaults to "default"
+    table: "your_table", // defaults to "vector_table"
+  }
+);
+
+const results = await vectorStore.similaritySearch("hello world", 1);
+console.log(results);
+
+const filteredResults = await vectorStore.similaritySearch("hello world", 1, {
+  whereStr: "metadata.name = '1'",
+});
+console.log(filteredResults);
+```
+
+## Related
+
+- Vector store [개념 가이드](/oss/integrations/vectorstores)
+- Vector store [how-to 가이드](/oss/integrations/vectorstores)

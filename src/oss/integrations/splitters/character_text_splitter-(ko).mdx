@@ -1,0 +1,145 @@
+---
+title: 문자 기반 분할
+---
+
+문자 기반 분할은 텍스트 분할의 가장 간단한 접근 방식입니다. 지정된 문자 시퀀스(기본값: `"\n\n"`)를 사용하여 텍스트를 나누며, 청크 길이는 문자 수로 측정됩니다.
+
+**핵심 사항**:
+1. **텍스트 분할 방식**: 주어진 문자 구분자를 기준으로 분할합니다.
+2. **청크 크기 측정 방식**: 문자 수로 측정합니다.
+
+:::python
+다음 중 선택할 수 있습니다:
+- `.split_text` — 일반 문자열 청크를 반환합니다.
+- `.create_documents` — LangChain @[Document] 객체를 반환하며, 다운스트림 작업을 위해 메타데이터를 보존해야 할 때 유용합니다.
+:::
+:::js
+다음 중 선택할 수 있습니다:
+- `.splitText` — 일반 문자열 청크를 반환합니다.
+- `.createDocuments` — LangChain @[Document] 객체를 반환하며, 다운스트림 작업을 위해 메타데이터를 보존해야 할 때 유용합니다.
+:::
+
+:::python
+```python
+pip install -qU langchain-text-splitters
+```
+:::
+:::js
+<CodeGroup>
+```bash npm
+npm install @langchain/textsplitters
+```
+
+```bash pnpm
+pnpm install @langchain/textsplitters
+```
+
+```bash yarn
+yarn add @langchain/textsplitters
+```
+
+```bash bun
+bun add @langchain/textsplitters
+```
+</CodeGroup>
+:::
+
+:::python
+```python
+from langchain_text_splitters import CharacterTextSplitter
+
+# Load an example document
+with open("state_of_the_union.txt") as f:
+    state_of_the_union = f.read()
+
+text_splitter = CharacterTextSplitter(
+    separator="\n\n",
+    chunk_size=1000,
+    chunk_overlap=200,
+    length_function=len,
+    is_separator_regex=False,
+)
+texts = text_splitter.create_documents([state_of_the_union])
+print(texts[0])
+```
+```output
+page_content='Madam Speaker, Madam Vice President, our First Lady and Second Gentleman. Members of Congress and the Cabinet. Justices of the Supreme Court. My fellow Americans.  \n\nLast year COVID-19 kept us apart. This year we are finally together again. \n\nTonight, we meet as Democrats Republicans and Independents. But most importantly as Americans. \n\nWith a duty to one another to the American people to the Constitution. \n\nAnd with an unwavering resolve that freedom will always triumph over tyranny. \n\nSix days ago, Russia’s Vladimir Putin sought to shake the foundations of the free world thinking he could make it bend to his menacing ways. But he badly miscalculated. \n\nHe thought he could roll into Ukraine and the world would roll over. Instead he met a wall of strength he never imagined. \n\nHe met the Ukrainian people. \n\nFrom President Zelenskyy to every Ukrainian, their fearlessness, their courage, their determination, inspires the world.'
+```
+:::
+:::js
+```ts
+import { CharacterTextSplitter } from "@langchain/textsplitters";
+import { readFileSync } from "fs";
+
+// Example: read a long document
+const stateOfTheUnion = readFileSync("state_of_the_union.txt", "utf8");
+
+const splitter = new CharacterTextSplitter({
+    separator: "\n\n",
+    chunkSize: 1000,
+    chunkOverlap: 200,
+});
+const texts = splitter.createDocuments([{ pageContent: stateOfTheUnion }]);
+console.log(texts[0]);
+```
+```output
+Document {
+    pageContent: 'Madam Speaker, Madam Vice President, our First Lady and Second Gentleman. Members of Congress and the Cabinet. Justices of the Supreme Court. My fellow Americans.  \n\nLast year COVID-19 kept us apart. This year we are finally together again. \n\nTonight, we meet as Democrats Republicans and Independents. But most importantly as Americans. \n\nWith a duty to one another to the American people to the Constitution. \n\nAnd with an unwavering resolve that freedom will always triumph over tyranny. \n\nSix days ago, Russia’s Vladimir Putin sought to shake the foundations of the free world thinking he could make it bend to his menacing ways. But he badly miscalculated. \n\nHe thought he could roll into Ukraine and the world would roll over. Instead he met a wall of strength he never imagined. \n\nHe met the Ukrainian people. \n\nFrom President Zelenskyy to every Ukrainian, their fearlessness, their courage, their determination, inspires the world.'
+}
+```
+:::
+
+:::python
+`.create_documents`를 사용하여 각 문서와 연관된 메타데이터를 출력 청크로 전파합니다:
+
+```python
+metadatas = [{"document": 1}, {"document": 2}]
+documents = text_splitter.create_documents(
+    [state_of_the_union, state_of_the_union], metadatas=metadatas
+)
+print(documents[0])
+```
+```output
+page_content='Madam Speaker, Madam Vice President, our First Lady and Second Gentleman. Members of Congress and the Cabinet. Justices of the Supreme Court. My fellow Americans.  \n\nLast year COVID-19 kept us apart. This year we are finally together again. \n\nTonight, we meet as Democrats Republicans and Independents. But most importantly as Americans. \n\nWith a duty to one another to the American people to the Constitution. \n\nAnd with an unwavering resolve that freedom will always triumph over tyranny. \n\nSix days ago, Russia’s Vladimir Putin sought to shake the foundations of the free world thinking he could make it bend to his menacing ways. But he badly miscalculated. \n\nHe thought he could roll into Ukraine and the world would roll over. Instead he met a wall of strength he never imagined. \n\nHe met the Ukrainian people. \n\nFrom President Zelenskyy to every Ukrainian, their fearlessness, their courage, their determination, inspires the world.' metadata={'document': 1}
+```
+:::
+:::js
+`.createDocuments`를 사용하여 각 문서와 연관된 메타데이터를 출력 청크로 전파합니다:
+
+```ts
+const metadatas = [{"document": 1}, {"document": 2}]
+const documents = splitter.createDocuments(
+    [{ pageContent: stateOfTheUnion }, { pageContent: stateOfTheUnion }],
+    { metadatas: metadatas }
+);
+console.log(documents[0]);
+```
+```output
+Document {
+    pageContent: 'Madam Speaker, Madam Vice President, our First Lady and Second Gentleman. Members of Congress and the Cabinet. Justices of the Supreme Court. My fellow Americans.  \n\nLast year COVID-19 kept us apart. This year we are finally together again. \n\nTonight, we meet as Democrats Republicans and Independents. But most importantly as Americans. \n\nWith a duty to one another to the American people to the Constitution. \n\nAnd with an unwavering resolve that freedom will always triumph over tyranny. \n\nSix days ago, Russia’s Vladimir Putin sought to shake the foundations of the free world thinking he could make it bend to his menacing ways. But he badly miscalculated. \n\nHe thought he could roll into Ukraine and the world would roll over. Instead he met a wall of strength he never imagined. \n\nHe met the Ukrainian people. \n\nFrom President Zelenskyy to every Ukrainian, their fearlessness, their courage, their determination, inspires the world.',
+    metadata: {'document': 1}
+}
+```
+:::
+
+:::python
+`.split_text`를 사용하여 문자열 콘텐츠를 직접 가져옵니다:
+
+```python
+text_splitter.split_text(state_of_the_union)[0]
+```
+```output
+'Madam Speaker, Madam Vice President, our First Lady and Second Gentleman. Members of Congress and the Cabinet. Justices of the Supreme Court. My fellow Americans.  \n\nLast year COVID-19 kept us apart. This year we are finally together again. \n\nTonight, we meet as Democrats Republicans and Independents. But most importantly as Americans. \n\nWith a duty to one another to the American people to the Constitution. \n\nAnd with an unwavering resolve that freedom will always triumph over tyranny. \n\nSix days ago, Russia’s Vladimir Putin sought to shake the foundations of the free world thinking he could make it bend to his menacing ways. But he badly miscalculated. \n\nHe thought he could roll into Ukraine and the world would roll over. Instead he met a wall of strength he never imagined. \n\nHe met the Ukrainian people. \n\nFrom President Zelenskyy to every Ukrainian, their fearlessness, their courage, their determination, inspires the world.'
+```
+
+:::
+:::js
+`.splitText`를 사용하여 문자열 콘텐츠를 직접 가져옵니다:
+
+```ts
+splitter.splitText(stateOfTheUnion)[0]
+```
+```output
+'Madam Speaker, Madam Vice President, our First Lady and Second Gentleman. Members of Congress and the Cabinet. Justices of the Supreme Court. My fellow Americans.  \n\nLast year COVID-19 kept us apart. This year we are finally together again. \n\nTonight, we meet as Democrats Republicans and Independents. But most importantly as Americans. \n\nWith a duty to one another to the American people to the Constitution. \n\nAnd with an unwavering resolve that freedom will always triumph over tyranny. \n\nSix days ago, Russia’s Vladimir Putin sought to shake the foundations of the free world thinking he could make it bend to his menacing ways. But he badly miscalculated. \n\nHe thought he could roll into Ukraine and the world would roll over. Instead he met a wall of strength he never imagined. \n\nHe met the Ukrainian people. \n\nFrom President Zelenskyy to every Ukrainian, their fearlessness, their courage, their determination, inspires the world.'
+```
+:::

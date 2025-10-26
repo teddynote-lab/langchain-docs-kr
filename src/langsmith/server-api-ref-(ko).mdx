@@ -1,0 +1,28 @@
+---
+title: LangSmith Deployment를 위한 LangGraph Server API 레퍼런스
+sidebarTitle: LangGraph Server API
+---
+
+LangGraph Server API 레퍼런스는 각 [deployment](/langsmith/deployments)의 `/docs` endpoint에서 확인할 수 있습니다 (예: `http://localhost:8124/docs`).
+
+<Card title="API 레퍼런스" href="https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html" icon="book">
+  전체 LangGraph Server API 레퍼런스 문서 보기
+</Card>
+
+## Authentication
+
+LangSmith로의 deployment에는 인증이 필요합니다. LangGraph Server로의 각 요청에 `X-Api-Key` header를 전달하세요. header의 값은 LangGraph Server가 배포된 organization의 유효한 LangSmith API key로 설정되어야 합니다.
+
+`curl` 명령어 예시:
+
+```shell
+curl --request POST \
+  --url http://localhost:8124/assistants/search \
+  --header 'Content-Type: application/json' \
+  --header 'X-Api-Key: LANGSMITH_API_KEY' \
+  --data '{
+  "metadata": {},
+  "limit": 10,
+  "offset": 0
+}'
+```

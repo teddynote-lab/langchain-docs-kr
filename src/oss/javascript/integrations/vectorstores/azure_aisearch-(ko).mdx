@@ -1,0 +1,145 @@
+---
+title: Azure AI Search
+---
+
+[Azure AI Search](https://azure.microsoft.com/products/ai-services/ai-search) (이전에는 Azure Search 및 Azure Cognitive Search로 알려짐)는 Azure의 프로덕션 규모 워크로드에서 속도와 관련성을 위해 최적화된 분산형 RESTful 검색 엔진입니다. [k-nearest neighbor](https://en.wikipedia.org/wiki/Nearest_neighbor_search) (kNN) 알고리즘을 사용한 벡터 검색과 [semantic search](https://learn.microsoft.com/azure/search/semantic-search-overview)도 지원합니다.
+
+이 vector store 통합은 전체 텍스트 검색, 벡터 검색 및 [최상의 순위 성능을 위한 하이브리드 검색](https://techcommunity.microsoft.com/t5/ai-azure-ai-services-blog/azure-cognitive-search-outperforming-vector-search-with-hybrid/ba-p/3929167)을 지원합니다.
+
+Azure AI Search의 벡터 검색 기능을 활용하는 방법은 [이 페이지](https://learn.microsoft.com/azure/search/vector-search-overview)에서 확인하세요. Azure 계정이 없다면 [무료 계정을 생성](https://azure.microsoft.com/free/)하여 시작할 수 있습니다.
+
+## Setup
+
+먼저 `@azure/search-documents` SDK와 [`@langchain/community`](https://www.npmjs.com/package/@langchain/community) package를 설치해야 합니다:
+
+<Tip>
+LangChain package 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install -S @langchain/community @langchain/core @azure/search-documents
+```
+
+또한 Azure AI Search 인스턴스가 실행 중이어야 합니다. [이 가이드](https://learn.microsoft.com/azure/search/search-create-service-portal)를 따라 Azure Portal에서 무료 버전을 비용 없이 배포할 수 있습니다.
+
+인스턴스가 실행되면 endpoint와 admin key가 있는지 확인하세요 (query key는 문서 검색에만 사용할 수 있으며, 인덱싱, 업데이트 또는 삭제에는 사용할 수 없습니다). endpoint는 Azure Portal의 인스턴스 "Overview" 섹션에서 찾을 수 있는 인스턴스의 URL입니다. admin key는 인스턴스의 "Keys" 섹션에서 찾을 수 있습니다. 그런 다음 다음 환경 변수를 설정해야 합니다:
+
+```bash .env vars
+# Azure AI Search connection settings
+AZURE_AISEARCH_ENDPOINT=
+AZURE_AISEARCH_KEY=
+
+# If you're using Azure OpenAI API, you'll need to set these variables
+AZURE_OPENAI_API_KEY=
+AZURE_OPENAI_API_INSTANCE_NAME=
+AZURE_OPENAI_API_DEPLOYMENT_NAME=
+AZURE_OPENAI_API_EMBEDDINGS_DEPLOYMENT_NAME=
+AZURE_OPENAI_API_VERSION=
+
+# Or you can use the OpenAI API directly
+OPENAI_API_KEY=
+```
+
+## 하이브리드 검색에 대하여
+
+하이브리드 검색은 전체 텍스트 검색과 벡터 검색의 장점을 결합하여 최상의 순위 성능을 제공하는 기능입니다. Azure AI Search vector store에서 기본적으로 활성화되어 있지만, vector store를 생성할 때 `search.type` 속성을 설정하여 다른 검색 쿼리 유형을 선택할 수 있습니다.
+
+하이브리드 검색과 검색 결과를 개선하는 방법에 대한 자세한 내용은 [공식 문서](https://learn.microsoft.com/azure/search/hybrid-search-overview)에서 확인할 수 있습니다.
+
+retrieval-augmented generation (RAG)과 같은 일부 시나리오에서는 검색 결과의 관련성을 향상시키기 위해 하이브리드 검색과 함께 **semantic ranking**을 활성화할 수 있습니다. vector store를 생성할 때 `search.type` 속성을 `AzureAISearchQueryType.SemanticHybrid`로 설정하여 semantic ranking을 활성화할 수 있습니다.
+semantic ranking 기능은 Basic 이상의 가격 책정 계층에서만 사용할 수 있으며 [지역별 가용성](https://azure.microsoft.com/en-us/explore/global-infrastructure/products-by-region/?products=search)에 따라 제한됩니다.
+
+하이브리드 검색과 함께 semantic ranking을 사용하는 성능에 대한 자세한 내용은 [이 블로그 게시물](https://techcommunity.microsoft.com/t5/ai-azure-ai-services-blog/azure-cognitive-search-outperforming-vector-search-with-hybrid/ba-p/3929167)에서 확인할 수 있습니다.
+
+## 예제: 문서 인덱싱, 벡터 검색 및 LLM 통합
+
+다음은 Azure AI Search에서 파일의 문서를 인덱싱하고, 하이브리드 검색 쿼리를 실행하고, 마지막으로 검색된 문서를 기반으로 자연어로 질문에 답변하는 chain을 사용하는 예제입니다.
+
+```typescript
+import {
+  AzureAISearchVectorStore,
+  AzureAISearchQueryType,
+} from "@langchain/community/vectorstores/azure_aisearch";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
+import { createStuffDocumentsChain } from "@langchain/classic/chains/combine_documents";
+import { createRetrievalChain } from "@langchain/classic/chains/retrieval";
+import { TextLoader } from "@langchain/classic/document_loaders/fs/text";
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+
+// Load documents from file
+const loader = new TextLoader("./state_of_the_union.txt");
+const rawDocuments = await loader.load();
+const splitter = new RecursiveCharacterTextSplitter({
+  chunkSize: 1000,
+  chunkOverlap: 0,
+});
+const documents = await splitter.splitDocuments(rawDocuments);
+
+// Create Azure AI Search vector store
+const store = await AzureAISearchVectorStore.fromDocuments(
+  documents,
+  new OpenAIEmbeddings(),
+  {
+    search: {
+      type: AzureAISearchQueryType.SimilarityHybrid,
+    },
+  }
+);
+
+// The first time you run this, the index will be created.
+// You may need to wait a bit for the index to be created before you can perform
+// a search, or you can create the index manually beforehand.
+
+// Performs a similarity search
+const resultDocuments = await store.similaritySearch(
+  "What did the president say about Ketanji Brown Jackson?"
+);
+
+console.log("Similarity search results:");
+console.log(resultDocuments[0].pageContent);
+/*
+  Tonight. I call on the Senate to: Pass the Freedom to Vote Act. Pass the John Lewis Voting Rights Act. And while you’re at it, pass the Disclose Act so Americans can know who is funding our elections.
+
+  Tonight, I’d like to honor someone who has dedicated his life to serve this country: Justice Stephen Breyer—an Army veteran, Constitutional scholar, and retiring Justice of the United States Supreme Court. Justice Breyer, thank you for your service.
+
+  One of the most serious constitutional responsibilities a President has is nominating someone to serve on the United States Supreme Court.
+
+  And I did that 4 days ago, when I nominated Circuit Court of Appeals Judge Ketanji Brown Jackson. One of our nation’s top legal minds, who will continue Justice Breyer’s legacy of excellence.
+*/
+
+// Use the store as part of a chain
+const model = new ChatOpenAI({ model: "gpt-3.5-turbo-1106" });
+const questionAnsweringPrompt = ChatPromptTemplate.fromMessages([
+  [
+    "system",
+    "Answer the user's questions based on the below context:\n\n{context}",
+  ],
+  ["human", "{input}"],
+]);
+
+const combineDocsChain = await createStuffDocumentsChain({
+  llm: model,
+  prompt: questionAnsweringPrompt,
+});
+
+const chain = await createRetrievalChain({
+  retriever: store.asRetriever(),
+  combineDocsChain,
+});
+
+const response = await chain.invoke({
+  input: "What is the president's top priority regarding prices?",
+});
+
+console.log("Chain response:");
+console.log(response.answer);
+/*
+  The president's top priority is getting prices under control.
+*/
+```
+
+## Related
+
+- Vector store [개념 가이드](/oss/integrations/vectorstores)
+- Vector store [사용 방법 가이드](/oss/integrations/vectorstores)

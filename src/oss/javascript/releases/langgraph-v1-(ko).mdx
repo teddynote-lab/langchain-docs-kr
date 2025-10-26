@@ -1,0 +1,146 @@
+---
+title: v1의 새로운 기능
+sidebarTitle: 릴리스 노트
+---
+
+**LangGraph v1은 에이전트 런타임의 안정성에 중점을 둔 릴리스입니다.** 핵심 graph API와 실행 모델은 변경되지 않은 채로 유지하면서, 타입 안전성, 문서, 개발자 경험을 개선했습니다.
+
+[LangChain v1](/oss/releases/langchain-v1)과 함께 작동하도록 설계되었으며 (LangChain의 `createAgent`는 LangGraph 위에 구축됨), 높은 수준에서 시작하여 필요할 때 세밀한 제어로 전환할 수 있습니다.
+
+<CardGroup cols={1}>
+    <Card title="안정적인 핵심 API" icon="diagram-project">
+        Graph 기본 요소(state, nodes, edges)와 실행/런타임 모델이 변경되지 않아 업그레이드가 간단합니다.
+    </Card>
+    <Card title="기본적으로 제공되는 신뢰성" icon="database">
+        체크포인팅, 영속성, 스트리밍, human-in-the-loop을 통한 내구성 있는 실행이 계속해서 일급 기능으로 제공됩니다.
+    </Card>
+    <Card title="LangChain v1과 원활한 통합" icon="link">
+        LangChain의 `createAgent`는 LangGraph에서 실행됩니다. 빠른 시작을 위해 LangChain을 사용하고, 커스텀 오케스트레이션을 위해 LangGraph로 전환하세요.
+    </Card>
+</CardGroup>
+
+업그레이드하려면,
+
+<CodeGroup>
+```bash npm
+npm install @langchain/langgraph @langchain/core
+```
+```bash pnpm
+pnpm add @langchain/langgraph @langchain/core
+```
+```bash yarn
+yarn add @langchain/langgraph @langchain/core
+```
+```bash bun
+bun add @langchain/langgraph @langchain/core
+```
+</CodeGroup>
+
+전체 변경 사항 목록은 [마이그레이션 가이드](/oss/migrate/langgraph-v1)를 참조하세요.
+
+## `createReactAgent`의 지원 중단
+
+LangGraph의 `createReactAgent` 사전 빌드는 LangChain의 `createAgent`를 위해 지원 중단되었습니다. 더 간단한 인터페이스를 제공하며, 미들웨어 도입을 통해 더 큰 커스터마이징 가능성을 제공합니다.
+
+* 새로운 `createAgent` API에 대한 정보는 [LangChain v1 릴리스 노트](/oss/releases/langchain-v1#createagent)를 참조하세요.
+* `createReactAgent`에서 `createAgent`로 마이그레이션하는 방법은 [LangChain v1 마이그레이션 가이드](/oss/migrate/langchain-v1#createagent)를 참조하세요.
+
+## 타입이 지정된 interrupt
+
+@[`StateGraph`]는 이제 생성자에서 interrupt 타입의 맵을 받아 graph 내에서 사용할 수 있는 interrupt 타입을 더 엄격하게 제한합니다.
+
+```typescript expandable
+import { StateGraph, MemorySaver, interrupt } from "@langchain/langgraph";
+import * as z from "zod";
+
+const stateSchema = z.object({
+  foo: z.string(),
+})
+
+const graphConfig = {
+  interrupts: {
+    // Define a simple interrupt that accepts a reason and returns messages
+    simple: interrupt<{ reason: string }, { messages: string[] }>, // [!code highlight]
+    // Define a complex interrupt with the same signature
+    complex: interrupt<{ reason: string }, { messages: string[] }>, // [!code highlight]
+  }
+}
+
+const checkpointer = new MemorySaver();
+
+const graph = new StateGraph(stateSchema, graphConfig)
+  .addNode("node", async (state, runtime) => {
+    // Trigger the simple interrupt with a reason
+    const response = runtime.interrupt.simple({ reason: "test" });
+    // Return the interrupt response as the new state
+    return { foo: response };
+  })
+  // Compile the graph with the checkpointer
+  .compile({ checkpointer });
+
+// Invoke the graph with initial state
+const result = await graph.invoke({ foo: "test" });
+
+// Access the interrupt data
+if (graph.isInterrupted(result)) {
+  console.log(result.__interrupt__.messages);
+}
+```
+
+interrupt에 대한 자세한 내용은 [Interrupts](/oss/langgraph/interrupts) 문서를 참조하세요.
+
+## Frontend SDK 개선 사항
+
+LangGraph v1은 프론트엔드에서 LangGraph 애플리케이션과 상호작용할 때 몇 가지 개선 사항을 제공합니다.
+
+### Event stream encoding
+
+저수준 `toLangGraphEventStream` 헬퍼가 제거되었습니다. 스트리밍 응답은 이제 SDK에서 기본적으로 처리되며, `graph.stream`에 `encoding` 형식을 전달하여 wire 형식을 선택할 수 있습니다. 이를 통해 UI 로직을 변경하지 않고도 SSE와 일반 JSON 응답 간에 쉽게 전환할 수 있습니다.
+
+자세한 내용은 [마이그레이션 가이드](/oss/migrate/langgraph-v1#stream-encoding)를 참조하세요.
+
+### `useStream`의 커스텀 transport
+
+React `useStream` hook은 이제 플러그 가능한 transport를 지원하므로 UI 코드를 변경하지 않고도 네트워크 레이어를 더 세밀하게 제어할 수 있습니다.
+
+```typescript
+const stream = useStream({
+  transport: new FetchStreamTransport({
+    apiUrl: "http://localhost:2024",
+  }),
+});
+```
+
+hook을 통합하고 커스터마이징하는 방법을 알아보세요: [LangGraph를 React 애플리케이션에 통합하기](/oss/langgraph/ui).
+
+## 이슈 보고
+
+1.0에서 발견된 이슈는 [`'v1'` label](https://github.com/langchain-ai/langgraphjs/issues?q=state%3Aopen%20label%3Av1)을 사용하여 [GitHub](https://github.com/langchain-ai/langgraphjs/issues)에 보고해 주세요.
+
+## 추가 리소스
+
+<CardGroup cols={3}>
+    <Card title="LangGraph 1.0" icon="rocket" href="https://blog.langchain.com/langchain-langchain-1-0-alpha-releases/">
+        공지사항 읽기
+    </Card>
+    <Card title="개요" icon="book" href="/oss/langgraph/overview" arrow>
+        LangGraph가 무엇이고 언제 사용하는지
+    </Card>
+    <Card title="Graph API" icon="diagram-project" href="/oss/langgraph/graph-api" arrow>
+        state, nodes, edges로 graph 구축하기
+    </Card>
+    <Card title="LangChain Agents" icon="robot" href="/oss/langchain/agents" arrow>
+        LangGraph 위에 구축된 고수준 에이전트
+    </Card>
+    <Card title="마이그레이션 가이드" icon="arrow-right-arrow-left" href="/oss/migrate/langgraph-v1" arrow>
+        LangGraph v1으로 마이그레이션하는 방법
+    </Card>
+    <Card title="GitHub" icon="github" href="https://github.com/langchain-ai/langgraphjs">
+        이슈 보고 또는 기여하기
+    </Card>
+</CardGroup>
+
+## 참고 자료
+
+- [버전 관리](/oss/versioning) - 버전 번호 이해하기
+- [릴리스 정책](/oss/release-policy) - 상세한 릴리스 정책

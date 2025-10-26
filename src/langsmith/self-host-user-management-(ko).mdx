@@ -1,0 +1,103 @@
+---
+title: 사용자 관리 커스터마이징
+sidebarTitle: 사용자 관리 커스터마이징
+---
+
+<Note>
+이 가이드는 [관리자 가이드](/langsmith/administration-overview)와 [조직 설정 가이드](/langsmith/set-up-a-workspace#set-up-an-organization)를 읽었다고 가정합니다.
+</Note>
+
+LangSmith는 feature flag를 사용하여 사용자 관리를 위한 추가 커스터마이징 기능을 제공합니다.
+
+## Features
+
+### 조직에 대한 Workspace 레벨 초대
+
+LangSmith의 기본 동작은 조직에 새 사용자를 초대하기 위해 사용자가 Organization Admin이어야 합니다. 이 책임을 workspace Admin에게 위임하고자 하는 self-hosted 고객의 경우, workspace Admin이 **workspace 레벨에서** 조직과 특정 workspace에 새 사용자를 초대할 수 있도록 하는 feature flag를 설정할 수 있습니다.
+
+아래 구성 옵션을 통해 이 기능이 활성화되면, workspace Admin은 `Settings` > `Workspaces` 아래의 `Workspace members` 탭에서 새 사용자를 추가할 수 있습니다. workspace 레벨에서 초대할 때 다음 두 가지 경우가 모두 지원되며, 조직 레벨 초대는 이전과 동일하게 작동합니다.
+
+1. 조직에서 아직 활성화되지 않은 사용자 초대: 사용자를 조직과 특정 workspace에 대기 중(pending)으로 추가합니다
+2. 조직에서 이미 활성화된 사용자 초대: 사용자를 활성 멤버로 workspace에 직접 추가합니다(대기 상태 없음).
+
+Admin은 두 경우 모두에 대해 동시에 사용자를 초대할 수 있습니다.
+
+#### Configuration
+
+<CodeGroup>
+
+```yaml Helm
+config:
+  workspaceScopeOrgInvitesEnabled: true
+```
+
+```bash Docker
+# In your .env file
+WORKSPACE_SCOPE_ORG_INVITES_ENABLED="true"
+```
+
+</CodeGroup>
+
+### SSO 신규 멤버 로그인 플로우
+
+helm **v0.11.10**부터, OAuth SSO를 사용하는 self-hosted 배포는 더 이상 멤버가 가입하기 위해 LangSmith 설정에서 수동으로 멤버를 추가할 필요가 없습니다. 배포에는 <b>기본</b> 조직이 있으며, 새 사용자는 LangSmith에 처음 로그인할 때 자동으로 추가됩니다.
+
+**기본** 조직의 경우, 새 멤버에게 할당될 workspace(들)와 workspace role을 설정할 수 있습니다. **기본이 아닌** 조직의 경우, 초대 플로우는 동일하게 유지됩니다.
+사용자가 조직에 가입하면, 기본 조직 설정을 넘어서는 workspace 또는 role의 변경 사항은 LangSmith 설정(이전과 같이) 또는 SCIM을 통해 관리해야 합니다.
+<Note>
+기본적으로 모든 새 사용자는 조직의 초기 프로비저닝된 workspace(**기본적으로 Workspace 1**)에 **Workspace Editor** role로 추가됩니다.
+</Note>
+![Update SSO Member Settings](/langsmith/images/sso-member-settings-update.png)
+
+<Note>
+기본 조직을 변경하려면 조직 선택 드롭다운에서 **Set Default Organization**을 사용하세요. (소스 및 대상 조직 모두에서 Org Admin 권한이 필요합니다.)
+</Note>
+
+
+### 조직 생성 비활성화
+
+기본적으로 모든 사용자는 LangSmith에서 조직을 생성할 수 있습니다. self-hosted 고객의 경우, 관리자는 초기 조직을 설정한 후 이 기능을 제한하고자 할 수 있습니다. 이 feature flag를 사용하면 관리자가 사용자의 새 조직 생성 기능을 비활성화할 수 있습니다.
+
+
+#### Configuration
+
+<Note>
+`userOrgCreationDisabled` feature flag는 [basic auth](/langsmith/self-host-basic-auth) 또는 [SSO](/langsmith/self-host-sso)를 사용하는 조직의 경우 기본적으로 `true`로 설정됩니다.
+</Note>
+<CodeGroup>
+
+```yaml Helm
+config:
+  userOrgCreationDisabled: true
+```
+
+```bash Docker
+# In your .env file
+FF_ORG_CREATION_DISABLED="true"
+```
+
+</CodeGroup>
+
+### 개인 조직 비활성화
+
+기본적으로 LangSmith에 로그인하는 모든 사용자는 개인 조직이 생성됩니다. self-hosted 고객의 경우, 관리자는 이 기능을 제한하고자 할 수 있습니다. 이 feature flag를 사용하면 관리자가 사용자의 개인 조직 생성 기능을 비활성화할 수 있습니다.
+
+#### Configuration
+
+<Note>
+`personalOrgsDisabled` feature flag는 [basic auth](/langsmith/self-host-basic-auth) 또는 [SSO](/langsmith/self-host-sso)를 사용하는 조직의 경우 기본적으로 `true`로 설정됩니다.
+</Note>
+
+<CodeGroup>
+
+```yaml Helm
+config:
+  personalOrgsDisabled: true
+```
+
+```bash Docker
+# In your .env file
+PERSONAL_ORGS_DISABLED="true"
+```
+
+</CodeGroup>

@@ -1,0 +1,1512 @@
+---
+title: supervisor agent 만들기
+sidebarTitle: Supervisor agent
+---
+
+import ChatModelTabsPy from '/snippets/chat-model-tabs.mdx';
+import ChatModelTabsJs from '/snippets/chat-model-tabs-js.mdx';
+
+## Overview
+
+**supervisor 패턴**은 중앙 supervisor agent가 전문화된 worker agent들을 조정하는 [multi-agent](/oss/langchain/multi-agent) 아키텍처입니다. 이 접근 방식은 작업에 다양한 유형의 전문 지식이 필요할 때 탁월합니다. 도메인 전반에 걸쳐 tool 선택을 관리하는 하나의 agent를 구축하는 대신, supervisor가 전체 워크플로우를 이해하고 조정하는 집중된 전문가들을 만듭니다.
+
+이 튜토리얼에서는 현실적인 워크플로우를 통해 이러한 이점을 보여주는 개인 비서 시스템을 구축합니다. 시스템은 근본적으로 다른 책임을 가진 두 명의 전문가를 조정합니다:
+
+- 일정 관리, 가용성 확인 및 이벤트 관리를 처리하는 **calendar agent**.
+- 커뮤니케이션 관리, 메시지 초안 작성 및 알림 전송을 관리하는 **email agent**.
+
+또한 사용자가 원하는 대로 작업(예: 발신 이메일)을 승인, 편집 및 거부할 수 있도록 [human-in-the-loop review](/oss/langchain/human-in-the-loop)를 통합합니다.
+
+### supervisor를 사용하는 이유는?
+
+Multi-agent 아키텍처를 사용하면 [tools](/oss/langchain/tools)를 worker들에게 분할할 수 있으며, 각각 고유한 prompt나 지침을 가집니다. 모든 calendar 및 email API에 직접 액세스할 수 있는 agent를 고려해보세요: 많은 유사한 tool 중에서 선택하고, 각 API의 정확한 형식을 이해하며, 여러 도메인을 동시에 처리해야 합니다. 성능이 저하되면 관련 tool과 관련 prompt를 논리적 그룹으로 분리하는 것이 도움이 될 수 있습니다(부분적으로 반복적인 개선을 관리하기 위해).
+
+### 개념
+
+다음 개념을 다룹니다:
+
+- [Multi-agent systems](/oss/langchain/multi-agent)
+- [Human-in-the-loop review](/oss/langchain/human-in-the-loop)
+
+## Setup
+
+### Installation
+
+이 튜토리얼은 `langchain` 패키지가 필요합니다:
+
+:::python
+<CodeGroup>
+```bash pip
+pip install langchain
+```
+```bash conda
+conda install langchain -c conda-forge
+```
+</CodeGroup>
+:::
+
+:::js
+<CodeGroup>
+```bash npm
+npm install langchain
+```
+```bash yarn
+yarn add langchain
+```
+```bash pnpm
+pnpm add langchain
+```
+</CodeGroup>
+:::
+
+자세한 내용은 [Installation guide](/oss/langchain/install)를 참조하세요.
+
+### LangSmith
+
+agent 내부에서 무슨 일이 일어나는지 검사하려면 [LangSmith](https://smith.langchain.com)를 설정하세요. 그런 다음 다음 환경 변수를 설정합니다:
+
+:::python
+<CodeGroup>
+```bash bash
+export LANGSMITH_TRACING="true"
+export LANGSMITH_API_KEY="..."
+```
+```python python
+import getpass
+import os
+
+os.environ["LANGSMITH_TRACING"] = "true"
+os.environ["LANGSMITH_API_KEY"] = getpass.getpass()
+```
+</CodeGroup>
+:::
+
+:::js
+<CodeGroup>
+```bash bash
+export LANGSMITH_TRACING="true"
+export LANGSMITH_API_KEY="..."
+```
+```typescript typescript
+process.env.LANGSMITH_TRACING = "true";
+process.env.LANGSMITH_API_KEY = "...";
+```
+</CodeGroup>
+:::
+
+### Components
+
+LangChain의 통합 제품군에서 chat model을 선택해야 합니다:
+
+:::python
+<ChatModelTabsPy />
+:::
+
+:::js
+<ChatModelTabsJs />
+:::
+
+## 1. Define tools
+
+구조화된 입력이 필요한 tool을 정의하는 것부터 시작합니다. 실제 애플리케이션에서는 실제 API(Google Calendar, SendGrid 등)를 호출합니다. 이 튜토리얼에서는 패턴을 시연하기 위해 stub을 사용합니다.
+
+:::python
+```python
+from langchain_core.tools import tool
+
+@tool
+def create_calendar_event(
+    title: str,
+    start_time: str,       # ISO format: "2024-01-15T14:00:00"
+    end_time: str,         # ISO format: "2024-01-15T15:00:00"
+    attendees: list[str],  # email addresses
+    location: str = ""
+) -> str:
+    """Create a calendar event. Requires exact ISO datetime format."""
+    # Stub: In practice, this would call Google Calendar API, Outlook API, etc.
+    return f"Event created: {title} from {start_time} to {end_time} with {len(attendees)} attendees"
+
+
+@tool
+def send_email(
+    to: list[str],  # email addresses
+    subject: str,
+    body: str,
+    cc: list[str] = []
+) -> str:
+    """Send an email via email API. Requires properly formatted addresses."""
+    # Stub: In practice, this would call SendGrid, Gmail API, etc.
+    return f"Email sent to {', '.join(to)} - Subject: {subject}"
+
+
+@tool
+def get_available_time_slots(
+    attendees: list[str],
+    date: str,  # ISO format: "2024-01-15"
+    duration_minutes: int
+) -> list[str]:
+    """Check calendar availability for given attendees on a specific date."""
+    # Stub: In practice, this would query calendar APIs
+    return ["09:00", "14:00", "16:00"]
+```
+:::
+
+:::js
+```typescript
+import { tool } from "langchain";
+import { z } from "zod";
+
+const createCalendarEvent = tool(
+  async ({ title, startTime, endTime, attendees, location }) => {
+    // Stub: In practice, this would call Google Calendar API, Outlook API, etc.
+    return `Event created: ${title} from ${startTime} to ${endTime} with ${attendees.length} attendees`;
+  },
+  {
+    name: "create_calendar_event",
+    description: "Create a calendar event. Requires exact ISO datetime format.",
+    schema: z.object({
+      title: z.string(),
+      startTime: z.string().describe("ISO format: '2024-01-15T14:00:00'"),
+      endTime: z.string().describe("ISO format: '2024-01-15T15:00:00'"),
+      attendees: z.array(z.string()).describe("email addresses"),
+      location: z.string().optional(),
+    }),
+  }
+);
+
+const sendEmail = tool(
+  async ({ to, subject, body, cc }) => {
+    // Stub: In practice, this would call SendGrid, Gmail API, etc.
+    return `Email sent to ${to.join(', ')} - Subject: ${subject}`;
+  },
+  {
+    name: "send_email",
+    description: "Send an email via email API. Requires properly formatted addresses.",
+    schema: z.object({
+      to: z.array(z.string()).describe("email addresses"),
+      subject: z.string(),
+      body: z.string(),
+      cc: z.array(z.string()).optional(),
+    }),
+  }
+);
+
+const getAvailableTimeSlots = tool(
+  async ({ attendees, date, durationMinutes }) => {
+    // Stub: In practice, this would query calendar APIs
+    return ["09:00", "14:00", "16:00"];
+  },
+  {
+    name: "get_available_time_slots",
+    description: "Check calendar availability for given attendees on a specific date.",
+    schema: z.object({
+      attendees: z.array(z.string()),
+      date: z.string().describe("ISO format: '2024-01-15'"),
+      durationMinutes: z.number(),
+    }),
+  }
+);
+```
+:::
+
+## 2. Create specialized sub-agents
+
+다음으로 각 도메인을 처리하는 전문화된 sub-agent를 만듭니다.
+
+### Create a calendar agent
+
+calendar agent는 자연어 일정 요청을 이해하고 정확한 API 호출로 변환합니다. 날짜 파싱, 가용성 확인 및 이벤트 생성을 처리합니다.
+
+:::python
+```python
+from langchain.agents import create_agent
+
+
+CALENDAR_AGENT_PROMPT = (
+    "You are a calendar scheduling assistant. "
+    "Parse natural language scheduling requests (e.g., 'next Tuesday at 2pm') "
+    "into proper ISO datetime formats. "
+    "Use get_available_time_slots to check availability when needed. "
+    "Use create_calendar_event to schedule events. "
+    "Always confirm what was scheduled in your final response."
+)
+
+calendar_agent = create_agent(
+    model,
+    tools=[create_calendar_event, get_available_time_slots],
+    system_prompt=CALENDAR_AGENT_PROMPT,
+)
+```
+:::
+
+:::js
+```typescript
+import { createAgent } from "langchain";
+
+const CALENDAR_AGENT_PROMPT = `
+You are a calendar scheduling assistant.
+Parse natural language scheduling requests (e.g., 'next Tuesday at 2pm')
+into proper ISO datetime formats.
+Use get_available_time_slots to check availability when needed.
+Use create_calendar_event to schedule events.
+Always confirm what was scheduled in your final response.
+`.trim();
+
+const calendarAgent = createAgent({
+  model: llm,
+  tools: [createCalendarEvent, getAvailableTimeSlots],
+  systemPrompt: CALENDAR_AGENT_PROMPT,
+});
+```
+:::
+
+calendar agent를 테스트하여 자연어 일정을 어떻게 처리하는지 확인하세요:
+
+:::python
+```python
+query = "Schedule a team meeting next Tuesday at 2pm for 1 hour"
+
+for step in calendar_agent.stream(
+    {"messages": [{"role": "user", "content": query}]}
+):
+    for update in step.values():
+        for message in update.get("messages", []):
+            message.pretty_print()
+```
+:::
+
+:::js
+```typescript
+const query = "Schedule a team meeting next Tuesday at 2pm for 1 hour";
+
+const stream = await calendarAgent.stream({
+  messages: [{ role: "user", content: query }]
+});
+
+for await (const step of stream) {
+  for (const update of Object.values(step)) {
+    if (update && typeof update === "object" && "messages" in update) {
+      for (const message of update.messages) {
+        console.log(message.toFormattedString());
+      }
+    }
+  }
+}
+```
+:::
+```
+================================== Ai Message ==================================
+Tool Calls:
+  get_available_time_slots (call_EIeoeIi1hE2VmwZSfHStGmXp)
+ Call ID: call_EIeoeIi1hE2VmwZSfHStGmXp
+  Args:
+    attendees: []
+    date: 2024-06-18
+    duration_minutes: 60
+================================= Tool Message =================================
+Name: get_available_time_slots
+
+["09:00", "14:00", "16:00"]
+================================== Ai Message ==================================
+Tool Calls:
+  create_calendar_event (call_zgx3iJA66Ut0W8S3NpT93kEB)
+ Call ID: call_zgx3iJA66Ut0W8S3NpT93kEB
+  Args:
+    title: Team Meeting
+    start_time: 2024-06-18T14:00:00
+    end_time: 2024-06-18T15:00:00
+    attendees: []
+================================= Tool Message =================================
+Name: create_calendar_event
+
+Event created: Team Meeting from 2024-06-18T14:00:00 to 2024-06-18T15:00:00 with 0 attendees
+================================== Ai Message ==================================
+
+The team meeting has been scheduled for next Tuesday, June 18th, at 2:00 PM and will last for 1 hour. If you need to add attendees or a location, please let me know!
+```
+
+agent는 "next Tuesday at 2pm"을 ISO 형식("2024-01-16T14:00:00")으로 파싱하고, 종료 시간을 계산하고, `create_calendar_event`를 호출하고, 자연어 확인을 반환합니다.
+
+### Create an email agent
+
+email agent는 메시지 작성 및 전송을 처리합니다. 수신자 정보 추출, 적절한 제목 및 본문 텍스트 작성, 이메일 커뮤니케이션 관리에 중점을 둡니다.
+
+:::python
+```python
+EMAIL_AGENT_PROMPT = (
+    "You are an email assistant. "
+    "Compose professional emails based on natural language requests. "
+    "Extract recipient information and craft appropriate subject lines and body text. "
+    "Use send_email to send the message. "
+    "Always confirm what was sent in your final response."
+)
+
+email_agent = create_agent(
+    model,
+    tools=[send_email],
+    system_prompt=EMAIL_AGENT_PROMPT,
+)
+```
+
+자연어 요청으로 email agent를 테스트하세요:
+
+```python
+query = "Send the design team a reminder about reviewing the new mockups"
+
+for step in email_agent.stream(
+    {"messages": [{"role": "user", "content": query}]}
+):
+    for update in step.values():
+        for message in update.get("messages", []):
+            message.pretty_print()
+```
+:::
+
+:::js
+```typescript
+const EMAIL_AGENT_PROMPT = `
+You are an email assistant.
+Compose professional emails based on natural language requests.
+Extract recipient information and craft appropriate subject lines and body text.
+Use send_email to send the message.
+Always confirm what was sent in your final response.
+`.trim();
+
+const emailAgent = createAgent({
+  model: llm,
+  tools: [sendEmail],
+  systemPrompt: EMAIL_AGENT_PROMPT,
+});
+```
+
+자연어 요청으로 email agent를 테스트하세요:
+
+```typescript
+const query = "Send the design team a reminder about reviewing the new mockups";
+
+const stream = await emailAgent.stream({
+  messages: [{ role: "user", content: query }]
+});
+
+for await (const step of stream) {
+  for (const update of Object.values(step)) {
+    if (update && typeof update === "object" && "messages" in update) {
+      for (const message of update.messages) {
+        console.log(message.toFormattedString());
+      }
+    }
+  }
+}
+```
+:::
+```
+================================== Ai Message ==================================
+Tool Calls:
+  send_email (call_OMl51FziTVY6CRZvzYfjYOZr)
+ Call ID: call_OMl51FziTVY6CRZvzYfjYOZr
+  Args:
+    to: ['design-team@example.com']
+    subject: Reminder: Please Review the New Mockups
+    body: Hi Design Team,
+
+This is a friendly reminder to review the new mockups at your earliest convenience. Your feedback is important to ensure that we stay on track with our project timeline.
+
+Please let me know if you have any questions or need additional information.
+
+Thank you!
+
+Best regards,
+================================= Tool Message =================================
+Name: send_email
+
+Email sent to design-team@example.com - Subject: Reminder: Please Review the New Mockups
+================================== Ai Message ==================================
+
+I've sent a reminder to the design team asking them to review the new mockups. If you need any further communication on this topic, just let me know!
+```
+
+agent는 비공식적인 요청에서 수신자를 추론하고, 전문적인 제목과 본문을 작성하고, `send_email`을 호출하고, 확인을 반환합니다. 각 sub-agent는 도메인별 tool과 prompt를 사용하여 좁은 초점을 가지므로 특정 작업에서 탁월할 수 있습니다.
+
+## 3. Wrap sub-agents as tools
+
+이제 각 sub-agent를 supervisor가 호출할 수 있는 tool로 래핑합니다. 이것은 계층화된 시스템을 만드는 핵심 아키텍처 단계입니다. supervisor는 "create_calendar_event"와 같은 저수준 tool이 아닌 "schedule_event"와 같은 고수준 tool을 보게 됩니다.
+
+:::python
+```python
+@tool
+def schedule_event(request: str) -> str:
+    """Schedule calendar events using natural language.
+
+    Use this when the user wants to create, modify, or check calendar appointments.
+    Handles date/time parsing, availability checking, and event creation.
+
+    Input: Natural language scheduling request (e.g., 'meeting with design team
+    next Tuesday at 2pm')
+    """
+    result = calendar_agent.invoke({
+        "messages": [{"role": "user", "content": request}]
+    })
+    return result["messages"][-1].text
+
+
+@tool
+def manage_email(request: str) -> str:
+    """Send emails using natural language.
+
+    Use this when the user wants to send notifications, reminders, or any email
+    communication. Handles recipient extraction, subject generation, and email
+    composition.
+
+    Input: Natural language email request (e.g., 'send them a reminder about
+    the meeting')
+    """
+    result = email_agent.invoke({
+        "messages": [{"role": "user", "content": request}]
+    })
+    return result["messages"][-1].text
+```
+:::
+
+:::js
+```typescript
+const scheduleEvent = tool(
+  async ({ request }) => {
+    const result = await calendarAgent.invoke({
+      messages: [{ role: "user", content: request }]
+    });
+    const lastMessage = result.messages[result.messages.length - 1];
+    return lastMessage.text;
+  },
+  {
+    name: "schedule_event",
+    description: `
+Schedule calendar events using natural language.
+
+Use this when the user wants to create, modify, or check calendar appointments.
+Handles date/time parsing, availability checking, and event creation.
+
+Input: Natural language scheduling request (e.g., 'meeting with design team next Tuesday at 2pm')
+    `.trim(),
+    schema: z.object({
+      request: z.string().describe("Natural language scheduling request"),
+    }),
+  }
+);
+
+const manageEmail = tool(
+  async ({ request }) => {
+    const result = await emailAgent.invoke({
+      messages: [{ role: "user", content: request }]
+    });
+    const lastMessage = result.messages[result.messages.length - 1];
+    return lastMessage.text;
+  },
+  {
+    name: "manage_email",
+    description: `
+Send emails using natural language.
+
+Use this when the user wants to send notifications, reminders, or any email communication.
+Handles recipient extraction, subject generation, and email composition.
+
+Input: Natural language email request (e.g., 'send them a reminder about the meeting')
+    `.trim(),
+    schema: z.object({
+      request: z.string().describe("Natural language email request"),
+    }),
+  }
+);
+```
+:::
+
+tool 설명은 supervisor가 각 tool을 언제 사용할지 결정하는 데 도움이 되므로 명확하고 구체적으로 작성하세요. supervisor는 중간 추론이나 tool 호출을 볼 필요가 없으므로 sub-agent의 최종 응답만 반환합니다.
+
+## 4. Create the supervisor agent
+
+이제 sub-agent를 조정하는 supervisor를 만듭니다. supervisor는 고수준 tool만 보고 개별 API 수준이 아닌 도메인 수준에서 라우팅 결정을 내립니다.
+
+:::python
+```python
+SUPERVISOR_PROMPT = (
+    "You are a helpful personal assistant. "
+    "You can schedule calendar events and send emails. "
+    "Break down user requests into appropriate tool calls and coordinate the results. "
+    "When a request involves multiple actions, use multiple tools in sequence."
+)
+
+supervisor_agent = create_agent(
+    model,
+    tools=[schedule_event, manage_email],
+    system_prompt=SUPERVISOR_PROMPT,
+)
+```
+:::
+
+:::js
+```typescript
+const SUPERVISOR_PROMPT = `
+You are a helpful personal assistant.
+You can schedule calendar events and send emails.
+Break down user requests into appropriate tool calls and coordinate the results.
+When a request involves multiple actions, use multiple tools in sequence.
+`.trim();
+
+const supervisorAgent = createAgent({
+  model: llm,
+  tools: [scheduleEvent, manageEmail],
+  systemPrompt: SUPERVISOR_PROMPT,
+});
+```
+:::
+
+## 5. Use the supervisor
+
+이제 여러 도메인에 걸친 조정이 필요한 복잡한 요청으로 전체 시스템을 테스트하세요:
+
+### Example 1: Simple single-domain request
+
+:::python
+```python
+query = "Schedule a team standup for tomorrow at 9am"
+
+for step in supervisor_agent.stream(
+    {"messages": [{"role": "user", "content": query}]}
+):
+    for update in step.values():
+        for message in update.get("messages", []):
+            message.pretty_print()
+```
+:::
+
+:::js
+```typescript
+const query = "Schedule a team standup for tomorrow at 9am";
+
+const stream = await supervisorAgent.stream({
+  messages: [{ role: "user", content: query }]
+});
+
+for await (const step of stream) {
+  for (const update of Object.values(step)) {
+    if (update && typeof update === "object" && "messages" in update) {
+      for (const message of update.messages) {
+        console.log(message.toFormattedString());
+      }
+    }
+  }
+}
+```
+:::
+```
+================================== Ai Message ==================================
+Tool Calls:
+  schedule_event (call_mXFJJDU8bKZadNUZPaag8Lct)
+ Call ID: call_mXFJJDU8bKZadNUZPaag8Lct
+  Args:
+    request: Schedule a team standup for tomorrow at 9am with Alice and Bob.
+================================= Tool Message =================================
+Name: schedule_event
+
+The team standup has been scheduled for tomorrow at 9:00 AM with Alice and Bob. If you need to make any changes or add more details, just let me know!
+================================== Ai Message ==================================
+
+The team standup with Alice and Bob is scheduled for tomorrow at 9:00 AM. If you need any further arrangements or adjustments, please let me know!
+```
+
+supervisor는 이것을 calendar 작업으로 식별하고, `schedule_event`를 호출하며, calendar agent가 날짜 파싱 및 이벤트 생성을 처리합니다.
+
+<Tip>
+각 chat model 호출에 대한 prompt 및 응답을 포함한 정보 흐름에 대한 완전한 투명성을 위해 위 실행에 대한 [LangSmith trace](https://smith.langchain.com/public/91a9a95f-fba9-4e84-aff0-371861ad2f4a/r)를 확인하세요.
+</Tip>
+
+### Example 2: Complex multi-domain request
+
+:::python
+```python
+query = (
+    "Schedule a meeting with the design team next Tuesday at 2pm for 1 hour, "
+    "and send them an email reminder about reviewing the new mockups."
+)
+
+for step in supervisor_agent.stream(
+    {"messages": [{"role": "user", "content": query}]}
+):
+    for update in step.values():
+        for message in update.get("messages", []):
+            message.pretty_print()
+```
+:::
+
+:::js
+```typescript
+const query =
+  "Schedule a meeting with the design team next Tuesday at 2pm for 1 hour, " +
+  "and send them an email reminder about reviewing the new mockups.";
+
+const stream = await supervisorAgent.stream({
+  messages: [{ role: "user", content: query }]
+});
+
+for await (const step of stream) {
+  for (const update of Object.values(step)) {
+    if (update && typeof update === "object" && "messages" in update) {
+      for (const message of update.messages) {
+        console.log(message.toFormattedString());
+      }
+    }
+  }
+}
+```
+:::
+```
+================================== Ai Message ==================================
+Tool Calls:
+  schedule_event (call_YA68mqF0koZItCFPx0kGQfZi)
+ Call ID: call_YA68mqF0koZItCFPx0kGQfZi
+  Args:
+    request: meeting with the design team next Tuesday at 2pm for 1 hour
+  manage_email (call_XxqcJBvVIuKuRK794ZIzlLxx)
+ Call ID: call_XxqcJBvVIuKuRK794ZIzlLxx
+  Args:
+    request: send the design team an email reminder about reviewing the new mockups
+================================= Tool Message =================================
+Name: schedule_event
+
+Your meeting with the design team is scheduled for next Tuesday, June 18th, from 2:00pm to 3:00pm. Let me know if you need to add more details or make any changes!
+================================= Tool Message =================================
+Name: manage_email
+
+I've sent an email reminder to the design team requesting them to review the new mockups. If you need to include more information or recipients, just let me know!
+================================== Ai Message ==================================
+
+Your meeting with the design team is scheduled for next Tuesday, June 18th, from 2:00pm to 3:00pm.
+
+I've also sent an email reminder to the design team, asking them to review the new mockups.
+
+Let me know if you'd like to add more details to the meeting or include additional information in the email!
+```
+
+supervisor는 이것이 calendar와 email 작업 모두를 필요로 한다는 것을 인식하고, 회의를 위해 `schedule_event`를 호출한 다음 알림을 위해 `manage_email`을 호출합니다. 각 sub-agent는 작업을 완료하고, supervisor는 두 결과를 일관된 응답으로 합성합니다.
+
+<Tip>
+개별 chat model prompt 및 응답을 포함한 위 실행에 대한 자세한 정보 흐름을 보려면 [LangSmith trace](https://smith.langchain.com/public/95cd00a3-d1f9-4dba-9731-7bf733fb6a3c/r)를 참조하세요.
+</Tip>
+
+### Complete working example
+
+다음은 실행 가능한 스크립트로 모든 것을 함께 모은 것입니다:
+
+<Expandable title="전체 코드 보기" defaultOpen={false}>
+
+:::python
+```python
+"""
+Personal Assistant Supervisor Example
+
+This example demonstrates the tool calling pattern for multi-agent systems.
+A supervisor agent coordinates specialized sub-agents (calendar and email)
+that are wrapped as tools.
+"""
+
+from langchain_core.tools import tool
+from langchain.agents import create_agent
+from langchain.chat_models import init_chat_model
+
+# ============================================================================
+# Step 1: Define low-level API tools (stubbed)
+# ============================================================================
+
+@tool
+def create_calendar_event(
+    title: str,
+    start_time: str,  # ISO format: "2024-01-15T14:00:00"
+    end_time: str,    # ISO format: "2024-01-15T15:00:00"
+    attendees: list[str],  # email addresses
+    location: str = ""
+) -> str:
+    """Create a calendar event. Requires exact ISO datetime format."""
+    return f"Event created: {title} from {start_time} to {end_time} with {len(attendees)} attendees"
+
+
+@tool
+def send_email(
+    to: list[str],      # email addresses
+    subject: str,
+    body: str,
+    cc: list[str] = []
+) -> str:
+    """Send an email via email API. Requires properly formatted addresses."""
+    return f"Email sent to {', '.join(to)} - Subject: {subject}"
+
+
+@tool
+def get_available_time_slots(
+    attendees: list[str],
+    date: str,  # ISO format: "2024-01-15"
+    duration_minutes: int
+) -> list[str]:
+    """Check calendar availability for given attendees on a specific date."""
+    return ["09:00", "14:00", "16:00"]
+
+
+# ============================================================================
+# Step 2: Create specialized sub-agents
+# ============================================================================
+
+model = init_chat_model("anthropic:claude-3-5-haiku-latest")  # for example
+
+calendar_agent = create_agent(
+    model,
+    tools=[create_calendar_event, get_available_time_slots],
+    system_prompt=(
+        "You are a calendar scheduling assistant. "
+        "Parse natural language scheduling requests (e.g., 'next Tuesday at 2pm') "
+        "into proper ISO datetime formats. "
+        "Use get_available_time_slots to check availability when needed. "
+        "Use create_calendar_event to schedule events. "
+        "Always confirm what was scheduled in your final response."
+    )
+)
+
+email_agent = create_agent(
+    model,
+    tools=[send_email],
+    system_prompt=(
+        "You are an email assistant. "
+        "Compose professional emails based on natural language requests. "
+        "Extract recipient information and craft appropriate subject lines and body text. "
+        "Use send_email to send the message. "
+        "Always confirm what was sent in your final response."
+    )
+)
+
+# ============================================================================
+# Step 3: Wrap sub-agents as tools for the supervisor
+# ============================================================================
+
+@tool
+def schedule_event(request: str) -> str:
+    """Schedule calendar events using natural language.
+
+    Use this when the user wants to create, modify, or check calendar appointments.
+    Handles date/time parsing, availability checking, and event creation.
+
+    Input: Natural language scheduling request (e.g., 'meeting with design team
+    next Tuesday at 2pm')
+    """
+    result = calendar_agent.invoke({
+        "messages": [{"role": "user", "content": request}]
+    })
+    return result["messages"][-1].text
+
+
+@tool
+def manage_email(request: str) -> str:
+    """Send emails using natural language.
+
+    Use this when the user wants to send notifications, reminders, or any email
+    communication. Handles recipient extraction, subject generation, and email
+    composition.
+
+    Input: Natural language email request (e.g., 'send them a reminder about
+    the meeting')
+    """
+    result = email_agent.invoke({
+        "messages": [{"role": "user", "content": request}]
+    })
+    return result["messages"][-1].text
+
+
+# ============================================================================
+# Step 4: Create the supervisor agent
+# ============================================================================
+
+supervisor_agent = create_agent(
+    model,
+    tools=[schedule_event, manage_email],
+    system_prompt=(
+        "You are a helpful personal assistant. "
+        "You can schedule calendar events and send emails. "
+        "Break down user requests into appropriate tool calls and coordinate the results. "
+        "When a request involves multiple actions, use multiple tools in sequence."
+    )
+)
+
+# ============================================================================
+# Step 5: Use the supervisor
+# ============================================================================
+
+if __name__ == "__main__":
+    # Example: User request requiring both calendar and email coordination
+    user_request = (
+        "Schedule a meeting with the design team next Tuesday at 2pm for 1 hour, "
+        "and send them an email reminder about reviewing the new mockups."
+    )
+
+    print("User Request:", user_request)
+    print("\n" + "="*80 + "\n")
+
+    for step in supervisor_agent.stream(
+        {"messages": [{"role": "user", "content": user_request}]}
+    ):
+        for update in step.values():
+            for message in update.get("messages", []):
+                message.pretty_print()
+```
+:::
+
+:::js
+```typescript
+/**
+ * Personal Assistant Supervisor Example
+ *
+ * This example demonstrates the tool calling pattern for multi-agent systems.
+ * A supervisor agent coordinates specialized sub-agents (calendar and email)
+ * that are wrapped as tools.
+ */
+
+import { tool, createAgent } from "langchain";
+import { ChatAnthropic } from "@langchain/anthropic";
+import { z } from "zod";
+
+// ============================================================================
+// Step 1: Define low-level API tools (stubbed)
+// ============================================================================
+
+const createCalendarEvent = tool(
+  async ({ title, startTime, endTime, attendees, location }) => {
+    // Stub: In practice, this would call Google Calendar API, Outlook API, etc.
+    return `Event created: ${title} from ${startTime} to ${endTime} with ${attendees.length} attendees`;
+  },
+  {
+    name: "create_calendar_event",
+    description: "Create a calendar event. Requires exact ISO datetime format.",
+    schema: z.object({
+      title: z.string(),
+      startTime: z.string().describe("ISO format: '2024-01-15T14:00:00'"),
+      endTime: z.string().describe("ISO format: '2024-01-15T15:00:00'"),
+      attendees: z.array(z.string()).describe("email addresses"),
+      location: z.string().optional().default(""),
+    }),
+  }
+);
+
+const sendEmail = tool(
+  async ({ to, subject, body, cc }) => {
+    // Stub: In practice, this would call SendGrid, Gmail API, etc.
+    return `Email sent to ${to.join(", ")} - Subject: ${subject}`;
+  },
+  {
+    name: "send_email",
+    description:
+      "Send an email via email API. Requires properly formatted addresses.",
+    schema: z.object({
+      to: z.array(z.string()).describe("email addresses"),
+      subject: z.string(),
+      body: z.string(),
+      cc: z.array(z.string()).optional().default([]),
+    }),
+  }
+);
+
+const getAvailableTimeSlots = tool(
+  async ({ attendees, date, durationMinutes }) => {
+    // Stub: In practice, this would query calendar APIs
+    return ["09:00", "14:00", "16:00"];
+  },
+  {
+    name: "get_available_time_slots",
+    description:
+      "Check calendar availability for given attendees on a specific date.",
+    schema: z.object({
+      attendees: z.array(z.string()),
+      date: z.string().describe("ISO format: '2024-01-15'"),
+      durationMinutes: z.number(),
+    }),
+  }
+);
+
+// ============================================================================
+// Step 2: Create specialized sub-agents
+// ============================================================================
+
+const llm = new ChatAnthropic({
+  model: "claude-3-5-haiku-latest",
+});
+
+const calendarAgent = createAgent({
+  model: llm,
+  tools: [createCalendarEvent, getAvailableTimeSlots],
+  systemPrompt: `
+You are a calendar scheduling assistant.
+Parse natural language scheduling requests (e.g., 'next Tuesday at 2pm')
+into proper ISO datetime formats.
+Use get_available_time_slots to check availability when needed.
+Use create_calendar_event to schedule events.
+Always confirm what was scheduled in your final response.
+  `.trim(),
+});
+
+const emailAgent = createAgent({
+  model: llm,
+  tools: [sendEmail],
+  systemPrompt: `
+You are an email assistant.
+Compose professional emails based on natural language requests.
+Extract recipient information and craft appropriate subject lines and body text.
+Use send_email to send the message.
+Always confirm what was sent in your final response.
+  `.trim(),
+});
+
+// ============================================================================
+// Step 3: Wrap sub-agents as tools for the supervisor
+// ============================================================================
+
+const scheduleEvent = tool(
+  async ({ request }) => {
+    const result = await calendarAgent.invoke({
+      messages: [{ role: "user", content: request }],
+    });
+    const lastMessage = result.messages[result.messages.length - 1];
+    return lastMessage.text;
+  },
+  {
+    name: "schedule_event",
+    description: `
+Schedule calendar events using natural language.
+
+Use this when the user wants to create, modify, or check calendar appointments.
+Handles date/time parsing, availability checking, and event creation.
+
+Input: Natural language scheduling request (e.g., 'meeting with design team next Tuesday at 2pm')
+    `.trim(),
+    schema: z.object({
+      request: z.string().describe("Natural language scheduling request"),
+    }),
+  }
+);
+
+const manageEmail = tool(
+  async ({ request }) => {
+    const result = await emailAgent.invoke({
+      messages: [{ role: "user", content: request }],
+    });
+    const lastMessage = result.messages[result.messages.length - 1];
+    return lastMessage.text;
+  },
+  {
+    name: "manage_email",
+    description: `
+Send emails using natural language.
+
+Use this when the user wants to send notifications, reminders, or any email communication.
+Handles recipient extraction, subject generation, and email composition.
+
+Input: Natural language email request (e.g., 'send them a reminder about the meeting')
+    `.trim(),
+    schema: z.object({
+      request: z.string().describe("Natural language email request"),
+    }),
+  }
+);
+
+// ============================================================================
+// Step 4: Create the supervisor agent
+// ============================================================================
+
+const supervisorAgent = createAgent({
+  model: llm,
+  tools: [scheduleEvent, manageEmail],
+  systemPrompt: `
+You are a helpful personal assistant.
+You can schedule calendar events and send emails.
+Break down user requests into appropriate tool calls and coordinate the results.
+When a request involves multiple actions, use multiple tools in sequence.
+  `.trim(),
+});
+
+// ============================================================================
+// Step 5: Use the supervisor
+// ============================================================================
+
+// Example: User request requiring both calendar and email coordination
+const userRequest =
+  "Schedule a meeting with the design team next Tuesday at 2pm for 1 hour, " +
+  "and send them an email reminder about reviewing the new mockups.";
+
+console.log("User Request:", userRequest);
+console.log(`\n${"=".repeat(80)}\n`);
+
+const stream = await supervisorAgent.stream({
+  messages: [{ role: "user", content: userRequest }],
+});
+
+for await (const step of stream) {
+  for (const update of Object.values(step)) {
+    if (update && typeof update === "object" && "messages" in update) {
+      for (const message of update.messages) {
+        console.log(message.toFormattedString());
+      }
+    }
+  }
+}
+```
+:::
+
+</Expandable>
+
+### Understanding the architecture
+
+시스템에는 세 개의 계층이 있습니다. 하단 계층에는 정확한 형식이 필요한 엄격한 API tool이 포함되어 있습니다. 중간 계층에는 자연어를 받아들이고, 구조화된 API 호출로 변환하고, 자연어 확인을 반환하는 sub-agent가 포함되어 있습니다. 상단 계층에는 고수준 기능으로 라우팅하고 결과를 합성하는 supervisor가 포함되어 있습니다.
+
+이러한 관심사의 분리는 여러 가지 이점을 제공합니다: 각 계층은 집중된 책임을 가지며, 기존 도메인에 영향을 주지 않고 새 도메인을 추가할 수 있으며, 각 계층을 독립적으로 테스트하고 반복할 수 있습니다.
+
+## 6. Add human-in-the-loop review
+
+민감한 작업에 대한 [human-in-the-loop review](/oss/langchain/human-in-the-loop)를 통합하는 것이 신중할 수 있습니다. LangChain에는 tool 호출을 검토하기 위한 [built-in middleware](/oss/langchain/human-in-the-loop#configuring-interrupts)가 포함되어 있으며, 이 경우 sub-agent가 호출하는 tool입니다.
+
+두 sub-agent 모두에 human-in-the-loop review를 추가해 보겠습니다:
+- `create_calendar_event` 및 `send_email` tool을 중단하도록 구성하여 모든 [response types](/oss/langchain/human-in-the-loop)(`approve`, `edit`, `reject`)를 허용합니다
+- **최상위 agent에만** [checkpointer](/oss/langchain/short-term-memory)를 추가합니다. 이는 실행을 일시 중지하고 재개하는 데 필요합니다.
+
+:::python
+```python
+from langchain.agents import create_agent
+from langchain.agents.middleware import HumanInTheLoopMiddleware # [!code highlight]
+from langgraph.checkpoint.memory import InMemorySaver # [!code highlight]
+
+
+calendar_agent = create_agent(
+    model,
+    tools=[create_calendar_event, get_available_time_slots],
+    system_prompt=CALENDAR_AGENT_PROMPT,
+    middleware=[ # [!code highlight]
+        HumanInTheLoopMiddleware( # [!code highlight]
+            interrupt_on={"create_calendar_event": True}, # [!code highlight]
+            description_prefix="Calendar event pending approval", # [!code highlight]
+        ), # [!code highlight]
+    ], # [!code highlight]
+)
+
+email_agent = create_agent(
+    model,
+    tools=[send_email],
+    system_prompt=EMAIL_AGENT_PROMPT,
+    middleware=[ # [!code highlight]
+        HumanInTheLoopMiddleware( # [!code highlight]
+            interrupt_on={"send_email": True}, # [!code highlight]
+            description_prefix="Outbound email pending approval", # [!code highlight]
+        ), # [!code highlight]
+    ], # [!code highlight]
+)
+
+supervisor_agent = create_agent(
+    model,
+    tools=[schedule_event, manage_email],
+    system_prompt=SUPERVISOR_PROMPT,
+    checkpointer=InMemorySaver(), # [!code highlight]
+)
+```
+:::
+
+:::js
+```typescript
+import { createAgent, humanInTheLoopMiddleware } from "langchain"; // [!code highlight]
+import { MemorySaver } from "@langchain/langgraph"; // [!code highlight]
+
+const calendarAgent = createAgent({
+  model: llm,
+  tools: [createCalendarEvent, getAvailableTimeSlots],
+  systemPrompt: CALENDAR_AGENT_PROMPT,
+  middleware: [ // [!code highlight]
+    humanInTheLoopMiddleware({ // [!code highlight]
+      interruptOn: { create_calendar_event: true }, // [!code highlight]
+      descriptionPrefix: "Calendar event pending approval", // [!code highlight]
+    }), // [!code highlight]
+  ], // [!code highlight]
+});
+
+const emailAgent = createAgent({
+  model: llm,
+  tools: [sendEmail],
+  systemPrompt: EMAIL_AGENT_PROMPT,
+  middleware: [ // [!code highlight]
+    humanInTheLoopMiddleware({ // [!code highlight]
+      interruptOn: { send_email: true }, // [!code highlight]
+      descriptionPrefix: "Outbound email pending approval", // [!code highlight]
+    }), // [!code highlight]
+  ], // [!code highlight]
+});
+
+const supervisorAgent = createAgent({
+  model: llm,
+  tools: [scheduleEvent, manageEmail],
+  systemPrompt: SUPERVISOR_PROMPT,
+  checkpointer: new MemorySaver(), // [!code highlight]
+});
+```
+:::
+
+쿼리를 반복해 보겠습니다. 다운스트림에서 액세스하기 위해 interrupt 이벤트를 목록으로 수집합니다:
+
+:::python
+```python
+query = (
+    "Schedule a meeting with the design team next Tuesday at 2pm for 1 hour, "
+    "and send them an email reminder about reviewing the new mockups."
+)
+
+config = {"configurable": {"thread_id": "6"}}
+
+interrupts = []
+for step in supervisor_agent.stream(
+    {"messages": [{"role": "user", "content": query}]},
+    config,
+):
+    for update in step.values():
+        if isinstance(update, dict):
+            for message in update.get("messages", []):
+                message.pretty_print()
+        else:
+            interrupt_ = update[0]
+            interrupts.append(interrupt_)
+            print(f"\nINTERRUPTED: {interrupt_.id}")
+```
+:::
+
+:::js
+```typescript
+const query =
+  "Schedule a meeting with the design team next Tuesday at 2pm for 1 hour, " +
+  "and send them an email reminder about reviewing the new mockups.";
+
+const config = { configurable: { thread_id: "6" } };
+
+const interrupts: any[] = [];
+const stream = await supervisorAgent.stream(
+  { messages: [{ role: "user", content: query }] },
+  config
+);
+
+for await (const step of stream) {
+  for (const update of Object.values(step)) {
+    if (update && typeof update === "object" && "messages" in update) {
+      for (const message of update.messages) {
+        console.log(message.toFormattedString());
+      }
+    } else if (Array.isArray(update)) {
+      const interrupt = update[0];
+      interrupts.push(interrupt);
+      console.log(`\nINTERRUPTED: ${interrupt.id}`);
+    }
+  }
+}
+```
+:::
+```
+================================== Ai Message ==================================
+Tool Calls:
+  schedule_event (call_t4Wyn32ohaShpEZKuzZbl83z)
+ Call ID: call_t4Wyn32ohaShpEZKuzZbl83z
+  Args:
+    request: Schedule a meeting with the design team next Tuesday at 2pm for 1 hour.
+  manage_email (call_JWj4vDJ5VMnvkySymhCBm4IR)
+ Call ID: call_JWj4vDJ5VMnvkySymhCBm4IR
+  Args:
+    request: Send an email reminder to the design team about reviewing the new mockups before our meeting next Tuesday at 2pm.
+
+INTERRUPTED: 4f994c9721682a292af303ec1a46abb7
+
+INTERRUPTED: 2b56f299be313ad8bc689eff02973f16
+```
+이번에는 실행을 중단했습니다. interrupt 이벤트를 검사해 보겠습니다:
+
+:::python
+```python
+for interrupt_ in interrupts:
+    for request in interrupt_.value["action_requests"]:
+        print(f"INTERRUPTED: {interrupt_.id}")
+        print(f"{request['description']}\n")
+```
+:::
+
+:::js
+```typescript
+for (const interrupt of interrupts) {
+  for (const request of interrupt.value.actionRequests) {
+    console.log(`INTERRUPTED: ${interrupt.id}`);
+    console.log(`${request.description}\n`);
+  }
+}
+```
+:::
+```
+INTERRUPTED: 4f994c9721682a292af303ec1a46abb7
+Calendar event pending approval
+
+Tool: create_calendar_event
+Args: {'title': 'Meeting with the Design Team', 'start_time': '2024-06-18T14:00:00', 'end_time': '2024-06-18T15:00:00', 'attendees': ['design team']}
+
+INTERRUPTED: 2b56f299be313ad8bc689eff02973f16
+Outbound email pending approval
+
+Tool: send_email
+Args: {'to': ['designteam@example.com'], 'subject': 'Reminder: Review New Mockups Before Meeting Next Tuesday at 2pm', 'body': "Hello Team,\n\nThis is a reminder to review the new mockups ahead of our meeting scheduled for next Tuesday at 2pm. Your feedback and insights will be valuable for our discussion and next steps.\n\nPlease ensure you've gone through the designs and are ready to share your thoughts during the meeting.\n\nThank you!\n\nBest regards,\n[Your Name]"}
+```
+
+@[`Command`]를 사용하여 ID를 참조하여 각 interrupt에 대한 결정을 지정할 수 있습니다. 자세한 내용은 [human-in-the-loop guide](/oss/langchain/human-in-the-loop)를 참조하세요. 시연 목적으로 여기서는 calendar 이벤트를 수락하지만 발신 이메일의 제목을 편집합니다:
+
+:::python
+```python
+from langgraph.types import Command # [!code highlight]
+
+resume = {}
+for interrupt_ in interrupts:
+    if interrupt_.id == "2b56f299be313ad8bc689eff02973f16":
+        # Edit email
+        edited_action = interrupt_.value["action_requests"][0].copy()
+        edited_action["arguments"]["subject"] = "Mockups reminder"
+        resume[interrupt_.id] = {
+            "decisions": [{"type": "edit", "edited_action": edited_action}]
+        }
+    else:
+        resume[interrupt_.id] = {"decisions": [{"type": "approve"}]}
+
+interrupts = []
+for step in supervisor_agent.stream(
+    Command(resume=resume), # [!code highlight]
+    config,
+):
+    for update in step.values():
+        if isinstance(update, dict):
+            for message in update.get("messages", []):
+                message.pretty_print()
+        else:
+            interrupt_ = update[0]
+            interrupts.append(interrupt_)
+            print(f"\nINTERRUPTED: {interrupt_.id}")
+```
+:::
+
+:::js
+```typescript
+import { Command } from "@langchain/langgraph"; // [!code highlight]
+
+const resume: Record<string, any> = {};
+for (const interrupt of interrupts) {
+  const actionRequest = interrupt.value.actionRequests[0];
+  if (actionRequest.name === "send_email") {
+    // Edit email
+    const editedAction = { ...actionRequest };
+    editedAction.arguments.subject = "Mockups reminder";
+    resume[interrupt.id] = {
+      decisions: [{ type: "edit", editedAction }]
+    };
+  } else {
+    resume[interrupt.id] = { decisions: [{ type: "approve" }] };
+  }
+}
+
+const resumeStream = await supervisorAgent.stream(
+  new Command({ resume }), // [!code highlight]
+  config
+);
+
+for await (const step of resumeStream) {
+  for (const update of Object.values(step)) {
+    if (update && typeof update === "object" && "messages" in update) {
+      for (const message of update.messages) {
+        console.log(message.toFormattedString());
+      }
+    }
+  }
+}
+```
+:::
+```
+================================= Tool Message =================================
+Name: schedule_event
+
+Your meeting with the design team has been scheduled for next Tuesday, June 18th, from 2:00 pm to 3:00 pm.
+================================= Tool Message =================================
+Name: manage_email
+
+Your email reminder to the design team has been sent. Here’s what was sent:
+
+- Recipient: designteam@example.com
+- Subject: Mockups reminder
+- Body: A reminder to review the new mockups before the meeting next Tuesday at 2pm, with a request for feedback and readiness for discussion.
+
+Let me know if you need any further assistance!
+================================== Ai Message ==================================
+
+- Your meeting with the design team has been scheduled for next Tuesday, June 18th, from 2:00 pm to 3:00 pm.
+- An email reminder has been sent to the design team about reviewing the new mockups before the meeting.
+
+Let me know if you need any further assistance!
+```
+실행이 우리의 입력으로 진행됩니다.
+
+## 7. Advanced: Control information flow
+
+기본적으로 sub-agent는 supervisor로부터 요청 문자열만 받습니다. 대화 기록이나 사용자 기본 설정과 같은 추가 컨텍스트를 전달하고 싶을 수 있습니다.
+
+### Pass additional conversational context to sub-agents
+
+:::python
+```python
+from langchain.tools import tool, ToolRuntime
+
+@tool
+def schedule_event(
+    request: str,
+    runtime: ToolRuntime
+) -> str:
+    """Schedule calendar events using natural language."""
+    # Customize context received by sub-agent
+    original_user_message = next(
+        message for message in runtime.state["messages"]
+        if message.type == "human"
+    )
+    prompt = (
+        "You are assisting with the following user inquiry:\n\n"
+        f"{original_user_message.text}\n\n"
+        "You are tasked with the following sub-request:\n\n"
+        f"{request}"
+    )
+    result = calendar_agent.invoke({
+        "messages": [{"role": "user", "content": prompt}],
+    })
+    return result["messages"][-1].text
+```
+:::
+
+:::js
+```typescript
+import { getCurrentTaskInput } from "@langchain/langgraph";
+import type { InternalAgentState } from "langchain";
+import { HumanMessage } from "@langchain/core/messages";
+
+const scheduleEvent = tool(
+  async ({ request }, config) => {
+    // Customize context received by sub-agent
+    // Access full thread messages from the config
+    const currentMessages = getCurrentTaskInput<InternalAgentState>(config).messages;
+
+    const originalUserMessage = currentMessages.find(HumanMessage.isInstance);
+
+    const prompt = `
+You are assisting with the following user inquiry:
+
+${originalUserMessage?.content || "No context available"}
+
+You are tasked with the following sub-request:
+
+${request}
+    `.trim();
+
+    const result = await calendarAgent.invoke({
+      messages: [{ role: "user", content: prompt }],
+    });
+    const lastMessage = result.messages[result.messages.length - 1];
+    return lastMessage.text;
+  },
+  {
+    name: "schedule_event",
+    description: "Schedule calendar events using natural language.",
+    schema: z.object({
+      request: z.string().describe("Natural language scheduling request"),
+    }),
+  }
+);
+```
+:::
+
+이를 통해 sub-agent가 전체 대화 컨텍스트를 볼 수 있으며, 이는 "내일 같은 시간에 일정을 잡아줘"(이전 대화 참조)와 같은 모호성을 해결하는 데 유용할 수 있습니다.
+
+<Tip>
+LangSmith trace의 [chat model call](https://smith.langchain.com/public/c7d54882-afb8-4039-9c5a-4112d0f458b0/r/6803571e-af78-4c68-904a-ecf55771084d)에서 sub agent가 받은 전체 컨텍스트를 볼 수 있습니다.
+</Tip>
+
+### Control what supervisor receives
+
+supervisor로 다시 흐르는 정보를 사용자 정의할 수도 있습니다:
+
+:::python
+```python
+import json
+
+@tool
+def schedule_event(request: str) -> str:
+    """Schedule calendar events using natural language."""
+    result = calendar_agent.invoke({
+        "messages": [{"role": "user", "content": request}]
+    })
+
+    # Option 1: Return just the confirmation message
+    return result["messages"][-1].text
+
+    # Option 2: Return structured data
+    # return json.dumps({
+    #     "status": "success",
+    #     "event_id": "evt_123",
+    #     "summary": result["messages"][-1].text
+    # })
+```
+:::
+
+:::js
+```typescript
+const scheduleEvent = tool(
+  async ({ request }) => {
+    const result = await calendarAgent.invoke({
+      messages: [{ role: "user", content: request }]
+    });
+
+    const lastMessage = result.messages[result.messages.length - 1];
+
+    // Option 1: Return just the confirmation message
+    return lastMessage.text;
+
+    // Option 2: Return structured data
+    // return JSON.stringify({
+    //   status: "success",
+    //   event_id: "evt_123",
+    //   summary: lastMessage.text
+    // });
+  },
+  {
+    name: "schedule_event",
+    description: "Schedule calendar events using natural language.",
+    schema: z.object({
+      request: z.string().describe("Natural language scheduling request"),
+    }),
+  }
+);
+```
+:::
+
+**중요:** sub-agent prompt가 최종 메시지에 모든 관련 정보가 포함되어야 함을 강조하는지 확인하세요. 일반적인 실패 모드는 tool 호출을 수행하지만 최종 응답에 결과를 포함하지 않는 sub-agent입니다.
+
+:::js
+<Tip>
+human-in-the-loop review 및 고급 정보 흐름 제어를 포함한 전체 supervisor 패턴을 보여주는 완전한 작동 예제는 LangChain.js 예제의 [`supervisor_complete.ts`](https://github.com/langchain-ai/langchainjs/blob/main/examples/src/createAgent/supervisor_complete.ts)를 확인하세요.
+</Tip>
+:::
+
+## 8. Key takeaways
+
+supervisor 패턴은 각 계층이 명확한 책임을 가진 추상화 계층을 만듭니다. supervisor 시스템을 설계할 때 명확한 도메인 경계로 시작하고 각 sub-agent에 집중된 tool과 prompt를 제공하세요. supervisor를 위한 명확한 tool 설명을 작성하고, 통합 전에 각 계층을 독립적으로 테스트하며, 특정 요구 사항에 따라 정보 흐름을 제어하세요.
+
+<Tip>
+**supervisor 패턴을 사용해야 하는 경우**
+
+여러 개의 뚜렷한 도메인(calendar, email, CRM, database)이 있고, 각 도메인에 여러 tool이나 복잡한 로직이 있으며, 중앙 집중식 워크플로우 제어를 원하고, sub-agent가 사용자와 직접 대화할 필요가 없을 때 supervisor 패턴을 사용하세요.
+
+몇 개의 tool만 있는 간단한 경우에는 단일 agent를 사용하세요. agent가 사용자와 대화해야 하는 경우 대신 [handoffs](/oss/langchain/multi-agent#handoffs)를 사용하세요. agent 간의 peer-to-peer 협업의 경우 다른 multi-agent 패턴을 고려하세요.
+</Tip>
+
+## Next steps
+
+agent 간 대화를 위한 [handoffs](/oss/langchain/multi-agent#handoffs)에 대해 알아보고, 정보 흐름을 미세 조정하기 위한 [context engineering](/oss/langchain/context-engineering)을 탐색하고, 다양한 패턴을 비교하기 위해 [multi-agent overview](/oss/langchain/multi-agent)를 읽고, multi-agent 시스템을 디버그하고 모니터링하기 위해 [LangSmith](https://smith.langchain.com)를 사용하세요.

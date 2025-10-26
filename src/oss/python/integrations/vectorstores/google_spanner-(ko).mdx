@@ -1,0 +1,211 @@
+---
+title: Google Spanner
+---
+
+> [Spanner](https://cloud.google.com/spanner)는 무제한 확장성과 보조 인덱스, 강력한 일관성, 스키마, SQL과 같은 관계형 의미론을 결합하여 하나의 쉬운 솔루션으로 99.999%의 가용성을 제공하는 고도로 확장 가능한 데이터베이스입니다.
+
+이 노트북은 `SpannerVectorStore` 클래스를 사용하여 Vector Search를 위해 `Spanner`를 사용하는 방법을 다룹니다.
+
+[GitHub](https://github.com/googleapis/langchain-google-spanner-python/)에서 패키지에 대해 자세히 알아보세요.
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/googleapis/langchain-google-spanner-python/blob/main/docs/vector_store.ipynb)
+
+## 시작하기 전에
+
+이 노트북을 실행하려면 다음을 수행해야 합니다:
+
+* [Google Cloud Project 생성](https://developers.google.com/workspace/guides/create-project)
+* [Cloud Spanner API 활성화](https://console.cloud.google.com/flows/enableapi?apiid=spanner.googleapis.com)
+* [Spanner 인스턴스 생성](https://cloud.google.com/spanner/docs/create-manage-instances)
+* [Spanner 데이터베이스 생성](https://cloud.google.com/spanner/docs/create-manage-databases)
+
+### 🦜🔗 라이브러리 설치
+
+이 통합은 자체 `langchain-google-spanner` 패키지에 있으므로 설치해야 합니다.
+
+```python
+pip install -qU langchain-google-spanner langchain-google-vertexai
+```
+
+```output
+Note: you may need to restart the kernel to use updated packages.
+```
+
+**Colab 전용:** 다음 셀의 주석을 해제하여 커널을 재시작하거나 버튼을 사용하여 커널을 재시작하세요. Vertex AI Workbench의 경우 상단의 버튼을 사용하여 터미널을 재시작할 수 있습니다.
+
+```python
+# # Automatically restart kernel after installs so that your environment can access the new packages
+# import IPython
+
+# app = IPython.Application.instance()
+# app.kernel.do_shutdown(True)
+```
+
+### 🔐 인증
+
+이 노트북에 로그인한 IAM 사용자로 Google Cloud에 인증하여 Google Cloud Project에 액세스하세요.
+
+* Colab을 사용하여 이 노트북을 실행하는 경우 아래 셀을 사용하고 계속하세요.
+* Vertex AI Workbench를 사용하는 경우 [여기](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env)에서 설정 지침을 확인하세요.
+
+```python
+from google.colab import auth
+
+auth.authenticate_user()
+```
+
+### ☁ Google Cloud Project 설정
+
+이 노트북 내에서 Google Cloud 리소스를 활용할 수 있도록 Google Cloud 프로젝트를 설정하세요.
+
+프로젝트 ID를 모르는 경우 다음을 시도해보세요:
+
+* `gcloud config list`를 실행하세요.
+* `gcloud projects list`를 실행하세요.
+* 지원 페이지를 참조하세요: [프로젝트 ID 찾기](https://support.google.com/googleapi/answer/7014113).
+
+```python
+# @markdown Please fill in the value below with your Google Cloud project ID and then run the cell.
+
+PROJECT_ID = "my-project-id"  # @param {type:"string"}
+
+# Set the project id
+!gcloud config set project {PROJECT_ID}
+%env GOOGLE_CLOUD_PROJECT={PROJECT_ID}
+```
+
+### 💡 API 활성화
+
+`langchain-google-spanner` 패키지를 사용하려면 Google Cloud Project에서 [Spanner API를 활성화](https://console.cloud.google.com/flows/enableapi?apiid=spanner.googleapis.com)해야 합니다.
+
+```python
+# enable Spanner API
+!gcloud services enable spanner.googleapis.com
+```
+
+## 기본 사용법
+
+### Spanner 데이터베이스 값 설정
+
+[Spanner Instances 페이지](https://console.cloud.google.com/spanner?_ga=2.223735448.2062268965.1707700487-2088871159.1707257687)에서 데이터베이스 값을 찾으세요.
+
+```python
+# @title Set Your Values Here { display-mode: "form" }
+INSTANCE = "my-instance"  # @param {type: "string"}
+DATABASE = "my-database"  # @param {type: "string"}
+TABLE_NAME = "vectors_search_data"  # @param {type: "string"}
+```
+
+### 테이블 초기화
+
+`SpannerVectorStore` 클래스 인스턴스는 id, content 및 embeddings 열이 있는 데이터베이스 테이블이 필요합니다.
+
+적절한 스키마로 테이블을 생성하는 데 사용할 수 있는 헬퍼 메서드 `init_vector_store_table()`이 있습니다.
+
+```python
+from langchain_google_spanner import SecondaryIndex, SpannerVectorStore, TableColumn
+
+SpannerVectorStore.init_vector_store_table(
+    instance_id=INSTANCE,
+    database_id=DATABASE,
+    table_name=TABLE_NAME,
+    # Customize the table creation
+    # id_column="row_id",
+    # content_column="content_column",
+    # metadata_columns=[
+    #     TableColumn(name="metadata", type="JSON", is_null=True),
+    #     TableColumn(name="title", type="STRING(MAX)", is_null=False),
+    # ],
+    # secondary_indexes=[
+    #     SecondaryIndex(index_name="row_id_and_title", columns=["row_id", "title"])
+    # ],
+)
+```
+
+### embedding 클래스 인스턴스 생성
+
+모든 [LangChain embeddings model](/oss/integrations/text_embedding/)을 사용할 수 있습니다.
+`VertexAIEmbeddings`를 사용하려면 Vertex AI API를 활성화해야 할 수 있습니다. 프로덕션 환경에서는 embedding 모델의 버전을 설정하는 것이 좋으며, [Text embeddings models](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/text-embeddings)에 대해 자세히 알아보세요.
+
+```python
+# enable Vertex AI API
+!gcloud services enable aiplatform.googleapis.com
+```
+
+```python
+from langchain_google_vertexai import VertexAIEmbeddings
+
+embeddings = VertexAIEmbeddings(
+    model_name="textembedding-gecko@latest", project=PROJECT_ID
+)
+```
+
+### SpannerVectorStore
+
+`SpannerVectorStore` 클래스를 초기화하려면 4개의 필수 인수를 제공해야 하며, 다른 인수는 선택 사항이며 기본값과 다른 경우에만 전달하면 됩니다.
+
+1. `instance_id` - Spanner 인스턴스의 이름
+1. `database_id` - Spanner 데이터베이스의 이름
+1. `table_name` - 문서와 해당 embeddings를 저장할 데이터베이스 내 테이블의 이름
+1. `embedding_service` - embeddings를 생성하는 데 사용되는 Embeddings 구현
+
+```python
+db = SpannerVectorStore(
+    instance_id=INSTANCE,
+    database_id=DATABASE,
+    table_name=TABLE_NAME,
+    embedding_service=embeddings,
+    # Connect to a custom vector store table
+    # id_column="row_id",
+    # content_column="content",
+    # metadata_columns=["metadata", "title"],
+)
+```
+
+#### Document 추가
+
+vector store에 문서를 추가합니다.
+
+```python
+import uuid
+
+from langchain_community.document_loaders import HNLoader
+
+loader = HNLoader("https://news.ycombinator.com/item?id=34817881")
+
+documents = loader.load()
+ids = [str(uuid.uuid4()) for _ in range(len(documents))]
+db.add_documents(documents, ids)
+```
+
+#### Document 검색
+
+유사도 검색으로 vector store에서 문서를 검색합니다.
+
+```python
+db.similarity_search(query="Explain me vector store?", k=3)
+```
+
+#### Document 검색
+
+최대 한계 관련성 검색으로 vector store에서 문서를 검색합니다.
+
+```python
+db.max_marginal_relevance_search("Testing the langchain integration with spanner", k=3)
+```
+
+#### Document 삭제
+
+vector store에서 문서를 제거하려면 VectorStore를 초기화할 때 `row_id` 열의 값에 해당하는 ID를 사용하세요.
+
+```python
+db.delete(ids=["id1", "id2"])
+```
+
+#### Document 삭제
+
+vector store에서 문서를 제거하려면 문서 자체를 활용할 수 있습니다. VectorStore 초기화 중에 제공된 content 열과 metadata 열이 문서에 해당하는 행을 찾는 데 사용됩니다. 일치하는 행은 삭제됩니다.
+
+```python
+db.delete(documents=[documents[0], documents[1]])
+```

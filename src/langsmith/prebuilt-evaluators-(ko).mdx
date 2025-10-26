@@ -1,0 +1,167 @@
+---
+title: 사전 구축된 evaluator 사용 방법
+sidebarTitle: 사전 구축된 evaluator 사용하기
+---
+
+LangSmith는 오픈소스 openevals 패키지와 통합되어 평가를 위한 시작점으로 사용할 수 있는 사전 구축된 evaluator 모음을 제공합니다.
+
+<Note>
+이 가이드에서는 한 가지 유형의 evaluator(LLM-as-a-judge)를 설정하고 실행하는 방법을 보여줍니다. 사용 예제가 포함된 사전 구축된 evaluator의 전체 목록은 [openevals](https://github.com/langchain-ai/openevals) 및 [agentevals](https://github.com/langchain-ai/agentevals) 저장소를 참조하세요.
+</Note>
+
+## Setup
+
+사전 구축된 LLM-as-a-judge evaluator를 사용하려면 `openevals` 패키지를 설치해야 합니다.
+
+<CodeGroup>
+
+```bash Python
+pip install -U openevals
+```
+
+```bash TypeScript
+yarn add openevals @langchain/core
+```
+
+</CodeGroup>
+
+또한 OpenAI API key를 환경 변수로 설정해야 하지만, 다른 provider를 선택할 수도 있습니다:
+
+```bash
+export OPENAI_API_KEY="your_openai_api_key"
+```
+
+Python의 경우 LangSmith의 [pytest](/langsmith/pytest) 통합을, TypeScript의 경우 [Vitest/Jest](/langsmith/vitest-jest)를 사용하여 평가를 실행합니다. `openevals`는 [`evaluate`](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate) 메서드와도 원활하게 통합됩니다. 설정 지침은 [해당 가이드](/langsmith/pytest)를 참조하세요.
+
+## Evaluator 실행하기
+
+일반적인 흐름은 간단합니다: `openevals`에서 evaluator 또는 factory function을 import한 다음, 테스트 파일 내에서 inputs, outputs, reference outputs와 함께 실행합니다. LangSmith는 evaluator의 결과를 자동으로 feedback으로 기록합니다.
+
+모든 evaluator가 각 매개변수를 필요로 하는 것은 아닙니다(예를 들어, exact match evaluator는 outputs와 reference outputs만 필요합니다). 또한 LLM-as-a-judge prompt에 추가 변수가 필요한 경우, kwargs로 전달하면 prompt에 포맷됩니다.
+
+다음과 같이 테스트 파일을 설정하세요:
+
+<CodeGroup>
+
+```python Python
+import pytest
+from langsmith import testing as t
+from openevals.llm import create_llm_as_judge
+from openevals.prompts import CORRECTNESS_PROMPT
+
+correctness_evaluator = create_llm_as_judge(
+    prompt=CORRECTNESS_PROMPT,
+    feedback_key="correctness",
+    model="openai:o3-mini",
+)
+
+# Mock standin for your application
+def my_llm_app(inputs: dict) -> str:
+    return "Doodads have increased in price by 10% in the past year."
+
+@pytest.mark.langsmith
+def test_correctness():
+    inputs = "How much has the price of doodads changed in the past year?"
+    reference_outputs = "The price of doodads has decreased by 50% in the past year."
+    outputs = my_llm_app(inputs)
+
+    t.log_inputs({"question": inputs})
+    t.log_outputs({"answer": outputs})
+    t.log_reference_outputs({"answer": reference_outputs})
+
+    correctness_evaluator(
+        inputs=inputs,
+        outputs=outputs,
+        reference_outputs=reference_outputs
+    )
+```
+
+```typescript TypeScript
+import * as ls from "langsmith/vitest";
+// import * as ls from "langsmith/jest";
+import { createLLMAsJudge, CORRECTNESS_PROMPT } from "openevals";
+
+const correctnessEvaluator = createLLMAsJudge({
+    prompt: CORRECTNESS_PROMPT,
+    feedbackKey: "correctness",
+    model: "openai:o3-mini",
+});
+
+// Mock standin for your application
+const myLLMApp = async (_inputs: Record<string, unknown>) => {
+    return "Doodads have increased in price by 10% in the past year.";
+};
+
+ls.describe("Correctness", () => {
+    ls.test("incorrect answer", {
+        inputs: {
+            question: "How much has the price of doodads changed in the past year?"
+        },
+        referenceOutputs: {
+            answer: "The price of doodads has decreased by 50% in the past year."
+        }
+    }, async ({ inputs, referenceOutputs }) => {
+        const outputs = await myLLMApp(inputs);
+        ls.logOutputs({ answer: outputs });
+        await correctnessEvaluator({
+            inputs,
+            outputs,
+            referenceOutputs,
+        });
+    });
+});
+```
+
+</CodeGroup>
+
+`feedback_key`/`feedbackKey` 매개변수는 실험에서 feedback의 이름으로 사용됩니다.
+
+터미널에서 평가를 실행하면 다음과 같은 결과가 나타납니다:
+
+![Prebuilt evaluator terminal result](/langsmith/images/prebuilt-eval-result.png)
+
+LangSmith에서 이미 dataset을 생성한 경우 사전 구축된 evaluator를 `evaluate` 메서드에 직접 전달할 수도 있습니다. Python을 사용하는 경우 `langsmith>=0.3.11`이 필요합니다:
+
+<CodeGroup>
+
+```python Python
+from langsmith import Client
+from openevals.llm import create_llm_as_judge
+from openevals.prompts import CONCISENESS_PROMPT
+
+client = Client()
+conciseness_evaluator = create_llm_as_judge(
+    prompt=CONCISENESS_PROMPT,
+    feedback_key="conciseness",
+    model="openai:o3-mini",
+)
+
+experiment_results = client.evaluate(
+    # This is a dummy target function, replace with your actual LLM-based system
+    lambda inputs: "What color is the sky?",
+    data="Sample dataset",
+    evaluators=[
+        conciseness_evaluator
+    ]
+)
+```
+
+```typescript TypeScript
+import { evaluate } from "langsmith/evaluation";
+import { createLLMAsJudge, CONCISENESS_PROMPT } from "openevals";
+
+const concisenessEvaluator = createLLMAsJudge({
+    prompt: CONCISENESS_PROMPT,
+    feedbackKey: "conciseness",
+    model: "openai:o3-mini",
+});
+
+await evaluate((inputs) => "What color is the sky?", {
+    data: datasetName,
+    evaluators: [concisenessEvaluator],
+});
+```
+
+</CodeGroup>
+
+사용 가능한 evaluator의 전체 목록은 [openevals](https://github.com/langchain-ai/openevals) 및 [agentevals](https://github.com/langchain-ai/agentevals) 저장소를 참조하세요.

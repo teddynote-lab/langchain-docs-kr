@@ -1,0 +1,62 @@
+```mdx
+---
+title: MISSING_CHECKPOINTER
+---
+
+
+
+built-in LangGraph persistence를 사용하려고 하지만 checkpointer를 제공하지 않았습니다.
+
+이는 @[`StateGraph`][StateGraph] 또는 @[`@entrypoint`]의 `compile()` 메서드에 `checkpointer`가 누락되었을 때 발생합니다.
+
+## Troubleshooting
+
+다음 방법들이 이 오류를 해결하는 데 도움이 될 수 있습니다:
+
+-   checkpointer를 초기화하고 @[`StateGraph`][StateGraph] 또는 @[`@entrypoint`]의 `compile()` 메서드에 전달하세요.
+
+:::python
+
+```python
+from langgraph.checkpoint.memory import InMemorySaver
+checkpointer = InMemorySaver()
+
+# Graph API
+graph = StateGraph(...).compile(checkpointer=checkpointer)
+
+# Functional API
+@entrypoint(checkpointer=checkpointer)
+def workflow(messages: list[str]) -> str:
+    ...
+```
+
+:::
+
+:::js
+
+```typescript
+import { InMemorySaver, StateGraph } from "@langchain/langgraph";
+const checkpointer = new InMemorySaver();
+
+// Graph API
+import { StateGraph } from "@langchain/langgraph";
+const graph = new StateGraph(...).compile({ checkpointer });
+
+// Functional API
+import { entrypoint } from "@langchain/langgraph";
+const workflow = entrypoint(
+    { checkpointer, name: "workflow" },
+    async (messages: string[]) => {
+        // ...
+    }
+);
+```
+
+:::
+
+-   LangGraph API를 사용하면 checkpointer를 수동으로 구현하거나 구성할 필요가 없습니다. API가 모든 persistence 인프라를 자동으로 처리합니다.
+
+## Related
+
+- [persistence](/oss/langgraph/persistence)에 대해 자세히 알아보세요.
+```

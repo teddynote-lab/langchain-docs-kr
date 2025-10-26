@@ -1,0 +1,69 @@
+---
+title: ForefrontAI
+---
+
+`Forefront` 플랫폼은 [오픈소스 대규모 언어 모델](https://docs.forefront.ai/get-started/models)을 미세 조정하고 사용할 수 있는 기능을 제공합니다.
+
+이 노트북은 [ForefrontAI](https://www.forefront.ai/)와 함께 LangChain을 사용하는 방법을 다룹니다.
+
+## Imports
+
+```python
+import os
+
+from langchain.chains import LLMChain
+from langchain_community.llms import ForefrontAI
+from langchain_core.prompts import PromptTemplate
+```
+
+## Environment API Key 설정
+
+ForefrontAI에서 API key를 받아야 합니다. 다양한 모델을 테스트할 수 있는 5일 무료 체험이 제공됩니다.
+
+```python
+# get a new token: https://docs.forefront.ai/forefront/api-reference/authentication
+
+from getpass import getpass
+
+FOREFRONTAI_API_KEY = getpass()
+```
+
+```python
+os.environ["FOREFRONTAI_API_KEY"] = FOREFRONTAI_API_KEY
+```
+
+## ForefrontAI instance 생성
+
+model endpoint url, length, temperature 등 다양한 parameter를 지정할 수 있습니다. endpoint url은 반드시 제공해야 합니다.
+
+```python
+llm = ForefrontAI(endpoint_url="YOUR ENDPOINT URL HERE")
+```
+
+## Prompt Template 생성
+
+질문과 답변을 위한 prompt template을 생성합니다.
+
+```python
+template = """Question: {question}
+
+Answer: Let's think step by step."""
+
+prompt = PromptTemplate.from_template(template)
+```
+
+## LLMChain 초기화
+
+```python
+llm_chain = LLMChain(prompt=prompt, llm=llm)
+```
+
+## LLMChain 실행
+
+질문을 제공하고 LLMChain을 실행합니다.
+
+```python
+question = "What NFL team won the Super Bowl in the year Justin Beiber was born?"
+
+llm_chain.run(question)
+```

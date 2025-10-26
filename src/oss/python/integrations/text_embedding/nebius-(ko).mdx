@@ -1,0 +1,245 @@
+---
+title: Nebius
+---
+
+[Nebius AI Studio](https://studio.nebius.ai/)는 통합 인터페이스를 통해 고품질 embedding 모델에 대한 API 액세스를 제공합니다. Nebius embedding 모델은 텍스트를 의미론적 의미를 포착하는 숫자 벡터로 변환하여 의미론적 검색, 클러스터링, 추천과 같은 다양한 애플리케이션에 유용합니다.
+
+## Overview
+
+`NebiusEmbeddings` 클래스는 LangChain을 통해 Nebius AI Studio의 embedding 모델에 대한 액세스를 제공합니다. 이러한 embedding은 의미론적 검색, 문서 유사도 및 텍스트의 벡터 표현이 필요한 기타 NLP 작업에 사용할 수 있습니다.
+
+### Integration details
+
+- **Provider**: Nebius AI Studio
+- **Model Types**: Text embedding 모델
+- **Primary Use Case**: 의미론적 유사도 및 검색을 위한 텍스트의 벡터 표현 생성
+- **Available Models**: BAAI/bge-en-icl 등 다양한 embedding 모델
+- **Dimensions**: 모델에 따라 다름 (일반적으로 1024-4096 차원)
+
+## Setup
+
+### Installation
+
+Nebius integration은 pip를 통해 설치할 수 있습니다:
+
+```python
+pip install -U langchain-nebius
+```
+
+### Credentials
+
+Nebius는 초기화 매개변수 `api_key`로 전달하거나 환경 변수 `NEBIUS_API_KEY`로 설정할 수 있는 API key가 필요합니다. [Nebius AI Studio](https://studio.nebius.ai/)에서 계정을 생성하여 API key를 얻을 수 있습니다.
+
+```python
+import getpass
+import os
+
+# Make sure you've set your API key as an environment variable
+if "NEBIUS_API_KEY" not in os.environ:
+    os.environ["NEBIUS_API_KEY"] = getpass.getpass("Enter your Nebius API key: ")
+```
+
+## Instantiation
+
+`NebiusEmbeddings` 클래스는 API key 및 모델 이름에 대한 선택적 매개변수로 인스턴스화할 수 있습니다:
+
+```python
+from langchain_nebius import NebiusEmbeddings
+
+# Initialize the embeddings model
+embeddings = NebiusEmbeddings(
+    # api_key="YOUR_API_KEY",  # You can pass the API key directly
+    model="BAAI/bge-en-icl"  # The default embedding model
+)
+```
+
+### Available Models
+
+지원되는 모델 목록은 [studio.nebius.com/?modality=embedding](https://studio.nebius.com/?modality=embedding)에서 확인할 수 있습니다.
+
+## Indexing and Retrieval
+
+Embedding 모델은 데이터 인덱싱과 이후 검색 모두에서 retrieval-augmented generation (RAG) 플로우에 자주 사용됩니다. 다음 예제는 문서 검색을 위해 vector store와 함께 `NebiusEmbeddings`를 사용하는 방법을 보여줍니다.
+
+```python
+from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
+
+# Prepare documents
+docs = [
+    Document(
+        page_content="Machine learning algorithms build mathematical models based on sample data"
+    ),
+    Document(page_content="Deep learning uses neural networks with many layers"),
+    Document(page_content="Climate change is a major global environmental challenge"),
+    Document(
+        page_content="Neural networks are inspired by the human brain's structure"
+    ),
+]
+
+# Create vector store
+vector_store = FAISS.from_documents(docs, embeddings)
+
+# Perform similarity search
+query = "How does the brain influence AI?"
+results = vector_store.similarity_search(query, k=2)
+
+print("Search results for query:", query)
+for i, doc in enumerate(results):
+    print(f"Result {i + 1}: {doc.page_content}")
+```
+
+```output
+Search results for query: How does the brain influence AI?
+Result 1: Neural networks are inspired by the human brain's structure
+Result 2: Deep learning uses neural networks with many layers
+```
+
+### Using with InMemoryVectorStore
+
+경량 애플리케이션을 위해 `InMemoryVectorStore`를 사용할 수도 있습니다:
+
+```python
+from langchain_core.vectorstores import InMemoryVectorStore
+
+# Create a sample text
+text = "LangChain is a framework for developing applications powered by language models"
+
+# Create a vector store
+vectorstore = InMemoryVectorStore.from_texts(
+    [text],
+    embedding=embeddings,
+)
+
+# Use as a retriever
+retriever = vectorstore.as_retriever()
+
+# Retrieve similar documents
+docs = retriever.invoke("What is LangChain?")
+print(f"Retrieved document: {docs[0].page_content}")
+```
+
+```output
+Retrieved document: LangChain is a framework for developing applications powered by language models
+```
+
+## Direct Usage
+
+vector store를 사용하지 않고 `NebiusEmbeddings` 클래스를 직접 사용하여 텍스트에 대한 embedding을 생성할 수 있습니다.
+
+### Embedding a Single Text
+
+`embed_query` 메서드를 사용하여 단일 텍스트를 embedding할 수 있습니다:
+
+```python
+query = "What is machine learning?"
+query_embedding = embeddings.embed_query(query)
+
+# Check the embedding dimension
+print(f"Embedding dimension: {len(query_embedding)}")
+print(f"First few values: {query_embedding[:5]}")
+```
+
+```output
+Embedding dimension: 4096
+First few values: [0.007419586181640625, 0.002246856689453125, 0.00193023681640625, -0.0066070556640625, -0.0179901123046875]
+```
+
+### Embedding Multiple Texts
+
+`embed_documents` 메서드를 사용하여 여러 텍스트를 한 번에 embedding할 수 있습니다:
+
+```python
+documents = [
+    "Machine learning is a branch of artificial intelligence",
+    "Deep learning is a subfield of machine learning",
+    "Natural language processing deals with interactions between computers and human language",
+]
+
+document_embeddings = embeddings.embed_documents(documents)
+
+# Check the results
+print(f"Number of document embeddings: {len(document_embeddings)}")
+print(f"Each embedding has {len(document_embeddings[0])} dimensions")
+```
+
+```output
+Number of document embeddings: 3
+Each embedding has 4096 dimensions
+```
+
+### Async Support
+
+NebiusEmbeddings는 비동기 작업을 지원합니다:
+
+```python
+import asyncio
+
+
+async def generate_embeddings_async():
+    # Embed a single query
+    query_result = await embeddings.aembed_query("What is the capital of France?")
+    print(f"Async query embedding dimension: {len(query_result)}")
+
+    # Embed multiple documents
+    docs = [
+        "Paris is the capital of France",
+        "Berlin is the capital of Germany",
+        "Rome is the capital of Italy",
+    ]
+    docs_result = await embeddings.aembed_documents(docs)
+    print(f"Async document embeddings count: {len(docs_result)}")
+
+
+await generate_embeddings_async()
+```
+
+```output
+Async query embedding dimension: 4096
+Async document embeddings count: 3
+```
+
+### Document Similarity Example
+
+```python
+import numpy as np
+from scipy.spatial.distance import cosine
+
+# Create some documents
+documents = [
+    "Machine learning algorithms build mathematical models based on sample data",
+    "Deep learning uses neural networks with many layers",
+    "Climate change is a major global environmental challenge",
+    "Neural networks are inspired by the human brain's structure",
+]
+
+# Embed the documents
+embeddings_list = embeddings.embed_documents(documents)
+
+
+# Function to calculate similarity
+def calculate_similarity(embedding1, embedding2):
+    return 1 - cosine(embedding1, embedding2)
+
+
+# Print similarity matrix
+print("Document Similarity Matrix:")
+for i, emb_i in enumerate(embeddings_list):
+    similarities = []
+    for j, emb_j in enumerate(embeddings_list):
+        similarity = calculate_similarity(emb_i, emb_j)
+        similarities.append(f"{similarity:.4f}")
+    print(f"Document {i + 1}: {similarities}")
+```
+
+```output
+Document Similarity Matrix:
+Document 1: ['1.0000', '0.8282', '0.5811', '0.7985']
+Document 2: ['0.8282', '1.0000', '0.5897', '0.8315']
+Document 3: ['0.5811', '0.5897', '1.0000', '0.5918']
+Document 4: ['0.7985', '0.8315', '0.5918', '1.0000']
+```
+
+## API reference
+
+Nebius AI Studio API에 대한 자세한 내용은 [Nebius AI Studio Documentation](https://studio.nebius.ai/docs/api-reference)을 참조하세요.

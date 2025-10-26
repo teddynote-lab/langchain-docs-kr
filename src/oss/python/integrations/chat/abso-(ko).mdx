@@ -1,0 +1,73 @@
+---
+title: ChatAbso
+---
+
+이 문서는 ChatAbso [chat models](https://python.langchain.com/docs/concepts/chat_models/) 시작하기를 도와드립니다. 모든 ChatAbso 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/en/latest/chat_models/langchain_abso.chat_models.ChatAbso.html)를 참조하세요.
+
+- Abso router에 대한 전체 문서는 [여기]([abso.ai](https://abso.ai))에서 찾을 수 있습니다
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/chat/abso) | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [ChatAbso](https://python.langchain.com/api_reference/en/latest/chat_models/langchain_abso.chat_models.ChatAbso.html) | [langchain-abso](https://python.langchain.com/api_reference/en/latest/abso_api_reference.html) | ❌ | ❌ | ❌ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-abso?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-abso?style=flat-square&label=%20) |
+
+## Setup
+
+ChatAbso 모델에 액세스하려면 OpenAI 계정을 생성하고 API key를 받은 다음 `langchain-abso` integration package를 설치해야 합니다.
+
+### Credentials
+
+- TODO: Update with relevant info.
+
+(TODO: link)로 이동하여 ChatAbso에 가입하고 API key를 생성하세요. 완료한 후 ABSO_API_KEY environment variable을 설정하세요:
+
+```python
+import getpass
+import os
+
+if not os.getenv("OPENAI_API_KEY"):
+    os.environ["OPENAI_API_KEY"] = getpass.getpass("Enter your OpenAI API key: ")
+```
+
+### Installation
+
+LangChain ChatAbso integration은 `langchain-abso` package에 있습니다:
+
+```python
+pip install -qU langchain-abso
+```
+
+## Instantiation
+
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
+
+```python
+from langchain_abso import ChatAbso
+
+llm = ChatAbso(fast_model="gpt-4o", slow_model="o3-mini")
+```
+
+## Invocation
+
+```python
+messages = [
+    (
+        "system",
+        "You are a helpful assistant that translates English to French. Translate the user sentence.",
+    ),
+    ("human", "I love programming."),
+]
+ai_msg = llm.invoke(messages)
+ai_msg
+```
+
+```python
+print(ai_msg.content)
+```
+
+## API reference
+
+모든 ChatAbso 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/en/latest/chat_models/langchain_abso.chat_models.ChatAbso.html](https://python.langchain.com/api_reference/en/latest/chat_models/langchain_abso.chat_models.ChatAbso.html)

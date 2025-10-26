@@ -1,0 +1,28 @@
+---
+title: Docugami
+---
+
+>[Docugami](https://docugami.com)는 비즈니스 문서를 Document XML Knowledge Graph로 변환하여, 전체 문서를 나타내는 XML 의미 트리의 포레스트를 생성합니다. 이는 문서 내 다양한 청크의 의미적 및 구조적 특성을 XML 트리로 포함하는 풍부한 표현입니다.
+
+## Installation and Setup
+
+
+<CodeGroup>
+```bash pip
+pip install dgml-utils
+pip install docugami-langchain
+```
+
+```bash uv
+uv add dgml-utils
+uv add docugami-langchain
+```
+</CodeGroup>
+
+## Document Loader
+
+[사용 예제](/oss/integrations/document_loaders/docugami)를 참조하세요.
+
+```python
+from docugami_langchain.document_loaders import DocugamiLoader
+```

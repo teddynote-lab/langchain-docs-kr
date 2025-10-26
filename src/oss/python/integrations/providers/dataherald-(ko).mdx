@@ -1,0 +1,72 @@
+---
+title: Dataherald
+---
+
+>[Dataherald](https://www.dataherald.com)는 자연어를 SQL로 변환하는 도구입니다.
+
+이 페이지에서는 LangChain 내에서 `Dataherald API`를 사용하는 방법을 다룹니다.
+
+## Installation and Setup
+- 다음 명령어로 필요한 패키지를 설치합니다
+<CodeGroup>
+```bash pip
+pip install dataherald
+```
+
+```bash uv
+uv add dataherald
+```
+</CodeGroup>
+- dataherald로 이동하여 [여기](https://www.dataherald.com)에서 가입합니다
+- 앱을 생성하고 `API KEY`를 받습니다
+- `API KEY`를 환경 변수 `DATAHERALD_API_KEY`로 설정합니다
+
+
+## Wrappers
+
+### Utility
+
+이 API를 래핑하는 DataheraldAPIWrapper utility가 있습니다. 이 utility를 import하려면:
+
+```python
+from langchain_community.utilities.dataherald import DataheraldAPIWrapper
+```
+
+이 wrapper에 대한 자세한 안내는 [이 노트북](/oss/integrations/tools/dataherald)을 참조하세요.
+
+### Tool
+
+agent에서 다음과 같이 tool을 사용할 수 있습니다:
+```python
+from langchain_community.utilities.dataherald import DataheraldAPIWrapper
+from langchain_community.tools.dataherald.tool import DataheraldTextToSQL
+from langchain_openai import ChatOpenAI
+from langchain_classic import hub
+from langchain.agents import AgentExecutor, create_agent, load_tools
+
+api_wrapper = DataheraldAPIWrapper(db_connection_id="<db_connection_id>")
+tool = DataheraldTextToSQL(api_wrapper=api_wrapper)
+llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+prompt = hub.pull("hwchase17/react")
+agent = create_agent(llm, tools, prompt)
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+agent_executor.invoke({"input":"Return the sql for this question: How many employees are in the company?"})
+```
+
+Output
+```shell
+> Entering new AgentExecutor chain...
+I need to use a tool that can convert this question into SQL.
+Action: dataherald
+Action Input: How many employees are in the company?Answer: SELECT
+    COUNT(*) FROM employeesI now know the final answer
+Final Answer: SELECT
+    COUNT(*)
+FROM
+    employees
+
+> Finished chain.
+{'input': 'Return the sql for this question: How many employees are in the company?', 'output': "SELECT \n    COUNT(*)\nFROM \n    employees"}
+```
+
+tool에 대한 자세한 정보는 [이 페이지](/oss/integrations/tools)를 참조하세요.

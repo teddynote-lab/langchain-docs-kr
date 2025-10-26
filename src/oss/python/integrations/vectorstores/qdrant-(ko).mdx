@@ -1,0 +1,505 @@
+---
+title: Qdrant
+---
+
+>[Qdrant](https://qdrant.tech/documentation/) (발음: quadrant)는 벡터 유사도 검색 엔진입니다. 추가 payload와 확장된 필터링 지원을 통해 벡터를 저장, 검색 및 관리할 수 있는 편리한 API를 제공하는 프로덕션 준비 서비스를 제공합니다. 이는 모든 종류의 신경망 또는 의미 기반 매칭, faceted search 및 기타 애플리케이션에 유용합니다.
+
+이 문서는 dense(임베딩 기반), sparse(텍스트 검색) 및 hybrid retrieval을 위해 LangChain과 함께 Qdrant를 사용하는 방법을 보여줍니다. `QdrantVectorStore` 클래스는 Qdrant의 새로운 [Query API](https://qdrant.tech/blog/qdrant-1.10.x/)를 통해 여러 retrieval 모드를 지원합니다. Qdrant v1.10.0 이상을 실행해야 합니다.
+
+## Setup
+
+`Qdrant`를 실행하는 다양한 모드가 있으며, 선택한 모드에 따라 약간의 차이가 있습니다. 옵션은 다음과 같습니다:
+
+- Local 모드, 서버 불필요
+- Docker 배포
+- Qdrant Cloud
+
+설치 지침은 [여기](https://qdrant.tech/documentation/install/)를 참조하세요.
+
+```python
+pip install -qU langchain-qdrant
+```
+
+### Credentials
+
+이 노트북의 코드를 실행하는 데 필요한 credentials는 없습니다.
+
+모델 호출에 대한 최고 수준의 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수 있습니다:
+
+```python
+os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
+os.environ["LANGSMITH_TRACING"] = "true"
+```
+
+## Initialization
+
+### Local 모드
+
+Python client는 Qdrant 서버를 실행하지 않고 local 모드에서 코드를 실행할 수 있는 옵션을 제공합니다. 이는 테스트 및 디버깅 또는 소량의 벡터만 저장하는 데 유용합니다. 임베딩은 완전히 in-memory로 유지하거나 디스크에 저장할 수 있습니다.
+
+#### In-memory
+
+일부 테스트 시나리오 및 빠른 실험의 경우, 모든 데이터를 메모리에만 보관하여 client가 삭제될 때(일반적으로 스크립트/노트북 종료 시) 제거되도록 하는 것을 선호할 수 있습니다.
+
+<EmbeddingTabs/>
+
+```python
+# | output: false
+# | echo: false
+from langchain_openai import OpenAIEmbeddings
+
+embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
+```
+
+```python
+from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
+from qdrant_client.http.models import Distance, VectorParams
+
+client = QdrantClient(":memory:")
+
+client.create_collection(
+    collection_name="demo_collection",
+    vectors_config=VectorParams(size=3072, distance=Distance.COSINE),
+)
+
+vector_store = QdrantVectorStore(
+    client=client,
+    collection_name="demo_collection",
+    embedding=embeddings,
+)
+```
+
+#### On-disk storage
+
+Qdrant 서버를 사용하지 않는 local 모드에서도 벡터를 디스크에 저장하여 실행 간에 유지할 수 있습니다.
+
+```python
+client = QdrantClient(path="/tmp/langchain_qdrant")
+
+client.create_collection(
+    collection_name="demo_collection",
+    vectors_config=VectorParams(size=3072, distance=Distance.COSINE),
+)
+
+vector_store = QdrantVectorStore(
+    client=client,
+    collection_name="demo_collection",
+    embedding=embeddings,
+)
+```
+
+### On-premise 서버 배포
+
+[Docker container](https://qdrant.tech/documentation/install/)로 Qdrant를 로컬에서 시작하거나 [공식 Helm chart](https://github.com/qdrant/qdrant-helm)를 사용하여 Kubernetes 배포를 선택하든, 이러한 인스턴스에 연결하는 방법은 동일합니다. 서비스를 가리키는 URL을 제공해야 합니다.
+
+```python
+url = "<---qdrant url here --->"
+docs = []  # put docs here
+qdrant = QdrantVectorStore.from_documents(
+    docs,
+    embeddings,
+    url=url,
+    prefer_grpc=True,
+    collection_name="my_documents",
+)
+```
+
+### Qdrant Cloud
+
+인프라 관리에 신경 쓰지 않으려면 [Qdrant Cloud](https://cloud.qdrant.io/)에서 완전 관리형 Qdrant 클러스터를 설정할 수 있습니다. 체험용으로 영구 무료 1GB 클러스터가 포함되어 있습니다. 관리형 버전의 Qdrant를 사용하는 주요 차이점은 공개 액세스로부터 배포를 보호하기 위해 API key를 제공해야 한다는 것입니다. 값은 `QDRANT_API_KEY` 환경 변수에도 설정할 수 있습니다.
+
+```python
+url = "<---qdrant cloud cluster url here --->"
+api_key = "<---api key here--->"
+qdrant = QdrantVectorStore.from_documents(
+    docs,
+    embeddings,
+    url=url,
+    prefer_grpc=True,
+    api_key=api_key,
+    collection_name="my_documents",
+)
+```
+
+## 기존 collection 사용하기
+
+새 문서나 텍스트를 로드하지 않고 `langchain_qdrant.Qdrant` 인스턴스를 가져오려면 `Qdrant.from_existing_collection()` 메서드를 사용할 수 있습니다.
+
+```python
+qdrant = QdrantVectorStore.from_existing_collection(
+    embedding=embeddings,
+    collection_name="my_documents",
+    url="http://localhost:6333",
+)
+```
+
+## Vector store 관리
+
+vector store를 생성한 후에는 다양한 항목을 추가하고 삭제하여 상호 작용할 수 있습니다.
+
+### Vector store에 항목 추가
+
+`add_documents` 함수를 사용하여 vector store에 항목을 추가할 수 있습니다.
+
+```python
+from uuid import uuid4
+
+from langchain_core.documents import Document
+
+document_1 = Document(
+    page_content="I had chocolate chip pancakes and scrambled eggs for breakfast this morning.",
+    metadata={"source": "tweet"},
+)
+
+document_2 = Document(
+    page_content="The weather forecast for tomorrow is cloudy and overcast, with a high of 62 degrees Fahrenheit.",
+    metadata={"source": "news"},
+)
+
+document_3 = Document(
+    page_content="Building an exciting new project with LangChain - come check it out!",
+    metadata={"source": "tweet"},
+)
+
+document_4 = Document(
+    page_content="Robbers broke into the city bank and stole $1 million in cash.",
+    metadata={"source": "news"},
+)
+
+document_5 = Document(
+    page_content="Wow! That was an amazing movie. I can't wait to see it again.",
+    metadata={"source": "tweet"},
+)
+
+document_6 = Document(
+    page_content="Is the new iPhone worth the price? Read this review to find out.",
+    metadata={"source": "website"},
+)
+
+document_7 = Document(
+    page_content="The top 10 soccer players in the world right now.",
+    metadata={"source": "website"},
+)
+
+document_8 = Document(
+    page_content="LangGraph is the best framework for building stateful, agentic applications!",
+    metadata={"source": "tweet"},
+)
+
+document_9 = Document(
+    page_content="The stock market is down 500 points today due to fears of a recession.",
+    metadata={"source": "news"},
+)
+
+document_10 = Document(
+    page_content="I have a bad feeling I am going to get deleted :(",
+    metadata={"source": "tweet"},
+)
+
+documents = [
+    document_1,
+    document_2,
+    document_3,
+    document_4,
+    document_5,
+    document_6,
+    document_7,
+    document_8,
+    document_9,
+    document_10,
+]
+uuids = [str(uuid4()) for _ in range(len(documents))]
+```
+
+```python
+vector_store.add_documents(documents=documents, ids=uuids)
+```
+
+### Vector store에서 항목 삭제
+
+```python
+vector_store.delete(ids=[uuids[-1]])
+```
+
+```output
+True
+```
+
+## Vector store 쿼리
+
+Vector store가 생성되고 관련 문서가 추가되면, chain 또는 agent를 실행하는 동안 쿼리하고 싶을 것입니다.
+
+### 직접 쿼리
+
+Qdrant vector store를 사용하는 가장 간단한 시나리오는 유사도 검색을 수행하는 것입니다. 내부적으로 쿼리는 벡터 임베딩으로 인코딩되어 Qdrant collection에서 유사한 문서를 찾는 데 사용됩니다.
+
+```python
+results = vector_store.similarity_search(
+    "LangChain provides abstractions to make working with LLMs easy", k=2
+)
+for res in results:
+    print(f"* {res.page_content} [{res.metadata}]")
+```
+
+```output
+* Building an exciting new project with LangChain - come check it out! [{'source': 'tweet', '_id': 'd3202666-6f2b-4186-ac43-e35389de8166', '_collection_name': 'demo_collection'}]
+* LangGraph is the best framework for building stateful, agentic applications! [{'source': 'tweet', '_id': '91ed6c56-fe53-49e2-8199-c3bb3c33c3eb', '_collection_name': 'demo_collection'}]
+```
+
+`QdrantVectorStore`는 유사도 검색을 위한 3가지 모드를 지원합니다. `retrieval_mode` 매개변수를 사용하여 구성할 수 있습니다.
+
+- Dense Vector Search (기본값)
+- Sparse Vector Search
+- Hybrid Search
+
+### Dense Vector Search
+
+Dense vector search는 벡터 기반 임베딩을 통해 유사도를 계산합니다. dense 벡터만으로 검색하려면:
+
+- `retrieval_mode` 매개변수를 `RetrievalMode.DENSE`로 설정해야 합니다. 이것이 기본 동작입니다.
+- [dense embeddings](https://python.langchain.com/docs/integrations/text_embedding/) 값을 `embedding` 매개변수에 제공해야 합니다.
+
+```python
+from langchain_qdrant import QdrantVectorStore, RetrievalMode
+from qdrant_client import QdrantClient
+from qdrant_client.http.models import Distance, VectorParams
+
+# Create a Qdrant client for local storage
+client = QdrantClient(path="/tmp/langchain_qdrant")
+
+# Create a collection with dense vectors
+client.create_collection(
+    collection_name="my_documents",
+    vectors_config=VectorParams(size=3072, distance=Distance.COSINE),
+)
+
+qdrant = QdrantVectorStore(
+    client=client,
+    collection_name="my_documents",
+    embedding=embeddings,
+    retrieval_mode=RetrievalMode.DENSE,
+)
+
+qdrant.add_documents(documents=documents, ids=uuids)
+
+query = "How much money did the robbers steal?"
+found_docs = qdrant.similarity_search(query)
+found_docs
+```
+
+### Sparse Vector Search
+
+sparse 벡터만으로 검색하려면:
+
+- `retrieval_mode` 매개변수를 `RetrievalMode.SPARSE`로 설정해야 합니다.
+- 임의의 sparse embeddings 제공자를 사용하는 [`SparseEmbeddings`](https://github.com/langchain-ai/langchain/blob/master/libs/partners/qdrant/langchain_qdrant/sparse_embeddings.py) 인터페이스의 구현을 `sparse_embedding` 매개변수의 값으로 제공해야 합니다.
+
+`langchain-qdrant` 패키지는 [FastEmbed](https://github.com/qdrant/fastembed) 기반 구현을 기본적으로 제공합니다.
+
+사용하려면 FastEmbed 패키지를 설치하세요.
+
+```python
+pip install -qU fastembed
+```
+
+```python
+from langchain_qdrant import FastEmbedSparse, QdrantVectorStore, RetrievalMode
+from qdrant_client import QdrantClient, models
+from qdrant_client.http.models import Distance, SparseVectorParams, VectorParams
+
+sparse_embeddings = FastEmbedSparse(model_name="Qdrant/bm25")
+
+# Create a Qdrant client for local storage
+client = QdrantClient(path="/tmp/langchain_qdrant")
+
+# Create a collection with sparse vectors
+client.create_collection(
+    collection_name="my_documents",
+    vectors_config={"dense": VectorParams(size=3072, distance=Distance.COSINE)},
+    sparse_vectors_config={
+        "sparse": SparseVectorParams(index=models.SparseIndexParams(on_disk=False))
+    },
+)
+
+qdrant = QdrantVectorStore(
+    client=client,
+    collection_name="my_documents",
+    sparse_embedding=sparse_embeddings,
+    retrieval_mode=RetrievalMode.SPARSE,
+    sparse_vector_name="sparse",
+)
+
+qdrant.add_documents(documents=documents, ids=uuids)
+
+query = "How much money did the robbers steal?"
+found_docs = qdrant.similarity_search(query)
+found_docs
+```
+
+### Hybrid Vector Search
+
+score fusion을 사용하여 dense 및 sparse 벡터로 hybrid search를 수행하려면:
+
+- `retrieval_mode` 매개변수를 `RetrievalMode.HYBRID`로 설정해야 합니다.
+- [dense embeddings](https://python.langchain.com/docs/integrations/text_embedding/) 값을 `embedding` 매개변수에 제공해야 합니다.
+- 임의의 sparse embeddings 제공자를 사용하는 [`SparseEmbeddings`](https://github.com/langchain-ai/langchain/blob/master/libs/partners/qdrant/langchain_qdrant/sparse_embeddings.py) 인터페이스의 구현을 `sparse_embedding` 매개변수의 값으로 제공해야 합니다.
+
+`HYBRID` 모드로 문서를 추가한 경우, collection에 dense 및 sparse 벡터가 모두 있으므로 검색 시 모든 retrieval 모드로 전환할 수 있습니다.
+
+```python
+from langchain_qdrant import FastEmbedSparse, QdrantVectorStore, RetrievalMode
+from qdrant_client import QdrantClient, models
+from qdrant_client.http.models import Distance, SparseVectorParams, VectorParams
+
+sparse_embeddings = FastEmbedSparse(model_name="Qdrant/bm25")
+
+# Create a Qdrant client for local storage
+client = QdrantClient(path="/tmp/langchain_qdrant")
+
+# Create a collection with both dense and sparse vectors
+client.create_collection(
+    collection_name="my_documents",
+    vectors_config={"dense": VectorParams(size=3072, distance=Distance.COSINE)},
+    sparse_vectors_config={
+        "sparse": SparseVectorParams(index=models.SparseIndexParams(on_disk=False))
+    },
+)
+
+qdrant = QdrantVectorStore(
+    client=client,
+    collection_name="my_documents",
+    embedding=embeddings,
+    sparse_embedding=sparse_embeddings,
+    retrieval_mode=RetrievalMode.HYBRID,
+    vector_name="dense",
+    sparse_vector_name="sparse",
+)
+
+qdrant.add_documents(documents=documents, ids=uuids)
+
+query = "How much money did the robbers steal?"
+found_docs = qdrant.similarity_search(query)
+found_docs
+```
+
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
+
+```python
+results = vector_store.similarity_search_with_score(
+    query="Will it be hot tomorrow", k=1
+)
+for doc, score in results:
+    print(f"* [SIM={score:3f}] {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+* [SIM=0.531834] The weather forecast for tomorrow is cloudy and overcast, with a high of 62 degrees. [{'source': 'news', '_id': '9e6ba50c-794f-4b88-94e5-411f15052a02', '_collection_name': 'demo_collection'}]
+```
+
+`QdrantVectorStore`에서 사용 가능한 모든 검색 함수의 전체 목록은 [API reference](https://python.langchain.com/api_reference/qdrant/qdrant/langchain_qdrant.qdrant.QdrantVectorStore.html)를 참조하세요.
+
+### Metadata 필터링
+
+Qdrant는 풍부한 타입 지원을 갖춘 [광범위한 필터링 시스템](https://qdrant.tech/documentation/concepts/filtering/)을 가지고 있습니다. `similarity_search_with_score` 및 `similarity_search` 메서드 모두에 추가 매개변수를 전달하여 LangChain에서 필터를 사용할 수도 있습니다.
+
+```python
+from qdrant_client import models
+
+results = vector_store.similarity_search(
+    query="Who are the best soccer players in the world?",
+    k=1,
+    filter=models.Filter(
+        should=[
+            models.FieldCondition(
+                key="page_content",
+                match=models.MatchValue(
+                    value="The top 10 soccer players in the world right now."
+                ),
+            ),
+        ]
+    ),
+)
+for doc in results:
+    print(f"* {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+* The top 10 soccer players in the world right now. [{'source': 'website', '_id': 'b0964ab5-5a14-47b4-a983-37fa5c5bd154', '_collection_name': 'demo_collection'}]
+```
+
+### Retriever로 변환하여 쿼리
+
+Vector store를 retriever로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
+
+```python
+retriever = vector_store.as_retriever(search_type="mmr", search_kwargs={"k": 1})
+retriever.invoke("Stealing from the bank is a crime")
+```
+
+```output
+[Document(metadata={'source': 'news', '_id': '50d8d6ee-69bf-4173-a6a2-b254e9928965', '_collection_name': 'demo_collection'}, page_content='Robbers broke into the city bank and stole $1 million in cash.')]
+```
+
+## Retrieval-augmented generation 사용법
+
+Retrieval-augmented generation (RAG)을 위해 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
+
+- [Tutorials](/oss/langchain/rag)
+- [How-to: Question and answer with RAG](https://python.langchain.com/docs/how_to/#qa-with-rag)
+- [Retrieval conceptual docs](https://python.langchain.com/docs/concepts/retrieval)
+
+## Qdrant 커스터마이징
+
+LangChain 애플리케이션 내에서 기존 Qdrant collection을 사용하는 옵션이 있습니다. 이러한 경우 Qdrant point를 LangChain `Document`로 매핑하는 방법을 정의해야 할 수 있습니다.
+
+### Named vectors
+
+Qdrant는 named vectors를 통해 [point당 여러 벡터](https://qdrant.tech/documentation/concepts/collections/#collection-with-multiple-vectors)를 지원합니다. 외부에서 생성된 collection으로 작업하거나 다른 이름의 벡터를 사용하려는 경우 이름을 제공하여 구성할 수 있습니다.
+
+```python
+from langchain_qdrant import RetrievalMode
+
+QdrantVectorStore.from_documents(
+    docs,
+    embedding=embeddings,
+    sparse_embedding=sparse_embeddings,
+    location=":memory:",
+    collection_name="my_documents_2",
+    retrieval_mode=RetrievalMode.HYBRID,
+    vector_name="custom_vector",
+    sparse_vector_name="custom_sparse_vector",
+)
+```
+
+### Metadata
+
+Qdrant는 선택적 JSON 형식의 payload와 함께 벡터 임베딩을 저장합니다. Payload는 선택 사항이지만 LangChain은 임베딩이 문서에서 생성된다고 가정하므로 원본 텍스트를 추출할 수 있도록 컨텍스트 데이터를 유지합니다.
+
+기본적으로 문서는 다음 payload 구조로 저장됩니다:
+
+```json
+{
+    "page_content": "Lorem ipsum dolor sit amet",
+    "metadata": {
+        "foo": "bar"
+    }
+}
+```
+
+그러나 page content 및 metadata에 다른 키를 사용하도록 결정할 수 있습니다. 이는 재사용하려는 collection이 이미 있는 경우 유용합니다.
+
+```python
+QdrantVectorStore.from_documents(
+    docs,
+    embeddings,
+    location=":memory:",
+    collection_name="my_documents_2",
+    content_payload_key="my_page_content_key",
+    metadata_payload_key="my_meta",
+)
+```
+
+## API reference
+
+모든 `QdrantVectorStore` 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/qdrant/qdrant/langchain_qdrant.qdrant.QdrantVectorStore.html](https://python.langchain.com/api_reference/qdrant/qdrant/langchain_qdrant.qdrant.QdrantVectorStore.html)

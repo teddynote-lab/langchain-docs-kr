@@ -1,0 +1,122 @@
+---
+title: CSV
+---
+
+<Tip>
+**호환성**: Node.js에서만 사용 가능합니다.
+</Tip>
+
+이 노트북은 `CSVLoader` [document loaders](/oss/integrations/document_loaders) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `CSVLoader` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_fs_csv.CSVLoader.html)를 참조하세요.
+
+이 예제는 CSV 파일에서 데이터를 로드하는 방법을 다룹니다. 두 번째 인수는 CSV 파일에서 추출할 `column` 이름입니다. CSV 파일의 각 행에 대해 하나의 document가 생성됩니다. `column`이 지정되지 않으면 각 행은 key/value 쌍으로 변환되며, 각 key/value 쌍은 document의 `pageContent`에 새 줄로 출력됩니다. `column`이 지정되면 각 행에 대해 하나의 document가 생성되고, 지정된 column의 값이 document의 `pageContent`로 사용됩니다.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Compatibility | Local | [PY support](https://python.langchain.com/docs/integrations/document_loaders/csv)|
+| :--- | :--- | :---: | :---: |  :---: |
+| [CSVLoader](https://api.js.langchain.com/classes/langchain_community_document_loaders_fs_csv.CSVLoader.html) | [@langchain/community](https://api.js.langchain.com/modules/langchain_community_document_loaders_fs_csv.html) | Node-only | ✅ | ✅ |
+
+## Setup
+
+`CSVLoader` document loader에 액세스하려면 `@langchain/community` integration과 `d3-dsv@2` peer dependency를 설치해야 합니다.
+
+### Installation
+
+LangChain CSVLoader integration은 `@langchain/community` integration package에 포함되어 있습니다.
+
+<CodeGroup>
+```bash npm
+npm install @langchain/community @langchain/core d3-dsv@2
+```
+```bash yarn
+yarn add @langchain/community @langchain/core d3-dsv@2
+```
+```bash pnpm
+pnpm add @langchain/community @langchain/core d3-dsv@2
+```
+</CodeGroup>
+
+## Instantiation
+
+이제 model 객체를 인스턴스화하고 document를 로드할 수 있습니다:
+
+```typescript
+import { CSVLoader } from "@langchain/community/document_loaders/fs/csv"
+
+const exampleCsvPath = "../../../../../../langchain/src/document_loaders/tests/example_data/example_separator.csv";
+
+const loader = new CSVLoader(exampleCsvPath)
+```
+
+## Load
+
+```typescript
+const docs = await loader.load()
+docs[0]
+```
+
+```output
+Document {
+  pageContent: 'id｜html: 1｜"<i>Corruption discovered at the core of the Banking Clan!</i>"',
+  metadata: {
+    source: '../../../../../../langchain/src/document_loaders/tests/example_data/example_separator.csv',
+    line: 1
+  },
+  id: undefined
+}
+```
+
+```typescript
+console.log(docs[0].metadata)
+```
+
+```output
+{
+  source: '../../../../../../langchain/src/document_loaders/tests/example_data/example_separator.csv',
+  line: 1
+}
+```
+
+## Usage, extracting a single column
+
+예제 CSV 파일:
+
+```csv
+id｜html
+1｜"<i>Corruption discovered at the core of the Banking Clan!</i>"
+2｜"<i>Reunited, Rush Clovis and Senator Amidala</i>"
+3｜"<i>discover the full extent of the deception.</i>"
+4｜"<i>Anakin Skywalker is sent to the rescue!</i>"
+```
+
+```typescript
+import { CSVLoader } from "@langchain/community/document_loaders/fs/csv";
+
+const singleColumnLoader = new CSVLoader(
+  exampleCsvPath,
+  {
+    column: "html",
+    separator:"｜"
+  }
+);
+
+const singleColumnDocs = await singleColumnLoader.load();
+console.log(singleColumnDocs[0]);
+```
+
+```output
+Document {
+  pageContent: '<i>Corruption discovered at the core of the Banking Clan!</i>',
+  metadata: {
+    source: '../../../../../../langchain/src/document_loaders/tests/example_data/example_separator.csv',
+    line: 1
+  },
+  id: undefined
+}
+```
+
+## API reference
+
+모든 CSVLoader 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_document_loaders_fs_csv.CSVLoader.html)를 참조하세요.

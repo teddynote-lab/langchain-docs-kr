@@ -1,0 +1,29 @@
+---
+title: HuggingFaceInference
+---
+
+다음은 HuggingFaceInference 모델을 LLM으로 호출하는 예제입니다:
+
+```bash npm
+npm install @langchain/community @langchain/core @huggingface/inference@4
+```
+
+<Tip>
+모든 패키지에서 model parameter를 통합하고 있습니다. 이제 `modelName` 대신 `model`을 사용하고, API key는 `apiKey`를 사용할 것을 권장합니다.
+</Tip>
+
+```typescript
+import { HuggingFaceInference } from "@langchain/community/llms/hf";
+
+const model = new HuggingFaceInference({
+  model: "gpt2",
+  apiKey: "YOUR-API-KEY", // In Node.js defaults to process.env.HUGGINGFACEHUB_API_KEY
+});
+const res = await model.invoke("1 + 1 =");
+console.log({ res });
+```
+
+## 관련 문서
+
+
+- [Models 가이드](/oss/langchain/models)

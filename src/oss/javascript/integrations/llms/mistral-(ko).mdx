@@ -1,0 +1,164 @@
+---
+title: MistralAI
+---
+
+<Tip>
+**Mistral 모델을 로컬에서 실행하고 싶으신가요? [Ollama 통합](/oss/integrations/chat/ollama)을 확인해보세요.**
+</Tip>
+<Warning>
+현재 Mistral 모델을 텍스트 완성 모델로 사용하는 방법을 설명하는 페이지를 보고 계십니다. Mistral에서 제공하는 많은 인기 모델은 [채팅 완성 모델](/oss/langchain/models)입니다.
+
+[이 페이지](/oss/integrations/chat/mistral/)를 찾고 계실 수 있습니다.
+</Warning>
+
+
+[Mistral AI](https://mistral.ai/)는 강력한 [오픈 소스 모델](https://docs.mistral.ai/getting-started/models/)을 호스팅하는 플랫폼입니다.
+
+이 문서는 LangChain을 사용하여 MistralAI 완성 모델(LLM)을 시작하는 데 도움을 드립니다. `MistralAI` 기능 및 구성 옵션에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_mistralai.MistralAI.html)를 참조하세요.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | PY support | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [MistralAI](https://api.js.langchain.com/classes/langchain_mistralai.MistralAI.html) | [`@langchain/mistralai`](https://www.npmjs.com/package/@langchain/mistralai) | ❌ | ✅ | ❌ | ![NPM - Downloads](https://img.shields.io/npm/dm/@langchain/mistralai?style=flat-square&label=%20&) | ![NPM - Version](https://img.shields.io/npm/v/@langchain/mistralai?style=flat-square&label=%20&) |
+
+## Setup
+
+MistralAI 모델에 액세스하려면 MistralAI 계정을 생성하고 API 키를 받은 다음 `@langchain/mistralai` 통합 패키지를 설치해야 합니다.
+
+### Credentials
+
+[console.mistral.ai](https://console.mistral.ai/)로 이동하여 MistralAI에 가입하고 API 키를 생성하세요. 완료한 후 `MISTRAL_API_KEY` 환경 변수를 설정하세요:
+
+```bash
+export MISTRAL_API_KEY="your-api-key"
+```
+
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
+
+```bash
+# export LANGSMITH_TRACING="true"
+# export LANGSMITH_API_KEY="your-api-key"
+```
+
+### Installation
+
+LangChain MistralAI 통합은 `@langchain/mistralai` 패키지에 있습니다:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/mistralai @langchain/core
+```
+```bash yarn
+yarn add @langchain/mistralai @langchain/core
+```
+```bash pnpm
+pnpm add @langchain/mistralai @langchain/core
+```
+</CodeGroup>
+
+## Instantiation
+
+이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다:
+
+```typescript
+import { MistralAI } from "@langchain/mistralai"
+
+const llm = new MistralAI({
+  model: "codestral-latest",
+  temperature: 0,
+  maxTokens: undefined,
+  maxRetries: 2,
+  // other params...
+})
+```
+
+## Invocation
+
+```typescript
+const inputText = "MistralAI is an AI company that "
+
+const completion = await llm.invoke(inputText)
+completion
+```
+
+```output
+ has developed Mistral 7B, a large language model (LLM) that is open-source and available for commercial use. Mistral 7B is a 7 billion parameter model that is trained on a diverse and high-quality dataset, and it has been fine-tuned to perform well on a variety of tasks, including text generation, question answering, and code interpretation.
+
+MistralAI has made Mistral 7B available under a permissive license, allowing anyone to use the model for commercial purposes without having to pay any fees. This has made Mistral 7B a popular choice for businesses and organizations that want to leverage the power of large language models without incurring high costs.
+
+Mistral 7B has been trained on a diverse and high-quality dataset, which has enabled it to perform well on a variety of tasks. It has been fine-tuned to generate coherent and contextually relevant text, and it has been shown to be capable of answering complex questions and interpreting code.
+
+Mistral 7B is also a highly efficient model, capable of processing text at a fast pace. This makes it well-suited for applications that require real-time responses, such as chatbots and virtual assistants.
+
+Overall, Mistral 7B is a powerful and versatile large language model that is open-source and available for commercial use. Its ability to perform well on a variety of tasks, its efficiency, and its permissive license make it a popular choice for businesses and organizations that want to leverage the power of large language models.
+```
+
+## Hooks
+
+Mistral AI는 세 가지 이벤트에 대한 커스텀 hook을 지원합니다: beforeRequest, requestError, reponse. 각 hook 타입의 함수 시그니처 예시는 아래에서 확인할 수 있습니다:
+
+```typescript
+const beforeRequestHook = (req: Request): Request | void | Promise<Request | void> => {
+    // Code to run before a request is processed by Mistral
+};
+
+const requestErrorHook = (err: unknown, req: Request): void | Promise<void> => {
+    // Code to run when an error occurs as Mistral is processing a request
+};
+
+const responseHook = (res: Response, req: Request): void | Promise<void> => {
+    // Code to run before Mistral sends a successful response
+};
+```
+
+채팅 모델에 이러한 hook을 추가하려면 인자로 전달하면 자동으로 추가됩니다:
+
+```typescript
+import { ChatMistralAI } from "@langchain/mistralai"
+
+const modelWithHooks = new ChatMistralAI({
+    model: "mistral-large-latest",
+    temperature: 0,
+    maxRetries: 2,
+    beforeRequestHooks: [ beforeRequestHook ],
+    requestErrorHooks: [ requestErrorHook ],
+    responseHooks: [ responseHook ],
+    // other params...
+});
+```
+
+또는 인스턴스화 후 수동으로 할당하고 추가할 수 있습니다:
+
+```typescript
+import { ChatMistralAI } from "@langchain/mistralai"
+
+const model = new ChatMistralAI({
+    model: "mistral-large-latest",
+    temperature: 0,
+    maxRetries: 2,
+    // other params...
+});
+
+model.beforeRequestHooks = [ ...model.beforeRequestHooks, beforeRequestHook ];
+model.requestErrorHooks = [ ...model.requestErrorHooks, requestErrorHook ];
+model.responseHooks = [ ...model.responseHooks, responseHook ];
+
+model.addAllHooksToHttpClient();
+```
+
+addAllHooksToHttpClient 메서드는 hook 중복을 방지하기 위해 업데이트된 전체 hook 목록을 할당하기 전에 현재 추가된 모든 hook을 지웁니다.
+
+Hook은 한 번에 하나씩 제거하거나 모델에서 모든 hook을 한 번에 지울 수 있습니다.
+
+```typescript
+model.removeHookFromHttpClient(beforeRequestHook);
+
+model.removeAllHooksFromHttpClient();
+```
+
+## API reference
+
+모든 MistralAI 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_mistralai.MistralAI.html)를 참조하세요.

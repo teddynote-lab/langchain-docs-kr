@@ -1,0 +1,43 @@
+---
+title: AgentQL
+---
+
+[AgentQL](https://www.agentql.com/)은 [AgentQL query](https://docs.agentql.com/agentql-query) 또는 자연어 프롬프트를 사용하여 모든 웹 페이지에서 웹 상호작용 및 구조화된 데이터 추출을 제공합니다. AgentQL은 여러 언어와 웹 페이지에서 시간이 지나도 변경되어도 중단 없이 사용할 수 있습니다.
+
+## Installation and Setup
+
+integration package를 설치합니다:
+
+<CodeGroup>
+```bash pip
+pip install langchain-agentql
+```
+
+```bash uv
+uv add langchain-agentql
+```
+</CodeGroup>
+
+## API Key
+
+[Dev Portal](https://dev.agentql.com/)에서 API Key를 받아 환경 변수에 추가합니다:
+```
+export AGENTQL_API_KEY="your-api-key-here"
+```
+
+## DocumentLoader
+AgentQL의 document loader는 AgentQL query를 사용하여 모든 웹 페이지에서 구조화된 데이터 추출을 제공합니다.
+
+```python
+from langchain_agentql.document_loaders import AgentQLLoader
+```
+[document loader 문서 및 사용 예제](/oss/integrations/document_loaders/agentql)를 참조하세요.
+
+## Tools and Toolkits
+AgentQL tools는 AgentQL query 또는 자연어 프롬프트를 사용하여 모든 웹 페이지에서 웹 상호작용 및 구조화된 데이터 추출을 제공합니다.
+
+```python
+from langchain_agentql.tools import ExtractWebDataTool, ExtractWebDataBrowserTool, GetWebElementBrowserTool
+from langchain_agentql import AgentQLBrowserToolkit
+```
+[tools 문서 및 사용 예제](/oss/integrations/tools/agentql)를 참조하세요.

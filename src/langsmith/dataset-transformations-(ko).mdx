@@ -1,0 +1,114 @@
+---
+title: Dataset 변환
+sidebarTitle: Dataset 변환
+---
+
+LangSmith를 사용하면 dataset의 schema 필드에 변환을 연결하여 UI, API 또는 run rule을 통해 데이터가 dataset에 추가되기 전에 적용할 수 있습니다.
+
+[LangSmith의 사전 구축된 JSON schema 타입](/langsmith/dataset-json-types)과 결합하여, dataset에 저장하기 전에 데이터를 쉽게 전처리할 수 있습니다.
+
+## Transformation 타입
+
+| Transformation Type          | Target Types                                                              | Functionality                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ---------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| remove\_system\_messages     | Array\[Message]                                                           | message 목록을 필터링하여 system message를 제거합니다.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| convert\_to\_openai\_message | Message Array\[Message]                                                   | LangChain의 내부 직렬화 형식에서 들어오는 모든 데이터를 langchain의 [convert\_to\_openai\_messages](https://python.langchain.com/api_reference/core/messages/langchain_core.messages.utils.convert_to_openai_messages.html)를 사용하여 OpenAI의 표준 message 형식으로 변환합니다. 대상 필드가 필수로 표시되어 있고 입력 시 일치하는 message가 없으면, 여러 잘 알려진 LangSmith tracing 형식(예: 추적된 LangChain [BaseChatModel](https://python.langchain.com/api_reference/core/language_models/langchain_core.language_models.chat_models.BaseChatModel.html) run 또는 [LangSmith OpenAI wrapper](/langsmith/annotate-code#wrap-the-openai-client)에서 추적된 run)에서 message(또는 message 목록)를 추출하고 message를 포함하는 원래 key를 제거합니다. |
+| convert\_to\_openai\_tool    | Array\[Tool] inputs dictionary의 최상위 필드에서만 사용 가능합니다. | langchain의 [convert\_to\_openai\_tool](https://python.langchain.com/api_reference/core/utils/langchain_core.utils.function_calling.convert_to_openai_tool.html)을 사용하여 들어오는 모든 데이터를 OpenAI 표준 tool 형식으로 변환합니다. 지정된 key에 tool이 없거나 존재하는 경우 run의 invocation parameter에서 tool 정의를 추출합니다. 이는 LangChain chat model이 tool 정의를 input이 아닌 run의 `extra.invocation_params` 필드에 추적하기 때문에 유용합니다.                                                                                                                                                                                                                                                                                                                                               |
+| remove\_extra\_fields        | Object                                                                    | 이 대상 object의 schema에 정의되지 않은 모든 필드를 제거합니다.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+
+## Chat Model 사전 구축 schema
+
+transformation의 주요 사용 사례는 프로덕션 trace를 dataset으로 수집하는 것을 단순화하여 downstream에서 평가/few shot prompting 등에 사용할 수 있도록 model provider 간에 표준화된 형식으로 만드는 것입니다.
+
+최종 사용자를 위한 transformation 설정을 단순화하기 위해 LangSmith는 다음을 수행하는 사전 정의된 schema를 제공합니다:
+
+* 수집된 run에서 message를 추출하고 openai 표준 형식으로 변환하여 모든 LangChain ChatModel 및 대부분의 model provider SDK와 호환되도록 하여 downstream 평가 및 실험에 사용할 수 있습니다
+* LLM에서 사용된 모든 tool을 추출하고 downstream 평가에서 재현성을 위해 example의 input에 추가합니다
+
+<Check>
+system prompt를 반복하려는 사용자는 Chat Model schema를 사용할 때 input message에 Remove System Messages transformation을 추가하는 경우가 많으며, 이렇게 하면 system prompt가 dataset에 저장되지 않습니다.
+</Check>
+
+### 호환성
+
+LLM run collection schema는 LangChain [BaseChatModel](https://python.langchain.com/api_reference/core/language_models/langchain_core.language_models.chat_models.BaseChatModel.html) run 또는 [LangSmith OpenAI wrapper](/langsmith/annotate-code#wrap-the-openai-client)에서 추적된 run의 데이터를 수집하도록 구축되었습니다.
+
+호환되지 않는 LLM run을 추적하는 경우 [support@langchain.dev](mailto:support@langchain.dev)로 문의하시면 지원을 확장할 수 있습니다.
+
+다른 종류의 run에 transformation을 적용하려는 경우(예: message history가 있는 LangGraph state 표현), schema를 직접 정의하고 관련 transformation을 수동으로 추가하세요.
+
+### 활성화
+
+tracing project 또는 annotation queue에서 dataset으로 run을 추가할 때 LLM run type이 있으면 기본적으로 Chat Model schema를 적용합니다.
+
+새 dataset에서 활성화하려면 [dataset 관리 가이드](/langsmith/manage-datasets-in-application)를 참조하세요.
+
+### 사양
+
+사전 구축된 schema의 전체 API 사양은 아래 섹션을 참조하세요:
+
+#### Input Schema
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "messages": {
+      "type": "array",
+      "items": {
+        "$ref": "https://api.smith.langchain.com/public/schemas/v1/message.json"
+      }
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "$ref": "https://api.smith.langchain.com/public/schemas/v1/tooldef.json"
+      }
+    }
+  },
+  "required": ["messages"]
+}
+```
+
+#### Output Schema
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "message": {
+      "$ref": "https://api.smith.langchain.com/public/schemas/v1/message.json"
+    }
+  },
+  "required": ["message"]
+}
+```
+
+#### Transformations
+
+그리고 transformation은 다음과 같습니다:
+
+```json
+[
+  {
+    "path": ["inputs"],
+    "transformation_type": "remove_extra_fields"
+  },
+  {
+    "path": ["inputs", "messages"],
+    "transformation_type": "convert_to_openai_message"
+  },
+  {
+    "path": ["inputs", "tools"],
+    "transformation_type": "convert_to_openai_tool"
+  },
+  {
+    "path": ["outputs"],
+    "transformation_type": "remove_extra_fields"
+  },
+  {
+    "path": ["outputs", "message"],
+    "transformation_type": "convert_to_openai_message"
+  }
+]
+```

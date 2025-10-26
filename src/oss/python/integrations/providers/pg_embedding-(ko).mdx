@@ -1,0 +1,27 @@
+---
+title: Postgres Embedding
+---
+
+> [pg_embedding](https://github.com/neondatabase/pg_embedding)은 `Postgres`와 근사 최근접 이웃 탐색을 위한 `Hierarchical Navigable Small Worlds` 알고리즘을 사용하여 벡터 유사도 검색을 수행하는 오픈소스 패키지입니다.
+
+## Installation and Setup
+
+여러 python 패키지를 설치해야 합니다.
+
+<CodeGroup>
+```bash pip
+pip install psycopg2-binary
+```
+
+```bash uv
+uv add psycopg2-binary
+```
+</CodeGroup>
+
+## Vector Store
+
+[사용 예제](/oss/integrations/vectorstores/pgembedding)를 참조하세요.
+
+```python
+from langchain_community.vectorstores import PGEmbedding
+```

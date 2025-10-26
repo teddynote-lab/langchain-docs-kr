@@ -1,0 +1,96 @@
+---
+title: Datadog Tracing
+---
+
+>[ddtrace](https://github.com/DataDog/dd-trace-py)는 LangChain 애플리케이션을 모니터링할 수 있는 통합 기능을 제공하는 Datadog 애플리케이션 성능 모니터링(APM) 라이브러리입니다.
+
+LangChain을 위한 ddtrace 통합의 주요 기능:
+- Traces: LangChain 요청, 매개변수, prompt-completion을 캡처하고 LangChain 작업을 시각화하는 데 도움을 줍니다.
+- Metrics: LangChain 요청 지연 시간, 오류, 토큰/비용 사용량(OpenAI LLM 및 chat model용)을 캡처합니다.
+- Logs: 각 LangChain 작업에 대한 prompt completion 데이터를 저장합니다.
+- Dashboard: metric, log, trace 데이터를 단일 평면으로 결합하여 LangChain 요청을 모니터링합니다.
+- Monitors: LangChain 요청 지연 시간 또는 오류율의 급증에 대응하여 알림을 제공합니다.
+
+참고: ddtrace LangChain 통합은 현재 LLM, chat model, Text Embedding Model, Chain, Vectorstore에 대한 tracing을 제공합니다.
+
+## 설치 및 설정
+
+1. Datadog Agent에서 APM과 StatsD를 Datadog API key와 함께 활성화합니다. 예를 들어, Docker에서:
+
+```
+docker run -d --cgroupns host \
+              --pid host \
+              -v /var/run/docker.sock:/var/run/docker.sock:ro \
+              -v /proc/:/host/proc/:ro \
+              -v /sys/fs/cgroup/:/host/sys/fs/cgroup:ro \
+              -e DD_API_KEY=<DATADOG_API_KEY> \
+              -p 127.0.0.1:8126:8126/tcp \
+              -p 127.0.0.1:8125:8125/udp \
+              -e DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true \
+              -e DD_APM_ENABLED=true \
+              gcr.io/datadoghq/agent:latest
+```
+
+2. Datadog APM Python 라이브러리를 설치합니다.
+
+<CodeGroup>
+```shell pip
+pip install "ddtrace>=1.17"
+```
+
+```shell uv
+uv add "ddtrace>=1.17"
+```
+</CodeGroup>
+
+
+3. LangChain 통합은 LangChain Python 애플리케이션 명령어 앞에 `ddtrace-run`을 접두사로 붙이면 자동으로 활성화할 수 있습니다:
+
+```
+DD_SERVICE="my-service" DD_ENV="staging" DD_API_KEY=<DATADOG_API_KEY> ddtrace-run python <your-app>.py
+```
+
+**참고**: Agent가 기본이 아닌 hostname이나 port를 사용하는 경우, `DD_AGENT_HOST`, `DD_TRACE_AGENT_PORT` 또는 `DD_DOGSTATSD_PORT`도 설정해야 합니다.
+
+또한, LangChain 통합은 애플리케이션에서 `langchain`을 처음 import하기 전에 `patch_all()` 또는 `patch(langchain=True)`를 추가하여 프로그래밍 방식으로 활성화할 수 있습니다.
+
+`ddtrace-run` 또는 `patch_all()`을 사용하면 LLM provider에 대한 HTTP 요청을 추적하는 `requests` 및 `aiohttp` 통합과 OpenAI 라이브러리에 대한 요청을 추적하는 `openai` 통합도 활성화됩니다.
+
+```python
+from ddtrace import config, patch
+
+# Note: be sure to configure the integration before calling `patch()`!
+# e.g. config.langchain["logs_enabled"] = True
+
+patch(langchain=True)
+
+# to trace synchronous HTTP requests
+# patch(langchain=True, requests=True)
+
+# to trace asynchronous HTTP requests (to the OpenAI library)
+# patch(langchain=True, aiohttp=True)
+
+# to include underlying OpenAI spans from the OpenAI integration
+# patch(langchain=True, openai=True)patch_all
+```
+
+더 고급 사용법은 [APM Python 라이브러리 문서](https://ddtrace.readthedocs.io/en/stable/installation_quickstart.html)를 참조하세요.
+
+
+## 구성
+
+사용 가능한 모든 구성 옵션은 [APM Python 라이브러리 문서](https://ddtrace.readthedocs.io/en/stable/integrations.html#langchain)를 참조하세요.
+
+
+### Log Prompt & Completion Sampling
+
+log prompt 및 completion sampling을 활성화하려면 `DD_LANGCHAIN_LOGS_ENABLED=1` 환경 변수를 설정하세요. 기본적으로 추적된 요청의 10%가 prompt와 completion을 포함하는 log를 생성합니다.
+
+log sample rate를 조정하려면 [APM 라이브러리 문서](https://ddtrace.readthedocs.io/en/stable/integrations.html#langchain)를 참조하세요.
+
+**참고**: Log 제출을 위해서는 `ddtrace-run` 실행 시 `DD_API_KEY`를 지정해야 합니다.
+
+
+## 문제 해결
+
+도움이 필요하신가요? [ddtrace](https://github.com/DataDog/dd-trace-py)에 이슈를 생성하거나 [Datadog 지원팀](https://docs.datadoghq.com/help/)에 문의하세요.

@@ -1,0 +1,151 @@
+---
+title: Oxylabs
+---
+
+>[Oxylabs](https://oxylabs.io/)는 최고 수준의 비즈니스, 윤리 및 규정 준수 표준을 기반으로 하는 시장 선도적인 웹 인텔리전스 수집 플랫폼으로, 전 세계 기업들이 데이터 기반 인사이트를 활용할 수 있도록 지원합니다.
+
+## Overview
+
+이 패키지는 Oxylabs와 LangChain의 통합을 포함하며, LangChain 프레임워크를 사용하여 Oxylabs Web Scraper API로 Google 검색 결과를 스크래핑하는 도구를 제공합니다.
+
+이 패키지에서 제공하는 클래스는 다음과 같습니다:
+
+- `OxylabsSearchRun` - 스크래핑된 Google 검색 결과를 포맷된 텍스트로 반환하는 도구
+- `OxylabsSearchResults` - 스크래핑된 Google 검색 결과를 JSON 형식으로 반환하는 도구
+- `OxylabsSearchAPIWrapper` - Oxylabs API를 초기화하기 위한 API wrapper
+
+|             가격             |
+|:-------------------------------:|
+| ✅ 1주일 동안 무료로 5,000개 결과 제공 |
+
+## Setup
+
+필요한 종속성을 설치합니다.
+
+```python
+pip install -qU langchain-oxylabs
+```
+
+### Credentials
+
+적절한 API key와 environment variable을 설정합니다. API 사용자 자격 증명을 생성하세요: [Oxylabs dashboard](https://dashboard.oxylabs.io/en/registration)에서 무료 평가판에 가입하거나 제품을 구매하여 API 사용자 자격 증명(OXYLABS_USERNAME 및 OXYLABS_PASSWORD)을 생성합니다.
+
+```python
+import getpass
+import os
+
+os.environ["OXYLABS_USERNAME"] = getpass.getpass("Enter your Oxylabs username: ")
+os.environ["OXYLABS_PASSWORD"] = getpass.getpass("Enter your Oxylabs password: ")
+```
+
+## Instantiation
+
+```python
+from langchain_oxylabs import OxylabsSearchAPIWrapper, OxylabsSearchRun
+
+oxylabs_wrapper = OxylabsSearchAPIWrapper()
+tool_ = OxylabsSearchRun(wrapper=oxylabs_wrapper)
+```
+
+## Invocation
+
+### Invoke directly with args
+
+`OxylabsSearchRun` tool은 자연어 쿼리여야 하는 단일 "query" argument를 받아 결합된 문자열 형식의 결과를 반환합니다:
+
+```python
+tool_.invoke({"query": "Restaurants in Paris."})
+```
+
+### Invoke with ToolCall
+
+```python
+tool_ = OxylabsSearchRun(
+    wrapper=oxylabs_wrapper,
+    kwargs={
+        "result_categories": [
+            "local_information",
+            "combined_search_result",
+        ]
+    },
+)
+```
+
+```python
+from pprint import pprint
+
+model_generated_tool_call = {
+    "args": {
+        "query": "Visit restaurants in Vilnius.",
+        "geo_location": "Vilnius,Lithuania",
+    },
+    "id": "1",
+    "name": "oxylabs_search",
+    "type": "tool_call",
+}
+tool_call_result = tool_.invoke(model_generated_tool_call)
+
+# The content is a JSON string of results
+pprint(tool_call_result.content)
+```
+
+## Use within an agent
+
+필요한 종속성을 설치합니다.
+
+```python
+pip install -qU "langchain[openai]" langgraph
+```
+
+```python
+import getpass
+import os
+
+from langchain.chat_models import init_chat_model
+
+os.environ["OPENAI_API_KEY"] = getpass.getpass("Enter API key for OpenAI: ")
+model = init_chat_model("gpt-4o-mini", model_provider="openai")
+```
+
+```python
+from langchain.agents import create_agent
+
+
+# Initialize OxylabsSearchRun tool
+tool_ = OxylabsSearchRun(wrapper=oxylabs_wrapper)
+
+agent = create_agent(model, [tool_])
+
+user_input = "What happened in the latest Burning Man floods?"
+
+for step in agent.stream(
+    {"messages": user_input},
+    stream_mode="values",
+):
+    step["messages"][-1].pretty_print()
+```
+
+## JSON results
+
+`OxylabsSearchResults` tool은 `OxylabsSearchRun` 대신 JSON 형식으로 결과를 검색하는 데 사용할 수 있습니다:
+
+```python
+import json
+
+from langchain_oxylabs import OxylabsSearchResults
+
+tool_ = OxylabsSearchResults(wrapper=oxylabs_wrapper)
+
+response_results = tool_.invoke({"query": "What are the most famous artists?"})
+response_results = json.loads(response_results)
+
+for result in response_results:
+    for key, value in result.items():
+        print(f"{key}: {value}")
+```
+
+## API reference
+
+이 통합 패키지에 대한 자세한 정보는 여기에서 확인할 수 있습니다: [github.com/oxylabs/langchain-oxylabs](https://github.com/oxylabs/langchain-oxylabs)
+
+Oxylabs Web Scraper API 문서: [developers.oxylabs.io/scraper-apis/web-scraper-api](https://developers.oxylabs.io/scraper-apis/web-scraper-api)

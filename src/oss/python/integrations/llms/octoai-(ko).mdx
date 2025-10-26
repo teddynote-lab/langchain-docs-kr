@@ -1,0 +1,56 @@
+---
+title: OctoAI
+---
+
+[OctoAI](https://docs.octoai.cloud/docs)는 효율적인 컴퓨팅에 대한 쉬운 액세스를 제공하며 사용자가 선택한 AI 모델을 애플리케이션에 통합할 수 있도록 합니다. `OctoAI` compute service는 AI 애플리케이션을 쉽게 실행, 튜닝 및 확장할 수 있도록 도와줍니다.
+
+이 예제는 LangChain을 사용하여 `OctoAI` [LLM endpoints](https://octoai.cloud/templates)와 상호작용하는 방법을 다룹니다.
+
+## Setup
+
+예제 앱을 실행하기 위해 두 가지 간단한 단계를 수행해야 합니다:
+
+1. [OctoAI 계정 페이지](https://octoai.cloud/settings)에서 API Token을 받으세요.
+
+2. 아래 코드 셀에 API key를 붙여넣으세요.
+
+참고: 다른 LLM 모델을 사용하려면 [Build a Container from Python](https://octo.ai/docs/bring-your-own-model/advanced-build-a-container-from-scratch-in-python)과 [Create a Custom Endpoint from a Container](https://octo.ai/docs/bring-your-own-model/create-custom-endpoints-from-a-container/create-custom-endpoints-from-a-container)를 따라 모델을 컨테이너화하고 사용자 정의 OctoAI endpoint를 직접 만든 다음 `OCTOAI_API_BASE` 환경 변수를 업데이트할 수 있습니다.
+
+```python
+import os
+
+os.environ["OCTOAI_API_TOKEN"] = "OCTOAI_API_TOKEN"
+```
+
+```python
+from langchain.chains import LLMChain
+from langchain_community.llms.octoai_endpoint import OctoAIEndpoint
+from langchain_core.prompts import PromptTemplate
+```
+
+## Example
+
+```python
+template = """Below is an instruction that describes a task. Write a response that appropriately completes the request.\n Instruction:\n{question}\n Response: """
+prompt = PromptTemplate.from_template(template)
+```
+
+```python
+llm = OctoAIEndpoint(
+    model_name="llama-2-13b-chat-fp16",
+    max_tokens=200,
+    presence_penalty=0,
+    temperature=0.1,
+    top_p=0.9,
+)
+```
+
+```python
+question = "Who was Leonardo da Vinci?"
+
+chain = prompt | llm
+
+print(chain.invoke(question))
+```
+
+레오나르도 다 빈치는 진정한 르네상스인이었습니다. 그는 1452년 이탈리아 빈치에서 태어났으며 예술, 과학, 공학, 수학 등 다양한 분야에서의 업적으로 알려져 있습니다. 그는 역사상 가장 위대한 화가 중 한 명으로 여겨지며, 그의 가장 유명한 작품으로는 모나리자와 최후의 만찬이 있습니다. 예술 외에도 다 빈치는 공학과 해부학에 상당한 기여를 했으며, 그의 기계와 발명품 설계는 시대를 수세기 앞서갔습니다. 그는 또한 그의 생각과 아이디어에 대한 귀중한 통찰력을 제공하는 광범위한 일지와 드로잉으로도 알려져 있습니다. 다 빈치의 유산은 오늘날에도 전 세계의 예술가, 과학자, 사상가들에게 계속해서 영감을 주고 영향을 미치고 있습니다.

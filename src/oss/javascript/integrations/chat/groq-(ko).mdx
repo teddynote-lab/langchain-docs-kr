@@ -1,0 +1,147 @@
+---
+title: ChatGroq
+---
+
+[Groq](https://groq.com/)는 LPU™ AI inference 기술로 구동되는 빠른 AI inference를 제공하는 회사로, 빠르고 저렴하며 에너지 효율적인 AI를 제공합니다.
+
+이 문서는 ChatGroq [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 ChatGroq 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_groq.ChatGroq.html)를 참조하세요.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | [PY support](https://python.langchain.com/docs/integrations/chat/groq) | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [ChatGroq](https://api.js.langchain.com/classes/langchain_groq.ChatGroq.html) | [`@langchain/groq`](https://www.npmjs.com/package/@langchain/groq) | ❌ | ❌ | ✅ | ![NPM - Downloads](https://img.shields.io/npm/dm/@langchain/groq?style=flat-square&label=%20&) | ![NPM - Version](https://img.shields.io/npm/v/@langchain/groq?style=flat-square&label=%20&) |
+
+### Model features
+
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
+
+| [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
+| :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+
+## Setup
+
+ChatGroq 모델에 액세스하려면 Groq 계정을 만들고 API key를 받은 다음 `@langchain/groq` integration package를 설치해야 합니다.
+
+### Credentials
+
+Groq API를 사용하려면 API key가 필요합니다. [여기](https://wow.groq.com/)에서 Groq 계정에 가입하고 API key를 생성할 수 있습니다.
+그런 다음 터미널에서 API key를 environment variable로 설정할 수 있습니다:
+
+```bash
+export GROQ_API_KEY="your-api-key"
+```
+
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
+
+```bash
+# export LANGSMITH_TRACING="true"
+# export LANGSMITH_API_KEY="your-api-key"
+```
+
+### Installation
+
+LangChain ChatGroq integration은 `@langchain/groq` package에 있습니다:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/groq @langchain/core
+```
+```bash yarn
+yarn add @langchain/groq @langchain/core
+```
+```bash pnpm
+pnpm add @langchain/groq @langchain/core
+```
+</CodeGroup>
+
+## Instantiation
+
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
+
+```typescript
+import { ChatGroq } from "@langchain/groq"
+
+const llm = new ChatGroq({
+    model: "llama-3.3-70b-versatile",
+    temperature: 0,
+    maxTokens: undefined,
+    maxRetries: 2,
+    // other params...
+})
+```
+
+## Invocation
+
+```typescript
+const aiMsg = await llm.invoke([
+    {
+      role: "system",
+      content: "You are a helpful assistant that translates English to French. Translate the user sentence.",
+    },
+    { role: "user", content: "I love programming." },
+])
+aiMsg
+```
+
+```output
+AIMessage {
+  "content": "I enjoy programming. (The French translation is: \"J'aime programmer.\")\n\nNote: I chose to translate \"I love programming\" as \"J'aime programmer\" instead of \"Je suis amoureux de programmer\" because the latter has a romantic connotation that is not present in the original English sentence.",
+  "additional_kwargs": {},
+  "response_metadata": {
+    "tokenUsage": {
+      "completionTokens": 73,
+      "promptTokens": 31,
+      "totalTokens": 104
+    },
+    "finish_reason": "stop"
+  },
+  "tool_calls": [],
+  "invalid_tool_calls": []
+}
+```
+
+```typescript
+console.log(aiMsg.content)
+```
+
+```output
+I enjoy programming. (The French translation is: "J'aime programmer.")
+
+Note: I chose to translate "I love programming" as "J'aime programmer" instead of "Je suis amoureux de programmer" because the latter has a romantic connotation that is not present in the original English sentence.
+```
+
+## Json invocation
+
+```typescript
+const messages = [
+  {
+    role: "system",
+    content: "You are a math tutor that handles math exercises and makes output in json in format { result: number }.",
+  },
+  { role: "user",  content: "2 + 2 * 2" },
+];
+
+const aiInvokeMsg = await llm.invoke(messages, { response_format: { type: "json_object" } });
+
+// if you want not to pass response_format in every invoke, you can bind it to the instance
+const llmWithResponseFormat = llm.bind({ response_format: { type: "json_object" } });
+const aiBindMsg = await llmWithResponseFormat.invoke(messages);
+
+// they are the same
+console.log({ aiInvokeMsgContent: aiInvokeMsg.content, aiBindMsg: aiBindMsg.content });
+```
+
+```output
+{
+  aiInvokeMsgContent: '{\n"result": 6\n}',
+  aiBindMsg: '{\n"result": 6\n}'
+}
+```
+
+## API reference
+
+모든 ChatGroq 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_groq.ChatGroq.html)를 참조하세요.

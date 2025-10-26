@@ -1,0 +1,273 @@
+---
+title: Neo4j Vector Index
+---
+
+Neo4j는 vector 유사도 검색을 통합 지원하는 오픈소스 graph database입니다.
+다음을 지원합니다:
+
+- approximate nearest neighbor search
+- Euclidean similarity 및 cosine similarity
+- vector와 keyword 검색을 결합한 hybrid search
+
+## Setup
+
+Neo4j Vector Index를 사용하려면 `neo4j-driver` package를 설치해야 합니다:
+
+```bash npm
+npm install neo4j-driver
+```
+<Tip>
+[LangChain package 설치에 대한 일반적인 지침은 이 섹션을 참조하세요](/oss/langchain/install).
+</Tip>
+
+```bash npm
+npm install @langchain/openai @langchain/community @langchain/core
+```
+
+### `docker-compose`로 `Neo4j` self hosted instance 설정하기
+
+`Neo4j`는 self-hosted Neo4j database instance를 빠르게 설정하는 데 사용할 수 있는 사전 빌드된 Docker image를 제공합니다.
+아래 내용으로 `docker-compose.yml`이라는 파일을 생성하세요:
+
+```yml docker-compose.yml
+services:
+  database:
+    image: neo4j
+    ports:
+      - 7687:7687
+      - 7474:7474
+    environment:
+      - NEO4J_AUTH=neo4j/pleaseletmein
+```
+
+그런 다음 같은 디렉토리에서 `docker compose up`을 실행하여 container를 시작하세요.
+
+`Neo4j` 설정 방법에 대한 자세한 정보는 [웹사이트](https://neo4j.com/docs/operations-manual/current/installation/)에서 확인할 수 있습니다.
+
+## Usage
+
+```typescript
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { Neo4jVectorStore } from "@langchain/community/vectorstores/neo4j_vector";
+
+// Configuration object for Neo4j connection and other related settings
+const config = {
+  url: "bolt://localhost:7687", // URL for the Neo4j instance
+  username: "neo4j", // Username for Neo4j authentication
+  password: "pleaseletmein", // Password for Neo4j authentication
+  indexName: "vector", // Name of the vector index
+  keywordIndexName: "keyword", // Name of the keyword index if using hybrid search
+  searchType: "vector" as const, // Type of search (e.g., vector, hybrid)
+  nodeLabel: "Chunk", // Label for the nodes in the graph
+  textNodeProperty: "text", // Property of the node containing text
+  embeddingNodeProperty: "embedding", // Property of the node containing embedding
+};
+
+const documents = [
+  { pageContent: "what's this", metadata: { a: 2 } },
+  { pageContent: "Cat drinks milk", metadata: { a: 1 } },
+];
+
+const neo4jVectorIndex = await Neo4jVectorStore.fromDocuments(
+  documents,
+  new OpenAIEmbeddings(),
+  config
+);
+
+const results = await neo4jVectorIndex.similaritySearch("water", 1);
+
+console.log(results);
+
+/*
+  [ Document { pageContent: 'Cat drinks milk', metadata: { a: 1 } } ]
+*/
+
+await neo4jVectorIndex.close();
+```
+
+### retrievalQuery parameter를 사용하여 응답 커스터마이징하기
+
+```typescript
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { Neo4jVectorStore } from "@langchain/community/vectorstores/neo4j_vector";
+
+/*
+ * The retrievalQuery is a customizable Cypher query fragment used in the Neo4jVectorStore class to define how
+ * search results should be retrieved and presented from the Neo4j database. It allows developers to specify
+ * the format and structure of the data returned after a similarity search.
+ * Mandatory columns for `retrievalQuery`:
+ *
+ * 1. text:
+ *    - Description: Represents the textual content of the node.
+ *    - Type: String
+ *
+ * 2. score:
+ *    - Description: Represents the similarity score of the node in relation to the search query. A
+ *      higher score indicates a closer match.
+ *    - Type: Float (ranging between 0 and 1, where 1 is a perfect match)
+ *
+ * 3. metadata:
+ *    - Description: Contains additional properties and information about the node. This can include
+ *      any other attributes of the node that might be relevant to the application.
+ *    - Type: Object (key-value pairs)
+ *    - Example: { "id": "12345", "category": "Books", "author": "John Doe" }
+ *
+ * Note: While you can customize the `retrievalQuery` to fetch additional columns or perform
+ * transformations, never omit the mandatory columns. The names of these columns (`text`, `score`,
+ * and `metadata`) should remain consistent. Renaming them might lead to errors or unexpected behavior.
+ */
+
+// Configuration object for Neo4j connection and other related settings
+const config = {
+  url: "bolt://localhost:7687", // URL for the Neo4j instance
+  username: "neo4j", // Username for Neo4j authentication
+  password: "pleaseletmein", // Password for Neo4j authentication
+  retrievalQuery: `
+    RETURN node.text AS text, score, {a: node.a * 2} AS metadata
+  `,
+};
+
+const documents = [
+  { pageContent: "what's this", metadata: { a: 2 } },
+  { pageContent: "Cat drinks milk", metadata: { a: 1 } },
+];
+
+const neo4jVectorIndex = await Neo4jVectorStore.fromDocuments(
+  documents,
+  new OpenAIEmbeddings(),
+  config
+);
+
+const results = await neo4jVectorIndex.similaritySearch("water", 1);
+
+console.log(results);
+
+/*
+  [ Document { pageContent: 'Cat drinks milk', metadata: { a: 2 } } ]
+*/
+
+await neo4jVectorIndex.close();
+```
+
+### 기존 graph에서 Neo4jVectorStore 인스턴스화하기
+
+```typescript
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { Neo4jVectorStore } from "@langchain/community/vectorstores/neo4j_vector";
+
+/**
+ * `fromExistingGraph` Method:
+ *
+ * Description:
+ * This method initializes a `Neo4jVectorStore` instance using an existing graph in the Neo4j database.
+ * It's designed to work with nodes that already have textual properties but might not have embeddings.
+ * The method will compute and store embeddings for nodes that lack them.
+ *
+ * Note:
+ * This method is particularly useful when you have a pre-existing graph with textual data and you want
+ * to enhance it with vector embeddings for similarity searches without altering the original data structure.
+ */
+
+// Configuration object for Neo4j connection and other related settings
+const config = {
+  url: "bolt://localhost:7687", // URL for the Neo4j instance
+  username: "neo4j", // Username for Neo4j authentication
+  password: "pleaseletmein", // Password for Neo4j authentication
+  indexName: "wikipedia",
+  nodeLabel: "Wikipedia",
+  textNodeProperties: ["title", "description"],
+  embeddingNodeProperty: "embedding",
+  searchType: "hybrid" as const,
+};
+
+// You should have a populated Neo4j database to use this method
+const neo4jVectorIndex = await Neo4jVectorStore.fromExistingGraph(
+  new OpenAIEmbeddings(),
+  config
+);
+
+await neo4jVectorIndex.close();
+```
+
+### Metadata filtering
+
+```typescript
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { Neo4jVectorStore } from "@langchain/community/vectorstores/neo4j_vector";
+
+/**
+ * `similaritySearch` Method with Metadata Filtering:
+ *
+ * Description:
+ * This method facilitates advanced similarity searches within a Neo4j vector index, leveraging both text embeddings and metadata attributes.
+ * The third parameter, `filter`, allows for the specification of metadata-based conditions that pre-filter the nodes before performing the similarity search.
+ * This approach enhances the search precision by allowing users to query based on complex metadata criteria alongside textual similarity.
+ * Metadata filtering also support the following operators:
+ *
+ *  $eq: Equal
+ *  $ne: Not Equal
+ *  $lt: Less than
+ *  $lte: Less than or equal
+ *  $gt: Greater than
+ *  $gte: Greater than or equal
+ *  $in: In a list of values
+ *  $nin: Not in a list of values
+ *  $between: Between two values
+ *  $like: Text contains value
+ *  $ilike: lowered text contains value
+ *
+ * The filter supports a range of query operations such as equality checks, range queries, and compound conditions (using logical operators like $and, $or).
+ * This makes it highly adaptable to varied use cases requiring detailed and specific retrieval of documents based on both content and contextual information.
+ *
+ * Note:
+ * Effective use of this method requires a well-structured Neo4j database where nodes are enriched with both text and metadata properties.
+ * The method is particularly useful in scenarios where the integration of text analysis with detailed metadata querying is crucial, such as in content recommendation systems, detailed archival searches, or any application where contextual relevance is key.
+ */
+
+// Configuration object for Neo4j connection and other related settings
+const config = {
+  url: "bolt://localhost:7687", // URL for the Neo4j instance
+  username: "neo4j", // Username for Neo4j authentication
+  password: "pleaseletmein", // Password for Neo4j authentication
+  indexName: "vector", // Name of the vector index
+  keywordIndexName: "keyword", // Name of the keyword index if using hybrid search
+  searchType: "vector" as const, // Type of search (e.g., vector, hybrid)
+  nodeLabel: "Chunk", // Label for the nodes in the graph
+  textNodeProperty: "text", // Property of the node containing text
+  embeddingNodeProperty: "embedding", // Property of the node containing embedding
+};
+
+const documents = [
+  { pageContent: "what's this", metadata: { a: 2 } },
+  { pageContent: "Cat drinks milk", metadata: { a: 1 } },
+];
+
+const neo4jVectorIndex = await Neo4jVectorStore.fromDocuments(
+  documents,
+  new OpenAIEmbeddings(),
+  config
+);
+
+const filter = { a: { $eq: 1 } };
+const results = await neo4jVectorIndex.similaritySearch("water", 1, { filter });
+
+console.log(results);
+
+/*
+  [ Document { pageContent: 'Cat drinks milk', metadata: { a: 1 } } ]
+*/
+
+await neo4jVectorIndex.close();
+```
+
+# Disclaimer ⚠️
+
+_보안 참고사항_: database 연결이 필요한 권한만 포함하도록 좁게 범위가 지정된 자격 증명을 사용하는지 확인하세요.
+그렇게 하지 않으면 호출 코드가 적절히 프롬프트되거나 database에 민감한 데이터가 있는 경우 삭제, 데이터 변경 또는 민감한 데이터 읽기를 초래하는 명령을 시도할 수 있으므로 데이터 손상 또는 손실이 발생할 수 있습니다.
+이러한 부정적인 결과를 방지하는 가장 좋은 방법은 (적절하게) 이 도구와 함께 사용되는 자격 증명에 부여된 권한을 제한하는 것입니다.
+예를 들어, database에 대한 읽기 전용 사용자를 생성하는 것은 호출 코드가 데이터를 변경하거나 삭제할 수 없도록 보장하는 좋은 방법입니다.
+
+## Related
+
+- Vector store [개념 가이드](/oss/integrations/vectorstores)
+- Vector store [how-to 가이드](/oss/integrations/vectorstores)

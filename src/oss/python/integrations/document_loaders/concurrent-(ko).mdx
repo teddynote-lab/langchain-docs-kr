@@ -1,0 +1,29 @@
+---
+title: Concurrent Loader
+---
+
+GenericLoader와 동일하게 작동하지만, 워크플로우를 최적화하려는 사용자를 위해 동시 처리 방식으로 작동합니다.
+
+```python
+from langchain_community.document_loaders import ConcurrentLoader
+```
+
+```python
+loader = ConcurrentLoader.from_filesystem("example_data/", glob="**/*.txt")
+```
+
+```python
+files = loader.load()
+```
+
+```python
+len(files)
+```
+
+```output
+2
+```
+
+```python
+
+```

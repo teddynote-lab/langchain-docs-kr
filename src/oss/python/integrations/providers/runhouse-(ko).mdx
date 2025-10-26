@@ -1,0 +1,29 @@
+---
+title: Runhouse
+---
+
+이 페이지는 LangChain 내에서 [Runhouse](https://github.com/run-house/runhouse) 생태계를 사용하는 방법을 다룹니다.
+설치 및 설정, LLM, Embedding의 세 부분으로 나뉩니다.
+
+## Installation and Setup
+- `pip install runhouse`로 Python SDK를 설치합니다
+- 온디맨드 클러스터를 사용하려면 `sky check`로 클라우드 자격 증명을 확인하세요
+
+## Self-hosted LLMs
+기본적인 self-hosted LLM의 경우 `SelfHostedHuggingFaceLLM` 클래스를 사용할 수 있습니다. 더 커스텀한 LLM의 경우 `SelfHostedPipeline` 부모 클래스를 사용할 수 있습니다.
+
+```python
+from langchain_community.llms import SelfHostedPipeline, SelfHostedHuggingFaceLLM
+```
+
+Self-hosted LLM에 대한 더 자세한 안내는 [이 노트북](/oss/integrations/llms/runhouse)을 참조하세요
+
+## Self-hosted Embeddings
+Runhouse를 통해 LangChain에서 self-hosted embedding을 사용하는 여러 가지 방법이 있습니다.
+
+Hugging Face Transformers 모델의 기본적인 self-hosted embedding의 경우 `SelfHostedEmbedding` 클래스를 사용할 수 있습니다.
+```python
+from langchain_community.llms import SelfHostedPipeline, SelfHostedHuggingFaceLLM
+```
+
+Self-hosted Embedding에 대한 더 자세한 안내는 [이 노트북](/oss/integrations/text_embedding/self-hosted)을 참조하세요

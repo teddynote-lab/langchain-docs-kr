@@ -1,0 +1,40 @@
+---
+title: AskNews
+---
+
+[AskNews](https://asknews.app/)는 매일 300,000개 이상의 기사를 처리하고 인덱싱하여 최신 글로벌 또는 과거 뉴스로 언어 모델을 향상시키고,
+낮은 지연 시간의 endpoint를 통해 prompt에 최적화된 응답을 제공하며,
+뉴스 보도의 투명성과 다양성을 보장합니다.
+
+## Installation and Setup
+
+먼저 `asknews` python package를 설치해야 합니다.
+
+<CodeGroup>
+```bash pip
+pip install asknews
+```
+
+```bash uv
+uv add asknews
+```
+</CodeGroup>
+
+또한 [AskNews console](https://my.asknews.app/)에서 생성할 수 있는 AskNews API credentials를 설정해야 합니다.
+
+
+## Retriever
+
+[사용 예제](/oss/integrations/retrievers/asknews)를 참조하세요.
+
+```python
+from langchain_community.retrievers import AskNewsRetriever
+```
+
+## Tool
+
+[사용 예제](/oss/integrations/tools/asknews)를 참조하세요.
+
+```python
+from langchain_community.tools.asknews import AskNewsSearch
+```

@@ -1,0 +1,190 @@
+---
+title: JaguarDB Vector Database
+---
+
+>[JaguarDB Vector Database]([www.jaguardb.com/windex.html](http://www.jaguardb.com/windex.html)
+>
+>1. 분산 vector database입니다
+>2. JaguarDB의 "ZeroMove" 기능은 즉각적인 수평 확장성을 제공합니다
+>3. Multimodal: embeddings, text, images, videos, PDFs, audio, time series, geospatial을 지원합니다
+>4. All-masters: 병렬 읽기 및 쓰기를 모두 지원합니다
+>5. 이상 탐지 기능을 제공합니다
+>6. RAG 지원: LLM을 독점 데이터 및 실시간 데이터와 결합합니다
+>7. Shared metadata: 여러 vector index에서 metadata를 공유합니다
+>8. Distance metrics: Euclidean, Cosine, InnerProduct, Manhatten, Chebyshev, Hamming, Jeccard, Minkowski를 지원합니다
+
+## Prerequisites
+
+이 파일의 예제를 실행하기 위한 두 가지 요구사항이 있습니다.
+
+1. JaguarDB server와 HTTP gateway server를 설치하고 설정해야 합니다.
+   다음 지침을 참조하세요:
+   [www.jaguardb.com](http://www.jaguardb.com)
+
+2. JaguarDB용 http client package를 설치해야 합니다:
+
+   ```
+       pip install -U jaguardb-http-client
+   ```
+
+## RAG With LangChain
+
+이 섹션에서는 langchain 소프트웨어 스택에서 Jaguar와 함께 LLM과 대화하는 방법을 보여줍니다.
+
+```python
+from langchain_community.document_loaders import TextLoader
+from langchain_community.vectorstores.jaguar import Jaguar
+from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import CharacterTextSplitter
+
+"""
+Load a text file into a set of documents
+"""
+loader = TextLoader("../../how_to/state_of_the_union.txt")
+documents = loader.load()
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=300)
+docs = text_splitter.split_documents(documents)
+
+"""
+Instantiate a Jaguar vector store
+"""
+### Jaguar HTTP endpoint
+url = "http://192.168.5.88:8080/fwww/"
+
+### Use OpenAI embedding model
+embeddings = OpenAIEmbeddings()
+
+### Pod is a database for vectors
+pod = "vdb"
+
+### Vector store name
+store = "langchain_rag_store"
+
+### Vector index name
+vector_index = "v"
+
+### Type of the vector index
+# cosine: distance metric
+# fraction: embedding vectors are decimal numbers
+# float: values stored with floating-point numbers
+vector_type = "cosine_fraction_float"
+
+### Dimension of each embedding vector
+vector_dimension = 1536
+
+### Instantiate a Jaguar store object
+vectorstore = Jaguar(
+    pod, store, vector_index, vector_type, vector_dimension, url, embeddings
+)
+
+"""
+Login must be performed to authorize the client.
+The environment variable JAGUAR_API_KEY or file $HOME/.jagrc
+should contain the API key for accessing JaguarDB servers.
+"""
+vectorstore.login()
+
+
+"""
+Create vector store on the JaguarDB database server.
+This should be done only once.
+"""
+# Extra metadata fields for the vector store
+metadata = "category char(16)"
+
+# Number of characters for the text field of the store
+text_size = 4096
+
+#  Create a vector store on the server
+vectorstore.create(metadata, text_size)
+
+"""
+Add the texts from the text splitter to our vectorstore
+"""
+vectorstore.add_documents(docs)
+
+""" Get the retriever object """
+retriever = vectorstore.as_retriever()
+# retriever = vectorstore.as_retriever(search_kwargs={"where": "m1='123' and m2='abc'"})
+
+""" The retriever object can be used with LangChain and LLM """
+```
+
+## Interaction With Jaguar Vector Store
+
+사용자는 유사도 검색 및 이상 탐지를 위해 Jaguar vector store와 직접 상호작용할 수 있습니다.
+
+```python
+from langchain_community.vectorstores.jaguar import Jaguar
+from langchain_openai import OpenAIEmbeddings
+
+# Instantiate a Jaguar vector store object
+url = "http://192.168.3.88:8080/fwww/"
+pod = "vdb"
+store = "langchain_test_store"
+vector_index = "v"
+vector_type = "cosine_fraction_float"
+vector_dimension = 10
+embeddings = OpenAIEmbeddings()
+vectorstore = Jaguar(
+    pod, store, vector_index, vector_type, vector_dimension, url, embeddings
+)
+
+# Login for authorization
+vectorstore.login()
+
+# Create the vector store with two metadata fields
+# This needs to be run only once.
+metadata_str = "author char(32), category char(16)"
+vectorstore.create(metadata_str, 1024)
+
+# Add a list of texts
+texts = ["foo", "bar", "baz"]
+metadatas = [
+    {"author": "Adam", "category": "Music"},
+    {"author": "Eve", "category": "Music"},
+    {"author": "John", "category": "History"},
+]
+ids = vectorstore.add_texts(texts=texts, metadatas=metadatas)
+
+#  Search similar text
+output = vectorstore.similarity_search(
+    query="foo",
+    k=1,
+    metadatas=["author", "category"],
+)
+assert output[0].page_content == "foo"
+assert output[0].metadata["author"] == "Adam"
+assert output[0].metadata["category"] == "Music"
+assert len(output) == 1
+
+# Search with filtering (where)
+where = "author='Eve'"
+output = vectorstore.similarity_search(
+    query="foo",
+    k=3,
+    fetch_k=9,
+    where=where,
+    metadatas=["author", "category"],
+)
+assert output[0].page_content == "bar"
+assert output[0].metadata["author"] == "Eve"
+assert output[0].metadata["category"] == "Music"
+assert len(output) == 1
+
+# Anomaly detection
+result = vectorstore.is_anomalous(
+    query="dogs can jump high",
+)
+assert result is False
+
+# Remove all data in the store
+vectorstore.clear()
+assert vectorstore.count() == 0
+
+# Remove the store completely
+vectorstore.drop()
+
+# Logout
+vectorstore.logout()
+```

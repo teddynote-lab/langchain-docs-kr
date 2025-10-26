@@ -1,0 +1,106 @@
+```markdown
+---
+title: Milvus
+---
+
+[Milvus](https://milvus.io/)는 임베딩 유사도 검색과 AI 애플리케이션을 위해 구축된 vector database입니다.
+
+<Tip>
+**호환성**
+
+Node.js에서만 사용 가능합니다.
+</Tip>
+
+## Setup
+
+1. 컴퓨터에서 Docker를 사용하여 Milvus 인스턴스를 실행합니다 [docs](https://milvus.io/docs/v2.1.x/install_standalone-docker.md)
+2. Milvus Node.js SDK를 설치합니다.
+
+   ```bash npm
+   npm install -S @zilliz/milvus2-sdk-node
+   ```
+3. 코드를 실행하기 전에 Milvus에 대한 환경 변수를 설정합니다
+
+   3.1 OpenAI
+
+   ```bash
+   export OPENAI_API_KEY=YOUR_OPENAI_API_KEY_HERE
+   export MILVUS_URL=YOUR_MILVUS_URL_HERE # for example http://localhost:19530
+   ```
+
+   3.2 Azure OpenAI
+
+   ```bash
+   export AZURE_OPENAI_API_KEY=YOUR_AZURE_OPENAI_API_KEY_HERE
+   export AZURE_OPENAI_API_INSTANCE_NAME=YOUR_AZURE_OPENAI_INSTANCE_NAME_HERE
+   export AZURE_OPENAI_API_DEPLOYMENT_NAME=YOUR_AZURE_OPENAI_DEPLOYMENT_NAME_HERE
+   export AZURE_OPENAI_API_COMPLETIONS_DEPLOYMENT_NAME=YOUR_AZURE_OPENAI_COMPLETIONS_DEPLOYMENT_NAME_HERE
+   export AZURE_OPENAI_API_EMBEDDINGS_DEPLOYMENT_NAME=YOUR_AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT_NAME_HERE
+   export AZURE_OPENAI_API_VERSION=YOUR_AZURE_OPENAI_API_VERSION_HERE
+   export AZURE_OPENAI_BASE_PATH=YOUR_AZURE_OPENAI_BASE_PATH_HERE
+   export MILVUS_URL=YOUR_MILVUS_URL_HERE # for example http://localhost:19530
+   ```
+
+## Index 및 query 문서
+
+<Tip>
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install @langchain/openai @langchain/core
+```
+```typescript
+import { Milvus } from "@langchain/classic/vectorstores/milvus";
+import { OpenAIEmbeddings } from "@langchain/openai";
+
+// text sample from Godel, Escher, Bach
+const vectorStore = await Milvus.fromTexts(
+  [
+    "Tortoise: Labyrinth? Labyrinth? Could it Are we in the notorious Little\
+            Harmonic Labyrinth of the dreaded Majotaur?",
+    "Achilles: Yiikes! What is that?",
+    "Tortoise: They say-although I person never believed it myself-that an I\
+            Majotaur has created a tiny labyrinth sits in a pit in the middle of\
+            it, waiting innocent victims to get lost in its fears complexity.\
+            Then, when they wander and dazed into the center, he laughs and\
+            laughs at them-so hard, that he laughs them to death!",
+    "Achilles: Oh, no!",
+    "Tortoise: But it's only a myth. Courage, Achilles.",
+  ],
+  [{ id: 2 }, { id: 1 }, { id: 3 }, { id: 4 }, { id: 5 }],
+  new OpenAIEmbeddings(),
+  {
+    collectionName: "goldel_escher_bach",
+  }
+);
+
+// or alternatively from docs
+const vectorStore = await Milvus.fromDocuments(docs, new OpenAIEmbeddings(), {
+  collectionName: "goldel_escher_bach",
+});
+
+const response = await vectorStore.similaritySearch("scared", 2);
+```
+
+## 기존 collection에서 문서 query하기
+
+```typescript
+import { Milvus } from "@langchain/classic/vectorstores/milvus";
+import { OpenAIEmbeddings } from "@langchain/openai";
+
+const vectorStore = await Milvus.fromExistingCollection(
+  new OpenAIEmbeddings(),
+  {
+    collectionName: "goldel_escher_bach",
+  }
+);
+
+const response = await vectorStore.similaritySearch("scared", 2);
+```
+
+## 관련 문서
+
+- Vector store [개념 가이드](/oss/integrations/vectorstores)
+- Vector store [how-to 가이드](/oss/integrations/vectorstores)
+```

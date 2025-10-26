@@ -1,0 +1,92 @@
+---
+title: TypeORM
+---
+
+일반적인 PostgreSQL 데이터베이스에서 벡터 검색을 활성화하기 위해, LangChain.js는 [`pgvector`](https://github.com/pgvector/pgvector) Postgres extension과 함께 [TypeORM](https://typeorm.io/)을 사용하는 것을 지원합니다.
+
+## Setup
+
+TypeORM을 사용하려면 `typeorm`과 `pg` package를 설치해야 합니다:
+
+```bash npm
+npm install typeorm
+```
+```bash npm
+npm install pg
+```
+
+<Tip>
+LangChain package 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install @langchain/openai @langchain/community @langchain/core
+```
+
+### `docker-compose`로 `pgvector` self hosted instance 설정하기
+
+`pgvector`는 self-hosted Postgres instance를 빠르게 설정하는 데 사용할 수 있는 사전 빌드된 Docker image를 제공합니다.
+아래 내용으로 `docker-compose.yml`이라는 파일을 생성하세요:
+
+```yml docker-compose.yml
+services:
+  db:
+    image: ankane/pgvector
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=ChangeMe
+      - POSTGRES_USER=myuser
+      - POSTGRES_DB=api
+```
+
+그런 다음 같은 디렉토리에서 `docker compose up`을 실행하여 container를 시작하세요.
+
+`pgvector` 설정 방법에 대한 자세한 정보는 [공식 repository](https://github.com/pgvector/pgvector)에서 확인할 수 있습니다.
+
+## Usage
+
+```typescript
+import { DataSourceOptions } from "typeorm";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { TypeORMVectorStore } from "@langchain/community/vectorstores/typeorm";
+
+// First, follow set-up instructions at
+// https://js.langchain.com/docs/modules/indexes/vector_stores/integrations/typeorm
+
+export const run = async () => {
+  const args = {
+    postgresConnectionOptions: {
+      type: "postgres",
+      host: "localhost",
+      port: 5432,
+      username: "myuser",
+      password: "ChangeMe",
+      database: "api",
+    } as DataSourceOptions,
+  };
+
+  const typeormVectorStore = await TypeORMVectorStore.fromDataSource(
+    new OpenAIEmbeddings(),
+    args
+  );
+
+  await typeormVectorStore.ensureTableInDatabase();
+
+  await typeormVectorStore.addDocuments([
+    { pageContent: "what's this", metadata: { a: 2 } },
+    { pageContent: "Cat drinks milk", metadata: { a: 1 } },
+  ]);
+
+  const results = await typeormVectorStore.similaritySearch("hello", 2);
+
+  console.log(results);
+};
+```
+
+## Related
+
+- Vector store [개념 가이드](/oss/integrations/vectorstores)
+- Vector store [how-to 가이드](/oss/integrations/vectorstores)

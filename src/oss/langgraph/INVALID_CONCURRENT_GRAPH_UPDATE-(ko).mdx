@@ -1,0 +1,100 @@
+```mdx
+---
+title: INVALID_CONCURRENT_GRAPH_UPDATE
+---
+
+LangGraph [`StateGraph`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.StateGraph)가 여러 노드로부터 동시에 state 업데이트를 받았지만, 해당 state 속성이 이를 지원하지 않습니다.
+
+이는 그래프에서 [fanout](/oss/langgraph/graph-api#map-reduce-and-the-send-api) 또는 다른 병렬 실행을 사용하고 있고, 다음과 같이 그래프를 정의한 경우 발생할 수 있습니다:
+
+:::python
+```python
+class State(TypedDict):
+    some_key: str  # [!code highlight]
+
+def node(state: State):
+    return {"some_key": "some_string_value"}
+
+def other_node(state: State):
+    return {"some_key": "some_string_value"}
+
+
+builder = StateGraph(State)
+builder.add_node(node)
+builder.add_node(other_node)
+builder.add_edge(START, "node")
+builder.add_edge(START, "other_node")
+graph = builder.compile()
+```
+:::
+
+:::js
+```typescript
+import { StateGraph, Annotation, START } from "@langchain/langgraph";
+import * as z from "zod";  // [!code highlight]
+
+const State = z.object({
+  someKey: z.string(),
+});
+
+const builder = new StateGraph(State)
+  .addNode("node", (state) => {
+    return { someKey: "some_string_value" };
+  })
+  .addNode("otherNode", (state) => {
+    return { someKey: "some_string_value" };
+  })
+  .addEdge(START, "node")
+  .addEdge(START, "otherNode");
+
+const graph = builder.compile();
+```
+:::
+
+:::python
+위 그래프의 노드가 `{ "some_key": "some_string_value" }`를 반환하면, `"some_key"`의 state 값이 `"some_string_value"`로 덮어씌워집니다.
+그러나 단일 단계 내에서 fanout과 같이 여러 노드가 `"some_key"`에 대한 값을 반환하면, 내부 state를 어떻게 업데이트해야 할지 불확실하기 때문에 그래프는 이 오류를 발생시킵니다.
+:::
+
+:::js
+위 그래프의 노드가 `{ someKey: "some_string_value" }`를 반환하면, `someKey`의 state 값이 `"some_string_value"`로 덮어씌워집니다.
+그러나 단일 단계 내에서 fanout과 같이 여러 노드가 `someKey`에 대한 값을 반환하면, 내부 state를 어떻게 업데이트해야 할지 불확실하기 때문에 그래프는 이 오류를 발생시킵니다.
+:::
+
+이를 해결하려면 여러 값을 결합하는 reducer를 정의할 수 있습니다:
+
+:::python
+```python
+import operator
+from typing import Annotated
+
+class State(TypedDict):
+    # The operator.add reducer fn makes this append-only  # [!code highlight]
+    some_key: Annotated[list, operator.add]  # [!code highlight]
+```
+:::
+
+:::js
+```typescript
+import { registry } from "@langchain/langgraph/zod";
+import * as z from "zod";
+
+const State = z.object({  // [!code highlight]
+  someKey: z.array(z.string()).register(registry, {  // [!code highlight]
+    reducer: {  // [!code highlight]
+      fn: (existing, update) => existing.concat(update),  // [!code highlight]
+    },
+    default: () => [] as string[],
+  }),
+});
+```
+:::
+
+이렇게 하면 병렬로 실행되는 여러 노드에서 반환된 동일한 key를 처리하는 로직을 정의할 수 있습니다.
+
+## Troubleshooting
+
+다음 사항이 이 오류를 해결하는 데 도움이 될 수 있습니다:
+
+* 그래프가 노드를 병렬로 실행하는 경우, 관련 state key에 reducer를 정의했는지 확인하세요.
+```

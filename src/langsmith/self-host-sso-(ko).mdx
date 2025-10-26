@@ -1,0 +1,299 @@
+---
+title: OAuth2.0 및 OIDC로 SSO 설정하기
+sidebarTitle: OAuth2.0 & OIDC로 SSO 설정하기
+---
+
+LangSmith Self-Hosted는 OAuth2.0 및 OIDC를 통한 SSO를 제공합니다. 이를 통해 인증이 Identity Provider(IdP)로 위임되어 LangSmith에 대한 접근을 관리할 수 있습니다.
+
+저희 구현은 몇 가지 예외를 제외하고 거의 모든 OIDC 호환 시스템을 지원합니다. 설정이 완료되면 다음과 같은 로그인 화면을 볼 수 있습니다:
+
+![OAuth SSO가 적용된 LangSmith UI](/langsmith/images/langsmith-ui-sso.png)
+
+## 개요
+
+<Note>
+[basic auth](/langsmith/self-host-basic-auth) 설치를 이 모드로 업그레이드할 수 있지만, [none auth](/langsmith/authentication-methods#none) 설치는 업그레이드할 수 없습니다. 업그레이드하려면 basic auth 설정을 제거하고 아래에 표시된 필수 설정 파라미터를 추가하면 됩니다. 이후 사용자는 OAuth를 통해서만 로그인할 수 있습니다. **업그레이드 후에도 접근을 유지하려면, 이전에 basic auth로 로그인한 이메일 주소를 사용하여 OAuth로 로그인할 수 있어야 합니다.**
+</Note>
+
+<Warning>
+LangSmith는 현재 self-hosted 환경에서 SSO에서 basic auth 모드로의 전환을 지원하지 않습니다. 또한, client secret이 있는 OAuth 모드에서 client secret이 없는 OAuth 모드로의 전환(및 그 반대)도 지원하지 않습니다. 마지막으로, basic auth와 OAuth를 동시에 사용하는 것도 지원하지 않습니다. OAuth를 활성화할 때 반드시 basic auth 설정을 비활성화하세요.
+</Warning>
+
+## Client Secret 사용 (권장)
+
+기본적으로 LangSmith Self-Hosted는 `Client Secret`이 포함된 `Authorization Code` 플로우를 지원합니다. 이 플로우에서는 client secret이 LangSmith에 안전하게 저장되며(프론트엔드에는 저장되지 않음), 인증 및 인증 세션을 설정하는 데 사용됩니다.
+
+### 사전 준비 사항
+
+* Self-hosted 환경이며 Enterprise 플랜을 사용해야 합니다.
+* IdP가 `Client Secret`이 포함된 `Authorization Code` 플로우를 지원해야 합니다.
+* IdP가 외부 discovery/issuer URL 사용을 지원해야 합니다. 이를 통해 IdP의 필요한 경로와 키를 가져옵니다.
+* LangSmith에 `OIDC`, `email`, `profile` scope를 제공해야 합니다. 이를 통해 사용자 정보와 이메일을 가져옵니다.
+<Note>
+
+LangSmith SSO는 오직 `https`를 통해서만 지원됩니다.
+</Note>
+
+### 설정 방법
+
+* IdP에서 콜백 URL을 `https://<host>/api/v1/oauth/custom-oidc/callback`으로 설정해야 합니다. 여기서 `host`는 LangSmith 인스턴스에 할당한 도메인 또는 IP입니다. 사용자가 인증을 마치면 IdP가 이 URL로 리디렉션합니다.
+* `values.yaml` 파일에 `oauthClientId`, `oauthClientSecret`, `hostname`, `oauthIssuerUrl`을 입력해야 합니다. 여기서 LangSmith 인스턴스를 설정합니다.
+* 아직 client secret을 사용한 Oauth를 설정하지 않았거나 개인 조직만 있는 경우, 새로 생성되는 SSO 조직의 최초 관리자 이메일 주소를 지정해야 합니다. basic auth에서 업그레이드하는 경우 기존 조직이 재사용됩니다.
+
+<CodeGroup>
+
+```yaml Helm
+config:
+  authType: mixed
+  hostname: https://langsmith.example.com
+  initialOrgAdminEmail: test@email.com # Set this if required
+  oauth:
+    enabled: true
+    oauthClientId: <YOUR CLIENT ID>
+    oauthClientSecret: <YOUR CLIENT SECRET>
+    oauthIssuerUrl: <YOUR DISCOVERY URL>
+    oauthScopes: "email,profile,openid"
+```
+
+```bash Docker
+# In your .env file
+AUTH_TYPE=mixed
+INITIAL_ORG_ADMIN_EMAIL=test@email.com
+LANGSMITH_URL=https://langsmith.example.com
+OAUTH_CLIENT_ID=your-client-id
+OAUTH_CLIENT_SECRET=your-client-secret
+OAUTH_ISSUER_URL=https://your-issuer-url
+OAUTH_SCOPES=email,profile,openid
+```
+
+</CodeGroup>
+
+### 세션 길이 제어
+
+<Note>
+이 섹션의 모든 환경 변수는 `platform-backend` 서비스용이며, Helm의 `platformBackend.deployment.extraEnv`를 통해 추가할 수 있습니다.
+</Note>
+
+* 기본적으로 세션 길이는 IdP에서 반환된 identity token의 만료로 제어됩니다.
+* 대부분의 설정에서는 refresh token을 사용하여 identity token 만료 이후에도 세션 길이를 `OAUTH_SESSION_MAX_SEC`까지 연장할 수 있습니다. 이를 위해서는 `offline_access` scope를 `oauthScopes`(Helm) 또는 `OAUTH_SCOPES`(Docker)에 추가해야 할 수 있습니다.
+* `OAUTH_SESSION_MAX_SEC`(기본값 1일)은 최대 1주(`604800`)까지 오버라이드할 수 있습니다.
+* refresh token을 지원하지 않는 IdP의 경우, `OAUTH_OVERRIDE_TOKEN_EXPIRY="true"`로 설정하면 identity token 만료를 무시하고 `OAUTH_SESSION_MAX_SEC`을 세션 길이로 사용합니다.
+
+### Sub Claim 오버라이드
+
+특정 상황에서는 IdP에서 어떤 claim을 `sub` claim으로 사용할지 오버라이드해야 할 수 있습니다.
+예를 들어, SCIM에서는 로그인 성공을 위해 resolved `sub` claim과 SCIM `externalId`가 일치해야 합니다.
+`sub` claim의 소스 attribute 또는 SCIM `externalId`에 제한이 있는 경우, `ISSUER_SUB_CLAIM_OVERRIDES` 환경 변수를 설정하여 어떤 OIDC JWT claim을 `sub`로 사용할지 선택할 수 있습니다.
+
+issuer URL이 이 설정에 포함된 URL 중 하나로 **시작**하면, 지정된 필드 이름에서 `sub` claim을 가져옵니다.
+예를 들어, 아래 설정에서는 issuer가 `https://idp.yourdomain.com/application/uuid`인 토큰은 `customClaim` 값을 `sub`로 사용합니다:
+
+```
+ISSUER_SUB_CLAIM_OVERRIDES='{"https://idp.yourdomain.com": "customClaim"}'
+```
+
+설정하지 않은 경우, Azure Entra ID를 IdP로 사용할 때 기본값은 `oid` claim을 사용합니다:
+
+```
+ISSUER_SUB_CLAIM_OVERRIDES='{"https://login.microsoftonline.com/": "oid", "https://sts.windows.net/": "oid", "https://login.microsoftonline.us/": "oid", "https://login.partner.microsoftonline.cn/": "oid"}'
+```
+
+### Google Workspace IdP 설정
+
+Google Workspace를 [OAuth2.0 및 OIDC](https://developers.google.com/identity/openid-connect/openid-connect)를 사용하여 PKCE 없이 SSO 제공자로 사용할 수 있습니다.
+
+<Note>
+조직의 Google Cloud Platform(GCP) 계정에 대한 관리자 권한이 있어야 새 프로젝트를 생성하거나, 기존 프로젝트에 대해 OAuth 2.0 자격 증명을 생성 및 구성할 수 있습니다. 각 GCP 프로젝트에는 하나의 OAuth 동의 화면만 있으므로, 접근 관리를 위해 새 프로젝트를 생성하는 것을 권장합니다.
+</Note>
+
+1. 새 GCP 프로젝트를 생성하세요. Google 문서의 [프로젝트 생성 및 관리](https://cloud.google.com/resource-manager/docs/creating-managing-projects) 항목을 참고하세요.
+
+2. 프로젝트를 생성한 후, Google API Console의 [자격 증명](https://console.developers.google.com/apis/credentials) 페이지를 엽니다(좌측 상단의 프로젝트가 올바른지 확인).
+
+3. 새 자격 증명 생성: `Create Credentials → OAuth client ID`
+
+4. `Application type`을 `Web application`으로 선택하고, 예를 들어 `LangSmith`와 같이 애플리케이션 이름을 입력하세요.
+
+5. `Authorized Javascript origins`에는 LangSmith 인스턴스의 도메인을 입력하세요. 예: `https://langsmith.yourdomain.com`
+
+6. `Authorized redirect URIs`에는 LangSmith 인스턴스의 도메인 뒤에 `/api/v1/oauth/custom-oidc/callback`을 붙여 입력하세요. 예: `https://langsmith.yourdomain.com/api/v1/oauth/custom-oidc/callback`
+
+7. `Create`를 클릭한 후, JSON을 다운로드하거나 `Client ID`(`.apps.googleusercontent.com`으로 끝남)와 `Client secret`을 안전한 곳에 복사 및 저장하세요. **나중에 다시 접근할 수 있습니다.**
+
+8. 좌측 네비게이션 메뉴에서 `OAuth consent screen`을 선택하세요.
+
+   1. Application type을 `Internal`로 선택하세요. **`Public`을 선택하면 Google 계정이 있는 누구나 로그인할 수 있습니다.**
+   2. 설명이 포함된 `Application name`을 입력하세요. 이 이름은 사용자가 로그인할 때 동의 화면에 표시됩니다. 예: `LangSmith` 또는 `<organization_name> SSO for LangSmith`.
+   3. Google API의 Scope 목록에 email, profile, openid만 있는지 확인하세요. SSO에 필요한 scope는 이 세 가지뿐입니다. 추가 scope를 부여하면 민감한 데이터 노출 위험이 증가합니다.
+
+9. (선택 사항) 조직 내에서 LangSmith 접근 권한을 제어하려면: [https://admin.google.com/ac/owl/list?tab=configuredApps](https://admin.google.com/ac/owl/list?tab=configuredApps)를 참고하세요. 자세한 내용은 [Google 문서](https://support.google.com/a/answer/7281227?hl=en\&fl=1\&sjid=9554153972856467090-NA)를 참고하세요.
+
+10. LangSmith가 이 OAuth 애플리케이션을 사용하도록 설정하세요. 예시로, Kubernetes 설정에 사용할 `config` 값은 다음과 같습니다:
+
+    1. `oauthClientId`: `Client ID` (`.apps.googleusercontent.com`으로 끝남)
+    2. `oauthClientSecret`: `Client secret`
+    3. `hostname`: LangSmith 인스턴스의 도메인(예: `https://langsmith.yourdomain.com`, 슬래시 없이)
+    4. `oauthIssuerUrl`: `https://accounts.google.com`
+    5. `oauth.enabled`: `true`
+    6. `authType`: `mixed`
+
+### Okta IdP 설정
+
+#### 지원 기능
+
+* IdP-initiated SSO
+* SP-initiated SSO
+
+#### 설정 단계
+
+자세한 내용은 Okta의 [문서](https://help.okta.com/en-us/content/topics/apps/apps_app_integration_wizard_oidc.htm)를 참고하세요.
+질문이나 문제가 있으면 [support@langchain.dev](mailto:support@langchain.dev)로 문의해 주세요.
+
+<div id="via-okta-integration-network">
+    <b>Okta Integration Network를 통한 설정(권장)</b>
+</div>
+
+<Note>
+이 설정 방법은 Okta에서 SCIM을 사용하려면 반드시 필요합니다.
+</Note>
+
+1. [Okta](https://login.okta.com/)에 로그인하세요.
+1. 우측 상단에서 Admin을 선택하세요. 이 버튼은 Admin 영역에서는 보이지 않습니다.
+1. `Browse App Integration Catalog`를 선택하세요.
+1. LangSmith 애플리케이션을 찾아 선택하세요.
+1. 애플리케이션 개요 페이지에서 Add Integration을 선택하세요.
+1. `ApiUrlBase`를 입력하세요:
+   * LangSmith API URL에서 **프로토콜**(`https://`)을 제외한 형태로 `<langsmith_domain>/api/v1`로 입력합니다. 예: `langsmith.yourdomain.com/api/v1`
+   * 설치가 서브도메인/경로 프리픽스로 구성된 경우, 해당 경로를 URL에 포함하세요. 예: `langsmith.yourdomain.com/prefix/api/v1`
+1. `AuthHost`는 비워둡니다.
+1. (선택 사항, [SCIM](/langsmith/user-management#set-up-scim-for-your-organization)도 사용할 계획이라면) `LangSmithUrl`을 입력하세요: 위에서 사용한 `<langsmith_url>`, 예: `langsmith.yourdomain.com`
+1. Application Visibility에서 박스를 체크하지 않습니다.
+1. Next를 선택하세요.
+1. `OpenID Connect`를 선택하세요.
+1. `Sign-On Options`을 입력하세요:
+   * `Application username format`: `Email`
+   * `Update application username on`: `Create and update`
+   * `Allow users to securely see their password`: **체크하지 않습니다.**
+1. **Save**를 클릭하세요.
+1. LangSmith가 이 OAuth 애플리케이션을 사용하도록 설정하세요([일반 설정 섹션](#configuration)에서 `initialOrgAdminEmail`에 대한 자세한 내용을 참고):
+
+<CodeGroup>
+
+```yaml Helm
+config:
+  authType: mixed
+  hostname: https://langsmith.example.com # the domain of your instance (note no trailing slash)
+  initialOrgAdminEmail: test@email.com # Set this if required
+  oauth:
+    enabled: true
+    oauthClientId: "Client ID" # (starts with `0o`)
+    oauthClientSecret: "Client secret"
+    oauthIssuerUrl: "https://company-7422949.okta.com" # the URL of your Okta instance
+    oauthScopes: "email,profile,openid"
+```
+
+```bash Docker
+# In your .env file
+AUTH_TYPE=mixed
+INITIAL_ORG_ADMIN_EMAIL=test@email.com # Set this if required
+LANGSMITH_URL=https://langsmith.example.com # the domain of your instance (note no trailing slash)
+OAUTH_CLIENT_ID="Client ID" # (starts with `0o`)
+OAUTH_CLIENT_SECRET="Client secret"
+OAUTH_ISSUER_URL="https://company-7422949.okta.com" # the URL of your Okta instance
+OAUTH_SCOPES=email,profile,openid
+```
+
+</CodeGroup>
+
+<div id="via-okta-custom-app-integration">
+    <b>커스텀 앱 통합을 통한 설정</b>
+</div>
+
+<Warning>
+SCIM은 이 설정 방법과 호환되지 않습니다. [**Okta Integration Network를 통한 설정**](#via-okta-integration-network)을 참고하세요.
+</Warning>
+
+1. Okta에 관리자 계정으로 로그인하여 **Okta Admin 콘솔**로 이동하세요.
+1. **Applications** > **Applications**에서 **Create App Integration**을 클릭하세요.
+1. Sign-in method로 **OIDC - OpenID Connect**를, Application type으로 **Web Application**을 선택한 후 **Next**를 클릭하세요.
+1. `App integration name`을 입력하세요(예: `LangSmith`).
+1. 권장: **Core grants > Refresh Token**을 체크하세요([세션 길이 제어](#session-length-controls) 참고).
+1. **Sign-in redirect URIs**에는 LangSmith 인스턴스의 도메인 뒤에 `/api/v1/oauth/custom-oidc/callback`을 붙여 입력하세요. 설치가 서브도메인/경로 프리픽스로 구성된 경우, 해당 경로를 포함하세요. 예: `https://langsmith.yourdomain.com/prefix/api/v1/oauth/custom-oidc/callback`
+1. **Sign-out redirect URIs**의 기본 URI는 제거하세요.
+1. **Trusted Origins > Base URIs**에는 프로토콜을 포함한 langsmith URL을 추가하세요. 예: `https://langsmith.yourdomain.com`
+1. **Assignments > Controlled access**에서 원하는 옵션을 선택하세요:
+    * 조직 내 모든 사용자가 접근 가능
+    * 선택한 그룹에만 접근 허용
+    * 지금은 그룹 할당 건너뛰기
+1. **Save**를 클릭하세요.
+1. **Sign On > OpenID Connect ID Token**에서 **Issuer**를 **Okta URL**로 설정하세요.
+1. (선택 사항) **General > Login**에서 **Login initiated by**를 `Either Okta or App`으로 설정하여 IdP-initiated 로그인을 활성화하세요.
+1. (권장) **General > Login > Email verification experience**에서 **Callback URI**에 LangSmith URL을 입력하세요. 예: `https://langsmith.yourdomain.com`
+1. LangSmith가 이 OAuth 애플리케이션을 사용하도록 설정하세요([일반 설정 섹션](#configuration)에서 `initialOrgAdminEmail`에 대한 자세한 내용을 참고):
+
+<CodeGroup>
+
+```yaml Helm
+config:
+  authType: mixed
+  hostname: https://langsmith.example.com # the domain of your instance (note no trailing slash)
+  initialOrgAdminEmail: test@email.com # Set this if required
+  oauth:
+    enabled: true
+    oauthClientId: "Client ID" # (starts with `0o`)
+    oauthClientSecret: "Client secret"
+    oauthIssuerUrl: "https://company-7422949.okta.com" # the URL of your Okta instance
+    oauthScopes: "email,profile,openid"
+```
+
+```bash Docker
+# In your .env file
+AUTH_TYPE=mixed
+INITIAL_ORG_ADMIN_EMAIL=test@email.com # Set this if required
+LANGSMITH_URL=https://langsmith.example.com # the domain of your instance (note no trailing slash)
+OAUTH_CLIENT_ID="Client ID" # (starts with `0o`)
+OAUTH_CLIENT_SECRET="Client secret"
+OAUTH_ISSUER_URL="https://company-7422949.okta.com" # the URL of your Okta instance
+OAUTH_SCOPES=email,profile,openid
+```
+
+</CodeGroup>
+
+#### SP-initiated SSO
+
+사용자는 LangSmith 홈페이지의 **Login via SSO** 버튼을 통해 로그인할 수 있습니다.
+
+## Client Secret 없이(PKCE) (사용 중단됨)
+
+가능하다면 `Client Secret`을 사용하는 것을 권장합니다(이전에는 지원하지 않았음). 하지만 IdP가 이를 지원하지 않는 경우, `Authorization Code with PKCE` 플로우를 사용할 수 있습니다.
+
+이 플로우는 `Client Secret`이 *필요하지 않습니다*. 대체 워크플로우는 [Client Secret 사용](#with-client-secret-recommended) 섹션을 참고하세요.
+
+### 요구 사항
+
+LangSmith에서 OAuth SSO를 사용하려면 몇 가지 요구 사항이 있습니다:
+
+* IdP가 `Authorization Code with PKCE` [플로우](https://www.oauth.com/oauth2-servers/pkce)를 지원해야 합니다(예를 들어 Google은 이 플로우를 지원하지 않지만, [위](#with-client-secret-recommended)에서 Google이 지원하는 대체 구성을 참고하세요). 일반적으로 OAuth Provider에서 "Single Page Application(SPA)" 구성으로 표시됩니다.
+* IdP가 외부 discovery/issuer URL 사용을 지원해야 합니다. 이를 통해 IdP의 필요한 경로와 키를 가져옵니다.
+* LangSmith에 `OIDC`, `email`, `profile` scope를 제공해야 합니다. 이를 통해 사용자 정보와 이메일을 가져옵니다.
+* IdP에서 콜백 URL을 `http://<host>/oauth-callback`으로 설정해야 합니다. 여기서 host는 LangSmith 인스턴스에 할당한 도메인 또는 IP입니다. 사용자가 인증을 마치면 IdP가 이 URL로 리디렉션합니다.
+* `values.yaml` 파일에 `oauthClientId`와 `oauthIssuerUrl`을 입력해야 합니다. 여기서 LangSmith 인스턴스를 설정합니다.
+
+<CodeGroup>
+
+```yaml Helm
+config:
+  oauth:
+    enabled: true
+    oauthClientId: <YOUR CLIENT ID>
+    oauthIssuerUrl: <YOUR DISCOVERY URL>
+```
+
+```bash Docker
+# In your .env file
+AUTH_TYPE=oauth
+OAUTH_CLIENT_ID=your-client-id
+OAUTH_ISSUER_URL=https://your-issuer-url
+```
+
+</CodeGroup>

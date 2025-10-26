@@ -1,0 +1,35 @@
+---
+title: GitBook
+---
+
+이 예제는 Cheerio를 사용하여 GitBook에서 데이터를 로드하는 방법을 다룹니다. 각 페이지마다 하나의 document가 생성됩니다.
+
+## Setup
+
+```bash npm
+npm install @langchain/community @langchain/core cheerio
+```
+## 단일 GitBook 페이지에서 로드하기
+
+```typescript
+import { GitbookLoader } from "@langchain/community/document_loaders/web/gitbook";
+
+const loader = new GitbookLoader(
+  "https://docs.gitbook.com/product-tour/navigation"
+);
+
+const docs = await loader.load();
+```
+## 주어진 GitBook의 모든 경로에서 로드하기
+
+이 기능이 작동하려면 GitbookLoader가 root path(이 예제에서는 https://docs.gitbook.com)로 초기화되어야 하며 `shouldLoadAllPaths`가 `true`로 설정되어야 합니다.
+
+```typescript
+import { GitbookLoader } from "@langchain/community/document_loaders/web/gitbook";
+
+const loader = new GitbookLoader("https://docs.gitbook.com", {
+  shouldLoadAllPaths: true,
+});
+
+const docs = await loader.load();
+```

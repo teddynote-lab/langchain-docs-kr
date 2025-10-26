@@ -1,0 +1,891 @@
+---
+title: SAP HANA Cloud Vector Engine
+---
+
+>[SAP HANA Cloud Vector Engine](https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-vector-engine-guide/sap-hana-cloud-sap-hana-database-vector-engine-guide)은 `SAP HANA Cloud` 데이터베이스에 완전히 통합된 vector store입니다.
+
+## Setup
+
+이 노트북 전체에서 사용되는 다른 패키지들과 함께 `langchain-hana` 외부 통합 패키지를 설치하세요.
+
+```python
+pip install -qU langchain-hana
+```
+
+### Credentials
+
+SAP HANA 인스턴스가 실행 중인지 확인하세요. 환경 변수에서 자격 증명을 로드하고 연결을 생성하세요:
+
+```python
+import os
+
+from dotenv import load_dotenv
+from hdbcli import dbapi
+
+load_dotenv()
+# Use connection settings from the environment
+connection = dbapi.connect(
+    address=os.environ.get("HANA_DB_ADDRESS"),
+    port=os.environ.get("HANA_DB_PORT"),
+    user=os.environ.get("HANA_DB_USER"),
+    password=os.environ.get("HANA_DB_PASSWORD"),
+    autocommit=True,
+    sslValidateCertificate=False,
+)
+```
+
+SAP HANA에 대해 더 자세히 알아보려면 [What is SAP HANA?](https://www.sap.com/products/data-cloud/hana/what-is-sap-hana.html)를 참조하세요.
+
+### Initialization
+
+`HanaDB` vector store를 초기화하려면 데이터베이스 연결과 embedding 인스턴스가 필요합니다. SAP HANA Cloud Vector Engine은 외부 및 내부 embedding을 모두 지원합니다.
+
+- #### Using External Embeddings
+
+<EmbeddingTabs/>
+
+```python
+# | output: false
+# | echo: false
+from langchain_openai import OpenAIEmbeddings
+
+embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
+```
+
+- #### Using Internal Embeddings
+
+또는 SAP HANA의 네이티브 `VECTOR_EMBEDDING()` 함수를 사용하여 SAP HANA에서 직접 embedding을 계산할 수 있습니다. 이를 활성화하려면 내부 모델 ID로 `HanaInternalEmbeddings` 인스턴스를 생성하고 이를 `HanaDB`에 전달하세요. `HanaInternalEmbeddings` 인스턴스는 `HanaDB`와 함께 사용하도록 특별히 설계되었으며 다른 vector store 구현과 함께 사용하기 위한 것이 아닙니다. 내부 embedding에 대한 자세한 내용은 [SAP HANA VECTOR_EMBEDDING Function](https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-vector-engine-guide/vector-embedding-function-vector)을 참조하세요.
+
+> **주의:** SAP HANA Cloud 인스턴스에서 NLP가 활성화되어 있는지 확인하세요.
+
+```python
+from langchain_hana import HanaInternalEmbeddings
+
+embeddings = HanaInternalEmbeddings(internal_embedding_model_id="SAP_NEB.20240715")
+```
+
+연결과 embedding 인스턴스가 준비되면 vector를 저장할 테이블 이름과 함께 `HanaDB`에 전달하여 vector store를 생성하세요:
+
+```python
+from langchain_hana import HanaDB
+
+db = HanaDB(
+    embedding=embeddings, connection=connection, table_name="STATE_OF_THE_UNION"
+)
+```
+
+## Example
+
+샘플 문서 "state_of_the_union.txt"를 로드하고 청크를 생성합니다.
+
+```python
+from langchain_community.document_loaders import TextLoader
+from langchain_core.documents import Document
+from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import CharacterTextSplitter
+
+text_documents = TextLoader(
+    "../../how_to/state_of_the_union.txt", encoding="UTF-8"
+).load()
+text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=0)
+text_chunks = text_splitter.split_documents(text_documents)
+print(f"Number of document chunks: {len(text_chunks)}")
+```
+
+```output
+Number of document chunks: 88
+```
+
+로드된 문서 청크를 테이블에 추가합니다. 이 예제에서는 이전 실행에서 존재할 수 있는 테이블의 이전 콘텐츠를 삭제합니다.
+
+```python
+# Delete already existing documents from the table
+db.delete(filter={})
+
+# add the loaded document chunks
+db.add_documents(text_chunks)
+```
+
+```output
+[]
+```
+
+이전 단계에서 추가된 문서 청크 중에서 가장 일치하는 두 개의 문서 청크를 가져오는 쿼리를 수행합니다.
+기본적으로 검색에는 "Cosine Similarity"가 사용됩니다.
+
+```python
+query = "What did the president say about Ketanji Brown Jackson"
+docs = db.similarity_search(query, k=2)
+
+for doc in docs:
+    print("-" * 80)
+    print(doc.page_content)
+```
+
+```output
+--------------------------------------------------------------------------------
+One of the most serious constitutional responsibilities a President has is nominating someone to serve on the United States Supreme Court.
+
+And I did that 4 days ago, when I nominated Circuit Court of Appeals Judge Ketanji Brown Jackson. One of our nation’s top legal minds, who will continue Justice Breyer’s legacy of excellence.
+--------------------------------------------------------------------------------
+As I said last year, especially to our younger transgender Americans, I will always have your back as your President, so you can be yourself and reach your God-given potential.
+
+While it often appears that we never agree, that isn’t true. I signed 80 bipartisan bills into law last year. From preventing government shutdowns to protecting Asian-Americans from still-too-common hate crimes to reforming military justice.
+```
+
+"Euclidian Distance"로 동일한 콘텐츠를 쿼리합니다. 결과는 "Cosine Similarity"와 동일해야 합니다.
+
+```python
+from langchain_hana.utils import DistanceStrategy
+
+db = HanaDB(
+    embedding=embeddings,
+    connection=connection,
+    distance_strategy=DistanceStrategy.EUCLIDEAN_DISTANCE,
+    table_name="STATE_OF_THE_UNION",
+)
+
+query = "What did the president say about Ketanji Brown Jackson"
+docs = db.similarity_search(query, k=2)
+for doc in docs:
+    print("-" * 80)
+    print(doc.page_content)
+```
+
+```output
+--------------------------------------------------------------------------------
+One of the most serious constitutional responsibilities a President has is nominating someone to serve on the United States Supreme Court.
+
+And I did that 4 days ago, when I nominated Circuit Court of Appeals Judge Ketanji Brown Jackson. One of our nation’s top legal minds, who will continue Justice Breyer’s legacy of excellence.
+--------------------------------------------------------------------------------
+As I said last year, especially to our younger transgender Americans, I will always have your back as your President, so you can be yourself and reach your God-given potential.
+
+While it often appears that we never agree, that isn’t true. I signed 80 bipartisan bills into law last year. From preventing government shutdowns to protecting Asian-Americans from still-too-common hate crimes to reforming military justice.
+```
+
+## Maximal Marginal Relevance Search (MMR)
+
+`Maximal marginal relevance`는 쿼리와의 유사성과 선택된 문서 간의 다양성을 최적화합니다. 처음 20개(fetch_k) 항목이 DB에서 검색됩니다. 그런 다음 MMR 알고리즘이 가장 일치하는 2개(k)를 찾습니다.
+
+```python
+docs = db.max_marginal_relevance_search(query, k=2, fetch_k=20)
+for doc in docs:
+    print("-" * 80)
+    print(doc.page_content)
+```
+
+```output
+--------------------------------------------------------------------------------
+One of the most serious constitutional responsibilities a President has is nominating someone to serve on the United States Supreme Court.
+
+And I did that 4 days ago, when I nominated Circuit Court of Appeals Judge Ketanji Brown Jackson. One of our nation’s top legal minds, who will continue Justice Breyer’s legacy of excellence.
+--------------------------------------------------------------------------------
+Groups of citizens blocking tanks with their bodies. Everyone from students to retirees teachers turned soldiers defending their homeland.
+
+In this struggle as President Zelenskyy said in his speech to the European Parliament “Light will win over darkness.” The Ukrainian Ambassador to the United States is here tonight.
+
+Let each of us here tonight in this Chamber send an unmistakable signal to Ukraine and to the world.
+```
+
+## Creating an HNSW Vector Index
+
+vector index는 vector에 대한 top-k 최근접 이웃 쿼리의 속도를 크게 향상시킬 수 있습니다. 사용자는 `create_hnsw_index` 함수를 사용하여 Hierarchical Navigable Small World (HNSW) vector index를 생성할 수 있습니다.
+
+데이터베이스 수준에서 index를 생성하는 방법에 대한 자세한 내용은 [공식 문서](https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-vector-engine-guide/create-vector-index-statement-data-definition)를 참조하세요.
+
+```python
+# HanaDB instance uses cosine similarity as default:
+db_cosine = HanaDB(
+    embedding=embeddings, connection=connection, table_name="STATE_OF_THE_UNION"
+)
+
+# Attempting to create the HNSW index with default parameters
+db_cosine.create_hnsw_index()  # If no other parameters are specified, the default values will be used
+# Default values: m=64, ef_construction=128, ef_search=200
+# The default index name will be: STATE_OF_THE_UNION_COSINE_SIMILARITY_IDX (verify this naming pattern in HanaDB class)
+
+
+# Creating a HanaDB instance with L2 distance as the similarity function and defined values
+db_l2 = HanaDB(
+    embedding=embeddings,
+    connection=connection,
+    table_name="STATE_OF_THE_UNION",
+    distance_strategy=DistanceStrategy.EUCLIDEAN_DISTANCE,  # Specify L2 distance
+)
+
+# This will create an index based on L2 distance strategy.
+db_l2.create_hnsw_index(
+    index_name="STATE_OF_THE_UNION_L2_index",
+    m=100,  # Max number of neighbors per graph node (valid range: 4 to 1000)
+    ef_construction=200,  # Max number of candidates during graph construction (valid range: 1 to 100000)
+    ef_search=500,  # Min number of candidates during the search (valid range: 1 to 100000)
+)
+
+# Use L2 index to perform MMR
+docs = db_l2.max_marginal_relevance_search(query, k=2, fetch_k=20)
+for doc in docs:
+    print("-" * 80)
+    print(doc.page_content)
+```
+
+```output
+--------------------------------------------------------------------------------
+One of the most serious constitutional responsibilities a President has is nominating someone to serve on the United States Supreme Court.
+
+And I did that 4 days ago, when I nominated Circuit Court of Appeals Judge Ketanji Brown Jackson. One of our nation’s top legal minds, who will continue Justice Breyer’s legacy of excellence.
+--------------------------------------------------------------------------------
+Groups of citizens blocking tanks with their bodies. Everyone from students to retirees teachers turned soldiers defending their homeland.
+
+In this struggle as President Zelenskyy said in his speech to the European Parliament “Light will win over darkness.” The Ukrainian Ambassador to the United States is here tonight.
+
+Let each of us here tonight in this Chamber send an unmistakable signal to Ukraine and to the world.
+```
+
+**주요 사항**:
+
+- **Similarity Function**: index의 유사도 함수는 기본적으로 **cosine similarity**입니다. 다른 유사도 함수(예: `L2` distance)를 사용하려면 `HanaDB` 인스턴스를 초기화할 때 지정해야 합니다.
+- **Default Parameters**: `create_hnsw_index` 함수에서 사용자가 `m`, `ef_construction` 또는 `ef_search`와 같은 매개변수에 대한 사용자 정의 값을 제공하지 않으면 기본값(예: `m=64`, `ef_construction=128`, `ef_search=200`)이 자동으로 사용됩니다. 이러한 값은 사용자 개입 없이 합리적인 성능으로 index가 생성되도록 보장합니다.
+
+## Basic Vectorstore Operations
+
+```python
+db = HanaDB(
+    connection=connection, embedding=embeddings, table_name="LANGCHAIN_DEMO_BASIC"
+)
+
+# Delete already existing documents from the table
+db.delete(filter={})
+```
+
+```output
+True
+```
+
+기존 테이블에 간단한 텍스트 문서를 추가할 수 있습니다.
+
+```python
+docs = [Document(page_content="Some text"), Document(page_content="Other docs")]
+db.add_documents(docs)
+```
+
+```output
+[]
+```
+
+metadata가 포함된 문서를 추가합니다.
+
+```python
+docs = [
+    Document(
+        page_content="foo",
+        metadata={"start": 100, "end": 150, "doc_name": "foo.txt", "quality": "bad"},
+    ),
+    Document(
+        page_content="bar",
+        metadata={"start": 200, "end": 250, "doc_name": "bar.txt", "quality": "good"},
+    ),
+]
+db.add_documents(docs)
+```
+
+```output
+[]
+```
+
+특정 metadata가 있는 문서를 쿼리합니다.
+
+```python
+docs = db.similarity_search("foobar", k=2, filter={"quality": "bad"})
+# With filtering on "quality"=="bad", only one document should be returned
+for doc in docs:
+    print("-" * 80)
+    print(doc.page_content)
+    print(doc.metadata)
+```
+
+```output
+--------------------------------------------------------------------------------
+foo
+{'start': 100, 'end': 150, 'doc_name': 'foo.txt', 'quality': 'bad'}
+```
+
+특정 metadata가 있는 문서를 삭제합니다.
+
+```python
+db.delete(filter={"quality": "bad"})
+
+# Now the similarity search with the same filter will return no results
+docs = db.similarity_search("foobar", k=2, filter={"quality": "bad"})
+print(len(docs))
+```
+
+```output
+0
+```
+
+## Advanced filtering
+
+기본 값 기반 필터링 기능 외에도 더 고급 필터링을 사용할 수 있습니다.
+아래 표는 사용 가능한 필터 연산자를 보여줍니다.
+
+| Operator | Semantic                 |
+|----------|-------------------------|
+| `$eq`    | Equality (==)           |
+| `$ne`    | Inequality (!=)         |
+| `$lt`    | Less than (&lt;)           |
+| `$lte`   | Less than or equal (&lt;=) |
+| `$gt`    | Greater than (>)        |
+| `$gte`   | Greater than or equal (>=) |
+| `$in`    | Contained in a set of given values  (in)    |
+| `$nin`   | Not contained in a set of given values  (not in)  |
+| `$between` | Between the range of two boundary values |
+| `$like`  | Text equality based on the "LIKE" semantics in SQL (using "%" as wildcard)  |
+| `$contains` | Filters documents containing a specific keyword |
+| `$and`   | Logical "and", supporting two or more operands |
+| `$or`    | Logical "or", supporting two or more operands |
+
+```python
+# Prepare some test documents
+docs = [
+    Document(
+        page_content="First",
+        metadata={"name": "Adam Smith", "is_active": True, "id": 1, "height": 10.0},
+    ),
+    Document(
+        page_content="Second",
+        metadata={"name": "Bob Johnson", "is_active": False, "id": 2, "height": 5.7},
+    ),
+    Document(
+        page_content="Third",
+        metadata={"name": "Jane Doe", "is_active": True, "id": 3, "height": 2.4},
+    ),
+]
+
+db = HanaDB(
+    connection=connection,
+    embedding=embeddings,
+    table_name="LANGCHAIN_DEMO_ADVANCED_FILTER",
+)
+
+# Delete already existing documents from the table
+db.delete(filter={})
+db.add_documents(docs)
+
+
+# Helper function for printing filter results
+def print_filter_result(result):
+    if len(result) == 0:
+        print("<empty result>")
+    for doc in result:
+        print(doc.metadata)
+```
+
+`$ne`, `$gt`, `$gte`, `$lt`, `$lte`로 필터링
+
+```python
+advanced_filter = {"id": {"$ne": 1}}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+
+advanced_filter = {"id": {"$gt": 1}}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+
+advanced_filter = {"id": {"$gte": 1}}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+
+advanced_filter = {"id": {"$lt": 1}}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+
+advanced_filter = {"id": {"$lte": 1}}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+```
+
+```output
+Filter: {'id': {'$ne': 1}}
+{'name': 'Jane Doe', 'is_active': True, 'id': 3, 'height': 2.4}
+{'name': 'Bob Johnson', 'is_active': False, 'id': 2, 'height': 5.7}
+Filter: {'id': {'$gt': 1}}
+{'name': 'Jane Doe', 'is_active': True, 'id': 3, 'height': 2.4}
+{'name': 'Bob Johnson', 'is_active': False, 'id': 2, 'height': 5.7}
+Filter: {'id': {'$gte': 1}}
+{'name': 'Adam Smith', 'is_active': True, 'id': 1, 'height': 10.0}
+{'name': 'Jane Doe', 'is_active': True, 'id': 3, 'height': 2.4}
+{'name': 'Bob Johnson', 'is_active': False, 'id': 2, 'height': 5.7}
+Filter: {'id': {'$lt': 1}}
+<empty result>
+Filter: {'id': {'$lte': 1}}
+{'name': 'Adam Smith', 'is_active': True, 'id': 1, 'height': 10.0}
+```
+
+`$between`, `$in`, `$nin`으로 필터링
+
+```python
+advanced_filter = {"id": {"$between": (1, 2)}}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+
+advanced_filter = {"name": {"$in": ["Adam Smith", "Bob Johnson"]}}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+
+advanced_filter = {"name": {"$nin": ["Adam Smith", "Bob Johnson"]}}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+```
+
+```output
+Filter: {'id': {'$between': (1, 2)}}
+{'name': 'Adam Smith', 'is_active': True, 'id': 1, 'height': 10.0}
+{'name': 'Bob Johnson', 'is_active': False, 'id': 2, 'height': 5.7}
+Filter: {'name': {'$in': ['Adam Smith', 'Bob Johnson']}}
+{'name': 'Adam Smith', 'is_active': True, 'id': 1, 'height': 10.0}
+{'name': 'Bob Johnson', 'is_active': False, 'id': 2, 'height': 5.7}
+Filter: {'name': {'$nin': ['Adam Smith', 'Bob Johnson']}}
+{'name': 'Jane Doe', 'is_active': True, 'id': 3, 'height': 2.4}
+```
+
+`$like`로 텍스트 필터링
+
+```python
+advanced_filter = {"name": {"$like": "a%"}}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+
+advanced_filter = {"name": {"$like": "%a%"}}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+```
+
+```output
+Filter: {'name': {'$like': 'a%'}}
+<empty result>
+Filter: {'name': {'$like': '%a%'}}
+{'name': 'Adam Smith', 'is_active': True, 'id': 1, 'height': 10.0}
+{'name': 'Jane Doe', 'is_active': True, 'id': 3, 'height': 2.4}
+```
+
+`$contains`로 텍스트 필터링
+
+```python
+advanced_filter = {"name": {"$contains": "bob"}}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+
+advanced_filter = {"name": {"$contains": "bo"}}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+
+advanced_filter = {"name": {"$contains": "Adam Johnson"}}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+
+advanced_filter = {"name": {"$contains": "Adam Smith"}}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+```
+
+```output
+Filter: {'name': {'$contains': 'bob'}}
+{'name': 'Bob Johnson', 'is_active': False, 'id': 2, 'height': 5.7}
+Filter: {'name': {'$contains': 'bo'}}
+<empty result>
+Filter: {'name': {'$contains': 'Adam Johnson'}}
+<empty result>
+Filter: {'name': {'$contains': 'Adam Smith'}}
+{'name': 'Adam Smith', 'is_active': True, 'id': 1, 'height': 10.0}
+```
+
+`$and`, `$or`로 결합 필터링
+
+```python
+advanced_filter = {"$or": [{"id": 1}, {"name": "bob"}]}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+
+advanced_filter = {"$and": [{"id": 1}, {"id": 2}]}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+
+advanced_filter = {"$or": [{"id": 1}, {"id": 2}, {"id": 3}]}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+
+advanced_filter = {
+    "$and": [{"name": {"$contains": "bob"}}, {"name": {"$contains": "johnson"}}]
+}
+print(f"Filter: {advanced_filter}")
+print_filter_result(db.similarity_search("just testing", k=5, filter=advanced_filter))
+```
+
+```output
+Filter: {'$or': [{'id': 1}, {'name': 'bob'}]}
+{'name': 'Adam Smith', 'is_active': True, 'id': 1, 'height': 10.0}
+Filter: {'$and': [{'id': 1}, {'id': 2}]}
+<empty result>
+Filter: {'$or': [{'id': 1}, {'id': 2}, {'id': 3}]}
+{'name': 'Adam Smith', 'is_active': True, 'id': 1, 'height': 10.0}
+{'name': 'Jane Doe', 'is_active': True, 'id': 3, 'height': 2.4}
+{'name': 'Bob Johnson', 'is_active': False, 'id': 2, 'height': 5.7}
+Filter: {'$and': [{'name': {'$contains': 'bob'}}, {'name': {'$contains': 'johnson'}}]}
+{'name': 'Bob Johnson', 'is_active': False, 'id': 2, 'height': 5.7}
+```
+
+## Using a VectorStore as a retriever in chains for retrieval augmented generation (RAG)
+
+```python
+# Access the vector DB with a new table
+db = HanaDB(
+    connection=connection,
+    embedding=embeddings,
+    table_name="LANGCHAIN_DEMO_RETRIEVAL_CHAIN",
+)
+
+# Delete already existing entries from the table
+db.delete(filter={})
+
+# add the loaded document chunks from the "State Of The Union" file
+db.add_documents(text_chunks)
+
+# Create a retriever instance of the vector store
+retriever = db.as_retriever()
+```
+
+prompt를 정의합니다.
+
+```python
+from langchain_core.prompts import PromptTemplate
+
+prompt_template = """
+You are an expert in state of the union topics. You are provided multiple context items that are related to the prompt you have to answer.
+Use the following pieces of context to answer the question at the end.
+
+'''
+{context}
+'''
+
+Question: {question}
+"""
+
+PROMPT = PromptTemplate(
+    template=prompt_template, input_variables=["context", "question"]
+)
+chain_type_kwargs = {"prompt": PROMPT}
+```
+
+채팅 기록과 prompt에 추가할 유사한 문서 청크의 검색을 처리하는 ConversationalRetrievalChain을 생성합니다.
+
+```python
+from langchain.chains import ConversationalRetrievalChain
+from langchain.memory import ConversationBufferMemory
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(model="gpt-3.5-turbo")
+memory = ConversationBufferMemory(
+    memory_key="chat_history", output_key="answer", return_messages=True
+)
+qa_chain = ConversationalRetrievalChain.from_llm(
+    llm,
+    db.as_retriever(search_kwargs={"k": 5}),
+    return_source_documents=True,
+    memory=memory,
+    verbose=False,
+    combine_docs_chain_kwargs={"prompt": PROMPT},
+)
+```
+
+첫 번째 질문을 하고 (사용된 텍스트 청크 수를 확인합니다).
+
+```python
+question = "What about Mexico and Guatemala?"
+
+result = qa_chain.invoke({"question": question})
+print("Answer from LLM:")
+print("================")
+print(result["answer"])
+
+source_docs = result["source_documents"]
+print("================")
+print(f"Number of used source document chunks: {len(source_docs)}")
+```
+
+```output
+Answer from LLM:
+================
+The United States has set up joint patrols with Mexico and Guatemala to catch more human traffickers at the border. This collaborative effort aims to improve border security and combat illegal activities such as human trafficking.
+================
+Number of used source document chunks: 5
+```
+
+chain에서 사용된 청크를 자세히 검토합니다. 질문에서 언급된 "Mexico and Guatemala"에 대한 정보가 최상위 순위 청크에 포함되어 있는지 확인합니다.
+
+```python
+for doc in source_docs:
+    print("-" * 80)
+    print(doc.page_content)
+    print(doc.metadata)
+```
+
+동일한 대화 chain에서 다른 질문을 합니다. 답변은 이전에 제공된 답변과 관련이 있어야 합니다.
+
+```python
+question = "How many casualties were reported after that?"
+
+result = qa_chain.invoke({"question": question})
+print("Answer from LLM:")
+print("================")
+print(result["answer"])
+```
+
+```output
+Answer from LLM:
+================
+Countries like Mexico and Guatemala are participating in joint patrols to catch human traffickers. The United States is also working with partners in South and Central America to host more refugees and secure their borders. Additionally, the U.S. is working with twenty-seven members of the European Union, as well as countries like France, Germany, Italy, the United Kingdom, Canada, Japan, Korea, Australia, New Zealand, and Switzerland.
+```
+
+## Standard tables vs. "custom" tables with vector data
+
+기본 동작으로 embedding을 위한 테이블은 3개의 열로 생성됩니다:
+
+- Document의 텍스트를 포함하는 `VEC_TEXT` 열
+- Document의 metadata를 포함하는 `VEC_META` 열
+- Document 텍스트의 embedding vector를 포함하는 `VEC_VECTOR` 열
+
+```python
+# Access the vector DB with a new table
+db = HanaDB(
+    connection=connection, embedding=embeddings, table_name="LANGCHAIN_DEMO_NEW_TABLE"
+)
+
+# Delete already existing entries from the table
+db.delete(filter={})
+
+# Add a simple document with some metadata
+docs = [
+    Document(
+        page_content="A simple document",
+        metadata={"start": 100, "end": 150, "doc_name": "simple.txt"},
+    )
+]
+db.add_documents(docs)
+```
+
+```output
+[]
+```
+
+"LANGCHAIN_DEMO_NEW_TABLE" 테이블의 열을 표시합니다
+
+```python
+cur = connection.cursor()
+cur.execute(
+    "SELECT COLUMN_NAME, DATA_TYPE_NAME FROM SYS.TABLE_COLUMNS WHERE SCHEMA_NAME = CURRENT_SCHEMA AND TABLE_NAME = 'LANGCHAIN_DEMO_NEW_TABLE'"
+)
+rows = cur.fetchall()
+for row in rows:
+    print(row)
+cur.close()
+```
+
+```output
+('VEC_META', 'NCLOB')
+('VEC_TEXT', 'NCLOB')
+('VEC_VECTOR', 'REAL_VECTOR')
+```
+
+세 개의 열에 삽입된 문서의 값을 표시합니다
+
+```python
+cur = connection.cursor()
+cur.execute(
+    "SELECT VEC_TEXT, VEC_META, TO_NVARCHAR(VEC_VECTOR) FROM LANGCHAIN_DEMO_NEW_TABLE LIMIT 1"
+)
+rows = cur.fetchall()
+print(rows[0][0])  # The text
+print(rows[0][1])  # The metadata
+print(rows[0][2])  # The vector
+cur.close()
+```
+
+사용자 정의 테이블은 표준 테이블의 의미와 일치하는 최소 세 개의 열이 있어야 합니다
+
+- embedding의 텍스트/컨텍스트를 위한 `NCLOB` 또는 `NVARCHAR` 타입의 열
+- metadata를 위한 `NCLOB` 또는 `NVARCHAR` 타입의 열
+- embedding vector를 위한 `REAL_VECTOR` 타입의 열
+
+테이블에는 추가 열이 포함될 수 있습니다. 새 Document가 테이블에 삽입될 때 이러한 추가 열은 NULL 값을 허용해야 합니다.
+
+```python
+# Create a new table "MY_OWN_TABLE_ADD" with three "standard" columns and one additional column
+my_own_table_name = "MY_OWN_TABLE_ADD"
+cur = connection.cursor()
+cur.execute(
+    (
+        f"CREATE TABLE {my_own_table_name} ("
+        "SOME_OTHER_COLUMN NVARCHAR(42), "
+        "MY_TEXT NVARCHAR(2048), "
+        "MY_METADATA NVARCHAR(1024), "
+        "MY_VECTOR REAL_VECTOR )"
+    )
+)
+
+# Create a HanaDB instance with the own table
+db = HanaDB(
+    connection=connection,
+    embedding=embeddings,
+    table_name=my_own_table_name,
+    content_column="MY_TEXT",
+    metadata_column="MY_METADATA",
+    vector_column="MY_VECTOR",
+)
+
+# Add a simple document with some metadata
+docs = [
+    Document(
+        page_content="Some other text",
+        metadata={"start": 400, "end": 450, "doc_name": "other.txt"},
+    )
+]
+db.add_documents(docs)
+
+# Check if data has been inserted into our own table
+cur.execute(f"SELECT * FROM {my_own_table_name} LIMIT 1")
+rows = cur.fetchall()
+print(rows[0][0])  # Value of column "SOME_OTHER_DATA". Should be NULL/None
+print(rows[0][1])  # The text
+print(rows[0][2])  # The metadata
+print(rows[0][3])  # The vector
+
+cur.close()
+```
+
+```output
+None
+Some other text
+{"start": 400, "end": 450, "doc_name": "other.txt"}
+<memory at 0x110f856c0>
+```
+
+다른 문서를 추가하고 사용자 정의 테이블에서 유사성 검색을 수행합니다.
+
+```python
+docs = [
+    Document(
+        page_content="Some more text",
+        metadata={"start": 800, "end": 950, "doc_name": "more.txt"},
+    )
+]
+db.add_documents(docs)
+
+query = "What's up?"
+docs = db.similarity_search(query, k=2)
+for doc in docs:
+    print("-" * 80)
+    print(doc.page_content)
+```
+
+```output
+--------------------------------------------------------------------------------
+Some more text
+--------------------------------------------------------------------------------
+Some other text
+```
+
+### Filter Performance Optimization with Custom Columns
+
+유연한 metadata 값을 허용하기 위해 모든 metadata는 기본적으로 metadata 열에 JSON으로 저장됩니다. 사용된 metadata 키와 값 타입 중 일부가 알려진 경우, 키 이름을 열 이름으로 하는 대상 테이블을 생성하고 specific_metadata_columns 목록을 통해 HanaDB 생성자에 전달하여 대신 추가 열에 저장할 수 있습니다. 이러한 값과 일치하는 metadata 키는 삽입 중에 특수 열로 복사됩니다. 필터는 specific_metadata_columns 목록의 키에 대해 metadata JSON 열 대신 특수 열을 사용합니다.
+
+```python
+# Create a new table "PERFORMANT_CUSTOMTEXT_FILTER" with three "standard" columns and one additional column
+my_own_table_name = "PERFORMANT_CUSTOMTEXT_FILTER"
+cur = connection.cursor()
+cur.execute(
+    (
+        f"CREATE TABLE {my_own_table_name} ("
+        "CUSTOMTEXT NVARCHAR(500), "
+        "MY_TEXT NVARCHAR(2048), "
+        "MY_METADATA NVARCHAR(1024), "
+        "MY_VECTOR REAL_VECTOR )"
+    )
+)
+
+# Create a HanaDB instance with the own table
+db = HanaDB(
+    connection=connection,
+    embedding=embeddings,
+    table_name=my_own_table_name,
+    content_column="MY_TEXT",
+    metadata_column="MY_METADATA",
+    vector_column="MY_VECTOR",
+    specific_metadata_columns=["CUSTOMTEXT"],
+)
+
+# Add a simple document with some metadata
+docs = [
+    Document(
+        page_content="Some other text",
+        metadata={
+            "start": 400,
+            "end": 450,
+            "doc_name": "other.txt",
+            "CUSTOMTEXT": "Filters on this value are very performant",
+        },
+    )
+]
+db.add_documents(docs)
+
+# Check if data has been inserted into our own table
+cur.execute(f"SELECT * FROM {my_own_table_name} LIMIT 1")
+rows = cur.fetchall()
+print(
+    rows[0][0]
+)  # Value of column "CUSTOMTEXT". Should be "Filters on this value are very performant"
+print(rows[0][1])  # The text
+print(
+    rows[0][2]
+)  # The metadata without the "CUSTOMTEXT" data, as this is extracted into a sperate column
+print(rows[0][3])  # The vector
+
+cur.close()
+```
+
+```output
+Filters on this value are very performant
+Some other text
+{"start": 400, "end": 450, "doc_name": "other.txt", "CUSTOMTEXT": "Filters on this value are very performant"}
+<memory at 0x110f859c0>
+```
+
+특수 열은 나머지 langchain 인터페이스에 완전히 투명합니다. 모든 것이 이전과 동일하게 작동하지만 더 성능이 좋습니다.
+
+```python
+docs = [
+    Document(
+        page_content="Some more text",
+        metadata={
+            "start": 800,
+            "end": 950,
+            "doc_name": "more.txt",
+            "CUSTOMTEXT": "Another customtext value",
+        },
+    )
+]
+db.add_documents(docs)
+
+advanced_filter = {"CUSTOMTEXT": {"$like": "%value%"}}
+query = "What's up?"
+docs = db.similarity_search(query, k=2, filter=advanced_filter)
+for doc in docs:
+    print("-" * 80)
+    print(doc.page_content)
+```
+
+```output
+--------------------------------------------------------------------------------
+Some more text
+--------------------------------------------------------------------------------
+Some other text
+```

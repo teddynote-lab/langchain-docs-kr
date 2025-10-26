@@ -1,0 +1,45 @@
+```mdx
+---
+title: WRITER
+---
+
+LangChain.js는 [WRITER](https://writer.com/) LLM 호출을 지원합니다.
+
+## Setup
+
+먼저 https://writer.com/에서 계정을 등록해야 합니다. 서비스 계정을 생성하고 API key를 기록해 두세요.
+
+다음으로, 공식 패키지를 peer dependency로 설치해야 합니다:
+
+```bash npm
+yarn add @writerai/writer-sdk
+```
+<Tip>
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install @langchain/community @langchain/core
+```
+
+## Usage
+
+```typescript
+import { Writer } from "@langchain/community/llms/writer";
+
+const model = new Writer({
+  maxTokens: 20,
+  apiKey: "YOUR-API-KEY", // In Node.js defaults to process.env.WRITER_API_KEY
+  orgId: "YOUR-ORGANIZATION-ID", // In Node.js defaults to process.env.WRITER_ORG_ID
+});
+const res = await model.invoke(
+  "What would be a good company name a company that makes colorful socks?"
+);
+console.log({ res });
+```
+
+## Related
+
+
+- [Models 가이드](/oss/langchain/models)
+```

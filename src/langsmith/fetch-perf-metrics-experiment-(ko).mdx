@@ -1,0 +1,177 @@
+```mdx
+---
+title: 실험의 성능 메트릭을 가져오는 방법
+sidebarTitle: 실험의 성능 메트릭 가져오기
+---
+
+<Check>
+Tracing project와 experiment는 백엔드에서 "session"이라고 불리는 동일한 기본 데이터 구조를 사용합니다.
+
+문서에서 이러한 용어들이 혼용되어 사용되는 것을 볼 수 있지만, 모두 동일한 기본 데이터 구조를 나타냅니다.
+
+현재 문서와 API 전반에 걸쳐 용어를 통일하는 작업을 진행하고 있습니다.
+</Check>
+
+Python 또는 TypeScript SDK에서 `evaluate`를 사용하여 실험을 실행할 때, `read_project`/`readProject` 메서드를 사용하여 실험의 성능 메트릭을 가져올 수 있습니다.
+
+실험 세부 정보에 대한 payload는 다음 값들을 포함합니다:
+
+```json
+{
+  "start_time": "2024-06-06T01:02:51.299960",
+  "end_time": "2024-06-06T01:03:04.557530+00:00",
+  "extra": {
+    "metadata": {
+      "git": {
+        "tags": null,
+        "dirty": true,
+        "branch": "ankush/agent-eval",
+        "commit": "...",
+        "repo_name": "...",
+        "remote_url": "...",
+        "author_name": "Ankush Gola",
+        "commit_time": "...",
+        "author_email": "..."
+      },
+      "revision_id": null,
+      "dataset_splits": ["base"],
+      "dataset_version": "2024-06-05T04:57:01.535578+00:00",
+      "num_repetitions": 3
+    }
+  },
+  "name": "SQL Database Agent-ae9ad229",
+  "description": null,
+  "default_dataset_id": null,
+  "reference_dataset_id": "...",
+  "id": "...",
+  "run_count": 9,
+  "latency_p50": 7.896,
+  "latency_p99": 13.09332,
+  "first_token_p50": null,
+  "first_token_p99": null,
+  "total_tokens": 35573,
+  "prompt_tokens": 32711,
+  "completion_tokens": 2862,
+  "total_cost": 0.206485,
+  "prompt_cost": 0.163555,
+  "completion_cost": 0.04293,
+  "tenant_id": "...",
+  "last_run_start_time": "2024-06-06T01:02:51.366397",
+  "last_run_start_time_live": null,
+  "feedback_stats": {
+    "cot contextual accuracy": {
+      "n": 9,
+      "avg": 0.6666666666666666,
+      "values": {
+        "CORRECT": 6,
+        "INCORRECT": 3
+      }
+    }
+  },
+  "session_feedback_stats": {},
+  "run_facets": [],
+  "error_rate": 0,
+  "streaming_rate": 0,
+  "test_run_number": 11
+}
+```
+
+여기에서 다음과 같은 성능 메트릭을 추출할 수 있습니다:
+
+* `latency_p50`: 50번째 백분위수 지연 시간(초 단위).
+* `latency_p99`: 99번째 백분위수 지연 시간(초 단위).
+* `total_tokens`: 사용된 총 토큰 수.
+* `prompt_tokens`: 사용된 prompt 토큰 수.
+* `completion_tokens`: 사용된 completion 토큰 수.
+* `total_cost`: 실험의 총 비용.
+* `prompt_cost`: prompt 토큰의 비용.
+* `completion_cost`: completion 토큰의 비용.
+* `feedback_stats`: 실험에 대한 피드백 통계.
+* `error_rate`: 실험의 오류율.
+* `first_token_p50`: 첫 번째 토큰 생성 시간의 50번째 백분위수 지연 시간(streaming 사용 시).
+* `first_token_p99`: 첫 번째 토큰 생성 시간의 99번째 백분위수 지연 시간(streaming 사용 시).
+
+다음은 Python 및 TypeScript SDK를 사용하여 실험의 성능 메트릭을 가져오는 방법의 예시입니다.
+
+먼저, 전제 조건으로 간단한 dataset을 생성합니다. 여기서는 Python으로만 시연하지만, TypeScript에서도 동일하게 수행할 수 있습니다. 평가에 대한 자세한 내용은 [how-to 가이드](/langsmith/evaluate-llm-application)를 참조하세요.
+
+```python
+from langsmith import Client
+
+client = Client()
+
+# Create a dataset
+dataset_name = "HelloDataset"
+dataset = client.create_dataset(dataset_name=dataset_name)
+
+examples = [
+    {
+        "inputs": {"input": "Harrison"},
+        "outputs": {"expected": "Hello Harrison"},
+    },
+    {
+        "inputs": {"input": "Ankush"},
+        "outputs": {"expected": "Hello Ankush"},
+    },
+]
+
+client.create_examples(dataset_id=dataset.id, examples=examples)
+```
+
+다음으로, 실험을 생성하고 `evaluate` 결과에서 실험 이름을 가져온 다음, 실험의 성능 메트릭을 가져옵니다.
+
+<CodeGroup>
+
+```python Python
+from langsmith.schemas import Example, Run
+dataset_name = "HelloDataset"
+
+def foo_label(root_run: Run, example: Example) -> dict:
+    return {"score": 1, "key": "foo"}
+
+from langsmith import evaluate
+
+results = evaluate(
+    lambda inputs: "Hello " + inputs["input"],
+    data=dataset_name,
+    evaluators=[foo_label],
+    experiment_prefix="Hello",
+)
+
+resp = client.read_project(project_name=results.experiment_name, include_stats=True)
+print(resp.json(indent=2))
+```
+
+```typescript TypeScript
+import { Client } from "langsmith";
+import { evaluate } from "langsmith/evaluation";
+import type { EvaluationResult } from "langsmith/evaluation";
+import type { Run, Example } from "langsmith/schemas";
+
+// Row-level evaluator
+function fooLabel(rootRun: Run, example: Example): EvaluationResult {
+    return {score: 1, key: "foo"};
+}
+
+const client = new Client();
+
+const results = await evaluate(
+    (inputs) => {
+        return { output: "Hello " + inputs.input };
+    },
+    {
+        data: "HelloDataset",
+        experimentPrefix: "Hello",
+        evaluators: [fooLabel],
+    }
+);
+
+const resp = await client.readProject({
+    projectName: results.experimentName,
+    includeStats: true
+})
+console.log(JSON.stringify(resp, null, 2))
+```
+
+</CodeGroup>
+```

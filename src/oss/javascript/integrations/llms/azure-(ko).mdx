@@ -1,0 +1,193 @@
+---
+title: Azure OpenAI
+---
+
+<Warning>
+**현재 Azure OpenAI 텍스트 completion 모델 사용에 관한 페이지를 보고 계십니다. 최신이자 가장 인기 있는 Azure OpenAI 모델은 [chat completion 모델](/oss/langchain/models)입니다.**
+
+
+특별히 `gpt-3.5-turbo-instruct`를 사용하는 것이 아니라면, [이 페이지](/oss/integrations/chat/azure/)를 찾고 계실 것입니다.
+</Warning>
+
+<Info>
+**이전에 LangChain.js는 전용 [Azure OpenAI SDK](https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/openai/openai)를 사용하여 Azure OpenAI와의 통합을 지원했습니다. 이 SDK는 이제 OpenAI SDK의 새로운 Azure 통합을 위해 더 이상 사용되지 않습니다. 새로운 통합을 통해 최신 OpenAI 모델과 기능에 출시 당일 접근할 수 있으며, OpenAI API와 Azure OpenAI 간의 원활한 전환이 가능합니다.**
+
+
+더 이상 사용되지 않는 SDK로 Azure OpenAI를 사용하고 있다면, 새로운 API로 업데이트하기 위해 [마이그레이션 가이드](#migration-from-azure-openai-sdk)를 참조하세요.
+
+</Info>
+
+
+[Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/)는 OpenAI의 강력한 언어 모델을 제공하는 Microsoft Azure 서비스입니다.
+
+이 문서는 LangChain을 사용하여 AzureOpenAI completion 모델(LLM)을 시작하는 데 도움을 드립니다. `AzureOpenAI` 기능 및 구성 옵션에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_openai.AzureOpenAI.html)를 참조하세요.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | [PY support](https://python.langchain.com/docs/integrations/llms/azure_openai) | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [AzureOpenAI](https://api.js.langchain.com/classes/langchain_openai.AzureOpenAI.html) | [@langchain/openai](https://api.js.langchain.com/modules/langchain_openai.html) | ❌ | ✅ | ✅ | ![NPM - Downloads](https://img.shields.io/npm/dm/@langchain/openai?style=flat-square&label=%20&) | ![NPM - Version](https://img.shields.io/npm/v/@langchain/openai?style=flat-square&label=%20&) |
+
+## Setup
+
+AzureOpenAI 모델에 접근하려면 Azure 계정을 생성하고, API 키를 받고, `@langchain/openai` 통합 패키지를 설치해야 합니다.
+
+### Credentials
+
+[azure.microsoft.com](https://azure.microsoft.com/)으로 이동하여 AzureOpenAI에 가입하고 API 키를 생성하세요.
+
+또한 Azure OpenAI 인스턴스를 배포해야 합니다. [이 가이드](https://learn.microsoft.com/azure/ai-services/openai/how-to/create-resource?pivots=web-portal)를 따라 Azure Portal에서 버전을 배포할 수 있습니다.
+
+인스턴스가 실행되면 인스턴스 이름과 키를 확인하세요. 키는 Azure Portal의 인스턴스 "Keys and Endpoint" 섹션에서 찾을 수 있습니다.
+
+Node.js를 사용하는 경우, 서비스를 사용하기 위해 다음 환경 변수를 정의할 수 있습니다:
+
+```bash
+AZURE_OPENAI_API_INSTANCE_NAME=<YOUR_INSTANCE_NAME>
+AZURE_OPENAI_API_DEPLOYMENT_NAME=<YOUR_DEPLOYMENT_NAME>
+AZURE_OPENAI_API_KEY=<YOUR_KEY>
+AZURE_OPENAI_API_VERSION="2024-02-01"
+```
+
+또는 `AzureOpenAI` constructor에 직접 값을 전달할 수 있습니다.
+
+모델 호출의 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
+
+```bash
+# export LANGSMITH_TRACING="true"
+# export LANGSMITH_API_KEY="your-api-key"
+```
+
+### Installation
+
+LangChain AzureOpenAI 통합은 `@langchain/openai` 패키지에 있습니다:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/openai @langchain/core
+```
+```bash yarn
+yarn add @langchain/openai @langchain/core
+```
+```bash pnpm
+pnpm add @langchain/openai @langchain/core
+```
+</CodeGroup>
+
+## Instantiation
+
+이제 모델 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
+
+```typescript
+import { AzureOpenAI } from "@langchain/openai"
+
+const llm = new AzureOpenAI({
+  model: "gpt-3.5-turbo-instruct",
+  azureOpenAIApiKey: "<your_key>", // In Node.js defaults to process.env.AZURE_OPENAI_API_KEY
+  azureOpenAIApiInstanceName: "<your_instance_name>", // In Node.js defaults to process.env.AZURE_OPENAI_API_INSTANCE_NAME
+  azureOpenAIApiDeploymentName: "<your_deployment_name>", // In Node.js defaults to process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME
+  azureOpenAIApiVersion: "<api_version>", // In Node.js defaults to process.env.AZURE_OPENAI_API_VERSION
+  temperature: 0,
+  maxTokens: undefined,
+  timeout: undefined,
+  maxRetries: 2,
+  // other params...
+})
+```
+
+## Invocation
+
+```typescript
+const inputText = "AzureOpenAI is an AI company that "
+
+const completion = await llm.invoke(inputText)
+completion
+```
+
+```output
+provides AI solutions to businesses. They offer a range of services including natural language processing, computer vision, and machine learning. Their solutions are designed to help businesses automate processes, gain insights from data, and improve decision-making. AzureOpenAI also offers consulting services to help businesses identify and implement the best AI solutions for their specific needs. They work with a variety of industries, including healthcare, finance, and retail. With their expertise in AI and their partnership with Microsoft Azure, AzureOpenAI is a trusted provider of AI solutions for businesses looking to stay ahead in the rapidly evolving world of technology.
+```
+
+## Using Azure Managed Identity
+
+Azure Managed Identity를 사용하는 경우, 다음과 같이 자격 증명을 구성할 수 있습니다:
+
+```typescript
+import {
+  DefaultAzureCredential,
+  getBearerTokenProvider,
+} from "@azure/identity";
+import { AzureOpenAI } from "@langchain/openai";
+
+const credentials = new DefaultAzureCredential();
+const azureADTokenProvider = getBearerTokenProvider(
+  credentials,
+  "https://cognitiveservices.azure.com/.default"
+);
+
+const managedIdentityLLM = new AzureOpenAI({
+  azureADTokenProvider,
+  azureOpenAIApiInstanceName: "<your_instance_name>",
+  azureOpenAIApiDeploymentName: "<your_deployment_name>",
+  azureOpenAIApiVersion: "<api_version>",
+});
+
+```
+
+## Using a different domain
+
+인스턴스가 기본 `openai.azure.com`이 아닌 다른 도메인에서 호스팅되는 경우, 대체 `AZURE_OPENAI_BASE_PATH` 환경 변수를 사용해야 합니다.
+예를 들어, `https://westeurope.api.microsoft.com/openai/deployments/{DEPLOYMENT_NAME}` 도메인에 연결하는 방법은 다음과 같습니다:
+
+```typescript
+import { AzureOpenAI } from "@langchain/openai";
+
+const differentDomainLLM = new AzureOpenAI({
+  azureOpenAIApiKey: "<your_key>", // In Node.js defaults to process.env.AZURE_OPENAI_API_KEY
+  azureOpenAIApiDeploymentName: "<your_deployment_name>", // In Node.js defaults to process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME
+  azureOpenAIApiVersion: "<api_version>", // In Node.js defaults to process.env.AZURE_OPENAI_API_VERSION
+  azureOpenAIBasePath:
+    "https://westeurope.api.microsoft.com/openai/deployments", // In Node.js defaults to process.env.AZURE_OPENAI_BASE_PATH
+});
+
+```
+
+## Migration from Azure OpenAI SDK
+
+`@langchain/azure-openai` 패키지와 함께 더 이상 사용되지 않는 Azure OpenAI SDK를 사용하고 있다면, 다음 단계에 따라 새로운 Azure 통합을 사용하도록 코드를 업데이트할 수 있습니다:
+
+1. 새로운 `@langchain/openai` 패키지를 설치하고 이전 `@langchain/azure-openai` 패키지를 제거합니다:
+
+   ```bash
+   npm install @langchain/openai
+   npm uninstall @langchain/azure-openai
+   ```
+
+2. `@langchain/openai` 패키지의 새로운 `AzureOpenAI` 및 @[`AzureChatOpenAI`] 클래스를 사용하도록 import를 업데이트합니다:
+
+   ```typescript
+   import { AzureOpenAI } from "@langchain/openai";
+   ```
+
+3. 새로운 `AzureOpenAI` 및 @[`AzureChatOpenAI`] 클래스를 사용하고 필요한 매개변수를 전달하도록 코드를 업데이트합니다:
+
+   ```typescript
+   const model = new AzureOpenAI({
+     azureOpenAIApiKey: "<your_key>",
+     azureOpenAIApiInstanceName: "<your_instance_name>",
+     azureOpenAIApiDeploymentName: "<your_deployment_name>",
+     azureOpenAIApiVersion: "<api_version>",
+   });
+   ```
+
+   이제 constructor가 `azureOpenAIEndpoint` 매개변수 대신 `azureOpenAIApiInstanceName` 매개변수를 요구하고, API 버전을 지정하기 위해 `azureOpenAIApiVersion` 매개변수를 추가한다는 점에 유의하세요.
+
+   - Azure Managed Identity를 사용하고 있었다면, 이제 `credentials` 대신 constructor에 `azureADTokenProvider` 매개변수를 사용해야 합니다. 자세한 내용은 [Azure Managed Identity](#using-azure-managed-identity) 섹션을 참조하세요.
+
+   - 환경 변수를 사용하고 있었다면, 이제 `AZURE_OPENAI_API_ENDPOINT` 대신 `AZURE_OPENAI_API_INSTANCE_NAME` 환경 변수를 설정하고, API 버전을 지정하기 위해 `AZURE_OPENAI_API_VERSION` 환경 변수를 추가해야 합니다.
+
+## API reference
+
+모든 AzureOpenAI 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_openai.AzureOpenAI.html)를 참조하세요.

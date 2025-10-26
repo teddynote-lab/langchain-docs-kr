@@ -1,0 +1,84 @@
+```markdown
+---
+title: Instructor로 추적하기
+sidebarTitle: Instructor (Python 전용)
+---
+
+LangSmith는 LLM으로 구조화된 출력을 생성하기 위한 인기 있는 오픈소스 라이브러리인 [Instructor](https://python.useinstructor.com/)와의 편리한 통합을 제공합니다.
+
+사용하려면 먼저 LangSmith API key를 설정해야 합니다.
+
+```shell
+export LANGSMITH_API_KEY=<your-api-key>
+# For LangSmith API keys linked to multiple workspaces, set the LANGSMITH_WORKSPACE_ID environment variable to specify which workspace to use.
+export LANGSMITH_WORKSPACE_ID=<your-workspace-id>
+```
+
+다음으로 LangSmith SDK를 설치해야 합니다:
+
+<CodeGroup>
+```bash pip
+pip install -U langsmith
+```
+
+```bash uv
+uv add langsmith
+```
+</CodeGroup>
+
+`langsmith.wrappers.wrap_openai`로 OpenAI client를 래핑하세요
+
+```python
+from openai import OpenAI
+from langsmith import wrappers
+
+client = wrappers.wrap_openai(OpenAI())
+```
+
+이후 `instructor`를 사용하여 래핑된 OpenAI client를 패치할 수 있습니다:
+
+```python
+import instructor
+
+client = instructor.patch(client)
+```
+
+이제 `instructor`를 평소처럼 사용할 수 있지만, 모든 것이 LangSmith에 기록됩니다!
+
+```python
+from pydantic import BaseModel
+
+
+class UserDetail(BaseModel):
+    name: str
+    age: int
+
+
+user = client.chat.completions.create(
+    model="gpt-4o-mini",
+    response_model=UserDetail,
+    messages=[
+        {"role": "user", "content": "Extract Jason is 25 years old"},
+    ]
+)
+```
+
+종종 다른 함수 내부에서 `instructor`를 사용하게 됩니다.
+이 래핑된 client를 사용하고 해당 함수들을 `@traceable`로 데코레이팅하여 중첩된 trace를 얻을 수 있습니다.
+`@traceable` decorator를 사용한 코드 추적 어노테이션 방법에 대한 자세한 내용은 [이 가이드](./annotate-code)를 참조하세요.
+
+```python {highlight={2}}
+# You can customize the run name with the `name` keyword argument
+@traceable(name="Extract User Details")
+def my_function(text: str) -> UserDetail:
+    return client.chat.completions.create(
+        model="gpt-4o-mini",
+        response_model=UserDetail,
+        messages=[
+            {"role": "user", "content": f"Extract {text}"},
+        ]
+    )
+
+my_function("Jason is 25 years old")
+```
+```

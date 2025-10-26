@@ -1,0 +1,56 @@
+---
+title: PromptLayer
+---
+
+>[PromptLayer](https://docs.promptlayer.com/introduction)는 prompt engineering을 위한 플랫폼입니다.
+> 또한 요청을 시각화하고, prompt 버전을 관리하며, 사용량을 추적하는 LLM observability 기능을 제공합니다.
+>
+>`PromptLayer`는 LangChain과 직접 통합되는 LLM을 제공하지만(예:
+> [`PromptLayerOpenAI`](https://docs.promptlayer.com/languages/langchain)),
+> callback을 사용하는 것이 `PromptLayer`를 LangChain과 통합하는 권장 방법입니다.
+
+## Installation and Setup
+
+`PromptLayer`를 사용하려면 다음이 필요합니다:
+- `PromptLayer` 계정 생성
+- API token을 생성하고 환경 변수로 설정 (`PROMPTLAYER_API_KEY`)
+
+Python package 설치:
+
+<CodeGroup>
+```bash pip
+pip install promptlayer
+```
+
+```bash uv
+uv add promptlayer
+```
+</CodeGroup>
+
+
+## Callback
+
+[사용 예제](/oss/integrations/callbacks/promptlayer)를 참조하세요.
+
+```python
+import promptlayer  # Don't forget this import!
+from langchain.callbacks import PromptLayerCallbackHandler
+```
+
+
+## LLM
+
+[사용 예제](/oss/integrations/llms/promptlayer_openai)를 참조하세요.
+
+```python
+from langchain_community.llms import PromptLayerOpenAI
+```
+
+
+## Chat Models
+
+[사용 예제](/oss/integrations/chat/promptlayer_chatopenai)를 참조하세요.
+
+```python
+from langchain_community.chat_models import PromptLayerChatOpenAI
+```

@@ -1,0 +1,49 @@
+```mdx
+---
+title: Jira
+---
+
+<Tip>
+**호환성**
+
+Node.js에서만 사용 가능합니다.
+</Tip>
+
+Jira 프로젝트의 이슈에서 document 객체를 로드하는 방법을 다룹니다.
+
+## Credentials
+
+- 요청을 인증하기 위해 access token을 설정하고 Jira 사용자 이름과 함께 제공해야 합니다
+- 또한 document로 로드할 이슈가 포함된 프로젝트의 project key와 host URL이 필요합니다.
+
+## Usage
+
+```typescript
+import { JiraProjectLoader } from "@langchain/community/document_loaders/web/jira";
+
+const host = process.env.JIRA_HOST || "https://jira.example.com";
+const username = process.env.JIRA_USERNAME;
+const accessToken = process.env.JIRA_ACCESS_TOKEN;
+const projectKey = process.env.JIRA_PROJECT_KEY || "PROJ";
+
+if (username && accessToken) {
+  // Created within last 30 days
+  const createdAfter = new Date();
+  createdAfter.setDate(createdAfter.getDate() - 30);
+  const loader = new JiraProjectLoader({
+    host,
+    projectKey,
+    username,
+    accessToken,
+    createdAfter,
+  });
+
+  const documents = await loader.load();
+  console.log(`Loaded ${documents.length} Jira document(s)`);
+} else {
+  console.log(
+    "You must provide a username and access token to run this example."
+  );
+}
+```
+```

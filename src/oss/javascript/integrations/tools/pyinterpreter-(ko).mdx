@@ -1,0 +1,65 @@
+---
+title: Python interpreter tool
+---
+
+<Warning>
+이 도구는 코드를 실행하며 잠재적으로 파괴적인 작업을 수행할 수 있습니다. 전달되는 코드를 신뢰할 수 있는지 주의하세요!
+</Warning>
+
+LangChain은 임의의 Python 코드를 실행하기 위한 실험적인 도구를 제공합니다.
+이는 더 강력한 계산을 수행하기 위해 코드를 생성할 수 있는 LLM과 결합하여 유용하게 사용할 수 있습니다.
+
+## Usage
+
+```typescript
+import { OpenAI } from "@langchain/openai";
+import { PythonInterpreterTool } from "@langchain/community/experimental/tools/pyinterpreter";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { StringOutputParser } from "@langchain/core/output_parsers";
+
+const prompt = ChatPromptTemplate.fromTemplate(
+  `Generate python code that does {input}. Do not generate anything else.`
+);
+
+const model = new OpenAI({});
+
+const interpreter = await PythonInterpreterTool.initialize({
+  indexURL: "../node_modules/pyodide",
+});
+
+// Note: In Deno, it may be easier to initialize the interpreter yourself:
+// import pyodideModule from "npm:pyodide/pyodide.js";
+// import { PythonInterpreterTool } from "npm:@langchain/community/experimental/tools/pyinterpreter";
+
+// const pyodide = await pyodideModule.loadPyodide();
+// const pythonTool = new PythonInterpreterTool({instance: pyodide})
+
+const chain = prompt
+  .pipe(model)
+  .pipe(new StringOutputParser())
+  .pipe(interpreter);
+
+const result = await chain.invoke({
+  input: `prints "Hello LangChain"`,
+});
+
+console.log(JSON.parse(result).stdout);
+
+// To install python packages:
+// This uses the loadPackages command.
+// This works for packages built with pyodide.
+await interpreter.addPackage("numpy");
+// But for other packages, you will want to use micropip.
+// See: https://pyodide.org/en/stable/usage/loading-packages.html
+// for more information
+await interpreter.addPackage("micropip");
+// The following is roughly equivalent to:
+// pyodide.runPython(`import ${pkgname}; ${pkgname}`);
+const micropip = interpreter.pyodideInstance.pyimport("micropip");
+await micropip.install("numpy");
+```
+
+## Related
+
+- Tool [conceptual guide](/oss/langchain/tools)
+- Tool [how-to guides](/oss/langchain/tools)

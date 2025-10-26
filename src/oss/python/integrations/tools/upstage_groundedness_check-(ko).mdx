@@ -1,0 +1,47 @@
+---
+title: Upstage Groundedness Check
+---
+
+이 노트북은 Upstage groundedness check 모델을 시작하는 방법을 다룹니다.
+
+## Installation
+
+`langchain-upstage` 패키지를 설치합니다.
+
+```bash
+pip install -U langchain-upstage
+```
+
+## Environment Setup
+
+다음 환경 변수를 설정해야 합니다:
+
+- `UPSTAGE_API_KEY`: [Upstage developers document](https://developers.upstage.ai/docs/getting-started/quick-start)에서 발급받은 Upstage API key
+
+```python
+import os
+
+os.environ["UPSTAGE_API_KEY"] = "YOUR_API_KEY"
+```
+
+## Usage
+
+`UpstageGroundednessCheck` class를 초기화합니다.
+
+```python
+from langchain_upstage import UpstageGroundednessCheck
+
+groundedness_check = UpstageGroundednessCheck()
+```
+
+`run` method를 사용하여 입력 텍스트의 groundedness를 확인합니다.
+
+```python
+request_input = {
+    "context": "Mauna Kea is an inactive volcano on the island of Hawai'i. Its peak is 4,207.3 m above sea level, making it the highest point in Hawaii and second-highest peak of an island on Earth.",
+    "answer": "Mauna Kea is 5,207.3 meters tall.",
+}
+
+response = groundedness_check.invoke(request_input)
+print(response)
+```

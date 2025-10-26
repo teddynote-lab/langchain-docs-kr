@@ -1,0 +1,95 @@
+---
+title: GPT4All
+---
+
+[GitHub:nomic-ai/gpt4all](https://github.com/nomic-ai/gpt4all)은 코드, 스토리, 대화를 포함한 방대한 양의 깨끗한 어시스턴트 데이터로 학습된 오픈소스 챗봇 생태계입니다.
+
+이 예제는 LangChain을 사용하여 `GPT4All` 모델과 상호작용하는 방법을 다룹니다.
+
+```python
+pip install -qU langchain-community gpt4all
+```
+
+### GPT4All Import하기
+
+```python
+from langchain_community.llms import GPT4All
+from langchain_core.prompts import PromptTemplate
+```
+
+### LLM에 전달할 질문 설정하기
+
+```python
+template = """Question: {question}
+
+Answer: Let's think step by step."""
+
+prompt = PromptTemplate.from_template(template)
+```
+
+### 모델 지정하기
+
+로컬에서 실행하려면 호환되는 ggml 형식의 모델을 다운로드하세요.
+
+[gpt4all 페이지](https://gpt4all.io/index.html)에는 유용한 `Model Explorer` 섹션이 있습니다:
+
+* 관심 있는 모델을 선택하세요
+* UI를 사용하여 다운로드하고 `.bin` 파일을 `local_path`(아래 참고)로 이동하세요
+
+자세한 정보는 [github.com/nomic-ai/gpt4all](https://github.com/nomic-ai/gpt4all)을 방문하세요.
+
+---
+
+이 통합은 아직 [`.stream()`](https://python.langchain.com/docs/how_to/streaming/) 메서드를 통한 청크 단위 streaming을 지원하지 않습니다. 아래 예제는 `streaming=True`와 함께 callback handler를 사용합니다:
+
+```python
+local_path = (
+    "./models/Meta-Llama-3-8B-Instruct.Q4_0.gguf"  # replace with your local file path
+)
+```
+
+```python
+from langchain_core.callbacks import BaseCallbackHandler
+
+count = 0
+
+
+class MyCustomHandler(BaseCallbackHandler):
+    def on_llm_new_token(self, token: str, **kwargs) -> None:
+        global count
+        if count < 10:
+            print(f"Token: {token}")
+            count += 1
+
+
+# Verbose is required to pass to the callback manager
+llm = GPT4All(model=local_path, callbacks=[MyCustomHandler()], streaming=True)
+
+# If you want to use a custom model add the backend parameter
+# Check https://docs.gpt4all.io/gpt4all_python.html for supported backends
+# llm = GPT4All(model=local_path, backend="gptj", callbacks=callbacks, streaming=True)
+
+chain = prompt | llm
+
+question = "What NFL team won the Super Bowl in the year Justin Bieber was born?"
+
+# Streamed tokens will be logged/aggregated via the passed callback
+res = chain.invoke({"question": question})
+```
+
+```output
+Token:  Justin
+Token:  Bieber
+Token:  was
+Token:  born
+Token:  on
+Token:  March
+Token:
+Token: 1
+Token: ,
+Token:
+```
+
+```python
+
+```

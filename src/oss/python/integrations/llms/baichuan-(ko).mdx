@@ -1,0 +1,54 @@
+---
+title: Baichuan LLM
+---
+
+Baichuan Inc. ([www.baichuan-ai.com/](https://www.baichuan-ai.com/))는 AGI 시대의 중국 스타트업으로, 인류의 근본적인 요구사항인 효율성, 건강, 행복을 해결하는 데 전념하고 있습니다.
+
+```python
+##Installing the langchain packages needed to use the integration
+pip install -qU langchain-community
+```
+
+## 사전 요구사항
+
+Baichuan LLM API에 접근하려면 API key가 필요합니다. [platform.baichuan-ai.com/](https://platform.baichuan-ai.com/)을 방문하여 API key를 발급받으세요.
+
+## Baichuan LLM 사용하기
+
+```python
+import os
+
+os.environ["BAICHUAN_API_KEY"] = "YOUR_API_KEY"
+```
+
+```python
+from langchain_community.llms import BaichuanLLM
+
+# Load the model
+llm = BaichuanLLM()
+
+res = llm.invoke("What's your name?")
+print(res)
+```
+
+```python
+res = llm.generate(prompts=["你好！"])
+res
+```
+
+```python
+for res in llm.stream("Who won the second world war?"):
+    print(res)
+```
+
+```python
+import asyncio
+
+
+async def run_aio_stream():
+    async for res in llm.astream("Write a poem about the sun."):
+        print(res)
+
+
+asyncio.run(run_aio_stream())
+```

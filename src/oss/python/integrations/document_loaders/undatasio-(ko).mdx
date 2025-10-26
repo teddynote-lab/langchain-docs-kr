@@ -1,0 +1,110 @@
+---
+title: UnDatasIO
+---
+
+이 노트북은 __UnDatasIO document loader__를 시작하기 위한 빠른 개요를 제공합니다. UnDatasIO는 PDF, PNG, JPG, JPEG, JFIF를 포함한 다양한 문서 형식의 효율적인 로딩 및 파싱을 가능하게 하며, document lazy loading 및 네이티브 async 지원과 같은 기능을 UnDatasIO의 안전한 클라우드 API를 통해 제공합니다. 이러한 기능들은 처리된 데이터를 RAG와 같은 생성형 AI 워크플로우에 바로 사용할 수 있도록 준비합니다.
+
+모든 기능 및 구성에 대한 자세한 문서는 공식 API 레퍼런스를 참조하세요.
+
+## Overview
+
+### Loader features
+
+| Source | Document Lazy Loading | Native Async Support |
+| :---: | :---: | :---: |
+| UnDatasIOLoader | ✅ | ✅ |
+
+## Setup
+
+### Credentials
+
+UnDatasIO는 API token이 필요합니다.
+[undatas.io](https://undatas.io)에서 무료 token을 생성하고 아래 셀에 설정하세요:
+
+```python
+import getpass
+import os
+
+if "UNDATASIO_TOKEN" not in os.environ:
+    os.environ["UNDATASIO_TOKEN"] = getpass.getpass(
+        "Enter your UnDatasIO API token: "
+    )
+```
+
+### Installation
+
+#### Normal Installation
+
+다음 패키지들은 이 노트북의 나머지 부분을 실행하는 데 필요합니다.
+
+```python
+# Install package, compatible with API partitioning
+pip install langchain-undatasio
+```
+
+### Initialization
+
+__UnDatasIOLoader__는 UnDatasIO 클라우드 API를 통한 단일 파일 업로드 및 파싱을 지원합니다.
+
+```python
+from langchain_undatasio import UnDatasIOLoader
+
+loader = UnDatasIOLoader(
+    token=os.environ["UNDATASIO_TOKEN"],
+    file_path="demo.pdf"
+)
+```
+
+### Load
+
+```python
+docs = loader.load()
+docs[0]
+```
+
+```output
+Document(
+    metadata={'source': 'demo.pdf', 'task_id': 't1', 'file_id': 'f1'},
+    page_content='Growing a Tail: Increasing Output Diversity in Large Language Models\n\nAuthors: Michal Shur-Ofry1, Bar Horowitz-Amsalem1†, Adir Rahamim2, Yonatan Belinkov2*\n\nAffiliations:\n\n1Law Faculty, Hebrew University of Jerusalem; Jerusalem, Israel.\n\n2Faculty of Computer Science, Technion – I'
+)
+```
+
+```python
+print(docs[0].page_content[:300])
+```
+
+```output
+Growing a Tail: Increasing Output Diversity in Large Language Models
+
+Authors: Michal Shur-Ofry1, Bar Horowitz-Amsalem1†, Adir Rahamim2, Yonatan Belinkov2*
+
+Affiliations:
+
+1Law Faculty, Hebrew University of Jerusalem; Jerusalem, Israel.
+
+2Faculty of Computer Science, Technion – I
+```
+
+### Lazy Load
+
+__UnDatasIOLoader__는 메모리 효율적인 반복을 위한 lazy loading을 지원합니다.
+
+```python
+pages = []
+for doc in loader.lazy_load():
+    pages.append(doc)
+
+pages[0]
+```
+
+```output
+Document(
+    metadata={'source': 'demo.pdf', 'task_id': 't1', 'file_id': 'f1'},
+    page_content='Growing a Tail: Increasing Output Diversity in Large Language Models\n\nAuthors: Michal Shur-Ofry1, Bar Horowitz-Amsalem1†, Adir Rahamim2, Yonatan Belinkov2*\n\nAffiliations:\n\n1Law Faculty, Hebrew University of Jerusalem; Jerusalem, Israel.\n\n2Faculty of Computer Science, Technion – I'
+)
+```
+
+## See Also
+
+- [UnDatasIO](https://undatas.io)
+- [langchain-undatasio](https://pypi.org/project/langchain-undatasio/)

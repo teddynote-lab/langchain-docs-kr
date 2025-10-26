@@ -1,0 +1,177 @@
+---
+title: Oracle AI Vector Search 문서 처리
+---
+
+Oracle AI Vector Search는 키워드가 아닌 의미론을 기반으로 데이터를 쿼리할 수 있는 인공지능(AI) 워크로드를 위해 설계되었습니다.
+Oracle AI Vector Search의 가장 큰 장점 중 하나는 비정형 데이터에 대한 의미론적 검색과 비즈니스 데이터에 대한 관계형 검색을 하나의 단일 시스템에서 결합할 수 있다는 것입니다.
+이는 강력할 뿐만 아니라 전문화된 vector database를 추가할 필요가 없어 여러 시스템 간의 데이터 분산으로 인한 문제를 제거하므로 훨씬 더 효과적입니다.
+
+또한, vector는 다음과 같은 Oracle Database의 가장 강력한 기능들의 이점을 누릴 수 있습니다:
+
+* [Partitioning Support](https://www.oracle.com/database/technologies/partitioning.html)
+* [Real Application Clusters scalability](https://www.oracle.com/database/real-application-clusters/)
+* [Exadata smart scans](https://www.oracle.com/database/technologies/exadata/software/smartscan/)
+* [Shard processing across geographically distributed databases](https://www.oracle.com/database/distributed-database/)
+* [Transactions](https://docs.oracle.com/en/database/oracle/oracle-database/23/cncpt/transactions.html)
+* [Parallel SQL](https://docs.oracle.com/en/database/oracle/oracle-database/21/vldbg/parallel-exec-intro.html#GUID-D28717E4-0F77-44F5-BB4E-234C31D4E4BA)
+* [Disaster recovery](https://www.oracle.com/database/data-guard/)
+* [Security](https://www.oracle.com/security/database-security/)
+* [Oracle Machine Learning](https://www.oracle.com/artificial-intelligence/database-machine-learning/)
+* [Oracle Graph Database](https://www.oracle.com/database/integrated-graph-database/)
+* [Oracle Spatial and Graph](https://www.oracle.com/database/spatial/)
+* [Oracle Blockchain](https://docs.oracle.com/en/database/oracle/oracle-database/23/arpls/dbms_blockchain_table.html#GUID-B469E277-978E-4378-A8C1-26D3FF96C9A6)
+* [JSON](https://docs.oracle.com/en/database/oracle/oracle-database/23/adjsn/json-in-oracle-database.html)
+
+이 가이드는 Oracle AI Vector Search 내의 Document Processing 기능을 사용하여 OracleDocLoader와 OracleTextSplitter를 각각 사용하여 문서를 로드하고 청크로 나누는 방법을 보여줍니다.
+
+Oracle Database를 처음 시작하는 경우, 데이터베이스 환경 설정에 대한 훌륭한 소개를 제공하는 [무료 Oracle 23 AI](https://www.oracle.com/database/free/#resources)를 탐색해 보시기 바랍니다. 데이터베이스 작업 시 기본적으로 system user를 사용하지 않는 것이 좋으며, 대신 보안 강화와 사용자 정의를 위해 자체 user를 생성할 수 있습니다. user 생성에 대한 자세한 단계는 Oracle에서 user를 설정하는 방법도 보여주는 [엔드 투 엔드 가이드](https://github.com/langchain-ai/langchain/blob/v0.3/cookbook/oracleai_demo.ipynb)를 참조하세요. 또한 user 권한을 이해하는 것은 데이터베이스 보안을 효과적으로 관리하는 데 매우 중요합니다. 이 주제에 대한 자세한 내용은 user 계정 및 보안 관리에 대한 공식 [Oracle 가이드](https://docs.oracle.com/en/database/oracle/oracle-database/19/admqs/administering-user-accounts-and-security.html#GUID-36B21D72-1BBB-46C9-A0C9-F0D2A8591B8D)에서 확인할 수 있습니다.
+
+### 사전 요구사항
+
+Oracle AI Vector Search와 함께 LangChain을 사용하려면 Oracle Python Client driver를 설치하세요.
+
+```python
+# pip install oracledb
+```
+
+### Oracle Database에 연결
+
+다음 샘플 코드는 Oracle Database에 연결하는 방법을 보여줍니다. 기본적으로 python-oracledb는 Oracle Database에 직접 연결하는 'Thin' 모드로 실행됩니다. 이 모드는 Oracle Client 라이브러리가 필요하지 않습니다. 그러나 python-oracledb가 이를 사용할 때 일부 추가 기능을 사용할 수 있습니다. Oracle Client 라이브러리를 사용할 때 Python-oracledb는 'Thick' 모드에 있다고 합니다. 두 모드 모두 Python Database API v2.0 사양을 지원하는 포괄적인 기능을 제공합니다. 각 모드에서 지원되는 기능에 대해 설명하는 다음 [가이드](https://python-oracledb.readthedocs.io/en/latest/user_guide/appendix_a.html#featuresummary)를 참조하세요. thin-mode를 사용할 수 없는 경우 thick-mode로 전환할 수 있습니다.
+
+```python
+import sys
+
+import oracledb
+
+# please update with your username, password, hostname and service_name
+username = "<username>"
+password = "<password>"
+dsn = "<hostname>/<service_name>"
+
+try:
+    conn = oracledb.connect(user=username, password=password, dsn=dsn)
+    print("Connection successful!")
+except Exception as e:
+    print("Connection failed!")
+    sys.exit(1)
+```
+
+이제 테이블을 생성하고 테스트할 샘플 문서를 삽입해 보겠습니다.
+
+```python
+try:
+    cursor = conn.cursor()
+
+    drop_table_sql = """drop table if exists demo_tab"""
+    cursor.execute(drop_table_sql)
+
+    create_table_sql = """create table demo_tab (id number, data clob)"""
+    cursor.execute(create_table_sql)
+
+    insert_row_sql = """insert into demo_tab values (:1, :2)"""
+    rows_to_insert = [
+        (
+            1,
+            "If the answer to any preceding questions is yes, then the database stops the search and allocates space from the specified tablespace; otherwise, space is allocated from the database default shared temporary tablespace.",
+        ),
+        (
+            2,
+            "A tablespace can be online (accessible) or offline (not accessible) whenever the database is open.\nA tablespace is usually online so that its data is available to users. The SYSTEM tablespace and temporary tablespaces cannot be taken offline.",
+        ),
+        (
+            3,
+            "The database stores LOBs differently from other data types. Creating a LOB column implicitly creates a LOB segment and a LOB index. The tablespace containing the LOB segment and LOB index, which are always stored together, may be different from the tablespace containing the table.\nSometimes the database can store small amounts of LOB data in the table itself rather than in a separate LOB segment.",
+        ),
+    ]
+    cursor.executemany(insert_row_sql, rows_to_insert)
+
+    conn.commit()
+
+    print("Table created and populated.")
+    cursor.close()
+except Exception as e:
+    print("Table creation failed.")
+    cursor.close()
+    conn.close()
+    sys.exit(1)
+```
+
+### 문서 로드
+
+사용자는 loader 매개변수를 적절히 구성하여 Oracle Database, 파일 시스템 또는 둘 다에서 문서를 유연하게 로드할 수 있습니다. 이러한 매개변수에 대한 포괄적인 세부 정보는 [Oracle AI Vector Search 가이드](https://docs.oracle.com/en/database/oracle/oracle-database/23/arpls/dbms_vector_chain1.html#GUID-73397E89-92FB-48ED-94BB-1AD960C4EA1F)를 참조하세요.
+
+OracleDocLoader를 사용하는 중요한 장점은 150개 이상의 다양한 파일 형식을 처리할 수 있어 다양한 문서 유형에 대해 여러 loader가 필요하지 않다는 것입니다. 지원되는 형식의 전체 목록은 [Oracle Text Supported Document Formats](https://docs.oracle.com/en/database/oracle/oracle-database/23/ccref/oracle-text-supported-document-formats.html)를 참조하세요.
+
+다음은 OracleDocLoader를 사용하는 방법을 보여주는 샘플 코드 스니펫입니다
+
+```python
+from langchain_community.document_loaders.oracleai import OracleDocLoader
+from langchain_core.documents import Document
+
+"""
+# loading a local file
+loader_params = {}
+loader_params["file"] = "<file>"
+
+# loading from a local directory
+loader_params = {}
+loader_params["dir"] = "<directory>"
+"""
+
+# loading from Oracle Database table
+loader_params = {
+    "owner": "<owner>",
+    "tablename": "demo_tab",
+    "colname": "data",
+}
+
+""" load the docs """
+loader = OracleDocLoader(conn=conn, params=loader_params)
+docs = loader.load()
+
+""" verify """
+print(f"Number of docs loaded: {len(docs)}")
+# print(f"Document-0: {docs[0].page_content}") # content
+```
+
+### 문서 분할
+
+문서는 작은 것부터 매우 큰 것까지 크기가 다양할 수 있습니다. 사용자는 embedding 생성을 용이하게 하기 위해 문서를 더 작은 섹션으로 청크하는 것을 선호하는 경우가 많습니다. 이 분할 프로세스에 대해 다양한 사용자 정의 옵션을 사용할 수 있습니다. 이러한 매개변수에 대한 포괄적인 세부 정보는 [Oracle AI Vector Search 가이드](https://docs.oracle.com/en/database/oracle/oracle-database/23/arpls/dbms_vector_chain1.html#GUID-4E145629-7098-4C7C-804F-FC85D1F24240)를 참조하세요.
+
+다음은 이를 구현하는 방법을 보여주는 샘플 코드입니다:
+
+```python
+from langchain_community.document_loaders.oracleai import OracleTextSplitter
+from langchain_core.documents import Document
+
+"""
+# Some examples
+# split by chars, max 500 chars
+splitter_params = {"split": "chars", "max": 500, "normalize": "all"}
+
+# split by words, max 100 words
+splitter_params = {"split": "words", "max": 100, "normalize": "all"}
+
+# split by sentence, max 20 sentences
+splitter_params = {"split": "sentence", "max": 20, "normalize": "all"}
+"""
+
+# split by default parameters
+splitter_params = {"normalize": "all"}
+
+# get the splitter instance
+splitter = OracleTextSplitter(conn=conn, params=splitter_params)
+
+list_chunks = []
+for doc in docs:
+    chunks = splitter.split_text(doc.page_content)
+    list_chunks.extend(chunks)
+
+""" verify """
+print(f"Number of Chunks: {len(list_chunks)}")
+# print(f"Chunk-0: {list_chunks[0]}") # content
+```
+
+### 엔드 투 엔드 데모
+
+Oracle AI Vector Search의 도움으로 엔드 투 엔드 RAG 파이프라인을 구축하려면 전체 데모 가이드 [Oracle AI Vector Search 엔드 투 엔드 데모 가이드](https://github.com/langchain-ai/langchain/blob/v0.3/cookbook/oracleai_demo.ipynb)를 참조하세요.

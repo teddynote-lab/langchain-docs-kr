@@ -1,0 +1,52 @@
+---
+title: ClickHouse에 대한 지원 쿼리 실행
+sidebarTitle: ClickHouse에 대한 지원 쿼리 실행
+---
+
+이 Helm repository는 LangSmith UI가 현재 직접 지원하지 않는 출력을 생성하는 쿼리를 포함하고 있습니다 (예: Clickhouse에서 쿼리 예외 로그 가져오기).
+
+이 명령은 이름과 비밀번호가 포함된 clickhouse 연결 문자열을 받아(secrets manager 호출에서 전달될 수 있음) 입력 파일의 쿼리를 실행합니다. 아래 예시에서는 `support_queries/clickhouse` 디렉토리의 `ch_get_query_exceptions.sql` 입력 파일을 사용하고 있습니다.
+
+### 사전 요구사항
+
+다음 도구/항목을 준비했는지 확인하세요.
+
+1. kubectl
+
+   * [https://kubernetes.io/docs/tasks/tools/](https://kubernetes.io/docs/tasks/tools/)
+
+2. Clickhouse database 자격 증명
+
+   * Host
+   * Port
+   * Username
+     * 번들 버전을 사용하는 경우, `default`입니다
+   * Password
+     * 번들 버전을 사용하는 경우, `password`입니다
+   * Database name
+     * 번들 버전을 사용하는 경우, `default`입니다
+
+3. 마이그레이션 스크립트를 실행할 머신에서 Clickhouse database로의 연결
+
+   * 번들 버전을 사용하는 경우, clickhouse service를 로컬 머신으로 port forward해야 할 수 있습니다.
+   * `kubectl port-forward svc/langsmith-clickhouse 8123:8123`을 실행하여 clickhouse service를 로컬 머신으로 port forward하세요.
+
+4. 지원 쿼리를 실행할 스크립트
+
+   * [여기](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/scripts/run_support_query_ch.sh)에서 스크립트를 다운로드할 수 있습니다
+
+### 쿼리 스크립트 실행
+
+원하는 쿼리를 실행하려면 다음 명령을 실행하세요:
+
+```bash
+sh run_support_query_ch.sh <clickhouse_url> --input path/to/query.sql
+```
+
+예를 들어, port-forwarding과 함께 번들 버전을 사용하는 경우, 명령은 다음과 같을 수 있습니다:
+
+```bash
+sh run_support_query_ch.sh "clickhouse://default:password@localhost:8123/default" --input support_queries/clickhouse/ch_get_query_exceptions.sql
+```
+
+이는 지난 7일 동안 Clickhouse에서 예외를 발생시킨 모든 쿼리에 대한 쿼리 로그를 출력합니다. 이를 파일로 추출하려면 `--output path/to/file.csv` 플래그를 추가하세요

@@ -1,0 +1,52 @@
+---
+title: Dria Retriever
+---
+
+[Dria](https://dria.co/) retriever는 에이전트가 포괄적인 지식 허브에서 텍스트 기반 검색을 수행할 수 있도록 합니다.
+
+## Setup
+
+Dria retriever를 사용하려면 먼저 Dria JS client를 설치하세요:
+
+```bash npm
+npm install dria
+```
+retriever에 두 가지를 제공해야 합니다:
+
+- **API Key**: 계정을 생성한 후 [프로필 페이지](https://dria.co/)에서 받을 수 있습니다.
+- **Contract ID**: 지식을 볼 때 페이지 상단이나 URL에서 확인할 수 있습니다.
+  예를 들어, Bitcoin 백서는 Dria에 https://dria.co/knowledge/2KxNbEb040GKQ1DSDNDsA-Fsj_BlQIEAlzBNuiapBR0 에 업로드되어 있으므로, contract ID는 `2KxNbEb040GKQ1DSDNDsA-Fsj_BlQIEAlzBNuiapBR0`입니다.
+    Contract ID는 인스턴스화 시 생략할 수 있으며, 나중에 `dria.contractId = "your-contract"`를 통해 설정할 수 있습니다.
+
+Dria retriever는 기본 [Dria client](https://npmjs.com/package/dria)도 노출합니다. client에 대해 자세히 알아보려면 [Dria 문서](https://github.com/firstbatchxyz/dria-js-client?tab=readme-ov-file#usage)를 참조하세요.
+
+## Usage
+
+<Tip>
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install dria @langchain/community @langchain/core
+```
+
+```typescript
+import { DriaRetriever } from "@langchain/community/retrievers/dria";
+
+// contract of TypeScript Handbook v4.9 uploaded to Dria
+// https://dria.co/knowledge/-B64DjhUtCwBdXSpsRytlRQCu-bie-vSTvTIT8Ap3g0
+const contractId = "-B64DjhUtCwBdXSpsRytlRQCu-bie-vSTvTIT8Ap3g0";
+
+const retriever = new DriaRetriever({
+  contractId, // a knowledge to connect to
+  apiKey: "DRIA_API_KEY", // if not provided, will check env for `DRIA_API_KEY`
+  topK: 15, // optional: default value is 10
+});
+
+const docs = await retriever.invoke("What is a union type?");
+console.log(docs);
+```
+
+## Related
+
+- [Retrieval 가이드](/oss/langchain/retrieval)

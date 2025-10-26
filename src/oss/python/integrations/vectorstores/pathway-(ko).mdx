@@ -1,0 +1,86 @@
+---
+title: Pathway
+---
+
+> [Pathway](https://pathway.com/)는 오픈 데이터 처리 프레임워크입니다. 실시간 데이터 소스와 변화하는 데이터로 동작하는 데이터 변환 파이프라인과 Machine Learning 애플리케이션을 손쉽게 개발할 수 있습니다.
+
+이 노트북은 라이브 `Pathway` 데이터 인덱싱 파이프라인을 `LangChain`과 함께 사용하는 방법을 보여줍니다. 일반적인 vector store를 사용하는 것과 동일한 방식으로, 체인에서 이 파이프라인의 결과를 쿼리할 수 있습니다. 하지만 내부적으로는, Pathway가 데이터 변경마다 인덱스를 업데이트하여 항상 최신의 답변을 제공합니다.
+
+이 노트북에서는 다음을 수행하는 [공개 데모 문서 처리 파이프라인](https://pathway.com/solutions/ai-pipelines#try-it-out)을 사용합니다:
+
+1. 여러 클라우드 데이터 소스의 변경 사항을 모니터링합니다.
+2. 데이터에 대한 vector index를 빌드합니다.
+
+자신만의 문서 처리 파이프라인이 필요하다면 [호스팅 제공](https://pathway.com/solutions/ai-pipelines)을 확인하거나 [직접 구축](https://pathway.com/developers/user-guide/llm-xpack/vectorstore_pipeline/)하세요.
+
+우리는 @[`VectorStore`] 클라이언트를 사용해 인덱스에 연결할 것이며, 이는 문서 매칭을 위해 `similarity_search` 함수를 구현합니다.
+
+이 문서에서 사용하는 기본 파이프라인은 클라우드 위치에 저장된 파일의 간단한 vector index를 손쉽게 구축할 수 있게 해줍니다. 그러나 Pathway는 groupby-reductions 및 서로 다른 데이터 소스 간 joins와 같은 SQL 유사 연산, 시간 기반 그룹화와 windowing, 그리고 광범위한 커넥터를 포함하여, 실시간 데이터 파이프라인과 앱을 구축하는 데 필요한 모든 것을 제공합니다.
+
+이 통합을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다
+
+## 데이터 파이프라인 쿼리하기
+
+클라이언트를 생성하고 구성하려면 문서 인덱싱 파이프라인의 `url` 또는 `host`와 `port` 중 하나를 제공해야 합니다. 아래 코드에서는 공개적으로 사용 가능한 [데모 파이프라인](https://pathway.com/solutions/ai-pipelines#try-it-out)을 사용하며, 해당 REST API는 `https://demo-document-indexing.pathway.stream`에서 접근할 수 있습니다. 이 데모는 [Google Drive](https://drive.google.com/drive/u/0/folders/1cULDv2OaViJBmOfG5WB0oWcgayNrGtVs)와 [Sharepoint](https://navalgo.sharepoint.com/sites/ConnectorSandbox/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FConnectorSandbox%2FShared%20Documents%2FIndexerSandbox&p=true&ga=1)에서 문서를 수집하고, 문서 검색을 위한 인덱스를 유지합니다.
+
+```python
+from langchain_community.vectorstores import PathwayVectorClient
+
+client = PathwayVectorClient(url="https://demo-document-indexing.pathway.stream")
+```
+
+ 그리고 이제 쿼리를 시작할 수 있습니다
+
+```python
+query = "What is Pathway?"
+docs = client.similarity_search(query)
+```
+
+```python
+print(docs[0].page_content)
+```
+
+ 당신의 차례입니다! [파이프라인을 준비](https://pathway.com/solutions/ai-pipelines)하거나 데모 파이프라인에 [새 문서 업로드](https://chat-realtime-sharepoint-gdrive.demo.pathway.com/) 후 쿼리를 다시 시도해 보세요!
+
+## 파일 메타데이터 기반 필터링
+
+[jmespath](https://jmespath.org/) 표현식을 사용한 문서 필터링을 지원합니다. 예를 들어:
+
+```python
+# take into account only sources modified later than unix timestamp
+docs = client.similarity_search(query, metadata_filter="modified_at >= `1702672093`")
+
+# take into account only sources modified later than unix timestamp
+docs = client.similarity_search(query, metadata_filter="owner == `james`")
+
+# take into account only sources with path containing 'repo_readme'
+docs = client.similarity_search(query, metadata_filter="contains(path, 'repo_readme')")
+
+# and of two conditions
+docs = client.similarity_search(
+    query, metadata_filter="owner == `james` && modified_at >= `1702672093`"
+)
+
+# or of two conditions
+docs = client.similarity_search(
+    query, metadata_filter="owner == `james` || modified_at >= `1702672093`"
+)
+```
+
+## 인덱싱된 파일 정보 가져오기
+
+`PathwayVectorClient.get_vectorstore_statistics()`는 인덱싱된 파일 수와 마지막 업데이트된 파일의 타임스탬프 등 vector store 상태에 관한 핵심 통계를 제공합니다. 체인에서 이를 사용하여 사용자에게 지식 베이스의 최신성을 알려줄 수 있습니다.
+
+```python
+client.get_vectorstore_statistics()
+```
+
+## 나만의 파이프라인
+
+### 프로덕션에서 실행하기
+
+자신만의 Pathway 데이터 인덱싱 파이프라인이 필요하다면 [호스팅 파이프라인](https://pathway.com/solutions/ai-pipelines)에 대한 Pathway의 제공을 확인하세요. 직접 Pathway 파이프라인을 운영할 수도 있습니다. 파이프라인을 구축하는 방법은 [Pathway 가이드](https://pathway.com/developers/user-guide/llm-xpack/vectorstore_pipeline/)를 참고하세요.
+
+### 문서 처리
+
+벡터화 파이프라인은 문서 파싱, 분할, 임베딩을 위한 플러그형 컴포넌트를 지원합니다. 임베딩과 분할에는 [LangChain components](https://pathway.com/developers/user-guide/llm-xpack/vectorstore_pipeline/#langchain)를 사용할 수 있으며, Pathway에서 제공하는 [embedders](https://pathway.com/developers/api-docs/pathway-xpacks-llm/embedders)와 [splitters](https://pathway.com/developers/api-docs/pathway-xpacks-llm/splitters)를 확인할 수도 있습니다. parser가 제공되지 않으면 기본적으로 `UTF-8` parser가 사용됩니다. 사용 가능한 parser는 [여기](https://github.com/pathwaycom/pathway/blob/main/python/pathway/xpacks/llm/parser.py)에서 찾을 수 있습니다.

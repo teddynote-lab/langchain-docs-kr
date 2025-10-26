@@ -1,0 +1,35 @@
+---
+title: Marqo
+---
+
+이 페이지는 LangChain 내에서 Marqo 생태계를 사용하는 방법을 다룹니다.
+
+### **Marqo란 무엇인가요?**
+
+Marqo는 인메모리 HNSW 인덱스에 저장된 embedding을 사용하여 최첨단 검색 속도를 달성하는 tensor search 엔진입니다. Marqo는 수평 인덱스 샤딩을 통해 수억 개의 문서 인덱스로 확장할 수 있으며 비동기 및 논블로킹 데이터 업로드 및 검색을 지원합니다. Marqo는 PyTorch, Huggingface, OpenAI 등의 최신 머신러닝 모델을 사용합니다. 사전 구성된 모델로 시작하거나 자체 모델을 가져올 수 있습니다. 내장된 ONNX 지원 및 변환을 통해 CPU와 GPU 모두에서 더 빠른 추론과 높은 처리량을 제공합니다.
+
+Marqo는 자체 추론 기능을 포함하고 있기 때문에 문서에 텍스트와 이미지를 혼합할 수 있으며, embedding 호환성을 걱정할 필요 없이 다른 시스템의 데이터가 포함된 Marqo 인덱스를 langchain 생태계로 가져올 수 있습니다.
+
+Marqo의 배포는 유연합니다. docker 이미지로 직접 시작하거나 [관리형 클라우드 제공에 대해 문의하실 수 있습니다!](https://www.marqo.ai/pricing)
+
+docker 이미지로 Marqo를 로컬에서 실행하려면 [시작 가이드를 참조하세요.](https://docs.marqo.ai/latest/)
+
+## 설치 및 설정
+
+- `pip install marqo`로 Python SDK를 설치하세요
+
+## Wrappers
+
+### VectorStore
+
+Marqo 인덱스를 감싸는 wrapper가 존재하여 vectorstore 프레임워크 내에서 사용할 수 있습니다. Marqo를 사용하면 embedding 생성을 위한 다양한 모델 중에서 선택할 수 있으며 일부 전처리 구성을 제공합니다.
+
+Marqo vectorstore는 이미지와 텍스트가 혼합된 문서가 있는 기존 멀티모달 인덱스와도 작동할 수 있습니다. 자세한 내용은 [문서](https://docs.marqo.ai/latest/#multi-modal-and-cross-modal-search)를 참조하세요. 기존 멀티모달 인덱스로 Marqo vectorstore를 인스턴스화하면 langchain vectorstore의 `add_texts` 메서드를 통해 새 문서를 추가하는 기능이 비활성화됩니다.
+
+이 vectorstore를 import하려면:
+
+```python
+from langchain_community.vectorstores import Marqo
+```
+
+Marqo wrapper와 고유한 기능에 대한 자세한 안내는 [이 노트북](/oss/integrations/vectorstores/marqo)을 참조하세요

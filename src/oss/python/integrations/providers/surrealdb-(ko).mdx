@@ -1,0 +1,30 @@
+---
+title: SurrealDB
+---
+
+[SurrealDB](https://surrealdb.com)는 AI 시스템을 위해 특별히 설계된 통합 멀티모델 데이터베이스입니다. 구조화된 데이터와 비구조화된 데이터(vector search, graph traversal, relational query, full-text search, document storage, time-series data 포함)를 단일 ACID 호환 엔진으로 결합하여, 3MB의 edge binary부터 클라우드의 petabyte 규모 클러스터까지 확장할 수 있습니다. 여러 전문화된 저장소의 필요성을 제거함으로써 SurrealDB는 아키텍처를 단순화하고 지연 시간을 줄이며 AI 워크로드의 일관성을 보장합니다.
+
+**GenAI 시스템에서 SurrealDB가 중요한 이유**
+- **스토리지와 메모리를 위한 하나의 엔진:** 영구 스토리지와 빠른 에이전트 친화적 메모리를 단일 시스템으로 결합하여 에이전트가 필요로 하는 모든 데이터를 제공하고 여러 시스템을 동기화할 필요를 제거합니다.
+- **에이전트를 위한 원홉 메모리:** vector search, graph traversal, semantic join, transactional write를 단일 쿼리로 실행하여 relational, graph, vector 데이터베이스를 함께 연결할 필요 없이 LLM 에이전트에게 빠르고 일관된 메모리 액세스를 제공합니다.
+- **제자리 추론 및 실시간 업데이트:** SurrealDB는 에이전트가 데이터 옆에서 추론을 실행하고 밀리초 단위의 최신 업데이트를 받을 수 있게 하여 실시간 추론과 협업에 중요합니다.
+- **버전 관리되는 영구 컨텍스트:** SurrealDB는 time-travel query와 버전 관리되는 레코드를 지원하여 에이전트가 일관되고 설명 가능한 추론을 위해 과거 상태를 감사하거나 "재생"할 수 있게 합니다.
+- **플러그 앤 플레이 에이전트 메모리:** AI 메모리를 네이티브 개념으로 노출하여 SurrealDB를 AI 프레임워크의 드롭인 백엔드로 쉽게 사용할 수 있게 합니다.
+
+## Installation and Setup
+
+<CodeGroup>
+```bash pip
+pip install langchain-surrealdb
+```
+
+```bash uv
+uv add langchain-surrealdb
+```
+</CodeGroup>
+
+## Vector Store
+
+[이 노트북](/oss/integrations/vectorstores/surrealdb)은 SurrealDB vector store를 시작하는 방법을 다룹니다.
+
+리포지토리에서 더 많은 [예제](https://github.com/surrealdb/langchain-surrealdb/blob/main/README.md#simple-example)를 찾아보세요.

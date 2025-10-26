@@ -1,0 +1,44 @@
+---
+title: TigerGraph
+---
+
+>[TigerGraph](https://www.tigergraph.com/tigergraph-db/)는 네이티브 분산형 고성능 graph database입니다.
+> vertex와 edge의 graph 형식으로 데이터를 저장하면 풍부한 관계를 형성할 수 있으며,
+> 이는 LLM 응답을 grounding하는 데 이상적입니다.
+
+`TigerGraph`와 `LangChain` 통합의 주요 예제는 [여기에서 확인할 수 있습니다](https://github.com/tigergraph/graph-ml-notebooks/blob/main/applications/large_language_models/TigerGraph_LangChain_Demo.ipynb).
+
+## Installation and Setup
+
+[`TigerGraph` database에 연결하는 방법](https://docs.tigergraph.com/pytigergraph/current/getting-started/connection)에 대한 지침을 따르세요.
+
+Python SDK를 설치합니다:
+
+<CodeGroup>
+```bash pip
+pip install pyTigerGraph
+```
+
+```bash uv
+uv add pyTigerGraph
+```
+</CodeGroup>
+
+## Example
+
+`TigerGraph InquiryAI` 기능을 사용하려면 `langchain_community.graphs`에서 `TigerGraph`를 import할 수 있습니다.
+
+```python
+import pyTigerGraph as tg
+
+conn = tg.TigerGraphConnection(host="DATABASE_HOST_HERE", graphname="GRAPH_NAME_HERE", username="USERNAME_HERE", password="PASSWORD_HERE")
+
+### ==== CONFIGURE INQUIRYAI HOST ====
+conn.ai.configureInquiryAIHost("INQUIRYAI_HOST_HERE")
+
+from langchain_community.graphs import TigerGraph
+
+graph = TigerGraph(conn)
+result = graph.query("How many servers are there?")
+print(result)
+```

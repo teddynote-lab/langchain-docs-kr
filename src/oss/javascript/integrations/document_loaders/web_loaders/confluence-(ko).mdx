@@ -1,0 +1,57 @@
+```markdown
+---
+title: Confluence
+---
+
+<Tip>
+**호환성**
+
+Node.js에서만 사용 가능합니다.
+</Tip>
+
+Confluence space의 페이지에서 document object를 로드하는 방법을 다룹니다.
+
+## Credentials
+
+- 요청을 인증하기 위해 access token을 설정하고 confluence username과 함께 제공해야 합니다
+- 또한 document로 로드할 페이지가 포함된 space의 `space key`가 필요합니다. 이는 space로 이동할 때 url에서 찾을 수 있습니다. 예: `https://example.atlassian.net/wiki/spaces/{SPACE_KEY}`
+- 그리고 페이지를 plain text로 파싱하기 위해 `html-to-text`를 설치해야 합니다
+
+```bash npm
+npm install @langchain/community @langchain/core html-to-text
+```
+
+## Usage
+
+```typescript
+import { ConfluencePagesLoader } from "@langchain/community/document_loaders/web/confluence";
+
+const username = process.env.CONFLUENCE_USERNAME;
+const accessToken = process.env.CONFLUENCE_ACCESS_TOKEN;
+const personalAccessToken = process.env.CONFLUENCE_PAT;
+
+if (username && accessToken) {
+  const loader = new ConfluencePagesLoader({
+    baseUrl: "https://example.atlassian.net/wiki",
+    spaceKey: "~EXAMPLE362906de5d343d49dcdbae5dEXAMPLE",
+    username,
+    accessToken,
+  });
+
+  const documents = await loader.load();
+  console.log(documents);
+} else if (personalAccessToken) {
+  const loader = new ConfluencePagesLoader({
+    baseUrl: "https://example.atlassian.net/wiki",
+    spaceKey: "~EXAMPLE362906de5d343d49dcdbae5dEXAMPLE",
+    personalAccessToken,
+  });
+  const documents = await loader.load();
+  console.log(documents);
+} else {
+  console.log(
+    "You need either a username and access token, or a personal access token (PAT), to use this example."
+  );
+}
+```
+```

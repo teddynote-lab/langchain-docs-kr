@@ -1,0 +1,723 @@
+---
+title: Elasticsearch
+---
+
+>[Elasticsearch](https://www.elastic.co/elasticsearch/)는 vector 및 lexical 검색을 모두 수행할 수 있는 분산형 RESTful 검색 및 분석 엔진입니다. Apache Lucene 라이브러리를 기반으로 구축되었습니다.
+
+이 노트북은 `Elasticsearch` vector store와 관련된 기능을 사용하는 방법을 보여줍니다.
+
+## Setup
+
+`Elasticsearch` vector 검색을 사용하려면 `langchain-elasticsearch` 패키지를 설치해야 합니다.
+
+```python
+pip install -qU langchain-elasticsearch
+```
+
+### Credentials
+
+Elasticsearch 인스턴스를 설정하는 두 가지 주요 방법이 있습니다:
+
+1. Elastic Cloud: Elastic Cloud는 관리형 Elasticsearch 서비스입니다. [무료 평가판](https://cloud.elastic.co/registration?utm_source=langchain&utm_content=documentation)에 가입하세요.
+
+로그인 자격 증명이 필요하지 않은 Elasticsearch 인스턴스에 연결하려면(보안이 활성화된 상태로 docker 인스턴스 시작), Elasticsearch URL과 index 이름을 embedding 객체와 함께 생성자에 전달하세요.
+
+2. Local Install Elasticsearch: Elasticsearch를 로컬에서 실행하여 시작하세요. 가장 쉬운 방법은 공식 Elasticsearch Docker 이미지를 사용하는 것입니다. 자세한 내용은 [Elasticsearch Docker 문서](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)를 참조하세요.
+
+### Running Elasticsearch via Docker
+
+예제: 보안이 비활성화된 단일 노드 Elasticsearch 인스턴스를 실행합니다. 프로덕션 환경에서는 권장되지 않습니다.
+
+```python
+%docker run -p 9200:9200 -e "discovery.type=single-node" -e "xpack.security.enabled=false" -e "xpack.security.http.ssl.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:8.12.1
+```
+
+### Running with Authentication
+
+프로덕션 환경에서는 보안을 활성화하여 실행하는 것을 권장합니다. 로그인 자격 증명으로 연결하려면 `es_api_key` 또는 `es_user`와 `es_password` 매개변수를 사용할 수 있습니다.
+
+<EmbeddingTabs/>
+
+```python
+# | output: false
+# | echo: false
+from langchain_openai import OpenAIEmbeddings
+
+embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
+```
+
+```python
+from langchain_elasticsearch import ElasticsearchStore
+
+elastic_vector_search = ElasticsearchStore(
+    es_url="http://localhost:9200",
+    index_name="langchain_index",
+    embedding=embeddings,
+    es_user="elastic",
+    es_password="changeme",
+)
+```
+
+#### 기본 "elastic" 사용자의 비밀번호를 얻는 방법은?
+
+기본 "elastic" 사용자의 Elastic Cloud 비밀번호를 얻으려면:
+
+1. [cloud.elastic.co](https://cloud.elastic.co)에서 Elastic Cloud 콘솔에 로그인합니다
+2. "Security" > "Users"로 이동합니다
+3. "elastic" 사용자를 찾아 "Edit"을 클릭합니다
+4. "Reset password"를 클릭합니다
+5. 프롬프트에 따라 비밀번호를 재설정합니다
+
+#### API key를 얻는 방법은?
+
+API key를 얻으려면:
+
+1. [cloud.elastic.co](https://cloud.elastic.co)에서 Elastic Cloud 콘솔에 로그인합니다
+2. Kibana를 열고 Stack Management > API Keys로 이동합니다
+3. "Create API key"를 클릭합니다
+4. API key의 이름을 입력하고 "Create"을 클릭합니다
+5. API key를 복사하여 `api_key` 매개변수에 붙여넣습니다
+
+### Elastic Cloud
+
+Elastic Cloud의 Elasticsearch 인스턴스에 연결하려면 `es_cloud_id` 매개변수 또는 `es_url`을 사용할 수 있습니다.
+
+```python
+elastic_vector_search = ElasticsearchStore(
+    es_cloud_id="<cloud_id>",
+    index_name="test_index",
+    embedding=embeddings,
+    es_user="elastic",
+    es_password="changeme",
+)
+```
+
+모델 호출에 대한 최고 수준의 자동 추적을 원한다면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수 있습니다:
+
+```python
+os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
+os.environ["LANGSMITH_TRACING"] = "true"
+```
+
+## Initialization
+
+Elasticsearch는 [docker](#running-elasticsearch-via-docker)를 사용하여 localhost:9200에서 로컬로 실행됩니다. Elastic Cloud에서 Elasticsearch에 연결하는 방법에 대한 자세한 내용은 위의 [인증을 사용한 연결](#running-with-authentication)을 참조하세요.
+
+```python
+from langchain_elasticsearch import ElasticsearchStore
+
+vector_store = ElasticsearchStore(
+    "langchain-demo", embedding=embeddings, es_url="http://localhost:9201"
+)
+```
+
+## Manage vector store
+
+### Add items to vector store
+
+```python
+from uuid import uuid4
+
+from langchain_core.documents import Document
+
+document_1 = Document(
+    page_content="I had chocolate chip pancakes and scrambled eggs for breakfast this morning.",
+    metadata={"source": "tweet"},
+)
+
+document_2 = Document(
+    page_content="The weather forecast for tomorrow is cloudy and overcast, with a high of 62 degrees.",
+    metadata={"source": "news"},
+)
+
+document_3 = Document(
+    page_content="Building an exciting new project with LangChain - come check it out!",
+    metadata={"source": "tweet"},
+)
+
+document_4 = Document(
+    page_content="Robbers broke into the city bank and stole $1 million in cash.",
+    metadata={"source": "news"},
+)
+
+document_5 = Document(
+    page_content="Wow! That was an amazing movie. I can't wait to see it again.",
+    metadata={"source": "tweet"},
+)
+
+document_6 = Document(
+    page_content="Is the new iPhone worth the price? Read this review to find out.",
+    metadata={"source": "website"},
+)
+
+document_7 = Document(
+    page_content="The top 10 soccer players in the world right now.",
+    metadata={"source": "website"},
+)
+
+document_8 = Document(
+    page_content="LangGraph is the best framework for building stateful, agentic applications!",
+    metadata={"source": "tweet"},
+)
+
+document_9 = Document(
+    page_content="The stock market is down 500 points today due to fears of a recession.",
+    metadata={"source": "news"},
+)
+
+document_10 = Document(
+    page_content="I have a bad feeling I am going to get deleted :(",
+    metadata={"source": "tweet"},
+)
+
+documents = [
+    document_1,
+    document_2,
+    document_3,
+    document_4,
+    document_5,
+    document_6,
+    document_7,
+    document_8,
+    document_9,
+    document_10,
+]
+uuids = [str(uuid4()) for _ in range(len(documents))]
+
+vector_store.add_documents(documents=documents, ids=uuids)
+```
+
+```output
+['21cca03c-9089-42d2-b41c-3d156be2b519',
+ 'a6ceb967-b552-4802-bb06-c0e95fce386e',
+ '3a35fac4-e5f0-493b-bee0-9143b41aedae',
+ '176da099-66b1-4d6a-811b-dfdfe0808d30',
+ 'ecfa1a30-3c97-408b-80c0-5c43d68bf5ff',
+ 'c0f08baa-e70b-4f83-b387-c6e0a0f36f73',
+ '489b2c9c-1925-43e1-bcf0-0fa94cf1cbc4',
+ '408c6503-9ba4-49fd-b1cc-95584cd914c5',
+ '5248c899-16d5-4377-a9e9-736ca443ad4f',
+ 'ca182769-c4fc-4e25-8f0a-8dd0a525955c']
+```
+
+### Delete items from vector store
+
+```python
+vector_store.delete(ids=[uuids[-1]])
+```
+
+```output
+True
+```
+
+## Query vector store
+
+vector store가 생성되고 관련 문서가 추가되면 chain 또는 agent를 실행하는 동안 쿼리하고 싶을 것입니다. 이 예제들은 검색 시 필터링을 사용하는 방법도 보여줍니다.
+
+### Query directly
+
+#### Similarity search
+
+metadata에 대한 필터링과 함께 간단한 유사도 검색을 수행하는 방법은 다음과 같습니다:
+
+```python
+results = vector_store.similarity_search(
+    query="LangChain provides abstractions to make working with LLMs easy",
+    k=2,
+    filter=[{"term": {"metadata.source.keyword": "tweet"}}],
+)
+for res in results:
+    print(f"* {res.page_content} [{res.metadata}]")
+```
+
+```output
+* Building an exciting new project with LangChain - come check it out! [{'source': 'tweet'}]
+* LangGraph is the best framework for building stateful, agentic applications! [{'source': 'tweet'}]
+```
+
+#### Similarity search with score
+
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
+
+```python
+results = vector_store.similarity_search_with_score(
+    query="Will it be hot tomorrow",
+    k=1,
+    filter=[{"term": {"metadata.source.keyword": "news"}}],
+)
+for doc, score in results:
+    print(f"* [SIM={score:3f}] {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+* [SIM=0.765887] The weather forecast for tomorrow is cloudy and overcast, with a high of 62 degrees. [{'source': 'news'}]
+```
+
+### Query by turning into retriever
+
+vector store를 retriever로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
+
+```python
+retriever = vector_store.as_retriever(
+    search_type="similarity_score_threshold", search_kwargs={"score_threshold": 0.2}
+)
+retriever.invoke("Stealing from the bank is a crime")
+```
+
+```output
+[Document(metadata={'source': 'news'}, page_content='Robbers broke into the city bank and stole $1 million in cash.'),
+ Document(metadata={'source': 'news'}, page_content='The stock market is down 500 points today due to fears of a recession.'),
+ Document(metadata={'source': 'website'}, page_content='Is the new iPhone worth the price? Read this review to find out.'),
+ Document(metadata={'source': 'tweet'}, page_content='Building an exciting new project with LangChain - come check it out!')]
+```
+
+## Distance Similarity Algorithm
+
+Elasticsearch는 다음과 같은 vector 거리 유사도 알고리즘을 지원합니다:
+
+- cosine
+- euclidean
+- dot_product
+
+cosine 유사도 알고리즘이 기본값입니다.
+
+similarity 매개변수를 통해 필요한 유사도 알고리즘을 지정할 수 있습니다.
+
+**참고**: 검색 전략에 따라 유사도 알고리즘은 쿼리 시점에 변경할 수 없습니다. field에 대한 index mapping을 생성할 때 설정해야 합니다. 유사도 알고리즘을 변경해야 하는 경우 index를 삭제하고 올바른 distance_strategy로 다시 생성해야 합니다.
+
+```python
+db = ElasticsearchStore.from_documents(
+    docs,
+    embeddings,
+    es_url="http://localhost:9200",
+    index_name="test",
+    distance_strategy="COSINE",
+    # distance_strategy="EUCLIDEAN_DISTANCE"
+    # distance_strategy="DOT_PRODUCT"
+)
+```
+
+## Retrieval Strategies
+
+Elasticsearch는 다양한 검색 전략을 지원하는 능력으로 인해 다른 vector 전용 데이터베이스에 비해 큰 장점을 가지고 있습니다. 이 노트북에서는 가장 일반적인 검색 전략 중 일부를 지원하도록 `ElasticsearchStore`를 구성합니다.
+
+기본적으로 `ElasticsearchStore`는 `DenseVectorStrategy`를 사용합니다(버전 0.2.0 이전에는 `ApproxRetrievalStrategy`라고 불렸습니다).
+
+### DenseVectorStrategy
+
+이것은 쿼리 vector와 가장 유사한 상위 k개의 vector를 반환합니다. `k` 매개변수는 `ElasticsearchStore`가 초기화될 때 설정됩니다. 기본값은 10입니다.
+
+```python
+from langchain_elasticsearch import DenseVectorStrategy
+
+db = ElasticsearchStore.from_documents(
+    docs,
+    embeddings,
+    es_url="http://localhost:9200",
+    index_name="test",
+    strategy=DenseVectorStrategy(),
+)
+
+docs = db.similarity_search(
+    query="What did the president say about Ketanji Brown Jackson?", k=10
+)
+```
+
+#### 예제: dense vector와 keyword 검색을 사용한 하이브리드 검색
+
+이 예제는 근사 의미 검색과 키워드 기반 검색의 조합을 사용하여 하이브리드 검색을 수행하도록 ElasticsearchStore를 구성하는 방법을 보여줍니다.
+
+우리는 RRF를 사용하여 서로 다른 검색 방법의 두 점수를 균형있게 조정합니다.
+
+하이브리드 검색을 활성화하려면 `DenseVectorStrategy` 생성자에서 `hybrid=True`를 설정해야 합니다.
+
+```python
+db = ElasticsearchStore.from_documents(
+    docs,
+    embeddings,
+    es_url="http://localhost:9200",
+    index_name="test",
+    strategy=DenseVectorStrategy(hybrid=True),
+)
+```
+
+hybrid가 활성화되면 수행되는 쿼리는 근사 의미 검색과 키워드 기반 검색의 조합이 됩니다.
+
+rrf(Reciprocal Rank Fusion)를 사용하여 서로 다른 검색 방법의 두 점수를 균형있게 조정합니다.
+
+**참고**: RRF는 Elasticsearch 8.9.0 이상이 필요합니다.
+
+```python
+{
+    "retriever": {
+        "rrf": {
+            "retrievers": [
+                {
+                    "standard": {
+                        "query": {
+                            "bool": {
+                                "filter": [],
+                                "must": [{"match": {"text": {"query": "foo"}}}],
+                            }
+                        },
+                    },
+                },
+                {
+                    "knn": {
+                        "field": "vector",
+                        "filter": [],
+                        "k": 1,
+                        "num_candidates": 50,
+                        "query_vector": [1.0, ..., 0.0],
+                    },
+                },
+            ]
+        }
+    }
+}
+```
+
+#### 예제: Elasticsearch의 Embedding Model을 사용한 dense vector 검색
+
+이 예제는 dense vector 검색을 위해 Elasticsearch에 배포된 embedding 모델을 사용하도록 `ElasticsearchStore`를 구성하는 방법을 보여줍니다.
+
+이를 사용하려면 `DenseVectorStrategy` 생성자에서 `query_model_id` 인수를 통해 model_id를 지정하세요.
+
+**참고**: 이를 위해서는 모델이 Elasticsearch ML 노드에 배포되어 실행 중이어야 합니다. `eland`로 모델을 배포하는 방법에 대한 [노트북 예제](https://github.com/elastic/elasticsearch-labs/blob/main/notebooks/integrations/hugging-face/loading-model-from-hugging-face.ipynb)를 참조하세요.
+
+```python
+DENSE_SELF_DEPLOYED_INDEX_NAME = "test-dense-self-deployed"
+
+# Note: This does not have an embedding function specified
+# Instead, we will use the embedding model deployed in Elasticsearch
+db = ElasticsearchStore(
+    es_cloud_id="<your cloud id>",
+    es_user="elastic",
+    es_password="<your password>",
+    index_name=DENSE_SELF_DEPLOYED_INDEX_NAME,
+    query_field="text_field",
+    vector_query_field="vector_query_field.predicted_value",
+    strategy=DenseVectorStrategy(model_id="sentence-transformers__all-minilm-l6-v2"),
+)
+
+# Setup a Ingest Pipeline to perform the embedding
+# of the text field
+db.client.ingest.put_pipeline(
+    id="test_pipeline",
+    processors=[
+        {
+            "inference": {
+                "model_id": "sentence-transformers__all-minilm-l6-v2",
+                "field_map": {"query_field": "text_field"},
+                "target_field": "vector_query_field",
+            }
+        }
+    ],
+)
+
+# creating a new index with the pipeline,
+# not relying on langchain to create the index
+db.client.indices.create(
+    index=DENSE_SELF_DEPLOYED_INDEX_NAME,
+    mappings={
+        "properties": {
+            "text_field": {"type": "text"},
+            "vector_query_field": {
+                "properties": {
+                    "predicted_value": {
+                        "type": "dense_vector",
+                        "dims": 384,
+                        "index": True,
+                        "similarity": "l2_norm",
+                    }
+                }
+            },
+        }
+    },
+    settings={"index": {"default_pipeline": "test_pipeline"}},
+)
+
+db.from_texts(
+    ["hello world"],
+    es_cloud_id="<cloud id>",
+    es_user="elastic",
+    es_password="<cloud password>",
+    index_name=DENSE_SELF_DEPLOYED_INDEX_NAME,
+    query_field="text_field",
+    vector_query_field="vector_query_field.predicted_value",
+    strategy=DenseVectorStrategy(model_id="sentence-transformers__all-minilm-l6-v2"),
+)
+
+# Perform search
+db.similarity_search("hello world", k=10)
+```
+
+### SparseVectorStrategy (ELSER)
+
+이 전략은 Elasticsearch의 sparse vector 검색을 사용하여 상위 k개의 결과를 검색합니다. 현재는 자체 "ELSER" embedding 모델만 지원합니다.
+
+**참고**: 이를 위해서는 ELSER 모델이 Elasticsearch ml 노드에 배포되어 실행 중이어야 합니다.
+
+이를 사용하려면 `ElasticsearchStore` 생성자에서 `SparseVectorStrategy`를 지정하세요(버전 0.2.0 이전에는 `SparseVectorRetrievalStrategy`라고 불렸습니다). model ID를 제공해야 합니다.
+
+```python
+from langchain_elasticsearch import SparseVectorStrategy
+
+# Note that this example doesn't have an embedding function. This is because we infer the tokens at index time and at query time within Elasticsearch.
+# This requires the ELSER model to be loaded and running in Elasticsearch.
+db = ElasticsearchStore.from_documents(
+    docs,
+    es_cloud_id="<cloud id>",
+    es_user="elastic",
+    es_password="<cloud password>",
+    index_name="test-elser",
+    strategy=SparseVectorStrategy(model_id=".elser_model_2"),
+)
+
+db.client.indices.refresh(index="test-elser")
+
+results = db.similarity_search(
+    "What did the president say about Ketanji Brown Jackson", k=4
+)
+print(results[0])
+```
+
+### DenseVectorScriptScoreStrategy
+
+이 전략은 Elasticsearch의 script score 쿼리를 사용하여 정확한 vector 검색(brute force라고도 함)을 수행하여 상위 k개의 결과를 검색합니다. (이 전략은 버전 0.2.0 이전에는 `ExactRetrievalStrategy`라고 불렸습니다.)
+
+이를 사용하려면 `ElasticsearchStore` 생성자에서 `DenseVectorScriptScoreStrategy`를 지정하세요.
+
+```python
+from langchain_elasticsearch import SparseVectorStrategy
+
+db = ElasticsearchStore.from_documents(
+    docs,
+    embeddings,
+    es_url="http://localhost:9200",
+    index_name="test",
+    strategy=DenseVectorScriptScoreStrategy(),
+)
+```
+
+### BM25Strategy
+
+마지막으로 전체 텍스트 키워드 검색을 사용할 수 있습니다.
+
+이를 사용하려면 `ElasticsearchStore` 생성자에서 `BM25Strategy`를 지정하세요.
+
+```python
+from langchain_elasticsearch import BM25Strategy
+
+db = ElasticsearchStore.from_documents(
+    docs,
+    es_url="http://localhost:9200",
+    index_name="test",
+    strategy=BM25Strategy(),
+)
+```
+
+### BM25RetrievalStrategy
+
+이 전략을 사용하면 사용자가 vector 검색 없이 순수 BM25를 사용하여 검색을 수행할 수 있습니다.
+
+이를 사용하려면 `ElasticsearchStore` 생성자에서 `BM25RetrievalStrategy`를 지정하세요.
+
+아래 예제에서 embedding 옵션이 지정되지 않았으며, 이는 embedding을 사용하지 않고 검색이 수행됨을 나타냅니다.
+
+```python
+from langchain_elasticsearch import ElasticsearchStore
+
+db = ElasticsearchStore(
+    es_url="http://localhost:9200",
+    index_name="test_index",
+    strategy=ElasticsearchStore.BM25RetrievalStrategy(),
+)
+
+db.add_texts(
+    ["foo", "foo bar", "foo bar baz", "bar", "bar baz", "baz"],
+)
+
+results = db.similarity_search(query="foo", k=10)
+print(results)
+```
+
+## Customise the Query
+
+검색 시 `custom_query` 매개변수를 사용하면 Elasticsearch에서 문서를 검색하는 데 사용되는 쿼리를 조정할 수 있습니다. 이는 field의 선형 부스팅을 지원하기 위해 더 복잡한 쿼리를 사용하려는 경우 유용합니다.
+
+```python
+# Example of a custom query thats just doing a BM25 search on the text field.
+def custom_query(query_body: dict, query: str):
+    """Custom query to be used in Elasticsearch.
+    Args:
+        query_body (dict): Elasticsearch query body.
+        query (str): Query string.
+    Returns:
+        dict: Elasticsearch query body.
+    """
+    print("Query Retriever created by the retrieval strategy:")
+    print(query_body)
+    print()
+
+    new_query_body = {"query": {"match": {"text": query}}}
+
+    print("Query thats actually used in Elasticsearch:")
+    print(new_query_body)
+    print()
+
+    return new_query_body
+
+
+results = db.similarity_search(
+    "What did the president say about Ketanji Brown Jackson",
+    k=4,
+    custom_query=custom_query,
+)
+print("Results:")
+print(results[0])
+```
+
+## Customize the Document Builder
+
+검색 시 `doc_builder` 매개변수를 사용하면 Elasticsearch에서 검색된 데이터를 사용하여 Document가 구축되는 방식을 조정할 수 있습니다. 이는 LangChain을 사용하여 생성되지 않은 index가 있는 경우 특히 유용합니다.
+
+```python
+from typing import Dict
+
+from langchain_core.documents import Document
+
+
+def custom_document_builder(hit: Dict) -> Document:
+    src = hit.get("_source", {})
+    return Document(
+        page_content=src.get("content", "Missing content!"),
+        metadata={
+            "page_number": src.get("page_number", -1),
+            "original_filename": src.get("original_filename", "Missing filename!"),
+        },
+    )
+
+
+results = db.similarity_search(
+    "What did the president say about Ketanji Brown Jackson",
+    k=4,
+    doc_builder=custom_document_builder,
+)
+print("Results:")
+print(results[0])
+```
+
+## Usage for retrieval-augmented generation
+
+retrieval-augmented generation(RAG)에 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
+
+- [Tutorials](/oss/langchain/rag)
+- [How-to: Question and answer with RAG](https://python.langchain.com/docs/how_to/#qa-with-rag)
+- [Retrieval conceptual docs](https://python.langchain.com/docs/concepts/retrieval)
+
+# FAQ
+
+## 질문: Elasticsearch에 문서를 인덱싱할 때 timeout 오류가 발생합니다. 어떻게 해결하나요?
+
+한 가지 가능한 문제는 문서가 Elasticsearch에 인덱싱되는 데 시간이 더 오래 걸릴 수 있다는 것입니다. ElasticsearchStore는 Elasticsearch bulk API를 사용하며, timeout 오류의 가능성을 줄이기 위해 조정할 수 있는 몇 가지 기본값이 있습니다.
+
+이는 SparseVectorRetrievalStrategy를 사용할 때도 좋은 방법입니다.
+
+기본값은 다음과 같습니다:
+
+- `chunk_size`: 500
+- `max_chunk_bytes`: 100MB
+
+이를 조정하려면 ElasticsearchStore `add_texts` 메서드에 `chunk_size` 및 `max_chunk_bytes` 매개변수를 전달할 수 있습니다.
+
+```python
+    vector_store.add_texts(
+        texts,
+        bulk_kwargs={
+            "chunk_size": 50,
+            "max_chunk_bytes": 200000000
+        }
+    )
+```
+
+# Upgrading to ElasticsearchStore
+
+langchain 기반 프로젝트에서 이미 Elasticsearch를 사용하고 있다면 현재 deprecated된 이전 구현인 `ElasticVectorSearch` 및 `ElasticKNNSearch`를 사용하고 있을 수 있습니다. 우리는 더 유연하고 사용하기 쉬운 `ElasticsearchStore`라는 새로운 구현을 도입했습니다. 이 노트북은 새로운 구현으로 업그레이드하는 과정을 안내합니다.
+
+## 새로운 기능은 무엇인가요?
+
+새로운 구현은 이제 `ElasticsearchStore`라는 하나의 클래스로, 전략을 통해 근사 dense vector, 정확한 dense vector, sparse vector(ELSER), BM25 검색 및 하이브리드 검색에 사용할 수 있습니다.
+
+## ElasticKNNSearch를 사용하고 있습니다
+
+이전 구현:
+
+```python
+from langchain_community.vectorstores.elastic_vector_search import ElasticKNNSearch
+
+db = ElasticKNNSearch(
+  elasticsearch_url="http://localhost:9200",
+  index_name="test_index",
+  embedding=embedding
+)
+
+```
+
+새로운 구현:
+
+```python
+from langchain_elasticsearch import ElasticsearchStore, DenseVectorStrategy
+
+db = ElasticsearchStore(
+  es_url="http://localhost:9200",
+  index_name="test_index",
+  embedding=embedding,
+  # if you use the model_id
+  # strategy=DenseVectorStrategy(model_id="test_model")
+  # if you use hybrid search
+  # strategy=DenseVectorStrategy(hybrid=True)
+)
+
+```
+
+## ElasticVectorSearch를 사용하고 있습니다
+
+이전 구현:
+
+```python
+from langchain_community.vectorstores.elastic_vector_search import ElasticVectorSearch
+
+db = ElasticVectorSearch(
+  elasticsearch_url="http://localhost:9200",
+  index_name="test_index",
+  embedding=embedding
+)
+
+```
+
+새로운 구현:
+
+```python
+from langchain_elasticsearch import ElasticsearchStore, DenseVectorScriptScoreStrategy
+
+db = ElasticsearchStore(
+  es_url="http://localhost:9200",
+  index_name="test_index",
+  embedding=embedding,
+  strategy=DenseVectorScriptScoreStrategy()
+)
+
+```
+
+```python
+db.client.indices.delete(
+    index="test-metadata, test-elser, test-basic",
+    ignore_unavailable=True,
+    allow_no_indices=True,
+)
+```
+
+## API reference
+
+모든 `ElasticSearchStore` 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/elasticsearch/vectorstores/langchain_elasticsearch.vectorstores.ElasticsearchStore.html](https://python.langchain.com/api_reference/elasticsearch/vectorstores/langchain_elasticsearch.vectorstores.ElasticsearchStore.html)

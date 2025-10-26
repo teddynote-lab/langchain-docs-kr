@@ -1,0 +1,44 @@
+---
+title: BAAI
+---
+
+>[Beijing Academy of Artificial Intelligence (BAAI) (Wikipedia)](https://en.wikipedia.org/wiki/Beijing_Academy_of_Artificial_Intelligence),
+> `Zhiyuan Institute`로도 알려진 BAAI는 중국의 비영리 인공지능(AI) 연구소입니다. 
+> `BAAI`는 AI 연구를 수행하며 학계와 산업계 간의 협력 촉진, 최고 인재 육성, 
+> AI 기술의 기초에 대한 장기 연구에 전념하고 있습니다. 협력 허브로서 BAAI의 
+> 창립 멤버에는 주요 AI 기업, 대학 및 연구 기관이 포함됩니다.
+
+
+## Embedding Models
+
+### HuggingFaceBgeEmbeddings
+
+>[HuggingFace의 BGE 모델](https://huggingface.co/BAAI/bge-large-en-v1.5)은 
+> [최고의 오픈소스 embedding 모델](https://huggingface.co/spaces/mteb/leaderboard) 중 하나입니다.
+
+[사용 예제](/oss/integrations/text_embedding/bge_huggingface)를 참조하세요.
+
+```python
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+```
+
+### IpexLLMBgeEmbeddings
+
+>[IPEX-LLM](https://github.com/intel-analytics/ipex-llm)은 Intel CPU와 GPU
+> (예: iGPU가 있는 로컬 PC, Arc, Flex, Max와 같은 별도 GPU)에서 매우 낮은 지연 시간으로 
+> LLM을 실행하기 위한 PyTorch 라이브러리입니다.
+
+[Intel CPU에서 모델 실행 사용 예제](/oss/integrations/text_embedding/ipex_llm)를 참조하세요.
+[Intel GPU에서 모델 실행 사용 예제](/oss/integrations/text_embedding/ipex_llm_gpu)를 참조하세요.
+
+```python
+from langchain_community.embeddings import IpexLLMBgeEmbeddings
+```
+
+### QuantizedBgeEmbeddings
+
+[사용 예제](/oss/integrations/text_embedding/itrex)를 참조하세요.
+
+```python
+from langchain_community.embeddings import QuantizedBgeEmbeddings
+```

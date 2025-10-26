@@ -1,0 +1,905 @@
+---
+title: LangChain으로 RAG 에이전트 만들기
+sidebarTitle: RAG 에이전트
+---
+
+import ChatModelTabsPy from '/snippets/chat-model-tabs.mdx';
+import ChatModelTabsJS from '/snippets/chat-model-tabs-js.mdx';
+import EmbeddingsTabsPy from '/snippets/embeddings-tabs-py.mdx';
+import EmbeddingsTabsJS from '/snippets/embeddings-tabs-js.mdx';
+import VectorstoreTabsPy from '/snippets/vectorstore-tabs-py.mdx';
+import VectorstoreTabsJS from '/snippets/vectorstore-tabs-js.mdx';
+
+
+## 개요
+
+LLM이 가능하게 하는 가장 강력한 애플리케이션 중 하나는 정교한 질의응답(Q&A) 챗봇입니다. 이는 특정 소스 정보에 대한 질문에 답변할 수 있는 애플리케이션입니다. 이러한 애플리케이션은 Retrieval Augmented Generation 또는 [RAG](/oss/langchain/retrieval/)로 알려진 기술을 사용합니다.
+
+이 튜토리얼에서는 비구조화된 텍스트 데이터 소스에 대한 간단한 Q&A 애플리케이션을 구축하는 방법을 보여줍니다. 다음을 시연할 것입니다:
+
+1. 간단한 tool로 검색을 실행하는 RAG [에이전트](#rag-agents). 이는 범용적으로 좋은 구현입니다.
+2. 쿼리당 단일 LLM 호출만 사용하는 2단계 RAG [체인](#rag-chains). 이는 간단한 쿼리에 대한 빠르고 효과적인 방법입니다.
+
+### 개념
+
+다음 개념을 다룰 것입니다:
+
+- **Indexing**: 소스에서 데이터를 수집하고 인덱싱하는 파이프라인. *이는 일반적으로 별도의 프로세스에서 발생합니다.*
+
+- **Retrieval and generation**: 실제 RAG 프로세스로, 런타임에 사용자 쿼리를 받아 인덱스에서 관련 데이터를 검색한 다음 이를 모델에 전달합니다.
+
+데이터를 인덱싱한 후에는 retrieval 및 generation 단계를 구현하기 위한 오케스트레이션 프레임워크로 [에이전트](/oss/langchain/agents)를 사용할 것입니다.
+
+<Note>
+    이 튜토리얼의 인덱싱 부분은 대부분 [semantic search 튜토리얼](/oss/langchain/knowledge-base)을 따릅니다.
+
+    데이터가 이미 검색 가능한 경우(즉, 검색을 실행하는 함수가 있는 경우) 또는 해당 튜토리얼의 내용에 익숙한 경우 [retrieval and generation](#2-retrieval-and-generation) 섹션으로 건너뛰어도 됩니다.
+</Note>
+
+### 미리보기
+
+이 가이드에서는 웹사이트 콘텐츠에 대한 질문에 답변하는 앱을 만들 것입니다. 사용할 특정 웹사이트는 Lilian Weng의 [LLM Powered Autonomous Agents](https://lilianweng.github.io/posts/2023-06-23-agent/) 블로그 게시물로, 게시물의 내용에 대해 질문할 수 있습니다.
+
+약 40줄의 코드로 간단한 인덱싱 파이프라인과 RAG 체인을 만들 수 있습니다. 전체 코드 스니펫은 아래를 참조하세요:
+
+<Accordion title="전체 코드 스니펫 펼치기">
+
+:::python
+```python
+import bs4
+from langchain.agents import AgentState, create_agent
+from langchain_community.document_loaders import WebBaseLoader
+from langchain.messages import MessageLikeRepresentation
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+# Load and chunk contents of the blog
+loader = WebBaseLoader(
+    web_paths=("https://lilianweng.github.io/posts/2023-06-23-agent/",),
+    bs_kwargs=dict(
+        parse_only=bs4.SoupStrainer(
+            class_=("post-content", "post-title", "post-header")
+        )
+    ),
+)
+docs = loader.load()
+
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+all_splits = text_splitter.split_documents(docs)
+
+# Index chunks
+_ = vector_store.add_documents(documents=all_splits)
+
+# Construct a tool for retrieving context
+@tool(response_format="content_and_artifact")
+def retrieve_context(query: str):
+    """Retrieve information to help answer a query."""
+    retrieved_docs = vector_store.similarity_search(query, k=2)
+    serialized = "\n\n".join(
+        (f"Source: {doc.metadata}\nContent: {doc.page_content}")
+        for doc in retrieved_docs
+    )
+    return serialized, retrieved_docs
+
+tools = [retrieve_context]
+# If desired, specify custom instructions
+prompt = (
+    "You have access to a tool that retrieves context from a blog post. "
+    "Use the tool to help answer user queries."
+)
+agent = create_agent(model, tools, system_prompt=prompt)
+```
+
+```python
+query = "What is task decomposition?"
+for step in agent.stream(
+    {"messages": [{"role": "user", "content": query}]},
+    stream_mode="values",
+):
+    step["messages"][-1].pretty_print()
+```
+
+```
+================================ Human Message =================================
+
+What is task decomposition?
+================================== Ai Message ==================================
+Tool Calls:
+  retrieve_context (call_xTkJr8njRY0geNz43ZvGkX0R)
+ Call ID: call_xTkJr8njRY0geNz43ZvGkX0R
+  Args:
+    query: task decomposition
+================================= Tool Message =================================
+Name: retrieve_context
+
+Source: {'source': 'https://lilianweng.github.io/posts/2023-06-23-agent/'}
+Content: Task decomposition can be done by...
+
+Source: {'source': 'https://lilianweng.github.io/posts/2023-06-23-agent/'}
+Content: Component One: Planning...
+================================== Ai Message ==================================
+
+Task decomposition refers to...
+```
+:::
+:::js
+```typescript
+import "cheerio";
+import { createAgent, tool } from "langchain";
+import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+import * as z from "zod";
+
+// Load and chunk contents of blog
+const pTagSelector = "p";
+const cheerioLoader = new CheerioWebBaseLoader(
+  "https://lilianweng.github.io/posts/2023-06-23-agent/",
+  {
+    selector: pTagSelector
+  }
+);
+
+const docs = await cheerioLoader.load();
+
+const splitter = new RecursiveCharacterTextSplitter({
+  chunkSize: 1000,
+  chunkOverlap: 200
+});
+const allSplits = await splitter.splitDocuments(docs);
+
+// Index chunks
+await vectorStore.addDocuments(allSplits)
+
+// Construct a tool for retrieving context
+const retrieveSchema = z.object({ query: z.string() });
+
+const retrieve = tool(
+  async ({ query }) => {
+    const retrievedDocs = await vectorStore.similaritySearch(query, 2);
+    const serialized = retrievedDocs
+      .map(
+        (doc) => `Source: ${doc.metadata.source}\nContent: ${doc.pageContent}`
+      )
+      .join("\n");
+    return [serialized, retrievedDocs];
+  },
+  {
+    name: "retrieve",
+    description: "Retrieve information related to a query.",
+    schema: retrieveSchema,
+    responseFormat: "content_and_artifact",
+  }
+);
+
+const agent = createAgent({ model: "openai:gpt-5", tools: [retrieve] });
+```
+```typescript
+let inputMessage = `What is Task Decomposition?`;
+
+let agentInputs = { messages: [{ role: "user", content: inputMessage }] };
+
+for await (const step of await agent.stream(agentInputs, {
+  streamMode: "values",
+})) {
+  const lastMessage = step.messages[step.messages.length - 1];
+  prettyPrint(lastMessage);
+  console.log("-----\n");
+}
+```
+:::
+
+[LangSmith trace](https://smith.langchain.com/public/a117a1f8-c96c-4c16-a285-00b85646118e/r)를 확인하세요.
+
+</Accordion>
+
+## 설정
+
+
+### 설치
+
+이 튜토리얼에는 다음 langchain 종속성이 필요합니다:
+
+:::python
+<CodeGroup>
+```bash pip
+pip install langchain langchain-text-splitters langchain-community bs4
+```
+```bash uv
+uv add langchain langchain-text-splitters langchain-community bs4
+```
+```bash conda
+conda install langchain langchain-text-splitters langchain-community bs4 -c conda-forge
+```
+</CodeGroup>
+:::
+:::js
+
+<CodeGroup>
+```bash npm
+npm i langchain @langchain/community @langchain/textsplitters
+```
+```bash yarn
+yarn add langchain @langchain/community @langchain/textsplitters
+```
+```bash pnpm
+pnpm add langchain @langchain/community @langchain/textsplitters
+```
+</CodeGroup>
+
+:::
+
+자세한 내용은 [설치 가이드](/oss/langchain/install)를 참조하세요.
+
+### LangSmith
+
+LangChain으로 구축하는 많은 애플리케이션에는 여러 LLM 호출이 포함된 여러 단계가 포함됩니다. 이러한 애플리케이션이 복잡해질수록 체인이나 에이전트 내부에서 정확히 무슨 일이 일어나고 있는지 검사할 수 있는 것이 중요해집니다. 이를 수행하는 가장 좋은 방법은 [LangSmith](https://smith.langchain.com)를 사용하는 것입니다.
+
+위 링크에서 가입한 후 trace 로깅을 시작하려면 환경 변수를 설정해야 합니다:
+
+```shell
+export LANGSMITH_TRACING="true"
+export LANGSMITH_API_KEY="..."
+```
+
+:::python
+또는 Python에서 설정하세요:
+
+```python
+import getpass
+import os
+
+os.environ["LANGSMITH_TRACING"] = "true"
+os.environ["LANGSMITH_API_KEY"] = getpass.getpass()
+```
+:::
+
+### 구성 요소
+
+LangChain의 통합 제품군에서 세 가지 구성 요소를 선택해야 합니다.
+
+chat model을 선택하세요:
+:::python
+<ChatModelTabsPy />
+:::
+:::js
+<ChatModelTabsJS />
+:::
+
+embeddings model을 선택하세요:
+:::python
+<EmbeddingsTabsPy />
+:::
+:::js
+<EmbeddingsTabsJS />
+:::
+
+vector store를 선택하세요:
+:::python
+<VectorstoreTabsPy />
+:::
+:::js
+<VectorstoreTabsJS />
+:::
+
+
+## 1. Indexing
+
+<Note>
+**이 섹션은 [semantic search 튜토리얼](/oss/langchain/knowledge-base)의 내용을 축약한 버전입니다.**
+
+데이터가 이미 인덱싱되어 검색 가능한 경우(즉, 검색을 실행하는 함수가 있는 경우) 또는 [document loaders](/oss/langchain/retrieval#document_loaders), [embeddings](/oss/langchain/retrieval#embedding_models), [vector stores](/oss/langchain/retrieval#vectorstores)에 익숙한 경우 [retrieval and generation](/oss/langchain/rag#2-retrieval-and-generation)에 대한 다음 섹션으로 건너뛰어도 됩니다.
+
+</Note>
+
+인덱싱은 일반적으로 다음과 같이 작동합니다:
+
+1. **Load**: 먼저 데이터를 로드해야 합니다. 이는 [Document Loaders](/oss/langchain/retrieval#document_loaders)로 수행됩니다.
+2. **Split**: [Text splitters](/oss/langchain/retrieval#text_splitters)는 큰 `Documents`를 더 작은 청크로 나눕니다. 이는 데이터를 인덱싱하고 모델에 전달하는 데 유용합니다. 큰 청크는 검색하기 어렵고 모델의 제한된 context window에 맞지 않기 때문입니다.
+3. **Store**: 나중에 검색할 수 있도록 분할된 데이터를 저장하고 인덱싱할 장소가 필요합니다. 이는 종종 [VectorStore](/oss/langchain/retrieval#vectorstores)와 [Embeddings](/oss/langchain/retrieval#embedding_models) 모델을 사용하여 수행됩니다.
+
+![index_diagram](/images/rag_indexing.png)
+
+### 문서 로드
+
+먼저 블로그 게시물 내용을 로드해야 합니다. 이를 위해 [DocumentLoaders](/oss/langchain/retrieval#document_loaders)를 사용할 수 있습니다. 이는 소스에서 데이터를 로드하고 @[Document] 객체 목록을 반환하는 객체입니다.
+
+:::python
+이 경우 [`WebBaseLoader`](/oss/integrations/document_loaders/web_base)를 사용합니다. 이는 `urllib`을 사용하여 웹 URL에서 HTML을 로드하고 `BeautifulSoup`을 사용하여 텍스트로 파싱합니다. `bs_kwargs`를 통해 `BeautifulSoup` 파서에 매개변수를 전달하여 HTML -\> 텍스트 파싱을 사용자 정의할 수 있습니다([BeautifulSoup 문서](https://beautiful-soup-4.readthedocs.io/en/latest/#beautifulsoup) 참조). 이 경우 "post-content", "post-title" 또는 "post-header" 클래스가 있는 HTML 태그만 관련이 있으므로 다른 모든 태그를 제거합니다.
+
+```python
+import bs4
+from langchain_community.document_loaders import WebBaseLoader
+
+# Only keep post title, headers, and content from the full HTML.
+bs4_strainer = bs4.SoupStrainer(class_=("post-title", "post-header", "post-content"))
+loader = WebBaseLoader(
+    web_paths=("https://lilianweng.github.io/posts/2023-06-23-agent/",),
+    bs_kwargs={"parse_only": bs4_strainer},
+)
+docs = loader.load()
+
+assert len(docs) == 1
+print(f"Total characters: {len(docs[0].page_content)}")
+```
+```output
+Total characters: 43131
+```
+
+```python
+print(docs[0].page_content[:500])
+```
+```output
+      LLM Powered Autonomous Agents
+
+Date: June 23, 2023  |  Estimated Reading Time: 31 min  |  Author: Lilian Weng
+
+
+Building agents with LLM (large language model) as its core controller is a cool concept. Several proof-of-concepts demos, such as AutoGPT, GPT-Engineer and BabyAGI, serve as inspiring examples. The potentiality of LLM extends beyond generating well-written copies, stories, essays and programs; it can be framed as a powerful general problem solver.
+Agent System Overview#
+In
+```
+:::
+:::js
+```typescript
+import "cheerio";
+import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
+
+const pTagSelector = "p";
+const cheerioLoader = new CheerioWebBaseLoader(
+  "https://lilianweng.github.io/posts/2023-06-23-agent/",
+  {
+    selector: pTagSelector,
+  }
+);
+
+const docs = await cheerioLoader.load();
+
+console.assert(docs.length === 1);
+console.log(`Total characters: ${docs[0].pageContent.length}`);
+```
+```
+Total characters: 22360
+```
+```typescript
+console.log(docs[0].pageContent.slice(0, 500));
+```
+```
+Building agents with LLM (large language model) as its core controller is...
+```
+:::
+**더 깊이 알아보기**
+
+`DocumentLoader`: 소스에서 데이터를 `Documents` 목록으로 로드하는 객체.
+
+- [통합](/oss/integrations/document_loaders/): 선택할 수 있는 160개 이상의 통합.
+- @[`BaseLoader`]: 기본 인터페이스에 대한 API 참조.
+
+### 문서 분할
+
+로드된 문서는 42,000자가 넘어 많은 모델의 context window에 맞지 않습니다. 전체 게시물을 context window에 맞출 수 있는 모델의 경우에도 매우 긴 입력에서 정보를 찾는 데 어려움을 겪을 수 있습니다.
+
+이를 처리하기 위해 @[`Document`]를 embedding 및 vector 저장을 위한 청크로 분할합니다. 이렇게 하면 런타임에 블로그 게시물의 가장 관련성 높은 부분만 검색하는 데 도움이 됩니다.
+
+[semantic search 튜토리얼](/oss/langchain/knowledge-base)에서와 같이 `RecursiveCharacterTextSplitter`를 사용합니다. 이는 각 청크가 적절한 크기가 될 때까지 새 줄과 같은 일반적인 구분 기호를 사용하여 문서를 재귀적으로 분할합니다. 이는 일반 텍스트 사용 사례에 권장되는 text splitter입니다.
+
+:::python
+```python
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=1000,  # chunk size (characters)
+    chunk_overlap=200,  # chunk overlap (characters)
+    add_start_index=True,  # track index in original document
+)
+all_splits = text_splitter.split_documents(docs)
+
+print(f"Split blog post into {len(all_splits)} sub-documents.")
+```
+```output
+Split blog post into 66 sub-documents.
+```
+
+**더 깊이 알아보기**
+
+`TextSplitter`: @[`Document`] 객체 목록을 저장 및 검색을 위한 더 작은 청크로 분할하는 객체.
+
+- [통합](/oss/integrations/splitters/)
+- [인터페이스](https://python.langchain.com/api_reference/text_splitters/base/langchain_text_splitters.base.TextSplitter.html): 기본 인터페이스에 대한 API 참조.
+
+:::
+:::js
+```typescript
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+
+const splitter = new RecursiveCharacterTextSplitter({
+  chunkSize: 1000,
+  chunkOverlap: 200,
+});
+const allSplits = await splitter.splitDocuments(docs);
+console.log(`Split blog post into ${allSplits.length} sub-documents.`);
+```
+```
+Split blog post into 29 sub-documents.
+```
+:::
+
+
+### 문서 저장
+
+이제 런타임에 검색할 수 있도록 66개의 텍스트 청크를 인덱싱해야 합니다. [semantic search 튜토리얼](/oss/langchain/knowledge-base)에 따라 각 문서 분할의 내용을 [embed](/oss/langchain/retrieval#embedding_models/)하고 이러한 embedding을 [vector store](/oss/langchain/retrieval#vectorstores/)에 삽입하는 접근 방식을 사용합니다. 입력 쿼리가 주어지면 vector 검색을 사용하여 관련 문서를 검색할 수 있습니다.
+
+[튜토리얼 시작 부분](/oss/langchain/rag#components)에서 선택한 vector store 및 embeddings model을 사용하여 단일 명령으로 모든 문서 분할을 embed하고 저장할 수 있습니다.
+
+:::python
+```python
+document_ids = vector_store.add_documents(documents=all_splits)
+
+print(document_ids[:3])
+```
+```output
+['07c18af6-ad58-479a-bfb1-d508033f9c64', '9000bf8e-1993-446f-8d4d-f4e507ba4b8f', 'ba3b5d14-bed9-4f5f-88be-44c88aedc2e6']
+```
+:::
+:::js
+```typescript
+await vectorStore.addDocuments(allSplits);
+```
+:::
+**더 깊이 알아보기**
+
+`Embeddings`: 텍스트를 embedding으로 변환하는 데 사용되는 text embedding model의 래퍼.
+
+- [통합](/oss/integrations/text_embedding/): 선택할 수 있는 30개 이상의 통합.
+- @[인터페이스][Embeddings]: 기본 인터페이스에 대한 API 참조.
+
+`VectorStore`: embedding을 저장하고 쿼리하는 데 사용되는 vector database의 래퍼.
+
+- [통합](/oss/integrations/vectorstores/): 선택할 수 있는 40개 이상의 통합.
+- [인터페이스](https://python.langchain.com/api_reference/core/vectorstores/langchain_core.vectorstores.base.VectorStore.html): 기본 인터페이스에 대한 API 참조.
+
+이것으로 파이프라인의 **Indexing** 부분이 완료됩니다. 이 시점에서 블로그 게시물의 청크된 내용을 포함하는 쿼리 가능한 vector store가 있습니다. 사용자 질문이 주어지면 이상적으로 질문에 답변하는 블로그 게시물의 스니펫을 반환할 수 있어야 합니다.
+
+## 2. Retrieval and Generation
+
+RAG 애플리케이션은 일반적으로 다음과 같이 작동합니다:
+
+1. **Retrieve**: 사용자 입력이 주어지면 [Retriever](/oss/langchain/retrieval#retrievers)를 사용하여 저장소에서 관련 분할을 검색합니다.
+2. **Generate**: [모델](/oss/langchain/models)이 질문과 검색된 데이터를 모두 포함하는 프롬프트를 사용하여 답변을 생성합니다.
+
+![retrieval_diagram](/images/rag_retrieval_generation.png)
+
+이제 실제 애플리케이션 로직을 작성해 보겠습니다. 사용자 질문을 받아 해당 질문과 관련된 문서를 검색하고, 검색된 문서와 초기 질문을 모델에 전달하여 답변을 반환하는 간단한 애플리케이션을 만들고자 합니다.
+
+다음을 시연할 것입니다:
+
+1. 간단한 tool로 검색을 실행하는 RAG [에이전트](#rag-agents). 이는 범용적으로 좋은 구현입니다.
+2. 쿼리당 단일 LLM 호출만 사용하는 2단계 RAG [체인](#rag-chains). 이는 간단한 쿼리에 대한 빠르고 효과적인 방법입니다.
+
+### RAG 에이전트
+
+RAG 애플리케이션의 한 가지 형태는 정보를 검색하는 tool이 있는 간단한 [에이전트](/oss/langchain/agents)입니다. vector store를 래핑하는 [tool](/oss/langchain/tools)을 구현하여 최소한의 RAG 에이전트를 조립할 수 있습니다:
+
+:::python
+```python
+from langchain.tools import tool
+
+@tool(response_format="content_and_artifact")
+def retrieve_context(query: str):
+    """Retrieve information to help answer a query."""
+    retrieved_docs = vector_store.similarity_search(query, k=2)
+    serialized = "\n\n".join(
+        (f"Source: {doc.metadata}\nContent: {doc.page_content}")
+        for doc in retrieved_docs
+    )
+    return serialized, retrieved_docs
+```
+
+<Tip>
+
+여기서는 @[tool decorator][@tool]를 사용하여 각 [ToolMessage](/oss/langchain/messages#tool-message)에 원시 문서를 [artifacts](/oss/langchain/messages#param-artifact)로 첨부하도록 tool을 구성합니다. 이를 통해 모델로 전송되는 문자열화된 표현과 별도로 애플리케이션에서 문서 메타데이터에 액세스할 수 있습니다.
+
+</Tip>
+:::
+:::js
+```typescript
+import * as z from "zod";
+import { tool } from "@langchain/core/tools";
+
+const retrieveSchema = z.object({ query: z.string() });
+
+const retrieve = tool(
+  async ({ query }) => {
+    const retrievedDocs = await vectorStore.similaritySearch(query, 2);
+    const serialized = retrievedDocs
+      .map(
+        (doc) => `Source: ${doc.metadata.source}\nContent: ${doc.pageContent}`
+      )
+      .join("\n");
+    return [serialized, retrievedDocs];
+  },
+  {
+    name: "retrieve",
+    description: "Retrieve information related to a query.",
+    schema: retrieveSchema,
+    responseFormat: "content_and_artifact",
+  }
+);
+```
+<Tip>
+    여기서는 `responseFormat`을 `content_and_artifact`로 지정하여 각 [ToolMessage](/oss/langchain/messages#tool-message)에 원시 문서를 [artifacts](/oss/langchain/messages#param-artifact)로 첨부하도록 tool을 구성합니다. 이를 통해 모델로 전송되는 문자열화된 표현과 별도로 애플리케이션에서 문서 메타데이터에 액세스할 수 있습니다.
+</Tip>
+:::
+
+:::python
+<Tip>
+    Retrieval tool은 위 예제와 같이 단일 문자열 `query` 인수로 제한되지 않습니다. 인수를 추가하여 LLM이 추가 검색 매개변수를 지정하도록 강제할 수 있습니다. 예를 들어 카테고리:
+
+    ```python
+    from typing import Literal
+
+    def retrieve_context(query: str, section: Literal["beginning", "middle", "end"]):
+    ```
+</Tip>
+:::
+
+tool이 주어지면 에이전트를 구성할 수 있습니다:
+
+:::python
+```python
+from langchain.agents import create_agent
+
+
+tools = [retrieve_context]
+# If desired, specify custom instructions
+prompt = (
+    "You have access to a tool that retrieves context from a blog post. "
+    "Use the tool to help answer user queries."
+)
+agent = create_agent(model, tools, system_prompt=prompt)
+```
+:::
+:::js
+
+tool이 주어지면 에이전트를 구성할 수 있습니다:
+
+```typescript
+import { createAgent } from "langchain";
+
+const tools = [retrieve];
+const systemPrompt = new SystemMessage(
+    "You have access to a tool that retrieves context from a blog post. " +
+    "Use the tool to help answer user queries."
+)
+
+const agent = createAgent({ model: "openai:gpt-5", tools, systemPrompt });
+```
+:::
+
+이를 테스트해 보겠습니다. 일반적으로 답변하기 위해 반복적인 검색 단계 시퀀스가 필요한 질문을 구성합니다:
+
+:::python
+```python
+query = (
+    "What is the standard method for Task Decomposition?\n\n"
+    "Once you get the answer, look up common extensions of that method."
+)
+
+for event in agent.stream(
+    {"messages": [{"role": "user", "content": query}]},
+    stream_mode="values",
+):
+    event["messages"][-1].pretty_print()
+```
+```
+================================ Human Message =================================
+
+What is the standard method for Task Decomposition?
+
+Once you get the answer, look up common extensions of that method.
+================================== Ai Message ==================================
+Tool Calls:
+  retrieve_context (call_d6AVxICMPQYwAKj9lgH4E337)
+ Call ID: call_d6AVxICMPQYwAKj9lgH4E337
+  Args:
+    query: standard method for Task Decomposition
+================================= Tool Message =================================
+Name: retrieve_context
+
+Source: {'source': 'https://lilianweng.github.io/posts/2023-06-23-agent/'}
+Content: Task decomposition can be done...
+
+Source: {'source': 'https://lilianweng.github.io/posts/2023-06-23-agent/'}
+Content: Component One: Planning...
+================================== Ai Message ==================================
+Tool Calls:
+  retrieve_context (call_0dbMOw7266jvETbXWn4JqWpR)
+ Call ID: call_0dbMOw7266jvETbXWn4JqWpR
+  Args:
+    query: common extensions of the standard method for Task Decomposition
+================================= Tool Message =================================
+Name: retrieve_context
+
+Source: {'source': 'https://lilianweng.github.io/posts/2023-06-23-agent/'}
+Content: Task decomposition can be done...
+
+Source: {'source': 'https://lilianweng.github.io/posts/2023-06-23-agent/'}
+Content: Component One: Planning...
+================================== Ai Message ==================================
+
+The standard method for Task Decomposition often used is the Chain of Thought (CoT)...
+```
+:::
+:::js
+```typescript
+let inputMessage = `What is the standard method for Task Decomposition?
+Once you get the answer, look up common extensions of that method.`;
+
+let agentInputs = { messages: [{ role: "user", content: inputMessage }] };
+
+const stream = await agent.stream(agentInputs, {
+  streamMode: "values",
+});
+for await (const step of stream) {
+  const lastMessage = step.messages[step.messages.length - 1];
+  console.log(`[${lastMessage.role}]: ${lastMessage.content}`);
+  console.log("-----\n");
+}
+```
+```
+[human]: What is the standard method for Task Decomposition?
+Once you get the answer, look up common extensions of that method.
+-----
+
+[ai]:
+Tools:
+- retrieve({"query":"standard method for Task Decomposition"})
+-----
+
+[tool]: Source: https://lilianweng.github.io/posts/2023-06-23-agent/
+Content: hard tasks into smaller and simpler steps...
+Source: https://lilianweng.github.io/posts/2023-06-23-agent/
+Content: System message:Think step by step and reason yourself...
+-----
+
+[ai]:
+Tools:
+- retrieve({"query":"common extensions of Task Decomposition method"})
+-----
+
+[tool]: Source: https://lilianweng.github.io/posts/2023-06-23-agent/
+Content: hard tasks into smaller and simpler steps...
+Source: https://lilianweng.github.io/posts/2023-06-23-agent/
+Content: be provided by other developers (as in Plugins) or self-defined...
+-----
+
+[ai]: ### Standard Method for Task Decomposition
+
+The standard method for task decomposition involves...
+-----
+```
+:::
+에이전트가 다음을 수행하는 것을 확인하세요:
+
+1. task decomposition을 위한 표준 방법을 검색하기 위한 쿼리를 생성합니다;
+2. 답변을 받은 후 그것의 일반적인 확장을 검색하기 위한 두 번째 쿼리를 생성합니다;
+3. 필요한 모든 컨텍스트를 받은 후 질문에 답변합니다.
+
+[LangSmith trace](https://smith.langchain.com/public/7b42d478-33d2-4631-90a4-7cb731681e88/r)에서 지연 시간 및 기타 메타데이터와 함께 전체 단계 시퀀스를 볼 수 있습니다.
+
+<Tip>
+    [LangGraph](/oss/langgraph/overview) 프레임워크를 직접 사용하여 더 깊은 수준의 제어 및 사용자 정의를 추가할 수 있습니다. 예를 들어 문서 관련성을 평가하고 검색 쿼리를 다시 작성하는 단계를 추가할 수 있습니다. 더 고급 형태는 LangGraph의 [Agentic RAG 튜토리얼](/oss/langgraph/agentic-rag)을 확인하세요.
+</Tip>
+
+
+### RAG 체인
+
+위의 [agentic RAG](#rag-agents) 형태에서는 LLM이 사용자 쿼리에 답변하는 데 도움이 되는 [tool call](/oss/langchain/models#tool-calling)을 생성하는 데 재량을 사용하도록 허용합니다. 이는 범용적으로 좋은 솔루션이지만 몇 가지 트레이드오프가 있습니다:
+
+| ✅ 장점                                                                 | ⚠️ 단점                                                                 |
+|-----------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| **필요할 때만 검색** – LLM은 불필요한 검색을 트리거하지 않고 인사말, 후속 질문 및 간단한 쿼리를 처리할 수 있습니다. | **두 번의 추론 호출** – 검색이 수행되면 쿼리를 생성하기 위한 한 번의 호출과 최종 응답을 생성하기 위한 또 다른 호출이 필요합니다. |
+| **컨텍스트 검색 쿼리** – 검색을 `query` 입력이 있는 tool로 처리함으로써 LLM은 대화 컨텍스트를 통합하는 자체 쿼리를 작성합니다. | **제어 감소** – LLM은 실제로 필요할 때 검색을 건너뛰거나 불필요할 때 추가 검색을 실행할 수 있습니다. |
+| **여러 검색 허용** – LLM은 단일 사용자 쿼리를 지원하기 위해 여러 검색을 실행할 수 있습니다. |                                                                            |
+
+
+또 다른 일반적인 접근 방식은 항상 검색을 실행하고(잠재적으로 원시 사용자 쿼리 사용) 결과를 단일 LLM 쿼리의 컨텍스트로 통합하는 2단계 체인입니다. 이는 쿼리당 단일 추론 호출을 발생시켜 유연성을 희생하면서 지연 시간을 줄입니다.
+
+이 접근 방식에서는 더 이상 루프에서 모델을 호출하지 않고 대신 단일 패스를 만듭니다.
+
+에이전트에서 tool을 제거하고 대신 retrieval 단계를 사용자 정의 프롬프트에 통합하여 이 체인을 구현할 수 있습니다:
+
+:::python
+```python
+from langchain.agents.middleware import dynamic_prompt, ModelRequest
+
+@dynamic_prompt
+def prompt_with_context(request: ModelRequest) -> str:
+    """Inject context into state messages."""
+    last_query = request.state["messages"][-1].text
+    retrieved_docs = vector_store.similarity_search(last_query)
+
+    docs_content = "\n\n".join(doc.page_content for doc in retrieved_docs)
+
+    system_message = (
+        "You are a helpful assistant. Use the following context in your response:"
+        f"\n\n{docs_content}"
+    )
+
+    return system_message
+
+
+agent = create_agent(model, tools=[], middleware=[prompt_with_context])
+```
+:::
+:::js
+```typescript
+import { createAgent, dynamicSystemPromptMiddleware } from "langchain";
+import { SystemMessage } from "@langchain/core/messages";
+
+const agent = createAgent({
+  model,
+  tools: [],
+  middleware: [
+    dynamicSystemPromptMiddleware(async (state) => {
+        const lastQuery = state.messages[state.messages.length - 1].content;
+
+        const retrievedDocs = await vectorStore.similaritySearch(lastQuery, 2);
+
+        const docsContent = retrievedDocs
+        .map((doc) => doc.pageContent)
+        .join("\n\n");
+
+        // Build system message
+        const systemMessage = new SystemMessage(
+        `You are a helpful assistant. Use the following context in your response:\n\n${docsContent}`
+        );
+
+        // Return system + existing messages
+        return [systemMessage, ...state.messages];
+    })
+  ]
+});
+```
+:::
+
+이를 시도해 보겠습니다:
+:::python
+```python
+query = "What is task decomposition?"
+for step in agent.stream(
+    {"messages": [{"role": "user", "content": query}]},
+    stream_mode="values",
+):
+    step["messages"][-1].pretty_print()
+```
+```
+================================ Human Message =================================
+
+What is task decomposition?
+================================== Ai Message ==================================
+
+Task decomposition is...
+```
+:::
+:::js
+```typescript
+let inputMessage = `What is Task Decomposition?`;
+
+let chainInputs = { messages: [{ role: "user", content: inputMessage }] };
+
+const stream = await agent.stream(chainInputs, {
+  streamMode: "values",
+})
+for await (const step of stream) {
+  const lastMessage = step.messages[step.messages.length - 1];
+  prettyPrint(lastMessage);
+  console.log("-----\n");
+}
+```
+:::
+[LangSmith trace](https://smith.langchain.com/public/0322904b-bc4c-4433-a568-54c6b31bbef4/r/9ef1c23e-380e-46bf-94b3-d8bb33df440c)에서 검색된 컨텍스트가 모델 프롬프트에 통합된 것을 볼 수 있습니다.
+
+이는 일반적으로 사용자 쿼리를 semantic search를 통해 실행하여 추가 컨텍스트를 가져오려는 제한된 설정에서 간단한 쿼리에 대한 빠르고 효과적인 방법입니다.
+
+<Accordion title="소스 문서 반환">
+
+위의 [RAG 체인](#rag-chains)은 해당 실행에 대한 단일 system message에 검색된 컨텍스트를 통합합니다.
+
+[agentic RAG](#rag-agents) 형태에서와 같이 때때로 문서 메타데이터에 액세스하기 위해 애플리케이션 상태에 원시 소스 문서를 포함하고 싶을 때가 있습니다. 2단계 체인의 경우 다음을 수행하여 이를 수행할 수 있습니다:
+
+1. 검색된 문서를 저장하기 위해 상태에 키 추가
+2. 해당 키를 채우기 위해 [pre-model hook](/oss/langchain/agents#pre-model-hook)을 통해 새 노드 추가(컨텍스트 주입도 함께)
+
+:::python
+```python
+from typing import Any
+from langchain_core.documents import Document
+from langchain.agents.middleware import AgentMiddleware, AgentState
+
+
+class State(AgentState):
+    context: list[Document]
+
+
+class RetrieveDocumentsMiddleware(AgentMiddleware[State]):
+    state_schema = State
+
+    def before_model(self, state: AgentState) -> dict[str, Any] | None:
+        last_message = state["messages"][-1]
+        retrieved_docs = vector_store.similarity_search(last_message.text)
+
+        docs_content = "\n\n".join(doc.page_content for doc in retrieved_docs)
+
+        augmented_message_content = (
+            f"{last_message.text}\n\n"
+            "Use the following context to answer the query:\n"
+            f"{docs_content}"
+        )
+        return {
+            "messages": [last_message.model_copy(update={"content": augmented_message_content})],
+            "context": retrieved_docs,
+        }
+
+
+agent = create_agent(
+    llm,
+    tools=[],
+    middleware=[RetrieveDocumentsMiddleware()],
+)
+```
+:::
+:::js
+```typescript
+import { createMiddleware, Document, createAgent } from "langchain";
+import { MessagesZodSchema } from "@langchain/langgraph";
+
+const StateSchema = z.object({
+  messages: MessagesZodSchema,
+  context: z.array(z.custom<Document>()),
+})
+
+const retrieveDocumentsMiddleware = createMiddleware({
+  stateSchema: StateSchema,
+  beforeModel: async (state) => {
+    const lastMessage = state.messages[state.messages.length - 1].content;
+    const retrievedDocs = await vectorStore.similaritySearch(lastMessage, 2);
+
+    const docsContent = retrievedDocs
+      .map((doc) => doc.pageContent)
+      .join("\n\n");
+
+    const augmentedMessageContent = [
+        ...lastMessage.content,
+        { type: "text", text: `Use the following context to answer the query:\n\n${docsContent}` }
+    ]
+
+    // Below we augment each input message with context, but we could also
+    // modify just the system message, as before.
+    return {
+      messages: [{
+        ...lastMessage,
+        content: augmentedMessageContent,
+      }]
+      context: retrievedDocs,
+    }
+  },
+});
+
+const agent = createAgent({
+  model,
+  tools: [],
+  middleware: [retrieveDocumentsMiddleware],
+});
+```
+:::
+</Accordion>
+
+
+## 다음 단계
+
+이제 @[`create_agent`]를 통해 간단한 RAG 애플리케이션을 구현했으므로 새로운 기능을 쉽게 통합하고 더 깊이 들어갈 수 있습니다:
+
+- 반응형 사용자 경험을 위해 token 및 기타 정보 [스트리밍](/oss/langchain/streaming)
+- 다중 턴 상호 작용을 지원하기 위해 [대화 메모리](/oss/langchain/short-term-memory) 추가
+- 대화 스레드 간 메모리를 지원하기 위해 [장기 메모리](/oss/langchain/long-term-memory) 추가
+- [구조화된 응답](/oss/langchain/structured-output) 추가
+- [LangSmith Deployments](/langsmith/deployments)로 애플리케이션 배포

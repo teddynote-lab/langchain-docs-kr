@@ -1,0 +1,753 @@
+---
+title: LangChain v1 마이그레이션 가이드
+sidebarTitle: 마이그레이션 가이드
+---
+
+이 마이그레이션 가이드는 LangChain v1의 주요 변경 사항을 설명합니다. v1의 새로운 기능에 대해 자세히 알아보려면 [소개 게시물](/oss/releases/langchain-v1)을 참조하세요.
+
+업그레이드하려면,
+
+<CodeGroup>
+```bash npm
+npm install langchain@latest @langchain/core@latest
+```
+```bash pnpm
+pnpm install langchain@latest @langchain/core@latest
+```
+```bash yarn
+yarn add langchain@latest @langchain/core@latest
+```
+```bash bun
+bun add langchain@latest @langchain/core@latest
+```
+</CodeGroup>
+
+## `createAgent`
+
+v1에서는 react agent prebuilt가 이제 langchain 패키지에 포함되어 있습니다. 아래 표는 변경된 기능을 설명합니다:
+
+| 섹션 | 변경 사항 |
+|---------|--------------|
+| [Import path](#import-path) | 패키지가 `@langchain/langgraph/prebuilts`에서 `langchain`으로 이동 |
+| [Prompts](#prompts) | 매개변수 이름이 `systemPrompt`로 변경, 동적 프롬프트는 middleware 사용 |
+| [Pre-model hook](#pre-model-hook) | `beforeModel` 메서드를 가진 middleware로 대체 |
+| [Post-model hook](#post-model-hook) | `afterModel` 메서드를 가진 middleware로 대체 |
+| [Custom state](#custom-state) | middleware에서 정의, zod 객체만 사용 |
+| [Model](#model) | middleware를 통한 동적 선택, 사전 바인딩된 모델은 지원되지 않음 |
+| [Tools](#tools) | Tool 오류 처리가 `wrapToolCall`을 사용하는 middleware로 이동 |
+| [Structured output](#structured-output) | prompted output 제거, `toolStrategy`/`providerStrategy` 사용 |
+| [Streaming node name](#streaming-node-name-rename) | 노드 이름이 `"agent"`에서 `"model"`로 변경 |
+| [Runtime context](#runtime-context) | `config.configurable` 대신 `context` 속성 사용 |
+| [Namespace](#simplified-namespace) | 에이전트 빌딩 블록에 집중하도록 간소화, 레거시 코드는 `@langchain/classic`으로 이동 |
+
+### Import path
+
+react agent prebuilt의 import path가 `@langchain/langgraph/prebuilts`에서 `langchain`으로 변경되었습니다. 함수 이름도 `createReactAgent`에서 `createAgent`로 변경되었습니다:
+
+```typescript
+import { createReactAgent } from "@langchain/langgraph/prebuilts"; // [!code --]
+import { createAgent } from "langchain"; // [!code ++]
+```
+
+### Prompts
+
+#### Static prompt rename
+
+`prompt` 매개변수가 `systemPrompt`로 이름이 변경되었습니다:
+
+<CodeGroup>
+```typescript v1 (new)
+import { createAgent } from "langchain";
+
+agent = createAgent({
+  model,
+  tools,
+  systemPrompt: "You are a helpful assistant.", // [!code highlight]
+});
+```
+```typescript v0 (old)
+import { createReactAgent } from "@langchain/langgraph/prebuilts";
+
+const agent = createReactAgent({
+  model,
+  tools,
+  prompt: "You are a helpful assistant.", // [!code highlight]
+});
+```
+</CodeGroup>
+
+#### `SystemMessage`
+
+시스템 프롬프트에서 `SystemMessage` 객체를 사용하는 경우, 이제 문자열 콘텐츠가 직접 사용됩니다:
+
+<CodeGroup>
+```typescript v1 (new)
+import { SystemMessage, createAgent } from "langchain";
+
+const agent = createAgent({
+  model,
+  tools,
+  systemPrompt: "You are a helpful assistant.", // [!code highlight]
+});
+```
+```typescript v0 (old)
+import { createReactAgent } from "@langchain/langgraph/prebuilts";
+
+const agent = createReactAgent({
+  model,
+  tools,
+  prompt: new SystemMessage(content: "You are a helpful assistant."), // [!code highlight]
+});
+```
+</CodeGroup>
+
+#### Dynamic prompts
+
+동적 프롬프트는 핵심 컨텍스트 엔지니어링 패턴입니다— 현재 대화 상태에 따라 모델에 전달하는 내용을 조정합니다. 이를 위해 `dynamicSystemPromptMiddleware`를 사용하세요:
+
+<CodeGroup>
+```typescript v1 (new)
+import { createAgent, dynamicSystemPromptMiddleware } from "langchain";
+import * as z from "zod";
+
+const contextSchema = z.object({
+  userRole: z.enum(["expert", "beginner"]).default("user"),
+});
+
+const userRolePrompt = dynamicSystemPromptMiddleware((request) => { // [!code highlight]
+  const userRole = request.runtime.context.userRole;
+  const basePrompt = "You are a helpful assistant.";
+
+  if (userRole === "expert") {
+    return `${basePrompt} Provide detailed technical responses.`;
+  } else if (userRole === "beginner") {
+    return `${basePrompt} Explain concepts simply and avoid jargon.`;
+  }
+  return basePrompt; // [!code highlight]
+});
+
+const agent = createAgent({
+  model,
+  tools,
+  middleware: [userRolePrompt],
+  contextSchema,
+});
+
+await agent.invoke({
+  messages: [new HumanMessage("Explain async programming")],
+  context: {
+    userRole: "expert",
+  },
+})
+```
+
+```typescript v0 (old)
+import { createReactAgent } from "@langchain/langgraph/prebuilts";
+
+const contextSchema = z.object({
+  userRole: z.enum(["expert", "beginner"]).default("user"),
+});
+
+const agent = createReactAgent({
+  model,
+  tools,
+  prompt: (state) => {
+    const userRole = state.context.userRole;
+    const basePrompt = "You are a helpful assistant.";
+
+    if (userRole === "expert") {
+      return `${basePrompt} Provide detailed technical responses.`;
+    } else if (userRole === "beginner") {
+      return `${basePrompt} Explain concepts simply and avoid jargon.`;
+    }
+    return basePrompt;
+  },
+  contextSchema,
+});
+
+// Use with context
+await agent.invoke({
+  messages: [new HumanMessage("Explain async programming")],
+  context: { userRole: "expert" },
+});
+```
+</CodeGroup>
+
+
+### Pre-model hook
+
+Pre-model hook은 이제 `beforeModel` 메서드를 가진 middleware로 구현됩니다. 이 패턴은 더 확장 가능합니다--모델이 호출되기 전에 실행할 여러 middleware를 정의하고 에이전트 간에 재사용할 수 있습니다.
+
+일반적인 사용 사례는 다음과 같습니다:
+- 대화 기록 요약
+- 메시지 트리밍
+- PII 삭제와 같은 입력 가드레일
+
+v1에는 내장된 요약 middleware가 포함되어 있습니다:
+
+<CodeGroup>
+```typescript v1 (new)
+import { createAgent, summarizationMiddleware } from "langchain";
+
+const agent = createAgent({
+  model: "anthropic:claude-sonnet-4-5",
+  tools,
+  middleware: [
+    summarizationMiddleware({
+      model: "anthropic:claude-sonnet-4-5",
+      maxTokensBeforeSummary: 1000,
+    }),
+  ],
+});
+```
+```typescript v0 (old)
+import { createReactAgent } from "@langchain/langgraph/prebuilts";
+
+function customSummarization(state) {
+  // Custom logic for message summarization
+}
+
+const agent = createReactAgent({
+  model: "anthropic:claude-sonnet-4-5",
+  tools,
+  preModelHook: customSummarization,
+});
+```
+</CodeGroup>
+
+### Post-model hook
+
+Post-model hook은 이제 `afterModel` 메서드를 가진 middleware로 구현됩니다. 이를 통해 모델이 응답한 후 여러 핸들러를 구성할 수 있습니다.
+
+일반적인 사용 사례는 다음과 같습니다:
+- Human-in-the-loop 승인
+- 출력 가드레일
+
+v1에는 내장된 human-in-the-loop middleware가 포함되어 있습니다:
+
+<CodeGroup>
+```typescript v1 (new)
+import { createAgent, humanInTheLoopMiddleware } from "langchain";
+
+const agent = createAgent({
+  model: "anthropic:claude-sonnet-4-5",
+  tools: [readEmail, sendEmail],
+  middleware: [
+    humanInTheLoopMiddleware({
+      interruptOn: {
+        sendEmail: { allowedDecisions: ["approve", "edit", "reject"] },
+      },
+    }),
+  ],
+});
+```
+```typescript v0 (old)
+import { createReactAgent } from "@langchain/langgraph/prebuilts";
+
+function customHumanInTheLoopHook(state) {
+  // Custom approval logic
+}
+
+const agent = createReactAgent({
+  model: "anthropic:claude-sonnet-4-5",
+  tools: [readEmail, sendEmail],
+  postModelHook: customHumanInTheLoopHook,
+});
+```
+</CodeGroup>
+
+### Custom state
+
+Custom state는 이제 `stateSchema` 속성을 사용하여 middleware에서 정의됩니다. Zod를 사용하여 에이전트 실행 중에 전달되는 추가 상태 필드를 선언하세요.
+
+<CodeGroup>
+```typescript v1 (new)
+import * as z from "zod";
+import { createAgent, createMiddleware, tool } from "langchain";
+
+const UserState = z.object({
+  userName: z.string(),
+});
+
+const userState = createMiddleware({
+  name: "UserState",
+  stateSchema: UserState,
+  beforeModel: (state) => {
+    // Access custom state properties
+    const name = state.userName;
+    // Optionally modify messages/system prompt based on state
+    return;
+  },
+});
+
+const greet = tool(
+  async () => {
+    return "Hello!";
+  },
+  {
+    name: "greet",
+    description: "Greet the user",
+    schema: z.object({}),
+  }
+);
+
+const agent = createAgent({
+  model: "anthropic:claude-sonnet-4-5",
+  tools: [greet],
+  middleware: [userState],
+});
+
+await agent.invoke({
+  messages: [{ role: "user", content: "Hi" }],
+  userName: "Ada",
+});
+```
+```typescript v0 (old)
+import { getCurrentTaskInput } from "@langchain/langgraph";
+import { createReactAgent } from "@langchain/langgraph/prebuilts";
+import * as z from "zod";
+
+const UserState = z.object({
+  userName: z.string(),
+});
+
+const greet = tool(
+  async () => {
+    const state = await getCurrentTaskInput();
+    const userName = state.userName;
+    return `Hello ${userName}!`;
+  },
+);
+
+// Custom state was provided via agent-level state schema or accessed ad hoc in hooks
+const agent = createReactAgent({
+  model: "anthropic:claude-sonnet-4-5",
+  tools: [greet],
+  stateSchema: UserState,
+});
+```
+</CodeGroup>
+
+### Model
+
+동적 모델 선택은 이제 middleware를 통해 이루어집니다. `wrapModelCall`을 사용하여 상태 또는 런타임 컨텍스트에 따라 모델(및 도구)을 교체하세요. `createReactAgent`에서는 `model` 매개변수에 전달된 함수를 통해 이 작업이 수행되었습니다.
+
+이 기능은 v1에서 middleware 인터페이스로 이식되었습니다.
+
+#### Dynamic model selection
+
+<CodeGroup>
+```typescript v1 (new)
+import { createAgent, createMiddleware } from "langchain";
+
+const dynamicModel = createMiddleware({
+  name: "DynamicModel",
+  wrapModelCall: (request, handler) => {
+    const messageCount = request.state.messages.length;
+    const model = messageCount > 10 ? "openai:gpt-5" : "openai:gpt-5-nano";
+    return handler({ ...request, model });
+  },
+});
+
+const agent = createAgent({
+  model: "openai:gpt-5-nano",
+  tools,
+  middleware: [dynamicModel],
+});
+```
+```typescript v0 (old)
+import { createReactAgent } from "@langchain/langgraph/prebuilts";
+
+function selectModel(state) {
+  return state.messages.length > 10 ? "openai:gpt-5" : "openai:gpt-5-nano";
+}
+
+const agent = createReactAgent({
+  model: selectModel,
+  tools,
+});
+```
+</CodeGroup>
+
+#### Pre-bound models
+
+structured output을 더 잘 지원하기 위해 `createAgent`는 일반 모델(문자열 또는 인스턴스)과 별도의 `tools` 목록을 받아야 합니다. structured output을 사용할 때 도구가 사전 바인딩된 모델을 전달하지 마세요.
+
+```typescript
+// No longer supported
+// const modelWithTools = new ChatOpenAI({ model: "gpt-4o-mini" }).bindTools([someTool]);
+// const agent = createAgent({ model: modelWithTools, tools: [] });
+
+// Use instead
+const agent = createAgent({ model: "openai:gpt-4o-mini", tools: [someTool] });
+```
+
+### Tools
+
+`createAgent`의 `tools` 인수는 다음을 허용합니다:
+
+- `tool`로 생성된 함수
+- LangChain tool 인스턴스
+- 내장 provider tool을 나타내는 객체
+
+middleware `wrapToolCall`을 사용하여 도구에 대한 오류 처리 및 로깅을 중앙 집중화하세요.
+
+<CodeGroup>
+```typescript v1 (new)
+import { createAgent, createMiddleware } from "langchain";
+
+const errorHandling = createMiddleware({
+  name: "ToolErrors",
+  wrapToolCall: async (request, handler) => {
+    try {
+      return await handler(request);
+    } catch (err) {
+      return `Error executing ${request.toolName}: ${String(err)}`;
+    }
+  },
+});
+
+const agent = createAgent({
+  model: "anthropic:claude-sonnet-4-5",
+  tools: [checkWeather, searchWeb],
+  middleware: [errorHandling],
+});
+```
+```typescript v0 (old)
+import { createReactAgent } from "@langchain/langgraph/prebuilts";
+
+const agent = createReactAgent({
+  model: "anthropic:claude-sonnet-4-5",
+  tools: [checkWeather, searchWeb],
+  // Error handling commonly implemented inside tool code or post hooks
+});
+```
+</CodeGroup>
+
+### Structured output
+
+#### Node changes
+
+Structured output은 이전에는 메인 에이전트와 별도의 노드에서 생성되었습니다. 이제는 더 이상 그렇지 않습니다. Structured output은 메인 루프에서 생성되어(추가 LLM 호출 없음) 비용과 지연 시간을 줄입니다.
+
+#### Tool and provider strategies
+
+v1에는 두 가지 전략이 있습니다:
+
+- `toolStrategy`는 인공 tool calling을 사용하여 structured output을 생성합니다
+- `providerStrategy`는 provider 네이티브 structured output 생성을 사용합니다
+
+<CodeGroup>
+```typescript v1 (new)
+import { createAgent, toolStrategy } from "langchain";
+import * as z from "zod";
+
+const OutputSchema = z.object({
+  summary: z.string(),
+  sentiment: z.string(),
+});
+
+const agent = createAgent({
+  model: "openai:gpt-4o-mini",
+  tools,
+  // explicitly using tool strategy
+  responseFormat: toolStrategy(OutputSchema), // [!code highlight]
+});
+```
+```typescript v0 (old)
+import { createReactAgent } from "@langchain/langgraph/prebuilts";
+import * as z from "zod";
+
+const OutputSchema = z.object({
+  summary: z.string(),
+  sentiment: z.string(),
+});
+
+const agent = createReactAgent({
+  model: "openai:gpt-4o-mini",
+  tools,
+  // Structured output was driven primarily via tool-calling with fewer options
+  responseFormat: OutputSchema,
+});
+```
+</CodeGroup>
+
+#### Prompted output removed
+
+`responseFormat`의 사용자 정의 지침을 통한 prompted output은 위의 전략을 위해 제거되었습니다.
+
+### Streaming node name rename
+
+에이전트에서 이벤트를 스트리밍할 때 노드 이름이 `"agent"`에서 `"model"`로 변경되어 노드의 목적을 더 잘 반영합니다.
+
+### Runtime context
+
+에이전트를 호출할 때 `context` config 인수를 통해 정적, 읽기 전용 구성을 전달하세요. 이는 `config.configurable`을 사용하던 패턴을 대체합니다.
+
+<CodeGroup>
+```typescript v1 (new)
+import { createAgent, HumanMessage } from "langchain";
+import * as z from "zod";
+
+const agent = createAgent({
+  model: "openai:gpt-4o",
+  tools,
+  contextSchema: z.object({ userId: z.string(), sessionId: z.string() }),
+});
+
+const result = await agent.invoke(
+  { messages: [new HumanMessage("Hello")] },
+  { context: { userId: "123", sessionId: "abc" } }, // [!code highlight]
+);
+```
+```typescript v0 (old)
+import { createReactAgent, HumanMessage } from "@langchain/langgraph/prebuilts";
+
+const agent = createReactAgent({ model, tools });
+
+// Pass context via config.configurable
+const result = await agent.invoke(
+  { messages: [new HumanMessage("Hello")] },
+  {
+    config: { // [!code highlight]
+      configurable: { userId: "123", sessionId: "abc" }, // [!code highlight]
+    }, // [!code highlight]
+  }
+);
+```
+</CodeGroup>
+
+<Note>
+    이전 `config.configurable` 패턴은 하위 호환성을 위해 여전히 작동하지만, 새 애플리케이션이나 v1로 마이그레이션하는 애플리케이션에는 새로운 `context` 매개변수를 사용하는 것이 권장됩니다.
+</Note>
+
+---
+
+## Standard content
+
+v1에서 메시지는 provider에 구애받지 않는 standard content block을 얻습니다. `message.contentBlocks`를 통해 provider 간에 일관되고 타입이 지정된 뷰에 액세스하세요. 기존 `message.content` 필드는 문자열 또는 provider 네이티브 구조에 대해 변경되지 않습니다.
+
+### What changed
+
+- 정규화된 콘텐츠를 위한 메시지의 새로운 `contentBlocks` 속성.
+- 강력한 타이핑을 위한 `ContentBlock` 아래의 새로운 TypeScript 타입.
+- `LC_OUTPUT_VERSION=v1` 또는 `outputVersion: "v1"`을 통한 standard block의 `content`로의 선택적 직렬화.
+
+### Read standardized content
+
+<CodeGroup>
+```typescript v1 (new)
+import { initChatModel } from "langchain";
+
+const model = await initChatModel("openai:gpt-5-nano");
+const response = await model.invoke("Explain AI");
+
+for (const block of response.contentBlocks) {
+  if (block.type === "reasoning") {
+    console.log(block.reasoning);
+  } else if (block.type === "text") {
+    console.log(block.text);
+  }
+}
+```
+```typescript v0 (old)
+// Provider-native formats vary; you needed per-provider handling.
+const response = await model.invoke("Explain AI");
+for (const item of response.content as any[]) {
+  if (item.type === "reasoning") {
+    // OpenAI-style reasoning
+  } else if (item.type === "thinking") {
+    // Anthropic-style thinking
+  } else if (item.type === "text") {
+    // Text
+  }
+}
+```
+</CodeGroup>
+
+### Create multimodal messages
+
+<CodeGroup>
+```typescript v1 (new)
+import { HumanMessage } from "langchain";
+
+const message = new HumanMessage({
+  contentBlocks: [
+    { type: "text", text: "Describe this image." },
+    { type: "image", url: "https://example.com/image.jpg" },
+  ],
+});
+const res = await model.invoke([message]);
+```
+```typescript v0 (old)
+import { HumanMessage } from "langchain";
+
+const message = new HumanMessage({
+  // Provider-native structure
+  content: [
+    { type: "text", text: "Describe this image." },
+    { type: "image_url", image_url: { url: "https://example.com/image.jpg" } },
+  ],
+});
+const res = await model.invoke([message]);
+```
+</CodeGroup>
+
+### Example block types
+
+```typescript
+import { ContentBlock } from "langchain";
+
+const textBlock: ContentBlock.Text = {
+  type: "text",
+  text: "Hello world",
+};
+
+const imageBlock: ContentBlock.Multimodal.Image = {
+  type: "image",
+  url: "https://example.com/image.png",
+  mimeType: "image/png",
+};
+```
+
+자세한 내용은 content blocks [참조](/oss/langchain/messages#content-block-reference)를 참조하세요.
+
+### Serialize standard content
+
+Standard content block은 기본적으로 `content` 속성으로 **직렬화되지 않습니다**. `content` 속성에서 standard content block에 액세스해야 하는 경우(예: 클라이언트에 메시지를 보낼 때), `content`로 직렬화하도록 선택할 수 있습니다.
+
+<CodeGroup>
+```bash
+export LC_OUTPUT_VERSION=v1
+```
+```typescript
+import { initChatModel } from "langchain";
+
+const model = await initChatModel("openai:gpt-5-nano", {
+  outputVersion: "v1",
+});
+```
+</CodeGroup>
+
+<Note>
+    자세히 알아보기: [Messages](/oss/langchain/messages#message-content) 및 [Standard content blocks](/oss/langchain/messages#standard-content-blocks). 입력 예제는 [Multimodal](/oss/langchain/messages#multimodal)을 참조하세요.
+</Note>
+
+---
+
+## Simplified package
+
+`langchain` 패키지 네임스페이스는 에이전트 빌딩 블록에 집중하도록 간소화되었습니다. 레거시 기능은 `@langchain/classic`으로 이동했습니다. 새 패키지는 가장 유용하고 관련성 있는 기능만 노출합니다.
+
+### Exports
+
+v1 패키지에는 다음이 포함됩니다:
+
+| 모듈 | 사용 가능한 항목 | 참고 |
+|--------|------------------|-------|
+| Agents | `createAgent`, `AgentState` | 핵심 에이전트 생성 기능 |
+| Messages | Message 타입, content block, `trimMessages` | `@langchain/core`에서 재내보내기 |
+| Tools | `tool`, tool 클래스 | `@langchain/core`에서 재내보내기 |
+| Chat models | `initChatModel`, `BaseChatModel` | 통합 모델 초기화 |
+
+### `@langchain/classic`
+
+레거시 chain, indexing API 또는 이전에 `@langchain/community`에서 재내보내기된 기능을 사용하는 경우 `@langchain/classic`을 설치하고 import를 업데이트하세요:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/classic
+```
+```bash pnpm
+pnpm install @langchain/classic
+```
+```bash yarn
+yarn add @langchain/classic
+```
+```bash bun
+bun add @langchain/classic
+```
+</CodeGroup>
+
+```typescript
+// v1 (new)
+import { ... } from "@langchain/classic";
+import { ... } from "@langchain/classic/chains";
+
+// v0 (old)
+import { ... } from "langchain";
+import { ... } from "langchain/chains";
+```
+
+---
+
+## Breaking changes
+
+### Dropped Node 18 support
+
+모든 LangChain 패키지는 이제 **Node.js 20 이상**이 필요합니다. Node.js 18은 2025년 3월에 [수명 종료](https://nodejs.org/en/about/releases/)에 도달했습니다.
+
+### New build outputs
+
+모든 langchain 패키지의 빌드는 이제 원시 typescript 출력을 사용하는 대신 번들러 기반 접근 방식을 사용합니다. `dist/` 디렉토리에서 파일을 import하고 있었다면(권장되지 않음), 새 모듈 시스템을 사용하도록 import를 업데이트해야 합니다.
+
+### Legacy code moved to `@langchain/classic`
+
+표준 인터페이스 및 에이전트의 초점 밖에 있는 레거시 기능은 [`@langchain/classic`](https://www.npmjs.com/package/@langchain/classic) 패키지로 이동했습니다. 핵심 `langchain` 패키지에서 사용 가능한 항목과 `@langchain/classic`으로 이동한 항목에 대한 자세한 내용은 [Simplified package](#simplified-package) 섹션을 참조하세요.
+
+### Removal of deprecated APIs
+
+이미 deprecated되어 1.0에서 제거될 예정이었던 메서드, 함수 및 기타 객체가 삭제되었습니다.
+
+<Accordion title="제거된 deprecated API 보기">
+
+다음 deprecated API가 v1에서 제거되었습니다:
+
+#### Core functionality
+- `TraceGroup` - 대신 LangSmith tracing 사용
+- `BaseDocumentLoader.loadAndSplit` - `.load()` 다음에 text splitter 사용
+- `RemoteRunnable` - 더 이상 지원되지 않음
+
+#### Prompts
+- `BasePromptTemplate.serialize` 및 `.deserialize` - JSON 직렬화를 직접 사용
+- `ChatPromptTemplate.fromPromptMessages` - `ChatPromptTemplate.fromMessages` 사용
+
+#### Retrievers
+- `BaseRetrieverInterface.getRelevantDocuments` - 대신 `.invoke()` 사용
+
+#### Runnables
+- `Runnable.bind` - `.bindTools()` 또는 다른 특정 바인딩 메서드 사용
+- `Runnable.map` - 대신 `.batch()` 사용
+- `RunnableBatchOptions.maxConcurrency` - config 객체에서 `maxConcurrency` 사용
+
+#### Chat models
+- `BaseChatModel.predictMessages` - 대신 `.invoke()` 사용
+- `BaseChatModel.predict` - 대신 `.invoke()` 사용
+- `BaseChatModel.serialize` - JSON 직렬화를 직접 사용
+- `BaseChatModel.callPrompt` - 대신 `.invoke()` 사용
+- `BaseChatModel.call` - 대신 `.invoke()` 사용
+
+#### LLMs
+- `BaseLLMParams.concurrency` - config 객체에서 `maxConcurrency` 사용
+- `BaseLLM.call` - 대신 `.invoke()` 사용
+- `BaseLLM.predict` - 대신 `.invoke()` 사용
+- `BaseLLM.predictMessages` - 대신 `.invoke()` 사용
+- `BaseLLM.serialize` - JSON 직렬화를 직접 사용
+
+#### Streaming
+- `createChatMessageChunkEncoderStream` - `.stream()` 메서드를 직접 사용
+
+#### Tracing
+- `BaseTracer.runMap` - LangSmith tracing API 사용
+- `getTracingCallbackHandler` - LangSmith tracing 사용
+- `getTracingV2CallbackHandler` - LangSmith tracing 사용
+- `LangChainTracerV1` - LangSmith tracing 사용
+
+#### Memory and storage
+- `BaseListChatMessageHistory.addAIChatMessage` - `AIMessage`와 함께 `.addMessage()` 사용
+- `BaseStoreInterface` - 특정 store 구현 사용
+
+#### Utilities
+- `getRuntimeEnvironmentSync` - 비동기 `getRuntimeEnvironment()` 사용
+
+</Accordion>

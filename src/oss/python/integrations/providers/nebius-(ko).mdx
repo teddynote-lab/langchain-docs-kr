@@ -1,0 +1,126 @@
+---
+title: Nebius
+---
+
+Nebius AI Studio와 관련된 모든 기능
+
+>[Nebius AI Studio](https://studio.nebius.ai/)는 다양한 사용 사례를 위한 최첨단 대규모 언어 모델 및 embedding 모델에 대한 API 액세스를 제공합니다.
+
+## Installation and Setup
+
+Nebius integration은 pip를 통해 설치할 수 있습니다:
+
+<CodeGroup>
+```bash pip
+pip install langchain-nebius
+```
+
+```bash uv
+uv add langchain-nebius
+```
+</CodeGroup>
+
+Nebius AI Studio를 사용하려면 [Nebius AI Studio](https://studio.nebius.ai/)에서 얻을 수 있는 API key가 필요합니다. API key는 초기화 parameter `api_key`로 전달하거나 환경 변수 `NEBIUS_API_KEY`로 설정할 수 있습니다.
+
+```python
+import os
+os.environ["NEBIUS_API_KEY"] = "YOUR-NEBIUS-API-KEY"
+```
+
+### Available Models
+
+지원되는 모델의 전체 목록은 [Nebius AI Studio Documentation](https://studio.nebius.com/)에서 확인할 수 있습니다.
+
+
+## Chat models
+
+### ChatNebius
+
+`ChatNebius` class를 사용하면 Nebius AI Studio의 chat model과 상호작용할 수 있습니다.
+
+[사용 예제](/oss/integrations/chat/nebius)를 참조하세요.
+
+```python
+from langchain_nebius import ChatNebius
+
+# Initialize the chat model
+chat = ChatNebius(
+    model="Qwen/Qwen3-30B-A3B-fast",  # Choose from available models
+    temperature=0.6,
+    top_p=0.95
+)
+```
+
+## Embedding models
+
+### NebiusEmbeddings
+
+`NebiusEmbeddings` class를 사용하면 Nebius AI Studio의 embedding model을 사용하여 vector embedding을 생성할 수 있습니다.
+
+[사용 예제](/oss/integrations/text_embedding/nebius)를 참조하세요.
+
+```python
+from langchain_nebius import NebiusEmbeddings
+
+# Initialize embeddings
+embeddings = NebiusEmbeddings(
+    model="BAAI/bge-en-icl"  # Default embedding model
+)
+```
+
+## Retrievers
+
+### NebiusRetriever
+
+`NebiusRetriever`는 Nebius AI Studio의 embedding을 사용하여 효율적인 유사도 검색을 가능하게 합니다. 고품질 embedding model을 활용하여 문서에 대한 의미론적 검색을 가능하게 합니다.
+
+[사용 예제](/oss/integrations/retrievers/nebius)를 참조하세요.
+
+```python
+from langchain_core.documents import Document
+from langchain_nebius import NebiusEmbeddings, NebiusRetriever
+
+# Create sample documents
+docs = [
+    Document(page_content="Paris is the capital of France"),
+    Document(page_content="Berlin is the capital of Germany"),
+]
+
+# Initialize embeddings
+embeddings = NebiusEmbeddings()
+
+# Create retriever
+retriever = NebiusRetriever(
+    embeddings=embeddings,
+    docs=docs,
+    k=2  # Number of documents to return
+)
+```
+
+## Tools
+
+### NebiusRetrievalTool
+
+`NebiusRetrievalTool`을 사용하면 NebiusRetriever를 기반으로 agent용 tool을 생성할 수 있습니다.
+
+```python
+from langchain_nebius import NebiusEmbeddings, NebiusRetriever, NebiusRetrievalTool
+from langchain_core.documents import Document
+
+# Create sample documents
+docs = [
+    Document(page_content="Paris is the capital of France and has the Eiffel Tower"),
+    Document(page_content="Berlin is the capital of Germany and has the Brandenburg Gate"),
+]
+
+# Create embeddings and retriever
+embeddings = NebiusEmbeddings()
+retriever = NebiusRetriever(embeddings=embeddings, docs=docs)
+
+# Create retrieval tool
+tool = NebiusRetrievalTool(
+    retriever=retriever,
+    name="nebius_search",
+    description="Search for information about European capitals"
+)
+```

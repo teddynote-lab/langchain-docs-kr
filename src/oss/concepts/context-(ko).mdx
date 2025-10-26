@@ -1,0 +1,279 @@
+---
+title: Context 개요
+sidebarTitle: Context
+---
+
+**Context engineering**은 AI 애플리케이션이 작업을 수행할 수 있도록 올바른 정보와 도구를 적절한 형식으로 제공하는 동적 시스템을 구축하는 실천 방법입니다. Context는 두 가지 주요 차원으로 특징지을 수 있습니다:
+
+1. **가변성**에 따라:
+  * **Static context**: 실행 중에 변경되지 않는 불변 데이터 (예: 사용자 메타데이터, 데이터베이스 연결, 도구)
+  * **Dynamic context**: 애플리케이션이 실행되면서 진화하는 가변 데이터 (예: 대화 기록, 중간 결과, 도구 호출 관찰)
+2. **수명**에 따라:
+  * **Runtime context**: 단일 실행 또는 호출에 범위가 지정된 데이터
+  * **Cross-conversation context**: 여러 대화 또는 세션에 걸쳐 지속되는 데이터
+
+<Tip>
+    Runtime context는 로컬 context를 의미합니다: 코드가 실행되는 데 필요한 데이터와 종속성입니다. 다음을 의미하지 **않습니다**:
+
+    * LLM context: LLM의 prompt에 전달되는 데이터
+    * "context window": LLM에 전달할 수 있는 최대 토큰 수
+
+    Runtime context는 LLM context를 최적화하는 데 사용할 수 있습니다. 예를 들어, runtime context의 사용자 메타데이터를 사용하여 사용자 기본 설정을 가져와 context window에 제공할 수 있습니다.
+</Tip>
+
+LangGraph는 가변성과 수명 차원을 결합한 세 가지 context 관리 방법을 제공합니다:
+
+:::python
+| Context 유형                                                                                | 설명                                            | 가변성 | 수명           | 접근 방법                           |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ---------- | ------------------ | --------------------------------------- |
+| [**Static runtime context**](#static-runtime-context)                                       | 시작 시 전달되는 사용자 메타데이터, 도구, db 연결 | Static     | Single run         | `invoke`/`stream`의 `context` 인자 |
+| [**Dynamic runtime context (state)**](#dynamic-runtime-context-state)                       | 단일 실행 중에 진화하는 가변 데이터          | Dynamic    | Single run         | LangGraph state 객체                  |
+| [**Dynamic cross-conversation context (store)**](#dynamic-cross-conversation-context-store) | 대화 간에 공유되는 영구 데이터            | Dynamic    | Cross-conversation | LangGraph store                         |
+
+## Static runtime context
+
+**Static runtime context**는 `invoke`/`stream`의 `context` 인자를 통해 실행 시작 시 애플리케이션에 전달되는 사용자 메타데이터, 도구, 데이터베이스 연결과 같은 불변 데이터를 나타냅니다. 이 데이터는 실행 중에 변경되지 않습니다.
+
+```python
+@dataclass
+class ContextSchema:
+    user_name: str
+
+graph.invoke(
+    {"messages": [{"role": "user", "content": "hi!"}]},
+    context={"user_name": "John Smith"}  # [!code highlight]
+)
+```
+
+<Tabs>
+    <Tab title="Agent prompt">
+    ```python
+    from dataclasses import dataclass
+    from langchain.agents import create_agent
+    from langchain.agents.middleware import dynamic_prompt, ModelRequest
+
+
+    @dataclass
+    class ContextSchema:
+        user_name: str
+
+    @dynamic_prompt  # [!code highlight]
+    def personalized_prompt(request: ModelRequest) -> str:  # [!code highlight]
+        user_name = request.runtime.context.user_name
+        return f"You are a helpful assistant. Address the user as {user_name}."
+
+    agent = create_agent(
+        model="anthropic:claude-sonnet-4-5",
+        tools=[get_weather],
+        middleware=[personalized_prompt],
+        context_schema=ContextSchema
+    )
+
+    agent.invoke(
+        {"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+        context=ContextSchema(user_name="John Smith")  # [!code highlight]
+    )
+```
+
+    자세한 내용은 [Agents](/oss/langchain/agents)를 참조하세요.
+    </Tab>
+    <Tab title="Workflow node">
+    ```python
+    from langgraph.runtime import Runtime
+
+    def node(state: State, runtime: Runtime[ContextSchema]):  # [!code highlight]
+        user_name = runtime.context.user_name
+        ...
+```
+
+    * 자세한 내용은 [Graph API](/oss/langgraph/graph-api#add-runtime-configuration)를 참조하세요.
+    </Tab>
+    <Tab title="In a tool">
+    ```python
+    from langchain.tools import tool, ToolRuntime
+
+    @tool
+    def get_user_email(runtime: ToolRuntime[ContextSchema]) -> str:
+        """Retrieve user information based on user ID."""
+        # simulate fetching user info from a database
+        email = get_user_email_from_db(runtime.context.user_name)  # [!code highlight]
+        return email
+```
+
+    자세한 내용은 [tool calling guide](/oss/langchain/tools#configuration)를 참조하세요.
+    </Tab>
+</Tabs>
+
+<Tip>
+    `Runtime` 객체는 static context 및 활성 store, stream writer와 같은 기타 유틸리티에 접근하는 데 사용할 수 있습니다.
+    자세한 내용은 @[`Runtime`][langgraph.runtime.Runtime] 문서를 참조하세요.
+</Tip>
+:::
+
+:::js
+| Context 유형                                                                                | 설명                                   | 가변성 | 수명           |
+| ------------------------------------------------------------------------------------------- | --------------------------------------------- | ---------- | ------------------ |
+| [**Config**](#config-static-context)                                                        | 실행 시작 시 전달되는 데이터             | Static     | Single run         |
+| [**Dynamic runtime context (state)**](#dynamic-runtime-context-state)                       | 단일 실행 중에 진화하는 가변 데이터 | Dynamic    | Single run         |
+| [**Dynamic cross-conversation context (store)**](#dynamic-cross-conversation-context-store) | 대화 간에 공유되는 영구 데이터   | Dynamic    | Cross-conversation |
+
+<a id="static-context"></a>
+## Config
+
+Config는 사용자 메타데이터나 API 키와 같은 불변 데이터를 위한 것입니다. 실행 중에 변경되지 않는 값이 있을 때 사용하세요.
+
+이 목적을 위해 예약된 **"configurable"**이라는 키를 사용하여 구성을 지정합니다.
+
+```typescript
+await graph.invoke(
+  { messages: [{ role: "user", content: "hi!" }] },
+  { configurable: { user_id: "user_123" } } // [!code highlight]
+);
+```
+:::
+
+<a id="state"></a>
+## Dynamic runtime context
+
+**Dynamic runtime context**는 단일 실행 중에 진화할 수 있는 가변 데이터를 나타내며 LangGraph state 객체를 통해 관리됩니다. 여기에는 대화 기록, 중간 결과, 도구 또는 LLM 출력에서 파생된 값이 포함됩니다. LangGraph에서 state 객체는 실행 중 [단기 메모리](/oss/concepts/memory) 역할을 합니다.
+
+<Tabs>
+    <Tab title="In an agent">
+    예제는 state를 agent **prompt**에 통합하는 방법을 보여줍니다.
+
+    State는 agent의 **tools**에서도 접근할 수 있으며, 필요에 따라 state를 읽거나 업데이트할 수 있습니다. 자세한 내용은 [tool calling guide](/oss/langchain/tools#short-term-memory)를 참조하세요.
+
+    :::python
+    ```python
+    from langchain.agents import create_agent
+    from langchain.agents.middleware import dynamic_prompt, ModelRequest
+    from langchain.agents import AgentState
+
+
+    class CustomState(AgentState):  # [!code highlight]
+        user_name: str
+
+    @dynamic_prompt  # [!code highlight]
+    def personalized_prompt(request: ModelRequest) -> str:  # [!code highlight]
+        user_name = request.state.get("user_name", "User")
+        return f"You are a helpful assistant. User's name is {user_name}"
+
+    agent = create_agent(
+        model="anthropic:claude-sonnet-4-5",
+        tools=[...],
+        state_schema=CustomState,  # [!code highlight]
+        middleware=[personalized_prompt],  # [!code highlight]
+    )
+
+    agent.invoke({
+        "messages": "hi!",
+        "user_name": "John Smith"
+    })
+    ```
+    :::
+
+    :::js
+    ```typescript
+    import { createAgent, createMiddleware } from "langchain";
+    import type { AgentState } from "langchain";
+    import * as z from "zod";
+
+    const CustomState = z.object({ // [!code highlight]
+      userName: z.string(),
+    });
+
+    const personalizedPrompt = createMiddleware({ // [!code highlight]
+      name: "PersonalizedPrompt",
+      stateSchema: CustomState,
+      wrapModelCall: (request, handler) => {
+        const userName = request.state.userName || "User";
+        const systemPrompt = `You are a helpful assistant. User's name is ${userName}`;
+        return handler({ ...request, systemPrompt });
+      },
+    });
+
+    const agent = createAgent({  // [!code highlight]
+      model: "anthropic:claude-sonnet-4-5",
+      tools: [/* your tools here */],
+      middleware: [personalizedPrompt] as const, // [!code highlight]
+    });
+
+    await agent.invoke({
+      messages: [{ role: "user", content: "hi!" }],
+      userName: "John Smith",
+    });
+    ```
+    :::
+    </Tab>
+    <Tab title="In a workflow">
+    :::python
+    ```python
+    from typing_extensions import TypedDict
+    from langchain.messages import AnyMessage
+    from langgraph.graph import StateGraph
+
+    class CustomState(TypedDict):  # [!code highlight]
+        messages: list[AnyMessage]
+        extra_field: int
+
+    def node(state: CustomState):  # [!code highlight]
+        messages = state["messages"]
+        ...
+        return {  # [!code highlight]
+            "extra_field": state["extra_field"] + 1  # [!code highlight]
+        }
+
+    builder = StateGraph(State)
+    builder.add_node(node)
+    builder.set_entry_point("node")
+    graph = builder.compile()
+    ```
+    :::
+
+    :::js
+    ```typescript
+    import type { BaseMessage } from "@langchain/core/messages";
+    import { StateGraph, MessagesZodMeta, START } from "@langchain/langgraph";
+    import { registry } from "@langchain/langgraph/zod";
+    import * as z from "zod";
+
+    const CustomState = z.object({  // [!code highlight]
+      messages: z
+        .array(z.custom<BaseMessage>())
+        .register(registry, MessagesZodMeta),
+      extraField: z.number(),
+    });
+
+    const builder = new StateGraph(CustomState)
+      .addNode("node", async (state) => {  // [!code highlight]
+        const messages = state.messages;
+        // ...
+        return {  // [!code highlight]
+          extraField: state.extraField + 1,
+        };
+      })
+      .addEdge(START, "node");
+
+    const graph = builder.compile();
+    ```
+    :::
+    </Tab>
+</Tabs>
+
+<Tip>
+    **메모리 활성화하기**
+    메모리를 활성화하는 방법에 대한 자세한 내용은 [memory guide](/oss/langgraph/add-memory)를 참조하세요. 이는 여러 호출에 걸쳐 agent의 state를 유지할 수 있는 강력한 기능입니다. 그렇지 않으면 state는 단일 실행에만 범위가 지정됩니다.
+</Tip>
+
+<a id="store"></a>
+
+## Dynamic cross-conversation context
+
+**Dynamic cross-conversation context**는 여러 대화 또는 세션에 걸쳐 지속되는 영구적이고 가변적인 데이터를 나타내며 LangGraph store를 통해 관리됩니다. 여기에는 사용자 프로필, 기본 설정, 과거 상호작용이 포함됩니다. LangGraph store는 여러 실행에 걸친 [장기 메모리](/oss/concepts/memory#long-term-memory) 역할을 합니다. 이는 영구적인 사실(예: 사용자 프로필, 기본 설정, 이전 상호작용)을 읽거나 업데이트하는 데 사용할 수 있습니다.
+
+## 참고 자료
+
+- [Memory 개념 개요](/oss/concepts/memory)
+- [LangChain의 단기 메모리](/oss/langchain/short-term-memory)
+- [LangChain의 장기 메모리](/oss/langchain/long-term-memory)
+- [LangGraph의 메모리](/oss/langgraph/add-memory)

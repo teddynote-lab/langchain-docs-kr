@@ -1,0 +1,20 @@
+---
+title: IMSDB
+---
+
+이 예제는 Cheerio를 사용하여 Internet Movie Script Database 웹사이트에서 데이터를 로드하는 방법을 다룹니다. 각 페이지마다 하나의 document가 생성됩니다.
+
+## Setup
+
+```bash npm
+npm install @langchain/community @langchain/core cheerio
+```
+## Usage
+
+```typescript
+import { IMSDBLoader } from "@langchain/community/document_loaders/web/imsdb";
+
+const loader = new IMSDBLoader("https://imsdb.com/scripts/BlacKkKlansman.html");
+
+const docs = await loader.load();
+```

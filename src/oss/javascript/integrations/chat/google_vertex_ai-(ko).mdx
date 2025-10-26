@@ -1,0 +1,276 @@
+---
+title: ChatVertexAI
+---
+
+[Google Vertex](https://cloud.google.com/vertex-ai)는 `gemini-2.5-pro`, `gemini-2.5-flash` 등 Google Cloud에서 사용 가능한 모든 foundation model을 제공하는 서비스입니다.
+또한 [Anthropic의 Claude](https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-claude)와 같은 Google 외부 모델도 제공합니다.
+
+이 문서는 `ChatVertexAI` [chat models](/oss/langchain/models) 시작하기를 도와드립니다. 모든 `ChatVertexAI` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_google_vertexai.ChatVertexAI.html)를 참조하세요.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | [PY support](https://python.langchain.com/docs/integrations/chat/google_vertex_ai_palm) | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [ChatVertexAI](https://api.js.langchain.com/classes/langchain_google_vertexai.ChatVertexAI.html) | [`@langchain/google-vertexai`](https://www.npmjs.com/package/@langchain/google-vertexai) | ❌ | ✅ | ✅ | ![NPM - Downloads](https://img.shields.io/npm/dm/@langchain/google-vertexai?style=flat-square&label=%20&) | ![NPM - Version](https://img.shields.io/npm/v/@langchain/google-vertexai?style=flat-square&label=%20&) |
+
+### Model features
+
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
+
+| [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
+| :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+logprobs는 지원되지만 Gemini는 사용에 상당한 제한이 있습니다.
+
+## Setup
+
+LangChain.js는 Node.js 환경에서 실행하는지 웹 환경에서 실행하는지에 따라 두 가지 다른 인증 방법을 지원합니다. 또한 두 패키지 모두에서 Vertex AI Express Mode에서 사용하는 인증 방법을 지원합니다.
+
+`ChatVertexAI` 모델에 액세스하려면 Google Cloud Platform(GCP) 계정에서 Google VertexAI를 설정하고, 자격 증명 파일을 저장하고, `@langchain/google-vertexai` integration 패키지를 설치해야 합니다.
+
+### Credentials
+
+[GCP 계정](https://console.cloud.google.com/)으로 이동하여 자격 증명 파일을 생성하세요. 완료되면 `GOOGLE_APPLICATION_CREDENTIALS` 환경 변수를 설정하세요:
+
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS="path/to/your/credentials.json"
+```
+
+웹 환경에서 실행하는 경우 `GOOGLE_VERTEX_AI_WEB_CREDENTIALS` 환경 변수를 JSON 문자열화된 객체로 설정하고 `@langchain/google-vertexai-web` 패키지를 설치해야 합니다:
+
+```bash
+GOOGLE_VERTEX_AI_WEB_CREDENTIALS={"type":"service_account","project_id":"YOUR_PROJECT-12345",...}
+```
+
+Vertex AI Express Mode를 사용하는 경우 `@langchain/google-vertexai` 또는 `@langchain/google-vertexai-web` 패키지 중 하나를 설치할 수 있습니다.
+그런 다음 [Express Mode](https://console.cloud.google.com/vertex-ai/studio) API Key 페이지로 이동하여 `GOOGLE_API_KEY` 환경 변수에 API Key를 설정하세요:
+
+```bash
+export GOOGLE_API_KEY="api_key_value"
+```
+
+모델 호출에 대한 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
+
+```bash
+# export LANGSMITH_TRACING="true"
+# export LANGSMITH_API_KEY="your-api-key"
+```
+
+### Installation
+
+LangChain `ChatVertexAI` integration은 `@langchain/google-vertexai` 패키지에 있습니다:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/google-vertexai @langchain/core
+```
+```bash yarn
+yarn add @langchain/google-vertexai @langchain/core
+```
+```bash pnpm
+pnpm add @langchain/google-vertexai @langchain/core
+```
+</CodeGroup>
+
+또는 [Vercel Edge function](https://vercel.com/blog/edge-functions-generally-available)과 같은 웹 환경에서 사용하는 경우:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/google-vertexai-web @langchain/core
+```
+```bash yarn
+yarn add @langchain/google-vertexai-web @langchain/core
+```
+```bash pnpm
+pnpm add @langchain/google-vertexai-web @langchain/core
+```
+</CodeGroup>
+
+## Instantiation
+
+이제 모델 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
+
+```typescript
+import { ChatVertexAI } from "@langchain/google-vertexai"
+// Uncomment the following line if you're running in a web environment:
+// import { ChatVertexAI } from "@langchain/google-vertexai-web"
+
+const llm = new ChatVertexAI({
+    model: "gemini-2.5-flash",
+    temperature: 0,
+    maxRetries: 2,
+    // For web, authOptions.credentials
+    // authOptions: { ... }
+    // other params...
+})
+```
+
+## Invocation
+
+```typescript
+const aiMsg = await llm.invoke([
+    [
+        "system",
+        "You are a helpful assistant that translates English to French. Translate the user sentence.",
+    ],
+    ["human", "I love programming."],
+])
+aiMsg
+```
+
+```output
+AIMessageChunk {
+  "content": "J'adore programmer. \n",
+  "additional_kwargs": {},
+  "response_metadata": {},
+  "tool_calls": [],
+  "tool_call_chunks": [],
+  "invalid_tool_calls": [],
+  "usage_metadata": {
+    "input_tokens": 20,
+    "output_tokens": 7,
+    "total_tokens": 27
+  }
+}
+```
+
+```typescript
+console.log(aiMsg.content)
+```
+
+```output
+J'adore programmer.
+```
+
+## Tool Calling with Google Search Retrieval
+
+Google 검색 도구를 사용하여 모델을 호출할 수 있으며, 이를 통해 실제 정보로 콘텐츠 생성을 [grounding](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/grounding)하고 환각을 줄일 수 있습니다.
+
+Grounding은 현재 `gemini-2.0-flash-exp`에서 지원되지 않습니다.
+
+Google Search를 사용하거나 사용자 정의 data store를 사용하여 grounding을 선택할 수 있습니다. 다음은 두 가지 예시입니다:
+
+### Google Search Retrieval
+
+Google Search를 사용하는 grounding 예시:
+
+```typescript
+import { ChatVertexAI } from "@langchain/google-vertexai"
+
+const searchRetrievalTool = {
+  googleSearchRetrieval: {
+    dynamicRetrievalConfig: {
+      mode: "MODE_DYNAMIC", // Use Dynamic Retrieval
+      dynamicThreshold: 0.7, // Default for Dynamic Retrieval threshold
+    },
+  },
+};
+
+const searchRetrievalModel = new ChatVertexAI({
+  model: "gemini-1.5-pro",
+  temperature: 0,
+  maxRetries: 0,
+}).bindTools([searchRetrievalTool]);
+
+const searchRetrievalResult = await searchRetrievalModel.invoke("Who won the 2024 NBA Finals?");
+
+console.log(searchRetrievalResult.content);
+```
+
+```output
+The Boston Celtics won the 2024 NBA Finals, defeating the Dallas Mavericks 4-1 in the series to claim their 18th NBA championship. This victory marked their first title since 2008 and established them as the team with the most NBA championships, surpassing the Los Angeles Lakers' 17 titles.
+```
+
+### Google Search Retrieval with Data Store
+
+먼저 data store를 설정하세요 (다음은 예시 data store의 스키마입니다):
+
+|    ID   |     Date     |    Team 1   |   Score  |   Team 2   |
+|:-------:|:------------:|:-----------:|:--------:|:----------:|
+|  3001   |  2023-09-07  |  Argentina  |  1 - 0   |  Ecuador   |
+|  3002   |  2023-09-12  |  Venezuela  |  1 - 0   |  Paraguay  |
+|  3003   |  2023-09-12  |  Chile      |  0 - 0   |  Colombia  |
+|  3004   |  2023-09-12  |  Peru       |  0 - 1   |  Brazil    |
+|  3005   |  2024-10-15  |  Argentina  |  6 - 0   |  Bolivia   |
+
+그런 다음 아래 제공된 예시에서 이 data store를 사용하세요:
+
+(`projectId`와 `datastoreId`에 대해 자신의 변수를 사용해야 합니다)
+
+```typescript
+import { ChatVertexAI } from "@langchain/google-vertexai";
+
+const projectId = "YOUR_PROJECT_ID";
+const datastoreId = "YOUR_DATASTORE_ID";
+
+const searchRetrievalToolWithDataset = {
+  retrieval: {
+    vertexAiSearch: {
+      datastore: `projects/${projectId}/locations/global/collections/default_collection/dataStores/${datastoreId}`,
+    },
+    disableAttribution: false,
+  },
+};
+
+const searchRetrievalModelWithDataset = new ChatVertexAI({
+  model: "gemini-1.5-pro",
+  temperature: 0,
+  maxRetries: 0,
+}).bindTools([searchRetrievalToolWithDataset]);
+
+const searchRetrievalModelResult = await searchRetrievalModelWithDataset.invoke(
+  "What is the score of Argentina vs Bolivia football game?"
+);
+
+console.log(searchRetrievalModelResult.content);
+```
+
+```output
+Argentina won against Bolivia with a score of 6-0 on October 15, 2024.
+```
+
+이제 제공된 data store의 데이터에 기반한 결과를 얻을 수 있습니다.
+
+## Context Caching
+
+Vertex AI는 context caching 기능을 제공하며, 이는 여러 API 요청에서 긴 메시지 콘텐츠 블록을 저장하고 재사용하여 비용을 최적화하는 데 도움이 됩니다. 이는 긴 대화 기록이나 상호 작용에서 자주 나타나는 메시지 세그먼트가 있을 때 특히 유용합니다.
+
+이 기능을 사용하려면 먼저 [이 공식 가이드](https://cloud.google.com/vertex-ai/generative-ai/docs/context-cache/context-cache-create)를 따라 context cache를 생성하세요.
+
+cache를 생성한 후 다음과 같이 runtime param으로 해당 id를 전달할 수 있습니다:
+
+```typescript
+import { ChatVertexAI } from "@langchain/google-vertexai";
+
+const modelWithCachedContent = new ChatVertexAI({
+  model: "gemini-1.5-pro-002",
+  location: "us-east5",
+});
+
+await modelWithCachedContent.invoke("What is in the content?", {
+  cachedContent:
+    "projects/PROJECT_NUMBER/locations/LOCATION/cachedContents/CACHE_ID",
+});
+```
+
+이 필드를 모델 인스턴스에 직접 바인딩할 수도 있습니다:
+
+```typescript
+const modelWithBoundCachedContent = new ChatVertexAI({
+  model: "gemini-1.5-pro-002",
+  location: "us-east5",
+}).bind({
+  cachedContent:
+    "projects/PROJECT_NUMBER/locations/LOCATION/cachedContents/CACHE_ID",
+});
+
+```
+
+현재 모든 모델이 context caching을 지원하는 것은 아닙니다.
+
+## API reference
+
+모든 ChatVertexAI 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_google_vertexai.ChatVertexAI.html)를 참조하세요.

@@ -1,0 +1,38 @@
+---
+title: Baidu Qianfan
+---
+
+`BaiduQianfanEmbeddings` 클래스는 Baidu Qianfan API를 사용하여 주어진 텍스트에 대한 embedding을 생성합니다.
+
+## Setup
+
+이 embedding model을 사용하려면 API key가 필요합니다. https://cloud.baidu.com/doc/WENXINWORKSHOP/s/alj562vvu 에서 등록하여 API key를 받을 수 있습니다.
+
+획득한 API key를 BAIDU_API_KEY라는 이름의 환경 변수로 설정하고, secret key를 BAIDU_SECRET_KEY라는 이름의 환경 변수로 설정하세요.
+
+그런 다음 [`@langchain/baidu-qianfan`](https://www.npmjs.com/package/@langchain/baidu-qianfan) package를 설치해야 합니다:
+
+<Tip>
+LangChain package 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install @langchain/baidu-qianfan @langchain/core
+```
+
+## Usage
+
+```typescript
+import { BaiduQianfanEmbeddings } from "@langchain/baidu-qianfan";
+
+const embeddings = new BaiduQianfanEmbeddings();
+const res = await embeddings.embedQuery(
+  "What would be a good company name a company that makes colorful socks?"
+);
+console.log({ res });
+```
+
+## Related
+
+- Embedding model [개념 가이드](/oss/integrations/text_embedding)
+- Embedding model [사용 방법 가이드](/oss/integrations/text_embedding)

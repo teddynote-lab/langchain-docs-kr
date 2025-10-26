@@ -1,0 +1,62 @@
+---
+title: BM25
+---
+
+BM25는 [Okapi BM25](https://en.wikipedia.org/wiki/Okapi_BM25)로도 알려져 있으며, 정보 검색 시스템에서 주어진 검색 쿼리에 대한 문서의 관련성을 추정하는 데 사용되는 순위 함수입니다.
+
+다른 소스에서 초기 문서 세트를 검색한 후 후처리 단계로 문서의 순위를 재조정하기 위해 검색 파이프라인의 일부로 사용할 수 있습니다.
+
+## Setup
+
+`BM25Retriever`는 `@langchain/community`에서 export됩니다. 다음과 같이 설치해야 합니다:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/community @langchain/core
+```
+```bash yarn
+yarn add @langchain/community @langchain/core
+```
+```bash pnpm
+pnpm add @langchain/community @langchain/core
+```
+</CodeGroup>
+
+이 retriever는 Okapi BM25의 [`이 구현`](https://github.com/FurkanToprak/OkapiBM25)의 코드를 사용합니다.
+
+## Usage
+
+이제 이전에 검색한 문서로 새로운 retriever를 생성할 수 있습니다:
+
+```typescript
+import { BM25Retriever } from "@langchain/community/retrievers/bm25";
+
+const retriever = BM25Retriever.fromDocuments([
+  { pageContent: "Buildings are made out of brick", metadata: {} },
+  { pageContent: "Buildings are made out of wood", metadata: {} },
+  { pageContent: "Buildings are made out of stone", metadata: {} },
+  { pageContent: "Cars are made out of metal", metadata: {} },
+  { pageContent: "Cars are made out of plastic", metadata: {} },
+  { pageContent: "mitochondria is the powerhouse of the cell", metadata: {} },
+  { pageContent: "mitochondria is made of lipids", metadata: {} },
+], { k: 4 });
+
+// Will return the 4 documents reranked by the BM25 algorithm
+await retriever.invoke("mitochondria");
+```
+
+```output
+[
+  { pageContent: 'mitochondria is made of lipids', metadata: {} },
+  {
+    pageContent: 'mitochondria is the powerhouse of the cell',
+    metadata: {}
+  },
+  { pageContent: 'Buildings are made out of brick', metadata: {} },
+  { pageContent: 'Buildings are made out of wood', metadata: {} }
+]
+```
+
+```typescript
+
+```

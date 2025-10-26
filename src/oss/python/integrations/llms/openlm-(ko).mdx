@@ -1,0 +1,72 @@
+---
+title: OpenLM
+---
+
+[OpenLM](https://github.com/r2d4/openlm)은 HTTP를 통해 다양한 추론 엔드포인트를 직접 호출할 수 있는 의존성이 없는 OpenAI 호환 LLM provider입니다.
+
+OpenAI Completion class를 구현하여 OpenAI API의 드롭인 대체제로 사용할 수 있습니다. 이 변경 사항은 최소한의 추가 코드로 BaseOpenAI를 활용합니다.
+
+이 예제는 LangChain을 사용하여 OpenAI와 HuggingFace 모두와 상호작용하는 방법을 다룹니다. 두 곳 모두에서 API key가 필요합니다.
+
+### Setup
+
+의존성을 설치하고 API key를 설정합니다.
+
+```python
+# Uncomment to install openlm and openai if you haven't already
+
+pip install -qU  openlm
+pip install -qU  langchain-openai
+```
+
+```python
+import os
+from getpass import getpass
+
+# Check if OPENAI_API_KEY environment variable is set
+if "OPENAI_API_KEY" not in os.environ:
+    print("Enter your OpenAI API key:")
+    os.environ["OPENAI_API_KEY"] = getpass()
+
+# Check if HF_API_TOKEN environment variable is set
+if "HF_API_TOKEN" not in os.environ:
+    print("Enter your HuggingFace Hub API key:")
+    os.environ["HF_API_TOKEN"] = getpass()
+```
+
+### LangChain과 OpenLM 사용하기
+
+여기서는 LLMChain에서 두 개의 model을 호출할 것입니다. OpenAI의 `text-davinci-003`과 HuggingFace의 `gpt2`입니다.
+
+```python
+from langchain.chains import LLMChain
+from langchain_community.llms import OpenLM
+from langchain_core.prompts import PromptTemplate
+```
+
+```python
+question = "What is the capital of France?"
+template = """Question: {question}
+
+Answer: Let's think step by step."""
+
+prompt = PromptTemplate.from_template(template)
+
+for model in ["text-davinci-003", "huggingface.co/gpt2"]:
+    llm = OpenLM(model=model)
+    llm_chain = LLMChain(prompt=prompt, llm=llm)
+    result = llm_chain.run(question)
+    print(
+        """Model: {}
+Result: {}""".format(model, result)
+    )
+```
+
+```output
+Model: text-davinci-003
+Result:  France is a country in Europe. The capital of France is Paris.
+Model: huggingface.co/gpt2
+Result: Question: What is the capital of France?
+
+Answer: Let's think step by step. I am not going to lie, this is a complicated issue, and I don't see any solutions to all this, but it is still far more
+```

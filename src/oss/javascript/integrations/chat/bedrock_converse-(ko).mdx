@@ -1,0 +1,134 @@
+---
+title: ChatBedrockConverse
+---
+
+[Amazon Bedrock Converse](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_Converse.html)는 선도적인 AI 스타트업과 Amazon의 Foundation Model(FM)을 API를 통해 사용할 수 있도록 하는 완전 관리형 서비스입니다. 다양한 FM 중에서 사용 사례에 가장 적합한 모델을 선택할 수 있습니다. Bedrock 모델을 위한 통합된 대화형 인터페이스를 제공하지만, 이전 [Bedrock 모델 서비스](/oss/integrations/chat/bedrock)의 모든 기능과 완전히 동등한 기능을 아직 제공하지는 않습니다.
+
+이 문서는 Amazon Bedrock Converse [chat model](/oss/langchain/models) 시작하기를 도와드립니다. 모든 `ChatBedrockConverse` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_aws.ChatBedrockConverse.html)를 참조하세요.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | [PY support](https://python.langchain.com/docs/integrations/chat/bedrock/#beta-bedrock-converse-api) | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [`ChatBedrockConverse`](https://api.js.langchain.com/classes/langchain_aws.ChatBedrockConverse.html) | [`@langchain/aws`](https://npmjs.com/@langchain/aws) | ❌ | ✅ | ✅ | ![NPM - Downloads](https://img.shields.io/npm/dm/@langchain/aws?style=flat-square&label=%20&) | ![NPM - Version](https://img.shields.io/npm/v/@langchain/aws?style=flat-square&label=%20&) |
+
+### Model features
+
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
+
+| [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
+| :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ |
+
+## Setup
+
+Bedrock 모델에 액세스하려면 AWS 계정을 생성하고, Bedrock API 서비스를 설정하고, access key ID와 secret key를 받고, `@langchain/community` integration package를 설치해야 합니다.
+
+### Credentials
+
+AWS에 가입하고 자격 증명을 설정하려면 [AWS 문서](https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html)를 참조하세요. 또한 [다음 지침](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html)에 따라 계정에 대한 모델 액세스를 활성화해야 합니다.
+
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수 있습니다:
+
+```bash
+# export LANGSMITH_TRACING="true"
+# export LANGSMITH_API_KEY="your-api-key"
+```
+
+### Installation
+
+LangChain `ChatBedrockConverse` integration은 `@langchain/aws` package에 있습니다:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/aws @langchain/core
+```
+```bash yarn
+yarn add @langchain/aws @langchain/core
+```
+```bash pnpm
+pnpm add @langchain/aws @langchain/core
+```
+</CodeGroup>
+
+## Instantiation
+
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다.
+
+AWS 인증 방법은 여러 가지가 있습니다 - 아래 예제는 환경 변수에 설정된 access key, secret access key 및 region을 사용합니다:
+
+```typescript
+import { ChatBedrockConverse } from "@langchain/aws";
+
+const llm = new ChatBedrockConverse({
+  model: "anthropic.claude-3-5-sonnet-20240620-v1:0",
+  region: process.env.BEDROCK_AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.BEDROCK_AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.BEDROCK_AWS_SECRET_ACCESS_KEY!,
+  },
+});
+```
+
+## Invocation
+
+```typescript
+const aiMsg = await llm.invoke([
+  [
+    "system",
+    "You are a helpful assistant that translates English to French. Translate the user sentence.",
+  ],
+  ["human", "I love programming."],
+])
+aiMsg
+```
+
+```output
+AIMessage {
+  "id": "f5dc5791-224e-4fe5-ba2e-4cc51d9e7795",
+  "content": "J'adore la programmation.",
+  "additional_kwargs": {},
+  "response_metadata": {
+    "$metadata": {
+      "httpStatusCode": 200,
+      "requestId": "f5dc5791-224e-4fe5-ba2e-4cc51d9e7795",
+      "attempts": 1,
+      "totalRetryDelay": 0
+    },
+    "metrics": {
+      "latencyMs": 584
+    },
+    "stopReason": "end_turn",
+    "usage": {
+      "inputTokens": 29,
+      "outputTokens": 11,
+      "totalTokens": 40
+    }
+  },
+  "tool_calls": [],
+  "invalid_tool_calls": [],
+  "usage_metadata": {
+    "input_tokens": 29,
+    "output_tokens": 11,
+    "total_tokens": 40
+  }
+}
+```
+
+```typescript
+console.log(aiMsg.content)
+```
+
+```output
+J'adore la programmation.
+```
+
+## Tool calling
+
+Bedrock 모델의 tool calling은 [다른 모델](/oss/langchain/tools)과 유사한 방식으로 작동하지만, 모든 Bedrock 모델이 tool calling을 지원하는 것은 아닙니다. 자세한 내용은 [AWS 모델 문서](https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html)를 참조하세요.
+
+## API reference
+
+모든 `ChatBedrockConverse` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_aws.ChatBedrockConverse.html)를 참조하세요.

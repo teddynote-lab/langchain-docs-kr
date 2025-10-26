@@ -1,0 +1,54 @@
+```markdown
+---
+title: IPEX-LLM - Intel CPU에서 로컬 BGE Embeddings 사용하기
+---
+
+> [IPEX-LLM](https://github.com/intel-analytics/ipex-llm)은 Intel CPU 및 GPU(예: iGPU가 있는 로컬 PC, Arc, Flex, Max와 같은 discrete GPU)에서 매우 낮은 지연 시간으로 LLM을 실행하기 위한 PyTorch 라이브러리입니다.
+
+이 예제는 Intel CPU에서 `ipex-llm` 최적화를 사용하여 LangChain으로 embedding 작업을 수행하는 방법을 다룹니다. 이는 RAG, 문서 QA 등과 같은 애플리케이션에서 유용합니다.
+
+## Setup
+
+```python
+pip install -qU langchain langchain-community
+```
+
+Intel CPU 최적화를 위한 IPEX-LLM과 `sentence-transformers`를 설치합니다.
+
+```python
+pip install --pre --upgrade ipex-llm[all] --extra-index-url https://download.pytorch.org/whl/cpu
+pip install sentence-transformers
+```
+
+> **Note**
+>
+> Windows 사용자의 경우, `ipex-llm` 설치 시 `--extra-index-url https://download.pytorch.org/whl/cpu`는 필요하지 않습니다.
+
+## Basic Usage
+
+```python
+from langchain_community.embeddings import IpexLLMBgeEmbeddings
+
+embedding_model = IpexLLMBgeEmbeddings(
+    model_name="BAAI/bge-large-en-v1.5",
+    model_kwargs={},
+    encode_kwargs={"normalize_embeddings": True},
+)
+```
+
+## API reference
+
+- [IpexLLMBgeEmbeddings](https://python.langchain.com/api_reference/community/embeddings/langchain_community.embeddings.ipex_llm.IpexLLMBgeEmbeddings.html)
+
+```python
+sentence = "IPEX-LLM is a PyTorch library for running LLM on Intel CPU and GPU (e.g., local PC with iGPU, discrete GPU such as Arc, Flex and Max) with very low latency."
+query = "What is IPEX-LLM?"
+
+text_embeddings = embedding_model.embed_documents([sentence, query])
+print(f"text_embeddings[0][:10]: {text_embeddings[0][:10]}")
+print(f"text_embeddings[1][:10]: {text_embeddings[1][:10]}")
+
+query_embedding = embedding_model.embed_query(query)
+print(f"query_embedding[:10]: {query_embedding[:10]}")
+```
+```

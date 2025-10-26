@@ -1,0 +1,133 @@
+---
+title: Cloud
+sidebarTitle: Cloud (SaaS)
+icon: cloud
+iconType: solid
+---
+
+<Callout icon="rocket" color="#4F46E5" iconType="regular">
+앱을 Cloud에 배포할 준비가 되었다면, [Cloud 배포 빠른 시작](/langsmith/deployment-quickstart) 또는 [전체 설정 가이드](/langsmith/deploy-to-cloud)를 따라하세요. 이 페이지는 참고용으로 Cloud 호스팅 모델을 설명합니다.
+</Callout>
+
+**Cloud** 옵션은 LangChain이 모든 LangSmith 인프라와 서비스를 호스팅하고 운영하는 완전 관리형 호스팅 모델입니다:
+
+- **완전 관리형 인프라**: LangChain이 모든 인프라, 업데이트, 확장 및 유지보수를 처리합니다.
+- **GitHub에서 배포**: 리포지토리를 연결하고 몇 번의 클릭으로 배포하세요.
+- **자동화된 CI/CD**: 빌드 프로세스는 플랫폼에서 자동으로 처리됩니다.
+- **LangSmith UI**: [관찰성](/langsmith/observability), [평가](/langsmith/evaluation), [배포 관리](/langsmith/deployments), [Studio](/langsmith/studio)에 대한 전체 액세스를 제공합니다.
+
+|                   | **관리 주체** | **실행 위치** |
+|-------------------|-------------------|-------------------|
+| **LangSmith platform (UI, APIs, datastores)** | LangChain | LangChain의 클라우드 |
+| **Your LangGraph Servers** | LangChain | LangChain의 클라우드 |
+| **CI/CD for your apps** | LangChain | LangChain의 클라우드 |
+
+![Cloud 배포: LangChain이 UI, API 및 LangGraph Server를 포함한 모든 구성 요소를 호스팅하고 관리합니다.](/langsmith/images/langgraph-cloud-architecture.png)
+
+## 시작하기
+
+Cloud에 첫 번째 애플리케이션을 배포하려면 [Cloud 배포 빠른 시작](/langsmith/deployment-quickstart)을 따라하거나 [종합 설정 가이드](/langsmith/deploy-to-cloud)를 참조하세요.
+
+## Cloud 아키텍처 및 확장성
+
+<Note>
+이 섹션은 [https://smith.langchain.com](https://smith.langchain.com) 및 [https://eu.smith.langchain.com](https://eu.smith.langchain.com)에서 제공되는 클라우드 관리형 LangSmith 서비스에만 해당됩니다.
+
+자체 호스팅 LangSmith 솔루션에 대한 정보는 [자체 호스팅 문서](/langsmith/self-hosted)를 참조하세요.
+</Note>
+
+LangSmith는 Google Cloud Platform(GCP)에 배포되며 높은 확장성을 갖도록 설계되었습니다. 많은 고객이 LLM 애플리케이션 관찰성, 평가 및 에이전트 배포를 위해 LangSmith에서 프로덕션 워크로드를 실행하고 있습니다.
+
+### 아키텍처
+
+미국 기반 LangSmith 서비스는 GCP의 `us-central1`(Iowa) 리전에 배포됩니다.
+
+<Note>
+[EU 기반 LangSmith 서비스](https://eu.smith.langchain.com)는 현재 사용 가능하며(2024년 7월 중순 기준) GCP의 `europe-west4`(Netherlands) 리전에 배포됩니다. 이 리전에서 엔터프라이즈 플랜에 관심이 있으시면 [영업팀에 문의](https://www.langchain.com/contact-sales)하세요.
+</Note>
+
+#### 지역별 스토리지
+
+이 표의 리소스와 서비스는 가입이 발생한 URL(미국 또는 EU)에 해당하는 위치에 저장됩니다. 클라우드 관리형 LangSmith는 인증/권한 부여를 위해 [Supabase](https://supabase.com)를, 데이터 웨어하우스를 위해 [ClickHouse Cloud](https://clickhouse.com/cloud)를 사용합니다.
+
+|                                     | US                                                                 | EU                                                                       |
+| ----------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| URL                                 | [https://smith.langchain.com](https://smith.langchain.com)         | [https://eu.smith.langchain.com](https://eu.smith.langchain.com)         |
+| API URL                             | [https://api.smith.langchain.com](https://api.smith.langchain.com) | [https://eu.api.smith.langchain.com](https://eu.api.smith.langchain.com) |
+| GCP                                 | us-central1 (Iowa)                                                 | europe-west4 (Netherlands)                                               |
+| Supabase                            | AWS us-east-1 (N. Virginia)                                        | AWS eu-central-1 (Germany)                                               |
+| ClickHouse Cloud                    | us-central1 (Iowa)                                                 | europe-west4 (Netherlands)                                               |
+| [LangSmith deployment](/langsmith/deployments) | us-central1 (Iowa)                                                 | europe-west4 (Netherlands)                                               |
+
+자세한 내용은 [지역 FAQ](/langsmith/regions-faq)를 참조하세요.
+
+#### 지역 독립적 스토리지
+
+여기에 나열된 데이터는 미국에만 저장됩니다:
+
+* Stripe 및 Metronome을 통한 결제 및 청구 정보
+
+#### GCP 서비스
+
+LangSmith는 다음 서비스로 구성되며, 모두 Google Kubernetes Engine(GKE)에 배포됩니다:
+
+* LangSmith Frontend: LangSmith UI를 제공합니다.
+* LangSmith Backend: LangSmith API를 제공합니다.
+* LangSmith Platform Backend: 인증 및 기타 대용량 작업을 처리합니다. (내부 서비스)
+* LangSmith Playground: Playground 기능을 위해 다양한 LLM 제공업체로 요청을 전달합니다.
+* LangSmith Queue: 비동기 작업 처리를 담당합니다. (내부 서비스)
+
+LangSmith는 다음 GCP 스토리지 서비스를 사용합니다:
+
+* Google Cloud Storage(GCS): 실행 입력 및 출력용.
+* Google Cloud SQL PostgreSQL: 트랜잭션 워크로드용.
+* Google Cloud Memorystore for Redis: 큐잉 및 캐싱용.
+* Clickhouse Cloud on GCP: 추적 수집 및 분석용. 우리 서비스는 동일한 GCP 리전에 호스팅된 Clickhouse Cloud에 private endpoint를 통해 연결됩니다.
+
+우리가 사용하는 몇 가지 추가 GCP 서비스는 다음과 같습니다:
+
+* Google Cloud Load Balancer: LangSmith 서비스로 트래픽을 라우팅합니다.
+* Google Cloud CDN: 정적 자산을 캐싱합니다.
+* Google Cloud Armor: 보안 및 속도 제한용. 우리가 적용하는 속도 제한에 대한 자세한 내용은 [이 가이드](/langsmith/administration-overview#rate-limits)를 참조하세요.
+
+<div style={{ textAlign: 'center' }}>
+<img
+    className="block dark:hidden"
+    src="/langsmith/images/cloud-arch-light.png"
+    alt="라이트 모드 개요"
+/>
+
+<img
+    className="hidden dark:block"
+    src="/langsmith/images/cloud-arch-dark.png"
+    alt="다크 모드 개요"
+/>
+</div>
+
+### IP 주소 허용 목록 추가
+
+#### LangChain SaaS에서의 Egress
+LangSmith 서비스를 떠나는 모든 트래픽은 NAT gateway를 통해 라우팅됩니다. 모든 트래픽은 다음 IP 주소에서 발생하는 것으로 표시됩니다:
+
+| US             | EU             |
+| -------------- | -------------- |
+| 34.59.65.97    | 34.13.192.67   |
+| 34.67.51.221   | 34.147.105.64  |
+| 34.46.212.37   | 34.90.22.166   |
+| 34.132.150.88  | 34.147.36.213  |
+| 35.188.222.201 | 34.32.137.113  |
+| 34.58.194.127  | 34.91.238.184  |
+| 34.59.97.173   | 35.204.101.241 |
+| 104.198.162.55 | 35.204.48.32   |
+
+Playground 또는 Online Evaluation에서 필요할 수 있는 자체 AzureOpenAI 서비스 또는 기타 엔드포인트에 연결하는 경우 이러한 IP 주소를 허용 목록에 추가하는 것이 도움이 될 수 있습니다.
+
+#### LangChain SaaS로의 Ingress
+langchain 엔드포인트는 다음 고정 IP 주소에 매핑됩니다:
+
+| US             | EU             |
+| -------------- | -------------- |
+| 34.8.121.39    | 34.95.92.214   |
+| 34.107.251.234 | 34.13.73.122   |
+
+프라이빗 네트워크에서 LangSmith SaaS 엔드포인트(`api.smith.langchain.com`, `smith.langchain.com`, `beacon.langchain.com`, `eu.api.smith.langchain.com`, `eu.smith.langchain.com`, `eu.beacon.langchain.com`)로의 트래픽을 활성화하려면 이러한 주소를 허용 목록에 추가해야 할 수 있습니다.

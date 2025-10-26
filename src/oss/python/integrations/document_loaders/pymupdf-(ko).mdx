@@ -1,0 +1,529 @@
+---
+title: PyMuPDFLoader
+---
+
+이 노트북은 `PyMuPDF` [document loader](https://python.langchain.com/docs/concepts/document_loaders) 시작하기에 대한 간단한 개요를 제공합니다. 모든 __ModuleName__Loader 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PyMuPDFLoader.html)를 참조하세요.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | JS support|
+| :--- | :--- | :---: | :---: |  :---: |
+| [PyMuPDFLoader](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PyMuPDFLoader.html) | [langchain-community](https://python.langchain.com/api_reference/community/index.html) | ✅ | ❌ | ❌ |
+
+---------
+
+### Loader features
+
+| Source | Document Lazy Loading | Native Async Support | Extract Images | Extract Tables |
+| :---: | :---: | :---: | :---: |:---: |
+| PyMuPDFLoader | ✅ | ❌ | ✅ | ✅ |
+
+## Setup
+
+### Credentials
+
+PyMuPDFLoader를 사용하는 데 자격 증명이 필요하지 않습니다
+
+모델 호출에 대한 자동화된 최고 수준의 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수 있습니다:
+
+```python
+# os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
+# os.environ["LANGSMITH_TRACING"] = "true"
+```
+
+### Installation
+
+**langchain-community**와 **pymupdf**를 설치합니다.
+
+```python
+%pip install -qU langchain-community pymupdf
+```
+
+```output
+Note: you may need to restart the kernel to use updated packages.
+```
+
+## Initialization
+
+이제 model object를 인스턴스화하고 document를 로드할 수 있습니다:
+
+```python
+from langchain_community.document_loaders import PyMuPDFLoader
+
+file_path = "./example_data/layout-parser-paper.pdf"
+loader = PyMuPDFLoader(file_path)
+```
+
+## Load
+
+```python
+docs = loader.load()
+docs[0]
+```
+
+```output
+Document(metadata={'producer': 'pdfTeX-1.40.21', 'creator': 'LaTeX with hyperref', 'creationdate': '2021-06-22T01:27:10+00:00', 'source': './example_data/layout-parser-paper.pdf', 'file_path': './example_data/layout-parser-paper.pdf', 'total_pages': 16, 'format': 'PDF 1.5', 'title': '', 'author': '', 'subject': '', 'keywords': '', 'moddate': '2021-06-22T01:27:10+00:00', 'trapped': '', 'page': 0}, page_content='LayoutParser: A Uniﬁed Toolkit for Deep\nLearning Based Document Image Analysis\nZejiang Shen1 (\x00), Ruochen Zhang2, Melissa Dell3, Benjamin Charles Germain\nLee4, Jacob Carlson3, and Weining Li5\n1 Allen Institute for AI\nshannons@allenai.org\n2 Brown University\nruochen zhang@brown.edu\n3 Harvard University\n{melissadell,jacob carlson}@fas.harvard.edu\n4 University of Washington\nbcgl@cs.washington.edu\n5 University of Waterloo\nw422li@uwaterloo.ca\nAbstract. Recent advances in document image analysis (DIA) have been\nprimarily driven by the application of neural networks. Ideally, research\noutcomes could be easily deployed in production and extended for further\ninvestigation. However, various factors like loosely organized codebases\nand sophisticated model conﬁgurations complicate the easy reuse of im-\nportant innovations by a wide audience. Though there have been on-going\neﬀorts to improve reusability and simplify deep learning (DL) model\ndevelopment in disciplines like natural language processing and computer\nvision, none of them are optimized for challenges in the domain of DIA.\nThis represents a major gap in the existing toolkit, as DIA is central to\nacademic research across a wide range of disciplines in the social sciences\nand humanities. This paper introduces LayoutParser, an open-source\nlibrary for streamlining the usage of DL in DIA research and applica-\ntions. The core LayoutParser library comes with a set of simple and\nintuitive interfaces for applying and customizing DL models for layout de-\ntection, character recognition, and many other document processing tasks.\nTo promote extensibility, LayoutParser also incorporates a community\nplatform for sharing both pre-trained models and full document digiti-\nzation pipelines. We demonstrate that LayoutParser is helpful for both\nlightweight and large-scale digitization pipelines in real-word use cases.\nThe library is publicly available at https://layout-parser.github.io.\nKeywords: Document Image Analysis · Deep Learning · Layout Analysis\n· Character Recognition · Open Source library · Toolkit.\n1\nIntroduction\nDeep Learning(DL)-based approaches are the state-of-the-art for a wide range of\ndocument image analysis (DIA) tasks including document image classiﬁcation [11,\narXiv:2103.15348v2  [cs.CV]  21 Jun 2021')
+```
+
+```python
+import pprint
+
+pprint.pp(docs[0].metadata)
+```
+
+```output
+{'producer': 'pdfTeX-1.40.21',
+ 'creator': 'LaTeX with hyperref',
+ 'creationdate': '2021-06-22T01:27:10+00:00',
+ 'source': './example_data/layout-parser-paper.pdf',
+ 'file_path': './example_data/layout-parser-paper.pdf',
+ 'total_pages': 16,
+ 'format': 'PDF 1.5',
+ 'title': '',
+ 'author': '',
+ 'subject': '',
+ 'keywords': '',
+ 'moddate': '2021-06-22T01:27:10+00:00',
+ 'trapped': '',
+ 'page': 0}
+```
+
+## Lazy Load
+
+```python
+pages = []
+for doc in loader.lazy_load():
+    pages.append(doc)
+    if len(pages) >= 10:
+        # do some paged operation, e.g.
+        # index.upsert(page)
+
+        pages = []
+len(pages)
+```
+
+```output
+6
+```
+
+```python
+print(pages[0].page_content[:100])
+pprint.pp(pages[0].metadata)
+```
+
+```output
+LayoutParser: A Uniﬁed Toolkit for DL-Based DIA
+11
+focuses on precision, eﬃciency, and robustness. T
+{'producer': 'pdfTeX-1.40.21',
+ 'creator': 'LaTeX with hyperref',
+ 'creationdate': '2021-06-22T01:27:10+00:00',
+ 'source': './example_data/layout-parser-paper.pdf',
+ 'file_path': './example_data/layout-parser-paper.pdf',
+ 'total_pages': 16,
+ 'format': 'PDF 1.5',
+ 'title': '',
+ 'author': '',
+ 'subject': '',
+ 'keywords': '',
+ 'moddate': '2021-06-22T01:27:10+00:00',
+ 'trapped': '',
+ 'page': 10}
+```
+
+metadata attribute는 최소한 다음 key들을 포함합니다:
+
+- source
+- page (*page* mode인 경우)
+- total_page
+- creationdate
+- creator
+- producer
+
+추가 metadata는 각 parser에 따라 다릅니다.
+이러한 정보는 (예를 들어 PDF를 분류하는 데) 유용할 수 있습니다.
+
+## Splitting mode & custom pages delimiter
+
+PDF 파일을 로드할 때 두 가지 방법으로 분할할 수 있습니다:
+
+- 페이지별
+- 단일 텍스트 흐름으로
+
+기본적으로 PyMuPDFLoader는 PDF를 페이지별로 분할합니다.
+
+### 페이지별로 PDF 추출. 각 페이지는 langchain Document object로 추출됩니다
+
+```python
+loader = PyMuPDFLoader(
+    "./example_data/layout-parser-paper.pdf",
+    mode="page",
+)
+docs = loader.load()
+print(len(docs))
+pprint.pp(docs[0].metadata)
+```
+
+```output
+16
+{'producer': 'pdfTeX-1.40.21',
+ 'creator': 'LaTeX with hyperref',
+ 'creationdate': '2021-06-22T01:27:10+00:00',
+ 'source': './example_data/layout-parser-paper.pdf',
+ 'file_path': './example_data/layout-parser-paper.pdf',
+ 'total_pages': 16,
+ 'format': 'PDF 1.5',
+ 'title': '',
+ 'author': '',
+ 'subject': '',
+ 'keywords': '',
+ 'moddate': '2021-06-22T01:27:10+00:00',
+ 'trapped': '',
+ 'page': 0}
+```
+
+이 mode에서는 pdf가 페이지별로 분할되고 결과 Documents metadata에 페이지 번호가 포함됩니다. 그러나 경우에 따라 pdf를 단일 텍스트 흐름으로 처리하고 싶을 수 있습니다(일부 단락을 반으로 자르지 않도록). 이 경우 *single* mode를 사용할 수 있습니다:
+
+### 전체 PDF를 단일 langchain Document object로 추출
+
+```python
+loader = PyMuPDFLoader(
+    "./example_data/layout-parser-paper.pdf",
+    mode="single",
+)
+docs = loader.load()
+print(len(docs))
+pprint.pp(docs[0].metadata)
+```
+
+```output
+1
+{'producer': 'pdfTeX-1.40.21',
+ 'creator': 'LaTeX with hyperref',
+ 'creationdate': '2021-06-22T01:27:10+00:00',
+ 'source': './example_data/layout-parser-paper.pdf',
+ 'file_path': './example_data/layout-parser-paper.pdf',
+ 'total_pages': 16,
+ 'format': 'PDF 1.5',
+ 'title': '',
+ 'author': '',
+ 'subject': '',
+ 'keywords': '',
+ 'moddate': '2021-06-22T01:27:10+00:00',
+ 'trapped': ''}
+```
+
+논리적으로 이 mode에서는 'page_number' metadata가 사라집니다. 텍스트 흐름에서 페이지가 끝나는 위치를 명확하게 식별하는 방법은 다음과 같습니다:
+
+### *single* mode에서 페이지 끝을 식별하기 위해 사용자 정의 *pages_delimiter* 추가
+
+```python
+loader = PyMuPDFLoader(
+    "./example_data/layout-parser-paper.pdf",
+    mode="single",
+    pages_delimiter="\n-------THIS IS A CUSTOM END OF PAGE-------\n",
+)
+docs = loader.load()
+print(docs[0].page_content[:5780])
+```
+
+이것은 단순히 \n이거나, 페이지 변경을 명확하게 나타내기 위한 \f이거나, 시각적 효과 없이 Markdown viewer에 원활하게 삽입하기 위한 \<!-- PAGE BREAK -->일 수 있습니다.
+
+# PDF에서 이미지 추출
+
+세 가지 솔루션 중 하나를 선택하여 PDF에서 이미지를 추출할 수 있습니다:
+
+- rapidOCR (경량 광학 문자 인식 도구)
+- Tesseract (높은 정밀도의 OCR 도구)
+- Multimodal language model
+
+이러한 함수를 조정하여 추출된 이미지의 출력 형식을 *html*, *markdown* 또는 *text* 중에서 선택할 수 있습니다
+
+결과는 페이지의 마지막 텍스트 단락과 마지막에서 두 번째 단락 사이에 삽입됩니다.
+
+### rapidOCR로 PDF에서 이미지 추출
+
+```python
+%pip install -qU rapidocr-onnxruntime
+```
+
+```output
+Note: you may need to restart the kernel to use updated packages.
+```
+
+```python
+from langchain_community.document_loaders.parsers import RapidOCRBlobParser
+
+loader = PyMuPDFLoader(
+    "./example_data/layout-parser-paper.pdf",
+    mode="page",
+    images_inner_format="markdown-img",
+    images_parser=RapidOCRBlobParser(),
+)
+docs = loader.load()
+
+print(docs[5].page_content)
+```
+
+주의하세요, RapidOCR은 중국어와 영어로 작동하도록 설계되었으며 다른 언어는 지원하지 않습니다.
+
+### Tesseract로 PDF에서 이미지 추출
+
+```python
+%pip install -qU pytesseract
+```
+
+```output
+Note: you may need to restart the kernel to use updated packages.
+```
+
+```python
+from langchain_community.document_loaders.parsers import TesseractBlobParser
+
+loader = PyMuPDFLoader(
+    "./example_data/layout-parser-paper.pdf",
+    mode="page",
+    images_inner_format="html-img",
+    images_parser=TesseractBlobParser(),
+)
+docs = loader.load()
+print(docs[5].page_content)
+```
+
+### multimodal model로 PDF에서 이미지 추출
+
+```python
+%pip install -qU langchain-openai
+```
+
+```output
+Note: you may need to restart the kernel to use updated packages.
+```
+
+```python
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+```
+
+```output
+True
+```
+
+```python
+from getpass import getpass
+
+if not os.environ.get("OPENAI_API_KEY"):
+    os.environ["OPENAI_API_KEY"] = getpass("OpenAI API key =")
+```
+
+```python
+from langchain_community.document_loaders.parsers import LLMImageBlobParser
+from langchain_openai import ChatOpenAI
+
+loader = PyMuPDFLoader(
+    "./example_data/layout-parser-paper.pdf",
+    mode="page",
+    images_inner_format="markdown-img",
+    images_parser=LLMImageBlobParser(model=ChatOpenAI(model="gpt-4o", max_tokens=1024)),
+)
+docs = loader.load()
+print(docs[5].page_content)
+```
+
+# PDF에서 테이블 추출
+
+PyMUPDF를 사용하면 PDF에서 테이블을 *html*, *markdown* 또는 *csv* 형식으로 추출할 수 있습니다:
+
+```python
+loader = PyMuPDFLoader(
+    "./example_data/layout-parser-paper.pdf",
+    mode="page",
+    extract_tables="markdown",
+)
+docs = loader.load()
+print(docs[4].page_content)
+```
+
+```output
+LayoutParser: A Uniﬁed Toolkit for DL-Based DIA
+5
+Table 1: Current layout detection models in the LayoutParser model zoo
+Dataset
+Base Model1 Large Model
+Notes
+PubLayNet [38]
+F / M
+M
+Layouts of modern scientiﬁc documents
+PRImA [3]
+M
+-
+Layouts of scanned modern magazines and scientiﬁc reports
+Newspaper [17]
+F
+-
+Layouts of scanned US newspapers from the 20th century
+TableBank [18]
+F
+F
+Table region on modern scientiﬁc and business document
+HJDataset [31]
+F / M
+-
+Layouts of history Japanese documents
+1 For each dataset, we train several models of diﬀerent sizes for diﬀerent needs (the trade-oﬀbetween accuracy
+vs. computational cost). For “base model” and “large model”, we refer to using the ResNet 50 or ResNet 101
+backbones [13], respectively. One can train models of diﬀerent architectures, like Faster R-CNN [28] (F) and Mask
+R-CNN [12] (M). For example, an F in the Large Model column indicates it has a Faster R-CNN model trained
+using the ResNet 101 backbone. The platform is maintained and a number of additions will be made to the model
+zoo in coming months.
+layout data structures, which are optimized for eﬃciency and versatility. 3) When
+necessary, users can employ existing or customized OCR models via the uniﬁed
+API provided in the OCR module. 4) LayoutParser comes with a set of utility
+functions for the visualization and storage of the layout data. 5) LayoutParser
+is also highly customizable, via its integration with functions for layout data
+annotation and model training. We now provide detailed descriptions for each
+component.
+3.1
+Layout Detection Models
+In LayoutParser, a layout model takes a document image as an input and
+generates a list of rectangular boxes for the target content regions. Diﬀerent
+from traditional methods, it relies on deep convolutional neural networks rather
+than manually curated rules to identify content regions. It is formulated as an
+object detection problem and state-of-the-art models like Faster R-CNN [28] and
+Mask R-CNN [12] are used. This yields prediction results of high accuracy and
+makes it possible to build a concise, generalized interface for layout detection.
+LayoutParser, built upon Detectron2 [35], provides a minimal API that can
+perform layout detection with only four lines of code in Python:
+1 import
+layoutparser as lp
+2 image = cv2.imread("image_file") # load
+images
+3 model = lp. Detectron2LayoutModel (
+4
+"lp:// PubLayNet/ faster_rcnn_R_50_FPN_3x /config")
+5 layout = model.detect(image)
+LayoutParser provides a wealth of pre-trained model weights using various
+datasets covering diﬀerent languages, time periods, and document types. Due to
+domain shift [7], the prediction performance can notably drop when models are ap-
+plied to target samples that are signiﬁcantly diﬀerent from the training dataset. As
+document structures and layouts vary greatly in diﬀerent domains, it is important
+to select models trained on a dataset similar to the test samples. A semantic syntax
+is used for initializing the model weights in LayoutParser, using both the dataset
+name and model name lp://<dataset-name>/<model-architecture-name>.
+
+
+|Dataset|Base Model1|Large Model|Notes|
+|---|---|---|---|
+|PubLayNet [38] PRImA [3] Newspaper [17] TableBank [18] HJDataset [31]|F / M M F F F / M|M &amp;#45; &amp;#45; F &amp;#45;|Layouts of modern scientific documents Layouts of scanned modern magazines and scientific reports Layouts of scanned US newspapers from the 20th century Table region on modern scientific and business document Layouts of history Japanese documents|
+```
+
+## Working with Files
+
+많은 document loader들은 파일 파싱을 포함합니다. 이러한 loader들 간의 차이점은 일반적으로 파일이 로드되는 방식이 아니라 파일이 파싱되는 방식에서 비롯됩니다. 예를 들어, `open`을 사용하여 PDF 또는 markdown 파일의 binary content를 읽을 수 있지만, 해당 binary data를 텍스트로 변환하려면 다른 파싱 로직이 필요합니다.
+
+결과적으로 파싱 로직을 로딩 로직에서 분리하는 것이 도움이 될 수 있으며, 이를 통해 데이터가 로드된 방식에 관계없이 주어진 parser를 재사용하기가 더 쉬워집니다.
+이 전략을 사용하여 동일한 파싱 매개변수로 다양한 파일을 분석할 수 있습니다.
+
+```python
+from langchain_community.document_loaders import FileSystemBlobLoader
+from langchain_community.document_loaders.generic import GenericLoader
+from langchain_community.document_loaders.parsers import PyMuPDFParser
+
+loader = GenericLoader(
+    blob_loader=FileSystemBlobLoader(
+        path="./example_data/",
+        glob="*.pdf",
+    ),
+    blob_parser=PyMuPDFParser(),
+)
+docs = loader.load()
+print(docs[0].page_content)
+pprint.pp(docs[0].metadata)
+```
+
+```output
+LayoutParser: A Uniﬁed Toolkit for Deep
+Learning Based Document Image Analysis
+Zejiang Shen1 ( ), Ruochen Zhang2, Melissa Dell3, Benjamin Charles Germain
+Lee4, Jacob Carlson3, and Weining Li5
+1 Allen Institute for AI
+shannons@allenai.org
+2 Brown University
+ruochen zhang@brown.edu
+3 Harvard University
+{melissadell,jacob carlson}@fas.harvard.edu
+4 University of Washington
+bcgl@cs.washington.edu
+5 University of Waterloo
+w422li@uwaterloo.ca
+Abstract. Recent advances in document image analysis (DIA) have been
+primarily driven by the application of neural networks. Ideally, research
+outcomes could be easily deployed in production and extended for further
+investigation. However, various factors like loosely organized codebases
+and sophisticated model conﬁgurations complicate the easy reuse of im-
+portant innovations by a wide audience. Though there have been on-going
+eﬀorts to improve reusability and simplify deep learning (DL) model
+development in disciplines like natural language processing and computer
+vision, none of them are optimized for challenges in the domain of DIA.
+This represents a major gap in the existing toolkit, as DIA is central to
+academic research across a wide range of disciplines in the social sciences
+and humanities. This paper introduces LayoutParser, an open-source
+library for streamlining the usage of DL in DIA research and applica-
+tions. The core LayoutParser library comes with a set of simple and
+intuitive interfaces for applying and customizing DL models for layout de-
+tection, character recognition, and many other document processing tasks.
+To promote extensibility, LayoutParser also incorporates a community
+platform for sharing both pre-trained models and full document digiti-
+zation pipelines. We demonstrate that LayoutParser is helpful for both
+lightweight and large-scale digitization pipelines in real-word use cases.
+The library is publicly available at https://layout-parser.github.io.
+Keywords: Document Image Analysis · Deep Learning · Layout Analysis
+· Character Recognition · Open Source library · Toolkit.
+1
+Introduction
+Deep Learning(DL)-based approaches are the state-of-the-art for a wide range of
+document image analysis (DIA) tasks including document image classiﬁcation [11,
+arXiv:2103.15348v2  [cs.CV]  21 Jun 2021
+{'source': 'example_data/layout-parser-paper.pdf',
+ 'file_path': 'example_data/layout-parser-paper.pdf',
+ 'total_pages': 16,
+ 'format': 'PDF 1.5',
+ 'title': '',
+ 'author': '',
+ 'subject': '',
+ 'keywords': '',
+ 'creator': 'LaTeX with hyperref',
+ 'producer': 'pdfTeX-1.40.21',
+ 'creationdate': '2021-06-22T01:27:10+00:00',
+ 'moddate': '2021-06-22T01:27:10+00:00',
+ 'trapped': '',
+ 'page': 0}
+```
+
+클라우드 스토리지의 파일로 작업하는 것도 가능합니다.
+
+```python
+from langchain_community.document_loaders import CloudBlobLoader
+from langchain_community.document_loaders.generic import GenericLoader
+
+loader = GenericLoader(
+    blob_loader=CloudBlobLoader(
+        url="s3:/mybucket",  # Supports s3://, az://, gs://, file:// schemes.
+        glob="*.pdf",
+    ),
+    blob_parser=PyMuPDFParser(),
+)
+docs = loader.load()
+print(docs[0].page_content)
+pprint.pp(docs[0].metadata)
+```
+
+## API reference
+
+모든 `PyMuPDFLoader` 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PyMuPDFLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PyMuPDFLoader.html)

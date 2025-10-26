@@ -1,0 +1,50 @@
+---
+title: PullMd Loader
+---
+
+>[PullMd](https://pull.md/)는 웹 페이지를 Markdown 형식으로 변환하는 서비스입니다. `langchain-pull-md` 패키지는 이 서비스를 활용하여 React, Angular, Vue.js와 같은 JavaScript 프레임워크로 렌더링된 URL을 로컬 렌더링 없이 Markdown으로 변환합니다.
+
+## Installation and Setup
+
+`langchain-pull-md`를 시작하려면 pip를 통해 패키지를 설치해야 합니다:
+
+<CodeGroup>
+```bash pip
+pip install langchain-pull-md
+```
+
+```bash uv
+uv add langchain-pull-md
+```
+</CodeGroup>
+
+자세한 통합 및 사용 방법은 [사용 예제](/oss/integrations/document_loaders/pull_md)를 참조하세요.
+
+## Document Loader
+
+`langchain-pull-md`의 `PullMdLoader` 클래스는 URL을 Markdown으로 변환하는 쉬운 방법을 제공합니다. LangChain의 처리 기능 내에서 사용하기 위해 최신 웹 애플리케이션의 콘텐츠를 로드하는 데 특히 유용합니다.
+
+```python
+from langchain_pull_md import PullMdLoader
+
+# Initialize the loader with a URL of a JavaScript-rendered webpage
+loader = PullMdLoader(url='https://example.com')
+
+# Load the content as a Document
+documents = loader.load()
+
+# Access the Markdown content
+for document in documents:
+    print(document.page_content)
+```
+
+이 loader는 모든 URL을 지원하며, 특히 동적 JavaScript로 구축된 사이트를 처리하는 데 능숙하여 데이터 처리 워크플로우에서 markdown 추출을 위한 다목적 도구입니다.
+
+## API reference
+
+사용 가능한 모든 function과 매개변수에 대한 포괄적인 가이드는 [API reference](https://github.com/chigwell/langchain-pull-md)를 참조하세요.
+
+## Additional Resources
+
+- [GitHub Repository](https://github.com/chigwell/langchain-pull-md)
+- [PyPi Package](https://pypi.org/project/langchain-pull-md/)

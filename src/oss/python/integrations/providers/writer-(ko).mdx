@@ -1,0 +1,76 @@
+```markdown
+---
+title: WRITER
+---
+
+WRITER와 관련된 모든 기능
+
+
+>이 페이지는 LangChain 내에서 [WRITER](https://writer.com/) 생태계를 사용하는 방법을 다룹니다. 자세한 내용은 Writer [문서](https://dev.writer.com/home/introduction)를 참조하세요.
+>[Palmyra](https://writer.com/blog/palmyra/)는 `WRITER`가 개발한 Large Language Model (LLM)입니다.
+>
+>[Writer API](https://dev.writer.com/api-guides/introduction)는 다양한 기능과 가격대를 가진 여러 Palmyra 하위 모델로 구동됩니다.
+
+## 설치 및 설정
+
+통합 패키지를 설치합니다
+<CodeGroup>
+```bash pip
+pip install langchain-writer
+```
+
+```bash uv
+uv add langchain-writer
+```
+</CodeGroup>
+
+WRITER API key를 발급받아 환경 변수(`WRITER_API_KEY`)로 설정합니다
+
+## Chat model
+
+```python
+from langchain_writer import ChatWriter
+```
+[자세히 보기](/oss/integrations/chat/writer).
+
+
+## PDF Parser
+
+```python
+from langchain_writer.pdf_parser import PDFParser
+```
+[자세히 보기](/oss/integrations/document_loaders/parsers/writer_pdf_parser).
+
+## Text splitter
+
+```python
+from langchain_writer.text_splitter import WriterTextSplitter
+```
+
+## Tools calling
+
+### Functions
+
+dict, Pydantic, python function 등을 통해 정의된 기본 function call을 지원합니다.
+
+### Graphs
+
+```python
+from langchain_writer.tools import GraphTool
+```
+[자세히 보기](/oss/integrations/tools/writer).
+
+### Web search tool
+
+```python
+from langchain_writer.tools import WebSearchTool
+```
+[자세히 보기](/oss/integrations/tools/writer).
+
+### Translation tool
+
+```python
+from langchain_writer.tools import TranslationTool
+```
+[자세히 보기](/oss/integrations/tools/writer).
+```

@@ -1,0 +1,30 @@
+---
+title: Reddit
+---
+
+>[Reddit](https://www.reddit.com)은 미국의 소셜 뉴스 수집, 콘텐츠 평가 및 토론 웹사이트입니다.
+
+## Installation and Setup
+
+먼저 python package를 설치해야 합니다.
+
+<CodeGroup>
+```bash pip
+pip install praw
+```
+
+```bash uv
+uv add praw
+```
+</CodeGroup>
+
+[Reddit Application](https://www.reddit.com/prefs/apps/)을 만들고 Reddit API 자격 증명으로 loader를 초기화하세요.
+
+## Document Loader
+
+[사용 예시](/oss/integrations/document_loaders/reddit)를 참조하세요.
+
+
+```python
+from langchain_community.document_loaders import RedditPostsLoader
+```

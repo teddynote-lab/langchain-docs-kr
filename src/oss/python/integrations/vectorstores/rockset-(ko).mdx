@@ -1,0 +1,144 @@
+---
+title: Rockset
+---
+
+>[Rockset](https://rockset.com/)은 클라우드에 최적화된 실시간 검색 및 분석 데이터베이스입니다. Rockset은 대규모에서 지연 시간이 낮고 동시성이 높은 검색 쿼리를 제공하기 위해 벡터 embeddings를 효율적으로 저장하는 [Converged Index™](https://rockset.com/blog/converged-indexing-the-secret-sauce-behind-rocksets-fast-queries/)를 사용합니다. Rockset은 메타데이터 필터링을 완벽히 지원하며, 지속적으로 업데이트되는 스트리밍 데이터에 대한 실시간 수집을 처리합니다.
+
+이 노트북은 LangChain에서 `Rockset`을 vector store로 사용하는 방법을 보여줍니다. 시작하기 전에 `Rockset` 계정과 API 키가 있어야 합니다. [지금 무료 체험을 시작하세요.](https://rockset.com/create/)
+
+이 통합을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다.
+
+## 환경 설정
+
+1. `Rockset` 콘솔을 사용하여 소스로 Write API를 갖는 [collection](https://rockset.com/docs/collections/)을 생성하세요. 이 가이드에서는 `langchain_demo`라는 collection을 생성합니다.
+
+    다음 [ingest transformation](https://rockset.com/docs/ingest-transformation/)을 구성하여 embeddings 필드를 지정하고 성능 및 스토리지 최적화를 활용하세요:
+
+   (이 예제에서는 OpenAI `text-embedding-ada-002`를 사용했으며, #length_of_vector_embedding = 1536)
+
+```
+SELECT _input.* EXCEPT(_meta),
+VECTOR_ENFORCE(_input.description_embedding, #length_of_vector_embedding, 'float') as description_embedding
+FROM _input
+```
+
+2. collection을 생성한 후, 콘솔에서 [API key](https://rockset.com/docs/iam/#users-api-keys-and-roles)를 가져오세요. 이 노트북에서는 `Oregon(us-west-2)` 리전을 사용한다고 가정합니다.
+
+3. LangChain이 `Rockset`과 직접 통신할 수 있도록 [rockset-python-client](https://github.com/rockset/rockset-python-client)를 설치하세요.
+
+```python
+pip install -qU  rockset
+```
+
+## LangChain 튜토리얼
+
+여러분의 Python 노트북에서 따라 하며 Rockset에 vector embeddings를 생성하고 저장해 보세요.
+이제 Rockset을 사용하여 검색어와 유사한 문서를 찾을 수 있습니다.
+
+### 1. 핵심 변수 정의
+
+```python
+import os
+
+import rockset
+
+ROCKSET_API_KEY = os.environ.get(
+    "ROCKSET_API_KEY"
+)  # Verify ROCKSET_API_KEY environment variable
+ROCKSET_API_SERVER = rockset.Regions.usw2a1  # Verify Rockset region
+rockset_client = rockset.RocksetClient(ROCKSET_API_SERVER, ROCKSET_API_KEY)
+
+COLLECTION_NAME = "langchain_demo"
+TEXT_KEY = "description"
+EMBEDDING_KEY = "description_embedding"
+```
+
+### 2. 문서 준비
+
+```python
+from langchain_community.document_loaders import TextLoader
+from langchain_community.vectorstores import Rockset
+from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import CharacterTextSplitter
+
+loader = TextLoader("../../how_to/state_of_the_union.txt")
+documents = loader.load()
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+docs = text_splitter.split_documents(documents)
+```
+
+### 3. 문서 삽입
+
+```python
+embeddings = OpenAIEmbeddings()  # Verify OPENAI_API_KEY environment variable
+
+docsearch = Rockset(
+    client=rockset_client,
+    embeddings=embeddings,
+    collection_name=COLLECTION_NAME,
+    text_key=TEXT_KEY,
+    embedding_key=EMBEDDING_KEY,
+)
+
+ids = docsearch.add_texts(
+    texts=[d.page_content for d in docs],
+    metadatas=[d.metadata for d in docs],
+)
+```
+
+### 4. 유사 문서 검색
+
+```python
+query = "What did the president say about Ketanji Brown Jackson"
+output = docsearch.similarity_search_with_relevance_scores(
+    query, 4, Rockset.DistanceFunction.COSINE_SIM
+)
+print("output length:", len(output))
+for d, dist in output:
+    print(dist, d.metadata, d.page_content[:20] + "...")
+
+##
+# output length: 4
+# 0.764990692109871 {'source': '../../../state_of_the_union.txt'} Madam Speaker, Madam...
+# 0.7485416901622112 {'source': '../../../state_of_the_union.txt'} And I’m taking robus...
+# 0.7468678973398306 {'source': '../../../state_of_the_union.txt'} And so many families...
+# 0.7436231261419488 {'source': '../../../state_of_the_union.txt'} Groups of citizens b...
+```
+
+### 5. 필터링을 통한 유사 문서 검색
+
+```python
+output = docsearch.similarity_search_with_relevance_scores(
+    query,
+    4,
+    Rockset.DistanceFunction.COSINE_SIM,
+    where_str="{} NOT LIKE '%citizens%'".format(TEXT_KEY),
+)
+print("output length:", len(output))
+for d, dist in output:
+    print(dist, d.metadata, d.page_content[:20] + "...")
+
+##
+# output length: 4
+# 0.7651359650263554 {'source': '../../../state_of_the_union.txt'} Madam Speaker, Madam...
+# 0.7486265516824893 {'source': '../../../state_of_the_union.txt'} And I’m taking robus...
+# 0.7469625542348115 {'source': '../../../state_of_the_union.txt'} And so many families...
+# 0.7344177777547739 {'source': '../../../state_of_the_union.txt'} We see the unity amo...
+```
+
+### 6. [선택] 삽입한 문서 삭제
+
+컬렉션에서 문서를 삭제하려면 각 문서에 연관된 고유 ID가 필요합니다.
+`Rockset.add_texts()`로 문서를 삽입할 때 ID를 정의하세요. 그렇지 않으면 Rockset이 각 문서에 대해 고유 ID를 생성합니다. 어느 경우든 `Rockset.add_texts()`는 삽입된 문서의 ID를 반환합니다.
+
+이 문서들을 삭제하려면 `Rockset.delete_texts()` 함수를 사용하면 됩니다.
+
+```python
+docsearch.delete_texts(ids)
+```
+
+## 요약
+
+이 튜토리얼에서는 `Rockset` collection을 생성하고, OpenAI embeddings로 문서를 `inserted`한 뒤, 메타데이터 필터 유무에 따라 유사 문서를 검색하는 작업을 성공적으로 수행했습니다.
+
+추후 업데이트는 [rockset.com/](https://rockset.com/)에서 확인하세요.

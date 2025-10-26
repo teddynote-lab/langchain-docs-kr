@@ -1,0 +1,237 @@
+---
+title: Server API를 사용한 시간 여행
+sidebarTitle: Server API를 사용한 시간 여행
+---
+
+LangGraph는 이전 checkpoint에서 실행을 재개할 수 있는 [**시간 여행**](/oss/langgraph/use-time-travel) 기능을 제공하며, 동일한 상태를 재생하거나 수정하여 대안을 탐색할 수 있습니다. 모든 경우에 과거 실행을 재개하면 히스토리에 새로운 분기가 생성됩니다.
+
+LangGraph Server API(LangGraph SDK를 통해)를 사용하여 시간 여행을 하려면:
+
+1. **graph 실행**: [LangGraph SDK](/langsmith/langgraph-python-sdk)의 @[client.runs.wait] 또는 @[client.runs.stream] API를 사용하여 초기 입력으로 graph를 실행합니다.
+2. **기존 thread에서 checkpoint 식별**: @[client.threads.get_history] 메서드를 사용하여 특정 `thread_id`에 대한 실행 히스토리를 검색하고 원하는 `checkpoint_id`를 찾습니다.
+  또는 실행을 일시 중지하려는 node 앞에 [breakpoint](/oss/langgraph/interrupts)를 설정할 수 있습니다. 그런 다음 해당 breakpoint까지 기록된 가장 최근 checkpoint를 찾을 수 있습니다.
+3. **(선택 사항) graph state 수정**: @[client.threads.update_state] 메서드를 사용하여 checkpoint에서 graph의 state를 수정하고 대체 state에서 실행을 재개합니다.
+4. **checkpoint에서 실행 재개**: `None` 입력과 적절한 `thread_id` 및 `checkpoint_id`를 사용하여 @[client.runs.wait] 또는 @[client.runs.stream] API를 사용합니다.
+
+## 워크플로우에서 시간 여행 사용하기
+
+<Accordion title="예제 graph">
+    ```python
+    from typing_extensions import TypedDict, NotRequired
+    from langgraph.graph import StateGraph, START, END
+    from langchain.chat_models import init_chat_model
+    from langgraph.checkpoint.memory import InMemorySaver
+
+    class State(TypedDict):
+        topic: NotRequired[str]
+        joke: NotRequired[str]
+
+    model = init_chat_model(
+        "anthropic:claude-sonnet-4-5",
+        temperature=0,
+    )
+
+    def generate_topic(state: State):
+        """LLM call to generate a topic for the joke"""
+        msg = model.invoke("Give me a funny topic for a joke")
+        return {"topic": msg.content}
+
+    def write_joke(state: State):
+        """LLM call to write a joke based on the topic"""
+        msg = model.invoke(f"Write a short joke about {state['topic']}")
+        return {"joke": msg.content}
+
+    # Build workflow
+    builder = StateGraph(State)
+
+    # Add nodes
+    builder.add_node("generate_topic", generate_topic)
+    builder.add_node("write_joke", write_joke)
+
+    # Add edges to connect nodes
+    builder.add_edge(START, "generate_topic")
+    builder.add_edge("generate_topic", "write_joke")
+
+    # Compile
+    graph = builder.compile()
+    ```
+</Accordion>
+
+### 1. graph 실행
+
+<Tabs>
+    <Tab title="Python">
+    ```python
+    from langgraph_sdk import get_client
+    client = get_client(url=<DEPLOYMENT_URL>)
+
+    # Using the graph deployed with the name "agent"
+    assistant_id = "agent"
+
+    # create a thread
+    thread = await client.threads.create()
+    thread_id = thread["thread_id"]
+
+    # Run the graph
+    result = await client.runs.wait(
+        thread_id,
+        assistant_id,
+        input={}
+    )
+    ```
+    </Tab>
+    <Tab title="JavaScript">
+    ```js
+    import { Client } from "@langchain/langgraph-sdk";
+    const client = new Client({ apiUrl: <DEPLOYMENT_URL> });
+
+    // Using the graph deployed with the name "agent"
+    const assistantID = "agent";
+
+    // create a thread
+    const thread = await client.threads.create();
+    const threadID = thread["thread_id"];
+
+    // Run the graph
+    const result = await client.runs.wait(
+      threadID,
+      assistantID,
+      { input: {}}
+    );
+    ```
+    </Tab>
+    <Tab title="cURL">
+    thread 생성:
+
+    ```bash
+    curl --request POST \
+    --url <DEPLOYMENT_URL>/threads \
+    --header 'Content-Type: application/json' \
+    --data '{}'
+    ```
+
+    graph 실행:
+
+    ```bash
+    curl --request POST \
+    --url <DEPLOYMENT_URL>/threads/<THREAD_ID>/runs/wait \
+    --header 'Content-Type: application/json' \
+    --data "{
+      \"assistant_id\": \"agent\",
+      \"input\": {}
+    }"
+    ```
+    </Tab>
+</Tabs>
+
+### 2. checkpoint 식별
+
+<Tabs>
+    <Tab title="Python">
+    ```python
+    # The states are returned in reverse chronological order.
+    states = await client.threads.get_history(thread_id)
+    selected_state = states[1]
+    print(selected_state)
+    ```
+    </Tab>
+    <Tab title="JavaScript">
+    ```js
+    // The states are returned in reverse chronological order.
+    const states = await client.threads.getHistory(threadID);
+    const selectedState = states[1];
+    console.log(selectedState);
+    ```
+    </Tab>
+    <Tab title="cURL">
+    ```bash
+    curl --request GET \
+    --url <DEPLOYMENT_URL>/threads/<THREAD_ID>/history \
+    --header 'Content-Type: application/json'
+    ```
+    </Tab>
+</Tabs>
+
+<a id="optional"></a>
+### 3. state 업데이트
+
+@[`update_state`]는 새로운 checkpoint를 생성합니다. 새 checkpoint는 동일한 thread와 연결되지만 새로운 checkpoint ID를 갖습니다.
+
+<Tabs>
+    <Tab title="Python">
+    ```python {highlight={4}}
+    new_config = await client.threads.update_state(
+        thread_id,
+        {"topic": "chickens"},
+        checkpoint_id=selected_state["checkpoint_id"]
+    )
+    print(new_config)
+```
+    </Tab>
+    <Tab title="JavaScript">
+    ```js
+    const newConfig = await client.threads.updateState(
+      threadID,
+      {
+        values: { "topic": "chickens" },
+        checkpointId: selectedState["checkpoint_id"]
+      }
+    );
+    console.log(newConfig);
+    ```
+    </Tab>
+    <Tab title="cURL">
+    ```bash
+    curl --request POST \
+    --url <DEPLOYMENT_URL>/threads/<THREAD_ID>/state \
+    --header 'Content-Type: application/json' \
+    --data "{
+      \"assistant_id\": \"agent\",
+      \"checkpoint_id\": <CHECKPOINT_ID>,
+      \"values\": {\"topic\": \"chickens\"}
+    }"
+    ```
+    </Tab>
+</Tabs>
+
+### 4. checkpoint에서 실행 재개
+
+<Tabs>
+    <Tab title="Python">
+    ```python {highlight={4,5}}
+    await client.runs.wait(
+        thread_id,
+        assistant_id,
+        input=None,
+        checkpoint_id=new_config["checkpoint_id"]
+    )
+```
+    </Tab>
+    <Tab title="JavaScript">
+    ```javascript {highlight={5,6}}
+    await client.runs.wait(
+      threadID,
+      assistantID,
+      {
+        input: null,
+        checkpointId: newConfig["checkpoint_id"]
+      }
+    );
+```
+    </Tab>
+    <Tab title="cURL">
+    ```bash
+    curl --request POST \
+    --url <DEPLOYMENT_URL>/threads/<THREAD_ID>/runs/wait \
+    --header 'Content-Type: application/json' \
+    --data "{
+      \"assistant_id\": \"agent\",
+      \"checkpoint_id\": <CHECKPOINT_ID>
+    }"
+    ```
+    </Tab>
+</Tabs>
+
+## 더 알아보기
+
+* [**LangGraph 시간 여행 가이드**](/oss/langgraph/use-time-travel): LangGraph에서 시간 여행 사용에 대해 자세히 알아보세요.

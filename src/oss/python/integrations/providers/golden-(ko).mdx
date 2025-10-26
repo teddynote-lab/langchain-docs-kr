@@ -1,0 +1,36 @@
+---
+title: Golden
+---
+
+>[Golden](https://golden.com)은 Golden Knowledge Graph를 사용하여 쿼리 및 데이터 보강을 위한 자연어 API 세트를 제공합니다. 예를 들어 `Products from OpenAI`, `Generative ai companies with series a funding`, `rappers who invest`와 같은 쿼리를 사용하여 관련 엔티티에 대한 구조화된 데이터를 검색할 수 있습니다.
+>
+>`golden-query` langchain tool은 [Golden Query API](https://docs.golden.com/reference/query-api)를 래핑한 것으로, 이러한 결과에 프로그래밍 방식으로 액세스할 수 있게 해줍니다.
+>자세한 내용은 [Golden Query API 문서](https://docs.golden.com/reference/query-api)를 참조하세요.
+
+## 설치 및 설정
+- [Golden API 문서](https://docs.golden.com/)로 이동하여 Golden API에 대한 개요를 확인하세요.
+- [Golden API Settings](https://golden.com/settings/api) 페이지에서 API key를 받으세요.
+- API key를 GOLDEN_API_KEY 환경 변수에 저장하세요
+
+## Wrappers
+
+### Utility
+
+이 API를 래핑하는 GoldenQueryAPIWrapper utility가 있습니다. 이 utility를 import하려면:
+
+```python
+from langchain_community.utilities.golden_query import GoldenQueryAPIWrapper
+```
+
+이 wrapper에 대한 자세한 안내는 [이 노트북](/oss/integrations/tools/golden_query)을 참조하세요.
+
+### Tool
+
+이 wrapper를 Tool로 쉽게 로드할 수도 있습니다 (Agent와 함께 사용).
+다음과 같이 할 수 있습니다:
+```python
+from langchain_community.agent_toolkits.load_tools import load_tools
+tools = load_tools(["golden-query"])
+```
+
+tool에 대한 자세한 내용은 [이 페이지](/oss/integrations/tools)를 참조하세요.

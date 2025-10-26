@@ -1,0 +1,115 @@
+---
+title: GOAT
+---
+
+[GOAT](https://github.com/goat-sdk/goat)는 AI agent를 위한 금융 toolkit입니다.
+
+<Warning>
+**이 tool은 LangChain 메인 repository 외부 [여기](https://github.com/goat-sdk/goat/)에 존재합니다.**
+
+외부 provider에 wallet을 연결할 때는 주의하시고 신뢰할 수 있는지 확인하세요.
+</Warning>
+
+## Overview
+
+다음과 같은 기능을 수행할 수 있는 agent를 만들 수 있습니다:
+
+- 결제 송수신
+- 물리적 및 디지털 상품과 서비스 구매
+- 다양한 투자 전략 실행:
+  - 수익률 획득
+  - 예측 시장에 베팅
+- 암호화폐 자산 구매
+- 모든 자산의 토큰화
+- 금융 인사이트 획득
+
+### 작동 방식
+
+GOAT는 blockchain, cryptocurrency(stablecoin 등), wallet을 인프라로 활용하여 agent가 경제 주체가 될 수 있도록 합니다:
+
+1. agent에게 [wallet](https://github.com/goat-sdk/goat/tree/main#chains-and-wallets)을 제공하세요
+2. [어디서든](https://github.com/goat-sdk/goat/tree/main#chains-and-wallets) 거래할 수 있도록 허용하세요
+3. [+200개 이상의 tool](https://github.com/goat-sdk/goat/tree/main#tools)을 사용하세요
+
+GOAT가 지원하는 모든 것을 [여기](https://github.com/goat-sdk/goat/tree/main#chains-and-wallets)에서 확인하세요.
+
+**경량화 및 확장 가능**
+다른 toolkit과 달리 GOAT는 핵심을 최소화하고 필요한 tool만 설치할 수 있도록 하여 경량화되고 확장 가능하도록 설계되었습니다.
+
+200개 이상의 통합에서 필요한 것을 찾지 못한 경우 다음을 쉽게 수행할 수 있습니다:
+
+- 자체 plugin 생성
+- 새로운 chain 통합
+- 새로운 wallet 통합
+- 새로운 agent framework 통합
+
+방법은 [여기](https://github.com/goat-sdk/goat/tree/main#-contributing)에서 확인하세요.
+
+## Setup
+
+1. core package와 langchain adapter를 설치하세요:
+
+```bash
+npm i @goat-sdk/core @goat-sdk/adapter-langchain
+```
+
+2. 사용하려는 wallet 유형을 설치하세요 (예: solana):
+
+```bash
+npm i @goat-sdk/wallet-evm @goat-sdk/wallet-viem
+```
+
+3. 해당 chain에서 사용하려는 plugin을 설치하세요:
+
+```bash
+npm i @goat-sdk/plugin-erc20
+```
+
+## Instantiation
+
+이제 toolkit을 인스턴스화할 수 있습니다:
+
+```typescript
+import { http } from "viem";
+import { createWalletClient } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { baseSepolia } from "viem/chains";
+
+import { getOnChainTools } from "@goat-sdk/adapter-langchain";
+import { PEPE, USDC, erc20 } from "@goat-sdk/plugin-erc20";
+
+import { sendETH } from "@goat-sdk/wallet-evm";
+import { viem } from "@goat-sdk/wallet-viem";
+
+import { ChatOpenAI } from "@langchain/openai";
+import { createAgent } from "@langchain/classic";
+
+// 1. Create a wallet client
+const account = privateKeyToAccount(
+  process.env.WALLET_PRIVATE_KEY as `0x${string}`
+);
+
+const walletClient = createWalletClient({
+  account: account,
+  transport: http(process.env.RPC_PROVIDER_URL),
+  chain: baseSepolia,
+});
+
+// 2. Set up the tools
+const tools = await getOnChainTools({
+  wallet: viem(walletClient),
+  plugins: [sendETH(), erc20({ tokens: [USDC, PEPE] })],
+});
+
+// 3. Create the agent
+const model = new ChatOpenAI({
+  model: "gpt-4o-mini",
+});
+
+const agent = createAgent({ llm: model, tools: tools });
+```
+
+## Related
+
+- Tool [개념 가이드](/oss/concepts/#tools)
+- Tool [how-to 가이드](/oss/langchain/tools)

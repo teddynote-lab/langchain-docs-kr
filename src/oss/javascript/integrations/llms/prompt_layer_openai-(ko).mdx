@@ -1,0 +1,61 @@
+```mdx
+---
+title: PromptLayer OpenAI
+---
+
+<Warning>
+이 모듈은 더 이상 사용되지 않으며 지원이 중단되었습니다. 아래 문서는 버전 0.2.0 이상에서 작동하지 않습니다.
+</Warning>
+
+LangChain은 prompt와 response를 로깅하고 디버깅하기 위해 PromptLayer와 통합됩니다. PromptLayer 지원을 추가하려면:
+
+1. 여기에서 PromptLayer 계정을 생성하세요: [https://promptlayer.com](https://www.promptlayer.com/).
+2. API token을 생성하고 `PromptLayerOpenAI` constructor의 `promptLayerApiKey` 인자로 전달하거나 `PROMPTLAYER_API_KEY` 환경 변수에 설정하세요.
+
+```typescript
+import { PromptLayerOpenAI } from "@langchain/classic/llms/openai";
+
+const model = new PromptLayerOpenAI({
+  temperature: 0.9,
+  apiKey: "YOUR-API-KEY", // In Node.js defaults to process.env.OPENAI_API_KEY
+  promptLayerApiKey: "YOUR-API-KEY", // In Node.js defaults to process.env.PROMPTLAYER_API_KEY
+});
+const res = await model.invoke(
+  "What would be a good company name a company that makes colorful socks?"
+);
+```
+
+# Azure PromptLayerOpenAI
+
+LangChain은 Azure에서 호스팅되는 OpenAI 인스턴스에 대해서도 PromptLayer와 통합됩니다:
+
+```typescript
+import { PromptLayerOpenAI } from "@langchain/classic/llms/openai";
+
+const model = new PromptLayerOpenAI({
+  temperature: 0.9,
+  azureOpenAIApiKey: "YOUR-AOAI-API-KEY", // In Node.js defaults to process.env.AZURE_OPENAI_API_KEY
+  azureOpenAIApiInstanceName: "YOUR-AOAI-INSTANCE-NAME", // In Node.js defaults to process.env.AZURE_OPENAI_API_INSTANCE_NAME
+  azureOpenAIApiDeploymentName: "YOUR-AOAI-DEPLOYMENT-NAME", // In Node.js defaults to process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME
+  azureOpenAIApiCompletionsDeploymentName:
+    "YOUR-AOAI-COMPLETIONS-DEPLOYMENT-NAME", // In Node.js defaults to process.env.AZURE_OPENAI_API_COMPLETIONS_DEPLOYMENT_NAME
+  azureOpenAIApiEmbeddingsDeploymentName:
+    "YOUR-AOAI-EMBEDDINGS-DEPLOYMENT-NAME", // In Node.js defaults to process.env.AZURE_OPENAI_API_EMBEDDINGS_DEPLOYMENT_NAME
+  azureOpenAIApiVersion: "YOUR-AOAI-API-VERSION", // In Node.js defaults to process.env.AZURE_OPENAI_API_VERSION
+  azureOpenAIBasePath: "YOUR-AZURE-OPENAI-BASE-PATH", // In Node.js defaults to process.env.AZURE_OPENAI_BASE_PATH
+  promptLayerApiKey: "YOUR-API-KEY", // In Node.js defaults to process.env.PROMPTLAYER_API_KEY
+});
+const res = await model.invoke(
+  "What would be a good company name a company that makes colorful socks?"
+);
+```
+
+request와 response는 [PromptLayer dashboard](https://promptlayer.com/home)에 로깅됩니다.
+
+> **_참고:_** streaming 모드에서는 PromptLayer가 response를 로깅하지 않습니다.
+
+## 관련 문서
+
+
+- [Models 가이드](/oss/langchain/models)
+```

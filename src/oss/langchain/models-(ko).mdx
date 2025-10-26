@@ -1,0 +1,1721 @@
+---
+title: Models
+---
+
+import ChatModelTabsPy from '/snippets/chat-model-tabs.mdx';
+import ChatModelTabsJS from '/snippets/chat-model-tabs-js.mdx';
+
+[LLM](https://en.wikipedia.org/wiki/Large_language_model)은 인간처럼 텍스트를 해석하고 생성할 수 있는 강력한 AI 도구입니다. 각 작업에 대한 전문적인 훈련 없이도 콘텐츠 작성, 언어 번역, 요약, 질문 답변 등 다양한 작업을 수행할 수 있을 만큼 다재다능합니다.
+
+텍스트 생성 외에도 많은 model들이 다음을 지원합니다:
+
+* <Icon icon="hammer" size={16} /> [Tool calling](#tool-calling) - 외부 tool(데이터베이스 쿼리나 API 호출 등)을 호출하고 그 결과를 응답에 사용합니다.
+* <Icon icon="shapes" size={16} /> [Structured output](#structured-outputs) - model의 응답이 정의된 형식을 따르도록 제약합니다.
+* <Icon icon="image" size={16} /> [Multimodality](#multimodal) - 텍스트 외에 이미지, 오디오, 비디오와 같은 데이터를 처리하고 반환합니다.
+* <Icon icon="brain" size={16} /> [Reasoning](#reasoning) - model이 결론에 도달하기 위해 다단계 추론을 수행합니다.
+
+Model은 [agent](/oss/langchain/agents)의 추론 엔진입니다. agent의 의사결정 프로세스를 주도하여 어떤 tool을 호출할지, 결과를 어떻게 해석할지, 언제 최종 답변을 제공할지를 결정합니다.
+
+선택한 model의 품질과 기능은 agent의 신뢰성과 성능에 직접적인 영향을 미칩니다. 서로 다른 model들은 서로 다른 작업에 뛰어납니다 - 일부는 복잡한 지시사항을 따르는 데 더 좋고, 다른 일부는 구조화된 추론에 더 좋으며, 일부는 더 많은 정보를 처리하기 위한 더 큰 context window를 지원합니다.
+
+LangChain의 표준 model interface는 다양한 provider 통합에 대한 액세스를 제공하므로, 사용 사례에 가장 적합한 model을 쉽게 실험하고 전환할 수 있습니다.
+
+<Info>
+    provider별 통합 정보 및 기능은 provider의 [통합 페이지](/oss/integrations/providers/overview)를 참조하세요.
+</Info>
+
+## 기본 사용법
+
+Model은 두 가지 방식으로 활용할 수 있습니다:
+
+1. **Agent와 함께** - [Agent](/oss/langchain/agents#model)를 생성할 때 model을 동적으로 지정할 수 있습니다.
+2. **독립적으로** - Agent 프레임워크 없이 텍스트 생성, 분류 또는 추출과 같은 작업을 위해 model을 직접 호출할 수 있습니다(agent 루프 외부).
+
+동일한 model interface가 두 컨텍스트 모두에서 작동하므로, 간단하게 시작하여 필요에 따라 더 복잡한 agent 기반 워크플로우로 확장할 수 있는 유연성을 제공합니다.
+
+### Model 초기화
+
+:::python
+LangChain에서 독립적인 model을 시작하는 가장 쉬운 방법은 @[`init_chat_model`]을 사용하여 선택한 [provider](/oss/integrations/providers/overview)에서 초기화하는 것입니다(아래 예제):
+
+<ChatModelTabsPy />
+```python
+response = model.invoke("Why do parrots talk?")
+```
+
+model [parameter](#parameters)를 전달하는 방법을 포함한 자세한 내용은 @[`init_chat_model`][init_chat_model]을 참조하세요.
+:::
+:::js
+LangChain에서 독립적인 model을 시작하는 가장 쉬운 방법은 `initChatModel`을 사용하여 선택한 [provider](/oss/integrations/providers/overview)에서 초기화하는 것입니다(아래 예제):
+
+<ChatModelTabsJS />
+```typescript
+const response = await model.invoke("Why do parrots talk?");
+```
+model [parameter](#parameters)를 전달하는 방법을 포함한 자세한 내용은 @[`initChatModel`][initChatModel]을 참조하세요.
+:::
+
+
+### 주요 메서드
+
+<Card title="Invoke" href="#invoke" icon="paper-plane" arrow="true" horizontal>
+    Model은 message를 입력으로 받아 완전한 응답을 생성한 후 message를 출력합니다.
+</Card>
+<Card title="Stream" href="#stream" icon="tower-broadcast" arrow="true" horizontal>
+    Model을 호출하되, 출력이 실시간으로 생성되는 동안 스트리밍합니다.
+</Card>
+<Card title="Batch" href="#batch" icon="grip" arrow="true" horizontal>
+    더 효율적인 처리를 위해 여러 요청을 batch로 model에 전송합니다.
+</Card>
+
+<Info>
+    Chat model 외에도 LangChain은 embedding model 및 vector store와 같은 다른 인접 기술에 대한 지원을 제공합니다. 자세한 내용은 [통합 페이지](/oss/integrations/providers/overview)를 참조하세요.
+</Info>
+
+## Parameter
+
+Chat model은 동작을 구성하는 데 사용할 수 있는 parameter를 받습니다. 지원되는 전체 parameter 세트는 model 및 provider에 따라 다르지만 표준 parameter는 다음과 같습니다:
+
+<ParamField body="model" type="string" required>
+    Provider와 함께 사용하려는 특정 model의 이름 또는 식별자입니다.
+</ParamField>
+
+:::python
+<ParamField body="api_key" type="string">
+    Model의 provider로 인증하는 데 필요한 키입니다. 일반적으로 model에 대한 액세스를 신청할 때 발급됩니다. 종종 <Tooltip tip="프로그램 외부에서 값이 설정되는 변수로, 일반적으로 운영 체제 또는 마이크로서비스에 내장된 기능을 통해 설정됩니다.">환경 변수</Tooltip>를 설정하여 액세스합니다.
+</ParamField>
+:::
+:::js
+<ParamField body="apiKey" type="string">
+    Model의 provider로 인증하는 데 필요한 키입니다. 일반적으로 model에 대한 액세스를 신청할 때 발급됩니다. 종종 <Tooltip tip="프로그램 외부에서 값이 설정되는 변수로, 일반적으로 운영 체제 또는 마이크로서비스에 내장된 기능을 통해 설정됩니다.">환경 변수</Tooltip>를 설정하여 액세스합니다.
+</ParamField>
+:::
+
+<ParamField body="temperature" type="number">
+    Model 출력의 무작위성을 제어합니다. 높은 값은 응답을 더 창의적으로 만들고, 낮은 값은 더 결정론적으로 만듭니다.
+</ParamField>
+
+<ParamField body="timeout" type="number">
+    요청을 취소하기 전에 model의 응답을 기다리는 최대 시간(초)입니다.
+</ParamField>
+
+:::python
+<ParamField body="max_tokens" type="number">
+    응답의 총 <Tooltip tip="Model이 읽고 생성하는 기본 단위입니다. Provider마다 다르게 정의할 수 있지만 일반적으로 단어의 전체 또는 일부를 나타낼 수 있습니다.">token</Tooltip> 수를 제한하여 출력 길이를 효과적으로 제어합니다.
+</ParamField>
+
+<ParamField body="max_retries" type="number">
+    네트워크 타임아웃이나 rate limit과 같은 문제로 인해 요청이 실패할 경우 시스템이 요청을 재전송하는 최대 시도 횟수입니다.
+</ParamField>
+:::
+:::js
+<ParamField body="maxTokens" type="number">
+    응답의 총 <Tooltip tip="Model이 읽고 생성하는 기본 단위입니다. Provider마다 다르게 정의할 수 있지만 일반적으로 단어의 전체 또는 일부를 나타낼 수 있습니다.">token</Tooltip> 수를 제한하여 출력 길이를 효과적으로 제어합니다.
+</ParamField>
+
+<ParamField body="maxRetries" type="number">
+    네트워크 타임아웃이나 rate limit과 같은 문제로 인해 요청이 실패할 경우 시스템이 요청을 재전송하는 최대 시도 횟수입니다.
+</ParamField>
+:::
+
+:::python
+@[`init_chat_model`]을 사용하여 이러한 parameter를 인라인 <Tooltip tip="임의의 키워드 인수" cta="자세히 알아보기" href="https://www.w3schools.com/python/python_args_kwargs.asp">`**kwargs`</Tooltip>로 전달합니다:
+
+```python Initialize using model parameters
+model = init_chat_model(
+    "anthropic:claude-sonnet-4-5",
+    # Kwargs passed to the model:
+    temperature=0.7,
+    timeout=30,
+    max_tokens=1000,
+)
+```
+:::
+:::js
+`initChatModel`을 사용하여 이러한 parameter를 인라인 parameter로 전달합니다:
+
+```typescript Initialize using model parameters
+const model = await initChatModel(
+    "anthropic:claude-sonnet-4-5",
+    { temperature: 0.7, timeout: 30, max_tokens: 1000 }
+)
+```
+:::
+
+<Info>
+    각 chat model 통합에는 provider별 기능을 제어하는 데 사용되는 추가 parameter가 있을 수 있습니다. 예를 들어 @[`ChatOpenAI`]에는 OpenAI Responses 또는 Completions API 사용 여부를 지정하는 `use_responses_api`가 있습니다.
+
+    특정 chat model이 지원하는 모든 parameter를 찾으려면 [chat model 통합](/oss/integrations/chat) 페이지를 참조하세요.
+</Info>
+
+---
+
+## 호출
+
+출력을 생성하려면 chat model을 호출해야 합니다. 각각 다른 사용 사례에 적합한 세 가지 주요 호출 메서드가 있습니다.
+
+### Invoke
+
+Model을 호출하는 가장 간단한 방법은 단일 message 또는 message 목록과 함께 @[`invoke()`][BaseChatModel.invoke]를 사용하는 것입니다.
+
+:::python
+```python Single message
+response = model.invoke("Why do parrots have colorful feathers?")
+print(response)
+```
+:::
+
+:::js
+```typescript Single message
+const response = await model.invoke("Why do parrots have colorful feathers?");
+console.log(response);
+```
+:::
+
+대화 기록을 나타내기 위해 message 목록을 model에 제공할 수 있습니다. 각 message에는 model이 대화에서 누가 message를 보냈는지 나타내는 데 사용하는 역할이 있습니다. 역할, 유형 및 내용에 대한 자세한 내용은 [message](/oss/langchain/messages) 가이드를 참조하세요.
+
+:::python
+```python Dictionary format
+from langchain.messages import HumanMessage, AIMessage, SystemMessage
+
+conversation = [
+    {"role": "system", "content": "You are a helpful assistant that translates English to French."},
+    {"role": "user", "content": "Translate: I love programming."},
+    {"role": "assistant", "content": "J'adore la programmation."},
+    {"role": "user", "content": "Translate: I love building applications."}
+]
+
+response = model.invoke(conversation)
+print(response)  # AIMessage("J'adore créer des applications.")
+```
+```python Message objects
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+
+conversation = [
+    SystemMessage("You are a helpful assistant that translates English to French."),
+    HumanMessage("Translate: I love programming."),
+    AIMessage("J'adore la programmation."),
+    HumanMessage("Translate: I love building applications.")
+]
+
+response = model.invoke(conversation)
+print(response)  # AIMessage("J'adore créer des applications.")
+```
+:::
+
+:::js
+```typescript Object format
+const conversation = [
+  { role: "system", content: "You are a helpful assistant that translates English to French." },
+  { role: "user", content: "Translate: I love programming." },
+  { role: "assistant", content: "J'adore la programmation." },
+  { role: "user", content: "Translate: I love building applications." },
+];
+
+const response = await model.invoke(conversation);
+console.log(response);  // AIMessage("J'adore créer des applications.")
+```
+```typescript Message objects
+import { HumanMessage, AIMessage, SystemMessage } from "langchain";
+
+const conversation = [
+  new SystemMessage("You are a helpful assistant that translates English to French."),
+  new HumanMessage("Translate: I love programming."),
+  new AIMessage("J'adore la programmation."),
+  new HumanMessage("Translate: I love building applications."),
+];
+
+const response = await model.invoke(conversation);
+console.log(response);  // AIMessage("J'adore créer des applications.")
+```
+:::
+
+### Stream
+
+대부분의 model은 생성되는 동안 출력 내용을 스트리밍할 수 있습니다. 출력을 점진적으로 표시함으로써 스트리밍은 특히 긴 응답의 경우 사용자 경험을 크게 향상시킵니다.
+
+@[`stream()`][BaseChatModel.stream]을 호출하면 생성되는 출력 chunk를 생성하는 <Tooltip tip="컬렉션의 각 항목에 순서대로 점진적으로 액세스를 제공하는 객체입니다.">iterator</Tooltip>가 반환됩니다. 루프를 사용하여 각 chunk를 실시간으로 처리할 수 있습니다:
+
+:::python
+<CodeGroup>
+    ```python Basic text streaming
+    for chunk in model.stream("Why do parrots have colorful feathers?"):
+        print(chunk.text, end="|", flush=True)
+    ```
+
+    ```python Stream tool calls, reasoning, and other content
+    for chunk in model.stream("What color is the sky?"):
+        for block in chunk.content_blocks:
+            if block["type"] == "reasoning" and (reasoning := block.get("reasoning")):
+                print(f"Reasoning: {reasoning}")
+            elif block["type"] == "tool_call_chunk":
+                print(f"Tool call chunk: {block}")
+            elif block["type"] == "text":
+                print(block["text"])
+            else:
+                ...
+    ```
+</CodeGroup>
+:::
+:::js
+<CodeGroup>
+    ```typescript Basic text streaming
+    const stream = await model.stream("Why do parrots have colorful feathers?");
+    for await (const chunk of stream) {
+      console.log(chunk.text)
+    }
+    ```
+
+    ```typescript Stream tool calls, reasoning, and other content
+    const stream = await model.stream("What color is the sky?");
+    for await (const chunk of stream) {
+      for (const block of chunk.contentBlocks) {
+        if (block.type === "reasoning") {
+          console.log(`Reasoning: ${block.reasoning}`);
+        } else if (block.type === "tool_call_chunk") {
+          console.log(`Tool call chunk: ${block}`);
+        } else if (block.type === "text") {
+          console.log(block.text);
+        } else {
+          ...
+        }
+      }
+    }
+    ```
+</CodeGroup>
+:::
+
+Model이 전체 응답 생성을 완료한 후 단일 @[`AIMessage`][AIMessage]를 반환하는 [`invoke()`](#invoke)와 달리, `stream()`은 각각 출력 텍스트의 일부를 포함하는 여러 @[`AIMessageChunk`][AIMessageChunk] 객체를 반환합니다. 중요한 점은 스트림의 각 chunk가 합산을 통해 전체 message로 수집되도록 설계되었다는 것입니다:
+
+:::python
+```python Construct an AIMessage
+full = None  # None | AIMessageChunk
+for chunk in model.stream("What color is the sky?"):
+    full = chunk if full is None else full + chunk
+    print(full.text)
+
+# The
+# The sky
+# The sky is
+# The sky is typically
+# The sky is typically blue
+# ...
+
+print(full.content_blocks)
+# [{"type": "text", "text": "The sky is typically blue..."}]
+```
+:::
+
+:::js
+```typescript Construct AIMessage
+let full: AIMessageChunk | null = null;
+for await (const chunk of stream) {
+  full = full ? full.concat(chunk) : chunk;
+  console.log(full.text);
+}
+
+// The
+// The sky
+// The sky is
+// The sky is typically
+// The sky is typically blue
+// ...
+
+console.log(full.contentBlocks);
+// [{"type": "text", "text": "The sky is typically blue..."}]
+```
+:::
+
+결과 message는 [`invoke()`](#invoke)로 생성된 message와 동일하게 처리할 수 있습니다 - 예를 들어 message 기록에 집계하여 대화 컨텍스트로 model에 다시 전달할 수 있습니다.
+
+<Warning>
+    스트리밍은 프로그램의 모든 단계가 chunk 스트림을 처리하는 방법을 알고 있는 경우에만 작동합니다. 예를 들어 스트리밍을 지원하지 않는 애플리케이션은 처리하기 전에 전체 출력을 메모리에 저장해야 하는 애플리케이션입니다.
+</Warning>
+
+<Accordion title="고급 스트리밍 주제">
+    <Accordion title='"자동 스트리밍" chat model'>
+        LangChain은 스트리밍 메서드를 명시적으로 호출하지 않는 경우에도 특정 경우에 자동으로 스트리밍 모드를 활성화하여 chat model에서의 스트리밍을 단순화합니다. 이는 비스트리밍 invoke 메서드를 사용하지만 chat model의 중간 결과를 포함하여 전체 애플리케이션을 스트리밍하려는 경우 특히 유용합니다.
+
+        예를 들어 [LangGraph agent](/oss/langchain/agents)에서는 node 내에서 `model.invoke()`를 호출할 수 있지만, 스트리밍 모드에서 실행 중인 경우 LangChain이 자동으로 스트리밍으로 위임합니다.
+
+        #### 작동 방식
+
+        Chat model을 `invoke()`할 때, 전체 애플리케이션을 스트리밍하려고 한다는 것을 감지하면 LangChain이 자동으로 내부 스트리밍 모드로 전환합니다. 호출 결과는 invoke를 사용하는 코드에 관한 한 동일하지만, chat model이 스트리밍되는 동안 LangChain은 LangChain의 callback 시스템에서 @[`on_llm_new_token`] 이벤트를 호출합니다.
+
+        :::python
+        Callback 이벤트를 통해 LangGraph `stream()` 및 @[`astream_events()`][BaseChatModel.astream_events]가 chat model의 출력을 실시간으로 표시할 수 있습니다.
+        :::
+        :::js
+        Callback 이벤트를 통해 LangGraph `stream()` 및 @[`streamEvents()`][BaseChatModel.streamEvents]가 chat model의 출력을 실시간으로 표시할 수 있습니다.
+        :::
+    </Accordion>
+    <Accordion title="스트리밍 이벤트">
+        :::python
+        LangChain chat model은 @[`astream_events()`][BaseChatModel.astream_events]를 사용하여 의미론적 이벤트를 스트리밍할 수도 있습니다.
+
+        이를 통해 이벤트 유형 및 기타 메타데이터를 기반으로 필터링을 단순화하고 백그라운드에서 전체 message를 집계합니다. 예제는 아래를 참조하세요.
+
+        ```python
+        async for event in model.astream_events("Hello"):
+
+            if event["event"] == "on_chat_model_start":
+                print(f"Input: {event['data']['input']}")
+
+            elif event["event"] == "on_chat_model_stream":
+                print(f"Token: {event['data']['chunk'].text}")
+
+            elif event["event"] == "on_chat_model_end":
+                print(f"Full message: {event['data']['output'].text}")
+
+            else:
+                pass
+        ```
+        ```txt
+        Input: Hello
+        Token: Hi
+        Token:  there
+        Token: !
+        Token:  How
+        Token:  can
+        Token:  I
+        ...
+        Full message: Hi there! How can I help today?
+        ```
+
+        <Tip>
+            이벤트 유형 및 기타 세부 정보는 @[`astream_events()`][BaseChatModel.astream_events] 참조를 확인하세요.
+        </Tip>
+        :::
+
+        :::js
+        LangChain chat model은 [`streamEvents()`][BaseChatModel.streamEvents]를 사용하여 의미론적 이벤트를 스트리밍할 수도 있습니다.
+
+        이를 통해 이벤트 유형 및 기타 메타데이터를 기반으로 필터링을 단순화하고 백그라운드에서 전체 message를 집계합니다. 예제는 아래를 참조하세요.
+
+        ```typescript
+        const stream = await model.streamEvents("Hello");
+        for await (const event of stream) {
+            if (event.event === "on_chat_model_start") {
+                console.log(`Input: ${event.data.input}`);
+            }
+            if (event.event === "on_chat_model_stream") {
+                console.log(`Token: ${event.data.chunk.text}`);
+            }
+            if (event.event === "on_chat_model_end") {
+                console.log(`Full message: ${event.data.output.text}`);
+            }
+        }
+        ```
+        ```txt
+        Input: Hello
+        Token: Hi
+        Token:  there
+        Token: !
+        Token:  How
+        Token:  can
+        Token:  I
+        ...
+        Full message: Hi there! How can I help today?
+        ```
+
+        이벤트 유형 및 기타 세부 정보는 @[`streamEvents()`][BaseChatModel.streamEvents] 참조를 확인하세요.
+        :::
+    </Accordion>
+</Accordion>
+
+### Batch
+
+독립적인 요청 모음을 model에 batch 처리하면 처리를 병렬로 수행할 수 있으므로 성능이 크게 향상되고 비용이 절감될 수 있습니다:
+
+:::python
+```python Batch
+responses = model.batch([
+    "Why do parrots have colorful feathers?",
+    "How do airplanes fly?",
+    "What is quantum computing?"
+])
+for response in responses:
+    print(response)
+```
+
+<Note>
+    이 섹션에서는 클라이언트 측에서 model 호출을 병렬화하는 chat model 메서드 @[`batch()`][BaseChatModel.batch]에 대해 설명합니다.
+
+    이는 [OpenAI](https://platform.openai.com/docs/guides/batch) 또는 [Anthropic](https://docs.claude.com/en/docs/build-with-claude/batch-processing#message-batches-api)과 같은 추론 provider가 지원하는 batch API와는 **다릅니다**.
+</Note>
+
+기본적으로 @[`batch()`][BaseChatModel.batch]는 전체 batch에 대한 최종 출력만 반환합니다. 각 개별 입력이 생성을 완료할 때 출력을 받으려면 @[`batch_as_completed()`][BaseChatModel.batch_as_completed]로 결과를 스트리밍할 수 있습니다:
+
+```python Yield batch responses upon completion
+for response in model.batch_as_completed([
+    "Why do parrots have colorful feathers?",
+    "How do airplanes fly?",
+    "What is quantum computing?"
+]):
+    print(response)
+```
+<Note>
+    @[`batch_as_completed()`][BaseChatModel.batch_as_completed]를 사용할 때 결과가 순서 없이 도착할 수 있습니다. 각 결과에는 필요에 따라 원래 순서를 재구성하기 위해 일치시킬 수 있는 입력 인덱스가 포함됩니다.
+</Note>
+
+<Tip>
+    @[`batch()`][BaseChatModel.batch] 또는 @[`batch_as_completed()`][BaseChatModel.batch_as_completed]를 사용하여 많은 수의 입력을 처리할 때 최대 병렬 호출 수를 제어할 수 있습니다. 이는 @[`RunnableConfig`] dictionary에서 @[`max_concurrency`][RunnableConfig(max_concurrency)] 속성을 설정하여 수행할 수 있습니다.
+
+    ```python Batch with max concurrency
+    model.batch(
+        list_of_inputs,
+        config={
+            'max_concurrency': 5,  # Limit to 5 parallel calls
+        }
+    )
+    ```
+
+    지원되는 속성의 전체 목록은 @[`RunnableConfig`] 참조를 확인하세요.
+</Tip>
+
+Batch 처리에 대한 자세한 내용은 @[참조][BaseChatModel.batch]를 확인하세요.
+:::
+
+:::js
+```typescript Batch
+const responses = await model.batch([
+  "Why do parrots have colorful feathers?",
+  "How do airplanes fly?",
+  "What is quantum computing?",
+  "Why do parrots have colorful feathers?",
+  "How do airplanes fly?",
+  "What is quantum computing?",
+]);
+for (const response of responses) {
+  console.log(response);
+}
+```
+
+<Tip>
+    `batch()`를 사용하여 많은 수의 입력을 처리할 때 최대 병렬 호출 수를 제어할 수 있습니다. 이는 @[`RunnableConfig`] dictionary에서 `maxConcurrency` 속성을 설정하여 수행할 수 있습니다.
+
+    ```typescript Batch with max concurrency
+    model.batch(
+      listOfInputs,
+      {
+        maxConcurrency: 5,  // Limit to 5 parallel calls
+      }
+    )
+    ```
+
+    지원되는 속성의 전체 목록은 @[`RunnableConfig`] 참조를 확인하세요.
+</Tip>
+
+Batch 처리에 대한 자세한 내용은 @[참조][BaseChatModel.batch]를 확인하세요.
+:::
+
+---
+
+## Tool calling
+
+Model은 데이터베이스에서 데이터를 가져오거나, 웹을 검색하거나, 코드를 실행하는 등의 작업을 수행하는 tool을 호출하도록 요청할 수 있습니다. Tool은 다음의 쌍입니다:
+
+1. Tool의 이름, 설명 및/또는 인수 정의(종종 JSON schema)를 포함한 schema
+2. 실행할 function 또는 <Tooltip tip="실행을 일시 중단하고 나중에 재개할 수 있는 메서드">coroutine</Tooltip>
+
+<Note>
+    "function calling"이라는 용어를 들을 수 있습니다. 이를 "tool calling"과 같은 의미로 사용합니다.
+</Note>
+
+:::python
+정의한 tool을 model이 사용할 수 있도록 하려면 @[`bind_tools()`][BaseChatModel.bind_tools]를 사용하여 바인딩해야 합니다. 후속 호출에서 model은 필요에 따라 바인딩된 tool 중 하나를 선택하여 호출할 수 있습니다.
+:::
+
+:::js
+정의한 tool을 model이 사용할 수 있도록 하려면 @[`bindTools()`][BaseChatModel.bindTools]를 사용하여 바인딩해야 합니다. 후속 호출에서 model은 필요에 따라 바인딩된 tool 중 하나를 선택하여 호출할 수 있습니다.
+:::
+
+일부 model provider는 model 또는 호출 parameter를 통해 활성화할 수 있는 내장 tool을 제공합니다(예: [`ChatOpenAI`](/oss/integrations/chat/openai), [`ChatAnthropic`](/oss/integrations/chat/anthropic)). 자세한 내용은 해당 [provider 참조](/oss/integrations/providers/overview)를 확인하세요.
+
+<Tip>
+    Tool 생성에 대한 세부 정보 및 기타 옵션은 [tool 가이드](/oss/langchain/tools)를 참조하세요.
+</Tip>
+
+:::python
+```python Binding user tools
+from langchain.tools import tool
+
+@tool
+def get_weather(location: str) -> str:
+    """Get the weather at a location."""
+    return f"It's sunny in {location}."
+
+
+model_with_tools = model.bind_tools([get_weather])  # [!code highlight]
+
+response = model_with_tools.invoke("What's the weather like in Boston?")
+for tool_call in response.tool_calls:
+    # View tool calls made by the model
+    print(f"Tool: {tool_call['name']}")
+    print(f"Args: {tool_call['args']}")
+```
+:::
+
+:::js
+```typescript Binding user tools
+import { tool } from "langchain";
+import * as z from "zod";
+import { ChatOpenAI } from "@langchain/openai";
+
+const getWeather = tool(
+  (input) => `It's sunny in ${input.location}.`,
+  {
+    name: "get_weather",
+    description: "Get the weather at a location.",
+    schema: z.object({
+      location: z.string().describe("The location to get the weather for"),
+    }),
+  },
+);
+
+const model = new ChatOpenAI({ model: "gpt-4o" });
+const modelWithTools = model.bindTools([getWeather]);  // [!code highlight]
+
+const response = await modelWithTools.invoke("What's the weather like in Boston?");
+const toolCalls = response.tool_calls || [];
+for (const tool_call of toolCalls) {
+  // View tool calls made by the model
+  console.log(`Tool: ${tool_call.name}`);
+  console.log(`Args: ${tool_call.args}`);
+}
+```
+:::
+
+사용자 정의 tool을 바인딩할 때 model의 응답에는 tool 실행 **요청**이 포함됩니다. [Agent](/oss/langchain/agents)와 별도로 model을 사용할 때는 요청된 작업을 수행하고 결과를 model에 반환하여 후속 추론에 사용하는 것은 사용자의 몫입니다. [Agent](/oss/langchain/agents)를 사용할 때는 agent 루프가 tool 실행 루프를 처리합니다.
+
+아래에서는 tool calling을 사용할 수 있는 몇 가지 일반적인 방법을 보여줍니다.
+
+<AccordionGroup>
+    <Accordion title="Tool 실행 루프" icon="arrow-rotate-right">
+        Model이 tool call을 반환하면 tool을 실행하고 결과를 model에 다시 전달해야 합니다. 이렇게 하면 model이 tool 결과를 사용하여 최종 응답을 생성할 수 있는 대화 루프가 생성됩니다. LangChain에는 이 오케스트레이션을 처리하는 [agent](/oss/langchain/agents) 추상화가 포함되어 있습니다.
+
+        다음은 이를 수행하는 방법의 간단한 예입니다:
+
+        :::python
+
+        ```python Tool execution loop
+        # Bind (potentially multiple) tools to the model
+        model_with_tools = model.bind_tools([get_weather])
+
+        # Step 1: Model generates tool calls
+        messages = [{"role": "user", "content": "What's the weather in Boston?"}]
+        ai_msg = model_with_tools.invoke(messages)
+        messages.append(ai_msg)
+
+        # Step 2: Execute tools and collect results
+        for tool_call in ai_msg.tool_calls:
+            # Execute the tool with the generated arguments
+            tool_result = get_weather.invoke(tool_call)
+            messages.append(tool_result)
+
+        # Step 3: Pass results back to model for final response
+        final_response = model_with_tools.invoke(messages)
+        print(final_response.text)
+        # "The current weather in Boston is 72°F and sunny."
+        ```
+
+        :::
+        :::js
+
+        ```typescript Tool execution loop
+        // Bind (potentially multiple) tools to the model
+        const modelWithTools = model.bindTools([get_weather])
+
+        // Step 1: Model generates tool calls
+        const messages = [{"role": "user", "content": "What's the weather in Boston?"}]
+        const ai_msg = await modelWithTools.invoke(messages)
+        messages.push(ai_msg)
+
+        // Step 2: Execute tools and collect results
+        for (const tool_call of ai_msg.tool_calls) {
+            // Execute the tool with the generated arguments
+            const tool_result = await get_weather.invoke(tool_call)
+            messages.push(tool_result)
+        }
+
+        // Step 3: Pass results back to model for final response
+        const final_response = await modelWithTools.invoke(messages)
+        console.log(final_response.text)
+        // "The current weather in Boston is 72°F and sunny."
+        ```
+
+        :::
+
+        Tool이 반환하는 각 @[`ToolMessage`]에는 원래 tool call과 일치하는 `tool_call_id`가 포함되어 있어 model이 결과를 요청과 연관시키는 데 도움이 됩니다.
+    </Accordion>
+    <Accordion title="Tool call 강제" icon="asterisk">
+        기본적으로 model은 사용자의 입력을 기반으로 사용할 바인딩된 tool을 자유롭게 선택할 수 있습니다. 그러나 특정 tool을 선택하도록 강제하거나 주어진 목록에서 **임의의** tool을 사용하도록 보장할 수 있습니다:
+
+        :::python
+
+        <CodeGroup>
+            ```python Force use of any tool
+            model_with_tools = model.bind_tools([tool_1], tool_choice="any")
+            ```
+            ```python Force use of specific tools
+            model_with_tools = model.bind_tools([tool_1], tool_choice="tool_1")
+            ```
+        </CodeGroup>
+
+        :::
+        :::js
+
+        <CodeGroup>
+            ```typescript Force use of any tool
+            const modelWithTools = model.bindTools([tool_1], { toolChoice: "any" })
+            ```
+            ```typescript Force use of specific tools
+            const modelWithTools = model.bindTools([tool_1], { toolChoice: "tool_1" })
+            ```
+        </CodeGroup>
+        :::
+    </Accordion>
+    <Accordion title="병렬 tool call" icon="layer-group">
+        많은 model이 적절한 경우 여러 tool을 병렬로 호출하는 것을 지원합니다. 이를 통해 model이 서로 다른 소스에서 동시에 정보를 수집할 수 있습니다.
+
+        :::python
+
+        ```python Parallel tool calls
+        model_with_tools = model.bind_tools([get_weather])
+
+        response = model_with_tools.invoke(
+            "What's the weather in Boston and Tokyo?"
+        )
+
+
+        # The model may generate multiple tool calls
+        print(response.tool_calls)
+        # [
+        #   {'name': 'get_weather', 'args': {'location': 'Boston'}, 'id': 'call_1'},
+        #   {'name': 'get_weather', 'args': {'location': 'Tokyo'}, 'id': 'call_2'},
+        # ]
+
+
+        # Execute all tools (can be done in parallel with async)
+        results = []
+        for tool_call in response.tool_calls:
+            if tool_call['name'] == 'get_weather':
+                result = get_weather.invoke(tool_call)
+            ...
+            results.append(result)
+        ```
+
+        :::
+        :::js
+
+        ```typescript Parallel tool calls
+        const modelWithTools = model.bind_tools([get_weather])
+
+        const response = await modelWithTools.invoke(
+            "What's the weather in Boston and Tokyo?"
+        )
+
+
+        // The model may generate multiple tool calls
+        console.log(response.tool_calls)
+        // [
+        //   { name: 'get_weather', args: { location: 'Boston' }, id: 'call_1' },
+        //   { name: 'get_time', args: { location: 'Tokyo' }, id: 'call_2' }
+        // ]
+
+
+        // Execute all tools (can be done in parallel with async)
+        const results = []
+        for (const tool_call of response.tool_calls || []) {
+            if (tool_call.name === 'get_weather') {
+                const result = await get_weather.invoke(tool_call)
+                results.push(result)
+            }
+        }
+        ```
+
+        :::
+
+        Model은 요청된 작업의 독립성을 기반으로 병렬 실행이 적절한 시기를 지능적으로 결정합니다.
+
+        <Tip>
+        Tool calling을 지원하는 대부분의 model은 기본적으로 병렬 tool call을 활성화합니다. 일부([OpenAI](/oss/integrations/chat/openai) 및 [Anthropic](/oss/integrations/chat/anthropic) 포함)는 이 기능을 비활성화할 수 있습니다. 이렇게 하려면 `parallel_tool_calls=False`를 설정하세요:
+        ```python
+        model.bind_tools([get_weather], parallel_tool_calls=False)
+        ```
+        </Tip>
+    </Accordion>
+    <Accordion title="Tool call 스트리밍" icon="rss">
+        응답을 스트리밍할 때 tool call은 @[`ToolCallChunk`]를 통해 점진적으로 구축됩니다. 이를 통해 완전한 응답을 기다리지 않고 생성되는 동안 tool call을 볼 수 있습니다.
+
+        :::python
+
+        ```python Streaming tool calls
+        for chunk in model_with_tools.stream(
+            "What's the weather in Boston and Tokyo?"
+        ):
+            # Tool call chunks arrive progressively
+            for tool_chunk in chunk.tool_call_chunks:
+                if name := tool_chunk.get("name"):
+                    print(f"Tool: {name}")
+                if id_ := tool_chunk.get("id"):
+                    print(f"ID: {id_}")
+                if args := tool_chunk.get("args"):
+                    print(f"Args: {args}")
+
+        # Output:
+        # Tool: get_weather
+        # ID: call_SvMlU1TVIZugrFLckFE2ceRE
+        # Args: {"lo
+        # Args: catio
+        # Args: n": "B
+        # Args: osto
+        # Args: n"}
+        # Tool: get_weather
+        # ID: call_QMZdy6qInx13oWKE7KhuhOLR
+        # Args: {"lo
+        # Args: catio
+        # Args: n": "T
+        # Args: okyo
+        # Args: "}
+        ```
+
+        Chunk를 누적하여 완전한 tool call을 구축할 수 있습니다:
+
+        ```python Accumulate tool calls
+        gathered = None
+        for chunk in model_with_tools.stream("What's the weather in Boston?"):
+            gathered = chunk if gathered is None else gathered + chunk
+            print(gathered.tool_calls)
+        ```
+
+        :::
+        :::js
+
+        ```typescript Streaming tool calls
+        const stream = await modelWithTools.stream(
+            "What's the weather in Boston and Tokyo?"
+        )
+        for await (const chunk of stream) {
+            // Tool call chunks arrive progressively
+            if (chunk.tool_call_chunks) {
+                for (const tool_chunk of chunk.tool_call_chunks) {
+                console.log(`Tool: ${tool_chunk.get('name', '')}`)
+                console.log(`Args: ${tool_chunk.get('args', '')}`)
+                }
+            }
+        }
+
+        // Output:
+        // Tool: get_weather
+        // Args:
+        // Tool:
+        // Args: {"loc
+        // Tool:
+        // Args: ation": "BOS"}
+        // Tool: get_time
+        // Args:
+        // Tool:
+        // Args: {"timezone": "Tokyo"}
+        ```
+
+        Chunk를 누적하여 완전한 tool call을 구축할 수 있습니다:
+
+        ```typescript Accumulate tool calls
+        let full: AIMessageChunk | null = null
+        const stream = await modelWithTools.stream("What's the weather in Boston?")
+        for await (const chunk of stream) {
+            full = full ? full.concat(chunk) : chunk
+            console.log(full.contentBlocks)
+        }
+        ```
+
+        :::
+    </Accordion>
+</AccordionGroup>
+
+---
+
+## Structured output
+
+Model은 주어진 schema와 일치하는 형식으로 응답을 제공하도록 요청할 수 있습니다. 이는 출력을 쉽게 구문 분석하고 후속 처리에 사용할 수 있도록 하는 데 유용합니다. LangChain은 구조화된 출력을 적용하기 위한 여러 schema 유형과 메서드를 지원합니다.
+
+:::python
+<Tabs>
+    <Tab title="Pydantic">
+        [Pydantic model](https://docs.pydantic.dev/latest/concepts/models/#basic-model-usage)은 필드 검증, 설명 및 중첩 구조를 갖춘 가장 풍부한 기능 세트를 제공합니다.
+
+        ```python
+        from pydantic import BaseModel, Field
+
+        class Movie(BaseModel):
+            """A movie with details."""
+            title: str = Field(..., description="The title of the movie")
+            year: int = Field(..., description="The year the movie was released")
+            director: str = Field(..., description="The director of the movie")
+            rating: float = Field(..., description="The movie's rating out of 10")
+
+        model_with_structure = model.with_structured_output(Movie)
+        response = model_with_structure.invoke("Provide details about the movie Inception")
+        print(response)  # Movie(title="Inception", year=2010, director="Christopher Nolan", rating=8.8)
+        ```
+    </Tab>
+    <Tab title="TypedDict">
+        `TypedDict`는 Python의 내장 타이핑을 사용하는 더 간단한 대안을 제공하며, 런타임 검증이 필요하지 않을 때 이상적입니다.
+
+        ```python
+        from typing_extensions import TypedDict, Annotated
+
+        class MovieDict(TypedDict):
+            """A movie with details."""
+            title: Annotated[str, ..., "The title of the movie"]
+            year: Annotated[int, ..., "The year the movie was released"]
+            director: Annotated[str, ..., "The director of the movie"]
+            rating: Annotated[float, ..., "The movie's rating out of 10"]
+
+        model_with_structure = model.with_structured_output(MovieDict)
+        response = model_with_structure.invoke("Provide details about the movie Inception")
+        print(response)  # {'title': 'Inception', 'year': 2010, 'director': 'Christopher Nolan', 'rating': 8.8}
+        ```
+    </Tab>
+    <Tab title="JSON Schema">
+        최대한의 제어 또는 상호 운용성을 위해 원시 JSON Schema를 제공할 수 있습니다.
+
+        ```python
+        import json
+
+        json_schema = {
+            "title": "Movie",
+            "description": "A movie with details",
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "The title of the movie"
+                },
+                "year": {
+                    "type": "integer",
+                    "description": "The year the movie was released"
+                },
+                "director": {
+                    "type": "string",
+                    "description": "The director of the movie"
+                },
+                "rating": {
+                    "type": "number",
+                    "description": "The movie's rating out of 10"
+                }
+            },
+            "required": ["title", "year", "director", "rating"]
+        }
+
+        model_with_structure = model.with_structured_output(
+            json_schema,
+            method="json_schema",
+        )
+        response = model_with_structure.invoke("Provide details about the movie Inception")
+        print(response)  # {'title': 'Inception', 'year': 2010, ...}
+        ```
+    </Tab>
+</Tabs>
+:::
+
+:::js
+<Tabs>
+    <Tab title="Zod">
+        [Zod schema](https://zod.dev/)는 출력 schema를 정의하는 선호되는 방법입니다. Zod schema가 제공되면 model 출력도 zod의 parse 메서드를 사용하여 schema에 대해 검증됩니다.
+
+        ```typescript
+        import * as z from "zod";
+
+        const Movie = z.object({
+          title: z.string().describe("The title of the movie"),
+          year: z.number().describe("The year the movie was released"),
+          director: z.string().describe("The director of the movie"),
+          rating: z.number().describe("The movie's rating out of 10"),
+        });
+
+        const modelWithStructure = model.withStructuredOutput(Movie);
+
+        const response = await modelWithStructure.invoke("Provide details about the movie Inception");
+        console.log(response);
+        // {
+        //   title: "Inception",
+        //   year: 2010,
+        //   director: "Christopher Nolan",
+        //   rating: 8.8,
+        // }
+        ```
+    </Tab>
+    <Tab title="JSON Schema">
+        최대한의 제어 또는 상호 운용성을 위해 원시 JSON Schema를 제공할 수 있습니다.
+
+        ```typescript
+        const jsonSchema = {
+          "title": "Movie",
+          "description": "A movie with details",
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "The title of the movie",
+            },
+            "year": {
+              "type": "integer",
+              "description": "The year the movie was released",
+            },
+            "director": {
+              "type": "string",
+              "description": "The director of the movie",
+            },
+            "rating": {
+              "type": "number",
+              "description": "The movie's rating out of 10",
+            },
+          },
+          "required": ["title", "year", "director", "rating"],
+        }
+
+        const modelWithStructure = model.withStructuredOutput(
+          jsonSchema,
+          { method: "jsonSchema" },
+        )
+
+        const response = await modelWithStructure.invoke("Provide details about the movie Inception")
+        console.log(response)  // {'title': 'Inception', 'year': 2010, ...}
+        ```
+    </Tab>
+</Tabs>
+:::
+
+:::python
+<Note>
+    **구조화된 출력에 대한 주요 고려 사항:**
+
+    - **Method parameter**: 일부 provider는 다양한 메서드(`'json_schema'`, `'function_calling'`, `'json_mode'`)를 지원합니다
+        - `'json_schema'`는 일반적으로 provider가 제공하는 전용 구조화된 출력 기능을 나타냅니다
+        - `'function_calling'`은 주어진 schema를 따르는 [tool call](#tool-calling)을 강제하여 구조화된 출력을 도출합니다
+        - `'json_mode'`는 일부 provider가 제공하는 `'json_schema'`의 전신입니다 - 유효한 json을 생성하지만 schema는 prompt에 설명되어야 합니다
+    - **Include raw**: `include_raw=True`를 사용하여 구문 분석된 출력과 원시 AI message를 모두 가져옵니다
+    - **Validation**: Pydantic model은 자동 검증을 제공하는 반면 `TypedDict` 및 JSON Schema는 수동 검증이 필요합니다
+</Note>
+:::
+
+:::js
+<Note>
+    **구조화된 출력에 대한 주요 고려 사항:**
+
+    - **Method parameter**: 일부 provider는 다양한 메서드(`'jsonSchema'`, `'functionCalling'`, `'jsonMode'`)를 지원합니다
+    - **Include raw**: @[`includeRaw: true`][BaseChatModel.with_structured_output(include_raw)]를 사용하여 구문 분석된 출력과 원시 @[`AIMessage`]를 모두 가져옵니다
+    - **Validation**: Zod model은 자동 검증을 제공하는 반면 JSON Schema는 수동 검증이 필요합니다
+</Note>
+:::
+
+<Accordion title="예제: 구문 분석된 구조와 함께 Message 출력">
+
+[Token 수](#token-usage)와 같은 응답 메타데이터에 액세스하기 위해 구문 분석된 표현과 함께 원시 @[`AIMessage`] 객체를 반환하는 것이 유용할 수 있습니다. 이렇게 하려면 @[`with_structured_output`][BaseChatModel.with_structured_output]을 호출할 때 @[`include_raw=True`][BaseChatModel.with_structured_output(include_raw)]를 설정하세요:
+
+    :::python
+    ```python
+    from pydantic import BaseModel, Field
+
+    class Movie(BaseModel):
+        """A movie with details."""
+        title: str = Field(..., description="The title of the movie")
+        year: int = Field(..., description="The year the movie was released")
+        director: str = Field(..., description="The director of the movie")
+        rating: float = Field(..., description="The movie's rating out of 10")
+
+    model_with_structure = model.with_structured_output(Movie, include_raw=True)  # [!code highlight]
+    response = model_with_structure.invoke("Provide details about the movie Inception")
+    response
+    # {
+    #     "raw": AIMessage(...),
+    #     "parsed": Movie(title=..., year=..., ...),
+    #     "parsing_error": None,
+    # }
+    ```
+    :::
+
+    :::js
+    ```typescript
+    import * as z from "zod";
+
+    const Movie = z.object({
+      title: z.string().describe("The title of the movie"),
+      year: z.number().describe("The year the movie was released"),
+      director: z.string().describe("The director of the movie"),
+      rating: z.number().describe("The movie's rating out of 10"),
+      title: z.string().describe("The title of the movie"),
+      year: z.number().describe("The year the movie was released"),
+      director: z.string().describe("The director of the movie"),  // [!code highlight]
+      rating: z.number().describe("The movie's rating out of 10"),
+    });
+
+    const modelWithStructure = model.withStructuredOutput(Movie, { includeRaw: true });
+
+    const response = await modelWithStructure.invoke("Provide details about the movie Inception");
+    console.log(response);
+    // {
+    //   raw: AIMessage { ... },
+    //   parsed: { title: "Inception", ... }
+    // }
+    ```
+    :::
+</Accordion>
+<Accordion title="예제: 중첩 구조">
+    Schema는 중첩될 수 있습니다:
+    :::python
+    <CodeGroup>
+        ```python Pydantic BaseModel
+        from pydantic import BaseModel, Field
+
+        class Actor(BaseModel):
+            name: str
+            role: str
+
+        class MovieDetails(BaseModel):
+            title: str
+            year: int
+            cast: list[Actor]
+            genres: list[str]
+            budget: float | None = Field(None, description="Budget in millions USD")
+
+        model_with_structure = model.with_structured_output(MovieDetails)
+        ```
+
+        ```python TypedDict
+        from typing_extensions import Annotated, TypedDict
+
+        class Actor(TypedDict):
+            name: str
+            role: str
+
+        class MovieDetails(TypedDict):
+            title: str
+            year: int
+            cast: list[Actor]
+            genres: list[str]
+            budget: Annotated[float | None, ..., "Budget in millions USD"]
+
+        model_with_structure = model.with_structured_output(MovieDetails)
+        ```
+    </CodeGroup>
+    :::
+
+    :::js
+    ```typescript
+    import * as z from "zod";
+
+    const Actor = z.object({
+      name: str
+      role: z.string(),
+    });
+
+    const MovieDetails = z.object({
+      title: z.string(),
+      year: z.number(),
+      cast: z.array(Actor),
+      genres: z.array(z.string()),
+      budget: z.number().nullable().describe("Budget in millions USD"),
+    });
+
+    const modelWithStructure = model.withStructuredOutput(MovieDetails);
+    ```
+    :::
+</Accordion>
+
+---
+
+## 지원되는 model
+
+LangChain은 OpenAI, Anthropic, Google, Azure, AWS Bedrock 등을 포함한 모든 주요 model provider를 지원합니다. 각 provider는 다양한 기능을 가진 다양한 model을 제공합니다. LangChain에서 지원되는 model의 전체 목록은 [통합 페이지](/oss/integrations/providers/overview)를 참조하세요.
+
+---
+
+## 고급 주제
+
+### Multimodal
+
+특정 model은 이미지, 오디오, 비디오와 같은 비텍스트 데이터를 처리하고 반환할 수 있습니다. [Content block](/oss/langchain/messages#message-content)을 제공하여 비텍스트 데이터를 model에 전달할 수 있습니다.
+
+<Tip>
+    기본 multimodal 기능을 갖춘 모든 LangChain chat model은 다음을 지원합니다:
+
+    1. 교차 provider 표준 형식의 데이터([message 가이드](/oss/langchain/messages) 참조)
+    2. OpenAI [chat completion](https://platform.openai.com/docs/api-reference/chat) 형식
+    3. 해당 특정 provider의 기본 형식(예: Anthropic model은 Anthropic 기본 형식을 허용)
+</Tip>
+
+자세한 내용은 message 가이드의 [multimodal 섹션](/oss/langchain/messages#multimodal)을 참조하세요.
+
+<Tooltip tip="모든 LLM이 동등하게 만들어지지는 않습니다!" cta="참조 보기" href="https://models.dev/">일부 model</Tooltip>은 응답의 일부로 multimodal 데이터를 반환할 수 있습니다. 그렇게 호출되면 결과 @[`AIMessage`]에는 multimodal 유형의 content block이 포함됩니다.
+
+:::python
+```python Multimodal output
+response = model.invoke("Create a picture of a cat")
+print(response.content_blocks)
+# [
+#     {"type": "text", "text": "Here's a picture of a cat"},
+#     {"type": "image", "base64": "...", "mime_type": "image/jpeg"},
+# ]
+```
+:::
+
+:::js
+```typescript Multimodal output
+const response = await model.invoke("Create a picture of a cat");
+console.log(response.contentBlocks);
+// [
+//   { type: "text", text: "Here's a picture of a cat" },
+//   { type: "image", data: "...", mimeType: "image/jpeg" },
+// ]
+```
+:::
+
+특정 provider에 대한 자세한 내용은 [통합 페이지](/oss/integrations/providers/overview)를 참조하세요.
+
+### Reasoning
+
+최신 model은 결론에 도달하기 위해 다단계 추론을 수행할 수 있습니다. 여기에는 복잡한 문제를 더 작고 관리하기 쉬운 단계로 나누는 것이 포함됩니다.
+
+**기본 model이 지원하는 경우,** 이 추론 프로세스를 표시하여 model이 최종 답변에 어떻게 도달했는지 더 잘 이해할 수 있습니다.
+
+:::python
+<CodeGroup>
+    ```python Stream reasoning output
+    for chunk in model.stream("Why do parrots have colorful feathers?"):
+        reasoning_steps = [r for r in chunk.content_blocks if r["type"] == "reasoning"]
+        print(reasoning_steps if reasoning_steps else chunk.text)
+    ```
+
+    ```python Complete reasoning output
+    response = model.invoke("Why do parrots have colorful feathers?")
+    reasoning_steps = [b for b in response.content_blocks if b["type"] == "reasoning"]
+    print(" ".join(step["reasoning"] for step in reasoning_steps))
+    ```
+</CodeGroup>
+:::
+
+:::js
+<CodeGroup>
+    ```typescript Stream reasoning output
+    const stream = model.stream("Why do parrots have colorful feathers?");
+    for await (const chunk of stream) {
+        const reasoningSteps = chunk.contentBlocks.filter(b => b.type === "reasoning");
+        console.log(reasoningSteps.length > 0 ? reasoningSteps : chunk.text);
+    }
+    ```
+
+    ```typescript Complete reasoning output
+    const response = await model.invoke("Why do parrots have colorful feathers?");
+    const reasoningSteps = response.contentBlocks.filter(b => b.type === "reasoning");
+    console.log(reasoningSteps.map(step => step.reasoning).join(" "));
+    ```
+</CodeGroup>
+:::
+
+Model에 따라 추론에 투입해야 하는 노력 수준을 지정할 수 있는 경우가 있습니다. 마찬가지로 model이 추론을 완전히 끄도록 요청할 수 있습니다. 이는 추론의 범주형 "계층"(예: `'low'` 또는 `'high'`) 또는 정수 token 예산의 형태를 취할 수 있습니다.
+
+자세한 내용은 해당 chat model의 [통합 페이지](/oss/integrations/providers/overview) 또는 [참조](https://reference.langchain.com/python/integrations/)를 참조하세요.
+
+
+### 로컬 model
+
+LangChain은 자체 하드웨어에서 로컬로 model을 실행하는 것을 지원합니다. 이는 데이터 프라이버시가 중요하거나, 사용자 정의 model을 호출하려는 경우, 또는 클라우드 기반 model을 사용할 때 발생하는 비용을 피하려는 시나리오에 유용합니다.
+
+[Ollama](/oss/integrations/chat/ollama)는 로컬에서 model을 실행하는 가장 쉬운 방법 중 하나입니다. [통합 페이지](/oss/integrations/providers/overview)에서 로컬 통합의 전체 목록을 참조하세요.
+
+### Prompt caching
+
+많은 provider가 동일한 token의 반복 처리에 대한 지연 시간과 비용을 줄이기 위해 prompt caching 기능을 제공합니다. 이러한 기능은 **암시적** 또는 **명시적**일 수 있습니다:
+
+- **암시적 prompt caching:** 요청이 cache에 도달하면 provider가 자동으로 비용 절감을 전달합니다. 예: [OpenAI](/oss/integrations/chat/openai) 및 [Gemini](/oss/integrations/chat/google_generative_ai) (Gemini 2.5 이상).
+- **명시적 caching:** provider가 더 큰 제어 또는 비용 절감을 보장하기 위해 cache 지점을 수동으로 표시할 수 있습니다. 예: @[`ChatOpenAI`] (`prompt_cache_key`를 통해), Anthropic의 [`AnthropicPromptCachingMiddleware`](/oss/integrations/chat/anthropic#prompt-caching) 및 [`cache_control`](https://docs.langchain.com/oss/python/integrations/chat/anthropic#prompt-caching) 옵션, [AWS Bedrock](/oss/integrations/chat/bedrock#prompt-caching), [Gemini](https://python.langchain.com/api_reference/google_genai/chat_models/langchain_google_genai.chat_models.ChatGoogleGenerativeAI.html).
+
+<Warning>
+    Prompt caching은 종종 최소 입력 token 임계값 이상에서만 활성화됩니다. 자세한 내용은 [provider 페이지](/oss/integrations/chat)를 참조하세요.
+</Warning>
+
+Cache 사용은 model 응답의 [사용 메타데이터](/oss/langchain/messages#token-usage)에 반영됩니다.
+
+### 서버 측 tool 사용
+
+일부 provider는 서버 측 [tool-calling](#tool-calling) 루프를 지원합니다: model이 웹 검색, 코드 인터프리터 및 기타 tool과 상호 작용하고 단일 대화 턴에서 결과를 분석할 수 있습니다.
+
+Model이 서버 측에서 tool을 호출하면 응답 message의 내용에 tool의 호출 및 결과를 나타내는 내용이 포함됩니다. 응답의 [content block](/oss/langchain/messages#standard-content-blocks)에 액세스하면 provider에 구애받지 않는 형식으로 서버 측 tool call 및 결과가 반환됩니다:
+
+:::python
+```python Invoke with server-side tool use
+from langchain.chat_models import init_chat_model
+
+model = init_chat_model("openai:gpt-4.1-mini")
+
+tool = {"type": "web_search"}
+model_with_tools = model.bind_tools([tool])
+
+response = model_with_tools.invoke("What was a positive news story from today?")
+response.content_blocks
+```
+```python Result expandable
+[
+    {
+        "type": "server_tool_call",
+        "name": "web_search",
+        "args": {
+            "query": "positive news stories today",
+            "type": "search"
+        },
+        "id": "ws_abc123"
+    },
+    {
+        "type": "server_tool_result",
+        "tool_call_id": "ws_abc123",
+        "status": "success"
+    },
+    {
+        "type": "text",
+        "text": "Here are some positive news stories from today...",
+        "annotations": [
+            {
+                "end_index": 410,
+                "start_index": 337,
+                "title": "article title",
+                "type": "citation",
+                "url": "..."
+            }
+        ]
+    }
+]
+```
+:::
+:::js
+```typescript
+import { initChatModel } from "langchain";
+
+const model = await initChatModel("openai:gpt-4.1-mini");
+const modelWithTools = model.bindTools([{ type: "web_search" }])
+
+const message = await modelWithTools.invoke("What was a positive news story from today?");
+console.log(message.contentBlocks);
+```
+:::
+이는 단일 대화 턴을 나타냅니다. 클라이언트 측 [tool-calling](#tool-calling)에서처럼 전달해야 하는 관련 [ToolMessage](/oss/langchain/messages#tool-message) 객체가 없습니다.
+
+사용 가능한 tool 및 사용 세부 정보는 해당 provider의 [통합 페이지](/oss/integrations/chat)를 참조하세요.
+
+:::python
+### Rate limiting
+
+많은 chat model provider는 주어진 기간 내에 수행할 수 있는 호출 수에 제한을 부과합니다. Rate limit에 도달하면 일반적으로 provider로부터 rate limit 오류 응답을 받게 되며, 더 많은 요청을 하기 전에 기다려야 합니다.
+
+Rate limit을 관리하는 데 도움이 되도록 chat model 통합은 초기화 중에 제공할 수 있는 `rate_limiter` parameter를 허용하여 요청이 이루어지는 속도를 제어합니다.
+
+<Accordion title="Rate limiter 초기화 및 사용" icon="gauge-high">
+    LangChain에는 (선택적) 내장 @[`InMemoryRateLimiter`]가 함께 제공됩니다. 이 limiter는 thread safe하며 동일한 프로세스의 여러 thread에서 공유할 수 있습니다.
+
+    ```python Define a rate limiter
+    from langchain_core.rate_limiters import InMemoryRateLimiter
+
+    rate_limiter = InMemoryRateLimiter(
+        requests_per_second=0.1,  # 1 request every 10s
+        check_every_n_seconds=0.1,  # Check every 100ms whether allowed to make a request
+        max_bucket_size=10,  # Controls the maximum burst size.
+    )
+
+    model = init_chat_model(
+        model="gpt-5",
+        model_provider="openai",
+        rate_limiter=rate_limiter  # [!code highlight]
+    )
+    ```
+
+    <Warning>
+        제공된 rate limiter는 단위 시간당 요청 수만 제한할 수 있습니다. 요청 크기를 기반으로 제한해야 하는 경우에는 도움이 되지 않습니다.
+    </Warning>
+</Accordion>
+:::
+
+### Base URL 또는 proxy
+
+많은 chat model 통합의 경우 API 요청에 대한 base URL을 구성할 수 있으므로 OpenAI 호환 API가 있는 model provider를 사용하거나 proxy 서버를 사용할 수 있습니다.
+
+<Accordion title="Base URL" icon="link">
+    :::python
+    많은 model provider가 OpenAI 호환 API를 제공합니다(예: [Together AI](https://www.together.ai/), [vLLM](https://github.com/vllm-project/vllm)). 적절한 `base_url` parameter를 지정하여 이러한 provider와 함께 @[`init_chat_model`]을 사용할 수 있습니다:
+
+    ```python
+    model = init_chat_model(
+        model="MODEL_NAME",
+        model_provider="openai",
+        base_url="BASE_URL",
+        api_key="YOUR_API_KEY",
+    )
+    ```
+    :::
+
+    :::js
+    많은 model provider가 OpenAI 호환 API를 제공합니다(예: [Together AI](https://www.together.ai/), [vLLM](https://github.com/vllm-project/vllm)). 적절한 `base_url` parameter를 지정하여 이러한 provider와 함께 `initChatModel`을 사용할 수 있습니다:
+
+    ```python
+    model = initChatModel(
+        "MODEL_NAME",
+        {
+            modelProvider: "openai",
+            baseUrl: "BASE_URL",
+            apiKey: "YOUR_API_KEY",
+        }
+    )
+    ```
+    :::
+
+    <Note>
+        직접 chat model 클래스 인스턴스화를 사용할 때 parameter 이름은 provider에 따라 다를 수 있습니다. 자세한 내용은 해당 [참조](/oss/integrations/providers/overview)를 확인하세요.
+    </Note>
+</Accordion>
+
+:::python
+<Accordion title="Proxy 구성" icon="shield">
+    HTTP proxy가 필요한 배포의 경우 일부 model 통합이 proxy 구성을 지원합니다:
+
+    ```python
+    from langchain_openai import ChatOpenAI
+
+    model = ChatOpenAI(
+        model="gpt-4o",
+        openai_proxy="http://proxy.example.com:8080"
+    )
+    ```
+
+<Note>
+    Proxy 지원은 통합에 따라 다릅니다. Proxy 구성 옵션은 특정 model provider의 [참조](/oss/integrations/providers/overview)를 확인하세요.
+</Note>
+
+</Accordion>
+:::
+
+
+### Log probability
+
+특정 model은 model을 초기화할 때 `logprobs` parameter를 설정하여 주어진 token의 가능성을 나타내는 token 수준 log probability를 반환하도록 구성할 수 있습니다:
+
+:::python
+```python
+model = init_chat_model(
+    model="gpt-4o",
+    model_provider="openai"
+).bind(logprobs=True)
+
+response = model.invoke("Why do parrots talk?")
+print(response.response_metadata["logprobs"])
+```
+:::
+
+:::js
+```typescript
+const model = new ChatOpenAI({
+    model: "gpt-4o",
+    logprobs: true,
+});
+
+const responseMessage = await model.invoke("Why do parrots talk?");
+
+responseMessage.response_metadata.logprobs.content.slice(0, 5);
+```
+:::
+
+### Token 사용량
+
+많은 model provider가 호출 응답의 일부로 token 사용 정보를 반환합니다. 사용 가능한 경우 이 정보는 해당 model이 생성한 @[`AIMessage`] 객체에 포함됩니다. 자세한 내용은 [message](/oss/langchain/messages) 가이드를 참조하세요.
+
+<Note>
+    일부 provider API, 특히 OpenAI 및 Azure OpenAI chat completion은 스트리밍 컨텍스트에서 token 사용 데이터를 수신하기 위해 사용자가 옵트인해야 합니다. 자세한 내용은 통합 가이드의 [스트리밍 사용 메타데이터](/oss/integrations/chat/openai#streaming-usage-metadata) 섹션을 참조하세요.
+</Note>
+
+:::python
+아래와 같이 callback 또는 context manager를 사용하여 애플리케이션의 model 전체에서 집계 token 수를 추적할 수 있습니다:
+
+<Tabs>
+    <Tab title="Callback handler">
+        ```python
+        from langchain.chat_models import init_chat_model
+        from langchain_core.callbacks import UsageMetadataCallbackHandler
+
+        model_1 = init_chat_model(model="openai:gpt-4o-mini")
+        model_2 = init_chat_model(model="anthropic:claude-3-5-haiku-latest")
+
+        callback = UsageMetadataCallbackHandler()
+        result_1 = model_1.invoke("Hello", config={"callbacks": [callback]})
+        result_2 = model_2.invoke("Hello", config={"callbacks": [callback]})
+        callback.usage_metadata
+        ```
+        ```python
+        {
+            'gpt-4o-mini-2024-07-18': {
+                'input_tokens': 8,
+                'output_tokens': 10,
+                'total_tokens': 18,
+                'input_token_details': {'audio': 0, 'cache_read': 0},
+                'output_token_details': {'audio': 0, 'reasoning': 0}
+            },
+            'claude-3-5-haiku-20241022': {
+                'input_tokens': 8,
+                'output_tokens': 21,
+                'total_tokens': 29,
+                'input_token_details': {'cache_read': 0, 'cache_creation': 0}
+            }
+        }
+        ```
+    </Tab>
+    <Tab title="Context manager">
+        ```python
+        from langchain.chat_models import init_chat_model
+        from langchain_core.callbacks import get_usage_metadata_callback
+
+        model_1 = init_chat_model(model="openai:gpt-4o-mini")
+        model_2 = init_chat_model(model="anthropic:claude-3-5-haiku-latest")
+
+        with get_usage_metadata_callback() as cb:
+            model_1.invoke("Hello")
+            model_2.invoke("Hello")
+            print(cb.usage_metadata)
+        ```
+        ```python
+        {
+            'gpt-4o-mini-2024-07-18': {
+                'input_tokens': 8,
+                'output_tokens': 10,
+                'total_tokens': 18,
+                'input_token_details': {'audio': 0, 'cache_read': 0},
+                'output_token_details': {'audio': 0, 'reasoning': 0}
+            },
+            'claude-3-5-haiku-20241022': {
+                'input_tokens': 8,
+                'output_tokens': 21,
+                'total_tokens': 29,
+                'input_token_details': {'cache_read': 0, 'cache_creation': 0}
+            }
+        }
+        ```
+    </Tab>
+</Tabs>
+:::
+
+### 호출 구성
+
+:::python
+Model을 호출할 때 @[`RunnableConfig`] dictionary를 사용하여 `config` parameter를 통해 추가 구성을 전달할 수 있습니다. 이는 실행 동작, callback 및 메타데이터 추적에 대한 런타임 제어를 제공합니다.
+:::
+
+:::js
+Model을 호출할 때 @[`RunnableConfig`] 객체를 사용하여 `config` parameter를 통해 추가 구성을 전달할 수 있습니다. 이는 실행 동작, callback 및 메타데이터 추적에 대한 런타임 제어를 제공합니다.
+:::
+
+일반적인 구성 옵션은 다음과 같습니다:
+
+:::python
+```python Invocation with config
+response = model.invoke(
+    "Tell me a joke",
+    config={
+        "run_name": "joke_generation",      # Custom name for this run
+        "tags": ["humor", "demo"],          # Tags for categorization
+        "metadata": {"user_id": "123"},     # Custom metadata
+        "callbacks": [my_callback_handler], # Callback handlers
+    }
+)
+```
+:::
+
+:::js
+```typescript Invocation with config
+const response = await model.invoke(
+    "Tell me a joke",
+    {
+        runName: "joke_generation",      // Custom name for this run
+        tags: ["humor", "demo"],          // Tags for categorization
+        metadata: {"user_id": "123"},     // Custom metadata
+        callbacks: [my_callback_handler], // Callback handlers
+    }
+)
+```
+:::
+
+이러한 구성 값은 다음과 같은 경우에 특히 유용합니다:
+- [LangSmith](https://docs.smith.langchain.com/) tracing으로 디버깅
+- 사용자 정의 로깅 또는 모니터링 구현
+- 프로덕션에서 리소스 사용 제어
+- 복잡한 pipeline 전체에서 호출 추적
+
+:::python
+<Accordion title="주요 구성 속성">
+    <ParamField body="run_name" type="string">
+        로그 및 trace에서 이 특정 호출을 식별합니다. 하위 호출에 상속되지 않습니다.
+    </ParamField>
+
+    <ParamField body="tags" type="string[]">
+        디버깅 도구에서 필터링 및 구성을 위해 모든 하위 호출에 상속되는 레이블입니다.
+    </ParamField>
+
+    <ParamField body="metadata" type="object">
+        추가 컨텍스트를 추적하기 위한 사용자 정의 키-값 쌍으로, 모든 하위 호출에 상속됩니다.
+    </ParamField>
+
+    <ParamField body="max_concurrency" type="number">
+        @[`batch()`][BaseChatModel.batch] 또는 @[`batch_as_completed()`][BaseChatModel.batch_as_completed]를 사용할 때 최대 병렬 호출 수를 제어합니다.
+    </ParamField>
+
+    <ParamField body="callbacks" type="array">
+        실행 중 이벤트를 모니터링하고 응답하기 위한 handler입니다.
+    </ParamField>
+
+    <ParamField body="recursion_limit" type="number">
+        복잡한 pipeline에서 무한 루프를 방지하기 위한 chain의 최대 재귀 깊이입니다.
+    </ParamField>
+</Accordion>
+:::
+
+:::js
+<Accordion title="주요 구성 속성">
+    <ParamField body="runName" type="string">
+        로그 및 trace에서 이 특정 호출을 식별합니다. 하위 호출에 상속되지 않습니다.
+    </ParamField>
+
+    <ParamField body="tags" type="string[]">
+        디버깅 도구에서 필터링 및 구성을 위해 모든 하위 호출에 상속되는 레이블입니다.
+    </ParamField>
+
+    <ParamField body="metadata" type="object">
+        추가 컨텍스트를 추적하기 위한 사용자 정의 키-값 쌍으로, 모든 하위 호출에 상속됩니다.
+    </ParamField>
+
+    <ParamField body="maxConcurrency" type="number">
+        `batch()`를 사용할 때 최대 병렬 호출 수를 제어합니다.
+    </ParamField>
+
+    <ParamField body="callbacks" type="CallbackHandler[]">
+        실행 중 이벤트를 모니터링하고 응답하기 위한 handler입니다.
+    </ParamField>
+
+    <ParamField body="recursion_limit" type="number">
+        복잡한 pipeline에서 무한 루프를 방지하기 위한 chain의 최대 재귀 깊이입니다.
+    </ParamField>
+</Accordion>
+:::
+
+<Tip>
+    지원되는 모든 속성은 @[`RunnableConfig`] 참조를 확인하세요.
+</Tip>
+
+:::python
+### 구성 가능한 model
+
+@[`configurable_fields`][BaseChatModel.configurable_fields]를 지정하여 런타임 구성 가능한 model을 만들 수도 있습니다. Model 값을 지정하지 않으면 기본적으로 `'model'` 및 `'model_provider'`를 구성할 수 있습니다.
+
+```python
+from langchain.chat_models import init_chat_model
+
+configurable_model = init_chat_model(temperature=0)
+
+configurable_model.invoke(
+    "what's your name",
+    config={"configurable": {"model": "gpt-5-nano"}},  # Run with GPT-5-Nano
+)
+configurable_model.invoke(
+    "what's your name",
+    config={"configurable": {"model": "claude-sonnet-4-5"}},  # Run with Claude
+)
+```
+
+<Accordion title="기본값이 있는 구성 가능한 model">
+    기본 model 값으로 구성 가능한 model을 만들고, 구성 가능한 parameter를 지정하고, 구성 가능한 parameter에 접두사를 추가할 수 있습니다:
+    ```python
+    first_model = init_chat_model(
+            model="gpt-4.1-mini",
+            temperature=0,
+            configurable_fields=("model", "model_provider", "temperature", "max_tokens"),
+            config_prefix="first",  # Useful when you have a chain with multiple models
+    )
+
+    first_model.invoke("what's your name")
+    ```
+    ```python
+    first_model.invoke(
+        "what's your name",
+        config={
+            "configurable": {
+                "first_model": "claude-sonnet-4-5",
+                "first_temperature": 0.5,
+                "first_max_tokens": 100,
+            }
+        },
+    )
+    ```
+</Accordion>
+
+<Accordion title="구성 가능한 model을 선언적으로 사용">
+    구성 가능한 model에서 `bind_tools`, `with_structured_output`, `with_configurable` 등과 같은 선언적 작업을 호출하고 일반적으로 인스턴스화된 chat model 객체와 동일한 방식으로 구성 가능한 model을 chain할 수 있습니다.
+
+    ```python
+    from pydantic import BaseModel, Field
+
+
+    class GetWeather(BaseModel):
+        """Get the current weather in a given location"""
+
+            location: str = Field(..., description="The city and state, e.g. San Francisco, CA")
+
+
+    class GetPopulation(BaseModel):
+        """Get the current population in a given location"""
+
+            location: str = Field(..., description="The city and state, e.g. San Francisco, CA")
+
+
+    model = init_chat_model(temperature=0)
+    model_with_tools = model.bind_tools([GetWeather, GetPopulation])
+
+    model_with_tools.invoke(
+        "what's bigger in 2024 LA or NYC", config={"configurable": {"model": "gpt-4.1-mini"}}
+    ).tool_calls
+    ```
+    ```
+    [
+        {
+            'name': 'GetPopulation',
+            'args': {'location': 'Los Angeles, CA'},
+            'id': 'call_Ga9m8FAArIyEjItHmztPYA22',
+            'type': 'tool_call'
+        },
+        {
+            'name': 'GetPopulation',
+            'args': {'location': 'New York, NY'},
+            'id': 'call_jh2dEvBaAHRaw5JUDthOs7rt',
+            'type': 'tool_call'
+        }
+    ]
+    ```
+    ```python
+    model_with_tools.invoke(
+        "what's bigger in 2024 LA or NYC",
+            config={"configurable": {"model": "claude-sonnet-4-5"}},
+    ).tool_calls
+    ```
+    ```
+    [
+        {
+            'name': 'GetPopulation',
+            'args': {'location': 'Los Angeles, CA'},
+            'id': 'toolu_01JMufPf4F4t2zLj7miFeqXp',
+            'type': 'tool_call'
+        },
+        {
+            'name': 'GetPopulation',
+            'args': {'location': 'New York City, NY'},
+            'id': 'toolu_01RQBHcE8kEEbYTuuS8WqY1u',
+            'type': 'tool_call'
+        }
+    ]
+    ```
+</Accordion>
+:::

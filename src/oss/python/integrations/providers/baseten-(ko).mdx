@@ -1,0 +1,39 @@
+---
+title: Baseten
+---
+
+>[Baseten](https://baseten.co)은 ML 모델을 성능, 안정성, 확장성 있게 배포하고 제공하는 데 필요한 모든 인프라를 제공하는 업체입니다.
+
+>모델 추론 플랫폼으로서 `Baseten`은 LangChain 생태계에서 `Provider`입니다.
+`Baseten` 통합은 현재 `Chat Models`와 `Embeddings` 컴포넌트를 구현하고 있습니다.
+
+>`Baseten`을 사용하면 `model` [slug](https://docs.baseten.co/development/model-apis/overview#supported-models)를 지정하여 Kimi K2 또는 GPT OSS와 같은 오픈 소스 모델에 model API를 통해 액세스하거나, `model_url`을 지정하여 전용 GPU에서 독점 모델 또는 파인튜닝된 모델을 전용 배포를 통해 실행할 수 있습니다.
+
+## 설치 및 설정
+
+LangChain에서 Baseten 모델을 사용하려면 다음 두 가지가 필요합니다:
+
+* [Baseten 계정](https://baseten.co)
+* [API key](https://docs.baseten.co/observability/api-keys)
+
+API key를 `BASETEN_API_KEY`라는 환경 변수로 내보내세요.
+
+```sh
+export BASETEN_API_KEY="paste_your_api_key_here"
+```
+
+## Chat Models (Model API 및 전용 배포)
+
+[사용 예제](/oss/integrations/chat/baseten)를 참조하세요.
+
+```python
+from langchain_baseten import ChatBaseten
+```
+
+## Embeddings (전용 배포만 해당)
+
+[사용 예제](/oss/integrations/text_embedding/baseten)를 참조하세요.
+
+```python
+from langchain_baseten import BasetenEmbeddings
+```

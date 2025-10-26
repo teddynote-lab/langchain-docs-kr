@@ -1,0 +1,43 @@
+---
+title: Quip
+---
+
+>[Quip](https://quip.com)은 모바일 및 웹을 위한 협업 생산성 소프트웨어 제품군입니다. 일반적으로 비즈니스 목적으로 그룹이 문서와 스프레드시트를 공동으로 생성하고 편집할 수 있습니다.
+
+`Quip` 문서를 위한 loader입니다.
+
+personal access token을 얻는 방법은 [여기](https://quip.com/dev/automation/documentation/current#section/Authentication/Get-Access-to-Quip's-APIs)를 참조하세요.
+
+`folder_ids` 및/또는 `thread_ids` 목록을 지정하여 해당 문서를 Document 객체로 로드할 수 있습니다. 둘 다 지정된 경우, loader는 `folder_ids`를 기반으로 이 폴더에 속한 모든 `thread_ids`를 가져오고, 전달된 `thread_ids`와 결합하여 두 집합의 합집합을 반환합니다.
+
+* folder_id를 확인하는 방법은?
+  quip 폴더로 이동하여 폴더를 마우스 오른쪽 버튼으로 클릭하고 링크를 복사한 다음, 링크에서 접미사를 추출하여 folder_id로 사용합니다. 힌트: `https://example.quip.com/<folder_id>`
+* thread_id를 확인하는 방법은?
+  thread_id는 문서 id입니다. quip 문서로 이동하여 문서를 마우스 오른쪽 버튼으로 클릭하고 링크를 복사한 다음, 링크에서 접미사를 추출하여 thread_id로 사용합니다. 힌트: `https://exmaple.quip.com/<thread_id>`
+
+또한 `include_all_folders`를 `True`로 설정하면 group_folder_ids를 가져옵니다.
+또한 boolean 값인 `include_attachments`를 지정하여 첨부 파일을 포함할 수 있습니다. 기본값은 False로 설정되어 있으며, True로 설정하면 모든 첨부 파일이 다운로드되고 QuipLoader가 첨부 파일에서 텍스트를 추출하여 Document 객체에 추가합니다. 현재 지원되는 첨부 파일 유형은 `PDF`, `PNG`, `JPEG/JPG`, `SVG`, `Word`, `Excel`입니다. 또한 boolean 값인 `include_comments`를 지정하여 문서의 댓글을 포함할 수 있습니다. 기본값은 False로 설정되어 있으며, True로 설정하면 문서의 모든 댓글이 가져와지고 QuipLoader가 이를 Document 객체에 추가합니다.
+
+QuipLoader를 사용하기 전에 최신 버전의 quip-api 패키지가 설치되어 있는지 확인하세요:
+
+```python
+pip install -qU  quip-api
+```
+
+## Examples
+
+### Personal Access Token
+
+```python
+from langchain_community.document_loaders.quip import QuipLoader
+
+loader = QuipLoader(
+    api_url="https://platform.quip.com", access_token="change_me", request_timeout=60
+)
+documents = loader.load(
+    folder_ids={"123", "456"},
+    thread_ids={"abc", "efg"},
+    include_attachments=False,
+    include_comments=False,
+)
+```

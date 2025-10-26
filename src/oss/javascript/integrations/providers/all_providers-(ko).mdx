@@ -1,0 +1,2047 @@
+---
+title: "모든 integration"
+sidebarTitle: "모든 provider"
+---
+
+JavaScript/TypeScript에서 사용 가능한 전체 integration 컬렉션을 둘러보세요. LangChain.js는 provider, tool, vector store, document loader 등 수백 개의 integration을 제공합니다.
+
+## 주요 provider
+
+<Columns cols={3}>
+  <Card
+    title="Anthropic"
+    href="/oss/integrations/providers/anthropic"
+    icon="anthropic"
+  >
+    고급 추론 및 대화를 위한 Anthropic의 Claude model과 통합하세요.
+  </Card>
+
+  <Card
+    title="AWS"
+    href="/oss/integrations/providers/aws"
+    icon="aws"
+  >
+    포괄적인 integration을 통해 AWS 서비스 및 foundation model에 액세스하세요.
+  </Card>
+
+  <Card
+    title="Google"
+    href="/oss/integrations/providers/google"
+    icon="google"
+  >
+    Gemini 및 Vertex AI를 포함한 Google의 AI 서비스와 통합하세요.
+  </Card>
+
+  <Card
+    title="Microsoft"
+    href="/oss/integrations/providers/microsoft"
+    icon="microsoft"
+  >
+    Microsoft Azure 서비스 및 AI 플랫폼에 연결하세요.
+  </Card>
+
+  <Card
+    title="OpenAI"
+    href="/oss/integrations/providers/openai"
+    icon="openai"
+  >
+    GPT model과 OpenAI의 포괄적인 AI 플랫폼으로 구축하세요.
+  </Card>
+</Columns>
+
+## Chat Model
+
+<Columns cols={3}>
+  <Card
+    title="Alibaba Tongyi"
+    href="/oss/integrations/chat/alibaba_tongyi"
+  >
+    중국어 및 다국어 애플리케이션을 위한 Alibaba의 Tongyi 언어 model.
+  </Card>
+
+  <Card
+    title="Anthropic"
+    href="/oss/integrations/chat/anthropic"
+    icon="anthropic"
+  >
+    고급 대화형 AI 및 추론을 위한 Claude model.
+  </Card>
+
+  <Card
+    title="Arcjet"
+    href="/oss/integrations/chat/arcjet"
+  >
+    내장 보호 기능을 갖춘 보안 중심 AI chat integration.
+  </Card>
+
+  <Card
+    title="Azure OpenAI"
+    href="/oss/integrations/chat/azure"
+    icon="microsoft"
+  >
+    Microsoft Azure의 엔터프라이즈 플랫폼을 통한 OpenAI model.
+  </Card>
+
+  <Card
+    title="Baidu Qianfan"
+    href="/oss/integrations/chat/baidu_qianfan"
+  >
+    중국어 AI model을 위한 Baidu의 Qianfan 플랫폼.
+  </Card>
+
+  <Card
+    title="Baidu Wenxin"
+    href="/oss/integrations/chat/baidu_wenxin"
+  >
+    자연어 처리를 위한 Baidu의 Wenxin (ERNIE) model.
+  </Card>
+
+  <Card
+    title="Amazon Bedrock"
+    href="/oss/integrations/chat/bedrock"
+    icon="aws"
+  >
+    Amazon Bedrock의 관리형 서비스를 통해 foundation model에 액세스하세요.
+  </Card>
+
+  <Card
+    title="Bedrock Converse"
+    href="/oss/integrations/chat/bedrock_converse"
+    icon="aws"
+  >
+    여러 foundation model을 위한 통합 Bedrock Converse API.
+  </Card>
+
+  <Card
+    title="Cerebras"
+    href="/oss/integrations/chat/cerebras"
+  >
+    Cerebras Systems의 AI processor로 초고속 추론.
+  </Card>
+
+  <Card
+    title="Cloudflare Workers AI"
+    href="/oss/integrations/chat/cloudflare_workersai"
+  >
+    Cloudflare의 edge computing 플랫폼에서 AI model 실행.
+  </Card>
+
+  <Card
+    title="Cohere"
+    href="/oss/integrations/chat/cohere"
+    icon="cohere"
+  >
+    텍스트 생성 및 이해를 위한 Cohere의 언어 model.
+  </Card>
+
+  <Card
+    title="Deep Infra"
+    href="/oss/integrations/chat/deep_infra"
+  >
+    Deep Infra의 클라우드 플랫폼을 통해 오픈소스 model에 액세스하세요.
+  </Card>
+
+  <Card
+    title="DeepSeek"
+    href="/oss/integrations/chat/deepseek"
+  >
+    DeepSeek의 고급 추론 및 코딩 model.
+  </Card>
+
+  <Card
+    title="Fake LLM"
+    href="/oss/integrations/chat/fake"
+  >
+    테스트 및 개발 목적을 위한 모의 chat model.
+  </Card>
+
+  <Card
+    title="Fireworks"
+    href="/oss/integrations/chat/fireworks"
+    icon="fireworks"
+  >
+    오픈소스 model을 위한 고성능 추론.
+  </Card>
+
+  <Card
+    title="Friendli"
+    href="/oss/integrations/chat/friendli"
+  >
+    효율적인 model 서빙을 위한 최적화된 추론 엔진.
+  </Card>
+
+  <Card
+    title="Google Generative AI"
+    href="/oss/integrations/chat/google_generative_ai"
+    icon="google"
+  >
+    Google의 Gemini model 및 생성형 AI 기능.
+  </Card>
+
+  <Card
+    title="Google Vertex AI"
+    href="/oss/integrations/chat/google_vertex_ai"
+    icon="google"
+  >
+    Google Cloud의 Vertex AI를 활용한 엔터프라이즈 AI 플랫폼.
+  </Card>
+
+  <Card
+    title="Groq"
+    href="/oss/integrations/chat/groq"
+    icon="groq"
+  >
+    Groq의 특수 하드웨어로 초고속 추론.
+  </Card>
+
+  <Card
+    title="IBM"
+    href="/oss/integrations/chat/ibm"
+  >
+    IBM Watson AI model 및 엔터프라이즈 솔루션.
+  </Card>
+
+  <Card
+    title="Llama.cpp"
+    href="/oss/integrations/chat/llama_cpp"
+  >
+    llama.cpp backend로 로컬 Llama model 실행.
+  </Card>
+
+  <Card
+    title="Minimax"
+    href="/oss/integrations/chat/minimax"
+  >
+    Minimax의 대화형 AI model 및 서비스.
+  </Card>
+
+  <Card
+    title="Mistral"
+    href="/oss/integrations/chat/mistral"
+    icon="mistral"
+  >
+    Mistral의 효율적이고 강력한 언어 model.
+  </Card>
+
+  <Card
+    title="Moonshot"
+    href="/oss/integrations/chat/moonshot"
+  >
+    다양한 언어 작업을 위한 Moonshot의 AI model.
+  </Card>
+
+  <Card
+    title="Neural Internet Bittensor"
+    href="/oss/integrations/chat/ni_bittensor"
+  >
+    Bittensor protocol을 통한 분산형 AI 네트워크.
+  </Card>
+
+  <Card
+    title="Novita"
+    href="/oss/integrations/chat/novita"
+  >
+    Novita의 AI model 및 클라우드 컴퓨팅 플랫폼.
+  </Card>
+
+  <Card
+    title="Ollama"
+    href="/oss/integrations/chat/ollama"
+    icon="ollama"
+  >
+    Ollama의 경량 추론 엔진으로 로컬 model 실행.
+  </Card>
+
+  <Card
+    title="Ollama Functions"
+    href="/oss/integrations/chat/ollama_functions"
+    icon="ollama"
+  >
+    Ollama model을 사용한 function calling 기능.
+  </Card>
+
+  <Card
+    title="OpenAI"
+    href="/oss/integrations/chat/openai"
+    icon="openai"
+  >
+    GPT model 및 OpenAI의 포괄적인 chat 기능.
+  </Card>
+
+  <Card
+    title="Perplexity"
+    href="/oss/integrations/chat/perplexity"
+  >
+    Perplexity의 검색 강화 언어 model.
+  </Card>
+
+  <Card
+    title="PremAI"
+    href="/oss/integrations/chat/premai"
+  >
+    AI model 배포 및 관리를 위한 PremAI의 플랫폼.
+  </Card>
+
+  <Card
+    title="PromptLayer OpenAI"
+    href="/oss/integrations/chat/prompt_layer_openai"
+  >
+    PromptLayer의 관찰 기능이 포함된 OpenAI integration.
+  </Card>
+
+  <Card
+    title="Tencent Hunyuan"
+    href="/oss/integrations/chat/tencent_hunyuan"
+  >
+    중국어 처리를 위한 Tencent의 Hunyuan model.
+  </Card>
+
+  <Card
+    title="Together AI"
+    href="/oss/integrations/chat/togetherai"
+    icon="together"
+  >
+    Together AI의 클라우드 플랫폼을 통한 오픈소스 model.
+  </Card>
+
+  <Card
+    title="WebLLM"
+    href="/oss/integrations/chat/web_llm"
+  >
+    웹 브라우저에서 직접 언어 model 실행.
+  </Card>
+
+  <Card
+    title="xAI"
+    href="/oss/integrations/chat/xai"
+  >
+    대화형 AI를 위한 xAI의 Grok model.
+  </Card>
+
+  <Card
+    title="Yandex"
+    href="/oss/integrations/chat/yandex"
+  >
+    Yandex의 AI model 및 언어 처리 서비스.
+  </Card>
+
+  <Card
+    title="ZhipuAI"
+    href="/oss/integrations/chat/zhipuai"
+  >
+    ZhipuAI의 ChatGLM 및 기타 중국어 언어 model.
+  </Card>
+</Columns>
+
+## LLM
+
+<Columns cols={3}>
+  <Card
+    title="AI21"
+    href="/oss/integrations/llms/ai21"
+  >
+    텍스트 생성을 위한 AI21 Labs의 Jurassic model.
+  </Card>
+
+  <Card
+    title="Aleph Alpha"
+    href="/oss/integrations/llms/aleph_alpha"
+  >
+    유럽 AI 회사의 다국어 언어 model.
+  </Card>
+
+  <Card
+    title="Arcjet"
+    href="/oss/integrations/llms/arcjet"
+  >
+    내장 보호 기능을 갖춘 보안 중심 LLM integration.
+  </Card>
+
+  <Card
+    title="AWS SageMaker"
+    href="/oss/integrations/llms/aws_sagemaker"
+    icon="aws"
+  >
+    Amazon SageMaker의 ML 플랫폼에 model 배포.
+  </Card>
+
+  <Card
+    title="Azure OpenAI"
+    href="/oss/integrations/llms/azure"
+    icon="microsoft"
+  >
+    Microsoft Azure의 엔터프라이즈 플랫폼을 통한 OpenAI model.
+  </Card>
+
+  <Card
+    title="Amazon Bedrock"
+    href="/oss/integrations/llms/bedrock"
+    icon="aws"
+  >
+    Amazon Bedrock 서비스를 통한 foundation model.
+  </Card>
+
+  <Card
+    title="Chrome AI"
+    href="/oss/integrations/llms/chrome_ai"
+  >
+    Chrome의 내장 기능을 사용한 브라우저 기반 AI.
+  </Card>
+
+  <Card
+    title="Cloudflare Workers AI"
+    href="/oss/integrations/llms/cloudflare_workersai"
+  >
+    Cloudflare의 edge computing 플랫폼의 AI model.
+  </Card>
+
+  <Card
+    title="Cohere"
+    href="/oss/integrations/llms/cohere"
+    icon="cohere"
+  >
+    다양한 NLP 작업을 위한 Cohere의 언어 model.
+  </Card>
+
+  <Card
+    title="Deep Infra"
+    href="/oss/integrations/llms/deep_infra"
+  >
+    Deep Infra의 인프라를 통한 오픈소스 model.
+  </Card>
+
+  <Card
+    title="Fireworks"
+    href="/oss/integrations/llms/fireworks"
+    icon="fireworks"
+  >
+    오픈소스 언어 model을 위한 빠른 추론.
+  </Card>
+
+  <Card
+    title="Friendli"
+    href="/oss/integrations/llms/friendli"
+  >
+    효율적인 model 추론을 위한 최적화된 서빙.
+  </Card>
+
+  <Card
+    title="Google Vertex AI"
+    href="/oss/integrations/llms/google_vertex_ai"
+    icon="google"
+  >
+    Google Cloud의 엔터프라이즈 AI 및 ML 플랫폼.
+  </Card>
+
+  <Card
+    title="Gradient AI"
+    href="/oss/integrations/llms/gradient_ai"
+  >
+    프라이빗 AI model 학습 및 배포 플랫폼.
+  </Card>
+
+  <Card
+    title="Hugging Face"
+    href="/oss/integrations/llms/huggingface_inference"
+  >
+    Hugging Face Inference API를 통해 수천 개의 model에 액세스하세요.
+  </Card>
+
+  <Card
+    title="IBM"
+    href="/oss/integrations/llms/ibm"
+  >
+    IBM Watson AI 및 언어 model 서비스.
+  </Card>
+
+  <Card
+    title="JigsawStack"
+    href="/oss/integrations/llms/jigsawstack"
+  >
+    JigsawStack의 AI 인프라 및 model 서비스.
+  </Card>
+
+  <Card
+    title="LayerUp Security"
+    href="/oss/integrations/llms/layerup_security"
+  >
+    모니터링 기능이 포함된 보안 강화 LLM integration.
+  </Card>
+
+  <Card
+    title="Llama.cpp"
+    href="/oss/integrations/llms/llama_cpp"
+  >
+    C++ 구현으로 Llama model을 로컬에서 실행.
+  </Card>
+
+  <Card
+    title="Mistral"
+    href="/oss/integrations/llms/mistral"
+    icon="mistral"
+  >
+    Mistral의 오픈소스 및 상용 언어 model.
+  </Card>
+
+  <Card
+    title="Neural Internet Bittensor"
+    href="/oss/integrations/llms/ni_bittensor"
+  >
+    Bittensor의 P2P 네트워크를 통한 분산형 AI.
+  </Card>
+
+  <Card
+    title="Ollama"
+    href="/oss/integrations/llms/ollama"
+    icon="ollama"
+  >
+    Ollama의 간단한 인터페이스로 로컬 model 서빙.
+  </Card>
+
+  <Card
+    title="OpenAI"
+    href="/oss/integrations/llms/openai"
+    icon="openai"
+  >
+    GPT model 및 OpenAI의 언어 model API.
+  </Card>
+
+  <Card
+    title="PromptLayer OpenAI"
+    href="/oss/integrations/llms/prompt_layer_openai"
+  >
+    PromptLayer의 로깅 및 관찰 기능이 포함된 OpenAI.
+  </Card>
+
+  <Card
+    title="Raycast"
+    href="/oss/integrations/llms/raycast"
+  >
+    Raycast 생산성 도구를 위한 AI integration.
+  </Card>
+
+  <Card
+    title="Replicate"
+    href="/oss/integrations/llms/replicate"
+  >
+    Replicate의 클라우드 플랫폼을 통해 오픈소스 model 실행.
+  </Card>
+
+  <Card
+    title="Together AI"
+    href="/oss/integrations/llms/together"
+    icon="together"
+  >
+    Together 플랫폼에서 오픈소스 model을 위한 빠른 추론.
+  </Card>
+
+  <Card
+    title="Writer"
+    href="/oss/integrations/llms/writer"
+  >
+    콘텐츠 생성을 위한 Writer의 엔터프라이즈 AI 플랫폼.
+  </Card>
+
+  <Card
+    title="Yandex"
+    href="/oss/integrations/llms/yandex"
+  >
+    Yandex의 언어 model 및 AI 서비스.
+  </Card>
+</Columns>
+
+## Text Embedding Model
+
+<Columns cols={3}>
+  <Card
+    title="Alibaba Tongyi"
+    href="/oss/integrations/text_embedding/alibaba_tongyi"
+  >
+    다국어 텍스트 표현을 위한 Alibaba의 embedding model.
+  </Card>
+
+  <Card
+    title="Azure OpenAI"
+    href="/oss/integrations/text_embedding/azure_openai"
+    icon="microsoft"
+  >
+    Microsoft Azure 플랫폼을 통한 OpenAI embedding.
+  </Card>
+
+  <Card
+    title="Baidu Qianfan"
+    href="/oss/integrations/text_embedding/baidu_qianfan"
+  >
+    중국어 콘텐츠를 위한 Baidu의 텍스트 embedding model.
+  </Card>
+
+  <Card
+    title="Amazon Bedrock"
+    href="/oss/integrations/text_embedding/bedrock"
+    icon="aws"
+  >
+    Amazon Bedrock을 통한 foundation model embedding.
+  </Card>
+
+  <Card
+    title="ByteDance Doubao"
+    href="/oss/integrations/text_embedding/bytedance_doubao"
+  >
+    콘텐츠 이해를 위한 ByteDance의 embedding model.
+  </Card>
+
+  <Card
+    title="Cloudflare AI"
+    href="/oss/integrations/text_embedding/cloudflare_ai"
+  >
+    Cloudflare의 edge AI 플랫폼의 텍스트 embedding.
+  </Card>
+
+  <Card
+    title="Cohere"
+    href="/oss/integrations/text_embedding/cohere"
+    icon="cohere"
+  >
+    Cohere의 다국어 embedding model.
+  </Card>
+
+  <Card
+    title="DeepInfra"
+    href="/oss/integrations/text_embedding/deepinfra"
+  >
+    DeepInfra를 통한 오픈소스 embedding model.
+  </Card>
+
+  <Card
+    title="Fireworks"
+    href="/oss/integrations/text_embedding/fireworks"
+    icon="fireworks"
+  >
+    Fireworks 플랫폼을 통한 빠른 embedding 추론.
+  </Card>
+
+  <Card
+    title="Google Generative AI"
+    href="/oss/integrations/text_embedding/google_generativeai"
+    icon="google"
+  >
+    텍스트 표현을 위한 Google의 embedding model.
+  </Card>
+
+  <Card
+    title="Google Vertex AI"
+    href="/oss/integrations/text_embedding/google_vertex_ai"
+    icon="google"
+  >
+    Vertex AI를 통한 엔터프라이즈 embedding model.
+  </Card>
+
+  <Card
+    title="Gradient AI"
+    href="/oss/integrations/text_embedding/gradient_ai"
+  >
+    Gradient AI 플랫폼을 사용한 프라이빗 embedding model.
+  </Card>
+
+  <Card
+    title="Hugging Face"
+    href="/oss/integrations/text_embedding/hugging_face_inference"
+  >
+    Hugging Face를 통한 수천 개의 embedding model.
+  </Card>
+
+  <Card
+    title="IBM"
+    href="/oss/integrations/text_embedding/ibm"
+  >
+    IBM Watson embedding model 및 AI 서비스.
+  </Card>
+
+  <Card
+    title="Jina"
+    href="/oss/integrations/text_embedding/jina"
+  >
+    Jina의 신경망 검색 및 embedding model.
+  </Card>
+
+  <Card
+    title="Llama.cpp"
+    href="/oss/integrations/text_embedding/llama_cpp"
+  >
+    llama.cpp를 사용한 로컬 embedding 생성.
+  </Card>
+
+  <Card
+    title="Minimax"
+    href="/oss/integrations/text_embedding/minimax"
+  >
+    Minimax의 텍스트 embedding 및 표현 model.
+  </Card>
+
+  <Card
+    title="Mistral"
+    href="/oss/integrations/text_embedding/mistralai"
+    icon="mistral"
+  >
+    Mistral의 효율적인 embedding model.
+  </Card>
+
+  <Card
+    title="MixedBread AI"
+    href="/oss/integrations/text_embedding/mixedbread_ai"
+  >
+    고품질 다국어 embedding model.
+  </Card>
+
+  <Card
+    title="Nomic"
+    href="/oss/integrations/text_embedding/nomic"
+  >
+    Nomic의 오픈소스 embedding model.
+  </Card>
+
+  <Card
+    title="Ollama"
+    href="/oss/integrations/text_embedding/ollama"
+    icon="ollama"
+  >
+    Ollama를 통한 로컬 embedding model.
+  </Card>
+
+  <Card
+    title="OpenAI"
+    href="/oss/integrations/text_embedding/openai"
+    icon="openai"
+  >
+    의미 검색을 위한 OpenAI의 text-embedding model.
+  </Card>
+
+  <Card
+    title="Pinecone"
+    href="/oss/integrations/text_embedding/pinecone"
+  >
+    Pinecone의 embedding model 및 vector database.
+  </Card>
+
+  <Card
+    title="PremAI"
+    href="/oss/integrations/text_embedding/premai"
+  >
+    PremAI의 embedding model 및 AI 플랫폼.
+  </Card>
+
+  <Card
+    title="Tencent Hunyuan"
+    href="/oss/integrations/text_embedding/tencent_hunyuan"
+  >
+    중국어 텍스트를 위한 Tencent의 embedding model.
+  </Card>
+
+  <Card
+    title="TensorFlow"
+    href="/oss/integrations/text_embedding/tensorflow"
+  >
+    TensorFlow 기반 embedding model 및 추론.
+  </Card>
+
+  <Card
+    title="Together AI"
+    href="/oss/integrations/text_embedding/togetherai"
+    icon="together"
+  >
+    Together 플랫폼의 오픈소스 embedding model.
+  </Card>
+
+  <Card
+    title="Transformers"
+    href="/oss/integrations/text_embedding/transformers"
+  >
+    로컬 transformer 기반 embedding model.
+  </Card>
+
+  <Card
+    title="Voyage AI"
+    href="/oss/integrations/text_embedding/voyageai"
+  >
+    Voyage AI의 도메인별 embedding model.
+  </Card>
+
+  <Card
+    title="ZhipuAI"
+    href="/oss/integrations/text_embedding/zhipuai"
+  >
+    ZhipuAI의 중국어 언어 embedding model.
+  </Card>
+</Columns>
+
+## Vector Store
+
+<Columns cols={3}>
+  <Card
+    title="AnalyticDB"
+    href="/oss/integrations/vectorstores/analyticdb"
+  >
+    vector 저장 및 검색을 위한 Alibaba Cloud의 AnalyticDB.
+  </Card>
+
+  <Card
+    title="AstraDB"
+    href="/oss/integrations/vectorstores/astradb"
+  >
+    확장 가능한 저장을 위한 DataStax Astra DB vector database.
+  </Card>
+
+  <Card
+    title="Azion EdgeSQL"
+    href="/oss/integrations/vectorstores/azion-edgesql"
+  >
+    Azion의 EdgeSQL을 사용한 edge 기반 vector 저장.
+  </Card>
+
+  <Card
+    title="Azure AI Search"
+    href="/oss/integrations/vectorstores/azure_aisearch"
+    icon="microsoft"
+  >
+    Microsoft Azure의 AI 기반 검색 및 vector 저장.
+  </Card>
+
+  <Card
+    title="Azure Cosmos DB MongoDB"
+    href="/oss/integrations/vectorstores/azure_cosmosdb_mongodb"
+    icon="microsoft"
+  >
+    MongoDB API를 사용한 Azure Cosmos DB의 vector 검색.
+  </Card>
+
+  <Card
+    title="Azure Cosmos DB NoSQL"
+    href="/oss/integrations/vectorstores/azure_cosmosdb_nosql"
+    icon="microsoft"
+  >
+    Azure Cosmos DB NoSQL API의 vector 저장.
+  </Card>
+
+  <Card
+    title="Cassandra"
+    href="/oss/integrations/vectorstores/cassandra"
+  >
+    Apache Cassandra vector 검색 기능.
+  </Card>
+
+  <Card
+    title="Chroma"
+    href="/oss/integrations/vectorstores/chroma"
+  >
+    AI 애플리케이션을 위한 오픈소스 embedding database.
+  </Card>
+
+  <Card
+    title="ClickHouse"
+    href="/oss/integrations/vectorstores/clickhouse"
+  >
+    vector 검색을 지원하는 빠른 컬럼형 database.
+  </Card>
+
+  <Card
+    title="CloseVector"
+    href="/oss/integrations/vectorstores/closevector"
+  >
+    유사도 검색을 위한 고성능 vector database.
+  </Card>
+
+  <Card
+    title="Cloudflare Vectorize"
+    href="/oss/integrations/vectorstores/cloudflare_vectorize"
+  >
+    Cloudflare의 edge에서 제공되는 서버리스 vector database.
+  </Card>
+
+  <Card
+    title="Convex"
+    href="/oss/integrations/vectorstores/convex"
+  >
+    통합 vector 저장 기능을 갖춘 풀스택 플랫폼.
+  </Card>
+
+  <Card
+    title="Couchbase"
+    href="/oss/integrations/vectorstores/couchbase"
+  >
+    vector 검색 기능을 갖춘 NoSQL database.
+  </Card>
+
+  <Card
+    title="Elasticsearch"
+    href="/oss/integrations/vectorstores/elasticsearch"
+  >
+    vector 검색을 지원하는 분산 검색 엔진.
+  </Card>
+
+  <Card
+    title="Faiss"
+    href="/oss/integrations/vectorstores/faiss"
+  >
+    효율적인 유사도 검색을 위한 Facebook의 라이브러리.
+  </Card>
+
+  <Card
+    title="Google Cloud SQL PostgreSQL"
+    href="/oss/integrations/vectorstores/google_cloudsql_pg"
+    icon="google"
+  >
+    Google Cloud의 vector 확장 기능을 갖춘 PostgreSQL.
+  </Card>
+
+  <Card
+    title="Google Vertex AI"
+    href="/oss/integrations/vectorstores/googlevertexai"
+    icon="google"
+  >
+    Google Vertex AI 플랫폼을 통한 vector 검색.
+  </Card>
+
+  <Card
+    title="SAP HANA Vector"
+    href="/oss/integrations/vectorstores/hanavector"
+  >
+    SAP HANA를 사용한 엔터프라이즈 vector database.
+  </Card>
+
+  <Card
+    title="Hnswlib"
+    href="/oss/integrations/vectorstores/hnswlib"
+  >
+    빠른 근사 최근접 이웃 검색 라이브러리.
+  </Card>
+
+  <Card
+    title="LanceDB"
+    href="/oss/integrations/vectorstores/lancedb"
+  >
+    개발자 친화적인 임베디드 vector database.
+  </Card>
+
+  <Card
+    title="LibSQL"
+    href="/oss/integrations/vectorstores/libsql"
+  >
+    vector 확장 기능을 갖춘 SQLite 호환 database.
+  </Card>
+
+  <Card
+    title="MariaDB"
+    href="/oss/integrations/vectorstores/mariadb"
+  >
+    vector 검색 기능을 갖춘 오픈소스 database.
+  </Card>
+
+  <Card
+    title="Memory Vector Store"
+    href="/oss/integrations/vectorstores/memory"
+  >
+    개발 및 테스트를 위한 인메모리 vector 저장.
+  </Card>
+
+  <Card
+    title="Milvus"
+    href="/oss/integrations/vectorstores/milvus"
+  >
+    AI 애플리케이션을 위한 오픈소스 vector database.
+  </Card>
+
+  <Card
+    title="Momento Vector Index"
+    href="/oss/integrations/vectorstores/momento_vector_index"
+  >
+    Momento 플랫폼을 사용한 서버리스 vector 인덱싱.
+  </Card>
+
+  <Card
+    title="MongoDB Atlas"
+    href="/oss/integrations/vectorstores/mongodb_atlas"
+  >
+    MongoDB Atlas 클라우드 database의 vector 검색.
+  </Card>
+
+  <Card
+    title="MyScale"
+    href="/oss/integrations/vectorstores/myscale"
+  >
+    분석을 위한 SQL 호환 vector database.
+  </Card>
+
+  <Card
+    title="Neo4j Vector"
+    href="/oss/integrations/vectorstores/neo4jvector"
+  >
+    통합 vector 검색 기능을 갖춘 graph database.
+  </Card>
+
+  <Card
+    title="Neon"
+    href="/oss/integrations/vectorstores/neon"
+  >
+    vector 확장 기능을 갖춘 서버리스 PostgreSQL.
+  </Card>
+
+  <Card
+    title="OpenSearch"
+    href="/oss/integrations/vectorstores/opensearch"
+  >
+    vector 기능을 갖춘 오픈소스 검색 엔진.
+  </Card>
+
+  <Card
+    title="PGVector"
+    href="/oss/integrations/vectorstores/pgvector"
+  >
+    vector 유사도 검색을 위한 PostgreSQL 확장.
+  </Card>
+
+  <Card
+    title="Pinecone"
+    href="/oss/integrations/vectorstores/pinecone"
+  >
+    머신러닝 애플리케이션을 위한 관리형 vector database.
+  </Card>
+
+  <Card
+    title="Prisma"
+    href="/oss/integrations/vectorstores/prisma"
+  >
+    vector 지원 기능을 갖춘 타입 안전 database 클라이언트.
+  </Card>
+
+  <Card
+    title="Qdrant"
+    href="/oss/integrations/vectorstores/qdrant"
+  >
+    오픈소스 vector 유사도 검색 엔진.
+  </Card>
+
+  <Card
+    title="Redis"
+    href="/oss/integrations/vectorstores/redis"
+  >
+    vector 검색 기능을 갖춘 인메모리 database.
+  </Card>
+
+  <Card
+    title="Rockset"
+    href="/oss/integrations/vectorstores/rockset"
+  >
+    vector 검색 기능을 갖춘 실시간 분석 database.
+  </Card>
+
+  <Card
+    title="SingleStore"
+    href="/oss/integrations/vectorstores/singlestore"
+  >
+    내장 vector function을 갖춘 분산 database.
+  </Card>
+
+  <Card
+    title="Supabase"
+    href="/oss/integrations/vectorstores/supabase"
+  >
+    vector 지원 기능을 갖춘 오픈소스 Firebase 대안.
+  </Card>
+
+  <Card
+    title="Tigris"
+    href="/oss/integrations/vectorstores/tigris"
+  >
+    vector 검색 기능을 갖춘 개발자 중심 database.
+  </Card>
+
+  <Card
+    title="Turbopuffer"
+    href="/oss/integrations/vectorstores/turbopuffer"
+  >
+    embedding을 위한 고성능 vector database.
+  </Card>
+
+  <Card
+    title="TypeORM"
+    href="/oss/integrations/vectorstores/typeorm"
+  >
+    vector database 지원 기능을 갖춘 TypeScript ORM.
+  </Card>
+
+  <Card
+    title="Typesense"
+    href="/oss/integrations/vectorstores/typesense"
+  >
+    vector 기능을 갖춘 오픈소스 검색 엔진.
+  </Card>
+
+  <Card
+    title="Upstash Vector"
+    href="/oss/integrations/vectorstores/upstash"
+  >
+    Redis 호환성을 갖춘 서버리스 vector database.
+  </Card>
+
+  <Card
+    title="USearch"
+    href="/oss/integrations/vectorstores/usearch"
+  >
+    더 작고 빠른 단일 파일 vector 검색 엔진.
+  </Card>
+
+  <Card
+    title="Vectara"
+    href="/oss/integrations/vectorstores/vectara"
+  >
+    내장 이해 기능을 갖춘 신경망 검색 플랫폼.
+  </Card>
+
+  <Card
+    title="Vercel Postgres"
+    href="/oss/integrations/vectorstores/vercel_postgres"
+  >
+    Vercel의 vector 확장 기능을 갖춘 PostgreSQL database.
+  </Card>
+
+  <Card
+    title="Voy"
+    href="/oss/integrations/vectorstores/voy"
+  >
+    브라우저용 WebAssembly 기반 vector database.
+  </Card>
+
+  <Card
+    title="Weaviate"
+    href="/oss/integrations/vectorstores/weaviate"
+  >
+    GraphQL API를 갖춘 오픈소스 vector database.
+  </Card>
+
+  <Card
+    title="Xata"
+    href="/oss/integrations/vectorstores/xata"
+  >
+    내장 vector 검색 기능을 갖춘 서버리스 database.
+  </Card>
+
+  <Card
+    title="Zep Cloud"
+    href="/oss/integrations/vectorstores/zep_cloud"
+  >
+    클라우드의 AI assistant를 위한 장기 메모리.
+  </Card>
+
+  <Card
+    title="Zep"
+    href="/oss/integrations/vectorstores/zep"
+  >
+    AI assistant 및 agent를 위한 장기 메모리.
+  </Card>
+</Columns>
+
+## Document loader
+
+### File Loader
+
+<Columns cols={3}>
+  <Card
+    title="ChatGPT"
+    href="/oss/integrations/document_loaders/file_loaders/chatgpt"
+  >
+    ChatGPT 대화 내보내기를 로드하고 파싱합니다.
+  </Card>
+
+  <Card
+    title="CSV"
+    href="/oss/integrations/document_loaders/file_loaders/csv"
+  >
+    사용자 정의 가능한 파싱으로 CSV 파일에서 데이터를 로드합니다.
+  </Card>
+
+  <Card
+    title="Directory"
+    href="/oss/integrations/document_loaders/file_loaders/directory"
+  >
+    파일 시스템 디렉토리에서 문서를 재귀적으로 로드합니다.
+  </Card>
+
+  <Card
+    title="DOCX"
+    href="/oss/integrations/document_loaders/file_loaders/docx"
+  >
+    Microsoft Word 문서에서 텍스트 및 메타데이터를 추출합니다.
+  </Card>
+
+  <Card
+    title="EPUB"
+    href="/oss/integrations/document_loaders/file_loaders/epub"
+  >
+    EPUB 전자책 파일을 로드하고 파싱합니다.
+  </Card>
+
+  <Card
+    title="JSON"
+    href="/oss/integrations/document_loaders/file_loaders/json"
+  >
+    유연한 구조 처리로 JSON 파일을 로드하고 파싱합니다.
+  </Card>
+
+  <Card
+    title="JSON Lines"
+    href="/oss/integrations/document_loaders/file_loaders/jsonlines"
+  >
+    줄바꿈으로 구분된 JSON 파일을 로드합니다.
+  </Card>
+
+  <Card
+    title="Multi-File"
+    href="/oss/integrations/document_loaders/file_loaders/multi_file"
+  >
+    다양한 유형의 여러 파일을 동시에 로드합니다.
+  </Card>
+
+  <Card
+    title="Notion Markdown"
+    href="/oss/integrations/document_loaders/file_loaders/notion_markdown"
+  >
+    Markdown으로 내보낸 Notion 페이지를 로드합니다.
+  </Card>
+
+  <Card
+    title="OpenAI Whisper Audio"
+    href="/oss/integrations/document_loaders/file_loaders/openai_whisper_audio"
+  >
+    OpenAI의 Whisper model을 사용하여 오디오 파일을 전사합니다.
+  </Card>
+
+  <Card
+    title="PDF"
+    href="/oss/integrations/document_loaders/file_loaders/pdf"
+  >
+    PDF 문서에서 텍스트를 추출합니다.
+  </Card>
+
+  <Card
+    title="PPTX"
+    href="/oss/integrations/document_loaders/file_loaders/pptx"
+  >
+    Microsoft PowerPoint 프레젠테이션을 로드합니다.
+  </Card>
+
+  <Card
+    title="Subtitles"
+    href="/oss/integrations/document_loaders/file_loaders/subtitles"
+  >
+    자막 파일(SRT, VTT 형식)을 로드합니다.
+  </Card>
+
+  <Card
+    title="Text"
+    href="/oss/integrations/document_loaders/file_loaders/text"
+  >
+    인코딩 감지 기능으로 일반 텍스트 파일을 로드합니다.
+  </Card>
+
+  <Card
+    title="Unstructured"
+    href="/oss/integrations/document_loaders/file_loaders/unstructured"
+  >
+    Unstructured.io를 사용하여 다양한 파일 형식을 로드합니다.
+  </Card>
+</Columns>
+
+### Web Loader
+
+<Columns cols={3}>
+  <Card
+    title="Airtable"
+    href="/oss/integrations/document_loaders/web_loaders/airtable"
+  >
+    Airtable base에서 레코드를 로드합니다.
+  </Card>
+
+  <Card
+    title="Apify Dataset"
+    href="/oss/integrations/document_loaders/web_loaders/apify_dataset"
+  >
+    Apify 웹 스크래핑 dataset에서 데이터를 로드합니다.
+  </Card>
+
+  <Card
+    title="AssemblyAI Audio"
+    href="/oss/integrations/document_loaders/web_loaders/assemblyai_audio_transcription"
+  >
+    AssemblyAI의 API를 사용하여 오디오를 전사합니다.
+  </Card>
+
+  <Card
+    title="Azure Blob Storage Container"
+    href="/oss/integrations/document_loaders/web_loaders/azure_blob_storage_container"
+    icon="microsoft"
+  >
+    Azure Blob Storage container에서 파일을 로드합니다.
+  </Card>
+
+  <Card
+    title="Azure Blob Storage File"
+    href="/oss/integrations/document_loaders/web_loaders/azure_blob_storage_file"
+    icon="microsoft"
+  >
+    Azure Blob Storage에서 개별 파일을 로드합니다.
+  </Card>
+
+  <Card
+    title="Browserbase"
+    href="/oss/integrations/document_loaders/web_loaders/browserbase"
+  >
+    Browserbase의 클라우드 브라우저를 사용하여 웹 콘텐츠를 로드합니다.
+  </Card>
+
+  <Card
+    title="College Confidential"
+    href="/oss/integrations/document_loaders/web_loaders/college_confidential"
+  >
+    College Confidential 포럼 콘텐츠를 스크랩합니다.
+  </Card>
+
+  <Card
+    title="Confluence"
+    href="/oss/integrations/document_loaders/web_loaders/confluence"
+  >
+    Atlassian Confluence에서 페이지를 로드합니다.
+  </Card>
+
+  <Card
+    title="Couchbase"
+    href="/oss/integrations/document_loaders/web_loaders/couchbase"
+  >
+    Couchbase database에서 문서를 로드합니다.
+  </Card>
+
+  <Card
+    title="Figma"
+    href="/oss/integrations/document_loaders/web_loaders/figma"
+  >
+    Figma 디자인 파일 및 댓글을 로드합니다.
+  </Card>
+
+  <Card
+    title="Firecrawl"
+    href="/oss/integrations/document_loaders/web_loaders/firecrawl"
+  >
+    Firecrawl의 웹 스크래핑 API를 사용하여 웹사이트를 크롤링합니다.
+  </Card>
+
+  <Card
+    title="GitBook"
+    href="/oss/integrations/document_loaders/web_loaders/gitbook"
+  >
+    GitBook 문서 사이트에서 콘텐츠를 로드합니다.
+  </Card>
+
+  <Card
+    title="GitHub"
+    href="/oss/integrations/document_loaders/web_loaders/github"
+  >
+    GitHub에서 파일 및 repository를 로드합니다.
+  </Card>
+
+  <Card
+    title="Google Cloud Storage"
+    href="/oss/integrations/document_loaders/web_loaders/google_cloud_storage"
+    icon="google"
+  >
+    Google Cloud Storage bucket에서 파일을 로드합니다.
+  </Card>
+
+  <Card
+    title="Google Cloud SQL PostgreSQL"
+    href="/oss/integrations/document_loaders/web_loaders/google_cloudsql_pg"
+    icon="google"
+  >
+    Google Cloud SQL PostgreSQL database에서 데이터를 로드합니다.
+  </Card>
+
+  <Card
+    title="Hacker News"
+    href="/oss/integrations/document_loaders/web_loaders/hn"
+  >
+    Hacker News에서 게시물 및 댓글을 로드합니다.
+  </Card>
+
+  <Card
+    title="IMSDb"
+    href="/oss/integrations/document_loaders/web_loaders/imsdb"
+  >
+    Internet Movie Script Database에서 영화 대본을 로드합니다.
+  </Card>
+
+  <Card
+    title="Jira"
+    href="/oss/integrations/document_loaders/web_loaders/jira"
+  >
+    Atlassian Jira에서 이슈 및 프로젝트를 로드합니다.
+  </Card>
+
+  <Card
+    title="LangSmith"
+    href="/oss/integrations/document_loaders/web_loaders/langsmith"
+  >
+    LangSmith에서 실행 및 dataset을 로드합니다.
+  </Card>
+
+  <Card
+    title="Notion API"
+    href="/oss/integrations/document_loaders/web_loaders/notionapi"
+  >
+    Notion에서 페이지 및 database를 로드합니다.
+  </Card>
+
+  <Card
+    title="PDF (Web)"
+    href="/oss/integrations/document_loaders/web_loaders/pdf"
+  >
+    웹 URL에서 PDF 파일을 로드합니다.
+  </Card>
+
+  <Card
+    title="Recursive URL"
+    href="/oss/integrations/document_loaders/web_loaders/recursive_url_loader"
+  >
+    웹 페이지를 재귀적으로 크롤링하고 로드합니다.
+  </Card>
+
+  <Card
+    title="S3"
+    href="/oss/integrations/document_loaders/web_loaders/s3"
+    icon="aws"
+  >
+    Amazon S3 bucket에서 파일을 로드합니다.
+  </Card>
+
+  <Card
+    title="SearchAPI"
+    href="/oss/integrations/document_loaders/web_loaders/searchapi"
+  >
+    SearchAPI를 사용하여 검색 결과를 로드합니다.
+  </Card>
+
+  <Card
+    title="SerpAPI"
+    href="/oss/integrations/document_loaders/web_loaders/serpapi"
+  >
+    SerpAPI를 사용하여 검색 결과를 로드합니다.
+  </Card>
+
+  <Card
+    title="Sitemap"
+    href="/oss/integrations/document_loaders/web_loaders/sitemap"
+  >
+    웹사이트 sitemap에서 URL을 로드합니다.
+  </Card>
+
+  <Card
+    title="Sonix Audio"
+    href="/oss/integrations/document_loaders/web_loaders/sonix_audio_transcription"
+  >
+    Sonix의 전사 API를 사용하여 오디오를 전사합니다.
+  </Card>
+
+  <Card
+    title="Sort.xyz Blockchain"
+    href="/oss/integrations/document_loaders/web_loaders/sort_xyz_blockchain"
+  >
+    Sort.xyz에서 블록체인 데이터를 로드합니다.
+  </Card>
+
+  <Card
+    title="Spider"
+    href="/oss/integrations/document_loaders/web_loaders/spider"
+  >
+    Spider API를 사용한 빠른 웹 크롤링.
+  </Card>
+
+  <Card
+    title="Taskade"
+    href="/oss/integrations/document_loaders/web_loaders/taskade"
+  >
+    Taskade에서 프로젝트 및 작업을 로드합니다.
+  </Card>
+
+  <Card
+    title="Web Cheerio"
+    href="/oss/integrations/document_loaders/web_loaders/web_cheerio"
+  >
+    서버 측 파싱을 위해 Cheerio를 사용하여 웹 페이지를 스크랩합니다.
+  </Card>
+
+  <Card
+    title="Web Playwright"
+    href="/oss/integrations/document_loaders/web_loaders/web_playwright"
+  >
+    Playwright 브라우저 자동화를 사용하여 동적 웹 콘텐츠를 로드합니다.
+  </Card>
+
+  <Card
+    title="Web Puppeteer"
+    href="/oss/integrations/document_loaders/web_loaders/web_puppeteer"
+  >
+    Puppeteer를 사용하여 JavaScript가 많은 웹사이트를 스크랩합니다.
+  </Card>
+
+  <Card
+    title="YouTube"
+    href="/oss/integrations/document_loaders/web_loaders/youtube"
+  >
+    YouTube 비디오 대본 및 메타데이터를 로드합니다.
+  </Card>
+</Columns>
+
+## Document Transformer
+
+<Columns cols={3}>
+  <Card
+    title="HTML to Text"
+    href="/oss/integrations/document_transformers/html-to-text"
+  >
+    HTML 콘텐츠를 깨끗하고 읽기 쉬운 텍스트로 변환합니다.
+  </Card>
+
+  <Card
+    title="Mozilla Readability"
+    href="/oss/integrations/document_transformers/mozilla_readability"
+  >
+    Mozilla의 Readability를 사용하여 웹 페이지에서 주요 콘텐츠를 추출합니다.
+  </Card>
+
+  <Card
+    title="OpenAI Metadata Tagger"
+    href="/oss/integrations/document_transformers/openai_metadata_tagger"
+    icon="openai"
+  >
+    OpenAI를 사용하여 문서에 대한 메타데이터 태그를 생성합니다.
+  </Card>
+</Columns>
+
+## Document Compressor
+
+<Columns cols={3}>
+  <Card
+    title="Cohere Rerank"
+    href="/oss/integrations/document_compressors/cohere_rerank"
+    icon="cohere"
+  >
+    Cohere의 reranking model을 사용하여 문서를 재순위화합니다.
+  </Card>
+
+  <Card
+    title="IBM"
+    href="/oss/integrations/document_compressors/ibm"
+  >
+    IBM Watson AI 서비스를 사용한 문서 압축.
+  </Card>
+
+  <Card
+    title="MixedBread AI"
+    href="/oss/integrations/document_compressors/mixedbread_ai"
+  >
+    MixedBread AI를 사용하여 문서를 재순위화하고 압축합니다.
+  </Card>
+</Columns>
+
+## Tool
+
+<Columns cols={3}>
+  <Card
+    title="AI Plugin Tool"
+    href="/oss/integrations/tools/aiplugin-tool"
+  >
+    OpenAI ChatGPT plugin을 tool로 실행합니다.
+  </Card>
+
+  <Card
+    title="Azure Dynamic Sessions"
+    href="/oss/integrations/tools/azure_dynamic_sessions"
+    icon="microsoft"
+  >
+    Azure Dynamic Sessions에서 안전한 코드 실행.
+  </Card>
+
+  <Card
+    title="Connery"
+    href="/oss/integrations/tools/connery"
+  >
+    Connery를 사용한 모듈식 AI action 및 integration.
+  </Card>
+
+  <Card
+    title="Connery Toolkit"
+    href="/oss/integrations/tools/connery_toolkit"
+  >
+    Connery의 사전 구축된 action toolkit에 액세스합니다.
+  </Card>
+
+  <Card
+    title="DALL-E"
+    href="/oss/integrations/tools/dalle"
+    icon="openai"
+  >
+    OpenAI의 DALL-E model을 사용하여 이미지를 생성합니다.
+  </Card>
+
+  <Card
+    title="Decodo"
+    href="/oss/integrations/tools/decodo"
+  >
+    Decodo를 사용한 코드 실행 및 분석.
+  </Card>
+
+  <Card
+    title="Discord"
+    href="/oss/integrations/tools/discord_tool"
+  >
+    Discord 서버 및 채널과 상호작용합니다.
+  </Card>
+
+  <Card
+    title="DuckDuckGo Search"
+    href="/oss/integrations/tools/duckduckgo_search"
+  >
+    DuckDuckGo를 사용한 개인정보 보호 중심 웹 검색.
+  </Card>
+
+  <Card
+    title="Exa Search"
+    href="/oss/integrations/tools/exa_search"
+  >
+    더 나은 결과를 위한 AI 기반 검색 엔진.
+  </Card>
+
+  <Card
+    title="Gmail"
+    href="/oss/integrations/tools/gmail"
+    icon="google"
+  >
+    Gmail API를 통해 이메일을 읽고 보냅니다.
+  </Card>
+
+  <Card
+    title="Goat"
+    href="/oss/integrations/tools/goat"
+  >
+    간단한 tool 실행 프레임워크.
+  </Card>
+
+  <Card
+    title="Google Calendar"
+    href="/oss/integrations/tools/google_calendar"
+    icon="google"
+  >
+    Google Calendar에서 이벤트 및 일정을 관리합니다.
+  </Card>
+
+  <Card
+    title="Google Places"
+    href="/oss/integrations/tools/google_places"
+    icon="google"
+  >
+    Google Places API를 사용하여 장소를 검색합니다.
+  </Card>
+
+  <Card
+    title="Google Routes"
+    href="/oss/integrations/tools/google_routes"
+    icon="google"
+  >
+    길찾기 및 경로 정보를 가져옵니다.
+  </Card>
+
+  <Card
+    title="Google Scholar"
+    href="/oss/integrations/tools/google_scholar"
+    icon="google"
+  >
+    학술 논문 및 인용을 검색합니다.
+  </Card>
+
+  <Card
+    title="Google Trends"
+    href="/oss/integrations/tools/google_trends"
+    icon="google"
+  >
+    검색 트렌드 및 인기도 데이터를 분석합니다.
+  </Card>
+
+  <Card
+    title="IBM"
+    href="/oss/integrations/tools/ibm"
+  >
+    IBM Watson AI tool 및 서비스에 액세스합니다.
+  </Card>
+
+  <Card
+    title="JigsawStack"
+    href="/oss/integrations/tools/jigsawstack"
+  >
+    JigsawStack의 AI 인프라 tool.
+  </Card>
+
+  <Card
+    title="JSON Tool"
+    href="/oss/integrations/tools/json"
+  >
+    JSON 데이터 구조를 파싱하고 조작합니다.
+  </Card>
+
+  <Card
+    title="Lambda Agent"
+    href="/oss/integrations/tools/lambda_agent"
+    icon="aws"
+  >
+    AWS Lambda function에서 코드를 실행합니다.
+  </Card>
+
+  <Card
+    title="MCP Toolbox"
+    href="/oss/integrations/tools/mcp_toolbox"
+  >
+    Model Context Protocol tool 및 유틸리티.
+  </Card>
+
+  <Card
+    title="OpenAPI"
+    href="/oss/integrations/tools/openapi"
+  >
+    OpenAPI 사양에서 tool을 생성합니다.
+  </Card>
+
+  <Card
+    title="Python Interpreter"
+    href="/oss/integrations/tools/pyinterpreter"
+  >
+    샌드박스 환경에서 Python 코드를 실행합니다.
+  </Card>
+
+  <Card
+    title="SearchAPI"
+    href="/oss/integrations/tools/searchapi"
+  >
+    SearchAPI를 통한 웹 검색 기능.
+  </Card>
+
+  <Card
+    title="SearXNG"
+    href="/oss/integrations/tools/searxng"
+  >
+    개인정보 보호를 존중하는 메타 검색 엔진.
+  </Card>
+
+  <Card
+    title="SerpAPI"
+    href="/oss/integrations/tools/serpapi"
+  >
+    SerpAPI를 통한 Google 검색 결과.
+  </Card>
+
+  <Card
+    title="Step Functions Agent"
+    href="/oss/integrations/tools/sfn_agent"
+    icon="aws"
+  >
+    AWS Step Functions workflow를 실행합니다.
+  </Card>
+
+  <Card
+    title="SQL"
+    href="/oss/integrations/tools/sql"
+  >
+    자연어를 사용하여 database를 쿼리합니다.
+  </Card>
+
+  <Card
+    title="StackExchange"
+    href="/oss/integrations/tools/stackexchange"
+  >
+    Stack Overflow 및 기타 SE 사이트를 검색합니다.
+  </Card>
+
+  <Card
+    title="Stagehand"
+    href="/oss/integrations/tools/stagehand"
+  >
+    웹 상호작용을 위한 브라우저 자동화.
+  </Card>
+
+  <Card
+    title="Tavily Crawl"
+    href="/oss/integrations/tools/tavily_crawl"
+  >
+    Tavily를 사용한 웹 크롤링 기능.
+  </Card>
+
+  <Card
+    title="Tavily Extract"
+    href="/oss/integrations/tools/tavily_extract"
+  >
+    웹 페이지에서 구조화된 데이터를 추출합니다.
+  </Card>
+
+  <Card
+    title="Tavily Map"
+    href="/oss/integrations/tools/tavily_map"
+  >
+    웹 크롤링 결과를 매핑하고 시각화합니다.
+  </Card>
+
+  <Card
+    title="Tavily Search"
+    href="/oss/integrations/tools/tavily_search"
+  >
+    검색 애플리케이션을 위한 AI 최적화 검색.
+  </Card>
+
+  <Card
+    title="Tavily Search Community"
+    href="/oss/integrations/tools/tavily_search_community"
+  >
+    Tavily를 통한 커뮤니티 기반 검색.
+  </Card>
+
+  <Card
+    title="Vector Store"
+    href="/oss/integrations/tools/vectorstore"
+  >
+    vector database를 tool로 쿼리합니다.
+  </Card>
+
+  <Card
+    title="Web Browser"
+    href="/oss/integrations/tools/webbrowser"
+  >
+    자동화된 웹 브라우징 및 상호작용.
+  </Card>
+
+  <Card
+    title="Wikipedia"
+    href="/oss/integrations/tools/wikipedia"
+  >
+    Wikipedia 문서를 검색하고 가져옵니다.
+  </Card>
+
+  <Card
+    title="Wolfram Alpha"
+    href="/oss/integrations/tools/wolframalpha"
+  >
+    Wolfram Alpha를 통한 계산 지식.
+  </Card>
+
+  <Card
+    title="Zapier Agent"
+    href="/oss/integrations/tools/zapier_agent"
+  >
+    Zapier integration을 사용하여 workflow를 자동화합니다.
+  </Card>
+</Columns>
+
+## Retriever
+
+<Columns cols={3}>
+  <Card
+    title="ArXiv"
+    href="/oss/integrations/retrievers/arxiv-retriever"
+  >
+    ArXiv에서 학술 논문을 검색하고 가져옵니다.
+  </Card>
+
+  <Card
+    title="Azion EdgeSQL"
+    href="/oss/integrations/retrievers/azion-edgesql"
+  >
+    Azion을 사용한 edge 기반 문서 검색.
+  </Card>
+
+  <Card
+    title="Bedrock Knowledge Bases"
+    href="/oss/integrations/retrievers/bedrock-knowledge-bases"
+    icon="aws"
+  >
+    Amazon Bedrock Knowledge Bases에서 검색합니다.
+  </Card>
+
+  <Card
+    title="BM25"
+    href="/oss/integrations/retrievers/bm25"
+  >
+    키워드 기반 검색을 위한 BM25 알고리즘.
+  </Card>
+
+  <Card
+    title="Chaindesk"
+    href="/oss/integrations/retrievers/chaindesk-retriever"
+  >
+    Chaindesk 플랫폼을 사용한 문서 검색.
+  </Card>
+
+  <Card
+    title="ChatGPT Retriever Plugin"
+    href="/oss/integrations/retrievers/chatgpt-retriever-plugin"
+    icon="openai"
+  >
+    공식 ChatGPT retriever plugin integration.
+  </Card>
+
+  <Card
+    title="Dria"
+    href="/oss/integrations/retrievers/dria"
+  >
+    Dria를 사용한 분산형 지식 검색.
+  </Card>
+
+  <Card
+    title="Exa"
+    href="/oss/integrations/retrievers/exa"
+  >
+    AI 기반 웹 검색 및 검색.
+  </Card>
+
+  <Card
+    title="HyDE"
+    href="/oss/integrations/retrievers/hyde"
+  >
+    더 나은 검색을 위한 가상 문서 embedding.
+  </Card>
+
+  <Card
+    title="Kendra"
+    href="/oss/integrations/retrievers/kendra-retriever"
+    icon="aws"
+  >
+    Amazon Kendra를 사용한 엔터프라이즈 검색.
+  </Card>
+
+  <Card
+    title="Metal"
+    href="/oss/integrations/retrievers/metal-retriever"
+  >
+    Metal을 사용한 관리형 vector 검색.
+  </Card>
+
+  <Card
+    title="Supabase Hybrid"
+    href="/oss/integrations/retrievers/supabase-hybrid"
+  >
+    vector 및 키워드 검색을 결합한 하이브리드 검색.
+  </Card>
+
+  <Card
+    title="Tavily"
+    href="/oss/integrations/retrievers/tavily"
+  >
+    RAG 애플리케이션을 위한 AI 최적화 검색.
+  </Card>
+
+  <Card
+    title="Time-Weighted"
+    href="/oss/integrations/retrievers/time-weighted-retriever"
+  >
+    시간 인식 문서 검색 및 순위 지정.
+  </Card>
+
+  <Card
+    title="Vespa"
+    href="/oss/integrations/retrievers/vespa-retriever"
+  >
+    vector 검색을 위한 빅데이터 서빙 엔진.
+  </Card>
+
+  <Card
+    title="Zep Cloud"
+    href="/oss/integrations/retrievers/zep-cloud-retriever"
+  >
+    클라우드 기반 장기 메모리 검색.
+  </Card>
+
+  <Card
+    title="Zep"
+    href="/oss/integrations/retrievers/zep-retriever"
+  >
+    장기 메모리 및 컨텍스트 검색.
+  </Card>
+</Columns>
+
+## Store
+
+<Columns cols={3}>
+  <Card
+    title="Cassandra Storage"
+    href="/oss/integrations/stores/cassandra_storage"
+  >
+    Cassandra를 사용한 분산 key-value 저장.
+  </Card>
+
+  <Card
+    title="File System"
+    href="/oss/integrations/stores/file_system"
+  >
+    개발을 위한 로컬 파일 시스템 저장.
+  </Card>
+
+  <Card
+    title="In-Memory"
+    href="/oss/integrations/stores/in_memory"
+  >
+    임시 데이터를 위한 빠른 인메모리 저장.
+  </Card>
+
+  <Card
+    title="IoRedis Storage"
+    href="/oss/integrations/stores/ioredis_storage"
+  >
+    IoRedis 클라이언트를 사용한 Redis 기반 저장.
+  </Card>
+
+  <Card
+    title="Upstash Redis Storage"
+    href="/oss/integrations/stores/upstash_redis_storage"
+  >
+    Upstash를 사용한 서버리스 Redis 저장.
+  </Card>
+
+  <Card
+    title="Vercel KV Storage"
+    href="/oss/integrations/stores/vercel_kv_storage"
+  >
+    Vercel의 edge 네트워크의 key-value 저장.
+  </Card>
+</Columns>
+
+## LLM Caching
+
+<Columns cols={3}>
+  <Card
+    title="Azure Cosmos DB NoSQL"
+    href="/oss/integrations/llm_caching/azure_cosmosdb_nosql"
+    icon="microsoft"
+  >
+    Azure Cosmos DB에 LLM 응답을 캐시합니다.
+  </Card>
+</Columns>
+
+## Callback
+
+<Columns cols={3}>
+  <Card
+    title="Datadog Tracer"
+    href="/oss/integrations/callbacks/datadog_tracer"
+  >
+    Datadog으로 LangChain 애플리케이션을 모니터링하고 추적합니다.
+  </Card>
+
+  <Card
+    title="Upstash Rate Limit"
+    href="/oss/integrations/callbacks/upstash_ratelimit_callback"
+  >
+    Upstash를 사용한 AI 애플리케이션의 rate limiting.
+  </Card>
+</Columns>

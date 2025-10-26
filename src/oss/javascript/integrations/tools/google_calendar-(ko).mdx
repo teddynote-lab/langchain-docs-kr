@@ -1,0 +1,81 @@
+---
+title: Google Calendar Tool
+---
+
+Google Calendar Tools는 에이전트가 연결된 캘린더에서 Google Calendar 이벤트를 생성하고 조회할 수 있도록 합니다.
+
+## Setup
+
+Google Calendar Tools를 사용하려면 다음 공식 peer dependency를 설치해야 합니다:
+
+```bash npm
+npm install googleapis
+```
+## Usage
+
+```typescript
+import { createAgent } from "@langchain/agents";
+import { ChatOpenAI } from "@langchain/openai";
+import { Calculator } from "@langchain/community/tools/calculator";
+import {
+  GoogleCalendarCreateTool,
+  GoogleCalendarViewTool,
+} from "@langchain/community/tools/google_calendar";
+
+export async function run() {
+  const model = new ChatOpenAI({
+    temperature: 0,
+    apiKey: process.env.OPENAI_API_KEY,
+    model: "gpt-4o-mini",
+  });
+
+  const googleCalendarParams = {
+    credentials: {
+      clientEmail: process.env.GOOGLE_CALENDAR_CLIENT_EMAIL,
+      privateKey: process.env.GOOGLE_CALENDAR_PRIVATE_KEY,
+      calendarId: process.env.GOOGLE_CALENDAR_CALENDAR_ID,
+    },
+    scopes: [
+      "https://www.googleapis.com/auth/calendar",
+      "https://www.googleapis.com/auth/calendar.events",
+    ],
+    model,
+  };
+
+  const tools = [
+    new Calculator(),
+    new GoogleCalendarCreateTool(googleCalendarParams),
+    new GoogleCalendarViewTool(googleCalendarParams),
+  ];
+
+  const calendarAgent = createAgent({
+    llm: model,
+    tools,
+  });
+
+  const createInput = `Create a meeting with John Doe next Friday at 4pm - adding to the agenda of it the result of 99 + 99`;
+
+  const createResult = await calendarAgent.invoke({
+    messages: [{ role: "user", content: createInput }],
+  });
+  //   Create Result {
+  //     output: 'A meeting with John Doe on 29th September at 4pm has been created and the result of 99 + 99 has been added to the agenda.'
+  //   }
+  console.log("Create Result", createResult);
+
+  const viewInput = `What meetings do I have this week?`;
+
+  const viewResult = await calendarAgent.invoke({
+    messages: [{ role: "user", content: viewInput }],
+  });
+  //   View Result {
+  //     output: "You have no meetings this week between 8am and 8pm."
+  //   }
+  console.log("View Result", viewResult);
+}
+```
+
+## Related
+
+- Tool [개념 가이드](/oss/langchain/tools)
+- Tool [사용 방법 가이드](/oss/langchain/tools)

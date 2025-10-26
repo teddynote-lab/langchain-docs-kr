@@ -1,0 +1,114 @@
+---
+title: HyperbrowserLoader
+---
+
+[Hyperbrowser](https://hyperbrowser.ai)는 headless 브라우저를 실행하고 확장하기 위한 플랫폼입니다. 대규모로 브라우저 세션을 시작하고 관리할 수 있으며, 단일 페이지 스크래핑부터 전체 사이트 크롤링까지 모든 웹 스크래핑 요구사항에 대한 사용하기 쉬운 솔루션을 제공합니다.
+
+주요 기능:
+
+- 즉각적인 확장성 - 인프라 걱정 없이 수백 개의 브라우저 세션을 몇 초 만에 시작
+- 간편한 통합 - Puppeteer 및 Playwright와 같은 인기 있는 도구와 원활하게 작동
+- 강력한 API - 모든 사이트를 스크래핑/크롤링하기 위한 사용하기 쉬운 API 등
+- 봇 차단 우회 - 내장된 스텔스 모드, 광고 차단, 자동 CAPTCHA 해결 및 순환 프록시
+
+이 가이드는 Hyperbrowser [document loader](https://python.langchain.com/docs/concepts/#document-loaders) 시작하기에 대한 간단한 개요를 제공합니다.
+
+Hyperbrowser에 대한 자세한 내용은 [Hyperbrowser 웹사이트](https://hyperbrowser.ai)를 방문하거나, 문서를 확인하려면 [Hyperbrowser 문서](https://docs.hyperbrowser.ai)를 방문하세요.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | JS support|
+| :--- | :--- | :---: | :---: |  :---: |
+| HyperbrowserLoader | langchain-hyperbrowser | ❌ | ❌ | ❌ |
+
+### Loader features
+
+| Source | Document Lazy Loading | Native Async Support |
+| :---: | :---: | :---: |
+| HyperbrowserLoader | ✅ | ✅ |
+
+## Setup
+
+Hyperbrowser document loader에 액세스하려면 `langchain-hyperbrowser` integration package를 설치하고, Hyperbrowser 계정을 생성하여 API key를 받아야 합니다.
+
+### Credentials
+
+[Hyperbrowser](https://app.hyperbrowser.ai/)로 이동하여 가입하고 API key를 생성하세요. 완료되면 HYPERBROWSER_API_KEY environment variable을 설정하세요:
+
+### Installation
+
+**langchain-hyperbrowser**를 설치하세요.
+
+```python
+pip install -qU langchain-hyperbrowser
+```
+
+## Initialization
+
+이제 model object를 인스턴스화하고 document를 로드할 수 있습니다:
+
+```python
+from langchain_hyperbrowser import HyperbrowserLoader
+
+loader = HyperbrowserLoader(
+    urls="https://example.com",
+    api_key="YOUR_API_KEY",
+)
+```
+
+## Load
+
+```python
+docs = loader.load()
+docs[0]
+```
+
+```output
+Document(metadata={'title': 'Example Domain', 'viewport': 'width=device-width, initial-scale=1', 'sourceURL': 'https://example.com'}, page_content='Example Domain\n\n# Example Domain\n\nThis domain is for use in illustrative examples in documents. You may use this\ndomain in literature without prior coordination or asking for permission.\n\n[More information...](https://www.iana.org/domains/example)')
+```
+
+```python
+print(docs[0].metadata)
+```
+
+## Lazy Load
+
+```python
+page = []
+for doc in loader.lazy_load():
+    page.append(doc)
+    if len(page) >= 10:
+        # do some paged operation, e.g.
+        # index.upsert(page)
+
+        page = []
+```
+
+## Advanced Usage
+
+loader가 수행할 작업을 지정할 수 있습니다. 기본 작업은 `scrape`입니다. `scrape`의 경우 스크래핑할 단일 URL 또는 URL 목록을 제공할 수 있습니다. `crawl`의 경우 단일 URL만 제공할 수 있습니다. `crawl` 작업은 제공된 페이지와 하위 페이지를 크롤링하고 각 페이지에 대한 document를 반환합니다.
+
+```python
+loader = HyperbrowserLoader(
+    urls="https://hyperbrowser.ai", api_key="YOUR_API_KEY", operation="crawl"
+)
+```
+
+loader에 대한 선택적 params도 `params` argument에 제공할 수 있습니다. 지원되는 params에 대한 자세한 내용은 [docs.hyperbrowser.ai/reference/sdks/python/scrape#start-scrape-job-and-wait](https://docs.hyperbrowser.ai/reference/sdks/python/scrape#start-scrape-job-and-wait) 또는 [docs.hyperbrowser.ai/reference/sdks/python/crawl#start-crawl-job-and-wait](https://docs.hyperbrowser.ai/reference/sdks/python/crawl#start-crawl-job-and-wait)를 방문하세요.
+
+```python
+loader = HyperbrowserLoader(
+    urls="https://example.com",
+    api_key="YOUR_API_KEY",
+    operation="scrape",
+    params={"scrape_options": {"include_tags": ["h1", "h2", "p"]}},
+)
+```
+
+## API reference
+
+- [GitHub](https://github.com/hyperbrowserai/langchain-hyperbrowser/)
+- [PyPi](https://pypi.org/project/langchain-hyperbrowser/)
+- [Hyperbrowser Docs](https://docs.hyperbrowser.ai/)

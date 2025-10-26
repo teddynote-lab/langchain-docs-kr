@@ -1,0 +1,340 @@
+---
+title: Oracle AI Vector Search - Vector Store
+---
+
+Oracle AI Vector Search는 키워드가 아닌 의미론을 기반으로 데이터를 쿼리할 수 있는 인공지능(AI) 워크로드를 위해 설계되었습니다.
+Oracle AI Vector Search의 가장 큰 장점 중 하나는 비정형 데이터에 대한 의미론적 검색을 단일 시스템 내에서 비즈니스 데이터에 대한 관계형 검색과 결합할 수 있다는 것입니다.
+이는 강력할 뿐만 아니라 전문화된 vector database를 추가할 필요가 없어 여러 시스템 간의 데이터 분산으로 인한 문제를 제거하므로 훨씬 더 효과적입니다.
+
+또한, vector는 다음과 같은 Oracle Database의 가장 강력한 기능들의 이점을 누릴 수 있습니다:
+
+* [Partitioning Support](https://www.oracle.com/database/technologies/partitioning.html)
+* [Real Application Clusters scalability](https://www.oracle.com/database/real-application-clusters/)
+* [Exadata smart scans](https://www.oracle.com/database/technologies/exadata/software/smartscan/)
+* [Shard processing across geographically distributed databases](https://www.oracle.com/database/distributed-database/)
+* [Transactions](https://docs.oracle.com/en/database/oracle/oracle-database/23/cncpt/transactions.html)
+* [Parallel SQL](https://docs.oracle.com/en/database/oracle/oracle-database/21/vldbg/parallel-exec-intro.html#GUID-D28717E4-0F77-44F5-BB4E-234C31D4E4BA)
+* [Disaster recovery](https://www.oracle.com/database/data-guard/)
+* [Security](https://www.oracle.com/security/database-security/)
+* [Oracle Machine Learning](https://www.oracle.com/artificial-intelligence/database-machine-learning/)
+* [Oracle Graph Database](https://www.oracle.com/database/integrated-graph-database/)
+* [Oracle Spatial and Graph](https://www.oracle.com/database/spatial/)
+* [Oracle Blockchain](https://docs.oracle.com/en/database/oracle/oracle-database/23/arpls/dbms_blockchain_table.html#GUID-B469E277-978E-4378-A8C1-26D3FF96C9A6)
+* [JSON](https://docs.oracle.com/en/database/oracle/oracle-database/23/adjsn/json-in-oracle-database.html)
+
+Oracle Database를 처음 시작하는 경우, 데이터베이스 환경 설정에 대한 훌륭한 소개를 제공하는 [무료 Oracle 23 AI](https://www.oracle.com/database/free/#resources)를 살펴보는 것을 고려해보세요. 데이터베이스 작업 시 기본적으로 system user를 사용하지 않는 것이 좋으며, 보안 강화와 사용자 정의를 위해 자체 user를 생성할 수 있습니다. user 생성에 대한 자세한 단계는 Oracle에서 user를 설정하는 방법도 보여주는 [엔드 투 엔드 가이드](https://github.com/langchain-ai/langchain/blob/v0.3/cookbook/oracleai_demo.ipynb)를 참조하세요. 또한, user 권한을 이해하는 것은 데이터베이스 보안을 효과적으로 관리하는 데 중요합니다. 이 주제에 대한 자세한 내용은 user 계정 및 보안 관리에 대한 공식 [Oracle 가이드](https://docs.oracle.com/en/database/oracle/oracle-database/19/admqs/administering-user-accounts-and-security.html#GUID-36B21D72-1BBB-46C9-A0C9-F0D2A8591B8D)에서 확인할 수 있습니다.
+
+### Oracle AI Vector Search와 LangChain 사용을 위한 전제 조건
+
+이 integration을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다
+
+Oracle AI Vector Search와 LangChain을 사용하려면 Oracle Python Client driver를 설치하세요.
+
+```python
+# pip install oracledb
+```
+
+### Oracle AI Vector Search에 연결하기
+
+다음 샘플 코드는 Oracle Database에 연결하는 방법을 보여줍니다. 기본적으로 python-oracledb는 Oracle Database에 직접 연결하는 'Thin' 모드로 실행됩니다. 이 모드는 Oracle Client 라이브러리가 필요하지 않습니다. 그러나 python-oracledb가 이를 사용할 때 일부 추가 기능을 사용할 수 있습니다. Oracle Client 라이브러리를 사용할 때 Python-oracledb는 'Thick' 모드에 있다고 합니다. 두 모드 모두 Python Database API v2.0 Specification을 지원하는 포괄적인 기능을 가지고 있습니다. 각 모드에서 지원되는 기능에 대해 설명하는 다음 [가이드](https://python-oracledb.readthedocs.io/en/latest/user_guide/appendix_a.html#featuresummary)를 참조하세요. thin-mode를 사용할 수 없는 경우 thick-mode로 전환할 수 있습니다.
+
+```python
+import oracledb
+
+username = "username"
+password = "password"
+dsn = "ipaddress:port/orclpdb1"
+
+try:
+    connection = oracledb.connect(user=username, password=password, dsn=dsn)
+    print("Connection successful!")
+except Exception as e:
+    print("Connection failed!")
+```
+
+### Oracle AI Vector Search 사용을 위한 필수 종속성 import
+
+```python
+from langchain_community.vectorstores import oraclevs
+from langchain_community.vectorstores.oraclevs import OracleVS
+from langchain_community.vectorstores.utils import DistanceStrategy
+from langchain_core.documents import Document
+from langchain_huggingface import HuggingFaceEmbeddings
+```
+
+### Document 로드하기
+
+```python
+# Define a list of documents (The examples below are 5 random documents from Oracle Concepts Manual )
+
+documents_json_list = [
+    {
+        "id": "cncpt_15.5.3.2.2_P4",
+        "text": "If the answer to any preceding questions is yes, then the database stops the search and allocates space from the specified tablespace; otherwise, space is allocated from the database default shared temporary tablespace.",
+        "link": "https://docs.oracle.com/en/database/oracle/oracle-database/23/cncpt/logical-storage-structures.html#GUID-5387D7B2-C0CA-4C1E-811B-C7EB9B636442",
+    },
+    {
+        "id": "cncpt_15.5.5_P1",
+        "text": "A tablespace can be online (accessible) or offline (not accessible) whenever the database is open.\nA tablespace is usually online so that its data is available to users. The SYSTEM tablespace and temporary tablespaces cannot be taken offline.",
+        "link": "https://docs.oracle.com/en/database/oracle/oracle-database/23/cncpt/logical-storage-structures.html#GUID-D02B2220-E6F5-40D9-AFB5-BC69BCEF6CD4",
+    },
+    {
+        "id": "cncpt_22.3.4.3.1_P2",
+        "text": "The database stores LOBs differently from other data types. Creating a LOB column implicitly creates a LOB segment and a LOB index. The tablespace containing the LOB segment and LOB index, which are always stored together, may be different from the tablespace containing the table.\nSometimes the database can store small amounts of LOB data in the table itself rather than in a separate LOB segment.",
+        "link": "https://docs.oracle.com/en/database/oracle/oracle-database/23/cncpt/concepts-for-database-developers.html#GUID-3C50EAB8-FC39-4BB3-B680-4EACCE49E866",
+    },
+    {
+        "id": "cncpt_22.3.4.3.1_P3",
+        "text": "The LOB segment stores data in pieces called chunks. A chunk is a logically contiguous set of data blocks and is the smallest unit of allocation for a LOB. A row in the table stores a pointer called a LOB locator, which points to the LOB index. When the table is queried, the database uses the LOB index to quickly locate the LOB chunks.",
+        "link": "https://docs.oracle.com/en/database/oracle/oracle-database/23/cncpt/concepts-for-database-developers.html#GUID-3C50EAB8-FC39-4BB3-B680-4EACCE49E866",
+    },
+]
+```
+
+```python
+# Create LangChain Documents
+
+documents_langchain = []
+
+for doc in documents_json_list:
+    metadata = {"id": doc["id"], "link": doc["link"]}
+    doc_langchain = Document(page_content=doc["text"], metadata=metadata)
+    documents_langchain.append(doc_langchain)
+```
+
+### AI Vector Search를 사용하여 다양한 거리 메트릭으로 Vector Store 생성하기
+
+먼저 각각 다른 거리 함수를 가진 세 개의 vector store를 생성합니다. 아직 인덱스를 생성하지 않았으므로 지금은 테이블만 생성됩니다. 나중에 이러한 vector store를 사용하여 HNSW 인덱스를 생성할 것입니다. Oracle AI Vector Search가 지원하는 다양한 유형의 인덱스에 대해 자세히 알아보려면 다음 [가이드](https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/manage-different-categories-vector-indexes.html)를 참조하세요.
+
+Oracle Database에 수동으로 연결하면 Documents_DOT, Documents_COSINE, Documents_EUCLIDEAN 세 개의 테이블을 볼 수 있습니다.
+
+그런 다음 HNSW 인덱스 대신 IVF 인덱스를 생성하는 데 사용될 Documents_DOT_IVF, Documents_COSINE_IVF, Documents_EUCLIDEAN_IVF 세 개의 추가 테이블을 생성합니다.
+
+```python
+# Ingest documents into Oracle Vector Store using different distance strategies
+
+# When using our API calls, start by initializing your vector store with a subset of your documents
+# through from_documents(), then incrementally add more documents using add_texts().
+# This approach prevents system overload and ensures efficient document processing.
+
+model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
+
+vector_store_dot = OracleVS.from_documents(
+    documents_langchain,
+    model,
+    client=connection,
+    table_name="Documents_DOT",
+    distance_strategy=DistanceStrategy.DOT_PRODUCT,
+)
+vector_store_max = OracleVS.from_documents(
+    documents_langchain,
+    model,
+    client=connection,
+    table_name="Documents_COSINE",
+    distance_strategy=DistanceStrategy.COSINE,
+)
+vector_store_euclidean = OracleVS.from_documents(
+    documents_langchain,
+    model,
+    client=connection,
+    table_name="Documents_EUCLIDEAN",
+    distance_strategy=DistanceStrategy.EUCLIDEAN_DISTANCE,
+)
+
+# Ingest documents into Oracle Vector Store using different distance strategies
+vector_store_dot_ivf = OracleVS.from_documents(
+    documents_langchain,
+    model,
+    client=connection,
+    table_name="Documents_DOT_IVF",
+    distance_strategy=DistanceStrategy.DOT_PRODUCT,
+)
+vector_store_max_ivf = OracleVS.from_documents(
+    documents_langchain,
+    model,
+    client=connection,
+    table_name="Documents_COSINE_IVF",
+    distance_strategy=DistanceStrategy.COSINE,
+)
+vector_store_euclidean_ivf = OracleVS.from_documents(
+    documents_langchain,
+    model,
+    client=connection,
+    table_name="Documents_EUCLIDEAN_IVF",
+    distance_strategy=DistanceStrategy.EUCLIDEAN_DISTANCE,
+)
+```
+
+### 기본 유사도 검색과 함께 텍스트에 대한 추가 및 삭제 작업 시연
+
+```python
+def manage_texts(vector_stores):
+    """
+    Adds texts to each vector store, demonstrates error handling for duplicate additions,
+    and performs deletion of texts. Showcases similarity searches and index creation for each vector store.
+
+    Args:
+    - vector_stores (list): A list of OracleVS instances.
+    """
+    texts = ["Rohan", "Shailendra"]
+    metadata = [
+        {"id": "100", "link": "Document Example Test 1"},
+        {"id": "101", "link": "Document Example Test 2"},
+    ]
+
+    for i, vs in enumerate(vector_stores, start=1):
+        # Adding texts
+        try:
+            vs.add_texts(texts, metadata)
+            print(f"\n\n\nAdd texts complete for vector store {i}\n\n\n")
+        except Exception as ex:
+            print(f"\n\n\nExpected error on duplicate add for vector store {i}\n\n\n")
+
+        # Deleting texts using the value of 'id'
+        vs.delete([metadata[0]["id"]])
+        print(f"\n\n\nDelete texts complete for vector store {i}\n\n\n")
+
+        # Similarity search
+        results = vs.similarity_search("How are LOBS stored in Oracle Database", 2)
+        print(f"\n\n\nSimilarity search results for vector store {i}: {results}\n\n\n")
+
+
+vector_store_list = [
+    vector_store_dot,
+    vector_store_max,
+    vector_store_euclidean,
+    vector_store_dot_ivf,
+    vector_store_max_ivf,
+    vector_store_euclidean_ivf,
+]
+manage_texts(vector_store_list)
+```
+
+### 각 거리 전략에 대한 특정 매개변수로 인덱스 생성 시연
+
+```python
+def create_search_indices(connection):
+    """
+    Creates search indices for the vector stores, each with specific parameters tailored to their distance strategy.
+    """
+    # Index for DOT_PRODUCT strategy
+    # Notice we are creating a HNSW index with default parameters
+    # This will default to creating a HNSW index with 8 Parallel Workers and use the Default Accuracy used by Oracle AI Vector Search
+    oraclevs.create_index(
+        connection,
+        vector_store_dot,
+        params={"idx_name": "hnsw_idx1", "idx_type": "HNSW"},
+    )
+
+    # Index for COSINE strategy with specific parameters
+    # Notice we are creating a HNSW index with parallel 16 and Target Accuracy Specification as 97 percent
+    oraclevs.create_index(
+        connection,
+        vector_store_max,
+        params={
+            "idx_name": "hnsw_idx2",
+            "idx_type": "HNSW",
+            "accuracy": 97,
+            "parallel": 16,
+        },
+    )
+
+    # Index for EUCLIDEAN_DISTANCE strategy with specific parameters
+    # Notice we are creating a HNSW index by specifying Power User Parameters which are neighbors = 64 and efConstruction = 100
+    oraclevs.create_index(
+        connection,
+        vector_store_euclidean,
+        params={
+            "idx_name": "hnsw_idx3",
+            "idx_type": "HNSW",
+            "neighbors": 64,
+            "efConstruction": 100,
+        },
+    )
+
+    # Index for DOT_PRODUCT strategy with specific parameters
+    # Notice we are creating an IVF index with default parameters
+    # This will default to creating an IVF index with 8 Parallel Workers and use the Default Accuracy used by Oracle AI Vector Search
+    oraclevs.create_index(
+        connection,
+        vector_store_dot_ivf,
+        params={
+            "idx_name": "ivf_idx1",
+            "idx_type": "IVF",
+        },
+    )
+
+    # Index for COSINE strategy with specific parameters
+    # Notice we are creating an IVF index with parallel 32 and Target Accuracy Specification as 90 percent
+    oraclevs.create_index(
+        connection,
+        vector_store_max_ivf,
+        params={
+            "idx_name": "ivf_idx2",
+            "idx_type": "IVF",
+            "accuracy": 90,
+            "parallel": 32,
+        },
+    )
+
+    # Index for EUCLIDEAN_DISTANCE strategy with specific parameters
+    # Notice we are creating an IVF index by specifying Power User Parameters which is neighbor_part = 64
+    oraclevs.create_index(
+        connection,
+        vector_store_euclidean_ivf,
+        params={"idx_name": "ivf_idx3", "idx_type": "IVF", "neighbor_part": 64},
+    )
+
+    print("Index creation complete.")
+
+
+create_search_indices(connection)
+```
+
+### 속성 필터링이 있거나 없는 모든 6개의 vector store에 대한 고급 검색 시연 – 필터링을 사용하면 document id 101만 선택하고 다른 것은 선택하지 않습니다
+
+```python
+# Conduct advanced searches after creating the indices
+def conduct_advanced_searches(vector_stores):
+    query = "How are LOBS stored in Oracle Database"
+    # Constructing a filter for direct comparison against document metadata
+    # This filter aims to include documents whose metadata 'id' is exactly '2'
+    filter_criteria = {"id": ["101"]}  # Direct comparison filter
+
+    for i, vs in enumerate(vector_stores, start=1):
+        print(f"\n--- Vector Store {i} Advanced Searches ---")
+        # Similarity search without a filter
+        print("\nSimilarity search results without filter:")
+        print(vs.similarity_search(query, 2))
+
+        # Similarity search with a filter
+        print("\nSimilarity search results with filter:")
+        print(vs.similarity_search(query, 2, filter=filter_criteria))
+
+        # Similarity search with relevance score
+        print("\nSimilarity search with relevance score:")
+        print(vs.similarity_search_with_score(query, 2))
+
+        # Similarity search with relevance score with filter
+        print("\nSimilarity search with relevance score with filter:")
+        print(vs.similarity_search_with_score(query, 2, filter=filter_criteria))
+
+        # Max marginal relevance search
+        print("\nMax marginal relevance search results:")
+        print(vs.max_marginal_relevance_search(query, 2, fetch_k=20, lambda_mult=0.5))
+
+        # Max marginal relevance search with filter
+        print("\nMax marginal relevance search results with filter:")
+        print(
+            vs.max_marginal_relevance_search(
+                query, 2, fetch_k=20, lambda_mult=0.5, filter=filter_criteria
+            )
+        )
+
+
+conduct_advanced_searches(vector_store_list)
+```
+
+### 엔드 투 엔드 데모
+
+Oracle AI Vector Search의 도움으로 엔드 투 엔드 RAG 파이프라인을 구축하려면 전체 데모 가이드 [Oracle AI Vector Search 엔드 투 엔드 데모 가이드](https://github.com/langchain-ai/langchain/blob/v0.3/cookbook/oracleai_demo.ipynb)를 참조하세요.

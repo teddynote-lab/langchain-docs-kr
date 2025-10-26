@@ -1,0 +1,178 @@
+---
+title: 분산 추적 구현하기
+sidebarTitle: 분산 추적 구현하기
+---
+
+때로는 여러 서비스에 걸쳐 요청을 추적해야 할 필요가 있습니다.
+
+LangSmith는 기본적으로 분산 추적을 지원하며, context propagation header(`langsmith-trace` 및 메타데이터/태그를 위한 선택적 `baggage`)를 사용하여 서비스 간 trace 내의 run을 연결합니다.
+
+클라이언트-서버 설정 예시:
+
+* Trace는 클라이언트에서 시작
+* 서버에서 계속됨
+
+## Python에서의 분산 추적
+
+```python
+# client.py
+from langsmith.run_helpers import get_current_run_tree, traceable
+import httpx
+
+@traceable
+async def my_client_function():
+    headers = {}
+    async with httpx.AsyncClient(base_url="...") as client:
+        if run_tree := get_current_run_tree():
+            # add langsmith-id to headers
+            headers.update(run_tree.to_headers())
+        return await client.post("/my-route", headers=headers)
+```
+
+그런 다음 서버(또는 다른 서비스)는 header를 적절하게 처리하여 trace를 계속할 수 있습니다. asgi 앱 Starlette 또는 FastAPI를 사용하는 경우, LangSmith의 `TracingMiddleware`를 사용하여 분산 trace를 연결할 수 있습니다.
+
+<Info>
+`TracingMiddleware` 클래스는 `langsmith==0.1.133`에 추가되었습니다.
+</Info>
+
+FastAPI 사용 예시:
+
+```python
+from langsmith import traceable
+from langsmith.middleware import TracingMiddleware
+from fastapi import FastAPI, Request
+
+app = FastAPI()  # Or Flask, Django, or any other framework
+app.add_middleware(TracingMiddleware)
+
+@traceable
+async def some_function():
+    ...
+
+@app.post("/my-route")
+async def fake_route(request: Request):
+    return await some_function()
+```
+
+또는 Starlette에서:
+
+```python
+from starlette.applications import Starlette
+from starlette.middleware import Middleware
+from langsmith.middleware import TracingMiddleware
+
+routes = ...
+middleware = [
+    Middleware(TracingMiddleware),
+]
+app = Starlette(..., middleware=middleware)
+```
+
+다른 서버 프레임워크를 사용하는 경우, `langsmith_extra`를 통해 header를 전달하여 분산 trace를 "수신"할 수 있습니다:
+
+```python
+# server.py
+import langsmith as ls
+from fastapi import FastAPI, Request
+
+@ls.traceable
+async def my_application():
+    ...
+
+app = FastAPI()  # Or Flask, Django, or any other framework
+
+@app.post("/my-route")
+async def fake_route(request: Request):
+    # request.headers:  {"langsmith-trace": "..."}
+    # as well as optional metadata/tags in `baggage`
+    with ls.tracing_context(parent=request.headers):
+        return await my_application()
+```
+
+위 예시는 `tracing_context` context manager를 사용합니다. `@traceable`로 래핑된 메서드의 `langsmith_extra` 파라미터에서 parent run context를 직접 지정할 수도 있습니다.
+
+```python
+# ... same as above
+
+@app.post("/my-route")
+async def fake_route(request: Request):
+    # request.headers:  {"langsmith-trace": "..."}
+    my_application(langsmith_extra={"parent": request.headers})
+```
+
+## TypeScript에서의 분산 추적
+
+<Note>
+TypeScript에서의 분산 추적은 `langsmith` 버전 `>=0.1.31`이 필요합니다
+</Note>
+
+먼저, 클라이언트에서 현재 run tree를 가져와 `langsmith-trace` 및 `baggage` header 값으로 변환하여 서버에 전달할 수 있습니다:
+
+```typescript
+// client.mts
+import { getCurrentRunTree, traceable } from "langsmith/traceable";
+
+const client = traceable(
+    async () => {
+        const runTree = getCurrentRunTree();
+        return await fetch("...", {
+            method: "POST",
+            headers: runTree.toHeaders(),
+        }).then((a) => a.text());
+    },
+    { name: "client" }
+);
+
+await client();
+```
+
+그런 다음 서버는 header를 다시 run tree로 변환하여 추적을 계속합니다.
+
+새로 생성된 run tree를 traceable function에 전달하려면 `withRunTree` helper를 사용할 수 있으며, 이는 traceable 호출 내에서 run tree가 전파되도록 보장합니다.
+
+<CodeGroup>
+
+```typescript Express.JS
+// server.mts
+import { RunTree } from "langsmith";
+import { traceable, withRunTree } from "langsmith/traceable";
+import express from "express";
+import bodyParser from "body-parser";
+
+    const server = traceable(
+        (text: string) => `Hello from the server! Received "${text}"`,
+        { name: "server" }
+    );
+
+    const app = express();
+    app.use(bodyParser.text());
+
+app.post("/", async (req, res) => {
+    const runTree = RunTree.fromHeaders(req.headers);
+    const result = await withRunTree(runTree, () => server(req.body));
+    res.send(result);
+});
+```
+
+```typescript Hono
+// server.mts
+import { RunTree } from "langsmith";
+import { traceable, withRunTree } from "langsmith/traceable";
+import { Hono } from "hono";
+
+    const server = traceable(
+        (text: string) => `Hello from the server! Received "${text}"`,
+        { name: "server" }
+    );
+
+    const app = new Hono();
+
+app.post("/", async (c) => {
+    const body = await c.req.text();
+    const runTree = RunTree.fromHeaders(c.req.raw.headers);
+    const result = await withRunTree(runTree, () => server(body));
+    return c.body(result);
+});
+```
+
+</CodeGroup>

@@ -1,0 +1,57 @@
+---
+title: AI21 Labs
+---
+
+>[AI21 Labs](https://www.ai21.com/about)는 자연어를 이해하고 생성할 수 있는 AI 시스템을 개발하는 자연어 처리(NLP) 전문 회사입니다.
+
+이 페이지에서는 `LangChain` 내에서 `AI21` 생태계를 사용하는 방법을 다룹니다.
+
+## Installation and Setup
+
+- AI21 api key를 발급받아 환경 변수로 설정하세요 (`AI21_API_KEY`)
+- Python 패키지를 설치하세요:
+
+<CodeGroup>
+```bash pip
+pip install langchain-ai21
+```
+
+```bash uv
+uv add langchain-ai21
+```
+</CodeGroup>
+
+## Chat models
+
+### AI21 Chat
+
+[사용 예제](/oss/integrations/chat/ai21)를 참조하세요.
+
+```python
+from langchain_ai21 import ChatAI21
+```
+
+## Deprecated features
+
+:::caution 다음 기능들은 더 이상 사용되지 않습니다.
+:::
+
+### AI21 LLM
+
+```python
+from langchain_ai21 import AI21LLM
+```
+
+### AI21 Contextual Answer
+
+```python
+from langchain_ai21 import AI21ContextualAnswers
+```
+
+## Text splitters
+
+### AI21 Semantic Text Splitter
+
+```python
+from langchain_ai21 import AI21SemanticTextSplitter
+```

@@ -1,0 +1,42 @@
+---
+title: Kinetica
+---
+
+[Kinetica](https://www.kinetica.com/)는 시계열 및 공간 데이터에 대한 분석과 생성형 AI를 지원하기 위해 특별히 설계된 실시간 데이터베이스입니다.
+
+## Chat Model
+
+Kinetica LLM wrapper는 [Kinetica SqlAssist
+LLM](https://docs.kinetica.com/7.2/sql-gpt/concepts/)을 사용하여 자연어를 SQL로 변환함으로써 데이터 검색 프로세스를 단순화합니다.
+
+사용법은 [Kinetica Language To SQL Chat Model](/oss/integrations/chat/kinetica)을 참조하세요.
+
+```python
+from langchain_community.chat_models.kinetica import ChatKinetica
+```
+
+## Vector Store
+
+Kinetica vectorstore wrapper는 Kinetica의 [벡터 유사도 검색](https://docs.kinetica.com/7.2/vector_search/)에 대한 네이티브 지원을 활용합니다.
+
+사용법은 [Kinetica Vectorstore API](/oss/integrations/vectorstores/kinetica)를 참조하세요.
+
+```python
+from langchain_community.vectorstores import Kinetica
+```
+
+## Document Loader
+
+Kinetica Document loader는 [Kinetica](https://www.kinetica.com/) 데이터베이스에서 LangChain [Documents](https://python.langchain.com/api_reference/core/documents/langchain_core.documents.base.Document.html)를 로드하는 데 사용할 수 있습니다.
+
+사용법은 [Kinetica Document Loader](/oss/integrations/document_loaders/kinetica)를 참조하세요.
+
+```python
+from langchain_community.document_loaders.kinetica_loader import KineticaLoader
+```
+
+## Retriever
+
+Kinetica Retriever는 비정형 쿼리가 주어졌을 때 문서를 반환할 수 있습니다.
+
+사용법은 [Kinetica VectorStore based Retriever](/oss/integrations/retrievers/kinetica)를 참조하세요.

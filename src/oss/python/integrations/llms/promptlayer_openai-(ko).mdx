@@ -1,0 +1,91 @@
+---
+title: PromptLayer OpenAI
+---
+
+`PromptLayer`는 GPT prompt engineering을 추적, 관리 및 공유할 수 있는 최초의 플랫폼입니다. `PromptLayer`는 여러분의 코드와 `OpenAI`의 python library 사이에서 middleware 역할을 합니다.
+
+`PromptLayer`는 모든 `OpenAI API` 요청을 기록하여, `PromptLayer` dashboard에서 요청 기록을 검색하고 탐색할 수 있도록 합니다.
+
+이 예제는 OpenAI 요청 기록을 시작하기 위해 [PromptLayer](https://www.promptlayer.com)에 연결하는 방법을 보여줍니다.
+
+다른 예제는 [여기](/oss/integrations/providers/promptlayer)에서 확인할 수 있습니다.
+
+## Install PromptLayer
+
+OpenAI와 함께 PromptLayer를 사용하려면 `promptlayer` package가 필요합니다. pip을 사용하여 `promptlayer`를 설치하세요.
+
+```python
+pip install -qU  promptlayer
+```
+
+## Imports
+
+```python
+import os
+
+import promptlayer
+from langchain_community.llms import PromptLayerOpenAI
+```
+
+## Set the Environment API Key
+
+[www.promptlayer.com](https://www.promptlayer.com)에서 navbar의 settings cog를 클릭하여 PromptLayer API Key를 생성할 수 있습니다.
+
+이를 `PROMPTLAYER_API_KEY`라는 environment variable로 설정하세요.
+
+또한 `OPENAI_API_KEY`라는 OpenAI Key도 필요합니다.
+
+```python
+from getpass import getpass
+
+PROMPTLAYER_API_KEY = getpass()
+```
+
+```output
+ ········
+```
+
+```python
+os.environ["PROMPTLAYER_API_KEY"] = PROMPTLAYER_API_KEY
+```
+
+```python
+from getpass import getpass
+
+OPENAI_API_KEY = getpass()
+```
+
+```output
+ ········
+```
+
+```python
+os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+```
+
+## Use the PromptLayerOpenAI LLM like normal
+
+*PromptLayer의 tagging 기능으로 요청을 추적하기 위해 선택적으로 `pl_tags`를 전달할 수 있습니다.*
+
+```python
+llm = PromptLayerOpenAI(pl_tags=["langchain"])
+llm("I am a cat and I want")
+```
+
+**위 요청은 이제 [PromptLayer dashboard](https://www.promptlayer.com)에 나타나야 합니다.**
+
+## Using PromptLayer Track
+
+[PromptLayer tracking 기능](https://magniv.notion.site/Track-4deee1b1f7a34c1680d085f82567dab9) 중 하나를 사용하려면, request id를 얻기 위해 PromptLayer LLM을 인스턴스화할 때 `return_pl_id` argument를 전달해야 합니다.
+
+```python
+llm = PromptLayerOpenAI(return_pl_id=True)
+llm_results = llm.generate(["Tell me a joke"])
+
+for res in llm_results.generations:
+    pl_request_id = res[0].generation_info["pl_request_id"]
+    promptlayer.track.score(request_id=pl_request_id, score=100)
+```
+
+이를 통해 PromptLayer dashboard에서 모델의 성능을 추적할 수 있습니다. prompt template을 사용하는 경우, 요청에 template을 첨부할 수도 있습니다.
+전반적으로, 이를 통해 PromptLayer dashboard에서 다양한 template과 model의 성능을 추적할 수 있는 기회를 얻게 됩니다.

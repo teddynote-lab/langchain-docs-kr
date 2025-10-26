@@ -1,0 +1,23 @@
+---
+title: Figma
+---
+
+>[Figma](https://www.figma.com/)는 인터페이스 디자인을 위한 협업 웹 애플리케이션입니다.
+
+## Installation and Setup
+
+Figma API는 `access token`, `node_ids`, 그리고 `file key`가 필요합니다.
+
+`file key`는 URL에서 추출할 수 있습니다. https://www.figma.com/file/\{filekey\}/sampleFilename
+
+`Node IDs` 또한 URL에서 확인할 수 있습니다. 아무 요소나 클릭하고 '?node-id=\{node_id\}' 파라미터를 찾아보세요.
+
+`Access token` [안내](https://help.figma.com/hc/en-us/articles/8085703771159-Manage-personal-access-tokens).
+
+## Document Loader
+
+[사용 예시](/oss/integrations/document_loaders/figma)를 참고하세요.
+
+```python
+from langchain_community.document_loaders import FigmaFileLoader
+```

@@ -1,0 +1,361 @@
+---
+title: Prompt engineering 빠른 시작
+sidebarTitle: 빠른 시작
+---
+
+import WorkspaceSecret from '/snippets/langsmith/set-workspace-secrets.mdx';
+
+Prompt는 대규모 언어 모델(LLM)의 동작을 안내합니다. [_Prompt engineering_](/langsmith/prompt-engineering-concepts)은 LLM이 신뢰할 수 있고 유용한 응답을 생성하도록 지시사항을 작성하고, 테스트하고, 개선하는 과정입니다.
+
+LangSmith는 prompt를 생성하고, 버전 관리하고, 테스트하고, 협업할 수 있는 도구를 제공합니다. 또한 구조화된 prompt를 재사용할 수 있는 [_prompt template_](/langsmith/prompt-engineering-concepts#prompts-vs-prompt-templates)과 prompt에 값(예: 사용자의 질문)을 동적으로 삽입할 수 있는 [_변수_](/langsmith/prompt-engineering-concepts#f-string-vs-mustache)와 같은 일반적인 개념을 접하게 됩니다.
+
+이 빠른 시작에서는 UI 또는 SDK를 사용하여 prompt를 생성하고, 테스트하고, 개선합니다. 이 빠른 시작은 OpenAI를 예시 LLM provider로 사용하지만, 동일한 워크플로우가 다른 provider에도 적용됩니다.
+
+<Tip>
+Prompt engineering 시작하기에 대한 비디오를 선호하는 경우 빠른 시작 [비디오 가이드](#video-guide)를 참조하세요.
+</Tip>
+
+## 사전 요구 사항
+
+시작하기 전에 다음을 준비해야 합니다:
+
+- **LangSmith 계정**: [smith.langchain.com](https://smith.langchain.com)에서 가입하거나 로그인하세요.
+- **LangSmith API key**: [API key 생성](/langsmith/create-account-api-key#create-an-api-key) 가이드를 따르세요.
+- **OpenAI API key**: [OpenAI dashboard](https://platform.openai.com/account/api-keys)에서 생성하세요.
+
+UI 또는 SDK 워크플로우에 대한 탭을 선택하세요:
+
+<Tabs>
+<Tab title="UI" icon="window">
+
+## 1. workspace secret 설정
+
+<WorkspaceSecret/>
+
+## 2. prompt 생성
+
+1. [LangSmith UI](https://smith.langchain.com)에서 왼쪽 메뉴의 **Prompts** 섹션으로 이동합니다.
+1. **+ Prompt**를 클릭하여 prompt를 생성합니다.
+1. 필요에 따라 prompt와 입력 변수를 편집하거나 추가하여 prompt를 수정합니다.
+
+<div style={{ textAlign: 'center' }}>
+<img
+    className="block dark:hidden"
+    src="/langsmith/images/create-a-prompt-light.png"
+    alt="편집 준비가 된 system prompt가 있는 Prompt playground."
+/>
+
+<img
+    className="hidden dark:block"
+    src="/langsmith/images/create-a-prompt-dark.png"
+    alt="편집 준비가 된 system prompt가 있는 Prompt playground."
+/>
+</div>
+
+
+## 3. prompt 테스트
+
+1. **Prompts** 제목 아래에서 모델 이름 옆의 톱니바퀴 <Icon icon="gear" iconType="solid" /> 아이콘을 선택하면 **Model Configuration** 탭의 **Prompt Settings** 창이 열립니다.
+1. 사용하려는 [model configuration](/langsmith/managing-model-configurations)을 설정합니다. 선택한 **Provider**와 **Model**에 따라 이 구성 페이지에서 구성 가능한 매개변수가 결정됩니다. 설정이 완료되면 **Save as**를 클릭합니다.
+
+    <div style={{ textAlign: 'center' }}>
+    <img
+        className="block dark:hidden"
+        src="/langsmith/images/model-config-light.png"
+        alt="LangSmith UI의 Model Configuration 창, Provider, Model, Temperature, Max Output Tokens, Top P, Presence Penalty, Frequency Penalty, Reasoning Effort 등의 설정."
+    />
+
+    <img
+        className="hidden dark:block"
+        src="/langsmith/images/model-config-dark.png"
+        alt="LangSmith UI의 Model Configuration 창, Provider, Model, Temperature, Max Output Tokens, Top P, Presence Penalty, Frequency Penalty, Reasoning Effort 등의 설정."
+    />
+    </div>
+
+1. **Inputs** 박스에서 테스트하려는 입력 변수를 지정한 다음 <Icon icon="circle-play" iconType="solid" /> **Start**를 클릭합니다.
+
+
+    <div style={{ textAlign: 'center' }}>
+    <img
+        className="block dark:hidden"
+        src="/langsmith/images/set-input-start-light.png"
+        alt="질문이 입력된 input 박스. output 박스에는 prompt에 대한 응답이 포함되어 있습니다."
+    />
+
+    <img
+        className="hidden dark:block"
+        src="/langsmith/images/set-input-start-dark.png"
+        alt="질문이 입력된 input 박스. output 박스에는 prompt에 대한 응답이 포함되어 있습니다."
+    />
+    </div>
+
+    Playground에서 prompt를 구성하는 더 많은 옵션에 대해 알아보려면 [prompt 설정 구성](/langsmith/managing-model-configurations)을 참조하세요.
+
+1. prompt를 테스트하고 개선한 후 **Save**를 클릭하여 향후 사용을 위해 저장합니다.
+
+## 4. prompt 반복 개선
+
+LangSmith는 팀 기반 prompt 반복 개선을 지원합니다. [Workspace](/langsmith/administration-overview#workspaces) 멤버는 playground에서 prompt를 실험하고 준비가 되면 변경 사항을 새로운 [_commit_](/langsmith/prompt-engineering-concepts#commits)으로 저장할 수 있습니다.
+
+prompt를 개선하려면:
+
+- 모델 provider가 제공하는 문서에서 prompt 생성 모범 사례를 참조하세요:
+    - [Best practices for prompt engineering with the OpenAI API](https://help.openai.com/en/articles/6654000-best-practices-for-prompt-engineering-with-the-openai-api)
+    - [Gemini's Introduction to prompt design](https://ai.google.dev/gemini-api/docs/prompting-intro)
+- LangSmith의 대화형 도구인 Prompt Canvas로 prompt를 구축하고 개선하세요. 자세한 내용은 [Prompt Canvas 가이드](/langsmith/write-prompt-with-ai)를 참조하세요.
+- 특정 commit에 태그를 지정하여 commit 기록에서 중요한 순간을 표시합니다.
+    1. commit을 생성하려면 **Playground**로 이동하여 **Commit**을 선택합니다. 변경 사항을 commit할 prompt를 선택한 다음 **Commit**을 클릭합니다.
+    1. 왼쪽 메뉴에서 **Prompts**로 이동합니다. prompt를 선택합니다. prompt의 상세 페이지에서 **Commits** 탭으로 이동합니다. 태그 아이콘 <Icon icon="tag" iconType="solid" />을 찾아 **Add a Commit Tag**를 클릭합니다.
+
+    <div style={{ textAlign: 'center' }}>
+    <img
+        className="block dark:hidden"
+        src="/langsmith/images/add-commit-tag-light.png"
+        alt="태그, commit 레이블이 있는 commit tag 박스, 태그를 생성하기 위한 commit tag name 박스."
+    />
+
+    <img
+        className="hidden dark:block"
+        src="/langsmith/images/add-commit-tag-dark.png"
+        alt="태그, commit 레이블이 있는 commit tag 박스, 태그를 생성하기 위한 commit tag name 박스."
+    />
+    </div>
+
+</Tab>
+<Tab title="SDK" icon="code">
+
+## 1. 환경 설정
+
+1. 터미널에서 환경을 준비합니다:
+
+    <CodeGroup>
+
+    ```bash Python
+    mkdir ls-prompt-quickstart && cd ls-prompt-quickstart
+    python -m venv .venv
+    source .venv/bin/activate
+    pip install -qU langsmith openai langchain_core
+    ```
+
+    ```bash TypeScript
+    mkdir ls-prompt-quickstart-ts && cd ls-prompt-quickstart-ts
+    npm init -y
+    npm install langsmith openai typescript ts-node
+    npx tsc --init
+    ```
+
+    </CodeGroup>
+
+1. API key를 설정합니다:
+
+    ```bash
+    export LANGSMITH_API_KEY='<your_api_key>'
+    export OPENAI_API_KEY='<your_api_key>'
+    ```
+
+## 2. prompt 생성
+
+prompt를 생성하려면 prompt에 포함할 메시지 목록을 정의한 다음 LangSmith에 push합니다.
+
+언어별 constructor와 push 메서드를 사용합니다:
+
+- Python: [`ChatPromptTemplate`](https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.chat.ChatPromptTemplate.html) → [`client.push_prompt(...)`](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.push_prompt)
+- TypeScript: [`ChatPromptTemplate.fromMessages(...)`](https://v03.api.js.langchain.com/classes/_langchain_core.prompts.ChatPromptTemplate.html#fromMessages) → [`client.pushPrompt(...)`](https://langsmith-docs-7jgx2bq8f-langchain.vercel.app/reference/js/classes/client.Client#pushprompt)
+
+1. `create_prompt` 파일에 다음 코드를 추가합니다:
+
+    <CodeGroup>
+
+    ```python Python
+    from langsmith import Client
+    from langchain_core.prompts import ChatPromptTemplate
+
+    client = Client()
+
+    prompt = ChatPromptTemplate([
+        ("system", "You are a helpful chatbot."),
+        ("user", "{question}"),
+    ])
+
+    client.push_prompt("prompt-quickstart", object=prompt)
+    ```
+
+    ```typescript TypeScript
+    import { Client } from "langsmith";
+    import { ChatPromptTemplate } from "@langchain/core/prompts";
+
+    const client = new Client();
+
+    const prompt = ChatPromptTemplate.fromMessages([
+    ["system", "You are a helpful chatbot."],
+    ["user", "{question}"],
+    ]);
+
+    await client.pushPrompt("prompt-quickstart", {
+    object: prompt,
+    });
+    ```
+
+    </CodeGroup>
+
+    이것은 순서가 지정된 메시지 목록을 생성하고, `ChatPromptTemplate`으로 래핑한 다음, 버전 관리 및 재사용을 위해 이름으로 prompt를 [workspace](/langsmith/administration-overview#workspaces)에 push합니다.
+
+1. `create_prompt`를 실행합니다:
+
+    <CodeGroup>
+
+    ```python Python
+    python create_prompt.py
+    ```
+
+    ```typescript TypeScript
+    npx tsx create_prompt.ts
+    ```
+
+    </CodeGroup>
+
+결과 링크를 따라 LangSmith UI에서 새로 생성된 Prompt Hub prompt를 확인하세요.
+
+## 3. prompt 테스트
+
+이 단계에서는 [2단계](#2-prompt-생성)에서 생성한 prompt를 이름(`"prompt-quickstart"`)으로 가져오고, 테스트 입력으로 형식을 지정하고, OpenAI의 chat 형식으로 변환한 다음 OpenAI Chat Completions API를 호출합니다.
+
+그런 다음 새 버전을 생성하여 prompt를 반복 개선합니다. workspace의 멤버는 기존 prompt를 열고 [UI](https://smith.langchain.com)에서 변경 사항을 실험하고 해당 변경 사항을 동일한 prompt의 새 commit으로 저장할 수 있으며, 이는 전체 팀의 기록을 보존합니다.
+
+1. `test_prompt` 파일에 다음을 추가합니다:
+
+    <CodeGroup>
+
+    ```python Python
+    from langsmith import Client
+    from openai import OpenAI
+    from langchain_core.messages import convert_to_openai_messages
+
+    client = Client()
+    oai_client = OpenAI()
+
+    prompt = client.pull_prompt("prompt-quickstart")
+
+    # Since the prompt only has one variable you could also pass in the value directly
+    # Equivalent to formatted_prompt = prompt.invoke("What is the color of the sky?")
+    formatted_prompt = prompt.invoke({"question": "What is the color of the sky?"})
+
+    response = oai_client.chat.completions.create(
+        model="gpt-4o",
+        messages=convert_to_openai_messages(formatted_prompt.messages),
+    )
+    ```
+
+    ```typescript TypeScript
+    import { OpenAI } from "openai";
+    import { pull } from "langchain/hub"
+    import { convertPromptToOpenAI } from "@langchain/openai";
+
+    const oaiClient = new OpenAI();
+
+    const prompt = await pull("prompt-quickstart");
+
+    // Format the prompt with the question
+    const formattedPrompt = await prompt.invoke({ question: "What is the color of the sky?" });
+
+    const response = await oaiClient.chat.completions.create({
+        model: "gpt-4o",
+        messages: convertPromptToOpenAI(formattedPrompt).messages,
+    });
+    ```
+    </CodeGroup>
+
+    이것은 테스트 중인 prompt의 최신 commit 버전에 대해 `pull`을 사용하여 이름으로 prompt를 로드합니다. commit hash `"<prompt-name>:<commit-hash>"`를 전달하여 특정 commit을 지정할 수도 있습니다.
+
+1. `test_prompt`를 실행합니다:
+
+    <CodeGroup>
+
+    ```python Python
+    python test_prompt.py
+    ```
+
+    ```typescript TypeScript
+    npx tsx test_prompt.ts
+    ```
+
+    </CodeGroup>
+
+1. prompt의 새 버전을 생성하려면 동일한 prompt 이름과 업데이트된 template으로 처음 사용한 것과 동일한 push 메서드를 호출합니다. LangSmith는 이를 새 commit으로 기록하고 이전 버전을 보존합니다.
+
+    다음 코드를 `iterate_prompt` 파일에 복사합니다:
+
+    <CodeGroup>
+
+    ```python Python
+    from langsmith import Client
+    from langchain_core.prompts import ChatPromptTemplate
+
+    client = Client()
+
+    new_prompt = ChatPromptTemplate([
+        ("system", "You are a helpful chatbot. Respond in Spanish."),
+        ("user", "{question}"),
+    ])
+
+    client.push_prompt("prompt-quickstart", object=new_prompt)
+    ```
+
+    ```typescript TypeScript
+    import { Client } from "langsmith";
+    import { ChatPromptTemplate } from "@langchain/core/prompts";
+
+    const client = new Client();
+
+    const newPrompt = ChatPromptTemplate.fromMessages([
+        ["system", "You are a helpful chatbot. Speak in Spanish."],
+        ["user", "{question}"]
+    ]);
+
+    await client.pushPrompt("prompt-quickstart", {
+        object: newPrompt
+    });
+    ```
+
+    </CodeGroup>
+
+1. `iterate_prompt`를 실행합니다:
+
+    <CodeGroup>
+
+    ```python Python
+    python iterate_prompt.py
+    ```
+
+    ```typescript TypeScript
+    npx tsx iterate_prompt.ts
+    ```
+    </CodeGroup>
+
+    이제 prompt에는 두 개의 commit이 포함됩니다.
+
+prompt를 개선하려면:
+
+- 모델 provider가 제공하는 문서에서 prompt 생성 모범 사례를 참조하세요:
+    - [Best practices for prompt engineering with the OpenAI API](https://help.openai.com/en/articles/6654000-best-practices-for-prompt-engineering-with-the-openai-api)
+    - [Gemini's Introduction to prompt design](https://ai.google.dev/gemini-api/docs/prompting-intro)
+- LangSmith의 대화형 도구인 Prompt Canvas로 prompt를 구축하고 개선하세요. 자세한 내용은 [Prompt Canvas 가이드](/langsmith/write-prompt-with-ai)를 참조하세요.
+
+</Tab>
+</Tabs>
+
+## 다음 단계
+
+- Prompt Hub를 사용하여 prompt를 저장하고 관리하는 방법에 대해 자세히 알아보려면 [prompt 생성 가이드](/langsmith/create-a-prompt)를 참조하세요.
+- 이 튜토리얼에서 [다중 턴 대화 테스트](/langsmith/multiple-messages)를 위해 Playground를 설정하는 방법을 알아보세요.
+- 개별 예제 대신 데이터셋에 대한 prompt의 성능을 테스트하는 방법을 알아보려면 [Prompt Playground에서 평가 실행](/langsmith/run-evaluation-from-prompt-playground)을 참조하세요.
+
+## 비디오 가이드
+<iframe
+  className="w-full aspect-video rounded-xl"
+  src="https://www.youtube.com/embed/h4f6bIWGkog?si=IVJFfhldC7M3HL4G"
+  title="YouTube video player"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>

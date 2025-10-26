@@ -1,0 +1,451 @@
+---
+title: Human-in-the-loop
+---
+
+
+
+Human-in-the-Loop (HITL) middleware를 사용하면 에이전트 tool 호출에 사람의 감독을 추가할 수 있습니다.
+모델이 검토가 필요할 수 있는 작업(예: 파일 쓰기 또는 SQL 실행)을 제안하면, middleware는 실행을 일시 중지하고 결정을 기다릴 수 있습니다.
+
+이는 구성 가능한 정책에 따라 각 tool 호출을 확인하여 수행됩니다. 개입이 필요한 경우, middleware는 실행을 중단하는 @[interrupt]를 발생시킵니다. Graph state는 LangGraph의 [persistence layer](/oss/langgraph/persistence)를 사용하여 저장되므로, 실행을 안전하게 일시 중지하고 나중에 재개할 수 있습니다.
+
+그런 다음 사람의 결정에 따라 다음 작업이 결정됩니다: 작업을 그대로 승인(`approve`)하거나, 실행 전에 수정(`edit`)하거나, 피드백과 함께 거부(`reject`)할 수 있습니다.
+
+## Interrupt 결정 유형
+
+Middleware는 사람이 interrupt에 응답할 수 있는 세 가지 기본 제공 방법을 정의합니다:
+
+| 결정 유형 | 설명                                                               | 사용 사례 예시                                    |
+|---------------|---------------------------------------------------------------------------|-----------------------------------------------------|
+| ✅ `approve`   | 작업이 그대로 승인되어 변경 없이 실행됩니다.                | 작성된 그대로 이메일 초안 보내기              |
+| ✏️ `edit`     | Tool 호출이 수정과 함께 실행됩니다.                             | 이메일을 보내기 전에 수신자 변경        |
+| ❌ `reject`    | Tool 호출이 거부되고, 설명이 대화에 추가됩니다. | 이메일 초안을 거부하고 다시 작성하는 방법 설명 |
+
+각 tool에 사용 가능한 결정 유형은 `interrupt_on`에서 구성한 정책에 따라 다릅니다.
+여러 tool 호출이 동시에 일시 중지되면, 각 작업에 대해 별도의 결정이 필요합니다.
+결정은 interrupt 요청에 나타나는 작업과 동일한 순서로 제공되어야 합니다.
+
+<Tip>
+Tool argument를 **편집**할 때는 신중하게 변경하세요. 원래 argument를 크게 수정하면 모델이 접근 방식을 재평가하고 tool을 여러 번 실행하거나 예상치 못한 작업을 수행할 수 있습니다.
+</Tip>
+
+
+## Interrupt 구성
+
+HITL을 사용하려면, 에이전트를 생성할 때 에이전트의 `middleware` 목록에 middleware를 추가하세요.
+
+각 작업에 허용되는 결정 유형에 대한 tool 작업의 매핑으로 구성합니다. Middleware는 tool 호출이 매핑의 작업과 일치할 때 실행을 중단합니다.
+
+:::python
+```python
+from langchain.agents import create_agent
+from langchain.agents.middleware import HumanInTheLoopMiddleware # [!code highlight]
+from langgraph.checkpoint.memory import InMemorySaver # [!code highlight]
+
+
+agent = create_agent(
+    model="openai:gpt-4o",
+    tools=[write_file_tool, execute_sql_tool, read_data_tool],
+    middleware=[
+        HumanInTheLoopMiddleware( # [!code highlight]
+            interrupt_on={
+                "write_file": True,  # All decisions (approve, edit, reject) allowed
+                "execute_sql": {"allowed_decisions": ["approve", "reject"]},  # No editing allowed
+                # Safe operation, no approval needed
+                "read_data": False,
+            },
+            # Prefix for interrupt messages - combined with tool name and args to form the full message
+            # e.g., "Tool execution pending approval: execute_sql with query='DELETE FROM...'"
+            # Individual tools can override this by specifying a "description" in their interrupt config
+            description_prefix="Tool execution pending approval",
+        ),
+    ],
+    # Human-in-the-loop requires checkpointing to handle interrupts.
+    # In production, use a persistent checkpointer like AsyncPostgresSaver.
+    checkpointer=InMemorySaver(),  # [!code highlight]
+)
+```
+:::
+
+:::js
+```ts
+import { createAgent, humanInTheLoopMiddleware } from "langchain"; // [!code highlight]
+import { MemorySaver } from "@langchain/langgraph"; // [!code highlight]
+
+const agent = createAgent({
+    model: "openai:gpt-4o",
+    tools: [writeFileTool, executeSQLTool, readDataTool],
+    middleware: [
+        humanInTheLoopMiddleware({
+            interruptOn: {
+                write_file: true, // All decisions (approve, edit, reject) allowed
+                execute_sql: {
+                    allowedDecisions: ["approve", "reject"],
+                    // No editing allowed
+                    description: "🚨 SQL execution requires DBA approval",
+                },
+                // Safe operation, no approval needed
+                read_data: false,
+            },
+            // Prefix for interrupt messages - combined with tool name and args to form the full message
+            // e.g., "Tool execution pending approval: execute_sql with query='DELETE FROM...'"
+            // Individual tools can override this by specifying a "description" in their interrupt config
+            descriptionPrefix: "Tool execution pending approval",
+        }),
+    ],
+    // Human-in-the-loop requires checkpointing to handle interrupts.
+    // In production, use a persistent checkpointer like AsyncPostgresSaver.
+    checkpointer: new MemorySaver(), // [!code highlight]
+});
+```
+:::
+
+
+<Info>
+    Interrupt 간에 graph state를 유지하려면 checkpointer를 구성해야 합니다.
+    프로덕션 환경에서는 @[`AsyncPostgresSaver`]와 같은 영구 checkpointer를 사용하세요. 테스트 또는 프로토타이핑의 경우 @[`InMemorySaver`]를 사용하세요.
+
+    에이전트를 호출할 때, 실행을 대화 스레드와 연결하기 위해 **thread ID**를 포함하는 `config`를 전달하세요.
+    자세한 내용은 [LangGraph interrupts 문서](/oss/langgraph/interrupts)를 참조하세요.
+</Info>
+
+
+## Interrupt에 응답하기
+
+에이전트를 호출하면, 완료되거나 interrupt가 발생할 때까지 실행됩니다. Interrupt는 tool 호출이 `interrupt_on`에서 구성한 정책과 일치할 때 트리거됩니다. 이 경우, 호출 결과에는 검토가 필요한 작업이 포함된 `__interrupt__` 필드가 포함됩니다. 그런 다음 해당 작업을 검토자에게 제시하고 결정이 제공되면 실행을 재개할 수 있습니다.
+
+
+:::python
+```python
+from langgraph.types import Command
+
+# Human-in-the-loop leverages LangGraph's persistence layer.
+# You must provide a thread ID to associate the execution with a conversation thread,
+# so the conversation can be paused and resumed (as is needed for human review).
+config = {"configurable": {"thread_id": "some_id"}} # [!code highlight]
+# Run the graph until the interrupt is hit.
+result = agent.invoke(
+    {
+        "messages": [
+            {
+                "role": "user",
+                "content": "Delete old records from the database",
+            }
+        ]
+    },
+    config=config # [!code highlight]
+)
+
+# The interrupt contains the full HITL request with action_requests and review_configs
+print(result['__interrupt__'])
+# > [
+# >    Interrupt(
+# >       value={
+# >          'action_requests': [
+# >             {
+# >                'name': 'execute_sql',
+# >                'arguments': {'query': 'DELETE FROM records WHERE created_at < NOW() - INTERVAL \'30 days\';'},
+# >                'description': 'Tool execution pending approval\n\nTool: execute_sql\nArgs: {...}'
+# >             }
+# >          ],
+# >          'review_configs': [
+# >             {
+# >                'action_name': 'execute_sql',
+# >                'allowed_decisions': ['approve', 'reject']
+# >             }
+# >          ]
+# >       }
+# >    )
+# > ]
+
+
+# Resume with approval decision
+agent.invoke(
+    Command( # [!code highlight]
+        resume={"decisions": [{"type": "approve"}]}  # or "edit", "reject" [!code highlight]
+    ), # [!code highlight]
+    config=config # Same thread ID to resume the paused conversation
+)
+```
+:::
+
+:::js
+```typescript
+import { HumanMessage } from "@langchain/core/messages";
+import { Command } from "@langchain/langgraph";
+
+// You must provide a thread ID to associate the execution with a conversation thread,
+// so the conversation can be paused and resumed (as is needed for human review).
+const config = { configurable: { thread_id: "some_id" } }; // [!code highlight]
+
+// Run the graph until the interrupt is hit.
+const result = await agent.invoke(
+    {
+        messages: [new HumanMessage("Delete old records from the database")],
+    },
+    config // [!code highlight]
+);
+
+
+// The interrupt contains the full HITL request with action_requests and review_configs
+console.log(result.__interrupt__);
+// > [
+// >    Interrupt(
+// >       value: {
+// >          action_requests: [
+// >             {
+// >                name: 'execute_sql',
+// >                arguments: { query: 'DELETE FROM records WHERE created_at < NOW() - INTERVAL \'30 days\';' },
+// >                description: 'Tool execution pending approval\n\nTool: execute_sql\nArgs: {...}'
+// >             }
+// >          ],
+// >          review_configs: [
+// >             {
+// >                action_name: 'execute_sql',
+// >                allowed_decisions: ['approve', 'reject']
+// >             }
+// >          ]
+// >       }
+// >    )
+// > ]
+
+// Resume with approval decision
+await agent.invoke(
+    new Command({ // [!code highlight]
+        resume: { decisions: [{ type: "approve" }] }, // or "edit", "reject" [!code highlight]
+    }), // [!code highlight]
+    config // Same thread ID to resume the paused conversation
+);
+```
+:::
+
+### 결정 유형
+
+<Tabs>
+<Tab title="✅ approve">
+`approve`를 사용하여 tool 호출을 그대로 승인하고 변경 없이 실행하세요.
+
+:::python
+```python
+agent.invoke(
+    Command(
+        # Decisions are provided as a list, one per action under review.
+        # The order of decisions must match the order of actions
+        # listed in the `__interrupt__` request.
+        resume={
+            "decisions": [
+                {
+                    "type": "approve",
+                }
+            ]
+        }
+    ),
+    config=config  # Same thread ID to resume the paused conversation
+)
+```
+:::
+
+:::js
+```typescript
+await agent.invoke(
+    new Command({
+        // Decisions are provided as a list, one per action under review.
+        // The order of decisions must match the order of actions
+        // listed in the `__interrupt__` request.
+        resume: {
+            decisions: [
+                {
+                    type: "approve",
+                }
+            ]
+        }
+    }),
+    config  // Same thread ID to resume the paused conversation
+);
+```
+:::
+</Tab>
+<Tab title="✏️ edit">
+    `edit`를 사용하여 실행 전에 tool 호출을 수정하세요.
+    새 tool 이름과 argument로 편집된 작업을 제공하세요.
+
+    :::python
+    ```python
+    agent.invoke(
+        Command(
+            # Decisions are provided as a list, one per action under review.
+            # The order of decisions must match the order of actions
+            # listed in the `__interrupt__` request.
+            resume={
+                "decisions": [
+                    {
+                        "type": "edit",
+                        # Edited action with tool name and args
+                        "edited_action": {
+                            # Tool name to call.
+                            # Will usually be the same as the original action.
+                            "name": "new_tool_name",
+                            # Arguments to pass to the tool.
+                            "args": {"key1": "new_value", "key2": "original_value"},
+                        }
+                    }
+                ]
+            }
+        ),
+        config=config  # Same thread ID to resume the paused conversation
+    )
+    ```
+    :::
+
+    :::js
+    ```typescript
+    await agent.invoke(
+        new Command({
+            // Decisions are provided as a list, one per action under review.
+            // The order of decisions must match the order of actions
+            // listed in the `__interrupt__` request.
+            resume: {
+                decisions: [
+                    {
+                        type: "edit",
+                        // Edited action with tool name and args
+                        editedAction: {
+                            // Tool name to call.
+                            // Will usually be the same as the original action.
+                            name: "new_tool_name",
+                            // Arguments to pass to the tool.
+                            args: { key1: "new_value", key2: "original_value" },
+                        }
+                    }
+                ]
+            }
+        }),
+        config  // Same thread ID to resume the paused conversation
+    );
+    ```
+    :::
+
+    <Tip>
+        Tool argument를 **편집**할 때는 신중하게 변경하세요. 원래 argument를 크게 수정하면 모델이 접근 방식을 재평가하고 tool을 여러 번 실행하거나 예상치 못한 작업을 수행할 수 있습니다.
+    </Tip>
+
+</Tab>
+
+<Tab title="❌ reject">
+    `reject`를 사용하여 tool 호출을 거부하고 실행 대신 피드백을 제공하세요.
+
+    :::python
+    ```python
+    agent.invoke(
+        Command(
+            # Decisions are provided as a list, one per action under review.
+            # The order of decisions must match the order of actions
+            # listed in the `__interrupt__` request.
+            resume={
+                "decisions": [
+                    {
+                        "type": "reject",
+                        # An explanation about why the action was rejected
+                        "message": "No, this is wrong because ..., instead do this ...",
+                    }
+                ]
+            }
+        ),
+        config=config  # Same thread ID to resume the paused conversation
+    )
+    ```
+    :::
+
+    :::js
+    ```typescript
+    await agent.invoke(
+        new Command({
+            // Decisions are provided as a list, one per action under review.
+            // The order of decisions must match the order of actions
+            // listed in the `__interrupt__` request.
+            resume: {
+                decisions: [
+                    {
+                        type: "reject",
+                        // An explanation about why the action was rejected
+                        message: "No, this is wrong because ..., instead do this ...",
+                    }
+                ]
+            }
+        }),
+        config  // Same thread ID to resume the paused conversation
+    );
+    ```
+    :::
+
+`message`는 에이전트가 작업이 거부된 이유와 대신 무엇을 해야 하는지 이해하는 데 도움이 되도록 대화에 피드백으로 추가됩니다.
+
+---
+
+### 여러 결정
+
+여러 작업이 검토 중일 때, interrupt에 나타나는 순서와 동일한 순서로 각 작업에 대한 결정을 제공하세요:
+
+:::python
+```python
+{
+    "decisions": [
+        {"type": "approve"},
+        {
+            "type": "edit",
+            "edited_action": {
+                "name": "tool_name",
+                "args": {"param": "new_value"}
+            }
+        },
+        {
+            "type": "reject",
+            "message": "This action is not allowed"
+        }
+    ]
+}
+```
+:::
+
+:::js
+```typescript
+{
+    decisions: [
+        { type: "approve" },
+        {
+            type: "edit",
+            editedAction: {
+                name: "tool_name",
+                args: { param: "new_value" }
+            }
+        },
+        {
+            type: "reject",
+            message: "This action is not allowed"
+        }
+    ]
+}
+```
+:::
+
+</Tab>
+</Tabs>
+
+
+## 실행 생명주기
+
+Middleware는 모델이 응답을 생성한 후 tool 호출이 실행되기 전에 실행되는 `after_model` hook을 정의합니다:
+
+1. 에이전트가 모델을 호출하여 응답을 생성합니다.
+2. Middleware가 응답에서 tool 호출을 검사합니다.
+3. 호출 중 사람의 입력이 필요한 경우, middleware는 `action_requests`와 `review_configs`가 포함된 `HITLRequest`를 빌드하고 @[interrupt]를 호출합니다.
+4. 에이전트가 사람의 결정을 기다립니다.
+5. `HITLResponse` 결정에 따라, middleware는 승인되거나 편집된 호출을 실행하고, 거부된 호출에 대한 @[ToolMessage]를 합성하며, 실행을 재개합니다.
+
+
+
+## 사용자 정의 HITL 로직
+
+더 전문화된 워크플로우의 경우, @[interrupt] primitive와 [middleware](/oss/langchain/middleware) 추상화를 직접 사용하여 사용자 정의 HITL 로직을 구축할 수 있습니다.
+
+Interrupt를 에이전트의 작업에 통합하는 방법을 이해하려면 위의 [실행 생명주기](#execution-lifecycle)를 검토하세요.

@@ -1,0 +1,57 @@
+---
+title: LangGraph SDK
+sidebarTitle: LangGraph SDK
+---
+
+LangSmith는 [LangGraph Server](/langsmith/langgraph-server)와 상호작용하기 위한 Python SDK를 제공합니다.
+
+<Tip>
+**Python SDK 레퍼런스**
+Python SDK에 대한 자세한 정보는 [Python SDK 레퍼런스 문서](/langsmith/langgraph-python-sdk)를 참조하세요.
+</Tip>
+
+## Installation
+
+사용하는 언어에 적합한 패키지 매니저를 사용하여 패키지를 설치할 수 있습니다:
+
+<Tabs>
+    <Tab title="Python">
+    ```bash
+    pip install langgraph-sdk
+    ```
+    </Tab>
+    <Tab title="JS">
+    ```bash
+    yarn add @langchain/langgraph-sdk
+    ```
+    </Tab>
+</Tabs>
+
+## Python sync vs. async
+
+Python SDK는 LangGraph Server와 상호작용하기 위한 동기(`get_sync_client`) 및 비동기(`get_client`) 클라이언트를 모두 제공합니다:
+
+<Tabs>
+    <Tab title="Sync">
+    ```python
+    from langgraph_sdk import get_sync_client
+
+    client = get_sync_client(url=..., api_key=...)
+    client.assistants.search()
+    ```
+    </Tab>
+    <Tab title="Async">
+    ```python
+    from langgraph_sdk import get_client
+
+    client = get_client(url=..., api_key=...)
+    await client.assistants.search()
+    ```
+    </Tab>
+</Tabs>
+
+## Learn more
+
+* [Python SDK Reference](/langsmith/langgraph-python-sdk)
+* [LangGraph CLI API Reference](/langsmith/cli)
+* [JS/TS SDK Reference](/langsmith/langgraph-js-ts-sdk)

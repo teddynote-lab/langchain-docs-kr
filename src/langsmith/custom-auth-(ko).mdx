@@ -1,0 +1,174 @@
+---
+title: 커스텀 인증 추가하기
+sidebarTitle: 커스텀 인증 추가하기
+---
+
+이 가이드는 LangSmith 애플리케이션에 커스텀 인증을 추가하는 방법을 보여줍니다. 이 페이지의 단계는 [클라우드](/langsmith/cloud) 및 [자체 호스팅](/langsmith/self-hosted) 배포 모두에 적용됩니다. 자체 커스텀 서버에서 [LangGraph 오픈 소스 라이브러리](/oss/langgraph/overview)를 독립적으로 사용하는 경우에는 적용되지 않습니다.
+
+## 배포에 커스텀 인증 추가하기
+
+배포에서 커스텀 인증을 활용하고 사용자 수준 메타데이터에 액세스하려면, 커스텀 인증 핸들러를 통해 `config["configurable"]["langgraph_auth_user"]` 객체를 자동으로 채우도록 커스텀 인증을 설정하세요. 그런 다음 그래프에서 `langgraph_auth_user` 키로 이 객체에 액세스하여 [에이전트가 사용자를 대신하여 인증된 작업을 수행](#enable-agent-authentication)할 수 있습니다.
+
+1. 인증 구현:
+
+    <Note>
+    커스텀 `@auth.authenticate` 핸들러가 없으면 LangGraph는 API 키 소유자(일반적으로 개발자)만 인식하므로 요청이 개별 최종 사용자로 범위가 지정되지 않습니다. 커스텀 토큰을 전파하려면 자체 핸들러를 구현해야 합니다.
+    </Note>
+
+    ```python
+    from langgraph_sdk import Auth
+    import requests
+
+    auth = Auth()
+
+    def is_valid_key(api_key: str) -> bool:
+        is_valid = # your API key validation logic
+        return is_valid
+
+    @auth.authenticate # (1)!
+    async def authenticate(headers: dict) -> Auth.types.MinimalUserDict:
+        api_key = headers.get(b"x-api-key")
+        if not api_key or not is_valid_key(api_key):
+            raise Auth.exceptions.HTTPException(status_code=401, detail="Invalid API key")
+
+        # Fetch user-specific tokens from your secret store
+        user_tokens = await fetch_user_tokens(api_key)
+
+        return { # (2)!
+            "identity": api_key,  #  fetch user ID from LangSmith
+            "github_token" : user_tokens.github_token
+            "jira_token" : user_tokens.jira_token
+            # ... custom fields/secrets here
+        }
+    ```
+  - 이 핸들러는 요청(헤더 등)을 받아 사용자를 검증하고 최소한 identity 필드가 포함된 딕셔너리를 반환합니다.
+  - 원하는 커스텀 필드(예: OAuth 토큰, 역할, 조직 ID 등)를 추가할 수 있습니다.
+
+2. [`langgraph.json`](/langsmith/application-structure#configuration-file)에 인증 파일 경로를 추가하세요:
+
+    ```json highlight={7-9}
+    {
+        "dependencies": ["."],
+        "graphs": {
+        "agent": "./agent.py:graph"
+        },
+        "env": ".env",
+        "auth": {
+            "path": "./auth.py:my_auth"
+        }
+    }
+    ```
+3. 서버에서 인증을 설정한 후에는 선택한 방식에 따라 필요한 인증 정보를 요청에 포함해야 합니다. JWT 토큰 인증을 사용한다고 가정하면 다음 방법 중 하나를 사용하여 배포에 액세스할 수 있습니다:
+
+    <Tabs>
+        <Tab title="Python Client">
+      ```python
+      from langgraph_sdk import get_client
+
+      my_token = "your-token" # In practice, you would generate a signed token with your auth provider
+      client = get_client(
+          url="http://localhost:2024",
+          headers={"Authorization": f"Bearer {my_token}"}
+      )
+      threads = await client.threads.search()
+      ```
+        </Tab>
+        <Tab title="Python RemoteGraph">
+      ```python
+      from langgraph.pregel.remote import RemoteGraph
+
+      my_token = "your-token" # In practice, you would generate a signed token with your auth provider
+      remote-graph = RemoteGraph(
+          "agent",
+          url="http://localhost:2024",
+          headers={"Authorization": f"Bearer {my_token}"}
+      )
+      threads = await remote-graph.ainvoke(...)
+      ```
+        </Tab>
+        <Tab title="JavaScript Client">
+      ```javascript
+      import { Client } from "@langchain/langgraph-sdk";
+
+      const my_token = "your-token"; // In practice, you would generate a signed token with your auth provider
+      const client = new Client({
+      apiUrl: "http://localhost:2024",
+      defaultHeaders: { Authorization: `Bearer ${my_token}` },
+      });
+      const threads = await client.threads.search();
+      ```
+        </Tab>
+        <Tab title="JavaScript RemoteGraph">
+      ```javascript
+      import { RemoteGraph } from "@langchain/langgraph/remote";
+
+      const my_token = "your-token"; // In practice, you would generate a signed token with your auth provider
+      const remoteGraph = new RemoteGraph({
+      graphId: "agent",
+      url: "http://localhost:2024",
+      headers: { Authorization: `Bearer ${my_token}` },
+      });
+      const threads = await remoteGraph.invoke(...);
+      ```
+        </Tab>
+        <Tab title="CURL">
+      ```bash
+      curl -H "Authorization: Bearer ${your-token}" http://localhost:2024/threads
+      ```
+        </Tab>
+    </Tabs>
+
+    RemoteGraph에 대한 자세한 내용은 [RemoteGraph 사용하기](/langsmith/use-remote-graph) 가이드를 참조하세요.
+
+## 에이전트 인증 활성화하기
+
+[인증](#add-custom-authentication-to-your-deployment) 후, 플랫폼은 LangSmith 배포에 전달되는 특수 구성 객체(`config`)를 생성합니다. 이 객체에는 `@auth.authenticate` 핸들러에서 반환하는 커스텀 필드를 포함하여 현재 사용자에 대한 정보가 포함됩니다.
+
+에이전트가 사용자를 대신하여 인증된 작업을 수행할 수 있도록 하려면 그래프에서 `langgraph_auth_user` 키로 이 객체에 액세스하세요:
+
+```python
+def my_node(state, config):
+    user_config = config["configurable"].get("langgraph_auth_user")
+    # token was resolved during the @auth.authenticate function
+    token = user_config.get("github_token","")
+    ...
+```
+
+<Note>
+보안 시크릿 저장소에서 사용자 자격 증명을 가져오세요. 그래프 상태에 시크릿을 저장하는 것은 권장되지 않습니다.
+</Note>
+
+### Studio에서 사용자 인증하기
+
+기본적으로 리소스에 커스텀 인증을 추가하면 [Studio](/langsmith/studio)에서 수행된 상호작용에도 적용됩니다. 원하는 경우 [is_studio_user()](https://langchain-ai.github.io/langgraph/cloud/reference/sdk/python_sdk_ref/#langgraph_sdk.auth.types.StudioUser)를 확인하여 로그인한 Studio 사용자를 다르게 처리할 수 있습니다.
+
+<Note>
+`is_studio_user`는 langgraph-sdk 버전 0.1.73에 추가되었습니다. 이전 버전을 사용하는 경우에도 `isinstance(ctx.user, StudioUser)`를 확인할 수 있습니다.
+</Note>
+
+```python
+from langgraph_sdk.auth import is_studio_user, Auth
+auth = Auth()
+
+# ... Setup authenticate, etc.
+
+@auth.on
+async def add_owner(
+    ctx: Auth.types.AuthContext,
+    value: dict  # The payload being sent to this access method
+) -> dict:  # Returns a filter dict that restricts access to resources
+    if is_studio_user(ctx.user):
+        return {}
+
+    filters = {"owner": ctx.user.identity}
+    metadata = value.setdefault("metadata", {})
+    metadata.update(filters)
+    return filters
+```
+
+관리형 LangSmith SaaS에 배포된 그래프에 대한 개발자 액세스를 허용하려는 경우에만 사용하세요.
+
+## 더 알아보기
+
+* [인증 및 액세스 제어](/langsmith/auth)
+* [커스텀 인증 설정 튜토리얼](/langsmith/set-up-custom-auth)

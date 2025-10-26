@@ -1,0 +1,29 @@
+---
+title: EverNote
+---
+
+>[EverNote](https://evernote.com/)는 사진, 오디오 및 저장된 웹 콘텐츠를 포함할 수 있는 노트를 보관하고 생성하기 위한 도구입니다. 노트는 가상 "노트북"에 저장되며 태그 지정, 주석 추가, 편집, 검색 및 내보내기가 가능합니다.
+
+## Installation and Setup
+
+먼저 `lxml`과 `html2text` python package를 설치해야 합니다.
+
+<CodeGroup>
+```bash pip
+pip install lxml
+pip install html2text
+```
+
+```bash uv
+uv add lxml
+uv add html2text
+```
+</CodeGroup>
+
+## Document Loader
+
+[사용 예시](/oss/integrations/document_loaders/evernote)를 참조하세요.
+
+```python
+from langchain_community.document_loaders import EverNoteLoader
+```

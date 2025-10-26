@@ -1,0 +1,115 @@
+---
+title: DeepInfra
+---
+
+[DeepInfra](https://deepinfra.com/?utm_source=langchain)는 [다양한 LLM](https://deepinfra.com/models?utm_source=langchain)과 [embedding 모델](https://deepinfra.com/models?type=embeddings&utm_source=langchain)에 대한 액세스를 제공하는 서버리스 추론 서비스입니다. 이 노트북은 chat model을 위해 LangChain을 DeepInfra와 함께 사용하는 방법을 다룹니다.
+
+## Environment API Key 설정
+
+DeepInfra에서 API key를 받아야 합니다. [로그인](https://deepinfra.com/login?from=%2Fdash)하여 새 token을 받아야 합니다.
+
+다양한 모델을 테스트할 수 있는 1시간의 무료 서버리스 GPU 컴퓨팅이 제공됩니다. ([여기](https://github.com/deepinfra/deepctl#deepctl) 참조)
+`deepctl auth token` 명령으로 token을 출력할 수 있습니다.
+
+```python
+# get a new token: https://deepinfra.com/login?from=%2Fdash
+
+import os
+from getpass import getpass
+
+from langchain_community.chat_models import ChatDeepInfra
+from langchain.messages import HumanMessage
+
+DEEPINFRA_API_TOKEN = getpass()
+
+# or pass deepinfra_api_token parameter to the ChatDeepInfra constructor
+os.environ["DEEPINFRA_API_TOKEN"] = DEEPINFRA_API_TOKEN
+
+chat = ChatDeepInfra(model="meta-llama/Llama-2-7b-chat-hf")
+
+messages = [
+    HumanMessage(
+        content="Translate this sentence from English to French. I love programming."
+    )
+]
+chat.invoke(messages)
+```
+
+## `ChatDeepInfra`는 async 및 streaming 기능도 지원합니다
+
+```python
+from langchain_core.callbacks import StreamingStdOutCallbackHandler
+```
+
+```python
+await chat.agenerate([messages])
+```
+
+```python
+chat = ChatDeepInfra(
+    streaming=True,
+    verbose=True,
+    callbacks=[StreamingStdOutCallbackHandler()],
+)
+chat.invoke(messages)
+```
+
+# Tool Calling
+
+DeepInfra는 현재 invoke 및 async invoke tool calling만 지원합니다.
+
+tool calling을 지원하는 모델의 전체 목록은 [tool calling 문서](https://deepinfra.com/docs/advanced/function_calling)를 참조하세요.
+
+```python
+import asyncio
+
+from dotenv import find_dotenv, load_dotenv
+from langchain_community.chat_models import ChatDeepInfra
+from langchain.messages import HumanMessage
+from langchain.tools import tool
+from pydantic import BaseModel
+
+model_name = "meta-llama/Meta-Llama-3-70B-Instruct"
+
+_ = load_dotenv(find_dotenv())
+
+
+# LangChain tool
+@tool
+def foo(something):
+    """
+    Called when foo
+    """
+    pass
+
+
+# Pydantic class
+class Bar(BaseModel):
+    """
+    Called when Bar
+    """
+
+    pass
+
+
+llm = ChatDeepInfra(model=model_name)
+tools = [foo, Bar]
+llm_with_tools = llm.bind_tools(tools)
+messages = [
+    HumanMessage("Foo and bar, please."),
+]
+
+response = llm_with_tools.invoke(messages)
+print(response.tool_calls)
+# [{'name': 'foo', 'args': {'something': None}, 'id': 'call_Mi4N4wAtW89OlbizFE1aDxDj'}, {'name': 'Bar', 'args': {}, 'id': 'call_daiE0mW454j2O1KVbmET4s2r'}]
+
+
+async def call_ainvoke():
+    result = await llm_with_tools.ainvoke(messages)
+    print(result.tool_calls)
+
+
+# Async call
+asyncio.run(call_ainvoke())
+# [{'name': 'foo', 'args': {'something': None}, 'id': 'call_ZH7FetmgSot4LHcMU6CEb8tI'}, {'name': 'Bar', 'args': {}, 'id': 'call_2MQhDifAJVoijZEvH8PeFSVB'}]
+```

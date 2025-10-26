@@ -1,0 +1,40 @@
+---
+title: TensorFlow Datasets
+---
+
+>[TensorFlow Datasets](https://www.tensorflow.org/datasets)는 TensorFlow 또는 Jax와 같은 다른 Python ML 프레임워크에서 바로 사용할 수 있는 데이터셋 모음입니다. 모든 데이터셋은 [tf.data.Datasets](https://www.tensorflow.org/api_docs/python/tf/data/Dataset)로 제공되어 사용하기 쉽고 고성능의 입력 파이프라인을 구성할 수 있습니다. 시작하려면 [가이드](https://www.tensorflow.org/datasets/overview)와 [데이터셋 목록](https://www.tensorflow.org/datasets/catalog/overview#all_datasets)을 참조하세요.
+
+
+
+## Installation and Setup
+
+`tensorflow`와 `tensorflow-datasets` python 패키지를 설치해야 합니다.
+
+<CodeGroup>
+```bash pip
+pip install tensorflow
+```
+
+```bash uv
+uv add tensorflow
+```
+</CodeGroup>
+
+<CodeGroup>
+```bash pip
+pip install tensorflow-dataset
+```
+
+```bash uv
+uv add tensorflow-dataset
+```
+</CodeGroup>
+
+
+## Document Loader
+
+[사용 예제](/oss/integrations/document_loaders/tensorflow_datasets)를 참조하세요.
+
+```python
+from langchain_community.document_loaders import TensorflowDatasetLoader
+```

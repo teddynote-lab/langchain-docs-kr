@@ -1,0 +1,228 @@
+---
+title: IBM Db2 Vector Store 및 Vector Search
+---
+
+LangChain의 Db2 통합(langchain-db2)은 MIT 라이선스로 배포되는 IBM 관계형 데이터베이스 Db2 버전 v12.1.2 이상에서 작동하는 vector store 및 vector search 기능을 제공합니다. 사용자는 제공된 구현을 그대로 사용하거나 특정 요구 사항에 맞게 사용자 정의할 수 있습니다.
+주요 기능은 다음과 같습니다:
+
+* 메타데이터를 포함한 벡터 저장
+* 메타데이터 필터링 옵션을 사용한 벡터 유사도 검색 및 max marginal relevance 검색
+* dot production, cosine 및 euclidean 거리 메트릭 지원
+* 인덱스 생성 및 근사 최근접 이웃 검색을 통한 성능 최적화 (곧 추가 예정)
+
+## Setup
+
+### Db2 Vector Store 및 Search와 함께 LangChain을 사용하기 위한 전제 조건
+
+db2 LangChain Vector Store 및 Search를 위한 통합 패키지인 `langchain-db2` 패키지를 설치합니다.
+
+패키지 설치 시 `langchain-core` 및 `ibm_db`와 같은 종속성도 함께 설치됩니다.
+
+```python
+# pip install -U langchain-db2
+```
+
+### Db2 Vector Store에 연결
+
+다음 샘플 코드는 Db2 Database에 연결하는 방법을 보여줍니다. 위의 종속성 외에도 벡터 데이터 타입을 지원하는 Db2 데이터베이스 인스턴스(버전 v12.1.2 이상)가 실행 중이어야 합니다.
+
+```python
+import ibm_db
+import ibm_db_dbi
+
+database = ""
+username = ""
+password = ""
+
+try:
+    connection = ibm_db_dbi.connect(database, username, password)
+    print("Connection successful!")
+except Exception as e:
+    print("Connection failed!")
+```
+
+### 필요한 종속성 import
+
+```python
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores.utils import DistanceStrategy
+from langchain_core.documents import Document
+from langchain_db2 import db2vs
+from langchain_db2.db2vs import DB2VS
+```
+
+## Initialization
+
+### Document 생성
+
+```python
+# Define a list of documents
+documents_json_list = [
+    {
+        "id": "doc_1_2_P4",
+        "text": "Db2 handles LOB data differently than other kinds of data. As a result, you sometimes need to take additional actions when you define LOB columns and insert the LOB data.",
+        "link": "https://www.ibm.com/docs/en/db2-for-zos/12?topic=programs-storing-lob-data-in-tables",
+    },
+    {
+        "id": "doc_11.1.0_P1",
+        "text": "Db2® column-organized tables add columnar capabilities to Db2 databases, which include data that is stored with column organization and vector processing of column data. Using this table format with star schema data marts provides significant improvements to storage, query performance, and ease of use through simplified design and tuning.",
+        "link": "https://www.ibm.com/docs/en/db2/11.1.0?topic=organization-column-organized-tables",
+    },
+    {
+        "id": "id_22.3.4.3.1_P2",
+        "text": "Data structures are elements that are required to use Db2®. You can access and use these elements to organize your data. Examples of data structures include tables, table spaces, indexes, index spaces, keys, views, and databases.",
+        "link": "https://www.ibm.com/docs/en/zos-basic-skills?topic=concepts-db2-data-structures",
+    },
+    {
+        "id": "id_3.4.3.1_P3",
+        "text": "Db2® maintains a set of tables that contain information about the data that Db2 controls. These tables are collectively known as the catalog. The catalog tables contain information about Db2 objects such as tables, views, and indexes. When you create, alter, or drop an object, Db2 inserts, updates, or deletes rows of the catalog that describe the object.",
+        "link": "https://www.ibm.com/docs/en/zos-basic-skills?topic=objects-db2-catalog",
+    },
+]
+```
+
+```python
+# Create LangChain Documents
+
+documents_langchain = []
+
+for doc in documents_json_list:
+    metadata = {"id": doc["id"], "link": doc["link"]}
+    doc_langchain = Document(page_content=doc["text"], metadata=metadata)
+    documents_langchain.append(doc_langchain)
+```
+
+### 다양한 거리 메트릭을 사용하여 Vector Store 생성
+
+먼저 각각 다른 거리 전략을 사용하는 세 개의 vector store를 생성합니다.
+
+(Db2 Database에 수동으로 연결하면 세 개의 테이블을 볼 수 있습니다:
+Documents_DOT, Documents_COSINE 및 Documents_EUCLIDEAN.)
+
+```python
+# Create Db2 Vector Stores using different distance strategies
+
+# When using our API calls, start by initializing your vector store with a subset of your documents
+# through from_documents(), then incrementally add more documents using add_texts().
+# This approach prevents system overload and ensures efficient document processing.
+
+model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
+
+vector_store_dot = DB2VS.from_documents(
+    documents_langchain,
+    model,
+    client=connection,
+    table_name="Documents_DOT",
+    distance_strategy=DistanceStrategy.DOT_PRODUCT,
+)
+vector_store_max = DB2VS.from_documents(
+    documents_langchain,
+    model,
+    client=connection,
+    table_name="Documents_COSINE",
+    distance_strategy=DistanceStrategy.COSINE,
+)
+vector_store_euclidean = DB2VS.from_documents(
+    documents_langchain,
+    model,
+    client=connection,
+    table_name="Documents_EUCLIDEAN",
+    distance_strategy=DistanceStrategy.EUCLIDEAN_DISTANCE,
+)
+```
+
+## Manage vector store
+
+### 기본 유사도 검색과 함께 텍스트에 대한 추가 및 삭제 작업 시연
+
+```python
+def manage_texts(vector_stores):
+    """
+    Adds texts to each vector store, demonstrates error handling for duplicate additions,
+    and performs deletion of texts. Showcases similarity searches and index creation for each vector store.
+
+    Args:
+    - vector_stores (list): A list of DB2VS instances.
+    """
+    texts = ["Rohan", "Shailendra"]
+    metadata = [
+        {"id": "100", "link": "Document Example Test 1"},
+        {"id": "101", "link": "Document Example Test 2"},
+    ]
+
+    for i, vs in enumerate(vector_stores, start=1):
+        # Adding texts
+        try:
+            vs.add_texts(texts, metadata)
+            print(f"\n\n\nAdd texts complete for vector store {i}\n\n\n")
+        except Exception as ex:
+            print(f"\n\n\nExpected error on duplicate add for vector store {i}\n\n\n")
+
+        # Deleting texts using the value of 'id'
+        vs.delete([metadata[0]["id"], metadata[1]["id"]])
+        print(f"\n\n\nDelete texts complete for vector store {i}\n\n\n")
+
+        # Similarity search
+        results = vs.similarity_search("How are LOBS stored in Db2 Database", 2)
+        print(f"\n\n\nSimilarity search results for vector store {i}: {results}\n\n\n")
+
+
+vector_store_list = [
+    vector_store_dot,
+    vector_store_max,
+    vector_store_euclidean,
+]
+manage_texts(vector_store_list)
+```
+
+## Query vector store
+
+### 속성 필터링을 사용하거나 사용하지 않고 vector store에 대한 고급 검색 시연
+
+필터링을 사용하면 문서 id 101만 선택하고 다른 것은 선택하지 않습니다
+
+```python
+# Conduct advanced searches
+def conduct_advanced_searches(vector_stores):
+    query = "How are LOBS stored in Db2 Database"
+    # Constructing a filter for direct comparison against document metadata
+    # This filter aims to include documents whose metadata 'id' is exactly '101'
+    filter_criteria = {"id": ["101"]}  # Direct comparison filter
+
+    for i, vs in enumerate(vector_stores, start=1):
+        print(f"\n--- Vector Store {i} Advanced Searches ---")
+        # Similarity search without a filter
+        print("\nSimilarity search results without filter:")
+        print(vs.similarity_search(query, 2))
+
+        # Similarity search with a filter
+        print("\nSimilarity search results with filter:")
+        print(vs.similarity_search(query, 2, filter=filter_criteria))
+
+        # Similarity search with relevance score
+        print("\nSimilarity search with relevance score:")
+        print(vs.similarity_search_with_score(query, 2))
+
+        # Similarity search with relevance score with filter
+        print("\nSimilarity search with relevance score with filter:")
+        print(vs.similarity_search_with_score(query, 2, filter=filter_criteria))
+
+        # Max marginal relevance search
+        print("\nMax marginal relevance search results:")
+        print(vs.max_marginal_relevance_search(query, 2, fetch_k=20, lambda_mult=0.5))
+
+        # Max marginal relevance search with filter
+        print("\nMax marginal relevance search results with filter:")
+        print(
+            vs.max_marginal_relevance_search(
+                query, 2, fetch_k=20, lambda_mult=0.5, filter=filter_criteria
+            )
+        )
+
+
+conduct_advanced_searches(vector_store_list)
+```
+
+## Usage for retrieval-augmented generation
+
+## API reference

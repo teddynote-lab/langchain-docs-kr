@@ -1,0 +1,200 @@
+---
+title: PredictionGuardEmbeddings
+---
+
+>[Prediction Guard](https://predictionguard.com)는 민감한 데이터를 보호하고, 일반적인 AI 오작동을 방지하며, 저렴한 하드웨어에서 실행되는 안전하고 확장 가능한 GenAI 플랫폼입니다.
+
+## Overview
+
+### Integration details
+
+이 integration은 LangChain과 함께 Prediction Guard embeddings integration을 사용하는 방법을 보여줍니다. 이 integration은 텍스트와 이미지를 개별적으로 또는 매칭된 쌍으로 함께 지원합니다.
+
+## Setup
+
+Prediction Guard 모델에 액세스하려면 [여기](https://predictionguard.com/get-started)에서 문의하여 Prediction Guard API key를 받고 시작하세요.
+
+### Credentials
+
+key를 받으면 다음과 같이 설정할 수 있습니다
+
+```python
+import os
+
+os.environ["PREDICTIONGUARD_API_KEY"] = "<Prediction Guard API Key"
+```
+
+### Installation
+
+```python
+pip install -qU langchain-predictionguard
+```
+
+## Instantiation
+
+먼저 Prediction Guard와 LangChain 패키지를 설치합니다. 그런 다음 필요한 환경 변수를 설정하고 패키지 import를 설정합니다.
+
+```python
+from langchain_predictionguard import PredictionGuardEmbeddings
+```
+
+```python
+embeddings = PredictionGuardEmbeddings(model="bridgetower-large-itm-mlm-itc")
+```
+
+Prediction Guard embeddings 생성은 텍스트와 이미지를 모두 지원합니다. 이 integration은 다양한 함수에 걸쳐 해당 지원을 포함합니다.
+
+## Indexing and Retrieval
+
+```python
+# Create a vector store with a sample text
+from langchain_core.vectorstores import InMemoryVectorStore
+
+text = "LangChain is the framework for building context-aware reasoning applications."
+
+vectorstore = InMemoryVectorStore.from_texts(
+    [text],
+    embedding=embeddings,
+)
+
+# Use the vectorstore as a retriever
+retriever = vectorstore.as_retriever()
+
+# Retrieve the most similar text
+retrieved_documents = retriever.invoke("What is LangChain?")
+
+# Show the retrieved document's content
+retrieved_documents[0].page_content
+```
+
+```output
+'LangChain is the framework for building context-aware reasoning applications.'
+```
+
+## Direct Usage
+
+vectorstore와 retriever 구현은 `embeddings.embed_documents(...)`와 `embeddings.embed_query(...)`를 호출하여 `from_texts` 및 retrieval `invoke` 작업에 사용되는 텍스트로부터 embeddings를 생성합니다.
+
+이러한 메서드는 다음 명령으로 직접 호출할 수 있습니다.
+
+### Embed single texts
+
+```python
+# Embedding a single string
+text = "This is an embedding example."
+single_vector = embeddings.embed_query(text)
+
+single_vector[:5]
+```
+
+```output
+[0.01456777285784483,
+ -0.08131945133209229,
+ -0.013045587576925755,
+ -0.09488929063081741,
+ -0.003087474964559078]
+```
+
+### Embed multiple texts
+
+```python
+# Embedding multiple strings
+docs = [
+    "This is an embedding example.",
+    "This is another embedding example.",
+]
+
+two_vectors = embeddings.embed_documents(docs)
+
+for vector in two_vectors:
+    print(vector[:5])
+```
+
+```output
+[0.01456777285784483, -0.08131945133209229, -0.013045587576925755, -0.09488929063081741, -0.003087474964559078]
+[-0.0015021917643025517, -0.08883760124444962, -0.0025286630261689425, -0.1052245944738388, 0.014225339516997337]
+```
+
+### Embed single images
+
+```python
+# Embedding a single image. These functions accept image URLs, image files, data URIs, and base64 encoded strings.
+image = [
+    "https://farm4.staticflickr.com/3300/3497460990_11dfb95dd1_z.jpg",
+]
+single_vector = embeddings.embed_images(image)
+
+print(single_vector[0][:5])
+```
+
+```output
+[0.0911610797047615, -0.034427884966135025, 0.007927080616354942, -0.03500846028327942, 0.022317267954349518]
+```
+
+### Embed multiple images
+
+```python
+# Embedding multiple images
+images = [
+    "https://fastly.picsum.photos/id/866/200/300.jpg?hmac=rcadCENKh4rD6MAp6V_ma-AyWv641M4iiOpe1RyFHeI",
+    "https://farm4.staticflickr.com/3300/3497460990_11dfb95dd1_z.jpg",
+]
+
+two_vectors = embeddings.embed_images(images)
+
+for vector in two_vectors:
+    print(vector[:5])
+```
+
+```output
+[0.1593627631664276, -0.03636132553219795, -0.013229663483798504, -0.08789524435997009, 0.062290553003549576]
+[0.0911610797047615, -0.034427884966135025, 0.007927080616354942, -0.03500846028327942, 0.022317267954349518]
+```
+
+### Embed single text-image pairs
+
+```python
+# Embedding a single text-image pair
+inputs = [
+    {
+        "text": "This is an embedding example.",
+        "image": "https://farm4.staticflickr.com/3300/3497460990_11dfb95dd1_z.jpg",
+    },
+]
+single_vector = embeddings.embed_image_text(inputs)
+
+print(single_vector[0][:5])
+```
+
+```output
+[0.0363212488591671, -0.10172265768051147, -0.014760786667466164, -0.046511903405189514, 0.03860781341791153]
+```
+
+### Embed multiple text-image pairs
+
+```python
+# Embedding multiple text-image pairs
+inputs = [
+    {
+        "text": "This is an embedding example.",
+        "image": "https://fastly.picsum.photos/id/866/200/300.jpg?hmac=rcadCENKh4rD6MAp6V_ma-AyWv641M4iiOpe1RyFHeI",
+    },
+    {
+        "text": "This is another embedding example.",
+        "image": "https://farm4.staticflickr.com/3300/3497460990_11dfb95dd1_z.jpg",
+    },
+]
+two_vectors = embeddings.embed_image_text(inputs)
+
+for vector in two_vectors:
+    print(vector[:5])
+```
+
+```output
+[0.11867266893386841, -0.05898813530802727, -0.026179173961281776, -0.10747235268354416, 0.07684746384620667]
+[0.026654226705431938, -0.10080841928720474, -0.012732953764498234, -0.04365091398358345, 0.036743905395269394]
+```
+
+## API reference
+
+모든 PredictionGuardEmbeddings 기능 및 구성에 대한 자세한 문서는 API reference를 확인하세요: [python.langchain.com/api_reference/community/embeddings/langchain_community.embeddings.predictionguard.PredictionGuardEmbeddings.html](https://python.langchain.com/api_reference/community/embeddings/langchain_community.embeddings.predictionguard.PredictionGuardEmbeddings.html)

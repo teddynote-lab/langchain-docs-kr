@@ -1,0 +1,154 @@
+---
+title: LLM-as-a-judge evaluator 정의하는 방법
+sidebarTitle: LLM-as-a-judge evaluator
+---
+
+<Info>
+* [LLM-as-a-judge evaluator](/langsmith/evaluation-concepts#llm-as-judge)
+</Info>
+
+LLM 애플리케이션은 단일한 정답이 없는 대화형 텍스트를 생성하는 경우가 많아 평가하기 어려울 수 있습니다.
+
+이 가이드는 LangSmith SDK 또는 UI를 사용하여 [오프라인 평가](/langsmith/evaluation-concepts#offline-evaluation)를 위한 LLM-as-a-judge evaluator를 정의하는 방법을 보여줍니다. 참고: 프로덕션 trace에서 실시간으로 평가를 실행하려면 [온라인 평가 설정](/langsmith/online-evaluations#configure-llm-as-judge-evaluators)을 참조하세요.
+
+## SDK
+
+### 사전 구축된 evaluator
+
+사전 구축된 evaluator는 평가를 설정할 때 유용한 시작점입니다. LangSmith에서 사전 구축된 evaluator를 사용하는 방법은 [사전 구축된 evaluator](/langsmith/prebuilt-evaluators)를 참조하세요.
+
+### 자체 LLM-as-a-judge evaluator 생성
+
+evaluator 로직을 완전히 제어하려면 자체 LLM-as-a-judge evaluator를 생성하고 LangSmith SDK([Python](https://docs.smith.langchain.com/reference/python/reference) / [TypeScript](https://docs.smith.langchain.com/reference/js))를 사용하여 실행하세요.
+
+`langsmith>=0.2.0` 필요
+
+```python
+from langsmith import evaluate, traceable, wrappers, Client
+from openai import OpenAI
+# Assumes you've installed pydantic
+from pydantic import BaseModel
+
+# Optionally wrap the OpenAI client to trace all model calls.
+oai_client = wrappers.wrap_openai(OpenAI())
+
+def valid_reasoning(inputs: dict, outputs: dict) -> bool:
+    """Use an LLM to judge if the reasoning and the answer are consistent."""
+    instructions = """
+Given the following question, answer, and reasoning, determine if the reasoning
+for the answer is logically valid and consistent with the question and the answer."""
+
+    class Response(BaseModel):
+        reasoning_is_valid: bool
+
+    msg = f"Question: {inputs['question']}\nAnswer: {outputs['answer']}\nReasoning: {outputs['reasoning']}"
+    response = oai_client.beta.chat.completions.parse(
+        model="gpt-4o",
+        messages=[{"role": "system", "content": instructions,}, {"role": "user", "content": msg}],
+        response_format=Response
+    )
+    return response.choices[0].message.parsed.reasoning_is_valid
+
+# Optionally add the 'traceable' decorator to trace the inputs/outputs of this function.
+@traceable
+def dummy_app(inputs: dict) -> dict:
+    return {"answer": "hmm i'm not sure", "reasoning": "i didn't understand the question"}
+
+ls_client = Client()
+dataset = ls_client.create_dataset("big questions")
+examples = [
+    {"inputs": {"question": "how will the universe end"}},
+    {"inputs": {"question": "are we alone"}},
+]
+ls_client.create_examples(dataset_id=dataset.id, examples=examples)
+
+results = evaluate(
+    dummy_app,
+    data=dataset,
+    evaluators=[valid_reasoning]
+)
+```
+
+커스텀 evaluator 작성 방법에 대한 자세한 내용은 [여기](/langsmith/code-evaluator)를 참조하세요.
+
+## UI
+
+### 사전 구축된 evaluator
+
+사전 구축된 evaluator는 평가를 설정할 때 유용한 시작점입니다. LangSmith UI는 다음과 같은 사전 구축된 evaluator를 지원합니다:
+
+* **Hallucination**: 사실적으로 잘못된 출력을 감지합니다. reference output이 필요합니다.
+* **Correctness**: reference와의 의미적 유사성을 확인합니다.
+* **Conciseness**: 답변이 질문에 대한 간결한 응답인지 평가합니다.
+* **Code checker**: 코드 답변의 정확성을 검증합니다.
+
+다음과 같은 경우에 이러한 evaluator를 구성할 수 있습니다:
+
+* [playground](/langsmith/observability-concepts#prompt-playground)를 사용하여 평가를 실행할 때
+* dataset의 일부로 [실험에서 자동으로 평가를 실행](/langsmith/bind-evaluator-to-dataset)할 때
+* [온라인 평가](/langsmith/online-evaluations#configure-llm-as-judge-evaluators)를 실행할 때
+
+## LLM-as-a-judge evaluator 커스터마이즈
+
+LLM-as-a-judge evaluator prompt에 대한 구체적인 지침을 추가하고 input/output/reference output의 어느 부분을 evaluator에 전달할지 구성하세요.
+
+{/* ![playground-evaluator.gif](/langsmith/images/playground-evaluator.gif) */}
+
+### Evaluator 선택/생성
+
+* playground 또는 dataset에서: **+Evaluator** 버튼을 선택합니다
+* tracing project에서: **Add rules**를 선택하고 rule을 구성한 다음 **Apply evaluator**를 선택합니다
+
+**Create your own evaluator option**을 선택합니다. 또는 사전 구축된 evaluator를 선택하여 편집할 수도 있습니다.
+
+### Evaluator 구성
+
+#### Prompt
+
+새 prompt를 생성하거나 [prompt hub](/langsmith/prompt-engineering-quickstart)에서 기존 prompt를 선택합니다.
+
+* **Create your own prompt**: 인라인으로 커스텀 prompt를 생성합니다.
+
+* **Pull a prompt from the prompt hub**: **Select a prompt** 드롭다운을 사용하여 기존 prompt에서 선택합니다. prompt editor 내에서 이러한 prompt를 직접 편집할 수는 없지만 prompt와 사용하는 schema를 볼 수 있습니다. 변경하려면 playground에서 prompt를 편집하고 버전을 commit한 다음 evaluator에서 새 prompt를 가져오세요.
+
+#### Model
+
+제공된 옵션에서 원하는 model을 선택합니다.
+
+#### Mapping variables
+
+variable mapping을 사용하여 run 또는 example에서 evaluator prompt로 전달되는 variable을 지정합니다. variable mapping을 돕기 위해 참조용 example(또는 run)이 제공됩니다. prompt의 variable을 클릭하고 드롭다운을 사용하여 input, output 또는 reference output의 관련 부분에 매핑하세요.
+
+prompt variable을 추가하려면 mustache 형식(기본값)을 사용하는 경우 이중 중괄호 `{{prompt_var}}`로, f-string 형식을 사용하는 경우 단일 중괄호 `{prompt_var}`로 variable을 입력하세요.
+
+필요에 따라 variable을 제거할 수 있습니다. 예를 들어 간결성과 같은 metric을 평가하는 경우 일반적으로 reference output이 필요하지 않으므로 해당 variable을 제거할 수 있습니다.
+
+#### Preview
+
+prompt를 미리 보면 오른쪽에 표시된 reference run 및 dataset example을 사용하여 형식화된 prompt가 어떻게 보일지 확인할 수 있습니다.
+
+#### Few-shot example로 evaluator 개선
+
+LLM-as-a-judge evaluator를 인간의 선호도에 더 잘 맞추기 위해 LangSmith는 evaluator 점수에 대한 [인간 수정](/langsmith/create-few-shot-evaluators#make-corrections)을 수집할 수 있습니다. 이 선택이 활성화되면 수정 사항이 자동으로 few-shot example로 prompt에 삽입됩니다.
+
+[few-shot example 설정 및 수정 방법](/langsmith/create-few-shot-evaluators)을 알아보세요.
+
+#### Feedback configuration
+
+Feedback configuration은 LLM-as-a-judge evaluator가 사용할 채점 기준입니다. 이것을 evaluator가 기반으로 평가할 루브릭으로 생각하세요. 점수는 run 또는 example에 [feedback](/langsmith/observability-concepts#feedback)으로 추가됩니다. evaluator에 대한 feedback 정의:
+
+1. **Name the feedback key**: 평가 결과를 볼 때 표시될 이름입니다. 이름은 실험 전체에서 고유해야 합니다.
+
+2. **Add a description**: feedback이 나타내는 내용을 설명합니다.
+
+3. **Choose a feedback type**:
+
+* **Boolean**: True/false feedback.
+* **Categorical**: 미리 정의된 카테고리에서 선택합니다.
+* **Continuous**: 지정된 범위 내의 숫자 점수.
+
+내부적으로 feedback configuration은 LLM-as-a-judge prompt에 [structured output](https://python.langchain.com/docs/concepts/structured_outputs/)으로 추가됩니다. hub의 기존 prompt를 사용하는 경우 evaluator를 구성하기 전에 prompt에 output schema를 추가해야 합니다. output schema의 각 최상위 key는 별도의 feedback으로 처리됩니다.
+
+### Evaluator 저장
+
+구성을 완료한 후 변경 사항을 저장합니다.

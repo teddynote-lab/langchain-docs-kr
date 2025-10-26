@@ -1,0 +1,42 @@
+---
+title: Bright Data
+---
+
+[Bright Data](https://brightdata.com)는 웹 스크래핑, SERP 수집 및 지역 제한 콘텐츠 액세스를 위한 도구를 제공하는 웹 데이터 플랫폼입니다.
+
+Bright Data를 사용하면 개발자는 웹사이트에서 구조화된 데이터를 추출하고, 검색 엔진 쿼리를 수행하며, 차단되거나 지역 제한이 있는 콘텐츠에 액세스할 수 있습니다. 이 플랫폼은 안티봇 시스템, CAPTCHA, IP 차단을 포함한 일반적인 웹 스크래핑 문제를 극복하는 데 도움을 주도록 설계되었습니다.
+
+## Installation and Setup
+
+<CodeGroup>
+```bash pip
+pip install langchain-brightdata
+```
+
+```bash uv
+uv add langchain-brightdata
+```
+</CodeGroup>
+
+Bright Data API key를 설정해야 합니다:
+
+```python
+import os
+os.environ["BRIGHT_DATA_API_KEY"] = "your-api-key"
+```
+
+또는 tool을 초기화할 때 직접 전달할 수 있습니다:
+
+```python
+from langchain_bright_data import BrightDataSERP
+
+tool = BrightDataSERP(bright_data_api_key="your-api-key")
+```
+
+## Tools
+
+Bright Data integration은 여러 tool을 제공합니다:
+
+- [BrightDataSERP](/oss/integrations/tools/brightdata_serp) - 지역 타겟팅을 통한 검색 엔진 결과 수집
+- [BrightDataUnblocker](/oss/integrations/tools/brightdata_unlocker) - 지역 제한이 있거나 봇 차단된 모든 공개 웹사이트에 액세스
+- [BrightDataWebScraperAPI](/oss/integrations/tools/brightdata-webscraperapi) - Amazon 제품 상세 정보 및 LinkedIn 프로필과 같은 100개 이상의 인기 도메인에서 구조화된 데이터 추출

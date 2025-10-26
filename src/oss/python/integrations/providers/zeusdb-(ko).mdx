@@ -1,0 +1,612 @@
+---
+title: ZeusDB
+---
+
+>[ZeusDB](https://www.zeusdb.com)는 Rust로 구동되는 고성능 vector database로, product quantization, 영구 저장소, 엔터프라이즈급 로깅과 같은 고급 기능을 제공합니다.
+
+이 문서는 ZeusDB를 사용하여 LangChain 애플리케이션에 엔터프라이즈급 vector 검색 기능을 제공하는 방법을 보여줍니다.
+
+## Quick Start
+
+### Installation
+
+<CodeGroup>
+```bash pip
+pip install langchain-zeusdb
+```
+
+```bash uv
+uv add langchain-zeusdb
+```
+
+</CodeGroup>
+
+### Getting Started
+
+이 예제는 *OpenAIEmbeddings*를 사용하며, OpenAI API key가 필요합니다 - [여기에서 OpenAI API key를 받으세요](https://platform.openai.com/api-keys)
+
+원하신다면 다른 embedding provider(Hugging Face, Cohere, custom functions 등)와 함께 이 패키지를 사용할 수도 있습니다.
+
+```bash
+pip install langchain-openai
+```
+
+```python
+import os
+import getpass
+
+os.environ['OPENAI_API_KEY'] = getpass.getpass('OpenAI API Key:')
+```
+
+### Basic Usage
+
+```python
+from langchain_zeusdb import ZeusDBVectorStore
+from langchain_openai import OpenAIEmbeddings
+from zeusdb import VectorDatabase
+
+# Initialize embeddings
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+
+# Create ZeusDB index
+vdb = VectorDatabase()
+index = vdb.create(
+    index_type="hnsw",
+    dim=1536,
+    space="cosine"
+)
+
+# Create vector store
+vector_store = ZeusDBVectorStore(
+    zeusdb_index=index,
+    embedding=embeddings
+)
+
+# Add documents
+from langchain_core.documents import Document
+
+docs = [
+    Document(page_content="ZeusDB is fast", metadata={"source": "docs"}),
+    Document(page_content="LangChain is powerful", metadata={"source": "docs"}),
+]
+
+vector_store.add_documents(docs)
+
+# Search
+results = vector_store.similarity_search("fast database", k=2)
+print(f"Found the following {len(results)} results:")
+print(results)
+```
+
+**예상 결과:**
+
+```text
+Found the following 2 results:
+[Document(id='ea2b4f13-b0b7-4cef-bb91-0fc4f4c41295', metadata={'source': 'docs'}, page_content='ZeusDB is fast'), Document(id='33dc1e87-a18a-4827-a0df-6ee47eabc7b2', metadata={'source': 'docs'}, page_content='LangChain is powerful')]
+```
+
+<br />
+
+### Factory Methods
+
+편의를 위해 한 단계로 vector store를 생성하고 채울 수 있습니다:
+
+#### Example 1: 텍스트로부터 생성 (한 단계로 index를 생성하고 텍스트를 추가)
+
+```python
+vector_store_texts = ZeusDBVectorStore.from_texts(
+    texts=["Hello world", "Goodbye world"],
+    embedding=embeddings,
+    metadatas=[{"source": "text1"}, {"source": "text2"}]
+)
+
+print("texts store count:", vector_store_texts.get_vector_count())         # -> 2
+print("texts store peek:", vector_store_texts.zeusdb_index.list(2))        # [('id1', {...}), ('id2', {...})]
+
+# Search the texts-based store
+results = vector_store_texts.similarity_search("Hello", k=1)
+print(f"Found in texts store: {results[0].page_content}")                  # -> "Hello world"
+```
+
+**예상 결과:**
+
+```text
+texts store count: 2
+texts store peek: [('e9c39b44-b610-4e00-91f3-bf652e9989ac', {'source': 'text1', 'text': 'Hello world'}), ('d33f210c-ed53-4006-a64a-a9eee397fec9', {'source': 'text2', 'text': 'Goodbye world'})]
+Found in texts store: Hello world
+```
+
+<br />
+
+#### Example 2: - 문서로부터 생성 (한 단계로 index를 생성하고 문서를 추가)
+
+```python
+new_docs = [
+    Document(page_content="Python is great", metadata={"source": "python"}),
+    Document(page_content="JavaScript is flexible", metadata={"source": "js"}),
+]
+
+vector_store_docs = ZeusDBVectorStore.from_documents(
+    documents=new_docs,
+    embedding=embeddings
+)
+
+print("docs store count:", vector_store_docs.get_vector_count())           # -> 2
+print("docs store peek:", vector_store_docs.zeusdb_index.list(2))          # [('id3', {...}), ('id4', {...})]
+
+# Search the documents-based store
+results = vector_store_docs.similarity_search("Python", k=1)
+print(f"Found in docs store: {results[0].page_content}")                   # -> "Python is great"
+```
+
+**예상 결과:**
+
+```text
+docs store count: 2
+docs store peek: [('aab2d1c1-7e02-4817-8dd8-6fb03570bb6f', {'text': 'Python is great', 'source': 'python'}), ('9a8a82cb-0e70-456c-9db2-556e464de14e', {'text': 'JavaScript is flexible', 'source': 'js'})]
+Found in docs store: Python is great
+```
+
+<br />
+
+## Advanced Features
+
+ZeusDB의 엔터프라이즈급 기능은 LangChain 생태계에 완전히 통합되어 quantization, persistence, 고급 검색 기능 및 기타 여러 엔터프라이즈 기능을 제공합니다.
+
+### Memory-Efficient Setup with Quantization
+
+대규모 데이터셋의 경우 Product Quantization을 사용하여 메모리 사용량을 줄일 수 있습니다:
+
+```python
+# Create quantized index for memory efficiency
+quantization_config = {
+    'type': 'pq',
+    'subvectors': 8,
+    'bits': 8,
+    'training_size': 10000
+}
+
+vdb = VectorDatabase()
+index = vdb.create(
+    index_type="hnsw",
+    dim=1536,
+    space="cosine",
+    quantization_config=quantization_config
+)
+
+vector_store = ZeusDBVectorStore(
+    zeusdb_index=index,
+    embedding=embeddings
+)
+```
+
+quantization 설정을 위한 유용한 구성 가이드라인과 권장 사항은 [문서](https://docs.zeusdb.com/en/latest/vector_database/product_quantization.html)를 참조하세요.
+
+<br />
+
+### Persistence
+
+ZeusDB persistence를 사용하면 완전히 채워진 index를 디스크에 저장하고 나중에 완전한 상태 복원과 함께 로드할 수 있습니다. 여기에는 vector, metadata, HNSW graph 및 (활성화된 경우) Product Quantization model이 포함됩니다.
+
+저장되는 내용:
+
+- Vector & ID
+- Metadata
+- HNSW graph 구조
+- Quantization config, centroid 및 training 상태 (PQ가 활성화된 경우)
+
+#### vector store 저장 방법
+
+```python
+# Save index
+vector_store.save_index("my_index.zdb")
+```
+
+#### vector store 로드 방법
+
+```python
+# Load index
+loaded_store = ZeusDBVectorStore.load_index(
+    path="my_index.zdb",
+    embedding=embeddings
+)
+
+# Verify after load
+print("vector count:", loaded_store.get_vector_count())
+print("index info:", loaded_store.info())
+print("store peek:", loaded_store.zeusdb_index.list(2))
+```
+
+#### Notes
+
+- path는 단일 파일이 아닌 디렉토리입니다. 대상이 쓰기 가능한지 확인하세요.
+- 저장된 index는 크로스 플랫폼이며 호환성 확인을 위한 format/version 정보를 포함합니다.
+- PQ를 사용한 경우 압축 model과 상태가 모두 보존되므로 로드 후 재학습이 필요하지 않습니다.
+- loaded_store에서 모든 vector store API(similarity_search, retriever 등)를 계속 사용할 수 있습니다.
+
+자세한 내용(파일 구조 및 포괄적인 예제 포함)은 [문서](https://docs.zeusdb.com/en/latest/vector_database/persistence.html)를 참조하세요.
+
+<br />
+
+### Advanced Search Options
+
+검색을 위한 scoring, diversity, metadata filtering 및 retriever 통합을 제어하려면 다음을 사용하세요.
+
+#### Similarity search with scores
+
+ZeusDB에서 `(Document, raw_distance)` 쌍을 반환합니다 — **낮은 distance = 더 유사함**.
+`[0, 1]` 범위의 정규화된 relevance를 선호하는 경우 `similarity_search_with_relevance_scores`를 사용하세요.
+
+```python
+# Similarity search with scores
+results_with_scores = vector_store.similarity_search_with_score(
+    query="machine learning",
+    k=5
+)
+
+print(results_with_scores)
+```
+
+**예상 결과:**
+
+```text
+[
+  (Document(id='ac0eaf5b-9f02-4ce2-8957-c369a7262c61', metadata={'source': 'docs'}, page_content='LangChain is powerful'), 0.8218843340873718),
+  (Document(id='faae3adf-7cf3-463c-b282-3790b096fa23', metadata={'source': 'docs'}, page_content='ZeusDB is fast'), 0.9140053391456604)
+]
+```
+
+#### MMR search for diversity
+
+MMR(Maximal Marginal Relevance)은 두 가지 요소의 균형을 맞춥니다: 쿼리와의 관련성과 선택된 결과 간의 다양성으로, 거의 중복된 답변을 줄입니다. lambda_mult로 균형을 제어합니다(1.0 = 모든 관련성, 0.0 = 모든 다양성).
+
+```python
+# MMR search for diversity
+mmr_results = vector_store.max_marginal_relevance_search(
+    query="AI applications",
+    k=5,
+    fetch_k=20,
+    lambda_mult=0.7  # Balance relevance vs diversity
+)
+
+print(mmr_results)
+```
+
+#### Search with metadata filtering
+
+문서를 추가할 때 저장한 document metadata를 사용하여 결과를 필터링합니다
+
+```python
+# Search with metadata filtering
+results = vector_store.similarity_search(
+    query="database performance",
+    k=3,
+    filter={"source": "documentation"}
+)
+```
+
+지원되는 metadata query 유형 및 연산자는 [문서](https://docs.zeusdb.com/en/latest/vector_database/metadata_filtering.html)를 참조하세요.
+
+#### As a Retriever
+
+vector store를 retriever로 전환하면 chain(예: RetrievalQA)이 context를 가져오기 위해 호출할 수 있는 표준 LangChain interface를 제공합니다. 내부적으로 선택한 검색 유형(similarity 또는 mmr)과 search_kwargs를 사용합니다.
+
+```python
+# Convert to retriever for use in chains
+retriever = vector_store.as_retriever(
+    search_type="mmr",
+    search_kwargs={"k": 3, "lambda_mult": 0.8}
+)
+
+# Use with LangChain Expression Language (LCEL) - requires only langchain-core
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
+from langchain_openai import ChatOpenAI
+
+def format_docs(docs):
+    return "\n\n".join([d.page_content for d in docs])
+
+template = """Answer the question based only on the following context:
+{context}
+
+Question: {question}
+"""
+
+prompt = ChatPromptTemplate.from_template(template)
+llm = ChatOpenAI()
+
+# Create a chain using LCEL
+chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+# Use the chain
+answer = chain.invoke("What is ZeusDB?")
+print(answer)
+```
+
+**예상 결과:**
+
+```text
+ZeusDB is a fast database management system.
+```
+
+<br />
+
+## Async Support
+
+ZeusDB는 non-blocking, 동시 vector 작업을 위한 비동기 작업을 지원합니다.
+
+**async를 사용해야 하는 경우:** web server(FastAPI/Starlette), 병렬 검색을 수행하는 agent/pipeline, 또는 non-blocking/동시 검색을 원하는 notebook. 간단한 스크립트를 작성하는 경우 동기 메서드로 충분합니다.
+
+이것들은 **비동기 작업**입니다 - 일반 동기 메서드의 async/await 버전입니다. 각각의 기능은 다음과 같습니다:
+
+1. `await vector_store.aadd_documents(documents)` - vector store에 문서를 비동기적으로 추가합니다 (`add_documents()`의 async 버전)
+2. `await vector_store.asimilarity_search("query", k=5)` - similarity 검색을 비동기적으로 수행합니다 (`similarity_search()`의 async 버전)
+3. `await vector_store.adelete(ids=["doc1", "doc2"])` - ID로 문서를 비동기적으로 삭제합니다 (`delete()`의 async 버전)
+
+async 버전은 다음과 같은 경우에 유용합니다:
+
+- async 애플리케이션을 구축하는 경우 (`asyncio`, FastAPI 등 사용)
+- 동시에 실행할 수 있는 non-blocking 작업을 원하는 경우
+- 여러 요청을 동시에 처리하는 경우
+- I/O-bound 애플리케이션에서 더 나은 성능을 원하는 경우
+
+예를 들어, 문서를 추가하는 동안 blocking하는 대신:
+
+```python
+# Synchronous (blocking)
+vector_store.add_documents(docs)  # Blocks until complete
+
+# Asynchronous (non-blocking)
+await vector_store.aadd_documents(docs)  # Can do other work while this runs
+```
+
+모든 작업은 async/await를 지원합니다:
+
+**Script 버전 (`python my_script.py`):**
+
+```python
+import asyncio
+from langchain_zeusdb import ZeusDBVectorStore
+from langchain_openai import OpenAIEmbeddings
+from langchain_core.documents import Document
+from zeusdb import VectorDatabase
+
+# Setup
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+vdb = VectorDatabase()
+index = vdb.create(index_type="hnsw", dim=1536, space="cosine")
+vector_store = ZeusDBVectorStore(zeusdb_index=index, embedding=embeddings)
+
+docs = [
+    Document(page_content="ZeusDB is fast", metadata={"source": "docs"}),
+    Document(page_content="LangChain is powerful", metadata={"source": "docs"}),
+]
+
+async def main():
+    # Add documents asynchronously
+    ids = await vector_store.aadd_documents(docs)
+    print("Added IDs:", ids)
+
+    # Run multiple searches concurrently
+    results_fast, results_powerful = await asyncio.gather(
+        vector_store.asimilarity_search("fast", k=2),
+        vector_store.asimilarity_search("powerful", k=2),
+    )
+    print("Fast results:", [d.page_content for d in results_fast])
+    print("Powerful results:", [d.page_content for d in results_powerful])
+
+    # Delete documents asynchronously
+    deleted = await vector_store.adelete(ids=ids[:1])
+    print("Deleted first doc:", deleted)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+**Colab/Notebook/Jupyter 버전 (top-level `await`):**
+
+```python
+from langchain_zeusdb import ZeusDBVectorStore
+from langchain_openai import OpenAIEmbeddings
+from langchain_core.documents import Document
+from zeusdb import VectorDatabase
+import asyncio
+
+# Setup
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+vdb = VectorDatabase()
+index = vdb.create(index_type="hnsw", dim=1536, space="cosine")
+vector_store = ZeusDBVectorStore(zeusdb_index=index, embedding=embeddings)
+
+docs = [
+    Document(page_content="ZeusDB is fast", metadata={"source": "docs"}),
+    Document(page_content="LangChain is powerful", metadata={"source": "docs"}),
+]
+
+# Add documents asynchronously
+ids = await vector_store.aadd_documents(docs)
+print("Added IDs:", ids)
+
+# Run multiple searches concurrently
+results_fast, results_powerful = await asyncio.gather(
+    vector_store.asimilarity_search("fast", k=2),
+    vector_store.asimilarity_search("powerful", k=2),
+)
+print("Fast results:", [d.page_content for d in results_fast])
+print("Powerful results:", [d.page_content for d in results_powerful])
+
+# Delete documents asynchronously
+deleted = await vector_store.adelete(ids=ids[:1])
+print("Deleted first doc:", deleted)
+```
+
+**예상 결과:**
+
+```text
+Added IDs: ['9c440918-715f-49ba-9b97-0d991d29e997', 'ad59c645-d3ba-4a4a-a016-49ed39514123']
+Fast results: ['ZeusDB is fast', 'LangChain is powerful']
+Powerful results: ['LangChain is powerful', 'ZeusDB is fast']
+Deleted first doc: True
+```
+
+<br />
+
+## Monitoring and Observability
+
+### Performance Monitoring
+
+```python
+# Get index statistics
+stats = vector_store.get_zeusdb_stats()
+print(f"Index size: {stats.get('total_vectors', '0')} vectors")
+print(f"Dimension: {stats.get('dimension')} | Space: {stats.get('space')} | Index type: {stats.get('index_type')}")
+
+# Benchmark search performance
+performance = vector_store.benchmark_search_performance(
+    query_count=100,
+    max_threads=4
+)
+print(f"Search QPS: {performance.get('parallel_qps', 0):.0f}")
+
+# Check quantization status
+if vector_store.is_quantized():
+    progress = vector_store.get_training_progress()
+    print(f"Quantization training: {progress:.1f}% complete")
+else:
+    print("Index is not quantized")
+```
+
+**예상 결과:**
+
+```text
+Index size: 2 vectors
+Dimension: 1536 | Space: cosine | Index type: HNSW
+Search QPS: 53807
+Index is not quantized
+```
+
+### Enterprise Logging
+
+ZeusDB는 스마트 환경 감지와 함께 자동으로 작동하는 엔터프라이즈급 구조화된 로깅을 포함합니다:
+
+```python
+import logging
+
+# ZeusDB automatically detects your environment and applies appropriate logging:
+# - Development: Human-readable logs, WARNING level
+# - Production: JSON structured logs, ERROR level
+# - Testing: Minimal output, CRITICAL level
+# - Jupyter: Clean readable logs, INFO level
+
+# Operations are automatically logged with performance metrics
+vector_store.add_documents(docs)
+# Logs: {"operation":"vector_addition","total_inserted":2,"duration_ms":45}
+
+# Control logging with environment variables if needed
+# ZEUSDB_LOG_LEVEL=debug ZEUSDB_LOG_FORMAT=json python your_app.py
+```
+
+ZeusDB의 엔터프라이즈 로깅 기능의 전체 기능에 대해 자세히 알아보려면 다음 [문서](https://docs.zeusdb.com/en/latest/vector_database/logging.html)를 읽어보세요.
+
+<br />
+
+## Configuration Options
+
+### Index Parameters
+
+```python
+vdb = VectorDatabase()
+index = vdb.create(
+    index_type="hnsw",           # Index algorithm
+    dim=1536,                    # Vector dimension
+    space="cosine",              # Distance metric: cosine, l2, l1
+    m=16,                        # HNSW connectivity
+    ef_construction=200,         # Build-time search width
+    expected_size=100000,        # Expected number of vectors
+    quantization_config=None     # Optional quantization
+)
+```
+
+### Search Parameters
+
+```python
+results = vector_store.similarity_search(
+    query="search query",
+    k=5,                         # Number of results
+    ef_search=None,              # Runtime search width (auto if None)
+    filter={"key": "value"}      # Metadata filter
+)
+```
+
+## Error Handling
+
+통합에는 포괄적인 오류 처리가 포함됩니다:
+
+```python
+try:
+    results = vector_store.similarity_search("query")
+    print(results)
+except Exception as e:
+    # Graceful degradation with logging
+    print(f"Search failed: {e}")
+    # Fallback logic here
+```
+
+## Requirements
+
+- **Python**: 3.10 이상
+- **ZeusDB**: 0.0.8 이상
+- **LangChain Core**: 0.3.74 이상
+
+## Installation from Source
+
+```bash
+git clone https://github.com/zeusdb/langchain-zeusdb.git
+cd langchain-zeusdb/libs/zeusdb
+pip install -e .
+```
+
+## Use Cases
+
+- **RAG Applications**: 질문 답변을 위한 고성능 검색
+- **Semantic Search**: 대규모 문서 컬렉션에서 빠른 유사도 검색
+- **Recommendation Systems**: Vector 기반 콘텐츠 및 협업 필터링
+- **Embeddings Analytics**: 고차원 embedding 공간 분석
+- **Real-time Applications**: 프로덕션 시스템을 위한 저지연 vector 검색
+
+## Compatibility
+
+### LangChain Versions
+
+- **LangChain Core**: 0.3.74+
+
+### Distance Metrics
+
+- **Cosine**: 기본값, 정규화된 유사도
+- **Euclidean (L2)**: 기하학적 거리
+- **Manhattan (L1)**: City-block 거리
+
+### Embedding Models
+
+모든 embedding provider와 호환됩니다:
+
+- OpenAI (`text-embedding-3-small`, `text-embedding-3-large`)
+- Hugging Face Transformers
+- Cohere Embeddings
+- Custom embedding function
+
+## Support
+
+- **Documentation**: [docs.zeusdb.com](https://docs.zeusdb.com)
+- **Issues**: [GitHub Issues](https://github.com/zeusdb/langchain-zeusdb/issues)
+- **Email**: [contact@zeusdb.com](mailto:contact@zeusdb.com)
+
+---
+
+*vector 검색을 빠르고, 확장 가능하며, 개발자 친화적으로 만듭니다.*

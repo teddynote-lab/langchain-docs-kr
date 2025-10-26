@@ -1,0 +1,74 @@
+```mdx
+---
+title: 로컬에서 평가 실행하는 방법 (Python 전용)
+sidebarTitle: 로컬에서 평가 실행하기 (Python)
+---
+
+때로는 LangSmith에 결과를 업로드하지 않고 로컬에서 평가를 실행하는 것이 유용할 수 있습니다. 예를 들어, 프롬프트를 빠르게 반복하면서 몇 가지 예제로 간단히 테스트하고 싶거나, target 및 evaluator function이 올바르게 정의되었는지 검증하는 경우, 이러한 평가를 기록하고 싶지 않을 수 있습니다.
+
+LangSmith Python SDK를 사용하고 `evaluate()` / `aevaluate()`에 `upload_results=False`를 전달하여 이를 수행할 수 있습니다.
+
+이렇게 하면 application과 evaluator가 항상 그렇듯이 정확히 실행되고 동일한 출력을 반환하지만, LangSmith에는 아무것도 기록되지 않습니다. 여기에는 실험 결과뿐만 아니라 application 및 evaluator trace도 포함됩니다.
+
+## 예제
+
+예제를 살펴보겠습니다:
+
+`langsmith>=0.2.0` 필요. 예제는 `pandas`도 사용합니다.
+
+```python
+from langsmith import Client
+
+# 1. Create and/or select your dataset
+ls_client = Client()
+dataset = ls_client.clone_public_dataset(
+    "https://smith.langchain.com/public/a63525f9-bdf2-4512-83e3-077dc9417f96/d"
+)
+
+# 2. Define an evaluator
+def is_concise(outputs: dict, reference_outputs: dict) -> bool:
+    return len(outputs["answer"]) < (3 * len(reference_outputs["answer"]))
+
+# 3. Define the interface to your app
+def chatbot(inputs: dict) -> dict:
+    return {"answer": inputs["question"] + " is a good question. I don't know the answer."}
+
+# 4. Run an evaluation
+experiment = ls_client.evaluate(
+    chatbot,
+    data=dataset,
+    evaluators=[is_concise],
+    experiment_prefix="my-first-experiment",
+    # 'upload_results' is the relevant arg.
+    upload_results=False
+)
+
+# 5. Analyze results locally
+results = list(experiment)
+
+# Check if 'is_concise' returned False.
+failed = [r for r in results if not r["evaluation_results"]["results"][0].score]
+
+# Explore the failed inputs and outputs.
+for r in failed:
+    print(r["example"].inputs)
+    print(r["run"].outputs)
+
+# Explore the results as a Pandas DataFrame.
+# Must have 'pandas' installed.
+df = experiment.to_pandas()
+df[["inputs.question", "outputs.answer", "reference.answer", "feedback.is_concise"]]
+```
+
+```python
+{'question': 'What is the largest mammal?'}
+{'answer': "What is the largest mammal? is a good question. I don't know the answer."}
+{'question': 'What do mammals and birds have in common?'}
+{'answer': "What do mammals and birds have in common? is a good question. I don't know the answer."}
+```
+
+|   | inputs.question                           | outputs.answer                                                                         | reference.answer           | feedback.is\_concise |
+| - | ----------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------- | -------------------- |
+| 0 | What is the largest mammal?               | What is the largest mammal? is a good question. I don't know the answer.               | The blue whale             | False                |
+| 1 | What do mammals and birds have in common? | What do mammals and birds have in common? is a good question. I don't know the answer. | They are both warm-blooded | False                |
+```

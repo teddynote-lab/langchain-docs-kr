@@ -1,0 +1,35 @@
+---
+title: Open AI Whisper Audio
+---
+
+<Tip>
+**호환성**
+
+Node.js에서만 사용 가능합니다.
+</Tip>
+
+이 문서는 [Open AI Whisper](https://platform.openai.com/docs/guides/speech-to-text) API를 사용하여 오디오 파일에서 document 객체를 로드하는 방법을 다룹니다.
+
+## Setup
+
+이 loader를 실행하려면 Open AI에서 계정을 생성하고 https://platform.openai.com/account 페이지에서 인증 키를 발급받아야 합니다.
+
+## Usage
+
+인증 키가 구성되면 loader를 사용하여 transcription을 생성하고 이를 Document로 변환할 수 있습니다.
+
+```typescript
+import { OpenAIWhisperAudio } from "@langchain/community/document_loaders/fs/openai_whisper_audio";
+
+const filePath = "./src/document_loaders/example_data/test.mp3";
+
+const loader = new OpenAIWhisperAudio(filePath, {
+  transcriptionCreateParams: {
+    language: "en",
+  },
+});
+
+const docs = await loader.load();
+
+console.log(docs);
+```

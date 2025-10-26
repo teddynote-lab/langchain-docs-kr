@@ -1,0 +1,32 @@
+---
+title: Yahoo
+---
+
+>[Yahoo (Wikipedia)](https://en.wikipedia.org/wiki/Yahoo)는 미국의 웹 서비스 제공업체입니다.
+>
+> 웹 포털, 검색 엔진 Yahoo Search, 그리고 `My Yahoo`, `Yahoo Mail`, `Yahoo News`,
+> `Yahoo Finance`, `Yahoo Sports` 및 광고 플랫폼 `Yahoo Native`를 포함한 관련 서비스를 제공합니다.
+
+
+## Tools
+
+### Yahoo Finance News
+
+python package를 설치해야 합니다:
+
+<CodeGroup>
+```bash pip
+pip install yfinance
+```
+
+```bash uv
+uv add yfinance
+```
+</CodeGroup>
+
+[사용 예제](/oss/integrations/tools/yahoo_finance_news)를 참조하세요.
+
+
+```python
+from langchain_community.tools import YahooFinanceNewsTool
+```

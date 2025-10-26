@@ -1,0 +1,99 @@
+```markdown
+---
+title: StripeAgentToolkit
+---
+
+이 가이드는 Stripe의 agent toolkit을 시작하기 위한 간단한 개요를 제공합니다.
+
+`StripeAgentToolkit`에 대한 자세한 내용은 [Stripe의 출시 블로그](https://stripe.dev/blog/adding-payments-to-your-agentic-workflows) 또는 프로젝트의 [PyPi 페이지](https://pypi.org/project/stripe-agent-toolkit/)에서 확인할 수 있습니다.
+
+## 개요
+
+### Integration 세부 정보
+
+| Class | Package | Serializable | [JS Support](https://github.com/stripe/agent-toolkit?tab=readme-ov-file#typescript) |  Version |
+| :--- | :--- | :---: | :---: | :---: |
+| StripeAgentToolkit | [stripe-agent-toolkit](https://pypi.org/project/stripe-agent-toolkit) | ❌ | ✅ |  ![PyPI - Version](https://img.shields.io/pypi/v/stripe-agent-toolkit?style=flat-square&label=%20) |
+
+## 설정
+
+이 외부 관리 패키지는 Stripe 팀이 관리하는 `stripe-agent-toolkit` 프로젝트에서 호스팅됩니다.
+
+다음 예제를 위해 langgraph와 함께 `pip`로 설치할 수 있습니다:
+
+```python
+pip install --quiet -U langgraph stripe-agent-toolkit
+```
+
+```output
+[notice] A new release of pip is available: 24.2 -> 24.3.1
+[notice] To update, run: pip install -U pip
+Note: you may need to restart the kernel to use updated packages.
+```
+
+### 자격 증명
+
+패키지 설치 외에도 [Stripe Dashboard](https://dashboard.stripe.com/account/apikeys)에서 사용할 수 있는 Stripe 계정의 secret key로 integration을 구성해야 합니다.
+
+```python
+import getpass
+import os
+
+if not os.environ.get("STRIPE_SECRET_KEY"):
+    os.environ["STRIPE_SECRET_KEY"] = getpass.getpass("STRIPE API key:\n")
+```
+
+최고 수준의 관찰성을 위해 [LangSmith](https://smith.langchain.com/)를 설정하는 것도 유용합니다(필수는 아님):
+
+```python
+os.environ["LANGSMITH_TRACING"] = "true"
+# os.environ["LANGSMITH_API_KEY"] = getpass.getpass()
+```
+
+## 인스턴스화
+
+여기서는 Stripe Toolkit의 인스턴스를 생성하는 방법을 보여줍니다
+
+```python
+from stripe_agent_toolkit.langchain.toolkit import StripeAgentToolkit
+
+stripe_agent_toolkit = StripeAgentToolkit(
+    secret_key=os.getenv("STRIPE_SECRET_KEY"),
+    configuration={
+        "actions": {
+            "payment_links": {
+                "create": True,
+            },
+        }
+    },
+)
+```
+
+## Agent
+
+다음은 toolkit을 사용하여 langgraph에서 기본 agent를 생성하는 방법입니다:
+
+```python
+from langchain_anthropic import ChatAnthropic
+from langchain.agents import create_agent
+
+
+model = ChatAnthropic(
+    model="claude-3-5-sonnet-20240620",
+)
+
+langgraph_agent_executor = create_agent(model, stripe_agent_toolkit.get_tools())
+
+input_state = {
+    "messages": """
+        Create a payment link for a new product called 'test' with a price
+        of $100. Come up with a funny description about buy bots,
+        maybe a haiku.
+    """,
+}
+
+output_state = langgraph_agent_executor.invoke(input_state)
+
+print(output_state["messages"][-1].content)
+```
+```

@@ -1,0 +1,150 @@
+---
+title: RunPod
+---
+
+RunPod LLM을 시작하세요.
+
+## Overview
+
+이 가이드는 [RunPod Serverless](https://www.runpod.io/serverless-gpu)에서 호스팅되는 텍스트 생성 모델과 상호작용하기 위해 LangChain `RunPod` LLM class를 사용하는 방법을 다룹니다.
+
+## Setup
+
+1. **패키지 설치:**
+
+   ```bash
+   pip install -qU langchain-runpod
+   ```
+
+2. **LLM Endpoint 배포:** [RunPod Provider 가이드](/oss/integrations/providers/runpod#setup)의 설정 단계를 따라 RunPod Serverless에 호환 가능한 텍스트 생성 endpoint를 배포하고 Endpoint ID를 얻으세요.
+3. **환경 변수 설정:** `RUNPOD_API_KEY`와 `RUNPOD_ENDPOINT_ID`가 설정되어 있는지 확인하세요.
+
+```python
+import getpass
+import os
+
+# Make sure environment variables are set (or pass them directly to RunPod)
+if "RUNPOD_API_KEY" not in os.environ:
+    os.environ["RUNPOD_API_KEY"] = getpass.getpass("Enter your RunPod API Key: ")
+if "RUNPOD_ENDPOINT_ID" not in os.environ:
+    os.environ["RUNPOD_ENDPOINT_ID"] = input("Enter your RunPod Endpoint ID: ")
+```
+
+## Instantiation
+
+`RunPod` class를 초기화합니다. `model_kwargs`를 통해 모델별 매개변수를 전달하고 polling 동작을 구성할 수 있습니다.
+
+```python
+from langchain_runpod import RunPod
+
+llm = RunPod(
+    # runpod_endpoint_id can be passed here if not set in env
+    model_kwargs={
+        "max_new_tokens": 256,
+        "temperature": 0.6,
+        "top_k": 50,
+        # Add other parameters supported by your endpoint handler
+    },
+    # Optional: Adjust polling
+    # poll_interval=0.3,
+    # max_polling_attempts=100
+)
+```
+
+## Invocation
+
+표준 LangChain `.invoke()` 및 `.ainvoke()` 메서드를 사용하여 모델을 호출합니다. Streaming도 `.stream()` 및 `.astream()`을 통해 지원됩니다(RunPod `/stream` endpoint를 polling하여 시뮬레이션됨).
+
+```python
+prompt = "Write a tagline for an ice cream shop on the moon."
+
+# Invoke (Sync)
+try:
+    response = llm.invoke(prompt)
+    print("--- Sync Invoke Response ---")
+    print(response)
+except Exception as e:
+    print(
+        f"Error invoking LLM: {e}. Ensure endpoint ID/API key are correct and endpoint is active/compatible."
+    )
+```
+
+```python
+# Stream (Sync, simulated via polling /stream)
+print("\n--- Sync Stream Response ---")
+try:
+    for chunk in llm.stream(prompt):
+        print(chunk, end="", flush=True)
+    print()  # Newline
+except Exception as e:
+    print(
+        f"\nError streaming LLM: {e}. Ensure endpoint handler supports streaming output format."
+    )
+```
+
+### Async 사용
+
+```python
+# AInvoke (Async)
+try:
+    async_response = await llm.ainvoke(prompt)
+    print("--- Async Invoke Response ---")
+    print(async_response)
+except Exception as e:
+    print(f"Error invoking LLM asynchronously: {e}.")
+```
+
+```python
+# AStream (Async)
+print("\n--- Async Stream Response ---")
+try:
+    async for chunk in llm.astream(prompt):
+        print(chunk, end="", flush=True)
+    print()  # Newline
+except Exception as e:
+    print(
+        f"\nError streaming LLM asynchronously: {e}. Ensure endpoint handler supports streaming output format."
+    )
+```
+
+## Chaining
+
+LLM은 LangChain Expression Language (LCEL) chain과 원활하게 통합됩니다.
+
+```python
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+
+# Assumes 'llm' variable is instantiated from the 'Instantiation' cell
+prompt_template = PromptTemplate.from_template("Tell me a joke about {topic}")
+parser = StrOutputParser()
+
+chain = prompt_template | llm | parser
+
+try:
+    chain_response = chain.invoke({"topic": "bears"})
+    print("--- Chain Response ---")
+    print(chain_response)
+except Exception as e:
+    print(f"Error running chain: {e}")
+
+# Async chain
+try:
+    async_chain_response = await chain.ainvoke({"topic": "robots"})
+    print("--- Async Chain Response ---")
+    print(async_chain_response)
+except Exception as e:
+    print(f"Error running async chain: {e}")
+```
+
+## Endpoint 고려사항
+
+- **Input:** endpoint handler는 `{"input": {"prompt": "...", ...}}` 내에서 prompt 문자열을 예상해야 합니다.
+- **Output:** handler는 최종 status response의 `"output"` key 내에 생성된 텍스트를 반환해야 합니다(예: `{"output": "Generated text..."}` 또는 `{"output": {"text": "..."}}`).
+- **Streaming:** `/stream` endpoint를 통한 시뮬레이션된 streaming의 경우, handler는 status response의 `"stream"` key를 chunk dictionary 목록으로 채워야 합니다. 예: `[{"output": "token1"}, {"output": "token2"}]`.
+
+## API reference
+
+`RunPod` LLM class, 매개변수 및 메서드에 대한 자세한 문서는 소스 코드 또는 생성된 API reference(사용 가능한 경우)를 참조하세요.
+
+소스 코드 링크: [https://github.com/runpod/langchain-runpod/blob/main/langchain_runpod/llms.py](https://github.com/runpod/langchain-runpod/blob/main/langchain_runpod/llms.py)

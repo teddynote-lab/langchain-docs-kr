@@ -1,0 +1,143 @@
+---
+title: Nomic
+---
+
+이 가이드는 LangChain을 사용하여 Nomic embedding model을 시작하는 데 도움을 드립니다. `NomicEmbeddings`의 기능 및 구성 옵션에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/nomic/embeddings/langchain_nomic.embeddings.NomicEmbeddings.html)를 참조하세요.
+
+## Overview
+
+### Integration details
+
+<ItemTable category="text_embedding" item="Nomic" />
+
+## Setup
+
+Nomic embedding model에 액세스하려면 Nomic 계정을 생성하고 API key를 받은 다음 `langchain-nomic` integration package를 설치해야 합니다.
+
+### Credentials
+
+[https://atlas.nomic.ai/](https://atlas.nomic.ai/)로 이동하여 Nomic에 가입하고 API key를 생성하세요. 완료한 후 `NOMIC_API_KEY` environment variable을 설정하세요:
+
+```python
+import getpass
+import os
+
+if not os.getenv("NOMIC_API_KEY"):
+    os.environ["NOMIC_API_KEY"] = getpass.getpass("Enter your Nomic API key: ")
+```
+
+model 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
+
+```python
+os.environ["LANGSMITH_TRACING"] = "true"
+os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
+```
+
+### Installation
+
+LangChain Nomic integration은 `langchain-nomic` package에 있습니다:
+
+```python
+pip install -qU langchain-nomic
+```
+
+```output
+Note: you may need to restart the kernel to use updated packages.
+```
+
+## Instantiation
+
+이제 model 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
+
+```python
+from langchain_nomic import NomicEmbeddings
+
+embeddings = NomicEmbeddings(
+    model="nomic-embed-text-v1.5",
+    # dimensionality=256,
+    # Nomic's `nomic-embed-text-v1.5` model was [trained with Matryoshka learning](https://blog.nomic.ai/posts/nomic-embed-matryoshka)
+    # to enable variable-length embeddings with a single model.
+    # This means that you can specify the dimensionality of the embeddings at inference time.
+    # The model supports dimensionality from 64 to 768.
+    # inference_mode="remote",
+    # One of `remote`, `local` (Embed4All), or `dynamic` (automatic). Defaults to `remote`.
+    # api_key=... , # if using remote inference,
+    # device="cpu",
+    # The device to use for local embeddings. Choices include
+    # `cpu`, `gpu`, `nvidia`, `amd`, or a specific device name. See
+    # the docstring for `GPT4All.__init__` for more info. Typically
+    # defaults to CPU. Do not use on macOS.
+)
+```
+
+## Indexing and Retrieval
+
+Embedding model은 데이터 인덱싱과 이후 검색 모두에서 retrieval-augmented generation (RAG) flow에 자주 사용됩니다. 자세한 지침은 [RAG tutorials](/oss/langchain/rag)를 참조하세요.
+
+아래에서는 위에서 초기화한 `embeddings` 객체를 사용하여 데이터를 인덱싱하고 검색하는 방법을 확인할 수 있습니다. 이 예제에서는 `InMemoryVectorStore`에서 샘플 문서를 인덱싱하고 검색합니다.
+
+```python
+# Create a vector store with a sample text
+from langchain_core.vectorstores import InMemoryVectorStore
+
+text = "LangChain is the framework for building context-aware reasoning applications"
+
+vectorstore = InMemoryVectorStore.from_texts(
+    [text],
+    embedding=embeddings,
+)
+
+# Use the vectorstore as a retriever
+retriever = vectorstore.as_retriever()
+
+# Retrieve the most similar text
+retrieved_documents = retriever.invoke("What is LangChain?")
+
+# show the retrieved document's content
+retrieved_documents[0].page_content
+```
+
+```output
+'LangChain is the framework for building context-aware reasoning applications'
+```
+
+## Direct Usage
+
+내부적으로 vectorstore와 retriever 구현은 `embeddings.embed_documents(...)`와 `embeddings.embed_query(...)`를 호출하여 각각 `from_texts`와 retrieval `invoke` 작업에 사용되는 텍스트에 대한 embedding을 생성합니다.
+
+이러한 메서드를 직접 호출하여 자신의 사용 사례에 맞는 embedding을 얻을 수 있습니다.
+
+### Embed single texts
+
+`embed_query`를 사용하여 단일 텍스트 또는 문서를 embedding할 수 있습니다:
+
+```python
+single_vector = embeddings.embed_query(text)
+print(str(single_vector)[:100])  # Show the first 100 characters of the vector
+```
+
+```output
+[0.024642944, 0.029083252, -0.14013672, -0.09082031, 0.058898926, -0.07489014, -0.0138168335, 0.0037
+```
+
+### Embed multiple texts
+
+`embed_documents`를 사용하여 여러 텍스트를 embedding할 수 있습니다:
+
+```python
+text2 = (
+    "LangGraph is a library for building stateful, multi-actor applications with LLMs"
+)
+two_vectors = embeddings.embed_documents([text, text2])
+for vector in two_vectors:
+    print(str(vector)[:100])  # Show the first 100 characters of the vector
+```
+
+```output
+[0.012771606, 0.023727417, -0.12365723, -0.083740234, 0.06530762, -0.07110596, -0.021896362, -0.0068
+[-0.019058228, 0.04058838, -0.15222168, -0.06842041, -0.012130737, -0.07128906, -0.04534912, 0.00522
+```
+
+## API reference
+
+`NomicEmbeddings`의 기능 및 구성 옵션에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/nomic/embeddings/langchain_nomic.embeddings.NomicEmbeddings.html)를 참조하세요.

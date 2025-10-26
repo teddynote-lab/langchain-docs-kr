@@ -1,0 +1,38 @@
+---
+title: Discord (community loader)
+---
+
+>[Discord](https://discord.com/)는 VoIP 및 인스턴트 메시징 소셜 플랫폼입니다. 사용자는 음성 통화, 영상 통화, 텍스트 메시징, 미디어 및 파일을 개인 채팅이나 "서버"라고 불리는 커뮤니티의 일부로 공유할 수 있습니다. 서버는 초대 링크를 통해 접근할 수 있는 영구적인 채팅방과 음성 채널의 모음입니다.
+
+## Installation and Setup
+
+<CodeGroup>
+```bash pip
+pip install pandas
+```
+
+```bash uv
+uv add pandas
+```
+</CodeGroup>
+
+`Discord` 데이터를 다운로드하려면 다음 단계를 따르세요:
+
+1. **User Settings**로 이동합니다
+2. **Privacy and Safety**로 이동합니다
+3. **Request all of my Data**로 이동하여 **Request Data** 버튼을 클릭합니다
+
+데이터를 받기까지 30일이 걸릴 수 있습니다. Discord에 등록된 이메일 주소로 이메일을 받게 됩니다. 해당 이메일에는 개인 Discord 데이터를 다운로드할 수 있는 다운로드 버튼이 있습니다.
+
+
+## Document Loader
+
+[사용 예제](/oss/integrations/document_loaders/discord)를 참조하세요.
+
+**참고:** `DiscordChatLoader`는 `ChatLoader`가 아니라 `DocumentLoader`입니다.
+이는 `Discord` 데이터 덤프에서 데이터를 로드하는 데 사용됩니다.
+`ChatLoader`에 대해서는 아래 Chat Loader 섹션을 참조하세요.
+
+```python
+from langchain_community.document_loaders import DiscordChatLoader
+```

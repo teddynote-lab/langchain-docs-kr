@@ -1,0 +1,98 @@
+---
+title: LangChain 설치하기
+sidebarTitle: 설치
+---
+
+
+
+LangChain package를 설치하려면:
+
+:::python
+<CodeGroup>
+    ```bash pip
+    pip install -U langchain
+    ```
+
+    ```bash uv
+    uv add langchain
+    ```
+</CodeGroup>
+:::
+
+:::js
+    <CodeGroup>
+    ```bash npm
+    npm install langchain @langchain/core
+    ```
+
+    ```bash pnpm
+    pnpm add langchain @langchain/core
+    ```
+
+    ```bash yarn
+    yarn add langchain @langchain/core
+    ```
+
+    ```bash bun
+    bun add langchain @langchain/core
+    ```
+    </CodeGroup>
+:::
+
+LangChain은 수백 개의 LLM과 수천 개의 다른 integration을 제공합니다. 이들은 독립적인 provider package에 포함되어 있습니다. 예를 들어:
+
+:::python
+<CodeGroup>
+    ```bash pip
+    # Installing the OpenAI integration
+    pip install -U langchain-openai
+
+    # Installing the Anthropic integration
+    pip install -U langchain-anthropic
+    ```
+    ```bash uv
+    # Installing the OpenAI integration
+    uv add langchain-openai
+
+    # Installing the Anthropic integration
+    uv add langchain-anthropic
+    ```
+</CodeGroup>
+
+:::
+
+:::js
+<CodeGroup>
+    ```bash npm
+    # Installing the OpenAI integration
+    npm install @langchain/openai
+    # Installing the Anthropic integration
+    npm install @langchain/anthropic
+    ```
+
+    ```bash pnpm
+    # Installing the OpenAI integration
+    pnpm install @langchain/openai
+    # Installing the Anthropic integration
+    pnpm install @langchain/anthropic
+    ```
+
+    ```bash yarn
+    # Installing the OpenAI integration
+    yarn add @langchain/openai
+    # Installing the Anthropic integration
+    yarn add @langchain/anthropic
+    ```
+
+    ```bash bun
+    # Installing the OpenAI integration
+    bun add @langchain/openai
+    # Installing the Anthropic integration
+    bun add @langchain/anthropic
+    ```
+</CodeGroup>
+:::
+
+<Tip>
+사용 가능한 integration의 전체 목록은 [Integrations 탭](/oss/integrations/providers/overview)을 참조하세요.
+</Tip>

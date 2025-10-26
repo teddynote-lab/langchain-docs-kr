@@ -1,0 +1,591 @@
+---
+title: AgentQL
+---
+
+[AgentQL](https://www.agentql.com/) tool은 [AgentQL query](https://docs.agentql.com/agentql-query) 또는 자연어 프롬프트를 사용하여 모든 웹 페이지에서 웹 상호작용 및 구조화된 데이터 추출을 제공합니다. AgentQL은 여러 언어와 웹 페이지에서 시간이 지나도 변경에 영향받지 않고 사용할 수 있습니다.
+
+## Overview
+
+AgentQL은 다음 세 가지 tool을 제공합니다:
+
+- **`ExtractWebDataTool`**은 [AgentQL query](https://docs.agentql.com/agentql-query/query-intro) 또는 데이터에 대한 자연어 설명을 사용하여 URL이 주어진 웹 페이지에서 구조화된 데이터를 JSON으로 추출합니다.
+
+다음 두 tool은 `AgentQLBrowserToolkit`으로 번들되어 있으며 `Playwright` browser 또는 Chrome DevTools Protocol (CDP)을 통한 원격 browser instance와 함께 사용해야 합니다:
+
+- **`ExtractWebDataBrowserTool`**은 [AgentQL query](https://docs.agentql.com/agentql-query/query-intro) 또는 자연어 설명을 사용하여 browser의 활성 웹 페이지에서 구조화된 데이터를 JSON으로 추출합니다.
+
+- **`GetWebElementBrowserTool`**은 자연어 설명을 사용하여 browser의 활성 웹 페이지에서 웹 element를 찾고 추가 상호작용을 위해 CSS selector를 반환합니다.
+
+### Integration details
+
+| Class | Package | Serializable | [JS support](https://js.langchain.com/docs/integrations/tools/langchain_agentql) |  Version |
+| :--- | :--- | :---: | :---: | :---: |
+| AgentQL | langchain-agentql | ❌ | ❌ |  1.0.0 |
+
+### Tool features
+
+| Tool | Web Data Extraction | Web Element Extraction | Use With Local Browser |
+| :--- | :---: | :---: | :---: |
+| ExtractWebDataTool | ✅ | ❌ | ❌
+| ExtractWebDataBrowserTool | ✅ | ❌ | ✅
+| GetWebElementBrowserTool | ❌ | ✅ | ✅
+
+## Setup
+
+```python
+pip install --quiet -U langchain-agentql
+```
+
+이 notebook을 실행하려면 `Playwright` browser를 설치하고 Jupyter Notebook의 `asyncio` loop를 구성해야 합니다.
+
+```python
+!playwright install
+
+# This import is required only for jupyter notebooks, since they have their own eventloop
+import nest_asyncio
+
+nest_asyncio.apply()
+```
+
+### Credentials
+
+AgentQL tool을 사용하려면 [AgentQL Dev Portal](https://dev.agentql.com/)에서 자신의 API key를 받아 AgentQL 환경 변수를 설정해야 합니다.
+
+```python
+import os
+
+os.environ["AGENTQL_API_KEY"] = "YOUR_AGENTQL_API_KEY"
+```
+
+## Instantiation
+
+### `ExtractWebDataTool`
+
+다음 매개변수로 `ExtractWebDataTool`을 인스턴스화할 수 있습니다:
+
+- `api_key`: [dev.agentql.com](https://dev.agentql.com)에서 받은 AgentQL API key. **`선택사항`.**
+- `timeout`: 요청이 timeout되기 전에 대기할 시간(초). 데이터 추출이 timeout되면 증가시키세요. **기본값은 `900`.**
+- `is_stealth_mode_enabled`: 실험적인 봇 회피 전략을 활성화할지 여부. 이 기능은 모든 웹사이트에서 항상 작동하지 않을 수 있습니다. 이 모드를 활성화하면 데이터 추출이 더 오래 걸릴 수 있습니다. **기본값은 `False`.**
+- `wait_for`: 데이터를 추출하기 전에 페이지가 로드될 때까지 대기할 시간(초). **기본값은 `0`.**
+- `is_scroll_to_bottom_enabled`: 데이터를 추출하기 전에 페이지 하단으로 스크롤할지 여부. **기본값은 `False`.**
+- `mode`: `"standard"`는 심층 데이터 분석을 사용하고, `"fast"`는 일부 분석 깊이를 속도와 교환하며 대부분의 사용 사례에 적합합니다. [이 가이드에서 모드에 대해 자세히 알아보세요.](https://docs.agentql.com/accuracy/standard-mode) **기본값은 `"fast"`.**
+- `is_screenshot_enabled`: 데이터를 추출하기 전에 스크린샷을 찍을지 여부. Base64 문자열로 'metadata'에 반환됩니다. **기본값은 `False`.**
+
+`ExtractWebDataTool`은 AgentQL의 REST API로 구현되어 있으며, [API Reference docs](https://docs.agentql.com/rest-api/api-reference)에서 매개변수에 대한 자세한 내용을 확인할 수 있습니다.
+
+```python
+from langchain_agentql.tools import ExtractWebDataTool
+
+extract_web_data_tool = ExtractWebDataTool()
+```
+
+### `ExtractWebDataBrowserTool`
+
+**ExtractWebDataBrowserTool**을 인스턴스화하려면 tool을 browser instance와 연결해야 합니다.
+
+다음 매개변수를 설정할 수 있습니다:
+
+- `timeout`: 요청이 timeout되기 전에 대기할 시간(초). 데이터 추출이 timeout되면 증가시키세요. **기본값은 `900`.**
+- `wait_for_network_idle`: 실행하기 전에 네트워크가 완전히 유휴 상태에 도달할 때까지 대기할지 여부. **기본값은 `True`.**
+- `include_hidden`: 페이지에서 시각적으로 숨겨진 element를 고려할지 여부. **기본값은 `True`.**
+- `mode`: `"standard"`는 심층 데이터 분석을 사용하고, `"fast"`는 일부 분석 깊이를 속도와 교환하며 대부분의 사용 사례에 적합합니다. [이 가이드에서 모드에 대해 자세히 알아보세요.](https://docs.agentql.com/accuracy/standard-mode) **기본값은 `"fast"`.**
+
+`ExtractWebDataBrowserTool`은 AgentQL의 SDK로 구현되어 있습니다. 매개변수와 함수에 대한 자세한 내용은 AgentQL의 [API References](https://docs.agentql.com/python-sdk/api-references/agentql-page#querydata)에서 확인할 수 있습니다.
+
+```python
+from langchain_agentql.tools import ExtractWebDataBrowserTool
+from langchain_agentql.utils import create_async_playwright_browser
+
+async_browser = await create_async_playwright_browser()
+
+extract_web_data_browser_tool = ExtractWebDataBrowserTool(async_browser=async_browser)
+```
+
+### `GetWebElementBrowserTool`
+
+**GetWebElementBrowserTool**을 인스턴스화하려면 tool을 browser instance와 연결해야 합니다.
+
+다음 매개변수를 설정할 수 있습니다:
+
+- `timeout`: 요청이 timeout되기 전에 대기할 시간(초). 데이터 추출이 timeout되면 증가시키세요. **기본값은 `900`.**
+- `wait_for_network_idle`: 실행하기 전에 네트워크가 완전히 유휴 상태에 도달할 때까지 대기할지 여부. **기본값은 `True`.**
+- `include_hidden`: 페이지에서 시각적으로 숨겨진 element를 고려할지 여부. **기본값은 `False`.**
+- `mode`: `"standard"`는 심층 데이터 분석을 사용하고, `"fast"`는 일부 분석 깊이를 속도와 교환하며 대부분의 사용 사례에 적합합니다. [이 가이드에서 모드에 대해 자세히 알아보세요.](https://docs.agentql.com/accuracy/standard-mode) **기본값은 `"fast"`.**
+
+`GetWebElementBrowserTool`은 AgentQL의 SDK로 구현되어 있습니다. 매개변수와 함수에 대한 자세한 내용은 AgentQL의 [API References](https://docs.agentql.com/python-sdk/api-references/agentql-page#queryelements)에서 확인할 수 있습니다.
+
+```python
+from langchain_agentql.tools import GetWebElementBrowserTool
+
+extract_web_element_tool = GetWebElementBrowserTool(async_browser=async_browser)
+```
+
+## Invocation
+
+### `ExtractWebDataTool`
+
+이 tool은 내부적으로 AgentQL의 REST API를 사용하여 공개적으로 사용 가능한 웹 페이지의 URL을 AgentQL의 endpoint로 전송합니다. 이는 비공개 페이지나 로그인된 세션에서는 작동하지 않습니다. 이러한 사용 사례에는 `ExtractWebDataBrowserTool`을 사용하세요.
+
+- `url`: 데이터를 추출하려는 웹 페이지의 URL.
+- `query`: 실행할 AgentQL query. 정확하게 구조화된 데이터를 추출하려면 AgentQL query를 사용하세요. [문서에서 AgentQL query 작성 방법에 대해 자세히 알아보거나](https://docs.agentql.com/agentql-query) [AgentQL Playground](https://dev.agentql.com/playground)에서 테스트해보세요.
+- `prompt`: 페이지에서 추출할 데이터에 대한 자연어 설명. AgentQL은 프롬프트에서 데이터 구조를 추론합니다. 특정 구조를 정의하지 않고 자유 형식 언어로 정의된 데이터를 추출하려면 `prompt`를 사용하세요.
+
+**참고:** AgentQL을 사용하려면 `query` 또는 `prompt` 중 하나를 정의해야 합니다.
+
+```python
+# You can invoke the tool with either a query or a prompt
+
+# extract_web_data_tool.invoke(
+#     {
+#         "url": "https://www.agentql.com/blog",
+#         "prompt": "the blog posts with title, url, date of post and author",
+#     }
+# )
+
+extract_web_data_tool.invoke(
+    {
+        "url": "https://www.agentql.com/blog",
+        "query": "{ posts[] { title url date author } }",
+    },
+)
+```
+
+```output
+{'data': {'posts': [{'title': 'Launch Week Recap—make the web AI-ready',
+    'url': 'https://www.agentql.com/blog/2024-launch-week-recap',
+    'date': 'Nov 18, 2024',
+    'author': 'Rachel-Lee Nabors'},
+   {'title': 'Accurate data extraction from PDFs and images with AgentQL',
+    'url': 'https://www.agentql.com/blog/accurate-data-extraction-pdfs-images',
+    'date': 'Feb 1, 2025',
+    'author': 'Rachel-Lee Nabors'},
+   {'title': 'Introducing Scheduled Scraping Workflows',
+    'url': 'https://www.agentql.com/blog/scheduling',
+    'date': 'Dec 2, 2024',
+    'author': 'Rachel-Lee Nabors'},
+   {'title': 'Updates to Our Pricing Model',
+    'url': 'https://www.agentql.com/blog/2024-pricing-update',
+    'date': 'Nov 19, 2024',
+    'author': 'Rachel-Lee Nabors'},
+   {'title': 'Get data from any page: AgentQL’s REST API Endpoint—Launch week day 5',
+    'url': 'https://www.agentql.com/blog/data-rest-api',
+    'date': 'Nov 15, 2024',
+    'author': 'Rachel-Lee Nabors'}]},
+ 'metadata': {'request_id': '0dc1f89c-1b6a-46fe-8089-6cd0f082f094',
+  'generated_query': None,
+  'screenshot': None}}
+```
+
+### `ExtractWebDataBrowserTool`
+
+- `query`: 실행할 AgentQL query. 정확하게 구조화된 데이터를 추출하려면 AgentQL query를 사용하세요. [문서에서 AgentQL query 작성 방법에 대해 자세히 알아보거나](https://docs.agentql.com/agentql-query) [AgentQL Playground](https://dev.agentql.com/playground)에서 테스트해보세요.
+- `prompt`: 페이지에서 추출할 데이터에 대한 자연어 설명. AgentQL은 프롬프트에서 데이터 구조를 추론합니다. 특정 구조를 정의하지 않고 자유 형식 언어로 정의된 데이터를 추출하려면 `prompt`를 사용하세요.
+
+**참고:** AgentQL을 사용하려면 `query` 또는 `prompt` 중 하나를 정의해야 합니다.
+
+데이터를 추출하려면 먼저 LangChain의 [Playwright](https://python.langchain.com/docs/integrations/tools/playwright/) tool을 사용하여 웹 페이지로 이동해야 합니다.
+
+```python
+from langchain_community.tools.playwright import NavigateTool
+
+navigate_tool = NavigateTool(async_browser=async_browser)
+await navigate_tool.ainvoke({"url": "https://www.agentql.com/blog"})
+```
+
+```output
+'Navigating to https://www.agentql.com/blog returned status code 200'
+```
+
+```python
+# You can invoke the tool with either a query or a prompt
+
+# await extract_web_data_browser_tool.ainvoke(
+#     {'query': '{ blogs[] { title url date author } }'}
+# )
+
+await extract_web_data_browser_tool.ainvoke(
+    {"prompt": "the blog posts with title, url, date of post and author"}
+)
+```
+
+```output
+/usr/local/lib/python3.11/dist-packages/agentql/_core/_utils.py:167: UserWarning: 🚨 The function get_data_by_prompt_experimental is experimental and may not work as expected 🚨
+  warnings.warn(
+```
+
+```output
+{'blog_posts': [{'title': 'Launch Week Recap—make the web AI-ready',
+   'url': 'https://www.agentql.com/blog/2024-launch-week-recap',
+   'date': 'Nov 18, 2024',
+   'author': 'Rachel-Lee Nabors'},
+  {'title': 'Accurate data extraction from PDFs and images with AgentQL',
+   'url': 'https://www.agentql.com/blog/accurate-data-extraction-pdfs-images',
+   'date': 'Feb 1, 2025',
+   'author': 'Rachel-Lee Nabors'},
+  {'title': 'Introducing Scheduled Scraping Workflows',
+   'url': 'https://www.agentql.com/blog/scheduling',
+   'date': 'Dec 2, 2024',
+   'author': 'Rachel-Lee Nabors'},
+  {'title': 'Updates to Our Pricing Model',
+   'url': 'https://www.agentql.com/blog/2024-pricing-update',
+   'date': 'Nov 19, 2024',
+   'author': 'Rachel-Lee Nabors'},
+  {'title': 'Get data from any page: AgentQL’s REST API Endpoint—Launch week day 5',
+   'url': 'https://www.agentql.com/blog/data-rest-api',
+   'date': 'Nov 15, 2024',
+   'author': 'Rachel-Lee Nabors'}]}
+```
+
+### `GetWebElementBrowserTool`
+
+- `prompt`: 페이지에서 찾을 웹 element에 대한 자연어 설명.
+
+```python
+selector = await extract_web_element_tool.ainvoke({"prompt": "Next page button"})
+selector
+```
+
+```output
+"[tf623_id='194']"
+```
+
+```python
+from langchain_community.tools.playwright import ClickTool
+
+# Disabling 'visible_only' will allow us to click on elements that are not visible on the page
+await ClickTool(async_browser=async_browser, visible_only=False).ainvoke(
+    {"selector": selector}
+)
+```
+
+```output
+"Clicked element '[tf623_id='194']'"
+```
+
+```python
+from langchain_community.tools.playwright import CurrentWebPageTool
+
+await CurrentWebPageTool(async_browser=async_browser).ainvoke({})
+```
+
+```output
+'https://www.agentql.com/blog/page/2'
+```
+
+## Chaining
+
+AgentQL tool을 [tool-calling model](/oss/langchain/tools/)에 먼저 바인딩한 다음 호출하여 chain에서 사용할 수 있습니다:
+
+### Instantiate LLM
+
+```python
+import os
+
+os.environ["OPENAI_API_KEY"] = "YOUR_OPENAI_API_KEY"
+```
+
+```python
+from langchain.chat_models import init_chat_model
+
+model = init_chat_model(model="gpt-4o", model_provider="openai")
+```
+
+### Execute Tool Chain
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableConfig, chain
+
+prompt = ChatPromptTemplate(
+    [
+        ("system", "You are a helpful assistant in extracting data from website."),
+        ("human", "{user_input}"),
+        ("placeholder", "{messages}"),
+    ]
+)
+
+# specifying tool_choice will force the model to call this tool.
+model_with_tools = model.bind_tools(
+    [extract_web_data_tool], tool_choice="extract_web_data_with_rest_api"
+)
+
+model_chain = prompt | model_with_tools
+
+
+@chain
+def tool_chain(user_input: str, config: RunnableConfig):
+    input_ = {"user_input": user_input}
+    ai_msg = model_chain.invoke(input_, config=config)
+    tool_msgs = extract_web_data_tool.batch(ai_msg.tool_calls, config=config)
+    return {"messages": tool_msgs}
+
+
+tool_chain.invoke(
+    "Extract data from https://www.agentql.com/blog using the following agentql query: { posts[] { title url date author } }"
+)
+```
+
+```output
+{'messages': [ToolMessage(content='{"data": {"posts": [{"title": "Launch Week Recap—make the web AI-ready", "url": "https://www.agentql.com/blog/2024-launch-week-recap", "date": "Nov 18, 2024", "author": "Rachel-Lee Nabors"}, {"title": "Accurate data extraction from PDFs and images with AgentQL", "url": "https://www.agentql.com/blog/accurate-data-extraction-pdfs-images", "date": "Feb 1, 2025", "author": "Rachel-Lee Nabors"}, {"title": "Introducing Scheduled Scraping Workflows", "url": "https://www.agentql.com/blog/scheduling", "date": "Dec 2, 2024", "author": "Rachel-Lee Nabors"}, {"title": "Updates to Our Pricing Model", "url": "https://www.agentql.com/blog/2024-pricing-update", "date": "Nov 19, 2024", "author": "Rachel-Lee Nabors"}, {"title": "Get data from any page: AgentQL’s REST API Endpoint—Launch week day 5", "url": "https://www.agentql.com/blog/data-rest-api", "date": "Nov 15, 2024", "author": "Rachel-Lee Nabors"}]}, "metadata": {"request_id": "1a84ed12-d02a-497d-b09d-21fe49342fa3", "generated_query": null, "screenshot": null}}', name='extract_web_data_with_rest_api', tool_call_id='call_z4Rl1MpjJZNcbLlq1OCneoMF')]}
+```
+
+## Use within an agent
+
+`AgentQLBrowserToolkit`을 사용하여 AI Agent와 함께 AgentQL tool을 사용할 수 있습니다. 이 toolkit에는 `ExtractDataBrowserTool`과 `GetWebElementBrowserTool`이 포함되어 있습니다. 다음은 AgentQL의 toolkit을 Playwright tool과 결합한 agentic browser action의 예시입니다.
+
+### Instantiate Toolkit
+
+```python
+from langchain_agentql.utils import create_async_playwright_browser
+
+async_agent_browser = await create_async_playwright_browser()
+```
+
+```python
+from langchain_agentql import AgentQLBrowserToolkit
+
+agentql_toolkit = AgentQLBrowserToolkit(async_browser=async_agent_browser)
+agentql_toolkit.get_tools()
+```
+
+```output
+[ExtractWebDataBrowserTool(async_browser=<Browser type=<BrowserType name=chromium executable_path=/root/.cache/ms-playwright/chromium-1155/chrome-linux/chrome> version=133.0.6943.16>),
+ GetWebElementBrowserTool(async_browser=<Browser type=<BrowserType name=chromium executable_path=/root/.cache/ms-playwright/chromium-1155/chrome-linux/chrome> version=133.0.6943.16>)]
+```
+
+```python
+from langchain_community.tools.playwright import ClickTool, NavigateTool
+
+# we hand pick the following tools to allow more precise agentic browser actions
+playwright_toolkit = [
+    NavigateTool(async_browser=async_agent_browser),
+    ClickTool(async_browser=async_agent_browser, visible_only=False),
+]
+playwright_toolkit
+```
+
+```output
+[NavigateTool(async_browser=<Browser type=<BrowserType name=chromium executable_path=/root/.cache/ms-playwright/chromium-1155/chrome-linux/chrome> version=133.0.6943.16>),
+ ClickTool(async_browser=<Browser type=<BrowserType name=chromium executable_path=/root/.cache/ms-playwright/chromium-1155/chrome-linux/chrome> version=133.0.6943.16>, visible_only=False)]
+```
+
+### Use with a ReAct Agent
+
+```python
+pip install --quiet -U langgraph
+```
+
+```python
+from langchain.agents import create_agent
+
+
+# You need to set up an llm, please refer to the chaining section
+agent_executor = create_agent(
+    model, agentql_toolkit.get_tools() + playwright_toolkit
+)
+```
+
+```python
+prompt = """
+Navigate to https://news.ycombinator.com/,
+extract the news titles on the current page,
+show the current page url,
+find the button on the webpage that direct to the next page,
+click on the button,
+show the current page url,
+extract the news title on the current page
+extract the news titles that mention "AI" from the two pages.
+"""
+
+events = agent_executor.astream(
+    {"messages": [("user", prompt)]},
+    stream_mode="values",
+)
+async for event in events:
+    event["messages"][-1].pretty_print()
+```
+
+```output
+================================ Human Message =================================
+
+
+Navigate to https://news.ycombinator.com/,
+extract the news titles on the current page,
+show the current page url,
+find the button on the webpage that direct to the next page,
+click on the button,
+show the current page url,
+extract the news title on the current page
+extract the news titles that mention "AI" from the two pages.
+
+================================== Ai Message ==================================
+Tool Calls:
+  navigate_browser (call_3eY5a0BRwyYj7kaNpAxkquTD)
+ Call ID: call_3eY5a0BRwyYj7kaNpAxkquTD
+  Args:
+    url: https://news.ycombinator.com/
+================================= Tool Message =================================
+Name: navigate_browser
+
+Navigating to https://news.ycombinator.com/ returned status code 200
+================================== Ai Message ==================================
+Tool Calls:
+  extract_web_data_from_browser (call_WvRrZKGGo8mq3JewRlaIS5xx)
+ Call ID: call_WvRrZKGGo8mq3JewRlaIS5xx
+  Args:
+    prompt: Extract all the news titles from this page.
+```
+```output
+/usr/local/lib/python3.11/dist-packages/agentql/_core/_utils.py:167: UserWarning: 🚨 The function get_data_by_prompt_experimental is experimental and may not work as expected 🚨
+  warnings.warn(
+```
+```output
+================================= Tool Message =================================
+Name: extract_web_data_from_browser
+
+{"news_item": [{"title": "I Went to SQL Injection Court"}, {"title": "Framework's first desktop is a strange-but unique-mini ITX gaming PC"}, {"title": "Hyperspace"}, {"title": "The XB-70 (2019)"}, {"title": "How core Git developers configure Git"}, {"title": "Emergent Misalignment: Narrow finetuning can produce broadly misaligned LLMs [pdf]"}, {"title": "Hard problems that reduce to document ranking"}, {"title": "Ggwave: Tiny Data-over-Sound Library"}, {"title": "Bald eagles are thriving again after near extinction"}, {"title": "Forum with 2.6M posts being deleted due to UK Online Safety Act"}, {"title": "Launch HN: Browser Use (YC W25) - open-source web agents"}, {"title": "Part two of Grant Sanderson's video with Terry Tao on the cosmic distance ladder"}, {"title": "New maps of the chaotic space-time inside black holes"}, {"title": "Knitting Your Parachute"}, {"title": "Chicory: A JVM native WebAssembly runtime"}, {"title": "Low Overhead Allocation Sampling with VMProf in PyPy's GC"}, {"title": "Sigma BF Camera"}, {"title": "DeepSearcher: A local open-source Deep Research"}, {"title": "Xonsh - A Python-powered shell"}, {"title": "A possible future of Python in the browser"}, {"title": "Show HN: GoatDB - A lightweight, offline-first, realtime NoDB for Deno and React"}, {"title": "Embedding Python in Elixir, it's fine"}, {"title": "The Deep Research problem"}, {"title": "Why are QR Codes with capital letters smaller than QR codes with lower case?"}, {"title": "Show HN: My new wiki for Silicon Graphics stuff"}, {"title": "AI is blurring the line between PMs and engineers?"}, {"title": "I recreated Shazam's algorithm with Go [video]"}, {"title": "Dogs may have domesticated themselves because they liked snacks, model suggests"}, {"title": "Show HN: Txtl - Fast static website of text utilities"}, {"title": "Have we been wrong about why Mars is red?"}]}
+================================== Ai Message ==================================
+Tool Calls:
+  get_web_element_from_browser (call_B6jn5ItasceNW7eeb640UhQQ)
+ Call ID: call_B6jn5ItasceNW7eeb640UhQQ
+  Args:
+    prompt: button or link to go to the next page
+  extract_web_data_from_browser (call_Wyh2VH76bzrlDozp7gpkVBl7)
+ Call ID: call_Wyh2VH76bzrlDozp7gpkVBl7
+  Args:
+    prompt: Extract the current page URL
+```
+```output
+/usr/local/lib/python3.11/dist-packages/agentql/_core/_utils.py:167: UserWarning: 🚨 The function get_data_by_prompt_experimental is experimental and may not work as expected 🚨
+  warnings.warn(
+```
+```output
+================================= Tool Message =================================
+Name: extract_web_data_from_browser
+
+{"current_page_url": "https://news.ycombinator.com/news"}
+================================== Ai Message ==================================
+Tool Calls:
+  click_element (call_NLGIW1lLutkZ6k0vqkfGbOD7)
+ Call ID: call_NLGIW1lLutkZ6k0vqkfGbOD7
+  Args:
+    selector: [tf623_id='944']
+================================= Tool Message =================================
+Name: click_element
+
+Clicked element '[tf623_id='944']'
+================================== Ai Message ==================================
+Tool Calls:
+  extract_web_data_from_browser (call_QPt8R2hqiSgytUvLcWUUORKF)
+ Call ID: call_QPt8R2hqiSgytUvLcWUUORKF
+  Args:
+    prompt: Extract the current page URL
+```
+```output
+/usr/local/lib/python3.11/dist-packages/agentql/_core/_utils.py:167: UserWarning: 🚨 The function get_data_by_prompt_experimental is experimental and may not work as expected 🚨
+  warnings.warn(
+```
+```output
+================================= Tool Message =================================
+Name: extract_web_data_from_browser
+
+{"current_page_url": "https://news.ycombinator.com/news?p=2"}
+================================== Ai Message ==================================
+Tool Calls:
+  extract_web_data_from_browser (call_ZZOPrIfVaVQ1A26j8EGE913W)
+ Call ID: call_ZZOPrIfVaVQ1A26j8EGE913W
+  Args:
+    prompt: Extract all the news titles from this page.
+```
+```output
+/usr/local/lib/python3.11/dist-packages/agentql/_core/_utils.py:167: UserWarning: 🚨 The function get_data_by_prompt_experimental is experimental and may not work as expected 🚨
+  warnings.warn(
+```
+```output
+================================= Tool Message =================================
+Name: extract_web_data_from_browser
+
+{"news_item": [{"title": "'Hey Number 17 '"}, {"title": "Building and operating a pretty big storage system called S3 (2023)"}, {"title": "Ghost House - software for automatic inbetweens"}, {"title": "Ask HN: Former devs who can't get a job, what did you end up doing for work?"}, {"title": "DeepSeek open source DeepEP - library for MoE training and Inference"}, {"title": "SETI's hard steps and how to resolve them"}, {"title": "A Defense of Weird Research"}, {"title": "DigiCert: Threat of legal action to stifle Bugzilla discourse"}, {"title": "Show HN: Tach - Visualize and untangle your Python codebase"}, {"title": "Ask HN: A retrofitted C dialect?"}, {"title": "“The closer to the train station, the worse the kebab” - a “study”"}, {"title": "Brewing Clean Water: The metal-remediating benefits of tea preparation"}, {"title": "Invoker Commands (Explainer)"}, {"title": "Freelancing: How I found clients, part 1"}, {"title": "Claude 3.7 Sonnet and Claude Code"}, {"title": "Clean Code vs. A Philosophy Of Software Design"}, {"title": "Show HN: While the world builds AI Agents, I'm just building calculators"}, {"title": "History of CAD"}, {"title": "Fans are better than tech at organizing information online (2019)"}, {"title": "Some Programming Language Ideas"}, {"title": "The independent researcher (2018)"}, {"title": "The best way to use text embeddings portably is with Parquet and Polars"}, {"title": "Show HN: Prioritize Anything with Stacks"}, {"title": "Ashby (YC W19) Is Hiring Principal Product Engineers"}, {"title": "GibberLink [AI-AI Communication]"}, {"title": "Show HN: I made a site to tell the time in corporate"}, {"title": "It’s still worth blogging in the age of AI"}, {"title": "What would happen if we didn't use TCP or UDP?"}, {"title": "Closing the “green gap”: energy savings from the math of the landscape function"}, {"title": "Larry Ellison's half-billion-dollar quest to change farming"}]}
+================================== Ai Message ==================================
+
+Here's a summary of the actions and results:
+
+### Page 1
+- **URL:** [https://news.ycombinator.com/news](https://news.ycombinator.com/news)
+- **News Titles:**
+  1. I Went to SQL Injection Court
+  2. Framework's first desktop is a strange-but unique-mini ITX gaming PC
+  3. Hyperspace
+  4. The XB-70 (2019)
+  5. How core Git developers configure Git
+  6. Emergent Misalignment: Narrow finetuning can produce broadly misaligned LLMs [pdf]
+  7. Hard problems that reduce to document ranking
+  8. Ggwave: Tiny Data-over-Sound Library
+  9. Bald eagles are thriving again after near extinction
+  10. Forum with 2.6M posts being deleted due to UK Online Safety Act
+  11. Launch HN: Browser Use (YC W25) - open-source web agents
+  12. Part two of Grant Sanderson's video with Terry Tao on the cosmic distance ladder
+  13. New maps of the chaotic space-time inside black holes
+  14. Knitting Your Parachute
+  15. Chicory: A JVM native WebAssembly runtime
+  16. Low Overhead Allocation Sampling with VMProf in PyPy's GC
+  17. Sigma BF Camera
+  18. DeepSearcher: A local open-source Deep Research
+  19. Xonsh - A Python-powered shell
+  20. A possible future of Python in the browser
+  21. Show HN: GoatDB - A lightweight, offline-first, realtime NoDB for Deno and React
+  22. Embedding Python in Elixir, it's fine
+  23. The Deep Research problem
+  24. Why are QR Codes with capital letters smaller than QR codes with lower case?
+  25. Show HN: My new wiki for Silicon Graphics stuff
+  26. **AI is blurring the line between PMs and engineers?**
+  27. I recreated Shazam's algorithm with Go [video]
+  28. Dogs may have domesticated themselves because they liked snacks, model suggests
+  29. Show HN: Txtl - Fast static website of text utilities
+  30. Have we been wrong about why Mars is red?
+
+### Page 2
+- **URL:** [https://news.ycombinator.com/news?p=2](https://news.ycombinator.com/news?p=2)
+- **News Titles:**
+  1. 'Hey Number 17'
+  2. Building and operating a pretty big storage system called S3 (2023)
+  3. Ghost House - software for automatic inbetweens
+  4. Ask HN: Former devs who can't get a job, what did you end up doing for work?
+  5. DeepSeek open source DeepEP - library for MoE training and Inference
+  6. SETI's hard steps and how to resolve them
+  7. A Defense of Weird Research
+  8. DigiCert: Threat of legal action to stifle Bugzilla discourse
+  9. Show HN: Tach - Visualize and untangle your Python codebase
+  10. Ask HN: A retrofitted C dialect?
+  11. “The closer to the train station, the worse the kebab” - a “study”
+  12. Brewing Clean Water: The metal-remediating benefits of tea preparation
+  13. Invoker Commands (Explainer)
+  14. Freelancing: How I found clients, part 1
+  15. Claude 3.7 Sonnet and Claude Code
+  16. Clean Code vs. A Philosophy Of Software Design
+  17. **Show HN: While the world builds AI Agents, I'm just building calculators**
+  18. History of CAD
+  19. Fans are better than tech at organizing information online (2019)
+  20. Some Programming Language Ideas
+  21. The independent researcher (2018)
+  22. The best way to use text embeddings portably is with Parquet and Polars
+  23. Show HN: Prioritize Anything with Stacks
+  24. Ashby (YC W19) Is Hiring Principal Product Engineers
+  25. **GibberLink [AI-AI Communication]**
+  26. Show HN: I made a site to tell the time in corporate
+  27. **It’s still worth blogging in the age of AI**
+  28. What would happen if we didn't use TCP or UDP?
+  29. Closing the “green gap”: energy savings from the math of the landscape function
+  30. Larry Ellison's half-billion-dollar quest to change farming
+
+### News Titles Mentioning "AI":
+1. Page 1: **AI is blurring the line between PMs and engineers?**
+2. Page 2:
+   - **Show HN: While the world builds AI Agents, I'm just building calculators**
+   - **GibberLink [AI-AI Communication]**
+   - **It’s still worth blogging in the age of AI**
+```
+
+## API reference
+
+이 integration을 사용하는 방법에 대한 자세한 내용은 [git repo](https://github.com/tinyfish-io/agentql-integrations/tree/main/langchain) 또는 [langchain integration documentation](https://docs.agentql.com/integrations/langchain)을 참조하세요.

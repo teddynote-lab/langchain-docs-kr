@@ -1,0 +1,45 @@
+---
+title: Sema4 (fka Robocorp)
+---
+
+>[Robocorp](https://robocorp.com/)은 어디서나 어떤 규모에서든 원활하게 실행되는 Python worker를 구축하고 운영할 수 있도록 지원합니다
+
+
+## Installation and Setup
+
+`langchain-robocorp` python package를 설치해야 합니다:
+
+<CodeGroup>
+```bash pip
+pip install langchain-robocorp
+```
+
+```bash uv
+uv add langchain-robocorp
+```
+</CodeGroup>
+
+에이전트 애플리케이션에서 통신할 수 있도록 실행 중인 `Action Server` 인스턴스가 필요합니다.
+Action Server를 설정하고 Action을 생성하는 방법은 [Robocorp Quickstart](https://github.com/robocorp/robocorp#quickstart)를 참조하세요.
+
+Action Server `new` 명령을 사용하여 새 프로젝트를 부트스트랩할 수 있습니다.
+
+```bash
+action-server new
+cd ./your-project-name
+action-server start
+```
+
+## Tool
+
+```python
+from langchain_robocorp.toolkits import ActionServerRequestTool
+```
+
+## Toolkit
+
+[사용 예제](/oss/integrations/tools/robocorp)를 참조하세요.
+
+```python
+from langchain_robocorp import ActionServerToolkit
+```

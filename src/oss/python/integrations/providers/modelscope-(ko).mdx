@@ -1,0 +1,58 @@
+---
+title: ModelScope
+---
+
+>[ModelScope](https://www.modelscope.cn/home)는 모델과 데이터셋의 대규모 저장소입니다.
+
+이 페이지는 LangChain 내에서 modelscope 생태계를 사용하는 방법을 다룹니다.
+설치 및 설정, 그리고 특정 modelscope wrapper에 대한 참조, 이렇게 두 부분으로 나뉩니다.
+
+## Installation
+
+<CodeGroup>
+```bash pip
+pip install -U langchain-modelscope-integration
+```
+
+```bash uv
+uv add langchain-modelscope-integration
+```
+</CodeGroup>
+
+[ModelScope](https://modelscope.cn/)로 이동하여 ModelScope에 가입하고 [SDK token](https://modelscope.cn/my/myaccesstoken)을 생성하세요. 완료한 후 `MODELSCOPE_SDK_TOKEN` environment variable을 설정하세요:
+
+```bash
+export MODELSCOPE_SDK_TOKEN=<your_sdk_token>
+```
+
+## Chat Models
+
+`ModelScopeChatEndpoint` class는 ModelScope의 chat model을 제공합니다. 사용 가능한 모델은 [여기](https://www.modelscope.cn/docs/model-service/API-Inference/intro)에서 확인하세요.
+
+```python
+from langchain_modelscope import ModelScopeChatEndpoint
+
+llm = ModelScopeChatEndpoint(model="Qwen/Qwen2.5-Coder-32B-Instruct")
+llm.invoke("Sing a ballad of LangChain.")
+```
+
+## Embeddings
+
+`ModelScopeEmbeddings` class는 ModelScope의 embedding을 제공합니다.
+
+```python
+from langchain_modelscope import ModelScopeEmbeddings
+
+embeddings = ModelScopeEmbeddings(model_id="damo/nlp_corom_sentence-embedding_english-base")
+embeddings.embed_query("What is the meaning of life?")
+```
+
+## LLMs
+`ModelScopeEndpoint` class는 ModelScope의 LLM을 제공합니다.
+
+```python
+from langchain_modelscope import ModelScopeEndpoint
+
+llm = ModelScopeEndpoint(model="Qwen/Qwen2.5-Coder-32B-Instruct")
+llm.invoke("The meaning of life is")
+```

@@ -1,0 +1,326 @@
+---
+title: LangSmith Deployments와 Evaluation을 활용한 CI/CD 파이프라인 구현
+sidebarTitle: CI/CD 파이프라인 구현하기
+---
+
+이 가이드에서는 LangSmith Deployments에 배포된 AI 에이전트 애플리케이션을 위한 종합적인 CI/CD 파이프라인 구현 방법을 설명합니다. 이 예제에서는 에이전트 오케스트레이션 및 빌드를 위해 [LangGraph](/oss/langgraph/overview) 오픈 소스 프레임워크를, 관찰성과 평가를 위해 [LangSmith](/langsmith/home)를 사용합니다. 이 파이프라인은 [cicd-pipeline-example 저장소](https://github.com/langchain-ai/cicd-pipeline-example)를 기반으로 합니다.
+
+## 개요
+
+CI/CD 파이프라인은 다음을 제공합니다:
+
+- <Icon icon="check-circle" /> **자동화된 테스트**: 단위, 통합, 엔드 투 엔드 테스트
+- <Icon icon="chart-line" /> **오프라인 평가**: [AgentEvals](https://github.com/langchain-ai/agentevals), [OpenEvals](https://github.com/langchain-ai/openevals), [LangSmith](https://docs.langchain.com/langsmith/home)를 활용한 성능 평가
+- <Icon icon="rocket" /> **프리뷰 및 프로덕션 배포**: Control Plane API를 통한 자동화된 스테이징 및 품질 게이트 프로덕션 릴리즈
+- <Icon icon="eye" /> **모니터링**: 지속적인 평가 및 알림
+
+## 파이프라인 아키텍처
+
+CI/CD 파이프라인은 코드 품질과 신뢰성 있는 배포를 보장하기 위해 여러 핵심 컴포넌트로 구성됩니다:
+
+```mermaid
+graph TD
+    A1[Code or Graph Change] --> B1[Trigger CI Pipeline]
+    A2[Prompt Commit in PromptHub] --> B1
+    A3[Online Evaluation Alert] --> B1
+    A4[PR Opened] --> B1
+
+    subgraph "Testing"
+        B1 --> C1[Run Unit Tests]
+        B1 --> C2[Run Integration Tests]
+        B1 --> C3[Run End to End Tests]
+        B1 --> C4[Run Offline Evaluations]
+
+        C4 --> D1[Evaluate with OpenEvals or AgentEvals]
+        C4 --> D2[Assertions: Hard and Soft]
+
+        C1 --> E1[Run LangGraph Dev Server Test]
+        C2 --> E1
+        C3 --> E1
+        D1 --> E1
+        D2 --> E1
+    end
+
+    E1 --> F1[Push to Staging Deployment - Deploy to LangSmith as Development Type]
+
+    F1 --> G1[Run Online Evaluations on Live Data]
+    G1 --> H1[Attach Scores to Traces]
+
+    H1 --> I1[If Quality Below Threshold]
+    I1 --> J1[Send to Annotation Queue]
+    I1 --> J2[Trigger Alert via Webhook]
+    I1 --> J3[Push Trace to Golden Dataset]
+
+    F1 --> K1[Promote to Production if All Pass - Deploy to LangSmith Production]
+
+    J2 --> L1[Slack or PagerDuty Notification]
+
+    subgraph Manual Review
+        J1 --> M1[Human Labeling]
+        M1 --> J3
+    end
+```
+
+### 트리거 소스
+
+이 파이프라인은 개발 중이거나 애플리케이션이 이미 운영 중일 때 여러 방식으로 트리거할 수 있습니다. 파이프라인 트리거 방식은 다음과 같습니다:
+
+- <Icon icon="code-branch" /> **코드 변경**: LangGraph 아키텍처 수정, 모델 변경, 에이전트 로직 업데이트, 기타 코드 개선을 위한 main/development 브랜치 푸시
+- <Icon icon="edit" /> **PromptHub 업데이트**: LangSmith PromptHub에 저장된 프롬프트 템플릿 변경—새 프롬프트 커밋 시 웹훅을 통해 파이프라인 실행
+- <Icon icon="exclamation-triangle" /> **온라인 평가 알림**: 라이브 배포에서 성능 저하 알림
+- <Icon icon="webhook" /> **LangSmith 트레이스 웹훅**: 트레이스 분석 및 성능 지표 기반 자동 트리거
+- <Icon icon="play" /> **수동 트리거**: 테스트 또는 긴급 배포를 위한 수동 파이프라인 실행
+
+### 테스트 레이어
+
+기존 소프트웨어와 달리, AI 에이전트 애플리케이션 테스트는 응답 품질 평가도 필요하므로 워크플로우의 각 부분을 테스트하는 것이 중요합니다. 파이프라인은 여러 테스트 레이어를 구현합니다:
+
+1. <Icon icon="puzzle-piece" /> **단위 테스트**: 개별 노드 및 유틸리티 함수 테스트
+2. <Icon icon="link" /> **통합 테스트**: 컴포넌트 상호작용 테스트
+3. <Icon icon="route" /> **엔드 투 엔드 테스트**: 전체 그래프 실행 테스트
+4. <Icon icon="brain" /> **오프라인 평가**: 실제 시나리오 기반 성능 평가(엔드 투 엔드 평가, 단일 단계 평가, 에이전트 경로 분석, 다중 턴 시뮬레이션 포함)
+5. <Icon icon="server" /> **LangGraph 개발 서버 테스트**: [langgraph-cli](/langsmith/cli) 도구를 사용하여(GitHub Action 내에서) LangGraph 에이전트를 실행하는 로컬 서버를 구동합니다. `/ok` 서버 API 엔드포인트를 30초간 폴링하며, 이후 오류를 발생시킵니다.
+
+## GitHub Actions 워크플로우
+
+CI/CD 파이프라인은 [Control Plane API](/langsmith/api-ref-control-plane)와 [LangSmith API](https://api.smith.langchain.com/redoc)를 활용하여 GitHub Actions로 배포를 자동화합니다. API 상호작용 및 배포 관리를 위한 헬퍼 스크립트: https://github.com/langchain-ai/cicd-pipeline-example/blob/main/.github/scripts/langgraph_api.py.
+
+워크플로우에는 다음이 포함됩니다:
+
+- **새 에이전트 배포**: 새 PR이 열리고 테스트가 통과하면, [Control Plane API](/langsmith/api-ref-control-plane)를 통해 LangSmith Deployments에 프리뷰 배포가 생성됩니다. 이를 통해 프로덕션으로 승격하기 전에 스테이징 환경에서 에이전트를 테스트할 수 있습니다.
+
+- **에이전트 배포 리비전**: 동일한 ID의 기존 배포가 발견되거나 PR이 main에 병합될 때 리비전이 발생합니다. main에 병합되는 경우 프리뷰 배포가 삭제되고 프로덕션 배포가 생성됩니다. 이를 통해 에이전트의 모든 업데이트가 프로덕션 인프라에 올바르게 배포 및 통합됩니다.
+
+    ![Agent Deployment Revision Workflow](./images/cicd-new-lgp-revision.png)
+
+- **테스트 및 평가 워크플로우**: 기존 테스트 단계(단위 테스트, 통합 테스트, 엔드 투 엔드 테스트 등) 외에도, 파이프라인에는 [오프라인 평가](/langsmith/evaluation-concepts#offline-evaluation)와 [LangGraph 개발 서버 테스트](/langsmith/local-server)가 포함되어 에이전트 품질을 검증합니다. 이러한 평가는 실제 시나리오와 데이터를 활용하여 에이전트 성능을 종합적으로 평가합니다.
+
+    ![Test with Results Workflow](./images/cicd-test-with-results.png)
+
+    <AccordionGroup>
+    <Accordion title="최종 응답 평가" icon="check-circle">
+        에이전트의 최종 출력이 기대 결과와 일치하는지 평가합니다. 이는 에이전트의 최종 응답이 품질 기준을 충족하고 사용자의 질문에 올바르게 답하는지 확인하는 가장 일반적인 평가 유형입니다.
+    </Accordion>
+
+    <Accordion title="단일 단계 평가" icon="step-forward">
+        LangGraph 워크플로우 내 개별 단계 또는 노드를 테스트합니다. 이를 통해 에이전트 로직의 특정 컴포넌트를 개별적으로 검증하여 전체 파이프라인 테스트 전에 각 단계가 올바르게 동작하는지 확인할 수 있습니다.
+    </Accordion>
+
+    <Accordion title="에이전트 경로 평가" icon="route">
+        그래프 내에서 에이전트가 거치는 전체 경로(중간 단계 및 결정 지점 포함)를 분석합니다. 이를 통해 병목, 불필요한 단계, 비효율적인 라우팅을 식별할 수 있습니다. 또한 에이전트가 적절한 도구를 올바른 순서와 시점에 호출했는지 평가합니다.
+    </Accordion>
+
+    <Accordion title="다중 턴 평가" icon="comments">
+        에이전트가 여러 상호작용에서 컨텍스트를 유지하는 대화 흐름을 테스트합니다. 이는 후속 질문, 추가 설명, 장기간 사용자 대화 등을 처리하는 에이전트에 매우 중요합니다.
+    </Accordion>
+    </AccordionGroup>
+
+    구체적인 테스트 방법은 [LangGraph 테스트 문서](/oss/langgraph/test)와 오프라인 평가에 대한 종합적인 개요는 [평가 접근 방식 가이드](/langsmith/evaluation-approaches)를 참고하세요.
+
+### 사전 준비 사항
+
+CI/CD 파이프라인을 설정하기 전에 다음을 준비하세요:
+
+- <Icon icon="robot" /> AI 에이전트 애플리케이션([LangGraph](/oss/langgraph/overview) 기반)
+- <Icon icon="user" /> [LangSmith 계정](https://smith.langchain.com/)
+- <Icon icon="key" /> 에이전트 배포 및 실험 결과 조회에 필요한 [LangSmith API 키](/langsmith/create-account-api-key)
+- <Icon icon="cog" /> 저장소 시크릿에 프로젝트별 환경 변수 설정(예: LLM 모델 API 키, 벡터 스토어 자격 증명, 데이터베이스 연결 정보 등)
+
+<Note>
+이 예제에서는 GitHub를 사용하지만, CI/CD 파이프라인은 GitLab, Bitbucket 등 다른 Git 호스팅 플랫폼에서도 동작합니다.
+</Note>
+
+## 배포 옵션
+
+LangSmith는 [LangSmith 인스턴스 호스팅 방식](/langsmith/hosting)에 따라 다양한 배포 방법을 지원합니다:
+
+- <Icon icon="cloud" /> **클라우드 LangSmith**: GitHub 직접 연동 또는 Docker 이미지 배포
+- <Icon icon="server" /> **셀프 호스팅/하이브리드**: 컨테이너 레지스트리 기반 배포
+
+배포 플로우는 에이전트 구현을 수정하는 것에서 시작합니다. 최소한 [`langgraph.json`](/langsmith/application-structure)과 프로젝트의 의존성 파일(`requirements.txt` 또는 `pyproject.toml`)이 필요합니다. `langgraph dev` CLI 도구로 오류를 확인하세요—오류가 있으면 수정해야 하며, 그렇지 않으면 LangSmith Deployments에 배포 시 성공합니다.
+
+```mermaid
+graph TD
+    A[Agent Implementation] --> B[langgraph.json + dependencies]
+    B --> C[Test Locally with langgraph dev]
+    C --> D{Errors?}
+    D -->|Yes| E[Fix Issues]
+    E --> C
+    D -->|No| F[Choose LangSmith Instance]
+
+    F --> G[Cloud LangSmith]
+    F --> H[Self-Hosted/Hybrid LangSmith]
+
+    subgraph "Cloud LangSmith"
+        G --> I[Method 1: Connect GitHub Repo in UI]
+        G --> J[Method 2: Control Plane API with GitHub Repo]
+        I --> K[Deploy via LangSmith UI]
+        J --> L[Deploy via Control Plane API]
+    end
+
+    subgraph "Self-Hosted/Hybrid LangSmith"
+        H --> S[Build Docker Image langgraph build]
+        S --> T[Push to Container Registry]
+        T --> U{Deploy via?}
+        U -->|UI| V[Specify Image URI in UI]
+        U -->|API| W[Use Control Plane API]
+        V --> X[Deploy via LangSmith UI]
+        W --> Y[Deploy via Control Plane API]
+    end
+
+    K --> AA[Agent Ready for Use]
+    L --> AA
+    X --> AA
+    Y --> AA
+
+    AA --> BB{Connect via?}
+    BB -->|LangGraph SDK| CC[Use LangGraph SDK]
+    BB -->|RemoteGraph| DD[Use RemoteGraph]
+    BB -->|REST API| EE[Use REST API]
+    BB -->|LangGraph Studio UI| FF[Use LangGraph Studio UI]
+```
+
+### 수동 배포 사전 준비 사항
+
+에이전트 배포 전에 다음을 준비하세요:
+
+1. <Icon icon="project-diagram" /> **LangGraph 그래프**: 에이전트 구현(예: `./agents/simple_text2sql.py:agent`)
+2. <Icon icon="box" /> **의존성**: 모든 필수 패키지가 포함된 `requirements.txt` 또는 `pyproject.toml`
+3. <Icon icon="cog" /> **구성**: 다음을 지정하는 `langgraph.json` 파일
+   - 에이전트 그래프 경로
+   - 의존성 위치
+   - 환경 변수
+   - Python 버전
+
+`langgraph.json` 예시:
+```json
+{
+    "graphs": {
+        "simple_text2sql": "./agents/simple_text2sql.py:agent"
+    },
+    "env": ".env",
+    "python_version": "3.11",
+    "dependencies": ["."],
+    "image_distro": "wolfi"
+}
+```
+
+### 로컬 개발 및 테스트
+
+![LangGraph Studio CLI Interface](./images/cicd-studio-cli.png)
+
+먼저 [Studio](/langsmith/studio)를 사용하여 에이전트를 로컬에서 테스트하세요:
+
+```bash
+# Start local development server with LangGraph Studio
+langgraph dev
+```
+
+이 작업은 다음을 수행합니다:
+- Studio와 함께 로컬 서버를 구동합니다.
+- 그래프를 시각화하고 상호작용할 수 있습니다.
+- 배포 전에 에이전트가 올바르게 동작하는지 검증합니다.
+
+<Note>
+에이전트가 로컬에서 오류 없이 실행된다면, LangSmith에 배포도 성공할 가능성이 높습니다. 이 로컬 테스트는 배포 시도 전에 구성 문제, 의존성 문제, 에이전트 로직 오류를 사전에 발견하는 데 도움이 됩니다.
+</Note>
+
+자세한 내용은 [LangGraph CLI 문서](/langsmith/cli#dev)를 참고하세요.
+
+### 방법 1: LangSmith 배포 UI
+
+LangSmith 배포 인터페이스를 사용하여 에이전트를 배포하세요:
+
+1. [LangSmith 대시보드](https://smith.langchain.com)에 접속합니다.
+2. **Deployments** 섹션으로 이동합니다.
+3. 우측 상단의 **+ New Deployment** 버튼을 클릭합니다.
+4. 드롭다운 메뉴에서 LangGraph 에이전트가 포함된 GitHub 저장소를 선택합니다.
+
+**지원되는 배포 방식:**
+- <Icon icon="cloud" /> **클라우드 LangSmith**: 드롭다운 메뉴를 통한 GitHub 직접 연동
+- <Icon icon="server" /> **셀프 호스팅/하이브리드 LangSmith**: Image Path 필드에 이미지 URI 지정(예: `docker.io/username/my-agent:latest`)
+
+<Info>
+**장점:**
+- 간편한 UI 기반 배포
+- GitHub 저장소와 직접 연동(클라우드)
+- Docker 이미지 수동 관리 불필요(클라우드)
+</Info>
+
+### 방법 2: Control Plane API
+
+Control Plane API를 사용하여 각 배포 유형에 맞는 방식으로 배포하세요:
+
+**클라우드 LangSmith의 경우:**
+- Control Plane API를 사용하여 GitHub 저장소를 지정해 배포 생성
+- 클라우드 배포는 Docker 이미지 빌드 불필요
+
+**셀프 호스팅/하이브리드 LangSmith의 경우:**
+```bash
+# Build Docker image
+langgraph build -t my-agent:latest
+
+# Push to your container registry
+docker push my-agent:latest
+```
+
+배포 환경에서 접근 가능한 모든 컨테이너 레지스트리(Docker Hub, AWS ECR, Azure ACR, Google GCR 등)에 푸시할 수 있습니다.
+
+**지원되는 배포 방식:**
+- <Icon icon="cloud" /> **클라우드 LangSmith**: Control Plane API로 GitHub 저장소에서 배포 생성
+- <Icon icon="server" /> **셀프 호스팅/하이브리드 LangSmith**: Control Plane API로 컨테이너 레지스트리에서 배포 생성
+
+자세한 내용은 [LangGraph CLI 빌드 문서](/langsmith/cli#build)를 참고하세요.
+
+### 배포된 에이전트 연결
+
+- <Icon icon="code" /> **[LangGraph SDK](https://langchain-ai.github.io/langgraph/cloud/reference/sdk/python_sdk_ref/#langgraph-sdk-python)**: LangGraph SDK를 사용하여 프로그래밍 방식으로 통합
+- <Icon icon="project-diagram" /> **[RemoteGraph](/langsmith/use-remote-graph)**: RemoteGraph를 사용하여 원격 그래프 연결(다른 그래프에서 사용)
+- <Icon icon="globe" /> **[REST API](/langsmith/server-api-ref)**: HTTP 기반 인터페이스로 배포된 에이전트와 상호작용
+- <Icon icon="desktop" /> **[Studio](/langsmith/studio)**: 테스트 및 디버깅을 위한 시각적 인터페이스 접근
+
+### 환경 구성
+
+#### 데이터베이스 & 캐시 구성
+
+기본적으로 LangSmith Deployments는 PostgreSQL과 Redis 인스턴스를 자동 생성합니다. 외부 서비스를 사용하려면 새 배포 또는 리비전에 다음 환경 변수를 설정하세요:
+
+```bash
+# Set environment variables for external services
+export POSTGRES_URI_CUSTOM="postgresql://user:pass@host:5432/db"
+export REDIS_URI_CUSTOM="redis://host:6379/0"
+```
+
+자세한 내용은 [환경 변수 문서](/langsmith/env-var#postgres-uri-custom)를 참고하세요.
+
+## 문제 해결
+
+### 잘못된 API 엔드포인트
+
+연결 문제가 발생하면 LangSmith 인스턴스에 맞는 올바른 엔드포인트 형식을 사용하는지 확인하세요. 서로 다른 엔드포인트를 가진 두 가지 API가 있습니다:
+
+#### LangSmith API(트레이스, 인제스션 등)
+
+LangSmith API 작업(트레이스, 평가, 데이터셋 등)을 위한 엔드포인트:
+
+| 리전 | 엔드포인트 |
+|--------|----------|
+| 미국 | `https://api.smith.langchain.com` |
+| 유럽 | `https://eu.api.smith.langchain.com` |
+
+셀프 호스팅 LangSmith 인스턴스의 경우, `<langsmith-url>`이 인스턴스 URL인 `http(s)://<langsmith-url>/api`를 사용하세요.
+
+<Note>
+`LANGSMITH_ENDPOINT` 환경 변수에 엔드포인트를 설정할 때는 끝에 `/v1`을 추가해야 합니다(예: `https://api.smith.langchain.com/v1` 또는 셀프 호스팅 시 `http(s)://<langsmith-url>/api/v1`).
+</Note>
+
+#### LangSmith Deployments API(배포)
+
+LangSmith Deployments 작업(배포, 리비전 등)을 위한 엔드포인트:
+
+| 리전 | 엔드포인트 |
+|--------|----------|
+| 미국 | `https://api.host.langchain.com` |
+| 유럽 | `https://eu.api.host.langchain.com` |
+
+셀프 호스팅 LangSmith 인스턴스의 경우, `<langsmith-url>`이 인스턴스 URL인 `http(s)://<langsmith-url>/api-host`를 사용하세요.

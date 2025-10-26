@@ -1,0 +1,28 @@
+---
+title: SQLite
+---
+
+>[SQLite](https://en.wikipedia.org/wiki/SQLite)는 C 프로그래밍 언어로 작성된 데이터베이스 엔진입니다. 독립 실행형 앱이 아니라 소프트웨어 개발자가 자신의 앱에 내장하는 라이브러리입니다. 따라서 임베디드 데이터베이스 제품군에 속합니다. 여러 주요 웹 브라우저, 운영 체제, 휴대폰 및 기타 임베디드 시스템에서 사용되므로 가장 널리 배포된 데이터베이스 엔진입니다.
+
+## Installation and Setup
+
+`SQLAlchemy` python package를 설치해야 합니다.
+
+<CodeGroup>
+```bash pip
+pip install SQLAlchemy
+```
+
+```bash uv
+uv add SQLAlchemy
+```
+</CodeGroup>
+
+## Vector Store
+
+[사용 예제](/oss/integrations/vectorstores/sqlitevec)를 참조하세요.
+
+```python
+from langchain_community.vectorstores import SQLiteVec
+from langchain_community.vectorstores import SQLiteVSS # legacy
+```

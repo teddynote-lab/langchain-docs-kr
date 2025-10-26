@@ -1,0 +1,77 @@
+---
+title: NotionAPI
+---
+
+이 가이드는 Notion API를 사용하여 Notion 페이지와 데이터베이스에서 문서를 로드하는 데 필요한 단계를 안내합니다.
+
+## Overview
+
+Notion은 노트 작성, 작업 관리 및 데이터 구성 도구를 하나의 인터페이스로 통합하는 다목적 생산성 플랫폼입니다.
+
+이 document loader는 전체 Notion 페이지와 데이터베이스를 가져와서 프로젝트에 통합할 준비가 된 LangChain Documents로 변환할 수 있습니다.
+
+## Setup
+
+1. 먼저 공식 Notion client와 [notion-to-md](https://www.npmjs.com/package/notion-to-md) package를 peer dependencies로 설치해야 합니다:
+
+```bash npm
+npm install @langchain/community @langchain/core @notionhq/client notion-to-md
+```
+
+2. [Notion integration](https://www.notion.so/my-integrations)을 생성하고 Internal Integration Secret(`NOTION_INTEGRATION_TOKEN`이라고도 함)을 안전하게 기록합니다.
+3. 페이지 또는 데이터베이스에 새 integration에 대한 연결을 추가합니다. 이를 위해 Notion 페이지를 열고 오른쪽 상단의 설정 메뉴로 이동한 다음 `Add connections`까지 스크롤하여 새 integration을 선택합니다.
+4. 로드하려는 페이지 또는 데이터베이스의 `PAGE_ID` 또는 `DATABASE_ID`를 가져옵니다.
+
+> url 경로의 32자 hex는 `ID`를 나타냅니다. 예를 들어:
+
+> PAGE_ID: [https://www.notion.so/skarard/LangChain-Notion-API-`b34ca03f219c4420a6046fc4bdfdf7b4`](https://www.notion.so/skarard/LangChain-Notion-API-b34ca03f219c4420a6046fc4bdfdf7b4)
+
+> DATABASE_ID: [https://www.notion.so/skarard/`c393f19c3903440da0d34bf9c6c12ff2`?v=9c70a0f4e174498aa0f9021e0a9d52de](https://www.notion.so/skarard/c393f19c3903440da0d34bf9c6c12ff2?v=9c70a0f4e174498aa0f9021e0a9d52de)
+
+> REGEX: `/(?<!=)[0-9a-f]{32}/`
+
+## Example Usage
+
+```typescript
+import { NotionAPILoader } from "@langchain/community/document_loaders/web/notionapi";
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+
+// Loading a page (including child pages all as separate documents)
+const pageLoader = new NotionAPILoader({
+  clientOptions: {
+    auth: "<NOTION_INTEGRATION_TOKEN>",
+  },
+  id: "<PAGE_ID>",
+  type: "page",
+});
+
+const splitter = new RecursiveCharacterTextSplitter();
+
+// Load the documents
+const pageDocs = await pageLoader.load();
+// Split the documents using the text splitter
+const splitDocs = await splitter.splitDocuments(pageDocs);
+
+console.log({ splitDocs });
+
+// Loading a database (each row is a separate document with all properties as metadata)
+const dbLoader = new NotionAPILoader({
+  clientOptions: {
+    auth: "<NOTION_INTEGRATION_TOKEN>",
+  },
+  id: "<DATABASE_ID>",
+  type: "database",
+  onDocumentLoaded: (current, total, currentTitle) => {
+    console.log(`Loaded Page: ${currentTitle} (${current}/${total})`);
+  },
+  callerOptions: {
+    maxConcurrency: 64, // Default value
+  },
+  propertiesAsHeader: true, // Prepends a front matter header of the page properties to the page contents
+});
+
+// A database row contents is likely to be less than 1000 characters so it's not split into multiple documents
+const dbDocs = await dbLoader.load();
+
+console.log({ dbDocs });
+```

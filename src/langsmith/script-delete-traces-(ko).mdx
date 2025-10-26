@@ -1,0 +1,68 @@
+---
+title: trace 삭제
+sidebarTitle: trace 삭제
+---
+
+LangSmith UI는 현재 개별 trace의 삭제를 지원하지 않습니다. 하지만 ClickHouse의 모든 materialized view(runs_history view 제외)와 runs 및 feedback 테이블에서 직접 trace를 제거하여 이를 수행할 수 있습니다.
+
+이 명령은 trace ID를 인수로 사용하거나 trace ID 목록이 포함된 파일을 사용하여 실행할 수 있습니다.
+
+### 사전 요구 사항
+
+다음 도구/항목을 준비했는지 확인하세요.
+
+1. kubectl
+
+   * [https://kubernetes.io/docs/tasks/tools/](https://kubernetes.io/docs/tasks/tools/)
+
+2. Clickhouse database 자격 증명
+
+   * Host
+   * Port
+   * Username
+     * 번들 버전을 사용하는 경우 `default`입니다
+   * Password
+     * 번들 버전을 사용하는 경우 `password`입니다
+   * Database name
+     * 번들 버전을 사용하는 경우 `default`입니다
+
+3. `delete_trace_by_id` script를 실행할 머신에서 Clickhouse database로의 연결
+
+   * 번들 버전을 사용하는 경우 clickhouse service를 로컬 머신으로 port forward해야 할 수 있습니다.
+   * `kubectl port-forward svc/langsmith-clickhouse 8123:8123`을 실행하여 clickhouse service를 로컬 머신으로 port forward하세요.
+
+4. trace를 삭제하는 script
+
+   * [여기](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/scripts/delete_trace_by_id.sh)에서 script를 다운로드할 수 있습니다
+
+### 단일 trace에 대한 삭제 script 실행
+
+단일 trace ID를 사용하여 trace 삭제 script를 실행하려면 다음 명령을 실행하세요:
+
+```bash
+sh delete_trace_by_id.sh <clickhouse_url> --trace_id <trace_id>
+```
+
+예를 들어, port-forwarding과 함께 번들 버전을 사용하는 경우 명령은 다음과 같습니다:
+
+```bash
+sh delete_trace_by_id.sh "clickhouse://default:password@localhost:8123/default" --trace_id 4ec70ec7-0808-416a-b836-7100aeec934b
+```
+
+LangSmith UI를 방문하면 지정된 trace ID가 더 이상 존재하지 않으며 통계에도 반영되지 않는 것을 확인할 수 있습니다.
+
+### 한 줄에 하나의 trace ID가 있는 파일에서 여러 trace에 대한 삭제 script 실행
+
+trace ID 목록을 사용하여 trace 삭제 script를 실행하려면 다음 명령을 실행하세요:
+
+```bash
+sh delete_trace_by_id.sh <clickhouse_url> --file <path/to/foo.txt>
+```
+
+예를 들어, port-forwarding과 함께 번들 버전을 사용하는 경우 명령은 다음과 같습니다:
+
+```bash
+sh delete_trace_by_id.sh "clickhouse://default:password@localhost:8123/default" --file path/to/traces.txt
+```
+
+LangSmith UI를 방문하면 지정된 모든 trace가 제거된 것을 확인할 수 있습니다.

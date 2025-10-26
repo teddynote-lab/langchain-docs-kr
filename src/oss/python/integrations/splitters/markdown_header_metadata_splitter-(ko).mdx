@@ -1,0 +1,158 @@
+---
+title: Markdown 분할
+---
+
+많은 채팅 또는 Q&A 애플리케이션은 임베딩 및 벡터 저장 전에 입력 문서를 청크로 분할하는 작업을 포함합니다.
+
+Pinecone의 [이 노트](https://www.pinecone.io/learn/chunking-strategies/)는 몇 가지 유용한 팁을 제공합니다:
+
+```wrap
+When a full paragraph or document is embedded, the embedding process considers both the overall context and the relationships between the sentences and phrases within the text. This can result in a more comprehensive vector representation that captures the broader meaning and themes of the text.
+```
+
+언급했듯이, 청킹은 종종 공통 컨텍스트를 가진 텍스트를 함께 유지하는 것을 목표로 합니다. 이를 염두에 두고, 문서 자체의 구조를 특별히 존중하고 싶을 수 있습니다. 예를 들어, markdown 파일은 헤더로 구성됩니다. 특정 헤더 그룹 내에서 청크를 생성하는 것은 직관적인 아이디어입니다. 이 문제를 해결하기 위해 [MarkdownHeaderTextSplitter](https://python.langchain.com/api_reference/text_splitters/markdown/langchain_text_splitters.markdown.MarkdownHeaderTextSplitter.html)를 사용할 수 있습니다. 이것은 지정된 헤더 세트로 markdown 파일을 분할합니다.
+
+예를 들어, 이 markdown을 분할하려면:
+```markdown
+md = '# Foo\n\n ## Bar\n\nHi this is Jim  \nHi this is Joe\n\n ## Baz\n\n Hi this is Molly'
+```
+
+분할할 헤더를 지정할 수 있습니다:
+```python
+[("#", "Header 1"),("##", "Header 2")]
+```
+
+그러면 콘텐츠가 공통 헤더로 그룹화되거나 분할됩니다:
+```
+{'content': 'Hi this is Jim  \nHi this is Joe', 'metadata': {'Header 1': 'Foo', 'Header 2': 'Bar'}}
+{'content': 'Hi this is Molly', 'metadata': {'Header 1': 'Foo', 'Header 2': 'Baz'}}
+```
+
+아래에서 몇 가지 예제를 살펴보겠습니다.
+
+### 기본 사용법:
+
+
+```python
+pip install -qU langchain-text-splitters
+```
+
+```python
+from langchain_text_splitters import MarkdownHeaderTextSplitter
+```
+
+```python
+markdown_document = "# Foo\n\n    ## Bar\n\nHi this is Jim\n\nHi this is Joe\n\n ### Boo \n\n Hi this is Lance \n\n ## Baz\n\n Hi this is Molly"
+
+headers_to_split_on = [
+    ("#", "Header 1"),
+    ("##", "Header 2"),
+    ("###", "Header 3"),
+]
+
+markdown_splitter = MarkdownHeaderTextSplitter(headers_to_split_on)
+md_header_splits = markdown_splitter.split_text(markdown_document)
+md_header_splits
+```
+
+```output
+[Document(metadata={'Header 1': 'Foo', 'Header 2': 'Bar'}, page_content='Hi this is Jim  \nHi this is Joe'),
+ Document(metadata={'Header 1': 'Foo', 'Header 2': 'Bar', 'Header 3': 'Boo'}, page_content='Hi this is Lance'),
+ Document(metadata={'Header 1': 'Foo', 'Header 2': 'Baz'}, page_content='Hi this is Molly')]
+```
+
+```python
+type(md_header_splits[0])
+```
+
+```output
+langchain_core.documents.base.Document
+```
+
+기본적으로 `MarkdownHeaderTextSplitter`는 분할되는 헤더를 출력 청크의 콘텐츠에서 제거합니다. 이는 `strip_headers = False`로 설정하여 비활성화할 수 있습니다.
+
+```python
+markdown_splitter = MarkdownHeaderTextSplitter(headers_to_split_on, strip_headers=False)
+md_header_splits = markdown_splitter.split_text(markdown_document)
+md_header_splits
+```
+
+```output
+[Document(metadata={'Header 1': 'Foo', 'Header 2': 'Bar'}, page_content='# Foo  \n## Bar  \nHi this is Jim  \nHi this is Joe'),
+ Document(metadata={'Header 1': 'Foo', 'Header 2': 'Bar', 'Header 3': 'Boo'}, page_content='### Boo  \nHi this is Lance'),
+ Document(metadata={'Header 1': 'Foo', 'Header 2': 'Baz'}, page_content='## Baz  \nHi this is Molly')]
+```
+
+<Note>
+    **기본 `MarkdownHeaderTextSplitter`는 공백과 줄바꿈을 제거합니다. Markdown 문서의 원래 형식을 유지하려면 [`ExperimentalMarkdownSyntaxTextSplitter`](https://python.langchain.com/api_reference/text_splitters/markdown/langchain_text_splitters.markdown.ExperimentalMarkdownSyntaxTextSplitter.html)를 확인하세요.**
+</Note>
+
+### Markdown 라인을 별도의 문서로 반환하는 방법
+
+기본적으로 `MarkdownHeaderTextSplitter`는 `headers_to_split_on`에 지정된 헤더를 기반으로 라인을 집계합니다. `return_each_line`을 지정하여 이를 비활성화할 수 있습니다:
+
+```python
+markdown_splitter = MarkdownHeaderTextSplitter(
+    headers_to_split_on,
+    return_each_line=True,
+)
+md_header_splits = markdown_splitter.split_text(markdown_document)
+md_header_splits
+```
+
+```output
+[Document(metadata={'Header 1': 'Foo', 'Header 2': 'Bar'}, page_content='Hi this is Jim'),
+ Document(metadata={'Header 1': 'Foo', 'Header 2': 'Bar'}, page_content='Hi this is Joe'),
+ Document(metadata={'Header 1': 'Foo', 'Header 2': 'Bar', 'Header 3': 'Boo'}, page_content='Hi this is Lance'),
+ Document(metadata={'Header 1': 'Foo', 'Header 2': 'Baz'}, page_content='Hi this is Molly')]
+```
+
+여기서 헤더 정보는 각 문서의 `metadata`에 유지됩니다.
+
+### 청크 크기를 제한하는 방법:
+
+각 markdown 그룹 내에서 `RecursiveCharacterTextSplitter`와 같은 원하는 텍스트 분할기를 적용할 수 있으며, 이를 통해 청크 크기를 추가로 제어할 수 있습니다.
+
+```python
+markdown_document = "# Intro \n\n    ## History \n\n Markdown[9] is a lightweight markup language for creating formatted text using a plain-text editor. John Gruber created Markdown in 2004 as a markup language that is appealing to human readers in its source code form.[9] \n\n Markdown is widely used in blogging, instant messaging, online forums, collaborative software, documentation pages, and readme files. \n\n ## Rise and divergence \n\n As Markdown popularity grew rapidly, many Markdown implementations appeared, driven mostly by the need for \n\n additional features such as tables, footnotes, definition lists,[note 1] and Markdown inside HTML blocks. \n\n #### Standardization \n\n From 2012, a group of people, including Jeff Atwood and John MacFarlane, launched what Atwood characterised as a standardisation effort. \n\n ## Implementations \n\n Implementations of Markdown are available for over a dozen programming languages."
+
+headers_to_split_on = [
+    ("#", "Header 1"),
+    ("##", "Header 2"),
+]
+
+# MD splits
+markdown_splitter = MarkdownHeaderTextSplitter(
+    headers_to_split_on=headers_to_split_on, strip_headers=False
+)
+md_header_splits = markdown_splitter.split_text(markdown_document)
+
+# Char-level splits
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+chunk_size = 250
+chunk_overlap = 30
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=chunk_size, chunk_overlap=chunk_overlap
+)
+
+# Split
+splits = text_splitter.split_documents(md_header_splits)
+splits
+```
+
+```output
+[Document(metadata={'Header 1': 'Intro', 'Header 2': 'History'}, page_content='# Intro  \n## History  \nMarkdown[9] is a lightweight markup language for creating formatted text using a plain-text editor. John Gruber created Markdown in 2004 as a markup language that is appealing to human readers in its source code form.[9]'),
+ Document(metadata={'Header 1': 'Intro', 'Header 2': 'History'}, page_content='Markdown is widely used in blogging, instant messaging, online forums, collaborative software, documentation pages, and readme files.'),
+ Document(metadata={'Header 1': 'Intro', 'Header 2': 'Rise and divergence'}, page_content='## Rise and divergence  \nAs Markdown popularity grew rapidly, many Markdown implementations appeared, driven mostly by the need for  \nadditional features such as tables, footnotes, definition lists,[note 1] and Markdown inside HTML blocks.'),
+ Document(metadata={'Header 1': 'Intro', 'Header 2': 'Rise and divergence'}, page_content='#### Standardization  \nFrom 2012, a group of people, including Jeff Atwood and John MacFarlane, launched what Atwood characterised as a standardisation effort.'),
+ Document(metadata={'Header 1': 'Intro', 'Header 2': 'Implementations'}, page_content='## Implementations  \nImplementations of Markdown are available for over a dozen programming languages.')]
+```
+
+## 문제 해결: `chunk_overlap`이 적용되지 않는 것처럼 보임
+
+- 헤더 기반 분할(예: `MarkdownHeaderTextSplitter`) 후에는 **`split_documents(docs)`**를 사용하세요(`split_text`가 아님). 이렇게 하면 오버랩이 **각 섹션 내에서** 적용되고 섹션별 metadata(헤더)가 청크에 보존됩니다.
+- 오버랩은 **단일 섹션**이 `chunk_size`를 초과하여 여러 청크로 분할될 때만 나타납니다.
+- 오버랩은 섹션/문서 경계(예: `# H1` → `## H2`)를 **넘지 않습니다**.
+- 헤더가 아주 작은 첫 번째 청크가 되는 경우, `strip_headers`를 `True`로 설정하여 헤더 라인이 독립적인 청크가 되지 않도록 하는 것을 고려하세요.
+- 텍스트에 줄바꿈/공백이 없는 경우, `separators`에 대체 `""`를 유지하여 분할기가 여전히 분할하고 오버랩을 적용할 수 있도록 하세요.

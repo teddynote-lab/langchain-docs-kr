@@ -1,0 +1,383 @@
+---
+title: Apache AGE
+---
+
+>[Apache AGE](https://age.apache.org/)는 graph database 기능을 제공하는 PostgreSQL extension입니다. AGE는 A Graph Extension의 약자이며, Bitnine의 PostgreSQL 10 fork인 AgensGraph에서 영감을 받았습니다. AgensGraph는 multi-model database입니다. 이 프로젝트의 목표는 relational 및 graph model 데이터를 모두 처리할 수 있는 단일 storage를 만들어 사용자가 표준 ANSI SQL과 함께 Graph query language인 openCypher를 사용할 수 있도록 하는 것입니다. `Apache AGE`가 저장하는 데이터 요소는 node, 이들을 연결하는 edge, 그리고 node와 edge의 attribute입니다.
+
+>이 notebook은 LLM을 사용하여 `Cypher` query language로 쿼리할 수 있는 graph database에 자연어 interface를 제공하는 방법을 보여줍니다.
+
+>[Cypher](https://en.wikipedia.org/wiki/Cypher_(query_language))는 property graph에서 표현력 있고 효율적인 데이터 쿼리를 가능하게 하는 선언적 graph query language입니다.
+
+## 설정하기
+
+AGE extension이 설치된 `Postgre` instance가 실행 중이어야 합니다. 테스트를 위한 한 가지 옵션은 공식 AGE docker image를 사용하여 docker container를 실행하는 것입니다.
+다음 스크립트를 실행하여 로컬 docker container를 실행할 수 있습니다:
+
+```
+docker run \
+    --name age  \
+    -p 5432:5432 \
+    -e POSTGRES_USER=postgresUser \
+    -e POSTGRES_PASSWORD=postgresPW \
+    -e POSTGRES_DB=postgresDB \
+    -d \
+    apache/age
+```
+
+docker에서 실행하는 방법에 대한 추가 지침은 [여기](https://hub.docker.com/r/apache/age)에서 확인할 수 있습니다.
+
+```python
+from langchain_community.graphs.age_graph import AGEGraph
+from langchain_neo4j import GraphCypherQAChain
+from langchain_openai import ChatOpenAI
+```
+
+```python
+conf = {
+    "database": "postgresDB",
+    "user": "postgresUser",
+    "password": "postgresPW",
+    "host": "localhost",
+    "port": 5432,
+}
+
+graph = AGEGraph(graph_name="age_test", conf=conf)
+```
+
+## 데이터베이스 시드하기
+
+데이터베이스가 비어 있다고 가정하면 Cypher query language를 사용하여 데이터를 채울 수 있습니다. 다음 Cypher statement는 멱등성(idempotent)을 가지므로, 한 번 또는 여러 번 실행하더라도 데이터베이스 정보는 동일합니다.
+
+```python
+graph.query(
+    """
+MERGE (m:Movie {name:"Top Gun"})
+WITH m
+UNWIND ["Tom Cruise", "Val Kilmer", "Anthony Edwards", "Meg Ryan"] AS actor
+MERGE (a:Actor {name:actor})
+MERGE (a)-[:ACTED_IN]->(m)
+"""
+)
+```
+
+```output
+[]
+```
+
+## Graph schema 정보 새로고침
+
+데이터베이스의 schema가 변경되면 Cypher statement를 생성하는 데 필요한 schema 정보를 새로고침할 수 있습니다.
+
+```python
+graph.refresh_schema()
+```
+
+```python
+print(graph.schema)
+```
+
+```output
+        Node properties are the following:
+        [{'properties': [{'property': 'name', 'type': 'STRING'}], 'labels': 'Actor'}, {'properties': [{'property': 'property_a', 'type': 'STRING'}], 'labels': 'LabelA'}, {'properties': [], 'labels': 'LabelB'}, {'properties': [], 'labels': 'LabelC'}, {'properties': [{'property': 'name', 'type': 'STRING'}], 'labels': 'Movie'}]
+        Relationship properties are the following:
+        [{'properties': [], 'type': 'ACTED_IN'}, {'properties': [{'property': 'rel_prop', 'type': 'STRING'}], 'type': 'REL_TYPE'}]
+        The relationships are the following:
+        ['(:`Actor`)-[:`ACTED_IN`]->(:`Movie`)', '(:`LabelA`)-[:`REL_TYPE`]->(:`LabelB`)', '(:`LabelA`)-[:`REL_TYPE`]->(:`LabelC`)']
+```
+
+## Graph 쿼리하기
+
+이제 graph cypher QA chain을 사용하여 graph에 질문할 수 있습니다
+
+```python
+chain = GraphCypherQAChain.from_llm(
+    ChatOpenAI(temperature=0), graph=graph, verbose=True, allow_dangerous_requests=True
+)
+```
+
+```python
+chain.invoke("Who played in Top Gun?")
+```
+
+```output
+> Entering new GraphCypherQAChain chain...
+```
+```output
+Generated Cypher:
+MATCH (a:Actor)-[:ACTED_IN]->(m:Movie)
+WHERE m.name = 'Top Gun'
+RETURN a.name
+Full Context:
+[{'name': 'Tom Cruise'}, {'name': 'Val Kilmer'}, {'name': 'Anthony Edwards'}, {'name': 'Meg Ryan'}]
+
+> Finished chain.
+```
+
+```output
+{'query': 'Who played in Top Gun?',
+ 'result': 'Tom Cruise, Val Kilmer, Anthony Edwards, Meg Ryan played in Top Gun.'}
+```
+
+## 결과 수 제한하기
+
+`top_k` parameter를 사용하여 Cypher QA Chain의 결과 수를 제한할 수 있습니다.
+기본값은 10입니다.
+
+```python
+chain = GraphCypherQAChain.from_llm(
+        ChatOpenAI(temperature=0),
+        graph=graph,
+        verbose=True,
+        top_k=2,
+        allow_dangerous_requests=True,
+)
+```
+
+```python
+chain.invoke("Who played in Top Gun?")
+```
+
+```output
+> Entering new GraphCypherQAChain chain...
+Generated Cypher:
+MATCH (a:Actor)-[:ACTED_IN]->(m:Movie {name: 'Top Gun'})
+RETURN a.name
+Full Context:
+[{'name': 'Tom Cruise'}, {'name': 'Val Kilmer'}]
+
+> Finished chain.
+```
+
+```output
+{'query': 'Who played in Top Gun?',
+ 'result': 'Tom Cruise, Val Kilmer played in Top Gun.'}
+```
+
+## 중간 결과 반환하기
+
+`return_intermediate_steps` parameter를 사용하여 Cypher QA Chain의 중간 단계를 반환할 수 있습니다
+
+```python
+chain = GraphCypherQAChain.from_llm(
+        ChatOpenAI(temperature=0),
+        graph=graph,
+        verbose=True,
+        return_intermediate_steps=True,
+        allow_dangerous_requests=True,
+)
+```
+
+```python
+result = chain("Who played in Top Gun?")
+print(f"Intermediate steps: {result['intermediate_steps']}")
+print(f"Final answer: {result['result']}")
+```
+
+```output
+> Entering new GraphCypherQAChain chain...
+Generated Cypher:
+MATCH (a:Actor)-[:ACTED_IN]->(m:Movie)
+WHERE m.name = 'Top Gun'
+RETURN a.name
+Full Context:
+[{'name': 'Tom Cruise'}, {'name': 'Val Kilmer'}, {'name': 'Anthony Edwards'}, {'name': 'Meg Ryan'}]
+
+> Finished chain.
+Intermediate steps: [{'query': "MATCH (a:Actor)-[:ACTED_IN]->(m:Movie)\nWHERE m.name = 'Top Gun'\nRETURN a.name"}, {'context': [{'name': 'Tom Cruise'}, {'name': 'Val Kilmer'}, {'name': 'Anthony Edwards'}, {'name': 'Meg Ryan'}]}]
+Final answer: Tom Cruise, Val Kilmer, Anthony Edwards, Meg Ryan played in Top Gun.
+```
+
+## 직접 결과 반환하기
+
+`return_direct` parameter를 사용하여 Cypher QA Chain의 직접 결과를 반환할 수 있습니다
+
+```python
+chain = GraphCypherQAChain.from_llm(
+        ChatOpenAI(temperature=0),
+        graph=graph,
+        verbose=True,
+        return_direct=True,
+        allow_dangerous_requests=True,
+)
+```
+
+```python
+chain.invoke("Who played in Top Gun?")
+```
+
+```output
+> Entering new GraphCypherQAChain chain...
+Generated Cypher:
+MATCH (a:Actor)-[:ACTED_IN]->(m:Movie {name: 'Top Gun'})
+RETURN a.name
+
+> Finished chain.
+```
+
+```output
+{'query': 'Who played in Top Gun?',
+ 'result': [{'name': 'Tom Cruise'},
+  {'name': 'Val Kilmer'},
+  {'name': 'Anthony Edwards'},
+  {'name': 'Meg Ryan'}]}
+```
+
+## Cypher 생성 prompt에 예제 추가하기
+
+특정 질문에 대해 LLM이 생성하기를 원하는 Cypher statement를 정의할 수 있습니다
+
+```python
+from langchain_core.prompts.prompt import PromptTemplate
+
+CYPHER_GENERATION_TEMPLATE = """Task:Generate Cypher statement to query a graph database.
+Instructions:
+Use only the provided relationship types and properties in the schema.
+Do not use any other relationship types or properties that are not provided.
+Schema:
+{schema}
+Note: Do not include any explanations or apologies in your responses.
+Do not respond to any questions that might ask anything else than for you to construct a Cypher statement.
+Do not include any text except the generated Cypher statement.
+Examples: Here are a few examples of generated Cypher statements for particular questions:
+# How many people played in Top Gun?
+MATCH (m:Movie {{title:"Top Gun"}})<-[:ACTED_IN]-()
+RETURN count(*) AS numberOfActors
+
+The question is:
+{question}"""
+
+CYPHER_GENERATION_PROMPT = PromptTemplate(
+        input_variables=["schema", "question"], template=CYPHER_GENERATION_TEMPLATE
+)
+
+chain = GraphCypherQAChain.from_llm(
+        ChatOpenAI(temperature=0),
+        graph=graph,
+        verbose=True,
+        cypher_prompt=CYPHER_GENERATION_PROMPT,
+        allow_dangerous_requests=True,
+)
+```
+
+```python
+chain.invoke("How many people played in Top Gun?")
+```
+
+```output
+> Entering new GraphCypherQAChain chain...
+```
+```output
+Generated Cypher:
+MATCH (:Movie {name:"Top Gun"})<-[:ACTED_IN]-(:Actor)
+RETURN count(*) AS numberOfActors
+Full Context:
+[{'numberofactors': 4}]
+
+> Finished chain.
+```
+
+```output
+{'query': 'How many people played in Top Gun?',
+ 'result': "I don't know the answer."}
+```
+
+## Cypher 및 답변 생성에 별도의 LLM 사용하기
+
+`cypher_llm` 및 `qa_llm` parameter를 사용하여 서로 다른 llm을 정의할 수 있습니다
+
+```python
+chain = GraphCypherQAChain.from_llm(
+    graph=graph,
+    cypher_llm=ChatOpenAI(temperature=0, model="gpt-3.5-turbo"),
+    qa_llm=ChatOpenAI(temperature=0, model="gpt-3.5-turbo-16k"),
+    verbose=True,
+    allow_dangerous_requests=True,
+)
+```
+
+```python
+chain.invoke("Who played in Top Gun?")
+```
+
+```output
+> Entering new GraphCypherQAChain chain...
+```
+```output
+Generated Cypher:
+MATCH (a:Actor)-[:ACTED_IN]->(m:Movie)
+WHERE m.name = 'Top Gun'
+RETURN a.name
+Full Context:
+[{'name': 'Tom Cruise'}, {'name': 'Val Kilmer'}, {'name': 'Anthony Edwards'}, {'name': 'Meg Ryan'}]
+
+> Finished chain.
+```
+
+```output
+{'query': 'Who played in Top Gun?',
+ 'result': 'Tom Cruise, Val Kilmer, Anthony Edwards, and Meg Ryan played in Top Gun.'}
+```
+
+## 특정 node 및 relationship type 무시하기
+
+`include_types` 또는 `exclude_types`를 사용하여 Cypher statement를 생성할 때 graph schema의 일부를 무시할 수 있습니다.
+
+```python
+chain = GraphCypherQAChain.from_llm(
+        graph=graph,
+        cypher_llm=ChatOpenAI(temperature=0, model="gpt-3.5-turbo"),
+        qa_llm=ChatOpenAI(temperature=0, model="gpt-3.5-turbo-16k"),
+        verbose=True,
+        exclude_types=["Movie"],
+        allow_dangerous_requests=True,
+)
+```
+
+```python
+# Inspect graph schema
+print(chain.graph_schema)
+```
+
+```output
+Node properties are the following:
+Actor {name: STRING},LabelA {property_a: STRING},LabelB {},LabelC {}
+Relationship properties are the following:
+ACTED_IN {},REL_TYPE {rel_prop: STRING}
+The relationships are the following:
+(:LabelA)-[:REL_TYPE]->(:LabelB),(:LabelA)-[:REL_TYPE]->(:LabelC)
+```
+
+## 생성된 Cypher statement 검증하기
+
+`validate_cypher` parameter를 사용하여 생성된 Cypher statement의 relationship 방향을 검증하고 수정할 수 있습니다
+
+```python
+chain = GraphCypherQAChain.from_llm(
+        llm=ChatOpenAI(temperature=0, model="gpt-3.5-turbo"),
+        graph=graph,
+        verbose=True,
+        validate_cypher=True,
+        allow_dangerous_requests=True,
+)
+```
+
+```python
+chain.invoke("Who played in Top Gun?")
+```
+
+```output
+> Entering new GraphCypherQAChain chain...
+Generated Cypher:
+MATCH (a:Actor)-[:ACTED_IN]->(m:Movie)
+WHERE m.name = 'Top Gun'
+RETURN a.name
+Full Context:
+[{'name': 'Tom Cruise'}, {'name': 'Val Kilmer'}, {'name': 'Anthony Edwards'}, {'name': 'Meg Ryan'}]
+
+> Finished chain.
+```
+
+```output
+{'query': 'Who played in Top Gun?',
+ 'result': 'Tom Cruise, Val Kilmer, Anthony Edwards, Meg Ryan played in Top Gun.'}
+```

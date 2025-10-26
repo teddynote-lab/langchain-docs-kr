@@ -1,0 +1,267 @@
+---
+title: 개요
+---
+
+[Google Cloud Platform](https://cloud.google.com/) 및 [AI Studio](https://aistudio.google.com/)와 관련된 기능
+
+## Chat models
+
+### Gemini Models
+
+[`ChatGoogleGenerativeAI`](/oss/integrations/chat/google_generative_ai)를 통해 `gemini-1.5-pro` 및 `gemini-2.0-flex`와 같은 Gemini 모델에 액세스하거나, VertexAI를 사용하는 경우 [`ChatVertexAI`](/oss/integrations/chat/google_vertex_ai) 클래스를 통해 액세스할 수 있습니다.
+
+<Tip>
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/langchain/install)을 참조하세요.
+</Tip>
+
+<Tabs>
+<Tab title="GenAI">
+
+```bash npm
+npm install @langchain/google-genai @langchain/core
+```
+API 키를 구성하세요.
+
+```
+export GOOGLE_API_KEY=your-api-key
+```
+```typescript
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+
+const model = new ChatGoogleGenerativeAI({
+  model: "gemini-pro",
+  maxOutputTokens: 2048,
+});
+
+// Batch and stream are also supported
+const res = await model.invoke([
+  [
+    "human",
+    "What would be a good company name for a company that makes colorful socks?",
+  ],
+]);
+```
+
+최신 Gemini 모델은 이미지 입력을 지원합니다:
+
+```typescript
+const visionModel = new ChatGoogleGenerativeAI({
+  model: "gemini-2.5-flash-lite",
+  maxOutputTokens: 2048,
+});
+const image = fs.readFileSync("./hotdog.jpg").toString("base64");
+const input2 = [
+  new HumanMessage({
+    content: [
+      {
+        type: "text",
+        text: "Describe the following image.",
+      },
+      {
+        type: "image_url",
+        image_url: `data:image/png;base64,${image}`,
+      },
+    ],
+  }),
+];
+
+const res = await visionModel.invoke(input2);
+```
+
+<Tip>
+**`@langchain/google-genai` 관련 통합 문서는 [여기](/oss/integrations/chat/google_generative_ai)를 클릭하세요**
+</Tip>
+
+</Tab>
+
+<Tab title="VertexAI">
+
+```bash npm
+npm install @langchain/google-vertexai @langchain/core
+```
+그런 다음 서비스 계정 자격 증명을 `GOOGLE_VERTEX_AI_WEB_CREDENTIALS` 환경 변수로 직접 추가하거나:
+
+```
+GOOGLE_VERTEX_AI_WEB_CREDENTIALS={"type":"service_account","project_id":"YOUR_PROJECT-12345",...}
+```
+파일 경로로 추가해야 합니다:
+
+```
+GOOGLE_VERTEX_AI_WEB_CREDENTIALS_FILE=/path/to/your/credentials.json
+```
+```typescript
+import { ChatVertexAI } from "@langchain/google-vertexai";
+// Or, if using the web entrypoint:
+// import { ChatVertexAI } from "@langchain/google-vertexai-web";
+
+const model = new ChatVertexAI({
+  model: "gemini-1.0-pro",
+  maxOutputTokens: 2048,
+});
+
+// Batch and stream are also supported
+const res = await model.invoke([
+  [
+    "human",
+    "What would be a good company name for a company that makes colorful socks?",
+  ],
+]);
+```
+
+Gemini vision 모델은 단일 human 메시지를 제공할 때 이미지 입력을 지원합니다. 예를 들어:
+
+```typescript
+const visionModel = new ChatVertexAI({
+  model: "gemini-pro-vision",
+  maxOutputTokens: 2048,
+});
+const image = fs.readFileSync("./hotdog.png").toString("base64");
+const input2 = [
+  new HumanMessage({
+    content: [
+      {
+        type: "text",
+        text: "Describe the following image.",
+      },
+      {
+        type: "image_url",
+        image_url: `data:image/png;base64,${image}`,
+      },
+    ],
+  }),
+];
+
+const res = await visionModel.invoke(input2);
+```
+
+<Tip>
+`@langchain/google-vertexai` 관련 통합 문서는 [여기](/oss/integrations/chat/google_vertex_ai)를 클릭하세요
+</Tip>
+
+</Tab>
+</Tabs>
+
+`image_url`의 값은 base64로 인코딩된 이미지여야 합니다 (예: `data:image/png;base64,abcd124`).
+
+### Gemma
+
+`ChatGoogle` 클래스를 사용하여 AI Studio를 통해 `gemma-3-27b-it` 모델에 액세스할 수 있습니다.
+(이 클래스는 Vertex AI와 AI Studio API 모두에서 작동하는 [`ChatVertexAI`](/oss/integrations/chat/google_vertex_ai) 클래스의 상위 클래스입니다.)
+
+<Tip>
+**Gemma는 오픈 모델이므로** [Ollama](/oss/integrations/chat/ollama/)를 포함한 다른 플랫폼에서도 사용할 수 있습니다.
+</Tip>
+
+```bash npm
+npm install @langchain/google-gauth @langchain/core
+```
+API 키를 구성하세요.
+
+```
+export GOOGLE_API_KEY=your-api-key
+```
+```typescript
+import { ChatGoogle } from "@langchain/google-gauth";
+
+const model = new ChatGoogle({
+  model: "gemma-3-27b-it",
+});
+
+const res = await model.invoke([
+  {
+    role: "user",
+    content:
+      "What would be a good company name for a company that makes colorful socks?",
+  },
+]);
+```
+
+### Third Party Models
+
+이러한 모델을 사용하기 위해 Vertex AI를 통한 인증 설정은 위를 참조하세요.
+
+[Anthropic](/oss/integrations/chat/anthropic) Claude 모델도 [Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-claude) 플랫폼을 통해 사용할 수 있습니다. 모델에 대한 액세스 활성화 및 사용할 모델 이름에 대한 자세한 내용은 [여기](https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-claude)를 참조하세요.
+
+PaLM 모델은 더 이상 지원되지 않습니다.
+
+## Vector Store
+
+### Vertex AI Vector Search
+
+> [Vertex AI Vector Search](https://cloud.google.com/vertex-ai/docs/matching-engine/overview)는 이전에 Vertex AI Matching Engine으로 알려져 있으며, 업계 최고의 대규모 저지연 vector database를 제공합니다. 이러한 vector database는 일반적으로 vector similarity-matching 또는 approximate nearest neighbor (ANN) 서비스라고 합니다.
+
+```typescript
+import { MatchingEngine } from "@langchain/community/vectorstores/googlevertexai";
+```
+
+### Postgres Vector Store
+
+[`@langchain/google-cloud-sql-pg`](https://www.npmjs.com/package/@langchain/google-cloud-sql-pg) 패키지의 [PostgresVectorStore](/oss/integrations/vectorstores/google_cloudsql_pg) 모듈은 CloudSQL for PostgresSQL을 사용하여 클래스를 통해 vector embedding을 저장하는 방법을 제공합니다.
+
+```bash
+$ yarn add @langchain/google-cloud-sql-pg
+```
+
+환경 변수를 설정하세요:
+
+```bash
+PROJECT_ID="your-project-id"
+REGION="your-project-region"
+INSTANCE_NAME="your-instance"
+DB_NAME="your-database-name"
+DB_USER="your-database-user"
+PASSWORD="your-database-password"
+```
+
+PostgresEngine 클래스를 통해 DB 연결을 생성하세요:
+
+```typescript
+const engine: PostgresEngine = await PostgresEngine.fromInstance(
+  process.env.PROJECT_ID ?? "",
+  process.env.REGION ?? "",
+  process.env.INSTANCE_NAME ?? "",
+  process.env.DB_NAME ?? "",
+  peArgs
+);
+```
+
+vector store 테이블을 초기화하세요:
+
+```typescript
+await engine.initVectorstoreTable(
+  "my_vector_store_table",
+  768,
+  vectorStoreArgs
+);
+```
+
+vector store 인스턴스를 생성하세요:
+
+```typescript
+const vectorStore = await PostgresVectorStore.initialize(
+  engine,
+  embeddingService,
+  "my_vector_store_table",
+  pvectorArgs
+);
+```
+
+## Tools
+
+### Google Search
+
+- [이 지침](https://stackoverflow.com/questions/37083058/programmatically-searching-google-in-python-using-custom-search)에 따라 Custom Search Engine을 설정하세요
+- 이전 단계에서 API Key와 Custom Search Engine ID를 가져와 각각 `GOOGLE_API_KEY` 및 `GOOGLE_CSE_ID` 환경 변수로 설정하세요
+
+이 API를 래핑하는 `GoogleCustomSearch` 유틸리티가 있습니다. 이 유틸리티를 import하려면:
+
+```typescript
+import { GoogleCustomSearch } from "@langchain/community/tools/google_custom_search";
+```
+
+이 wrapper를 Tool로 쉽게 로드할 수 있습니다 (Agent와 함께 사용). 다음과 같이 할 수 있습니다:
+
+```typescript
+const tools = [new GoogleCustomSearch({})];
+// Pass this variable into your agent.
+```

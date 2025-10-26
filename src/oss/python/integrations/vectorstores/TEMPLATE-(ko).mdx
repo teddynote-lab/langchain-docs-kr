@@ -1,0 +1,169 @@
+---
+title: (MODULE_NAME)VectorStore
+---
+
+이 Python vector store 템플릿 사용 방법:
+
+- [ ] (MODULE_NAME)을 모듈 이름으로 대체하세요. 예: Anthropic, OpenAI 등 (`command + F`를 활용하세요)
+- [ ] 올바른 모듈을 가리키도록 링크를 업데이트하세요
+- [ ] 필요한 경우 PyPi/registry 패키지 이름을 업데이트하세요
+- [ ] 필요한 경우 API key 환경 변수 이름을 업데이트하세요
+
+템플릿은 이 줄 아래부터 시작됩니다...
+
+이 가이드는 (MODULE_NAME) [vector store](/oss/integrations/vectorstores#overview) 시작하기에 대한 간단한 개요를 제공합니다. 모든 (MODULE_NAME)VectorStore 기능, 매개변수 및 구성에 대한 자세한 목록은 [(MODULE_NAME)VectorStore API reference](<LINK>)를 참조하세요.
+
+## Setup
+
+(MODULE_NAME) vector store에 액세스하려면 (MODULE_NAME) 계정을 생성하고 API key를 받은 다음 `langchain-(MODULE_NAME)` integration 패키지를 설치해야 합니다.
+
+### Credentials
+
+```python Set API key icon="key"
+import getpass
+import os
+
+if "(MODULE_NAME)_API_KEY" not in os.environ:
+    os.environ["(MODULE_NAME)_API_KEY"] = getpass.getpass("Enter your (MODULE_NAME) API key: ")
+```
+
+모델 호출의 자동화된 <Tooltip tip="모델 실행의 각 단계를 로깅하여 디버그하고 개선합니다">tracing</Tooltip>을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
+
+```python Enable tracing icon="flask"
+os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
+os.environ["LANGSMITH_TRACING"] = "true"
+```
+
+### Installation
+
+LangChain (MODULE_NAME) integration은 `langchain-(MODULE_NAME)` 패키지에 있습니다:
+
+<CodeGroup>
+    ```python pip
+    pip install -U langchain-(MODULE_NAME)
+    ```
+    ```python uv
+    uv add langchain-(MODULE_NAME)
+    ```
+</CodeGroup>
+
+---
+
+## Instantiation
+
+이제 model 객체를 인스턴스화하고 응답을 생성할 수 있습니다:
+
+```python Initialize vector store icon="database"
+from langchain_(MODULE_NAME).vectorstores import (MODULE_NAME)VectorStore
+
+vector_store = (MODULE_NAME)VectorStore(embeddings=embeddings)
+```
+
+---
+
+## Manage vector store
+
+### Add items
+
+```python Add documents icon="folder-plus"
+from langchain_core.documents import Document
+
+document_1 = Document(page_content="foo", metadata={"source": "https://example.com"})
+document_2 = Document(page_content="bar", metadata={"source": "https://example.com"})
+document_3 = Document(page_content="baz", metadata={"source": "https://example.com"})
+documents = [document_1, document_2, document_3]
+
+vector_store.add_documents(documents=documents, ids=["1", "2", "3"])
+```
+
+### Update items
+
+```python Update document by ID icon="pencil"
+updated_document = Document(
+    page_content="qux", metadata={"source": "https://another-example.com"}
+)
+
+vector_store.update_documents(document_id="1", document=updated_document)
+```
+
+### Delete items
+
+```python Delete documents by IDs icon="trash"
+vector_store.delete(ids=["3"])
+```
+
+---
+
+## Query vector store
+
+vector store가 생성되고 관련 문서가 추가되면 chain이나 agent를 실행하는 동안 쿼리하고 싶을 것입니다.
+
+### Directly
+
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
+
+```python Similarity search icon="folder-tree"
+results = vector_store.similarity_search(
+    query="thud", k=1, filter={"source": "https://another-example.com"}
+)
+for doc in results:
+    print(f"* {doc.page_content} [{doc.metadata}]")
+```
+
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
+
+```python Similarity search with scores icon="star-half-stroke"
+results = vector_store.similarity_search_with_score(
+    query="thud", k=1, filter={"source": "https://example.com"}
+)
+for doc, score in results:
+    print(f"* [SIM={score:3f}] {doc.page_content} [{doc.metadata}]")
+```
+
+### By turning into retriever
+
+vector store를 retriever로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
+
+```python Create retriever icon="robot"
+retriever = vector_store.as_retriever(search_type="mmr", search_kwargs={"k": 1})
+retriever.invoke("thud")
+```
+
+---
+
+## Usage for retrieval-augmented generation
+
+<Card
+    title="(MODULE_NAME) Vector Store RAG 가이드"
+    href="/oss/langchain/rag"
+    icon="magnifying-glass"
+    arrow
+>
+    retrieval-augmented generation (RAG)을 위해 이 vector store를 사용하는 방법에 대한 가이드
+</Card>
+
+---
+
+## TODO: 이 vector store에 특정한 기능
+
+관련이 없으면 삭제하세요.
+
+예시를 위해 기존 vector store 문서를 참조하세요:
+
+- [Qdrant](/oss/integrations/vectorstores/qdrant)
+- [FAISS](/oss/integrations/vectorstores/faiss)
+- [Chroma](/oss/integrations/vectorstores/chroma)
+
+예시:
+- <Icon icon="ruler-horizontal" size={16}/> Distance functions
+- <Icon icon="chart-simple" size={16}/> Relevance
+- <Icon icon="filter" size={16}/> Filtering
+- <Icon icon="server" size={16} /> External storage options
+- <Icon icon="tags" size={16} /> Indexing
+- <Icon icon="code-merge" size={16} /> Merging
+
+---
+
+## API reference
+
+모든 (MODULE_NAME)VectorStore 기능 및 구성에 대한 자세한 문서는 [API reference](<LINK>)를 참조하세요.

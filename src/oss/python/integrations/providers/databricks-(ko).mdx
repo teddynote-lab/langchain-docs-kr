@@ -1,0 +1,129 @@
+---
+title: Databricks
+---
+
+> [Databricks](https://www.databricks.com/) Intelligence Platform은 생성형 AI로 구동되는 세계 최초의 데이터 인텔리전스 플랫폼입니다. 비즈니스의 모든 측면에 AI를 주입하세요.
+
+Databricks는 다양한 방식으로 LangChain 생태계를 수용합니다:
+
+1. 🚀 **Model Serving** - [Databricks Model Serving](https://www.databricks.com/product/model-serving)을 통해 DBRX, Llama3, Mixtral과 같은 최첨단 LLM 또는 파인튜닝된 모델에 고가용성 및 저지연 추론 엔드포인트로 액세스할 수 있습니다. LangChain은 LLM(`Databricks`), Chat Model(`ChatDatabricks`), Embeddings(`DatabricksEmbeddings`) 구현을 제공하여 Databricks Model Serving에 호스팅된 모델을 LangChain 애플리케이션과 통합하는 과정을 간소화합니다.
+2. 📃 **Vector Search** - [Databricks Vector Search](https://www.databricks.com/product/machine-learning/vector-search)는 Databricks Platform 내에 원활하게 통합된 서버리스 벡터 데이터베이스입니다. `DatabricksVectorSearch`를 사용하여 확장성과 신뢰성이 뛰어난 유사도 검색 엔진을 LangChain 애플리케이션에 통합할 수 있습니다.
+3. 📊 **MLflow** - [MLflow](https://mlflow.org/)는 실험 관리, 평가, 추적, 배포 등을 포함한 전체 ML 라이프사이클을 관리하는 오픈소스 플랫폼입니다. [MLflow의 LangChain 통합](/oss/integrations/providers/mlflow_tracking)은 현대적인 복합 ML 시스템을 개발하고 운영하는 프로세스를 간소화합니다.
+4. 🌐 **SQL Database** - [Databricks SQL](https://www.databricks.com/product/databricks-sql)은 LangChain의 `SQLDatabase`와 통합되어 자동 최적화되고 뛰어난 성능의 데이터 웨어하우스에 액세스할 수 있습니다.
+5. 💡 **Open Models** - Databricks는 [DBRX](https://www.databricks.com/blog/introducing-dbrx-new-state-art-open-llm)와 같은 모델을 오픈소스로 제공하며, 이는 [Hugging Face Hub](https://huggingface.co/databricks/dbrx-instruct)를 통해 사용할 수 있습니다. 이러한 모델은 `transformers` 라이브러리와의 통합을 활용하여 LangChain에서 직접 사용할 수 있습니다.
+
+설치
+------------
+
+Databricks의 퍼스트 파티 통합은 이제 databricks-langchain 파트너 패키지에서 사용할 수 있습니다.
+
+<CodeGroup>
+```bash pip
+pip install databricks-langchain
+```
+
+```bash uv
+uv add databricks-langchain
+```
+</CodeGroup>
+
+레거시 langchain-databricks 파트너 패키지는 여전히 사용 가능하지만 곧 deprecated될 예정입니다.
+
+Chat Model
+----------
+
+`ChatDatabricks`는 Llama3, Mixtral, DBRX와 같은 최첨단 모델뿐만 아니라 자체 파인튜닝된 모델을 포함하여 Databricks에 호스팅된 chat endpoint에 액세스하기 위한 Chat Model 클래스입니다.
+
+```
+from databricks_langchain import ChatDatabricks
+
+chat_model = ChatDatabricks(endpoint="databricks-meta-llama-3-70b-instruct")
+```
+
+LangChain 애플리케이션 내에서 사용하는 방법에 대한 자세한 가이드는 [사용 예제](/oss/integrations/chat/databricks)를 참조하세요.
+
+LLM
+---
+
+`Databricks`는 Databricks에 호스팅된 completion endpoint에 액세스하기 위한 LLM 클래스입니다.
+
+<Warning>
+텍스트 completion 모델은 deprecated되었으며 최신 및 가장 인기 있는 모델은 [chat completion 모델](/oss/langchain/models)입니다. 이러한 모델과 tool calling과 같은 고급 기능을 사용하려면 `ChatDatabricks` chat model을 대신 사용하세요.
+</Warning>
+
+```
+from langchain_community.llm.databricks import Databricks
+
+llm = Databricks(endpoint="your-completion-endpoint")
+```
+
+LangChain 애플리케이션 내에서 사용하는 방법에 대한 자세한 가이드는 [사용 예제](/oss/integrations/llms/databricks)를 참조하세요.
+
+Embeddings
+----------
+
+`DatabricksEmbeddings`는 BGE와 같은 최첨단 모델뿐만 아니라 자체 파인튜닝된 모델을 포함하여 Databricks에 호스팅된 text-embedding endpoint에 액세스하기 위한 Embeddings 클래스입니다.
+
+```
+from databricks_langchain import DatabricksEmbeddings
+
+embeddings = DatabricksEmbeddings(endpoint="databricks-bge-large-en")
+```
+
+LangChain 애플리케이션 내에서 사용하는 방법에 대한 자세한 가이드는 [사용 예제](/oss/integrations/text_embedding/databricks)를 참조하세요.
+
+Vector Search
+-------------
+
+Databricks Vector Search는 벡터 데이터베이스에 메타데이터를 포함한 데이터의 벡터 표현을 저장할 수 있는 서버리스 유사도 검색 엔진입니다. Vector Search를 사용하면 [Unity Catalog](https://www.databricks.com/product/unity-catalog)에서 관리하는 [Delta](https://docs.databricks.com/en/introduction/delta-comparison.html) 테이블에서 자동 업데이트되는 벡터 검색 인덱스를 생성하고 간단한 API로 쿼리하여 가장 유사한 벡터를 반환할 수 있습니다.
+
+```
+from databricks_langchain import DatabricksVectorSearch
+
+dvs = DatabricksVectorSearch(
+    endpoint="<YOUT_ENDPOINT_NAME>",
+    index_name="<YOUR_INDEX_NAME>",
+    index,
+    text_column="text",
+    embedding=embeddings,
+    columns=["source"]
+)
+docs = dvs.similarity_search("What is vector search?)
+```
+
+벡터 인덱스를 설정하고 LangChain과 통합하는 방법은 [사용 예제](/oss/integrations/vectorstores/databricks_vector_search)를 참조하세요.
+
+MLflow 통합
+------------------
+
+LangChain 통합의 맥락에서 MLflow는 다음과 같은 기능을 제공합니다:
+
+- **Experiment Tracking**: LangChain 실험에서 모델, artifact 및 trace를 추적하고 저장합니다.
+- **Dependency Management**: 의존성 라이브러리를 자동으로 기록하여 개발, 스테이징 및 프로덕션 환경 간의 일관성을 보장합니다.
+- **Model Evaluation**: LangChain 애플리케이션을 평가하기 위한 네이티브 기능을 제공합니다.
+- **Tracing**: LangChain 애플리케이션을 통한 데이터 흐름을 시각적으로 추적합니다.
+
+광범위한 코드 예제와 가이드를 통해 LangChain과 함께 MLflow를 사용하는 전체 기능에 대해 알아보려면 [MLflow LangChain 통합](/oss/integrations/providers/mlflow_tracking)을 참조하세요.
+
+SQLDatabase
+-----------
+
+Databricks SQL에 연결하거나 구조화된 데이터를 쿼리하려면 [Databricks structured retriever tool 문서](https://docs.databricks.com/en/generative-ai/agent-framework/structured-retrieval-tools.html#table-query-tool)를 참조하고, 위에서 생성한 SQL UDF를 사용하여 agent를 생성하려면 [Databricks UC 통합](https://docs.unitycatalog.io/ai/integrations/langchain/)을 참조하세요.
+
+Open Models
+-----------
+
+HuggingFace에 호스팅된 Databricks의 오픈 모델을 직접 통합하려면 LangChain의 [HuggingFace 통합](/oss/integrations/providers/huggingface)을 사용할 수 있습니다.
+
+```
+from langchain_huggingface import HuggingFaceEndpoint
+
+llm = HuggingFaceEndpoint(
+    repo_id="databricks/dbrx-instruct",
+    task="text-generation",
+    max_new_tokens=512,
+    do_sample=False,
+    repetition_penalty=1.03,
+)
+llm.invoke("What is DBRX model?")
+```

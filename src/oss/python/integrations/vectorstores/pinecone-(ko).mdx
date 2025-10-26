@@ -1,0 +1,217 @@
+---
+title: Pinecone
+---
+
+>[Pinecone](https://docs.pinecone.io/docs/overview)은 광범위한 기능을 제공하는 vector database입니다.
+
+이 notebook은 `Pinecone` vector database와 관련된 기능을 사용하는 방법을 보여줍니다.
+
+## Setup
+
+`PineconeVectorStore`를 사용하려면 먼저 partner package와 이 notebook 전체에서 사용되는 다른 package들을 설치해야 합니다.
+
+```python
+pip install -qU langchain langchain-pinecone langchain-openai
+```
+
+마이그레이션 참고사항: `langchain_community.vectorstores`의 Pinecone 구현에서 마이그레이션하는 경우, `pinecone-client` v6에 의존하는 `langchain-pinecone`을 설치하기 전에 `pinecone-client` v2 의존성을 제거해야 할 수 있습니다.
+
+### Credentials
+
+새로운 Pinecone 계정을 생성하거나 기존 계정에 로그인한 후, 이 notebook에서 사용할 API key를 생성하세요.
+
+```python
+import getpass
+import os
+
+from pinecone import Pinecone
+
+if not os.getenv("PINECONE_API_KEY"):
+    os.environ["PINECONE_API_KEY"] = getpass.getpass("Enter your Pinecone API key: ")
+
+pinecone_api_key = os.environ.get("PINECONE_API_KEY")
+
+pc = Pinecone(api_key=pinecone_api_key)
+```
+
+model 호출에 대한 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
+
+```python
+os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
+os.environ["LANGSMITH_TRACING"] = "true"
+```
+
+## Initialization
+
+vector store를 초기화하기 전에 Pinecone index에 연결해 보겠습니다. `index_name`이라는 이름의 index가 존재하지 않으면 생성됩니다.
+
+```python
+from pinecone import ServerlessSpec
+
+index_name = "langchain-test-index"  # change if desired
+
+if not pc.has_index(index_name):
+    pc.create_index(
+        name=index_name,
+        dimension=1536,
+        metric="cosine",
+        spec=ServerlessSpec(cloud="aws", region="us-east-1"),
+    )
+
+index = pc.Index(index_name)
+```
+
+```python
+from langchain_openai import OpenAIEmbeddings
+
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+```
+
+```python
+from langchain_pinecone import PineconeVectorStore
+
+vector_store = PineconeVectorStore(index=index, embedding=embeddings)
+```
+
+## Manage vector store
+
+vector store를 생성한 후에는 다양한 항목을 추가하고 삭제하여 상호작용할 수 있습니다.
+
+### Add items to vector store
+
+`add_documents` function을 사용하여 vector store에 항목을 추가할 수 있습니다.
+
+```python
+from uuid import uuid4
+
+from langchain_core.documents import Document
+
+document_1 = Document(
+    page_content="I had chocolate chip pancakes and scrambled eggs for breakfast this morning.",
+    metadata={"source": "tweet"},
+)
+
+document_2 = Document(
+    page_content="The weather forecast for tomorrow is cloudy and overcast, with a high of 62 degrees.",
+    metadata={"source": "news"},
+)
+
+document_3 = Document(
+    page_content="Building an exciting new project with LangChain - come check it out!",
+    metadata={"source": "tweet"},
+)
+
+document_4 = Document(
+    page_content="Robbers broke into the city bank and stole $1 million in cash.",
+    metadata={"source": "news"},
+)
+
+document_5 = Document(
+    page_content="Wow! That was an amazing movie. I can't wait to see it again.",
+    metadata={"source": "tweet"},
+)
+
+document_6 = Document(
+    page_content="Is the new iPhone worth the price? Read this review to find out.",
+    metadata={"source": "website"},
+)
+
+document_7 = Document(
+    page_content="The top 10 soccer players in the world right now.",
+    metadata={"source": "website"},
+)
+
+document_8 = Document(
+    page_content="LangGraph is the best framework for building stateful, agentic applications!",
+    metadata={"source": "tweet"},
+)
+
+document_9 = Document(
+    page_content="The stock market is down 500 points today due to fears of a recession.",
+    metadata={"source": "news"},
+)
+
+document_10 = Document(
+    page_content="I have a bad feeling I am going to get deleted :(",
+    metadata={"source": "tweet"},
+)
+
+documents = [
+    document_1,
+    document_2,
+    document_3,
+    document_4,
+    document_5,
+    document_6,
+    document_7,
+    document_8,
+    document_9,
+    document_10,
+]
+uuids = [str(uuid4()) for _ in range(len(documents))]
+vector_store.add_documents(documents=documents, ids=uuids)
+```
+
+### Delete items from vector store
+
+```python
+vector_store.delete(ids=[uuids[-1]])
+```
+
+## Query vector store
+
+vector store가 생성되고 관련 document들이 추가되면, chain이나 agent를 실행하는 동안 이를 query하고 싶을 것입니다.
+
+### Query directly
+
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
+
+```python
+results = vector_store.similarity_search(
+    "LangChain provides abstractions to make working with LLMs easy",
+    k=2,
+    filter={"source": "tweet"},
+)
+for res in results:
+    print(f"* {res.page_content} [{res.metadata}]")
+```
+
+#### Similarity search with score
+
+score와 함께 검색할 수도 있습니다:
+
+```python
+results = vector_store.similarity_search_with_score(
+    "Will it be hot tomorrow?", k=1, filter={"source": "news"}
+)
+for res, score in results:
+    print(f"* [SIM={score:3f}] {res.page_content} [{res.metadata}]")
+```
+
+#### Other search methods
+
+이 notebook에 나열되지 않은 더 많은 검색 방법(예: MMR)이 있습니다. 모든 방법을 찾으려면 [API reference](https://python.langchain.com/api_reference/pinecone/vectorstores/langchain_pinecone.vectorstores.PineconeVectorStore.html)를 참조하세요.
+
+### Query by turning into retriever
+
+vector store를 retriever로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
+
+```python
+retriever = vector_store.as_retriever(
+    search_type="similarity_score_threshold",
+    search_kwargs={"k": 1, "score_threshold": 0.4},
+)
+retriever.invoke("Stealing from the bank is a crime", filter={"source": "news"})
+```
+
+## Usage for retrieval-augmented generation
+
+retrieval-augmented generation (RAG)을 위해 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
+
+- [Tutorials](/oss/langchain/rag)
+- [How-to: Question and answer with RAG](https://python.langchain.com/docs/how_to/#qa-with-rag)
+- [Retrieval conceptual docs](https://python.langchain.com/docs/concepts/retrieval)
+
+## API reference
+
+모든 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/pinecone/vectorstores/langchain_pinecone.vectorstores.PineconeVectorStore.html](https://python.langchain.com/api_reference/pinecone/vectorstores/langchain_pinecone.vectorstores.PineconeVectorStore.html)

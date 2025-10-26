@@ -1,0 +1,130 @@
+---
+title: Redis
+---
+
+>[Redis (Remote Dictionary Server)](https://en.wikipedia.org/wiki/Redis)는 오픈소스 인메모리 스토리지로,
+> 분산 인메모리 key-value 데이터베이스, 캐시 및 메시지 브로커로 사용되며, 선택적으로 영속성을 제공합니다.
+> 모든 데이터를 메모리에 보관하고 설계 방식 덕분에 `Redis`는 낮은 지연 시간의 읽기 및 쓰기를 제공하여,
+> 캐시가 필요한 사용 사례에 특히 적합합니다. Redis는 가장 인기 있는 NoSQL 데이터베이스이며,
+> 전체 데이터베이스 중에서도 가장 인기 있는 데이터베이스 중 하나입니다.
+
+이 페이지는 LangChain 내에서 [Redis](https://redis.com) 생태계를 사용하는 방법을 다룹니다.
+설치 및 설정, 그리고 특정 Redis wrapper에 대한 참조, 이렇게 두 부분으로 나뉩니다.
+
+## Installation and Setup
+
+Python SDK와 LangChain Redis integration을 설치합니다:
+
+<CodeGroup>
+```bash pip
+pip install redis langchain-redis
+```
+
+```bash uv
+uv add redis langchain-redis
+```
+</CodeGroup>
+
+Redis를 로컬에서 실행하려면 Docker를 사용할 수 있습니다:
+
+```bash
+docker run --name langchain-redis -d -p 6379:6379 redis redis-server --save 60 1 --loglevel warning
+```
+
+컨테이너를 중지하려면:
+
+```bash
+docker stop langchain-redis
+```
+
+다시 시작하려면:
+
+```bash
+docker start langchain-redis
+```
+
+### Connections
+
+독립 실행형 Redis 서버 또는 Replication과 Redis Sentinels를 사용하는 고가용성 설정을 지원하는 데이터베이스에 연결하려면 redis url connection string이 필요합니다.
+
+#### Redis Standalone connection url
+독립 실행형 `Redis` 서버의 경우, python redis 모듈의 "from_url()" 메서드 [Redis.from_url](https://redis-py.readthedocs.io/en/stable/connections.html#redis.Redis.from_url)에 설명된 대로 공식 redis connection url 형식을 사용할 수 있습니다.
+
+예시: `redis_url = "redis://:secret-pass@localhost:6379/0"`
+
+#### Redis Sentinel connection url
+
+[Redis sentinel 설정](https://redis.io/docs/management/sentinel/)의 경우 connection scheme은 "redis+sentinel"입니다.
+이는 Sentinels에 대한 connection url이 없는 한 공식 IANA 등록 프로토콜 scheme에 대한 비공식 확장입니다.
+
+예시: `redis_url = "redis+sentinel://:secret-pass@sentinel-host:26379/mymaster/0"`
+
+형식은 `redis+sentinel://$USERNAME:$PASSWORD@$HOST_OR_IP:$PORT/$SERVICE_NAME/$DB_NUMBER`이며,
+명시적으로 설정하지 않으면 "service-name = mymaster" 및 "db-number = 0"의 기본값이 사용됩니다.
+service-name은 Sentinel 내에서 구성된 redis 서버 모니터링 그룹 이름입니다.
+
+현재 url 형식은 connection string을 하나의 sentinel host로만 제한하며(목록을 제공할 수 없음),
+Redis 서버와 sentinel 모두 동일한 password를 설정해야 합니다(사용하는 경우).
+
+#### Redis Cluster connection url
+
+Redis cluster는 현재 "redis_url" 매개변수가 필요한 모든 메서드에서 지원되지 않습니다.
+Redis Cluster를 사용하는 유일한 방법은 `RedisCache`와 같이 사전 구성된 Redis client를 허용하는 LangChain class를 사용하는 것입니다
+(아래 예시 참조).
+
+## Cache
+
+Cache wrapper를 사용하면 [Redis](https://redis.io)를 LLM prompt 및 response를 위한 원격, 낮은 지연 시간의 인메모리 캐시로 사용할 수 있습니다.
+
+### Standard Cache
+standard cache는 전 세계 [오픈소스](https://redis.io) 및 [엔터프라이즈](https://redis.com) 사용자를 위한 프로덕션 사용 사례에서 Redis의 핵심입니다.
+
+```python
+from langchain_redis import RedisCache
+```
+
+LLM과 함께 이 캐시를 사용하려면:
+```python
+from langchain.globals import set_llm_cache
+import redis
+
+redis_client = redis.Redis.from_url(...)
+set_llm_cache(RedisCache(redis_client))
+```
+
+### Semantic Cache
+Semantic caching을 사용하면 사용자 입력과 이전에 캐시된 결과 간의 의미적 유사성을 기반으로 캐시된 prompt를 검색할 수 있습니다. 내부적으로 Redis를 캐시와 vectorstore로 모두 사용합니다.
+
+```python
+from langchain_redis import RedisSemanticCache
+```
+
+LLM과 함께 이 캐시를 사용하려면:
+```python
+from langchain.globals import set_llm_cache
+import redis
+
+# use any embedding provider...
+from tests.integration_tests.vectorstores.fake_embeddings import FakeEmbeddings
+
+redis_url = "redis://localhost:6379"
+
+set_llm_cache(RedisSemanticCache(
+    embedding=FakeEmbeddings(),
+    redis_url=redis_url
+))
+```
+
+## VectorStore
+
+vectorstore wrapper는 Redis를 의미적 검색 또는 LLM 콘텐츠 검색을 위한 낮은 지연 시간의 [vector database](https://redis.com/solutions/use-cases/vector-database/)로 전환합니다.
+
+```python
+from langchain_community.vectorstores import Redis
+```
+
+## Retriever
+
+Redis vector store retriever wrapper는 vectorstore class를 일반화하여
+낮은 지연 시간의 문서 검색을 수행합니다. retriever를 생성하려면
+기본 vectorstore class에서 `.as_retriever()`를 호출하기만 하면 됩니다.

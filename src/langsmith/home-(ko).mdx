@@ -1,0 +1,108 @@
+---
+title: LangSmith 문서
+sidebarTitle: 개요
+mode: wide
+---
+
+**LangSmith는 LLM 애플리케이션을 개발, 디버깅 및 배포하기 위한 도구를 제공합니다.**
+요청을 추적하고, 출력을 평가하며, 프롬프트를 테스트하고, 배포를 한 곳에서 관리할 수 있습니다.
+LangSmith는 프레임워크에 구애받지 않으므로 LangChain의 오픈소스 라이브러리인
+[`langchain`](/oss/langchain/overview)과 [`langgraph`](/oss/langgraph/overview)를 사용하거나 사용하지 않고도 활용할 수 있습니다.
+로컬에서 프로토타입을 만든 다음, 통합 모니터링 및 평가를 통해 프로덕션으로 전환하여 더 안정적인 AI 시스템을 구축하세요.
+
+<Callout icon="bullhorn" color="#DFC5FE" iconType="regular">
+LangGraph Platform은 이제 [LangSmith Deployment](/langsmith/deployments)입니다. 자세한 내용은 [Changelog](https://changelog.langchain.com/announcements/product-naming-changes-langsmith-deployment-and-langsmith-studio)를 확인하세요.
+</Callout>
+
+## 시작하기
+
+<Steps>
+    <Step title="계정 만들기" icon="user-plus">
+        [smith.langchain.com](https://smith.langchain.com)에서 가입하세요 (신용카드 불필요).
+        **Google**, **GitHub** 또는 **이메일**로 로그인할 수 있습니다.
+    </Step>
+    <Step title="API key 생성하기" icon="key">
+        [Settings 페이지](https://smith.langchain.com/settings) → **API Keys** → **Create API Key**로 이동하세요.
+        키를 복사하여 안전하게 저장하세요.
+    </Step>
+</Steps>
+
+계정과 API key가 준비되면, LangSmith로 구축을 시작할 퀵스타트를 선택하세요:
+
+<Columns cols={3}>
+    <Card
+        title="Observability"
+        icon="magnifying-glass"
+        href="/langsmith/observability-quickstart"
+        arrow="true"
+        cta="추적 시작하기"
+    >
+        애플리케이션이 수행하는 모든 단계를 가시화하여 더 빠르게 디버깅하고 안정성을 향상시키세요.
+    </Card>
+
+    <Card
+        title="Evaluation"
+        icon="chart-line"
+        href="/langsmith/evaluation-quickstart"
+        arrow="true"
+        cta="앱 평가하기"
+    >
+        시간 경과에 따른 품질을 측정하고 추적하여 AI 애플리케이션이 일관되고 신뢰할 수 있도록 보장하세요.
+    </Card>
+
+    <Card
+        title="Deployment"
+        icon="cloud-arrow-up"
+        iconType="solid"
+        href="/langsmith/deployments"
+        arrow="true"
+        cta="에이전트 배포하기"
+        >
+        에이전트를 LangGraph Server로 배포하여 프로덕션에서 확장할 수 있도록 준비하세요.
+    </Card>
+
+    <Card
+        title="Prompt Testing"
+        icon="flask"
+        href="/langsmith/prompt-engineering-quickstart"
+        arrow="true"
+        cta="프롬프트 테스트하기"
+    >
+        내장된 버전 관리 및 협업 기능으로 프롬프트를 반복하여 개선 사항을 더 빠르게 배포하세요.
+    </Card>
+    <Card
+        title="Studio"
+        icon="window"
+        href="/langsmith/quick-start-studio"
+        arrow="true"
+        cta="Studio로 개발하기"
+    >
+        시각적 인터페이스를 사용하여 애플리케이션을 엔드투엔드로 설계, 테스트 및 개선하세요.
+    </Card>
+        <Card
+        title="Hosting"
+        icon="server"
+        iconType="solid"
+        href="/langsmith/hosting"
+        arrow="true"
+        cta="호스팅 모드 선택하기"
+    >
+        클라우드, 자체 환경 또는 하이브리드로 LangSmith를 호스팅하여 인프라 및 규정 준수 요구사항에 맞추세요.
+    </Card>
+</Columns>
+
+## Workflow
+
+LangSmith는 로컬 개발부터 프로덕션까지 하나의 통합된 워크플로우에서 observability, evaluation, deployment 및 hosting을 결합합니다.
+
+<img
+    className="block dark:hidden"
+    src="/langsmith/images/overview-light.svg"
+    alt="LangSmith가 개발부터 프로덕션까지 단일 워크플로우에서 observability, evaluation, deployment 및 hosting을 통합하는 방법을 보여주는 다이어그램."
+/>
+
+<img
+    className="hidden dark:block"
+    src="/langsmith/images/overview-dark.svg"
+    alt="LangSmith가 개발부터 프로덕션까지 단일 워크플로우에서 observability, evaluation, deployment 및 hosting을 통합하는 방법을 보여주는 다이어그램."
+/>

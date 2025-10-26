@@ -1,0 +1,137 @@
+---
+title: 특정 project에 trace 로깅하기
+sidebarTitle: 특정 project에 trace 로깅하기
+---
+
+환경 변수를 통해 정적으로, 그리고 런타임에 동적으로 trace의 대상 project를 변경할 수 있습니다.
+
+## 대상 project를 정적으로 설정하기
+
+[Tracing Concepts](/langsmith/observability-concepts#projects) 섹션에서 언급했듯이, LangSmith는 trace를 그룹화하기 위해 `Project` 개념을 사용합니다. 지정하지 않으면 project는 `default`로 설정됩니다. `LANGSMITH_PROJECT` 환경 변수를 설정하여 전체 애플리케이션 실행에 대한 사용자 정의 project 이름을 구성할 수 있습니다. 이는 애플리케이션을 실행하기 전에 수행되어야 합니다.
+
+```
+export LANGSMITH_PROJECT=my-custom-project
+```
+
+<Warning>
+`LANGSMITH_PROJECT` 플래그는 JS SDK 버전 >= 0.2.16에서만 지원됩니다. 이전 버전을 사용하는 경우 `LANGCHAIN_PROJECT`를 대신 사용하세요.
+</Warning>
+
+지정된 project가 존재하지 않으면 첫 번째 trace가 수집될 때 자동으로 생성됩니다.
+
+## 대상 project를 동적으로 설정하기
+
+[tracing을 위한 코드 주석 처리](/langsmith/annotate-code) 방법에 따라 프로그램 런타임에 다양한 방식으로 project 이름을 설정할 수도 있습니다. 이는 동일한 애플리케이션 내에서 서로 다른 project에 trace를 로깅하려는 경우에 유용합니다.
+
+<Note>
+아래 방법 중 하나를 사용하여 project 이름을 동적으로 설정하면 `LANGSMITH_PROJECT` 환경 변수로 설정된 project 이름이 재정의됩니다.
+</Note>
+
+<CodeGroup>
+
+```python Python
+import openai
+from langsmith import traceable
+from langsmith.run_trees import RunTree
+
+client = openai.Client()
+messages = [
+  {"role": "system", "content": "You are a helpful assistant."},
+  {"role": "user", "content": "Hello!"}
+]
+
+# Use the @traceable decorator with the 'project_name' parameter to log traces to LangSmith
+# Ensure that the LANGSMITH_TRACING environment variables is set for @traceable to work
+@traceable(
+  run_type="llm",
+  name="OpenAI Call Decorator",
+  project_name="My Project"
+)
+def call_openai(
+  messages: list[dict], model: str = "gpt-4o-mini"
+) -> str:
+  return client.chat.completions.create(
+      model=model,
+      messages=messages,
+  ).choices[0].message.content
+
+# Call the decorated function
+call_openai(messages)
+
+# You can also specify the Project via the project_name parameter
+# This will override the project_name specified in the @traceable decorator
+call_openai(
+  messages,
+  langsmith_extra={"project_name": "My Overridden Project"},
+)
+
+# The wrapped OpenAI client accepts all the same langsmith_extra parameters
+# as @traceable decorated functions, and logs traces to LangSmith automatically.
+# Ensure that the LANGSMITH_TRACING environment variables is set for the wrapper to work.
+from langsmith import wrappers
+wrapped_client = wrappers.wrap_openai(client)
+wrapped_client.chat.completions.create(
+  model="gpt-4o-mini",
+  messages=messages,
+  langsmith_extra={"project_name": "My Project"},
+)
+
+# Alternatively, create a RunTree object
+# You can set the project name using the project_name parameter
+rt = RunTree(
+  run_type="llm",
+  name="OpenAI Call RunTree",
+  inputs={"messages": messages},
+  project_name="My Project"
+)
+chat_completion = client.chat.completions.create(
+  model="gpt-4o-mini",
+  messages=messages,
+)
+# End and submit the run
+rt.end(outputs=chat_completion)
+rt.post()
+```
+
+```typescript TypeScript
+import OpenAI from "openai";
+import { traceable } from "langsmith/traceable";
+import { wrapOpenAI } from "langsmith/wrappers";
+import { RunTree} from "langsmith";
+
+const client = new OpenAI();
+const messages = [
+  {role: "system", content: "You are a helpful assistant."},
+  {role: "user", content: "Hello!"}
+];
+
+const traceableCallOpenAI = traceable(async (messages: {role: string, content: string}[], model: string) => {
+  const completion = await client.chat.completions.create({
+      model: model,
+      messages: messages,
+  });
+  return completion.choices[0].message.content;
+},{
+  run_type: "llm",
+  name: "OpenAI Call Traceable",
+  project_name: "My Project"
+});
+
+// Call the traceable function
+await traceableCallOpenAI(messages, "gpt-4o-mini");
+
+// Create and use a RunTree object
+const rt = new RunTree({
+  run_type: "llm",
+  name: "OpenAI Call RunTree",
+  inputs: { messages },
+  project_name: "My Project"
+});
+await rt.postRun();
+
+// Execute a chat completion and handle it within RunTree
+rt.end({outputs: chatCompletion});
+await rt.patchRun();
+```
+
+</CodeGroup>

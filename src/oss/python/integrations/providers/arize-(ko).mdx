@@ -1,0 +1,31 @@
+---
+title: Arize
+---
+
+[Arize](https://arize.com)는 AI 관찰성 및 LLM 평가 플랫폼으로, LangChain 애플리케이션을 지원하며
+입력, embedding, retrieval, function, 출력 메시지에 대한 상세한 trace를 제공합니다.
+
+
+## 설치 및 설정
+
+먼저, `arize` python package를 설치해야 합니다.
+
+<CodeGroup>
+```bash pip
+pip install arize
+```
+
+```bash uv
+uv add arize
+```
+</CodeGroup>
+
+다음으로, [Arize 계정](https://app.arize.com/auth/join)을 설정하고
+`API_KEY` 또는 `SPACE_KEY`를 받아야 합니다.
+
+
+## Callback handler
+
+```python
+from langchain_community.callbacks import ArizeCallbackHandler
+```

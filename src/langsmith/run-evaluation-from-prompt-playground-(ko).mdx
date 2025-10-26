@@ -1,0 +1,30 @@
+---
+title: Prompt playground에서 평가 실행하기
+sidebarTitle: UI 사용
+---
+
+LangSmith를 사용하면 UI에서 직접 평가를 실행할 수 있습니다. [**Prompt Playground**](/langsmith/prompt-engineering#prompt-playground)를 사용하면 코드를 작성하지 않고도 일련의 입력에 대해 prompt 또는 model 구성을 테스트하여 다양한 컨텍스트나 시나리오에서 얼마나 잘 작동하는지 확인할 수 있습니다.
+
+평가를 실행하기 전에 [기존 dataset](/langsmith/evaluation-concepts#datasets)이 있어야 합니다. [UI에서 dataset 생성하기](/langsmith/manage-datasets-in-application#set-up-your-dataset) 방법을 알아보세요.
+
+코드로 실험을 실행하려면 [SDK를 사용한 평가 실행](/langsmith/evaluate-llm-application)을 참조하세요.
+
+![](/langsmith/images/playground-experiment.gif)
+
+## Prompt playground에서 experiment 생성하기[​](#create-an-experiment-in-the-prompt-playground "Direct link to Create an experiment in the prompt playground")
+
+1. 사이드바에서 **Playground**를 클릭하여 **playground로 이동**합니다.
+2. 기존에 저장된 prompt를 선택하거나 새로운 prompt를 생성하여 **prompt를 추가**합니다.
+3. **Test over dataset** 드롭다운에서 **dataset을 선택**합니다
+
+* dataset input의 key가 prompt의 input variable과 일치해야 합니다. 예를 들어, 위 비디오에서 선택된 dataset은 "blog"라는 key를 가진 input을 가지고 있으며, 이는 prompt의 input variable과 올바르게 일치합니다.
+* Prompt playground에서는 최대 15개의 input variable이 허용됩니다.
+
+4. **Start** 또는 CMD+Enter를 클릭하여 **experiment를 시작**합니다. 이렇게 하면 dataset의 모든 example에 대해 prompt가 실행되고 dataset 세부 정보 페이지에 experiment 항목이 생성됩니다. 나중에 experiment를 검토할 때 쉽게 참조할 수 있도록 experiment를 시작하기 전에 prompt를 prompt hub에 커밋하는 것을 권장합니다.
+5. **View full experiment**를 클릭하여 **전체 결과를 확인**합니다. 이렇게 하면 experiment의 결과를 볼 수 있는 experiment 세부 정보 페이지로 이동합니다.
+
+## Experiment에 평가 점수 추가하기[​](#add-evaluation-scores-to-the-experiment "Direct link to Add evaluation scores to the experiment")
+
+Evaluator를 추가하여 특정 기준에 따라 experiment를 평가하세요. **+Evaluator** 버튼을 사용하여 playground에서 LLM-as-a-judge 또는 custom code evaluator를 추가할 수 있습니다.
+
+UI를 통해 evaluator를 추가하는 방법에 대해 자세히 알아보려면 [LLM-as-a-judge evaluator 정의 방법](/langsmith/llm-as-judge)을 참조하세요.

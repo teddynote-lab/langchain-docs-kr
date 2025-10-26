@@ -1,0 +1,46 @@
+---
+title: Anchor Browser
+---
+
+[Anchor](https://anchorbrowser.io?utm=langchain)는 API가 없거나 API 범위가 제한된 웹 애플리케이션의 워크플로우 자동화 문제를 해결하는 AI Agentic 브라우저 자동화 플랫폼입니다. 브라우저 기반 자동화의 생성, 배포 및 관리를 단순화하여 복잡한 웹 상호작용을 간단한 API endpoint로 변환합니다.
+
+`langchain-anchorbrowser`는 3가지 주요 tool을 제공합니다:
+- `AnchorContentTool` - Markdown 또는 HTML 형식의 웹 콘텐츠 추출용.
+- `AnchorScreenshotTool` - 웹 페이지 스크린샷용.
+- `AnchorWebTaskTools` - 웹 작업 수행용.
+
+## Quickstart
+
+### Installation
+
+패키지를 설치합니다:
+
+<CodeGroup>
+```bash pip
+pip install langchain-anchorbrowser
+```
+
+```bash uv
+uv add langchain-anchorbrowser
+```
+</CodeGroup>
+
+### Usage
+
+의도한 tool을 import하고 활용합니다. 사용 가능한 Anchor Browser tool의 전체 목록은 [Anchor Browser tool 페이지](/oss/integrations/tools/anchor_browser)의 **Tool Features** 표를 참조하세요.
+
+```python
+from langchain_anchorbrowser import AnchorContentTool
+
+# Get Markdown Content for https://www.anchorbrowser.io
+AnchorContentTool().invoke(
+    {"url": "https://www.anchorbrowser.io", "format": "markdown"}
+)
+```
+
+## Additional Resources
+
+- [PyPi](https://pypi.org/project/langchain-anchorbrowser)
+- [Github](https://github.com/anchorbrowser/langchain-anchorbrowser)
+- [Anchor Browser Docs](https://docs.anchorbrowser.io/introduction?utm=langchain)
+- [Anchor Browser API Reference](https://docs.anchorbrowser.io/api-reference/ai-tools/perform-web-task?utm=langchain)
