@@ -1,0 +1,160 @@
+---
+title: LangSmith Chat Datasets
+---
+
+이 노트북은 LangSmith chat dataset을 로드하고 해당 데이터로 모델을 fine-tune하는 쉬운 방법을 보여줍니다.
+프로세스는 간단하며 3단계로 구성됩니다.
+
+1. chat dataset을 생성합니다.
+2. LangSmithDatasetChatLoader를 사용하여 예제를 로드합니다.
+3. 모델을 fine-tune합니다.
+
+그런 다음 fine-tune된 모델을 LangChain 앱에서 사용할 수 있습니다.
+
+시작하기 전에 필수 구성 요소를 설치하겠습니다.
+
+## Prerequisites
+
+langchain >= 0.0.311이 설치되어 있고 LangSmith API key로 환경이 구성되어 있는지 확인하세요.
+
+```python
+pip install -qU  langchain langchain-openai
+```
+
+```python
+import os
+import uuid
+
+uid = uuid.uuid4().hex[:6]
+os.environ["LANGSMITH_TRACING"] = "true"
+os.environ["LANGSMITH_API_KEY"] = "YOUR API KEY"
+```
+
+## 1. Select a dataset
+
+이 노트북은 fine-tune할 run을 선택하여 모델을 직접 fine-tune합니다. 이러한 run은 추적된 run에서 선별하는 경우가 많습니다. LangSmith dataset에 대한 자세한 내용은 [docs](https://docs.smith.langchain.com/evaluation/concepts#datasets)에서 확인할 수 있습니다.
+
+이 튜토리얼을 위해 여기에서 사용할 수 있는 기존 dataset을 업로드하겠습니다.
+
+```python
+from langsmith.client import Client
+
+client = Client()
+```
+
+```python
+import requests
+
+url = "https://raw.githubusercontent.com/langchain-ai/langchain/v0.3/docs/docs/integrations/chat_loaders/example_data/langsmith_chat_dataset.json"
+response = requests.get(url)
+response.raise_for_status()
+data = response.json()
+```
+
+```python
+dataset_name = f"Extraction Fine-tuning Dataset {uid}"
+ds = client.create_dataset(dataset_name=dataset_name, data_type="chat")
+```
+
+```python
+_ = client.create_examples(
+    inputs=[e["inputs"] for e in data],
+    outputs=[e["outputs"] for e in data],
+    dataset_id=ds.id,
+)
+```
+
+## 2. Prepare Data
+
+이제 LangSmithRunChatLoader의 인스턴스를 생성하고 lazy_load() 메서드를 사용하여 chat session을 로드할 수 있습니다.
+
+```python
+from langchain_community.chat_loaders.langsmith import LangSmithDatasetChatLoader
+
+loader = LangSmithDatasetChatLoader(dataset_name=dataset_name)
+
+chat_sessions = loader.lazy_load()
+```
+
+#### chat session이 로드되면 fine-tuning에 적합한 형식으로 변환합니다
+
+```python
+from langchain_community.adapters.openai import convert_messages_for_finetuning
+
+training_data = convert_messages_for_finetuning(chat_sessions)
+```
+
+## 3. Fine-tune the Model
+
+이제 OpenAI 라이브러리를 사용하여 fine-tuning 프로세스를 시작합니다.
+
+```python
+import json
+import time
+from io import BytesIO
+
+import openai
+
+my_file = BytesIO()
+for dialog in training_data:
+    my_file.write((json.dumps({"messages": dialog}) + "\n").encode("utf-8"))
+
+my_file.seek(0)
+training_file = openai.files.create(file=my_file, purpose="fine-tune")
+
+job = openai.fine_tuning.jobs.create(
+    training_file=training_file.id,
+    model="gpt-3.5-turbo",
+)
+
+# Wait for the fine-tuning to complete (this may take some time)
+status = openai.fine_tuning.jobs.retrieve(job.id).status
+start_time = time.time()
+while status != "succeeded":
+    print(f"Status=[{status}]... {time.time() - start_time:.2f}s", end="\r", flush=True)
+    time.sleep(5)
+    status = openai.fine_tuning.jobs.retrieve(job.id).status
+
+# Now your model is fine-tuned!
+```
+
+```output
+Status=[running]... 429.55s. 46.34s
+```
+
+## 4. Use in LangChain
+
+fine-tuning 후 LangChain 앱에서 ChatOpenAI model class와 함께 결과 model ID를 사용합니다.
+
+```python
+# Get the fine-tuned model ID
+job = openai.fine_tuning.jobs.retrieve(job.id)
+model_id = job.fine_tuned_model
+
+# Use the fine-tuned model in LangChain
+from langchain_openai import ChatOpenAI
+
+model = ChatOpenAI(
+    model=model_id,
+    temperature=1,
+)
+```
+
+```python
+model.invoke("There were three ravens sat on a tree.")
+```
+
+```output
+AIMessage(content='[{"s": "There were three ravens", "object": "tree", "relation": "sat on"}, {"s": "three ravens", "object": "a tree", "relation": "sat on"}]')
+```
+
+이제 LangSmith LLM run의 데이터를 사용하여 모델을 성공적으로 fine-tune했습니다!
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/chat_loaders/langsmith_dataset.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

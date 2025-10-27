@@ -1,0 +1,257 @@
+---
+title: Hyperbrowser Browser Agent Tools
+---
+
+[Hyperbrowser](https://hyperbrowser.ai)는 브라우저 에이전트를 실행하고 headless 브라우저를 확장하기 위한 플랫폼입니다. 대규모로 브라우저 세션을 시작하고 관리할 수 있으며, 단일 페이지 스크래핑이나 전체 사이트 크롤링과 같은 모든 웹 스크래핑 요구사항에 대해 사용하기 쉬운 솔루션을 제공합니다.
+
+주요 기능:
+
+- 즉각적인 확장성 - 인프라 문제 없이 수백 개의 브라우저 세션을 몇 초 만에 시작
+- 간편한 통합 - Puppeteer 및 Playwright와 같은 인기 있는 도구와 원활하게 작동
+- 강력한 API - 모든 사이트를 스크래핑/크롤링하기 위한 사용하기 쉬운 API 등
+- 안티봇 조치 우회 - 내장된 스텔스 모드, 광고 차단, 자동 CAPTCHA 해결 및 순환 프록시
+
+이 가이드는 Hyperbrowser 도구를 시작하기 위한 빠른 개요를 제공합니다.
+
+Hyperbrowser에 대한 자세한 내용은 [Hyperbrowser 웹사이트](https://hyperbrowser.ai)를 방문하거나, 문서를 확인하려면 [Hyperbrowser 문서](https://docs.hyperbrowser.ai)를 방문하세요.
+
+## Browser Agents
+
+Hyperbrowser는 AI 모델이 프로그래밍 방식으로 웹 브라우저와 상호작용할 수 있도록 하는 강력한 브라우저 에이전트 도구를 제공합니다. 이러한 브라우저 에이전트는 웹사이트를 탐색하고, 양식을 작성하고, 버튼을 클릭하고, 데이터를 추출하고, 복잡한 웹 자동화 작업을 수행할 수 있습니다.
+
+브라우저 에이전트는 다음과 같은 경우에 특히 유용합니다:
+
+- 복잡한 웹사이트에서 웹 스크래핑 및 데이터 추출
+- 반복적인 웹 작업 자동화
+- 인증이 필요한 웹 애플리케이션과 상호작용
+- 여러 웹사이트에서 리서치 수행
+- 웹 애플리케이션 테스트
+
+Hyperbrowser는 세 가지 유형의 브라우저 에이전트 도구를 제공합니다:
+
+- **Browser Use Tool**: 범용 브라우저 자동화 도구
+- **OpenAI CUA Tool**: OpenAI의 Computer Use Agent와의 통합
+- **Claude Computer Use Tool**: Anthropic의 Claude와의 컴퓨터 사용 통합
+
+## Overview
+
+### Integration details
+
+| Tool                      | Package                | Local | Serializable | JS support |
+| :-----------------------  | :--------------------- | :---: | :----------: | :--------: |
+| Browser Use Tool          | langchain-hyperbrowser |  ❌   |      ❌      |      ❌    |
+| OpenAI CUA Tool           | langchain-hyperbrowser |  ❌   |      ❌      |      ❌    |
+| Claude Computer Use Tool  | langchain-hyperbrowser |  ❌   |      ❌      |     ❌     |
+
+## Setup
+
+Hyperbrowser 도구에 액세스하려면 `langchain-hyperbrowser` 통합 패키지를 설치하고, Hyperbrowser 계정을 생성하고 API 키를 받아야 합니다.
+
+### Credentials
+
+[Hyperbrowser](https://app.hyperbrowser.ai/)로 이동하여 가입하고 API 키를 생성하세요. 완료되면 HYPERBROWSER_API_KEY 환경 변수를 설정하세요:
+
+```bash
+export HYPERBROWSER_API_KEY=<your-api-key>
+```
+
+### Installation
+
+**langchain-hyperbrowser**를 설치하세요.
+
+```python
+pip install -qU langchain-hyperbrowser
+```
+
+## Instantiation
+
+### Browser Use Tool
+
+`HyperbrowserBrowserUseTool`은 브라우저 에이전트, 특히 Browser-Use 에이전트를 사용하여 웹 자동화 작업을 수행하는 도구입니다.
+
+```python
+from langchain_hyperbrowser import HyperbrowserBrowserUseTool
+tool = HyperbrowserBrowserUseTool()
+```
+
+### OpenAI CUA Tool
+
+`HyperbrowserOpenAICUATool`은 Hyperbrowser를 통해 OpenAI의 Computer Use Agent (CUA) 기능을 활용하는 특수 도구입니다.
+
+```python
+from langchain_hyperbrowser import HyperbrowserOpenAICUATool
+tool = HyperbrowserOpenAICUATool()
+```
+
+### Claude Computer Use Tool
+
+`HyperbrowserClaudeComputerUseTool`은 Hyperbrowser를 통해 Claude의 컴퓨터 사용 기능을 활용하는 특수 도구입니다.
+
+```python
+from langchain_hyperbrowser import HyperbrowserClaudeComputerUseTool
+tool = HyperbrowserClaudeComputerUseTool()
+```
+
+## Invocation
+
+### Basic Usage
+
+#### Browser Use Tool
+
+```python
+from langchain_hyperbrowser import HyperbrowserBrowserUseTool
+
+tool = HyperbrowserBrowserUseTool()
+result = tool.run({"task": "Go to Hacker News and summarize the top 5 posts right now"})
+print(result)
+```
+
+```output
+{'data': 'The top 5 posts on Hacker News right now are:\n1. Stop Syncing Everything - https://sqlsync.dev/posts/stop-syncing-everything/\n2. Move fast, break things: A review of Abundance by Ezra Klein and Derek Thompson - https://networked.substack.com/p/move-fast-and-break-things\n3. DEDA – Tracking Dots Extraction, Decoding and Anonymisation Toolkit - https://github.com/dfd-tud/deda\n4. Electron band structure in germanium, my ass (2001) - https://pages.cs.wisc.edu/~kovar/hall.html\n5. Show HN: I vibecoded a 35k LoC recipe app - https://www.recipeninja.ai', 'error': None}
+```
+
+#### OpenAI CUA Tool
+
+```python
+from langchain_hyperbrowser import HyperbrowserOpenAICUATool
+
+tool = HyperbrowserOpenAICUATool()
+result = tool.run(
+    {"task": "Go to Hacker News and get me the title of the top 5 posts right now"}
+)
+print(result)
+```
+
+```output
+{'data': 'Here are the titles of the top 5 posts on Hacker News right now:\n\n1. "DEDA – Tracking Dots Extraction, Decoding and Anonymisation Toolkit"\n2. "A man powers home for eight years using a thousand old laptop batteries"\n3. "Electron band structure in Germanium, my ass"\n4. "Bletchley code breaker Betty Webb dies aged 101"\n5. "Show HN: Zig Topological Sort Library for Parallel Processing"', 'error': None}
+```
+
+#### Claude Computer Use Tool
+
+```python
+from langchain_hyperbrowser import HyperbrowserClaudeComputerUseTool
+
+tool = HyperbrowserClaudeComputerUseTool()
+result = tool.run({"task": "Go to Hacker News and summarize the top 5 posts right now"})
+print(result)
+```
+
+```output
+{'data': "Now I'll summarize the top 5 posts on Hacker News as of April 1, 2025:\n\n### Top 5 Hacker News Posts Summary\n\n1. **A man powers home for eight years using a thousand old laptop batteries** (techoreon.com)\n   - 267 points, posted 5 hours ago\n   - An innovative DIY project where someone managed to power their home using recycled laptop batteries for an extended period.\n\n2. **Electron band structure in germanium, my ass** (wisc.edu)\n   - 611 points, posted 8 hours ago\n   - Academic or technical discussion about electron band structure in germanium, possibly with a controversial or humorous take given the title.\n\n3. **Bletchley code breaker Betty Webb dies aged 101** (bbc.com)\n   - 575 points, posted 8 hours ago\n   - Obituary for Betty Webb, who worked as a code breaker at Bletchley Park during WWII, passing away at the age of 101.\n\n4. **Show HN: Zig Topological Sort Library for Parallel Processing** (github.com/williamw520)\n   - 55 points, posted 3 hours ago\n   - A developer sharing a library written in Zig programming language for topological sorting that supports parallel processing.\n\n5. **The Myst Graph: A New Perspective on Myst** (githr.com)\n   - 107 points, posted 5 hours ago\n   - An article presenting a new analysis or visualization of the classic video game Myst, likely using graph theory.\n\nThese are the top 5 posts currently trending on Hacker News as of April 1, 2025.", 'error': None}
+```
+
+### With Custom Session Options
+
+모든 도구는 사용자 정의 세션 옵션을 지원합니다:
+
+```python
+result = tool.run(
+    {
+        "task": "Go to npmjs.com, and tell me when react package was last updated.",
+        "session_options": {
+            "session_options": {"use_proxy": True, "accept_cookies": True}
+        },
+    }
+)
+print(result)
+```
+
+```output
+{'data': 'I have found that the react package was last published 11 hours ago. This is the most recently updated package I could find.', 'error': None}
+```
+
+### Async Usage
+
+모든 도구는 비동기 사용을 지원합니다:
+
+```python
+async def browse_website():
+    tool = HyperbrowserBrowserUseTool()
+    result = await tool.arun(
+        {
+            "task": "Go to npmjs.com, click the first visible package, and tell me when it was updated"
+        }
+    )
+    return result
+
+
+result = await browse_website()
+```
+
+```output
+{'data': 'The page displays information about the "Example Domain," stating that it is used for illustrative purposes and can be utilized without permission. There\'s a link to "More information..." but no specific contact details are provided.', 'error': None}
+```
+
+## Use within an agent
+
+다음은 에이전트 내에서 Hyperbrowser 도구를 사용하는 방법입니다:
+
+```python
+from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_hyperbrowser import browser_use_tool
+from langchain_openai import ChatOpenAI
+from langchain.agents import create_agent
+
+
+model = ChatOpenAI(temperature=0)
+
+# You can use any of the three tools here
+browser_use_tool = HyperbrowserBrowserUseTool()
+agent = create_agent(model, [browser_use_tool])
+
+user_input = "Go to npmjs.com, and tell me when react package was last updated."
+for step in agent.stream(
+    {"messages": user_input},
+    stream_mode="values",
+):
+    step["messages"][-1].pretty_print()
+```
+
+```output
+================================ Human Message =================================
+
+Go to npmjs.com, and tell me when react package was last updated.
+================================== Ai Message ==================================
+Tool Calls:
+  hyperbrowser_browser_use (call_pkAaDjn6kKH9yT3rHDb4hmET)
+ Call ID: call_pkAaDjn6kKH9yT3rHDb4hmET
+  Args:
+    task: Go to npmjs.com and find the last updated date of the React package.
+    session_options: None
+================================= Tool Message =================================
+Name: hyperbrowser_browser_use
+
+{"data": "The last updated date of the React package is a day ago.", "error": null}
+================================== Ai Message ==================================
+
+The React package was last updated a day ago.
+```
+
+## Configuration Options
+
+Claude Computer Use, OpenAI CUA 및 Browser Use는 다음 매개변수를 사용할 수 있습니다:
+
+- `task`: 에이전트를 사용하여 실행할 작업
+- `max_steps`: 에이전트가 작업을 완료하기 위해 수행할 수 있는 최대 상호작용 단계 수
+- `session_options`: 브라우저 세션 구성
+
+자세한 내용은 각 API 참조를 확인하세요:
+
+- [Browser Use API Reference](https://docs.hyperbrowser.ai/reference/api-reference/agents/browser-use)
+- [OpenAI CUA API Reference](https://docs.hyperbrowser.ai/reference/api-reference/agents/openai-cua)
+- [Claude Computer Use API Reference](https://docs.hyperbrowser.ai/reference/api-reference/agents/claude-computer-use)
+
+## API reference
+
+- [GitHub](https://github.com/hyperbrowserai/langchain-hyperbrowser/)
+- [PyPi](https://pypi.org/project/langchain-hyperbrowser/)
+- [Hyperbrowser Docs](https://docs.hyperbrowser.ai/)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/tools/hyperbrowser_browser_agent_tools.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

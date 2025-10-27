@@ -1,0 +1,40 @@
+---
+title: MCP Toolbox
+---
+
+LangChain의 [MCP Toolbox](https://googleapis.github.io/genai-toolbox/getting-started/introduction/)를 사용하면 에이전트에 도구 세트를 장착할 수 있습니다. 에이전트가 쿼리를 받으면 MCP Toolbox에서 제공하는 가장 적절한 도구를 지능적으로 선택하고 사용하여 요청을 처리할 수 있습니다.
+
+## 무엇인가요?
+
+MCP Toolbox는 본질적으로 도구를 위한 컨테이너입니다. 에이전트를 위한 멀티 도구 장치라고 생각하면 됩니다. 여러분이 만든 모든 도구를 담을 수 있습니다. 그러면 에이전트가 사용자의 입력에 따라 어떤 특정 도구를 사용할지 결정합니다.
+
+이는 다양한 기능이 필요한 여러 작업을 수행해야 하는 에이전트가 있을 때 특히 유용합니다.
+
+## 설치
+
+시작하려면 필요한 패키지를 설치해야 합니다:
+
+<CodeGroup>
+```bash pip
+pip install toolbox-langchain
+```
+
+```bash uv
+uv add toolbox-langchain
+```
+</CodeGroup>
+
+## 튜토리얼
+
+에이전트와 함께 MCP Toolbox를 생성, 구성 및 사용하는 방법에 대한 완전한 단계별 가이드는 상세한 Jupyter notebook 튜토리얼을 참조하세요.
+
+**[➡️ 전체 튜토리얼 보기](/oss/python/integrations/tools/toolbox)**.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/toolbox.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

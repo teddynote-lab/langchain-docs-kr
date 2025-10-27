@@ -1,0 +1,51 @@
+---
+title: Transwarp
+---
+
+>[Transwarp](https://www.transwarp.cn/en/introduction)는 
+> 엔터프라이즈급 빅데이터 및 AI 인프라 소프트웨어를 구축하여
+> 데이터 세계의 미래를 만들어가는 것을 목표로 합니다. 통합, 저장, 거버넌스, 모델링, 분석,
+> 마이닝 및 유통을 포함한 전체 데이터 라이프사이클에 걸쳐
+> 엔터프라이즈에 인프라 소프트웨어와 서비스를 제공합니다.
+>
+> `Transwarp`는 기술 연구 및
+> 개발에 집중하며 다음 분야에서 핵심 기술을 축적해왔습니다:
+> 분산 컴퓨팅, SQL 컴파일, 데이터베이스 기술,
+> 다중 모델 데이터 관리 통합, 컨테이너 기반 클라우드 컴퓨팅,
+> 그리고 빅데이터 분석 및 인텔리전스.
+
+## Installation
+
+여러 python package를 설치해야 합니다:
+
+<CodeGroup>
+```bash pip
+pip install -U tiktoken hippo-api
+```
+
+```bash uv
+uv add tiktoken hippo-api
+```
+</CodeGroup>
+
+그리고 connection 설정을 가져옵니다.
+
+## Vector stores
+
+### Hippo
+
+[사용 예제 및 설치 지침](/oss/python/integrations/vectorstores/hippo)을 참조하세요.
+
+```python
+from langchain_community.vectorstores.hippo import Hippo
+```
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/transwarp.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

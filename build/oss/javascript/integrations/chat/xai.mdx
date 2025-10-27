@@ -1,0 +1,141 @@
+```markdown
+---
+title: ChatXAI
+---
+
+[xAI](https://x.ai/)는 대규모 언어 모델(LLM)을 개발하는 인공지능 회사입니다. 그들의 주력 모델인 Grok은 실시간 X(구 Twitter) 데이터로 학습되었으며, 기술적 작업에서 높은 성능을 유지하면서도 재치 있고 개성 넘치는 응답을 제공하는 것을 목표로 합니다.
+
+이 가이드는 `ChatXAI` [chat models](/oss/javascript/langchain/models) 시작하기를 도와드립니다. 모든 `ChatXAI` 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/_langchain_xai.ChatXAI.html)를 참조하세요.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | PY support | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [ChatXAI](https://api.js.langchain.com/classes/_langchain_xai.ChatXAI.html) | [`@langchain/xai`](https://www.npmjs.com/package/@langchain/xai) | ❌ | ✅ | ❌ | ![NPM - Downloads](https://img.shields.io/npm/dm/@langchain/xai?style=flat-square&label=%20&) | ![NPM - Version](https://img.shields.io/npm/v/@langchain/xai?style=flat-square&label=%20&) |
+
+### Model features
+
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
+
+| [Tool calling](/oss/javascript/langchain/tools) | [Structured output](/oss/javascript/langchain/structured-output) | JSON mode | [Image input](/oss/javascript/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/javascript/langchain/streaming/) | [Token usage](/oss/javascript/langchain/models#token-usage) | [Logprobs](/oss/javascript/langchain/models#log-probabilities) |
+| :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+
+## Setup
+
+`ChatXAI` 모델에 액세스하려면 xAI 계정을 생성하고, [API key를 발급](https://console.x.ai/)받고, `@langchain/xai` integration package를 설치해야 합니다.
+
+### Credentials
+
+[xAI 웹사이트](https://x.ai)로 이동하여 xAI에 가입하고 API key를 생성하세요. 완료한 후 `XAI_API_KEY` environment variable을 설정하세요:
+
+```bash
+export XAI_API_KEY="your-api-key"
+```
+
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
+
+```bash
+# export LANGSMITH_TRACING="true"
+# export LANGSMITH_API_KEY="your-api-key"
+```
+
+### Installation
+
+LangChain `ChatXAI` integration은 `@langchain/xai` package에 있습니다:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/xai @langchain/core
+```
+```bash yarn
+yarn add @langchain/xai @langchain/core
+```
+```bash pnpm
+pnpm add @langchain/xai @langchain/core
+```
+</CodeGroup>
+
+## Instantiation
+
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
+
+```typescript
+import { ChatXAI } from "@langchain/xai"
+
+const llm = new ChatXAI({
+    model: "grok-beta", // default
+    temperature: 0,
+    maxTokens: undefined,
+    maxRetries: 2,
+    // other params...
+})
+```
+
+## Invocation
+
+```typescript
+const aiMsg = await llm.invoke([
+    [
+      "system",
+      "You are a helpful assistant that translates English to French. Translate the user sentence.",
+    ],
+    ["human", "I love programming."],
+])
+console.log(aiMsg)
+```
+
+```output
+AIMessage {
+  "id": "71d7e3d8-30dd-472c-8038-b6b283dcee63",
+  "content": "J'adore programmer.",
+  "additional_kwargs": {},
+  "response_metadata": {
+    "tokenUsage": {
+      "promptTokens": 30,
+      "completionTokens": 6,
+      "totalTokens": 36
+    },
+    "finish_reason": "stop",
+    "usage": {
+      "prompt_tokens": 30,
+      "completion_tokens": 6,
+      "total_tokens": 36
+    },
+    "system_fingerprint": "fp_3e3898d4ce"
+  },
+  "tool_calls": [],
+  "invalid_tool_calls": [],
+  "usage_metadata": {
+    "output_tokens": 6,
+    "input_tokens": 30,
+    "total_tokens": 36,
+    "input_token_details": {},
+    "output_token_details": {}
+  }
+}
+```
+
+```typescript
+console.log(aiMsg.content)
+```
+
+```output
+J'adore programmer.
+```
+
+## API reference
+
+모든 ChatXAI 기능과 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/_langchain_xai.ChatXAI.html)를 참조하세요.
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/chat/xai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

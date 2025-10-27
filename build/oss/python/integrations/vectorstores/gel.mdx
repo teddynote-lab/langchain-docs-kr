@@ -1,0 +1,259 @@
+---
+title: Gel
+---
+
+> `gel`을 backend로 사용하는 LangChain vectorstore 추상화의 구현입니다.
+
+[Gel](https://www.geldata.com/)은 빠른 개발에서 프로덕션 사이클로의 전환에 최적화된 오픈소스 PostgreSQL 데이터 레이어입니다. 고수준의 엄격하게 타입이 지정된 그래프형 데이터 모델, 구성 가능한 계층적 쿼리 언어, 완전한 SQL 지원, 마이그레이션, Auth 및 AI 모듈을 제공합니다.
+
+코드는 [langchain-gel](https://github.com/geldata/langchain-gel)이라는 통합 패키지에 있습니다.
+
+## Setup
+
+먼저 관련 패키지를 설치합니다:
+
+```python
+! pip install -qU gel langchain-gel
+```
+
+## Initialization
+
+`VectorStore`의 backend로 Gel을 사용하려면 작동하는 Gel 인스턴스가 필요합니다.
+다행히도 원하지 않는 한 Docker 컨테이너나 복잡한 작업이 필요하지 않습니다!
+
+로컬 인스턴스를 설정하려면 다음을 실행하세요:
+
+```python
+! gel project init --non-interactive
+```
+
+[Gel Cloud](https://cloud.geldata.com/)를 사용하는 경우(사용하는 것을 권장합니다!), 해당 명령에 인수를 하나 더 추가하세요:
+
+```bash
+gel project init --server-instance <org-name>/<instance-name>
+```
+
+Gel을 실행하는 다양한 방법에 대한 포괄적인 목록은 참조 문서의 [Running Gel](https://docs.geldata.com/reference/running) 섹션을 참조하세요.
+
+### 스키마 설정
+
+[Gel schema](https://docs.geldata.com/reference/datamodel)는 애플리케이션의 데이터 모델에 대한 명시적인 고수준 설명입니다.
+데이터 레이아웃을 정확하게 정의할 수 있을 뿐만 아니라, link, access policy, function, trigger, constraint, index 등과 같은 Gel의 강력한 기능을 구동합니다.
+
+LangChain의 [`VectorStore`](https://reference.langchain.com/python/langchain_core/vectorstores/?h=#langchain_core.vectorstores.base.VectorStore)는 스키마에 대해 다음과 같은 레이아웃을 기대합니다:
+
+```python
+schema_content = """
+using extension pgvector;
+
+module default {
+    scalar type EmbeddingVector extending ext::pgvector::vector<1536>;
+
+    type Record {
+        required collection: str;
+        text: str;
+        embedding: EmbeddingVector;
+        external_id: str {
+            constraint exclusive;
+        };
+        metadata: json;
+
+        index ext::pgvector::hnsw_cosine(m := 16, ef_construction := 128)
+            on (.embedding)
+    }
+}
+""".strip()
+
+with open("dbschema/default.gel", "w") as f:
+    f.write(schema_content)
+```
+
+데이터베이스에 스키마 변경 사항을 적용하려면 Gel의 [migration mechanism](https://docs.geldata.com/reference/datamodel/migrations)을 사용하여 마이그레이션을 실행하세요:
+
+```python
+! gel migration create --non-interactive
+! gel migrate
+```
+
+이 시점부터 `GelVectorStore`는 LangChain에서 사용 가능한 다른 vectorstore의 드롭인 대체품으로 사용할 수 있습니다.
+
+## Instantiation
+
+<EmbeddingTabs/>
+
+```python
+# | output: false
+# | echo: false
+from langchain_openai import OpenAIEmbeddings
+
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+```
+
+```python
+from langchain_gel import GelVectorStore
+
+vector_store = GelVectorStore(
+    embeddings=embeddings,
+)
+```
+
+## Manage vector store
+
+### vector store에 항목 추가
+
+ID로 문서를 추가하면 해당 ID와 일치하는 기존 문서를 덮어쓰게 됩니다.
+
+```python
+from langchain_core.documents import Document
+
+docs = [
+    Document(
+        page_content="there are cats in the pond",
+        metadata={"id": "1", "location": "pond", "topic": "animals"},
+    ),
+    Document(
+        page_content="ducks are also found in the pond",
+        metadata={"id": "2", "location": "pond", "topic": "animals"},
+    ),
+    Document(
+        page_content="fresh apples are available at the market",
+        metadata={"id": "3", "location": "market", "topic": "food"},
+    ),
+    Document(
+        page_content="the market also sells fresh oranges",
+        metadata={"id": "4", "location": "market", "topic": "food"},
+    ),
+    Document(
+        page_content="the new art exhibit is fascinating",
+        metadata={"id": "5", "location": "museum", "topic": "art"},
+    ),
+    Document(
+        page_content="a sculpture exhibit is also at the museum",
+        metadata={"id": "6", "location": "museum", "topic": "art"},
+    ),
+    Document(
+        page_content="a new coffee shop opened on Main Street",
+        metadata={"id": "7", "location": "Main Street", "topic": "food"},
+    ),
+    Document(
+        page_content="the book club meets at the library",
+        metadata={"id": "8", "location": "library", "topic": "reading"},
+    ),
+    Document(
+        page_content="the library hosts a weekly story time for kids",
+        metadata={"id": "9", "location": "library", "topic": "reading"},
+    ),
+    Document(
+        page_content="a cooking class for beginners is offered at the community center",
+        metadata={"id": "10", "location": "community center", "topic": "classes"},
+    ),
+]
+
+vector_store.add_documents(docs, ids=[doc.metadata["id"] for doc in docs])
+```
+
+### vector store에서 항목 삭제
+
+```python
+vector_store.delete(ids=["3"])
+```
+
+## Query vector store
+
+vector store가 생성되고 관련 문서가 추가되면 chain이나 agent를 실행하는 동안 쿼리하고 싶을 것입니다.
+
+### Filtering Support
+
+vectorstore는 문서의 metadata 필드에 적용할 수 있는 필터 세트를 지원합니다.
+
+| Operator | Meaning/Category        |
+|----------|-------------------------|
+| \$eq      | Equality (==)           |
+| \$ne      | Inequality (!=)         |
+| \$lt      | Less than (&lt;)           |
+| \$lte     | Less than or equal (&lt;=) |
+| \$gt      | Greater than (>)        |
+| \$gte     | Greater than or equal (>=) |
+| \$in      | Special Cased (in)      |
+| \$nin     | Special Cased (not in)  |
+| \$between | Special Cased (between) |
+| \$like    | Text (like)             |
+| \$ilike   | Text (case-insensitive like) |
+| \$and     | Logical (and)           |
+| \$or      | Logical (or)            |
+
+### 직접 쿼리
+
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
+
+```python
+results = vector_store.similarity_search(
+    "kitty", k=10, filter={"id": {"$in": ["1", "5", "2", "9"]}}
+)
+for doc in results:
+    print(f"* {doc.page_content} [{doc.metadata}]")
+```
+
+operator 없이 여러 필드가 있는 dict를 제공하면 최상위 레벨은 논리적 **AND** 필터로 해석됩니다
+
+```python
+vector_store.similarity_search(
+    "ducks",
+    k=10,
+    filter={
+        "id": {"$in": ["1", "5", "2", "9"]},
+        "location": {"$in": ["pond", "market"]},
+    },
+)
+```
+
+```python
+vector_store.similarity_search(
+    "ducks",
+    k=10,
+    filter={
+        "$and": [
+            {"id": {"$in": ["1", "5", "2", "9"]}},
+            {"location": {"$in": ["pond", "market"]}},
+        ]
+    },
+)
+```
+
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
+
+```python
+results = vector_store.similarity_search_with_score(query="cats", k=1)
+for doc, score in results:
+    print(f"* [SIM={score:3f}] {doc.page_content} [{doc.metadata}]")
+```
+
+### retriever로 변환하여 쿼리
+
+chain에서 더 쉽게 사용할 수 있도록 vector store를 retriever로 변환할 수도 있습니다.
+
+```python
+retriever = vector_store.as_retriever(search_kwargs={"k": 1})
+retriever.invoke("kitty")
+```
+
+## Usage for retrieval-augmented generation
+
+retrieval-augmented generation (RAG)에 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
+
+- [Build a RAG app with LangChain](/oss/python/langchain/rag)
+- [Agentic RAG](/oss/python/langgraph/agentic-rag)
+- [Retrieval docs](/oss/python/langchain/retrieval)
+
+## API reference
+
+모든 GelVectorStore 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/](https://python.langchain.com/api_reference/)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/vectorstores/gel.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

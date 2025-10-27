@@ -1,0 +1,28 @@
+---
+title: Zotero
+---
+
+[Zotero](https://www.zotero.org/)는 서지 데이터 및 관련 연구 자료를 관리하기 위한 오픈 소스 참고 문헌 관리 시스템입니다. [API](https://www.zotero.org/support/dev/web_api/v3/start)를 통해 개인 라이브러리와 공유 그룹 라이브러리에 연결할 수 있습니다. 이 retriever 구현은 [PyZotero](https://github.com/urschrei/pyzotero)를 활용하여 라이브러리에 액세스합니다.
+
+## Installation
+
+```bash
+pip install pyzotero
+```
+
+## Retriever
+
+[사용 예제](/oss/python/integrations/retrievers/zotero)를 참조하세요.
+
+```python
+from langchain_zotero_retriever.retrievers import ZoteroRetriever
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/zotero.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

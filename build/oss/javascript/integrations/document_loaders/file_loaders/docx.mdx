@@ -1,0 +1,67 @@
+---
+title: Docx 파일
+---
+
+`DocxLoader`를 사용하면 Microsoft Word 문서에서 텍스트 데이터를 추출할 수 있습니다. 최신 `.docx` 형식과 레거시 `.doc` 형식을 모두 지원합니다. 파일 유형에 따라 추가 종속성이 필요합니다.
+
+---
+
+## Setup
+
+`DocxLoader`를 사용하려면 `@langchain/community` integration과 `mammoth` 또는 `word-extractor` package가 필요합니다:
+
+- **`mammoth`**: `.docx` 파일 처리용.
+- **`word-extractor`**: `.doc` 파일 처리용.
+
+### Installation
+
+#### `.docx` 파일용
+
+```bash npm
+npm install @langchain/community @langchain/core mammoth
+```
+#### `.doc` 파일용
+
+```bash npm
+npm install @langchain/community @langchain/core word-extractor
+```
+## Usage
+
+### `.docx` 파일 로드하기
+
+`.docx` 파일의 경우, loader를 초기화할 때 명시적으로 parameter를 지정할 필요가 없습니다:
+
+```javascript
+import { DocxLoader } from "@langchain/community/document_loaders/fs/docx";
+
+const loader = new DocxLoader(
+  "src/document_loaders/tests/example_data/attention.docx"
+);
+
+const docs = await loader.load();
+```
+### `.doc` 파일 로드하기
+
+`.doc` 파일의 경우, loader를 초기화할 때 `type`을 `doc`으로 명시적으로 지정해야 합니다:
+
+```javascript
+import { DocxLoader } from "@langchain/community/document_loaders/fs/docx";
+
+const loader = new DocxLoader(
+  "src/document_loaders/tests/example_data/attention.doc",
+  {
+    type: "doc",
+  }
+);
+
+const docs = await loader.load();
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/file_loaders/docx.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

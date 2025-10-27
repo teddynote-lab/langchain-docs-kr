@@ -1,0 +1,70 @@
+---
+title: Model2Vec
+---
+
+Model2Vec는 모든 sentence transformer를 매우 작은 정적 모델로 변환하는 기술입니다.
+[model2vec](https://github.com/MinishLab/model2vec)는 embedding을 생성하는 데 사용할 수 있습니다.
+
+## Setup
+
+```bash
+pip install -U langchain-community
+```
+
+## Instantiation
+
+`model2vec`가 설치되어 있는지 확인하세요
+
+```bash
+pip install -U model2vec
+```
+
+## Indexing and Retrieval
+
+```python
+from langchain_community.embeddings import Model2vecEmbeddings
+```
+
+```python
+embeddings = Model2vecEmbeddings("minishlab/potion-base-8M")
+```
+
+```python
+query_text = "This is a test query."
+query_result = embeddings.embed_query(query_text)
+```
+
+```python
+document_text = "This is a test document."
+document_result = embeddings.embed_documents([document_text])
+```
+
+## Direct Usage
+
+다음은 `model2vec`를 직접 사용하는 방법입니다
+
+```python
+from model2vec import StaticModel
+
+# Load a model from the HuggingFace hub (in this case the potion-base-8M model)
+model = StaticModel.from_pretrained("minishlab/potion-base-8M")
+
+# Make embeddings
+embeddings = model.encode(["It's dangerous to go alone!", "It's a secret to everybody."])
+
+# Make sequences of token embeddings
+token_embeddings = model.encode_as_sequence(["It's dangerous to go alone!", "It's a secret to everybody."])
+```
+
+## API reference
+
+자세한 정보는 model2vec github [repo](https://github.com/MinishLab/model2vec)를 확인하세요
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/text_embedding/model2vec.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

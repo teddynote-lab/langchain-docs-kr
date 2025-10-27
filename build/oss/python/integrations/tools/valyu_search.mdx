@@ -1,0 +1,123 @@
+---
+title: ValyuContext
+---
+
+>[Valyu](https://www.valyu.network/)는 AI 애플리케이션과 에이전트가 인터넷과 독점 데이터 소스에서 LLM에 적합한 관련 정보를 검색할 수 있도록 합니다.
+
+이 노트북은 LangChain에서 Valyu context tool을 사용하는 방법을 다룹니다.
+
+먼저 Valyu API key를 받아서 환경 변수로 추가하세요. [여기에서 가입](https://platform.valyu.network/)하여 $10 무료 크레딧을 받으세요.
+
+## 개요
+
+### Integration 세부 정보
+
+| Class                                                         | Package                                                        | Serializable | JS support |  Version |
+|:--------------------------------------------------------------|:---------------------------------------------------------------| :---: | :---: | :---: |
+| [Valyu Search](https://github.com/valyu-network/langchain-valyu) | [langchain-valyu](https://pypi.org/project/langchain-valyu/) | ✅ | ❌  |  ![PyPI - Version](https://img.shields.io/pypi/v/langchain-valyu?style=flat-square&label=%20) |
+
+## 설정
+
+이 integration은 `langchain-valyu` 패키지에 포함되어 있습니다.
+
+```python
+pip install -qU langchain-valyu
+```
+
+패키지를 사용하려면 `VALYU_API_KEY` 환경 변수를 Valyu API key로 설정해야 합니다.
+
+```python
+import getpass
+import os
+
+if not os.environ.get("VALYU_API_KEY"):
+    os.environ["VALYU_API_KEY"] = getpass.getpass("Valyu API key:\n")
+```
+
+## 인스턴스화
+
+여기서는 Valyu search tool의 인스턴스를 생성하는 방법을 보여줍니다. 이 tool을 사용하면 Valyu의 Context API endpoint를 사용하여 검색 쿼리를 완료할 수 있습니다.
+
+```python
+from langchain_valyu import ValyuSearchTool
+
+tool = ValyuSearchTool()
+```
+
+## 호출
+
+### 인자와 함께 직접 호출
+
+Valyu search tool은 호출 시 다음 인자를 받습니다:
+
+- `query` (필수): 자연어 검색 쿼리
+- `search_type` (선택): 검색 유형, 예: "all"
+- `max_num_results` (선택): 반환할 최대 결과 수
+- `similarity_threshold` (선택): 결과의 유사도 임계값
+- `query_rewrite` (선택): 쿼리 재작성 여부
+- `max_price` (선택): 검색의 최대 가격
+
+신뢰성과 성능상의 이유로 특정 매개변수가 필수이거나 제한될 수 있습니다. 자세한 내용은 [Valyu API 문서](https://docs.valyu.network/overview)를 참조하세요.
+
+```python
+search_results = tool._run(
+    query="What are agentic search-enhanced large reasoning models?",
+    search_type="all",
+    max_num_results=5,
+    similarity_threshold=0.4,
+    query_rewrite=False,
+    max_price=20.0,
+)
+
+print("Search Results:", search_results)
+```
+
+## 에이전트 내에서 사용
+
+tool을 에이전트에 바인딩하여 agent executor와 함께 직접 사용할 수 있습니다. 이를 통해 에이전트는 Valyu search tool에 사용 가능한 인자를 동적으로 설정할 수 있습니다.
+
+```python
+if not os.environ.get("OPENAI_API_KEY"):
+    os.environ["OPENAI_API_KEY"] = getpass.getpass("OPENAI_API_KEY:\n")
+```
+
+```python
+# | output: false
+# | echo: false
+
+# !pip install -qU langchain langchain-openai
+from langchain.chat_models import init_chat_model
+
+model = init_chat_model(model="gpt-4o", model_provider="openai", temperature=0)
+```
+
+```python
+from langchain_valyu import ValyuSearchTool
+from langchain.agents import create_agent
+
+
+valyu_search_tool = ValyuSearchTool()
+
+agent = create_agent(model, [valyu_search_tool])
+
+user_input = "What are the key factors driving recent stock market volatility, and how do macroeconomic indicators influence equity prices across different sectors?"
+
+for step in agent.stream(
+    {"messages": user_input},
+    stream_mode="values",
+):
+    step["messages"][-1].pretty_print()
+```
+
+## API reference
+
+모든 Valyu Context API 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [docs.valyu.network/overview](https://docs.valyu.network/overview)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/tools/valyu_search.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

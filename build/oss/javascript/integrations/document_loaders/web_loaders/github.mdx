@@ -1,0 +1,143 @@
+---
+title: GitHub
+---
+
+이 예제는 GitHub repository에서 데이터를 로드하는 방법을 다룹니다.
+rate limit을 늘리고 private repository에 접근하려면 `GITHUB_ACCESS_TOKEN` environment variable을 GitHub access token으로 설정할 수 있습니다.
+
+## Setup
+
+GitHub loader는 peer dependency로 [ignore npm package](https://www.npmjs.com/package/ignore)가 필요합니다. 다음과 같이 설치하세요:
+
+```bash npm
+npm install @langchain/community @langchain/core ignore
+```
+
+## Usage
+
+```typescript
+import { GithubRepoLoader } from "@langchain/community/document_loaders/web/github";
+
+export const run = async () => {
+  const loader = new GithubRepoLoader(
+    "https://github.com/langchain-ai/langchainjs",
+    {
+      branch: "main",
+      recursive: false,
+      unknown: "warn",
+      maxConcurrency: 5, // Defaults to 2
+    }
+  );
+  const docs = await loader.load();
+  console.log({ docs });
+};
+```
+
+loader는 이미지와 같은 binary 파일을 무시합니다.
+
+### .gitignore Syntax 사용하기
+
+특정 파일을 무시하려면 constructor에 `ignorePaths` 배열을 전달할 수 있습니다:
+
+```typescript
+import { GithubRepoLoader } from "@langchain/community/document_loaders/web/github";
+
+export const run = async () => {
+  const loader = new GithubRepoLoader(
+    "https://github.com/langchain-ai/langchainjs",
+    { branch: "main", recursive: false, unknown: "warn", ignorePaths: ["*.md"] }
+  );
+  const docs = await loader.load();
+  console.log({ docs });
+  // Will not include any .md files
+};
+```
+
+### 다른 GitHub Instance 사용하기
+
+`github.com`이 아닌 다른 GitHub instance를 대상으로 하고 싶을 수 있습니다. 예를 들어 회사의 GitHub Enterprise instance가 있는 경우입니다.
+이를 위해서는 두 가지 추가 parameter가 필요합니다:
+
+- `baseUrl` - GitHub instance의 base URL로, githubUrl이 `<baseUrl>/<owner>/<repo>/...`와 일치합니다
+- `apiUrl` - GitHub instance의 API endpoint URL
+
+```typescript
+import { GithubRepoLoader } from "@langchain/community/document_loaders/web/github";
+
+export const run = async () => {
+  const loader = new GithubRepoLoader(
+    "https://github.your.company/org/repo-name",
+    {
+      baseUrl: "https://github.your.company",
+      apiUrl: "https://github.your.company/api/v3",
+      accessToken: "ghp_A1B2C3D4E5F6a7b8c9d0",
+      branch: "main",
+      recursive: true,
+      unknown: "warn",
+    }
+  );
+  const docs = await loader.load();
+  console.log({ docs });
+};
+```
+
+### Submodule 처리하기
+
+repository에 submodule이 있는 경우, loader가 이를 따라갈지 여부를 결정해야 합니다. boolean `processSubmodules` parameter로 이를 제어할 수 있습니다. 기본적으로 submodule은 처리되지 않습니다.
+submodule 처리는 `recursive` parameter를 true로 설정한 경우에만 작동합니다.
+
+```typescript
+import { GithubRepoLoader } from "@langchain/community/document_loaders/web/github";
+
+export const run = async () => {
+  const loader = new GithubRepoLoader(
+    "https://github.com/langchain-ai/langchainjs",
+    {
+      branch: "main",
+      recursive: true,
+      processSubmodules: true,
+      unknown: "warn",
+    }
+  );
+  const docs = await loader.load();
+  console.log({ docs });
+};
+```
+
+loader는 현재 repository와 다른 GitHub instance에 위치한 submodule은 따라가지 않습니다.
+
+### 대용량 repository 스트리밍하기
+
+메모리 효율적인 방식으로 대용량 repository를 처리해야 하는 상황의 경우, `loadAsStream` method를 사용하여 전체 GitHub repository에서 document를 비동기적으로 스트리밍할 수 있습니다.
+
+```typescript
+import { GithubRepoLoader } from "@langchain/community/document_loaders/web/github";
+
+export const run = async () => {
+  const loader = new GithubRepoLoader(
+    "https://github.com/langchain-ai/langchainjs",
+    {
+      branch: "main",
+      recursive: false,
+      unknown: "warn",
+      maxConcurrency: 3, // Defaults to 2
+    }
+  );
+
+  const docs = [];
+  for await (const doc of loader.loadAsStream()) {
+    docs.push(doc);
+  }
+
+  console.log({ docs });
+};
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/web_loaders/github.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

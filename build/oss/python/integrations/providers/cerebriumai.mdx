@@ -1,0 +1,42 @@
+---
+title: CerebriumAI
+---
+
+>[Cerebrium](https://docs.cerebrium.ai/cerebrium/getting-started/introduction)은 서버리스 GPU 인프라 제공업체입니다.
+> 여러 LLM 모델에 대한 API 액세스를 제공합니다.
+
+[CerebriumAI 문서](https://docs.cerebrium.ai/examples/langchain)의 예제를 참조하세요.
+
+## Installation and Setup
+
+- python package 설치:
+<CodeGroup>
+```bash pip
+pip install cerebrium
+```
+
+```bash uv
+uv add cerebrium
+```
+</CodeGroup>
+
+- [CerebriumAI api key 받기](https://docs.cerebrium.ai/cerebrium/getting-started/installation) 및 환경 변수로 설정 (`CEREBRIUMAI_API_KEY`)
+
+
+## LLMs
+
+[사용 예제](/oss/python/integrations/llms/cerebriumai)를 참조하세요.
+
+
+```python
+from langchain_community.llms import CerebriumAI
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/cerebriumai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

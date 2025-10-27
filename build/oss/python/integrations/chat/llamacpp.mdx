@@ -1,0 +1,252 @@
+---
+title: Llama.cpp
+---
+
+>[llama.cpp python](https://github.com/abetlen/llama-cpp-python) 라이브러리는 `@ggerganov`의
+>[llama.cpp](https://github.com/ggerganov/llama.cpp)에 대한 간단한 Python 바인딩입니다.
+>
+>이 패키지는 다음을 제공합니다:
+>
+> - ctypes 인터페이스를 통한 C API에 대한 저수준 액세스
+> - 텍스트 완성을 위한 고수준 Python API
+>   - `OpenAI`와 유사한 API
+>   - `LangChain` 호환성
+>   - `LlamaIndex` 호환성
+> - OpenAI 호환 웹 서버
+>   - 로컬 Copilot 대체
+>   - Function Calling 지원
+>   - Vision API 지원
+>   - 다중 모델
+
+## 개요
+
+### Integration 세부 정보
+
+| Class | Package | Local | Serializable | JS support |
+| :--- | :--- | :---: | :---: |  :---: |
+| [ChatLlamaCpp](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.llamacpp.ChatLlamaCpp.html) | [langchain-community](https://python.langchain.com/api_reference/community/index.html) | ✅ | ❌ | ❌ |
+
+### Model 기능
+
+| [Tool calling](/oss/python/langchain/tools) | [Structured output](/oss/python/langchain/structured-output) | JSON mode | Image input | Audio input | Video input | [Token-level streaming](/oss/python/langchain/streaming/) | Native async | [Token usage](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
+| :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ |
+
+## 설정
+
+시작하고 아래에 표시된 **모든** 기능을 사용하려면 tool-calling을 위해 미세 조정된 모델을 사용하는 것이 좋습니다.
+
+NousResearch의 [Hermes-2-Pro-Llama-3-8B-GGUF](https://huggingface.co/NousResearch/Hermes-2-Pro-Llama-3-8B-GGUF)를 사용하겠습니다.
+
+> Hermes 2 Pro는 Nous Hermes 2의 업그레이드 버전으로, OpenHermes 2.5 Dataset의 업데이트되고 정리된 버전과 자체 개발한 Function Calling 및 JSON Mode 데이터셋으로 구성되어 있습니다. 이 새로운 버전의 Hermes는 뛰어난 일반 작업 및 대화 기능을 유지하면서 Function Calling에도 탁월합니다.
+
+로컬 모델에 대해 더 깊이 알아보려면 다음 가이드를 참조하세요:
+
+- [로컬에서 LLM 실행하기](https://python.langchain.com/v0.1/docs/guides/development/local_llms/)
+- [RAG와 함께 로컬 모델 사용하기](https://python.langchain.com/v0.1/docs/use_cases/question_answering/local_retrieval_qa/)
+
+### 설치
+
+LangChain LlamaCpp integration은 `langchain-community`와 `llama-cpp-python` 패키지에 있습니다:
+
+```python
+pip install -qU langchain-community llama-cpp-python
+```
+
+## 인스턴스화
+
+이제 model 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
+
+```python
+# Path to your model weights
+local_model = "local/path/to/Hermes-2-Pro-Llama-3-8B-Q8_0.gguf"
+```
+
+```python
+import multiprocessing
+
+from langchain_community.chat_models import ChatLlamaCpp
+
+llm = ChatLlamaCpp(
+    temperature=0.5,
+    model_path=local_model,
+    n_ctx=10000,
+    n_gpu_layers=8,
+    n_batch=300,  # Should be between 1 and n_ctx, consider the amount of VRAM in your GPU.
+    max_tokens=512,
+    n_threads=multiprocessing.cpu_count() - 1,
+    repeat_penalty=1.5,
+    top_p=0.5,
+    verbose=True,
+)
+```
+
+## 호출
+
+```python
+messages = [
+    (
+        "system",
+        "You are a helpful assistant that translates English to French. Translate the user sentence.",
+    ),
+    ("human", "I love programming."),
+]
+
+ai_msg = llm.invoke(messages)
+ai_msg
+```
+
+```python
+print(ai_msg.content)
+```
+
+```output
+J'aime programmer. (In France, "programming" is often used in its original sense of scheduling or organizing events.)
+
+If you meant computer-programming:
+Je suis amoureux de la programmation informatique.
+
+(You might also say simply 'programmation', which would be understood as both meanings - depending on context).
+```
+
+## Tool calling
+
+먼저, OpenAI Function Calling과 거의 동일하게 작동합니다.
+
+OpenAI에는 도구와 그 인수를 설명하고 모델이 호출할 도구와 해당 도구에 대한 입력이 포함된 JSON 객체를 반환하도록 하는 [tool calling](https://platform.openai.com/docs/guides/function-calling) API가 있습니다(여기서는 "tool calling"과 "function calling"을 같은 의미로 사용합니다). tool-calling은 도구를 사용하는 chain과 agent를 구축하고 모델에서 구조화된 출력을 얻는 데 매우 유용합니다.
+
+`ChatLlamaCpp.bind_tools`를 사용하면 Pydantic 클래스, dict 스키마, LangChain 도구 또는 함수를 모델에 도구로 쉽게 전달할 수 있습니다. 내부적으로 이들은 다음과 같은 OpenAI tool 스키마로 변환됩니다:
+
+```
+{
+    "name": "...",
+    "description": "...",
+    "parameters": {...}  # JSONSchema
+}
+```
+
+그리고 모든 모델 호출에 전달됩니다.
+
+그러나 함수/도구를 자동으로 트리거할 수 없으므로 'tool choice' 매개변수를 지정하여 강제해야 합니다. 이 매개변수는 일반적으로 아래와 같이 형식화됩니다.
+
+`{"type": "function", "function": {"name": <<tool_name>>}}.`
+
+```python
+from langchain.tools import tool
+from pydantic import BaseModel, Field
+
+
+class WeatherInput(BaseModel):
+        location: str = Field(description="The city and state, e.g. San Francisco, CA")
+        unit: str = Field(enum=["celsius", "fahrenheit"])
+
+
+@tool("get_current_weather", args_schema=WeatherInput)
+def get_weather(location: str, unit: str):
+    """Get the current weather in a given location"""
+    return f"Now the weather in {location} is 22 {unit}"
+
+
+llm_with_tools = llm.bind_tools(
+        tools=[get_weather],
+        tool_choice={"type": "function", "function": {"name": "get_current_weather"}},
+)
+```
+
+```python
+ai_msg = llm_with_tools.invoke(
+    "what is the weather like in HCMC in celsius",
+)
+```
+
+```python
+ai_msg.tool_calls
+```
+
+```output
+[{'name': 'get_current_weather',
+  'args': {'location': 'Ho Chi Minh City', 'unit': 'celsius'},
+  'id': 'call__0_get_current_weather_cmpl-394d9943-0a1f-425b-8139-d2826c1431f2'}]
+```
+
+```python
+class MagicFunctionInput(BaseModel):
+        magic_function_input: int = Field(description="The input value for magic function")
+
+
+@tool("get_magic_function", args_schema=MagicFunctionInput)
+def magic_function(magic_function_input: int):
+    """Get the value of magic function for an input."""
+    return magic_function_input + 2
+
+
+llm_with_tools = llm.bind_tools(
+        tools=[magic_function],
+        tool_choice={"type": "function", "function": {"name": "get_magic_function"}},
+)
+
+ai_msg = llm_with_tools.invoke(
+    "What is magic function of 3?",
+)
+
+ai_msg
+```
+
+```python
+ai_msg.tool_calls
+```
+
+```output
+[{'name': 'get_magic_function',
+  'args': {'magic_function_input': 3},
+  'id': 'call__0_get_magic_function_cmpl-cd83a994-b820-4428-957c-48076c68335a'}]
+```
+
+# Structured output
+
+```python
+from langchain_core.utils.function_calling import convert_to_openai_tool
+from pydantic import BaseModel
+
+
+class Joke(BaseModel):
+    """A setup to a joke and the punchline."""
+
+    setup: str
+    punchline: str
+
+
+dict_schema = convert_to_openai_tool(Joke)
+structured_llm = llm.with_structured_output(dict_schema)
+result = structured_llm.invoke("Tell me a joke about birds")
+result
+```
+
+```python
+result
+```
+
+```output
+{'setup': '- Why did the chicken cross the playground?',
+ 'punchline': '\n\n- To get to its gilded cage on the other side!'}
+```
+
+# Streaming
+
+```python
+for chunk in llm.stream("what is 25x5"):
+        print(chunk.content, end="\n", flush=True)
+```
+
+## API reference
+
+모든 ChatLlamaCpp 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.llamacpp.ChatLlamaCpp.html](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.llamacpp.ChatLlamaCpp.html)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/chat/llamacpp.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

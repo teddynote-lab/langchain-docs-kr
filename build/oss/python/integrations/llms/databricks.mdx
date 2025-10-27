@@ -1,0 +1,145 @@
+---
+title: Databricks
+---
+
+> [Databricks](https://www.databricks.com/) Lakehouse Platform은 데이터, 분석 및 AI를 하나의 플랫폼에 통합합니다.
+
+이 가이드는 Databricks [LLM models](https://python.langchain.com/docs/concepts/text_llms) 시작하기에 대한 간단한 개요를 제공합니다. 모든 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/llms/langchain_community.llms.databricks.Databricks.html)를 참조하세요.
+
+## Overview
+
+`Databricks` LLM class는 다음 두 가지 endpoint 유형 중 하나로 호스팅되는 completion endpoint를 래핑합니다:
+
+* [Databricks Model Serving](https://docs.databricks.com/en/machine-learning/model-serving/index.html), 프로덕션 및 개발에 권장됨,
+* Cluster driver proxy app, 대화형 개발에 권장됨.
+
+이 예제 notebook은 LLM endpoint를 래핑하고 LangChain 애플리케이션에서 LLM으로 사용하는 방법을 보여줍니다.
+
+## Limitations
+
+`Databricks` LLM class는 *레거시* 구현이며 기능 호환성에 몇 가지 제한 사항이 있습니다.
+
+* 동기 호출만 지원합니다. Streaming 또는 async API는 지원되지 않습니다.
+* `batch` API는 지원되지 않습니다.
+
+이러한 기능을 사용하려면 새로운 [ChatDatabricks](https://python.langchain.com/docs/integrations/chat/databricks) class를 대신 사용하세요. `ChatDatabricks`는 streaming, async, batch 등을 포함한 `ChatModel`의 모든 API를 지원합니다.
+
+## Setup
+
+Databricks model에 액세스하려면 Databricks 계정을 생성하고, 자격 증명을 설정하고(Databricks workspace 외부에 있는 경우에만), 필요한 패키지를 설치해야 합니다.
+
+### Credentials (Databricks 외부에 있는 경우에만)
+
+Databricks 내부에서 LangChain 앱을 실행하는 경우 이 단계를 건너뛸 수 있습니다.
+
+그렇지 않은 경우, Databricks workspace hostname과 personal access token을 각각 `DATABRICKS_HOST` 및 `DATABRICKS_TOKEN` 환경 변수에 수동으로 설정해야 합니다. access token을 얻는 방법은 [Authentication Documentation](https://docs.databricks.com/en/dev-tools/auth/index.html#databricks-personal-access-tokens)을 참조하세요.
+
+```python
+import getpass
+import os
+
+os.environ["DATABRICKS_HOST"] = "https://your-workspace.cloud.databricks.com"
+if "DATABRICKS_TOKEN" not in os.environ:
+    os.environ["DATABRICKS_TOKEN"] = getpass.getpass(
+        "Enter your Databricks access token: "
+    )
+```
+
+또는 `Databricks` class를 초기화할 때 이러한 매개변수를 전달할 수 있습니다.
+
+```python
+from langchain_community.llms import Databricks
+
+databricks = Databricks(
+    host="https://your-workspace.cloud.databricks.com",
+    # We strongly recommend NOT to hardcode your access token in your code, instead use secret management tools
+    # or environment variables to store your access token securely. The following example uses Databricks Secrets
+    # to retrieve the access token that is available within the Databricks notebook.
+    token=dbutils.secrets.get(scope="YOUR_SECRET_SCOPE", key="databricks-token"),
+)
+```
+
+### Installation
+
+LangChain Databricks integration은 `langchain-community` 패키지에 포함되어 있습니다. 또한 이 notebook의 코드를 실행하려면 `mlflow >= 2.9`가 필요합니다.
+
+```python
+pip install -qU langchain-community mlflow>=2.9.0
+```
+
+## Wrapping Model Serving Endpoint
+
+### Prerequisites
+
+* LLM이 등록되고 [Databricks serving endpoint](https://docs.databricks.com/machine-learning/model-serving/index.html)에 배포되었습니다.
+* endpoint에 대한 ["Can Query" permission](https://docs.databricks.com/security/auth-authz/access-control/serving-endpoint-acl.html)이 있습니다.
+
+예상되는 MLflow model signature는 다음과 같습니다:
+
+* inputs: `[{"name": "prompt", "type": "string"}, {"name": "stop", "type": "list[string]"}]`
+* outputs: `[{"type": "string"}]`
+
+### Invocation
+
+```python
+from langchain_community.llms import Databricks
+
+llm = Databricks(endpoint_name="YOUR_ENDPOINT_NAME")
+llm.invoke("How are you?")
+```
+
+```output
+'I am happy to hear that you are in good health and as always, you are appreciated.'
+```
+
+```python
+llm.invoke("How are you?", stop=["."])
+```
+
+```output
+'Good'
+```
+
+### Transform Input and Output
+
+때때로 호환되지 않는 model signature를 가진 serving endpoint를 래핑하거나 추가 config를 삽입하고 싶을 수 있습니다. `transform_input_fn` 및 `transform_output_fn` 인수를 사용하여 추가 전처리/후처리를 정의할 수 있습니다.
+
+```python
+# Use `transform_input_fn` and `transform_output_fn` if the serving endpoint
+# expects a different input schema and does not return a JSON string,
+# respectively, or you want to apply a prompt template on top.
+
+
+def transform_input(**request):
+    full_prompt = f"""{request["prompt"]}
+    Be Concise.
+    """
+    request["prompt"] = full_prompt
+    return request
+
+
+def transform_output(response):
+    return response.upper()
+
+
+llm = Databricks(
+    endpoint_name="YOUR_ENDPOINT_NAME",
+    transform_input_fn=transform_input,
+    transform_output_fn=transform_output,
+)
+
+llm.invoke("How are you?")
+```
+
+```output
+'I AM DOING GREAT THANK YOU.'
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/llms/databricks.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

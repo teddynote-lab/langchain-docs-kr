@@ -1,0 +1,260 @@
+---
+title: ChatMistralAI
+---
+
+[Mistral AI](https://mistral.ai/)는 강력한 [오픈 소스 모델](https://docs.mistral.ai/getting-started/models/)을 호스팅하는 플랫폼입니다.
+
+이 문서는 ChatMistralAI [chat models](/oss/javascript/langchain/models) 시작하기를 도와드립니다. 모든 ChatMistralAI 기능과 설정에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_mistralai.ChatMistralAI.html)를 참조하세요.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | [PY support](https://python.langchain.com/docs/integrations/chat/mistralai) | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [ChatMistralAI](https://api.js.langchain.com/classes/langchain_mistralai.ChatMistralAI.html) | [`@langchain/mistralai`](https://www.npmjs.com/package/@langchain/mistralai) | ❌ | ❌ | ✅ | ![NPM - Downloads](https://img.shields.io/npm/dm/@langchain/mistralai?style=flat-square&label=%20&) | ![NPM - Version](https://img.shields.io/npm/v/@langchain/mistralai?style=flat-square&label=%20&) |
+
+### Model features
+
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
+
+| [Tool calling](/oss/javascript/langchain/tools) | [Structured output](/oss/javascript/langchain/structured-output) | JSON mode | [Image input](/oss/javascript/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/javascript/langchain/streaming/) | [Token usage](/oss/javascript/langchain/models#token-usage) | [Logprobs](/oss/javascript/langchain/models#log-probabilities) |
+| :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ |
+
+## Setup
+
+Mistral AI 모델에 액세스하려면 Mistral AI 계정을 생성하고 API key를 발급받은 후 `@langchain/mistralai` integration package를 설치해야 합니다.
+
+### Credentials
+
+[여기](https://console.mistral.ai/)로 이동하여 Mistral AI에 가입하고 API key를 생성하세요. 완료한 후 `MISTRAL_API_KEY` environment variable을 설정하세요:
+
+```bash
+export MISTRAL_API_KEY="your-api-key"
+```
+
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
+
+```bash
+# export LANGSMITH_TRACING="true"
+# export LANGSMITH_API_KEY="your-api-key"
+```
+
+### Installation
+
+LangChain ChatMistralAI integration은 `@langchain/mistralai` package에 있습니다:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/mistralai @langchain/core
+```
+```bash yarn
+yarn add @langchain/mistralai @langchain/core
+```
+```bash pnpm
+pnpm add @langchain/mistralai @langchain/core
+```
+</CodeGroup>
+
+## Instantiation
+
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
+
+```typescript
+import { ChatMistralAI } from "@langchain/mistralai"
+
+const llm = new ChatMistralAI({
+    model: "mistral-large-latest",
+    temperature: 0,
+    maxRetries: 2,
+    // other params...
+})
+```
+
+## Invocation
+
+mistral에 chat message를 보낼 때 따라야 할 몇 가지 요구사항이 있습니다:
+
+- 첫 번째 메시지는 assistant (ai) message가 _*될 수 없습니다*_.
+- Message는 user와 assistant (ai) message 간에 _*교대로*_ 나타나야 합니다.
+- Message는 assistant (ai) 또는 system message로 _*끝날 수 없습니다*_.
+
+```typescript
+const aiMsg = await llm.invoke([
+    [
+        "system",
+        "You are a helpful assistant that translates English to French. Translate the user sentence.",
+    ],
+    ["human", "I love programming."],
+])
+aiMsg
+```
+
+```output
+AIMessage {
+  "content": "J'adore la programmation.",
+  "additional_kwargs": {},
+  "response_metadata": {
+    "tokenUsage": {
+      "completionTokens": 9,
+      "promptTokens": 27,
+      "totalTokens": 36
+    },
+    "finish_reason": "stop"
+  },
+  "tool_calls": [],
+  "invalid_tool_calls": [],
+  "usage_metadata": {
+    "input_tokens": 27,
+    "output_tokens": 9,
+    "total_tokens": 36
+  }
+}
+```
+
+```typescript
+console.log(aiMsg.content)
+```
+
+```output
+J'adore la programmation.
+```
+
+## Tool calling
+
+Mistral의 API는 일부 모델에 대해 [tool calling](/oss/javascript/langchain/tools)을 지원합니다. tool calling을 지원하는 모델은 [이 페이지](https://docs.mistral.ai/capabilities/function_calling/)에서 확인할 수 있습니다.
+
+아래 예제는 사용 방법을 보여줍니다:
+
+```typescript
+import { ChatMistralAI } from "@langchain/mistralai";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import * as z from "zod";
+import { tool } from "@langchain/core/tools";
+
+const calculatorSchema = z.object({
+  operation: z
+    .enum(["add", "subtract", "multiply", "divide"])
+    .describe("The type of operation to execute."),
+  number1: z.number().describe("The first number to operate on."),
+  number2: z.number().describe("The second number to operate on."),
+});
+
+const calculatorTool = tool((input) => {
+  return JSON.stringify(input);
+}, {
+  name: "calculator",
+  description: "A simple calculator tool",
+  schema: calculatorSchema,
+});
+
+// Bind the tool to the model
+const modelWithTool = new ChatMistralAI({
+  model: "mistral-large-latest",
+}).bindTools([calculatorTool]);
+
+
+const calcToolPrompt = ChatPromptTemplate.fromMessages([
+  [
+    "system",
+    "You are a helpful assistant who always needs to use a calculator.",
+  ],
+  ["human", "{input}"],
+]);
+
+// Chain your prompt, model, and output parser together
+const chainWithCalcTool = calcToolPrompt.pipe(modelWithTool);
+
+const calcToolRes = await chainWithCalcTool.invoke({
+  input: "What is 2 + 2?",
+});
+console.log(calcToolRes.tool_calls);
+```
+
+```output
+[
+  {
+    name: 'calculator',
+    args: { operation: 'add', number1: 2, number2: 2 },
+    type: 'tool_call',
+    id: 'DD9diCL1W'
+  }
+]
+```
+
+## Hooks
+
+Mistral AI는 세 가지 이벤트에 대한 custom hook을 지원합니다: beforeRequest, requestError, reponse. 각 hook type에 대한 function signature 예제는 아래에서 확인할 수 있습니다:
+
+```typescript
+const beforeRequestHook = (req: Request): Request | void | Promise<Request | void> => {
+    // Code to run before a request is processed by Mistral
+};
+
+const requestErrorHook = (err: unknown, req: Request): void | Promise<void> => {
+    // Code to run when an error occurs as Mistral is processing a request
+};
+
+const responseHook = (res: Response, req: Request): void | Promise<void> => {
+    // Code to run before Mistral sends a successful response
+};
+```
+
+이러한 hook을 chat model에 추가하려면 argument로 전달하면 자동으로 추가됩니다:
+
+```typescript
+import { ChatMistralAI } from "@langchain/mistralai"
+
+const modelWithHooks = new ChatMistralAI({
+    model: "mistral-large-latest",
+    temperature: 0,
+    maxRetries: 2,
+    beforeRequestHooks: [ beforeRequestHook ],
+    requestErrorHooks: [ requestErrorHook ],
+    responseHooks: [ responseHook ],
+    // other params...
+});
+```
+
+또는 인스턴스화 후 수동으로 할당하고 추가할 수 있습니다:
+
+```typescript
+import { ChatMistralAI } from "@langchain/mistralai"
+
+const model = new ChatMistralAI({
+    model: "mistral-large-latest",
+    temperature: 0,
+    maxRetries: 2,
+    // other params...
+});
+
+model.beforeRequestHooks = [ ...model.beforeRequestHooks, beforeRequestHook ];
+model.requestErrorHooks = [ ...model.requestErrorHooks, requestErrorHook ];
+model.responseHooks = [ ...model.responseHooks, responseHook ];
+
+model.addAllHooksToHttpClient();
+```
+
+addAllHooksToHttpClient method는 hook 중복을 방지하기 위해 전체 업데이트된 hook list를 할당하기 전에 현재 추가된 모든 hook을 지웁니다.
+
+Hook은 한 번에 하나씩 제거하거나 모델에서 모든 hook을 한 번에 지울 수 있습니다.
+
+```typescript
+model.removeHookFromHttpClient(beforeRequestHook);
+
+model.removeAllHooksFromHttpClient();
+```
+
+## API reference
+
+모든 ChatMistralAI 기능과 설정에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_mistralai.ChatMistralAI.html)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/chat/mistral.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

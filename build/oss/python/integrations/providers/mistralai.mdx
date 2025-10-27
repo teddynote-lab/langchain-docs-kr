@@ -1,0 +1,51 @@
+---
+title: MistralAI
+---
+
+>[Mistral AI](https://docs.mistral.ai/api/)는 강력한 오픈 소스 모델을 호스팅하는 플랫폼입니다.
+
+
+## Installation and Setup
+
+API와 통신하려면 유효한 [API key](https://console.mistral.ai/users/api-keys/)가 필요합니다.
+
+또한 `langchain-mistralai` 패키지가 필요합니다:
+
+<CodeGroup>
+```bash pip
+pip install langchain-mistralai
+```
+
+```bash uv
+uv add langchain-mistralai
+```
+</CodeGroup>
+
+## Chat models
+
+### ChatMistralAI
+
+[사용 예제](/oss/python/integrations/chat/mistralai)를 참조하세요.
+
+```python
+from langchain_mistralai.chat_models import ChatMistralAI
+```
+
+## Embedding models
+
+### MistralAIEmbeddings
+
+[사용 예제](/oss/python/integrations/text_embedding/mistralai)를 참조하세요.
+
+```python
+from langchain_mistralai import MistralAIEmbeddings
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/mistralai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

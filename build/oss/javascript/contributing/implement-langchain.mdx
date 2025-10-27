@@ -1,0 +1,64 @@
+---
+title: LangChain integration 구현하기
+sidebarTitle: 구현
+---
+
+Integration package는 사용자가 프로젝트에서 사용하기 위해 설치할 수 있는 Python package입니다. 이들은 LangChain interface 표준을 준수하는 하나 이상의 component를 구현합니다.
+
+LangChain component는 [`langchain-core`](https://github.com/langchain-ai/langchain/tree/master/libs/core)의 base class의 subclass입니다. 예시로는 [chat model](/oss/javascript/integrations/chat), [tool](/oss/javascript/integrations/tools), [retriever](/oss/javascript/integrations/retrievers) 등이 있습니다.
+
+여러분의 integration package는 일반적으로 이러한 component 중 최소 하나 이상의 subclass를 구현합니다. 각각에 대한 세부 정보를 보려면 아래 탭을 펼쳐보세요.
+
+<Tabs>
+    <Tab title="Chat Models">
+        Chat model은 @[`BaseChatModel`] class의 subclass입니다. 이들은 chat completion 생성, message formatting 처리, model parameter 관리를 위한 method를 구현합니다.
+
+        <Warning>
+            Chat model integration 가이드는 현재 작업 중입니다. 그동안 LangChain chat model이 어떻게 작동하는지에 대한 자세한 내용은 [chat model 개념 가이드](/oss/javascript/langchain/models)를 참조하세요.
+        </Warning>
+    </Tab>
+    <Tab title="Tools">
+        Tool은 주로 2가지 방식으로 사용됩니다:
+
+        1. Chat model의 tool calling 기능에 텍스트 요청과 함께 전달할 "input schema" 또는 "args schema"를 정의하여, chat model이 "tool call" 또는 tool을 호출할 parameter를 생성할 수 있도록 합니다.
+        2. 위에서 생성된 "tool call"을 받아 어떤 작업을 수행하고, chat model에 ToolMessage로 다시 전달할 수 있는 응답을 반환합니다.
+
+        Tools class는 @[`BaseTool`] base class를 상속해야 합니다. 이 interface는 subclass에서 구현해야 하는 3개의 property와 2개의 method를 가지고 있습니다.
+
+        <Warning>
+            Tools integration 가이드는 현재 작업 중입니다. 그동안 LangChain tool이 어떻게 작동하는지에 대한 자세한 내용은 [tools 개념 가이드](/oss/javascript/langchain/tools)를 참조하세요.
+        </Warning>
+    </Tab>
+    <Tab title="Retrievers">
+        Retriever는 query를 기반으로 API, database 또는 기타 소스에서 document를 검색하는 데 사용됩니다. Retriever class는 BaseRetriever base class를 상속해야 합니다.
+
+        <Warning>
+            Retriever integration 가이드는 현재 작업 중입니다. 그동안 LangChain retriever가 어떻게 작동하는지에 대한 자세한 내용은 [retriever 개념 가이드](/oss/javascript/integrations/retrievers)를 참조하세요.
+        </Warning>
+    </Tab>
+    <Tab title="Vector Stores">
+        모든 vector store는 @[`VectorStore`] base class를 상속해야 합니다. 이 interface는 vector store에서 document를 작성, 삭제 및 검색하기 위한 method로 구성됩니다.
+
+        Vector store integration을 구현하는 방법에 대한 자세한 내용은 [vector store integration 가이드](/oss/javascript/integrations/vectorstores)를 참조하세요.
+
+        <Warning>
+            Vector store integration 가이드는 현재 작업 중입니다. 그동안 LangChain vector store가 어떻게 작동하는지에 대한 자세한 내용은 [vector store 개념 가이드](/oss/javascript/integrations/vectorstores)를 참조하세요.
+        </Warning>
+    </Tab>
+    <Tab title="Embeddings">
+        Embedding model은 [`Embeddings`](https://v03.api.js.langchain.com/classes/_langchain_core.embeddings.Embeddings.html) class의 subclass입니다.
+
+        <Warning>
+            Embedding model integration 가이드는 현재 작업 중입니다. 그동안 LangChain embedding model이 어떻게 작동하는지에 대한 자세한 내용은 [embedding model 개념 가이드](/oss/javascript/integrations/text_embedding)를 참조하세요.
+        </Warning>
+    </Tab>
+</Tabs>
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/contributing/implement-langchain.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

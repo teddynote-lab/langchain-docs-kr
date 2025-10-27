@@ -1,0 +1,75 @@
+---
+title: Nomic
+---
+
+>[Nomic](https://www.nomic.ai/)은 모든 사람이 AI 규모의 데이터셋과 상호작용하고 소비자용 컴퓨터에서 AI 모델을 실행할 수 있도록 하는 도구를 구축합니다.
+>
+>`Nomic`은 현재 두 가지 제품을 제공합니다:
+>
+>- `Atlas`: Visual Data Engine
+>- `GPT4All`: Open Source Edge Language Model Ecosystem
+
+Nomic 통합은 두 개의 파트너 패키지에 존재합니다: [langchain-nomic](https://pypi.org/project/langchain-nomic/)과 [langchain-community](https://pypi.org/project/langchain-community/).
+
+## Installation
+
+다음과 같이 설치할 수 있습니다:
+
+<CodeGroup>
+```bash pip
+pip install -U langchain-nomic
+pip install -U langchain-community
+```
+
+```bash uv
+uv add langchain-nomic
+uv add langchain-community
+```
+</CodeGroup>
+
+## LLMs
+
+### GPT4All
+
+[사용 예제](/oss/python/integrations/llms/gpt4all)를 참조하세요.
+
+```python
+from langchain_community.llms import GPT4All
+```
+
+## Embedding models
+
+### NomicEmbeddings
+
+[사용 예제](/oss/python/integrations/text_embedding/nomic)를 참조하세요.
+
+```python
+from langchain_nomic import NomicEmbeddings
+```
+
+### GPT4All
+
+[사용 예제](/oss/python/integrations/text_embedding/gpt4all)를 참조하세요.
+
+```python
+from langchain_community.embeddings import GPT4AllEmbeddings
+```
+
+## Vector store
+
+### Atlas
+
+[사용 예제 및 설치 지침](/oss/python/integrations/vectorstores/atlas)을 참조하세요.
+
+```python
+from langchain_community.vectorstores import AtlasDB
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/nomic.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

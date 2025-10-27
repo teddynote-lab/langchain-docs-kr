@@ -1,0 +1,61 @@
+---
+title: ClickHouse 통계 생성
+sidebarTitle: ClickHouse 통계 생성
+---
+
+자체 호스팅 LangSmith 인스턴스의 문제 해결 과정에서 LangChain 팀은 메모리 및 CPU 사용량과 연결 동시성을 이해하는 데 도움이 되는 ClickHouse 통계를 생성하도록 요청할 수 있습니다.
+
+이 명령은 LangChain 팀과 공유할 수 있는 CSV를 생성합니다.
+
+### 사전 요구 사항
+
+다음 도구/항목을 준비했는지 확인하세요.
+
+1. kubectl
+
+   * [https://kubernetes.io/docs/tasks/tools/](https://kubernetes.io/docs/tasks/tools/)
+
+2. ClickHouse 데이터베이스 자격 증명
+
+   * Host
+   * Port
+   * Username
+     * 번들 버전을 사용하는 경우 `default`입니다
+   * Password
+     * 번들 버전을 사용하는 경우 `password`입니다
+   * Database name
+     * 번들 버전을 사용하는 경우 `default`입니다
+
+3. `get_clickhouse_stats` 스크립트를 실행할 머신에서 ClickHouse 데이터베이스에 대한 연결
+
+   * 번들 버전을 사용하는 경우 clickhouse service를 로컬 머신으로 port forward해야 할 수 있습니다.
+   * `kubectl port-forward svc/langsmith-clickhouse 8123:8123`을 실행하여 clickhouse service를 로컬 머신으로 port forward하세요.
+
+4. ClickHouse 통계를 생성하는 스크립트
+
+   * [여기](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/scripts/get_clickhouse_stats.sh)에서 스크립트를 다운로드할 수 있습니다
+
+### clickhouse 통계 생성 스크립트 실행
+
+다음 명령을 실행하여 통계 생성 스크립트를 실행하세요:
+
+```bash
+sh get_clickhouse_stats.sh <clickhouse_url> --output path/to/file.csv
+```
+
+예를 들어, port-forwarding과 함께 번들 버전을 사용하는 경우 명령은 다음과 같습니다:
+
+```bash
+sh get_clickhouse_stats.sh "clickhouse://default:password@localhost:8123/default" --output clickhouse_stats.csv
+```
+
+이 명령을 실행한 후 ClickHouse 통계가 포함된 clickhouse\_stats.csv 파일이 생성된 것을 확인할 수 있습니다.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/script-generate-clickhouse-stats.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,42 @@
+---
+title: Chaindesk Retriever
+---
+
+이 예제는 Chaindesk.ai datastore에서 문서를 검색하기 위해 retrieval chain에서 Chaindesk Retriever를 사용하는 방법을 보여줍니다.
+
+## 사용법
+
+<Tip>
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/javascript/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install @langchain/community @langchain/core
+```
+
+```typescript
+import { ChaindeskRetriever } from "@langchain/community/retrievers/chaindesk";
+
+const retriever = new ChaindeskRetriever({
+  datastoreId: "DATASTORE_ID",
+  apiKey: "CHAINDESK_API_KEY", // optional: needed for private datastores
+  topK: 8, // optional: default value is 3
+});
+
+const docs = await retriever.invoke("hello");
+
+console.log(docs);
+```
+
+## 관련 문서
+
+- [Retrieval 가이드](/oss/javascript/langchain/retrieval)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/retrievers/chaindesk-retriever.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

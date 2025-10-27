@@ -1,0 +1,551 @@
+---
+title: Intel의 Visual Data Management System (VDMS)
+---
+
+이 노트북은 VDMS를 vector store로 시작하는 방법을 다룹니다.
+
+>Intel의 [Visual Data Management System (VDMS)](https://github.com/IntelLabs/vdms)은 그래프로 저장된 visual metadata를 통해 관련 visual 데이터를 검색하고 더 빠른 액세스를 위해 visual 데이터에 대한 머신 친화적인 개선을 가능하게 함으로써 클라우드 규모를 달성하는 것을 목표로 하는 대용량 "visual" 데이터의 효율적인 액세스를 위한 스토리지 솔루션입니다. VDMS는 MIT 라이선스로 제공됩니다. `VDMS`에 대한 자세한 내용은 [이 페이지](https://github.com/IntelLabs/vdms/wiki)를 방문하고, LangChain API 참조는 [여기](https://python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.vdms.VDMS.html)에서 확인하세요.
+
+VDMS는 다음을 지원합니다:
+
+* K nearest neighbor 검색
+* Euclidean distance (L2) 및 inner product (IP)
+* 인덱싱 및 거리 계산을 위한 라이브러리: FaissFlat (기본값), FaissHNSWFlat, FaissIVFFlat, Flinng, TileDBDense, TileDBSparse
+* 텍스트, 이미지 및 비디오에 대한 embedding
+* Vector 및 metadata 검색
+
+## 설정
+
+VDMS vector store에 액세스하려면 `langchain-vdms` 통합 패키지를 설치하고 공개적으로 사용 가능한 Docker 이미지를 통해 VDMS 서버를 배포해야 합니다.
+간단하게 하기 위해 이 노트북은 포트 55555를 사용하여 로컬 호스트에 VDMS 서버를 배포합니다.
+
+```python
+pip install -qU "langchain-vdms>=0.1.3"
+!docker run --no-healthcheck --rm -d -p 55555:55555 --name vdms_vs_test_nb intellabs/vdms:latest
+!sleep 5
+```
+
+```output
+Note: you may need to restart the kernel to use updated packages.
+c464076e292613df27241765184a673b00c775cecb7792ef058591c2cbf0bde8
+```
+
+### 자격 증명
+
+`VDMS`는 자격 증명 없이 사용할 수 있습니다.
+
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정하세요:
+
+```python
+os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
+os.environ["LANGSMITH_TRACING"] = "true"
+```
+
+## 초기화
+
+VDMS Client를 사용하여 FAISS IndexFlat 인덱싱(기본값)과 Euclidean distance(기본값)를 유사도 검색을 위한 거리 메트릭으로 사용하는 VDMS vectorstore에 연결합니다.
+
+<EmbeddingTabs/>
+
+```python
+# | output: false
+# | echo: false
+
+! pip install -qU langchain-huggingface
+from langchain_huggingface import HuggingFaceEmbeddings
+
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
+```
+
+```python
+from langchain_vdms.vectorstores import VDMS, VDMS_Client
+
+collection_name = "test_collection_faiss_L2"
+
+vdms_client = VDMS_Client(host="localhost", port=55555)
+
+vector_store = VDMS(
+    client=vdms_client,
+    embedding=embeddings,
+    collection_name=collection_name,
+    engine="FaissFlat",
+    distance_strategy="L2",
+)
+```
+
+## Vector store 관리
+
+### Vector store에 항목 추가
+
+```python
+import logging
+
+logging.basicConfig()
+logging.getLogger("langchain_vdms.vectorstores").setLevel(logging.INFO)
+
+from langchain_core.documents import Document
+
+document_1 = Document(
+    page_content="I had chocolate chip pancakes and scrambled eggs for breakfast this morning.",
+    metadata={"source": "tweet"},
+    id=1,
+)
+
+document_2 = Document(
+    page_content="The weather forecast for tomorrow is cloudy and overcast, with a high of 62 degrees.",
+    metadata={"source": "news"},
+    id=2,
+)
+
+document_3 = Document(
+    page_content="Building an exciting new project with LangChain - come check it out!",
+    metadata={"source": "tweet"},
+    id=3,
+)
+
+document_4 = Document(
+    page_content="Robbers broke into the city bank and stole $1 million in cash.",
+    metadata={"source": "news"},
+    id=4,
+)
+
+document_5 = Document(
+    page_content="Wow! That was an amazing movie. I can't wait to see it again.",
+    metadata={"source": "tweet"},
+    id=5,
+)
+
+document_6 = Document(
+    page_content="Is the new iPhone worth the price? Read this review to find out.",
+    metadata={"source": "website"},
+    id=6,
+)
+
+document_7 = Document(
+    page_content="The top 10 soccer players in the world right now.",
+    metadata={"source": "website"},
+    id=7,
+)
+
+document_8 = Document(
+    page_content="LangGraph is the best framework for building stateful, agentic applications!",
+    metadata={"source": "tweet"},
+    id=8,
+)
+
+document_9 = Document(
+    page_content="The stock market is down 500 points today due to fears of a recession.",
+    metadata={"source": "news"},
+    id=9,
+)
+
+document_10 = Document(
+    page_content="I have a bad feeling I am going to get deleted :(",
+    metadata={"source": "tweet"},
+    id=10,
+)
+
+documents = [
+    document_1,
+    document_2,
+    document_3,
+    document_4,
+    document_5,
+    document_6,
+    document_7,
+    document_8,
+    document_9,
+    document_10,
+]
+
+doc_ids = [str(i) for i in range(1, 11)]
+vector_store.add_documents(documents=documents, ids=doc_ids)
+```
+
+```output
+['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+```
+
+id가 여러 번 제공되는 경우 `add_documents`는 id가 고유한지 확인하지 않습니다. 이러한 이유로 추가하기 전에 기존 id 항목을 삭제하려면 `upsert`를 사용하세요.
+
+```python
+vector_store.upsert(documents, ids=doc_ids)
+```
+
+```output
+{'succeeded': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+ 'failed': []}
+```
+
+### Vector store의 항목 업데이트
+
+```python
+updated_document_1 = Document(
+    page_content="I had chocolate chip pancakes and fried eggs for breakfast this morning.",
+    metadata={"source": "tweet"},
+    id=1,
+)
+
+updated_document_2 = Document(
+    page_content="The weather forecast for tomorrow is sunny and warm, with a high of 82 degrees.",
+    metadata={"source": "news"},
+    id=2,
+)
+
+vector_store.update_documents(
+    ids=doc_ids[:2],
+    documents=[updated_document_1, updated_document_2],
+    batch_size=2,
+)
+```
+
+### Vector store에서 항목 삭제
+
+```python
+vector_store.delete(ids=doc_ids[-1])
+```
+
+```output
+True
+```
+
+## Vector store 쿼리
+
+Vector store가 생성되고 관련 문서가 추가되면 체인이나 에이전트를 실행하는 동안 쿼리하고 싶을 것입니다.
+
+### 직접 쿼리
+
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
+
+```python
+results = vector_store.similarity_search(
+    "LangChain provides abstractions to make working with LLMs easy",
+    k=2,
+    filter={"source": ["==", "tweet"]},
+)
+for doc in results:
+    print(f"* ID={doc.id}: {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+INFO:langchain_vdms.vectorstores:VDMS similarity search took 0.0063 seconds
+```
+```output
+* ID=3: Building an exciting new project with LangChain - come check it out! [{'source': 'tweet'}]
+* ID=8: LangGraph is the best framework for building stateful, agentic applications! [{'source': 'tweet'}]
+```
+
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
+
+```python
+results = vector_store.similarity_search_with_score(
+        "Will it be hot tomorrow?", k=1, filter={"source": ["==", "news"]}
+)
+for doc, score in results:
+        print(f"* [SIM={score:3f}] {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+INFO:langchain_vdms.vectorstores:VDMS similarity search took 0.0460 seconds
+```
+```output
+* [SIM=0.753577] The weather forecast for tomorrow is sunny and warm, with a high of 82 degrees. [{'source': 'news'}]
+```
+
+embedding을 사용하여 유사도 검색을 실행하려면 다음을 실행할 수 있습니다:
+
+```python
+results = vector_store.similarity_search_by_vector(
+    embedding=embeddings.embed_query("I love green eggs and ham!"), k=1
+)
+for doc in results:
+    print(f"* {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+INFO:langchain_vdms.vectorstores:VDMS similarity search took 0.0044 seconds
+```
+```output
+* The weather forecast for tomorrow is sunny and warm, with a high of 82 degrees. [{'source': 'news'}]
+```
+
+### Retriever로 변환하여 쿼리
+
+체인에서 더 쉽게 사용할 수 있도록 vector store를 retriever로 변환할 수도 있습니다.
+
+```python
+retriever = vector_store.as_retriever(
+        search_type="similarity",
+        search_kwargs={"k": 3},
+)
+results = retriever.invoke("Stealing from the bank is a crime")
+for doc in results:
+    print(f"* {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+INFO:langchain_vdms.vectorstores:VDMS similarity search took 0.0042 seconds
+```
+```output
+* Robbers broke into the city bank and stole $1 million in cash. [{'source': 'news'}]
+* The stock market is down 500 points today due to fears of a recession. [{'source': 'news'}]
+* Is the new iPhone worth the price? Read this review to find out. [{'source': 'website'}]
+```
+
+```python
+retriever = vector_store.as_retriever(
+    search_type="similarity_score_threshold",
+    search_kwargs={
+        "k": 1,
+        "score_threshold": 0.0,  # >= score_threshold
+    },
+)
+results = retriever.invoke("Stealing from the bank is a crime")
+for doc in results:
+    print(f"* {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+INFO:langchain_vdms.vectorstores:VDMS similarity search took 0.0042 seconds
+```
+```output
+* Robbers broke into the city bank and stole $1 million in cash. [{'source': 'news'}]
+```
+
+```python
+retriever = vector_store.as_retriever(
+        search_type="mmr",
+        search_kwargs={"k": 1, "fetch_k": 10},
+)
+results = retriever.invoke(
+        "Stealing from the bank is a crime", filter={"source": ["==", "news"]}
+)
+for doc in results:
+    print(f"* {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+INFO:langchain_vdms.vectorstores:VDMS mmr search took 0.0042 secs
+```
+```output
+* Robbers broke into the city bank and stole $1 million in cash. [{'source': 'news'}]
+```
+
+### Collection 삭제
+
+이전에는 `id`를 기반으로 문서를 제거했습니다. 여기서는 ID가 제공되지 않았으므로 모든 문서가 제거됩니다.
+
+```python
+print("Documents before deletion: ", vector_store.count())
+
+vector_store.delete(collection_name=collection_name)
+
+print("Documents after deletion: ", vector_store.count())
+```
+
+```output
+Documents before deletion:  10
+Documents after deletion:  0
+```
+
+## Retrieval-augmented generation 사용
+
+이 vector store를 retrieval-augmented generation (RAG)에 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
+
+* [VDMS를 사용한 Multi-modal RAG](https://github.com/langchain-ai/langchain/blob/v0.3/cookbook/multi_modal_RAG_vdms.ipynb)
+* [VDMS를 사용한 Visual RAG](https://github.com/langchain-ai/langchain/blob/v0.3/cookbook/visual_RAG_vdms.ipynb)
+- [LangChain으로 RAG 앱 구축하기](/oss/python/langchain/rag)
+- [Agentic RAG](/oss/python/langgraph/agentic-rag)
+- [Retrieval 문서](/oss/python/langchain/retrieval)
+
+## 다른 엔진을 사용한 유사도 검색
+
+VDMS는 인덱싱 및 거리 계산을 위한 다양한 라이브러리를 지원합니다: FaissFlat (기본값), FaissHNSWFlat, FaissIVFFlat, Flinng, TileDBDense, TileDBSparse.
+기본적으로 vectorstore는 FaissFlat을 사용합니다. 아래에서 다른 엔진을 사용하는 몇 가지 예를 보여줍니다.
+
+### Faiss HNSWFlat 및 Euclidean Distance를 사용한 유사도 검색
+
+여기서는 Faiss IndexHNSWFlat 인덱싱과 L2를 유사도 검색을 위한 거리 메트릭으로 사용하여 VDMS에 문서를 추가합니다. 쿼리와 관련된 세 개의 문서(`k=3`)를 검색하고 문서와 함께 점수도 반환합니다.
+
+```python
+db_FaissHNSWFlat = VDMS.from_documents(
+    documents,
+    client=vdms_client,
+    ids=doc_ids,
+    collection_name="my_collection_FaissHNSWFlat_L2",
+    embedding=embeddings,
+    engine="FaissHNSWFlat",
+    distance_strategy="L2",
+)
+# Query
+k = 3
+query = "LangChain provides abstractions to make working with LLMs easy"
+docs_with_score = db_FaissHNSWFlat.similarity_search_with_score(query, k=k, filter=None)
+
+for res, score in docs_with_score:
+    print(f"* [SIM={score:3f}] {res.page_content} [{res.metadata}]")
+```
+
+```output
+INFO:langchain_vdms.vectorstores:Descriptor set my_collection_FaissHNSWFlat_L2 created
+INFO:langchain_vdms.vectorstores:VDMS similarity search took 0.1272 seconds
+```
+```output
+* [SIM=0.716791] Building an exciting new project with LangChain - come check it out! [{'source': 'tweet'}]
+* [SIM=0.936718] LangGraph is the best framework for building stateful, agentic applications! [{'source': 'tweet'}]
+* [SIM=1.834110] Is the new iPhone worth the price? Read this review to find out. [{'source': 'website'}]
+```
+
+### Faiss IVFFlat 및 Inner Product (IP) Distance를 사용한 유사도 검색
+
+Faiss IndexIVFFlat 인덱싱과 IP를 유사도 검색을 위한 거리 메트릭으로 사용하여 VDMS에 문서를 추가합니다. 쿼리와 관련된 세 개의 문서(`k=3`)를 검색하고 문서와 함께 점수도 반환합니다.
+
+```python
+db_FaissIVFFlat = VDMS.from_documents(
+    documents,
+        client=vdms_client,
+        ids=doc_ids,
+        collection_name="my_collection_FaissIVFFlat_IP",
+        embedding=embeddings,
+        engine="FaissIVFFlat",
+        distance_strategy="IP",
+)
+
+k = 3
+query = "LangChain provides abstractions to make working with LLMs easy"
+docs_with_score = db_FaissIVFFlat.similarity_search_with_score(query, k=k, filter=None)
+for res, score in docs_with_score:
+        print(f"* [SIM={score:3f}] {res.page_content} [{res.metadata}]")
+```
+
+```output
+INFO:langchain_vdms.vectorstores:Descriptor set my_collection_FaissIVFFlat_IP created
+INFO:langchain_vdms.vectorstores:VDMS similarity search took 0.0052 seconds
+```
+```output
+* [SIM=0.641605] Building an exciting new project with LangChain - come check it out! [{'source': 'tweet'}]
+* [SIM=0.531641] LangGraph is the best framework for building stateful, agentic applications! [{'source': 'tweet'}]
+* [SIM=0.082945] Is the new iPhone worth the price? Read this review to find out. [{'source': 'website'}]
+```
+
+### FLINNG 및 IP Distance를 사용한 유사도 검색
+
+이 섹션에서는 Filters to Identify Near-Neighbor Groups (FLINNG) 인덱싱과 IP를 유사도 검색을 위한 거리 메트릭으로 사용하여 VDMS에 문서를 추가합니다. 쿼리와 관련된 세 개의 문서(`k=3`)를 검색하고 문서와 함께 점수도 반환합니다.
+
+```python
+db_Flinng = VDMS.from_documents(
+    documents,
+    client=vdms_client,
+    ids=doc_ids,
+    collection_name="my_collection_Flinng_IP",
+    embedding=embeddings,
+    engine="Flinng",
+    distance_strategy="IP",
+)
+# Query
+k = 3
+query = "LangChain provides abstractions to make working with LLMs easy"
+docs_with_score = db_Flinng.similarity_search_with_score(query, k=k, filter=None)
+for res, score in docs_with_score:
+    print(f"* [SIM={score:3f}] {res.page_content} [{res.metadata}]")
+```
+
+```output
+INFO:langchain_vdms.vectorstores:Descriptor set my_collection_Flinng_IP created
+INFO:langchain_vdms.vectorstores:VDMS similarity search took 0.0042 seconds
+```
+```output
+* [SIM=0.000000] I had chocolate chip pancakes and scrambled eggs for breakfast this morning. [{'source': 'tweet'}]
+* [SIM=0.000000] I had chocolate chip pancakes and scrambled eggs for breakfast this morning. [{'source': 'tweet'}]
+* [SIM=0.000000] I had chocolate chip pancakes and scrambled eggs for breakfast this morning. [{'source': 'tweet'}]
+```
+
+## Metadata 필터링
+
+작업하기 전에 collection을 좁히는 것이 도움이 될 수 있습니다.
+
+예를 들어, `get_by_constraints` 메서드를 사용하여 metadata로 collection을 필터링할 수 있습니다. metadata를 필터링하기 위해 dictionary가 사용됩니다. 여기서는 `langchain_id = "2"`인 문서를 검색하고 vector store에서 제거합니다.
+
+***참고:*** `id`는 정수로 추가 metadata로 생성되었으며 `langchain_id`(내부 ID)는 각 항목에 대한 고유한 문자열입니다.
+
+```python
+response, response_array = db_FaissIVFFlat.get_by_constraints(
+    db_FaissIVFFlat.collection_name,
+        limit=1,
+        include=["metadata", "embeddings"],
+        constraints={"langchain_id": ["==", "2"]},
+)
+
+# Delete id=2
+db_FaissIVFFlat.delete(collection_name=db_FaissIVFFlat.collection_name, ids=["2"])
+
+print("Deleted entry:")
+for doc in response:
+        print(f"* ID={doc.id}: {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+Deleted entry:
+* ID=2: The weather forecast for tomorrow is cloudy and overcast, with a high of 62 degrees. [{'source': 'news'}]
+```
+
+```python
+response, response_array = db_FaissIVFFlat.get_by_constraints(
+    db_FaissIVFFlat.collection_name,
+        include=["metadata"],
+)
+for doc in response:
+        print(f"* ID={doc.id}: {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+* ID=10: I have a bad feeling I am going to get deleted :( [{'source': 'tweet'}]
+* ID=9: The stock market is down 500 points today due to fears of a recession. [{'source': 'news'}]
+* ID=8: LangGraph is the best framework for building stateful, agentic applications! [{'source': 'tweet'}]
+* ID=7: The top 10 soccer players in the world right now. [{'source': 'website'}]
+* ID=6: Is the new iPhone worth the price? Read this review to find out. [{'source': 'website'}]
+* ID=5: Wow! That was an amazing movie. I can't wait to see it again. [{'source': 'tweet'}]
+* ID=4: Robbers broke into the city bank and stole $1 million in cash. [{'source': 'news'}]
+* ID=3: Building an exciting new project with LangChain - come check it out! [{'source': 'tweet'}]
+* ID=1: I had chocolate chip pancakes and scrambled eggs for breakfast this morning. [{'source': 'tweet'}]
+```
+
+여기서는 `id`가 정수이므로 ID 범위를 필터링하는 데 사용합니다.
+
+```python
+response, response_array = db_FaissIVFFlat.get_by_constraints(
+    db_FaissIVFFlat.collection_name,
+        include=["metadata", "embeddings"],
+        constraints={"source": ["==", "news"]},
+)
+for doc in response:
+        print(f"* ID={doc.id}: {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+* ID=9: The stock market is down 500 points today due to fears of a recession. [{'source': 'news'}]
+* ID=4: Robbers broke into the city bank and stole $1 million in cash. [{'source': 'news'}]
+```
+
+## VDMS Server 중지
+
+```python
+!docker kill vdms_vs_test_nb
+```
+
+```output
+vdms_vs_test_nb
+```
+
+## API 참조
+
+TODO: API 참조 추가
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/vectorstores/vdms.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

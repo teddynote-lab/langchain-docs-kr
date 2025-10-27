@@ -1,0 +1,44 @@
+---
+title: Beam
+---
+
+>[Beam](https://www.beam.cloud/)은 GPU가 장착된 원격 서버에서 코드를 실행할 수 있는 클라우드 컴퓨팅 플랫폼입니다.
+
+
+## 설치 및 설정
+
+- [계정 생성하기](https://www.beam.cloud/)
+- Beam CLI 설치: `curl https://raw.githubusercontent.com/slai-labs/get-beam/main/get-beam.sh -sSfL | sh`
+- API 키 등록: `beam configure`
+- 환경 변수 설정 (`BEAM_CLIENT_ID`) 및 (`BEAM_CLIENT_SECRET`)
+- Beam SDK 설치:
+
+<CodeGroup>
+```bash pip
+pip install beam-sdk
+```
+
+```bash uv
+uv add beam-sdk
+```
+</CodeGroup>
+
+
+## LLMs
+
+[사용 예제](/oss/python/integrations/llms/beam)를 참조하세요.
+
+[Beam 문서](https://docs.beam.cloud/examples/langchain)에서 다른 예제를 확인하세요.
+
+```python
+from langchain_community.llms.beam import Beam
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/beam.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

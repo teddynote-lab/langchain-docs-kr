@@ -1,0 +1,85 @@
+---
+title: 사용자 정의 TLS 인증서 구성
+sidebarTitle: 사용자 정의 TLS 인증서 구성
+---
+
+이 가이드를 사용하여 LangSmith에서 TLS를 구성하세요. 먼저 내부 인증 기관(CA)을 마운트하여 배포가 데이터베이스 또는 외부 서비스 호출을 위해 시스템 전체에서 올바른 루트를 신뢰하도록 합니다. 그런 다음 지원되는 모델 제공자와 안전하게 통신하기 위해 [Playground](/langsmith/prompt-engineering-concepts#prompt-playground) 전용 mTLS를 구성할 수 있습니다.
+
+이 페이지에서 다루는 내용:
+
+- 데이터베이스 연결 및 Playground 모델 호출을 위한 TLS를 활성화하기 위해 시스템 전체에 [내부 인증 기관 마운트](#mount-internal-cas-for-tls) (CA)
+- 지원되는 모델 제공자와의 mTLS를 위해 클라이언트 인증서/키를 제공하는 Playground 전용 TLS 설정 사용
+
+## TLS를 위한 내부 CA 마운트
+
+<Note>
+아래 구성을 사용하여 내부 CA를 마운트하려면 Helm chart 버전 0.11.9 이상을 사용해야 합니다.
+</Note>
+
+이 방법을 사용하여 LangSmith가 시스템 전체에서 내부/공개 CA를 신뢰하도록 합니다(Playground 모델 호출 및 [데이터베이스/외부 서비스 연결](/langsmith/self-hosted#storage-services)).
+
+1. 데이터베이스 및 외부 서비스와의 TLS에 필요한 모든 CA를 포함하는 파일을 생성합니다. 배포가 프록시 없이 `beacon.langchain.com`과 직접 통신하는 경우 공개 신뢰 CA를 포함해야 합니다. 모든 인증서는 이 파일에 빈 줄을 사이에 두고 연결되어야 합니다.
+    ```
+    -----BEGIN CERTIFICATE-----
+    <PUBLIC_CA>
+    -----END CERTIFICATE-----
+
+    -----BEGIN CERTIFICATE-----
+    <INTERNAL_CA>
+    -----END CERTIFICATE-----
+
+    ...
+    ```
+2. 이 파일의 내용을 포함하는 키로 Kubernetes secret을 생성합니다.
+    ```bash
+    kubectl create secret generic <SECRET_NAME> --from-file=<SECRET_KEY>=<CA_BUNDLE_FILE_PATH> -n <NAMESPACE>
+    ```
+3. 데이터베이스 및 기타 외부 서비스와의 TLS에 사용자 정의 CA를 사용하는 경우 LangSmith helm chart에 다음 값을 제공합니다:
+    ```yaml Helm
+    config:
+      customCa:
+        secretName: <SECRET_NAME> # The name of the secret created in step 2.
+        secretKey: <SECRET_KEY> # The key in the secret containing the CA bundle.
+
+    clickhouse:
+      external:
+        tls: true # Only enable if you want TLS for Clickhouse.
+    postgres:
+      external:
+        customTls: true # Only enable if you want TLS for Postgres.
+    ```
+4. TLS 지원 연결 문자열을 사용해야 합니다:
+    - <b>Postgres</b>: 끝에 `?sslmode=verify-full&sslrootcert=system`을 추가합니다.
+    - <b>Redis</b>: 접두사로 `redis://` 대신 `rediss://`를 사용합니다.
+
+## 모델 제공자를 위한 사용자 정의 TLS 인증서 사용
+
+<Note>
+이 기능은 현재 다음 모델 제공자에서만 사용할 수 있습니다:
+
+* Azure OpenAI
+* OpenAI
+* Custom (사용자 정의 모델 서버). 자세한 내용은 [사용자 정의 모델 서버 문서](/langsmith/custom-endpoint)를 참조하세요.
+
+이러한 TLS 설정은 선택한 모델 제공자의 모든 호출(Online Evaluation 포함)에 적용됩니다. 제공자가 상호 TLS(클라이언트 인증서/키)를 요구하거나 제공자 호출을 위해 특정 CA로 신뢰를 재정의해야 할 때 사용하세요. 이는 위에서 구성한 내부 CA 번들을 보완합니다.
+</Note>
+
+LangSmith Playground에서 모델 제공자에 연결하기 위해 사용자 정의 TLS 인증서를 사용할 수 있습니다. 이는 자체 서명 인증서, 사용자 정의 인증 기관의 인증서 또는 상호 TLS 인증을 사용하는 경우에 유용합니다.
+
+사용자 정의 TLS 인증서를 사용하려면 다음 환경 변수를 설정하세요. 애플리케이션 설정을 구성하는 방법에 대한 자세한 내용은 [자체 호스팅 배포 섹션](/langsmith/architectural-overview)을 참조하세요.
+
+* `LANGSMITH_PLAYGROUND_TLS_MODEL_PROVIDERS`: 사용자 정의 TLS 인증서가 필요한 모델 제공자의 쉼표로 구분된 목록입니다. 현재 `azure_openai`, `openai`, `custom`만 지원되는 모델 제공자이지만, 향후 더 많은 제공자가 지원될 예정입니다.
+* [선택사항] `LANGSMITH_PLAYGROUND_TLS_KEY`: PEM 형식의 개인 키입니다. 이는 파일 경로(마운트된 볼륨용)여야 합니다. 일반적으로 상호 TLS 인증에만 필요합니다.
+* [선택사항] `LANGSMITH_PLAYGROUND_TLS_CERT`: PEM 형식의 인증서입니다. 이는 파일 경로(마운트된 볼륨용)여야 합니다. 일반적으로 상호 TLS 인증에만 필요합니다.
+* [선택사항] `LANGSMITH_PLAYGROUND_TLS_CA`: PEM 형식의 사용자 정의 인증 기관(CA) 인증서입니다. 이는 파일 경로(마운트된 볼륨용)여야 합니다. helm 버전 `0.11.9` 미만을 사용하는 경우에만 CA를 마운트하기 위해 사용하세요. 그렇지 않으면 위의 [TLS를 위한 내부 CA 마운트](./self-host-custom-tls-certificates#mount-internal-cas-for-tls) 섹션을 사용하세요.
+
+이러한 환경 변수를 설정한 후 LangSmith Playground **Settings** 페이지로 이동하여 사용자 정의 TLS 인증서가 필요한 **Provider**를 선택하세요. 평소와 같이 모델 제공자 구성을 설정하면 모델 제공자에 연결할 때 사용자 정의 TLS 인증서가 사용됩니다.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/self-host-custom-tls-certificates.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

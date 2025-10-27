@@ -1,0 +1,214 @@
+---
+title: Permit
+---
+
+Permit은 RBAC, ABAC, ReBAC와 같은 다양한 모델을 사용하여 세밀하고 실시간 권한 관리를 제공하는 접근 제어 플랫폼입니다. 조직이 애플리케이션 전반에 걸쳐 동적 정책을 적용하여 승인된 사용자만 특정 리소스에 접근할 수 있도록 보장합니다.
+
+### Integration details
+
+이 노트북은 [Permit.io](https://permit.io/) 권한을 LangChain retriever에 통합하는 방법을 설명합니다.
+
+두 가지 커스텀 retriever를 제공합니다:
+
+- PermitSelfQueryRetriever – self-query 방식을 사용하여 사용자의 자연어 프롬프트를 파싱하고, Permit에서 사용자에게 허용된 리소스 ID를 가져와 vector store 검색에 해당 필터를 자동으로 적용합니다.
+
+- PermitEnsembleRetriever – LangChain의 EnsembleRetriever를 통해 여러 기본 retriever(예: BM25 + Vector)를 결합한 다음, 병합된 결과를 Permit.io로 필터링합니다.
+
+## Setup
+
+다음 명령어로 패키지를 설치하세요:
+
+```bash
+pip install langchain-permit
+```
+
+개별 쿼리에서 자동 추적을 받으려면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
+
+```python
+os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
+os.environ["LANGSMITH_TRACING"] = "true"
+```
+
+### Installation
+
+```bash
+pip install langchain-permit
+```
+
+#### Environment Variables
+
+```bash
+PERMIT_API_KEY=your_api_key
+PERMIT_PDP_URL= # or your real deployment
+OPENAI_API_KEY=sk-...
+```
+
+- 실행 중인 Permit PDP가 필요합니다. 정책 및 컨테이너 설정에 대한 자세한 내용은 [Permit docs](https://docs.permit.io/)를 참조하세요.
+- 래핑할 수 있는 vector store 또는 여러 retriever가 필요합니다.
+
+```python
+pip install -qU langchain-permit
+```
+
+## Instantiation
+
+### PermitSelfQueryRetriever
+
+#### Basic Explanation
+
+1. Permit에서 허용된 문서 ID를 검색합니다.
+
+2. LLM을 사용하여 쿼리를 파싱하고 "구조화된 필터"를 구축하여 허용된 ID가 있는 문서만 고려되도록 합니다.
+
+#### Basic Usage
+
+```python
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_permit.retrievers import PermitSelfQueryRetriever
+
+# Step 1: Create / load some documents and build a vector store
+docs = [...]
+embeddings = OpenAIEmbeddings()
+vectorstore = FAISS.from_documents(docs, embeddings)
+
+# Step 2: Initialize the retriever
+retriever = PermitSelfQueryRetriever(
+    api_key="...",
+    pdp_url="...",
+    user={"key": "user-123"},
+    resource_type="document",
+    action="read",
+    llm=...,                # Typically a ChatOpenAI or other LLM
+    vectorstore=vectorstore,
+    enable_limit=True,      # optional
+)
+
+# Step 3: Query
+query = "Give me docs about cats"
+results = retriever.get_relevant_documents(query)
+for doc in results:
+    print(doc.metadata.get("id"), doc.page_content)
+```
+
+### PermitEnsembleRetriever
+
+#### Basic Explanation
+
+1. LangChain의 EnsembleRetriever를 사용하여 여러 하위 retriever(예: vector 기반, BM25 등)에서 문서를 수집합니다.
+2. 문서를 검색한 후 Permit의 filter_objects를 호출하여 사용자가 볼 수 없는 문서를 제거합니다.
+
+#### Basic Usage
+
+```python
+from langchain_community.retrievers import BM25Retriever
+from langchain_core.documents import Document
+from langchain_permit.retrievers import PermitEnsembleRetriever
+
+# Suppose we have two child retrievers: bm25_retriever, vector_retriever
+...
+ensemble_retriever = PermitEnsembleRetriever(
+    api_key="...",
+    pdp_url="...",
+    user="user_abc",
+    action="read",
+    resource_type="document",
+    retrievers=[bm25_retriever, vector_retriever],
+    weights=None
+)
+
+docs = ensemble_retriever.get_relevant_documents("Query about cats")
+for doc in docs:
+    print(doc.metadata.get("id"), doc.page_content)
+```
+
+### Demo Scripts
+
+더 완전한 데모는 `/langchain_permit/examples/demo_scripts` 폴더를 확인하세요:
+
+1. demo_self_query.py – PermitSelfQueryRetriever를 시연합니다.
+2. demo_ensemble.py – PermitEnsembleRetriever를 시연합니다.
+
+각 스크립트는 문서를 빌드하거나 로드하고, Permit을 구성하고, 쿼리를 실행하는 방법을 보여줍니다.
+
+### Conclusion
+
+이러한 커스텀 retriever를 사용하면 Permit.io의 권한 검사를 LangChain의 검색 워크플로우에 원활하게 통합할 수 있습니다. 애플리케이션의 vector search 로직을 유지하면서 승인된 문서만 반환되도록 보장할 수 있습니다.
+
+Permit 정책 설정에 대한 자세한 내용은 공식 Permit docs를 참조하세요. JWT 검증이나 더 광범위한 RAG 파이프라인과 같은 다른 도구와 결합하려면 examples 폴더의 docs/tools.ipynb를 확인하세요.
+
+```python
+from langchain_permit import PermitRetriever
+
+retriever = PermitRetriever(
+    # ...
+)
+```
+
+## Usage
+
+```python
+query = "..."
+
+retriever.invoke(query)
+```
+
+## Use within a chain
+
+다른 retriever와 마찬가지로 PermitRetriever는 [chains](https://docs.permit.io/)를 통해 LLM 애플리케이션에 통합될 수 있습니다.
+
+LLM 또는 chat model이 필요합니다:
+
+<ChatModelTabs customVarName="llm" />
+
+```python
+# | output: false
+# | echo: false
+
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+```
+
+```python
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+
+prompt = ChatPromptTemplate.from_template(
+    """Answer the question based only on the context provided.
+
+Context: {context}
+
+Question: {question}"""
+)
+
+
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
+chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+```
+
+```python
+chain.invoke("...")
+```
+
+## API reference
+
+모든 PermitRetriever 기능 및 구성에 대한 자세한 문서는 [Repo](https://github.com/permitio/langchain-permit/tree/master/langchain_permit/examples/demo_scripts)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/retrievers/permit.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

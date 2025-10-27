@@ -1,0 +1,53 @@
+---
+title: AssemblyAI
+---
+
+>[AssemblyAI](https://www.assemblyai.com/)는 speech-to-text, speaker diarization, speech summarization 등의 작업을 위한 `Speech AI` 모델을 구축합니다.
+> `AssemblyAI`의 Speech AI 모델은 음성 데이터(통화, 가상 회의, 팟캐스트 등)를 위한 정확한 speech-to-text, speaker detection, sentiment analysis, chapter detection, PII redaction을 포함합니다.
+
+
+
+## 설치 및 설정
+
+[API key](https://www.assemblyai.com/dashboard/signup)를 받으세요.
+
+`assemblyai` 패키지를 설치하세요.
+
+<CodeGroup>
+```bash pip
+pip install -U assemblyai
+```
+
+```bash uv
+uv add assemblyai
+```
+</CodeGroup>
+
+## Document Loader
+
+###  AssemblyAI Audio Transcript
+
+`AssemblyAIAudioTranscriptLoader`는 `AssemblyAI API`를 사용하여 오디오 파일을 전사하고 전사된 텍스트를 document로 로드합니다.
+
+[사용 예제](/oss/python/integrations/document_loaders/assemblyai)를 참조하세요.
+
+```python
+from langchain_community.document_loaders import AssemblyAIAudioTranscriptLoader
+```
+
+###  AssemblyAI Audio Loader By Id
+
+`AssemblyAIAudioLoaderById`는 AssemblyAI API를 사용하여 기존 전사를 가져오고 지정된 형식에 따라 전사된 텍스트를 하나 이상의 Document로 로드합니다.
+
+```python
+from langchain_community.document_loaders import AssemblyAIAudioLoaderById
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/assemblyai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

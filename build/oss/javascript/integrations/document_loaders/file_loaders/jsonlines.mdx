@@ -1,0 +1,54 @@
+---
+title: JSONLines 파일
+---
+
+이 예제는 JSONLines 또는 JSONL 파일에서 데이터를 로드하는 방법을 다룹니다. 두 번째 인수는 파일의 각 JSON 객체에서 추출할 속성을 가리키는 JSONPointer입니다. 파일의 각 JSON 객체마다 하나의 document가 생성됩니다.
+
+JSONLines 파일 예제:
+
+```json
+{"html": "This is a sentence."}
+{"html": "This is another sentence."}
+```
+
+코드 예제:
+
+```typescript
+import { JSONLinesLoader } from "@langchain/classic/document_loaders/fs/json";
+
+const loader = new JSONLinesLoader(
+  "src/document_loaders/example_data/example.jsonl",
+  "/html"
+);
+
+const docs = await loader.load();
+/*
+[
+  Document {
+    "metadata": {
+      "blobType": "application/jsonl+json",
+      "line": 1,
+      "source": "blob",
+    },
+    "pageContent": "This is a sentence.",
+  },
+  Document {
+    "metadata": {
+      "blobType": "application/jsonl+json",
+      "line": 2,
+      "source": "blob",
+    },
+    "pageContent": "This is another sentence.",
+  },
+]
+*/
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/file_loaders/jsonlines.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,51 @@
+---
+title: Groq
+---
+
+>[Groq](https://groq.com)은 세계 최초의 Language Processing Unit™, 즉 `LPU`를 개발했습니다.
+> `Groq LPU`는 결정론적이고 단일 코어 스트리밍 아키텍처를 가지고 있으며, 주어진 워크로드에 대해 예측 가능하고 반복 가능한 성능으로 GenAI 추론 속도의 표준을 설정합니다.
+>
+>아키텍처를 넘어, `Groq` 소프트웨어는 여러분과 같은 개발자들이 혁신적이고 강력한 AI 애플리케이션을 만드는 데 필요한 도구를 제공하도록 설계되었습니다.
+>
+>Groq를 엔진으로 사용하면 다음을 수행할 수 있습니다:
+>* 실시간 AI 및 HPC 추론을 위한 타협 없는 낮은 지연 시간과 성능 달성 🔥
+>* 주어진 워크로드에 대한 정확한 성능 및 컴퓨팅 시간 파악 🔮
+>* 최첨단 기술을 활용하여 경쟁에서 앞서 나가기 💪
+
+
+## Installation and Setup
+
+integration package를 설치합니다:
+
+<CodeGroup>
+```bash pip
+pip install langchain-groq
+```
+
+```bash uv
+uv add langchain-groq
+```
+</CodeGroup>
+
+[API key](https://console.groq.com/login?utm_source=langchain&utm_content=provider_page)를 요청하고 환경 변수로 설정합니다:
+
+```bash
+export GROQ_API_KEY=gsk_...
+```
+
+## Chat models
+
+[사용 예제](/oss/python/integrations/chat/groq)를 참조하세요.
+
+```python
+from langchain_groq import ChatGroq
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/groq.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

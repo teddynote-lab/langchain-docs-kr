@@ -1,0 +1,323 @@
+---
+title: Model Context Protocol (MCP)
+---
+
+
+
+
+[Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction)은 애플리케이션이 LLM에 도구와 컨텍스트를 제공하는 방법을 표준화하는 개방형 프로토콜입니다. LangChain agent는 [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchainjs/tree/main/libs/langchain-mcp-adapters/adapters) 라이브러리를 사용하여 MCP server에 정의된 도구를 사용할 수 있습니다.
+
+
+## 설치
+
+
+
+LangGraph에서 MCP 도구를 사용하려면 `@langchain/mcp-adapters` 라이브러리를 설치하세요:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/mcp-adapters
+```
+
+```bash pnpm
+pnpm add @langchain/mcp-adapters
+```
+
+```bash yarn
+yarn add @langchain/mcp-adapters
+```
+
+```bash bun
+bun add @langchain/mcp-adapters
+```
+</CodeGroup>
+
+
+## Transport 타입
+
+MCP는 클라이언트-서버 통신을 위한 다양한 transport 메커니즘을 지원합니다:
+
+- stdio: 클라이언트가 서버를 하위 프로세스로 실행하고 표준 입력/출력을 통해 통신합니다. 로컬 도구와 간단한 설정에 가장 적합합니다.
+- Streamable HTTP: 서버가 HTTP 요청을 처리하는 독립적인 프로세스로 실행됩니다. 원격 연결과 여러 클라이언트를 지원합니다.
+- Server-Sent Events (SSE): 실시간 스트리밍 통신에 최적화된 streamable HTTP의 변형입니다.
+
+## MCP 도구 사용
+
+
+
+`@langchain/mcp-adapters`는 agent가 하나 이상의 MCP server에 정의된 도구를 사용할 수 있게 합니다.
+
+```ts Accessing multiple MCP servers icon="server"
+import { MultiServerMCPClient } from "@langchain/mcp-adapters";  // [!code highlight]
+import { ChatAnthropic } from "@langchain/anthropic";
+import { createAgent } from "langchain";
+
+const client = new MultiServerMCPClient({  // [!code highlight]
+    math: {
+        transport: "stdio",  // Local subprocess communication
+        command: "node",
+        // Replace with absolute path to your math_server.js file
+        args: ["/path/to/math_server.js"],
+    },
+    weather: {
+        transport: "sse",  // Server-Sent Events for streaming
+        // Ensure you start your weather server on port 8000
+        url: "http://localhost:8000/mcp",
+    },
+});
+
+const tools = await client.getTools();  // [!code highlight]
+const agent = createAgent({
+    model: "anthropic:claude-sonnet-4-5",
+    tools,  // [!code highlight]
+});
+
+const mathResponse = await agent.invoke({
+    messages: [{ role: "user", content: "what's (3 + 5) x 12?" }],
+});
+
+const weatherResponse = await agent.invoke({
+    messages: [{ role: "user", content: "what is the weather in nyc?" }],
+});
+```
+
+
+<Note>
+    `MultiServerMCPClient`는 **기본적으로 stateless입니다**. 각 도구 호출은 새로운 MCP `ClientSession`을 생성하고, 도구를 실행한 다음 정리합니다.
+</Note>
+
+## 커스텀 MCP server
+
+
+
+자체 MCP server를 생성하려면 `@modelcontextprotocol/sdk` 라이브러리를 사용할 수 있습니다. 이 라이브러리는 [도구](https://modelcontextprotocol.io/docs/learn/server-concepts#tools-ai-actions)를 정의하고 server로 실행하는 간단한 방법을 제공합니다.
+
+<CodeGroup>
+```bash npm
+npm install @modelcontextprotocol/sdk
+```
+
+```bash pnpm
+pnpm add @modelcontextprotocol/sdk
+```
+
+```bash yarn
+yarn add @modelcontextprotocol/sdk
+```
+
+```bash bun
+bun add @modelcontextprotocol/sdk
+```
+</CodeGroup>
+
+
+다음 참조 구현을 사용하여 MCP 도구 server로 agent를 테스트하세요.
+
+
+
+```typescript title="Math server (stdio transport)" icon="floppy-disk"
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+    CallToolRequestSchema,
+    ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
+
+const server = new Server(
+    {
+        name: "math-server",
+        version: "0.1.0",
+    },
+    {
+        capabilities: {
+        tools: {},
+        },
+    }
+);
+
+server.setRequestHandler(ListToolsRequestSchema, async () => {
+    return {
+        tools: [
+        {
+            name: "add",
+            description: "Add two numbers",
+            inputSchema: {
+            type: "object",
+            properties: {
+                a: {
+                type: "number",
+                description: "First number",
+                },
+                b: {
+                type: "number",
+                description: "Second number",
+                },
+            },
+            required: ["a", "b"],
+            },
+        },
+        {
+            name: "multiply",
+            description: "Multiply two numbers",
+            inputSchema: {
+            type: "object",
+            properties: {
+                a: {
+                type: "number",
+                description: "First number",
+                },
+                b: {
+                type: "number",
+                description: "Second number",
+                },
+            },
+            required: ["a", "b"],
+            },
+        },
+        ],
+    };
+});
+
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    switch (request.params.name) {
+        case "add": {
+        const { a, b } = request.params.arguments as { a: number; b: number };
+        return {
+            content: [
+            {
+                type: "text",
+                text: String(a + b),
+            },
+            ],
+        };
+        }
+        case "multiply": {
+        const { a, b } = request.params.arguments as { a: number; b: number };
+        return {
+            content: [
+            {
+                type: "text",
+                text: String(a * b),
+            },
+            ],
+        };
+        }
+        default:
+        throw new Error(`Unknown tool: ${request.params.name}`);
+    }
+});
+
+async function main() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Math MCP server running on stdio");
+}
+
+main();
+```
+
+```typescript title="Weather server (SSE transport)" icon="wifi"
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
+import {
+    CallToolRequestSchema,
+    ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
+import express from "express";
+
+const app = express();
+app.use(express.json());
+
+const server = new Server(
+    {
+        name: "weather-server",
+        version: "0.1.0",
+    },
+    {
+        capabilities: {
+        tools: {},
+        },
+    }
+);
+
+server.setRequestHandler(ListToolsRequestSchema, async () => {
+    return {
+        tools: [
+        {
+            name: "get_weather",
+            description: "Get weather for location",
+            inputSchema: {
+            type: "object",
+            properties: {
+                location: {
+                type: "string",
+                description: "Location to get weather for",
+                },
+            },
+            required: ["location"],
+            },
+        },
+        ],
+    };
+});
+
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    switch (request.params.name) {
+        case "get_weather": {
+        const { location } = request.params.arguments as { location: string };
+        return {
+            content: [
+            {
+                type: "text",
+                text: `It's always sunny in ${location}`,
+            },
+            ],
+        };
+        }
+        default:
+        throw new Error(`Unknown tool: ${request.params.name}`);
+    }
+});
+
+app.post("/mcp", async (req, res) => {
+    const transport = new SSEServerTransport("/mcp", res);
+    await server.connect(transport);
+});
+
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => {
+    console.log(`Weather MCP server running on port ${PORT}`);
+});
+```
+
+
+## Stateful 도구 사용
+
+도구 호출 간에 컨텍스트를 유지하는 stateful server의 경우, `client.session()`을 사용하여 영구적인 `ClientSession`을 생성하세요.
+
+
+
+```typescript Using MCP ClientSession for stateful tool usage
+import { loadMCPTools } from "@langchain/mcp-adapters/tools.js";
+
+const client = new MultiServerMCPClient({...});
+const session = await client.session("math");
+const tools = await loadMCPTools(session);
+```
+
+
+## 추가 리소스
+
+* [MCP 문서](https://modelcontextprotocol.io/introduction)
+* [MCP Transport 문서](https://modelcontextprotocol.io/docs/concepts/transports)
+
+* [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchainjs/tree/main/libs/langchain-mcp-adapters/)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/mcp.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,99 @@
+---
+title: Microsoft Word
+---
+
+>[Microsoft Word](https://www.microsoft.com/en-us/microsoft-365/word)는 Microsoft에서 개발한 워드 프로세서입니다.
+
+이 문서는 `Word` 문서를 다운스트림에서 사용할 수 있는 document 형식으로 로드하는 방법을 다룹니다.
+
+## Docx2txt 사용하기
+
+`Docx2txt`를 사용하여 .docx 파일을 document로 로드합니다.
+
+```python
+pip install -qU  docx2txt
+```
+
+```python
+from langchain_community.document_loaders import Docx2txtLoader
+
+loader = Docx2txtLoader("./example_data/fake.docx")
+
+data = loader.load()
+
+data
+```
+
+```output
+[Document(page_content='Lorem ipsum dolor sit amet.', metadata={'source': './example_data/fake.docx'})]
+```
+
+## Unstructured 사용하기
+
+Unstructured를 로컬에서 설정하는 방법에 대한 자세한 내용은 필수 시스템 종속성 설정을 포함하여 [이 가이드](/oss/python/integrations/providers/unstructured/)를 참조하세요.
+
+```python
+from langchain_community.document_loaders import UnstructuredWordDocumentLoader
+
+loader = UnstructuredWordDocumentLoader("example_data/fake.docx")
+
+data = loader.load()
+
+data
+```
+
+```output
+[Document(page_content='Lorem ipsum dolor sit amet.', metadata={'source': 'example_data/fake.docx'})]
+```
+
+### Element 유지하기
+
+내부적으로 Unstructured는 텍스트의 다른 청크에 대해 서로 다른 "element"를 생성합니다. 기본적으로 이들을 결합하지만, `mode="elements"`를 지정하여 쉽게 분리를 유지할 수 있습니다.
+
+```python
+loader = UnstructuredWordDocumentLoader("./example_data/fake.docx", mode="elements")
+
+data = loader.load()
+
+data[0]
+```
+
+```output
+Document(page_content='Lorem ipsum dolor sit amet.', metadata={'source': './example_data/fake.docx', 'category_depth': 0, 'file_directory': './example_data', 'filename': 'fake.docx', 'last_modified': '2023-12-19T13:42:18', 'languages': ['por', 'cat'], 'filetype': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'category': 'Title'})
+```
+
+## Azure AI Document Intelligence 사용하기
+
+>[Azure AI Document Intelligence](https://aka.ms/doc-intelligence) (이전 명칭 `Azure Form Recognizer`)는 디지털 또는 스캔된 PDF, 이미지, Office 및 HTML 파일에서 텍스트(필기 포함), 표, 문서 구조(예: 제목, 섹션 제목 등) 및 키-값 쌍을 추출하는 머신러닝 기반 서비스입니다.
+>
+>Document Intelligence는 `PDF`, `JPEG/JPG`, `PNG`, `BMP`, `TIFF`, `HEIF`, `DOCX`, `XLSX`, `PPTX` 및 `HTML`을 지원합니다.
+
+`Document Intelligence`를 사용하는 현재 loader 구현은 페이지별로 콘텐츠를 통합하여 LangChain document로 변환할 수 있습니다. 기본 출력 형식은 markdown이며, 의미론적 document 청킹을 위해 `MarkdownHeaderTextSplitter`와 쉽게 연결할 수 있습니다. 또한 `mode="single"` 또는 `mode="page"`를 사용하여 단일 페이지의 순수 텍스트를 반환하거나 페이지별로 분할된 document를 반환할 수 있습니다.
+
+## 사전 요구 사항
+
+**East US**, **West US2**, **West Europe** 3개 미리 보기 지역 중 하나에 Azure AI Document Intelligence 리소스가 필요합니다 - 리소스가 없는 경우 [이 문서](https://learn.microsoft.com/azure/ai-services/document-intelligence/create-document-intelligence-resource?view=doc-intel-4.0.0)를 따라 생성하세요. loader에 매개변수로 `<endpoint>`와 `<key>`를 전달해야 합니다.
+
+pip install -qU  langchain langchain-community azure-ai-documentintelligence
+
+```python
+from langchain_community.document_loaders import AzureAIDocumentIntelligenceLoader
+
+file_path = "<filepath>"
+endpoint = "<endpoint>"
+key = "<key>"
+loader = AzureAIDocumentIntelligenceLoader(
+    api_endpoint=endpoint, api_key=key, file_path=file_path, api_model="prebuilt-layout"
+)
+
+documents = loader.load()
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/document_loaders/microsoft_word.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

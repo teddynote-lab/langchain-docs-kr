@@ -1,0 +1,195 @@
+---
+title: Deep Agents Middleware
+sidebarTitle: Middleware
+description: Deep agent를 구동하는 middleware 이해하기
+---
+
+Deep agent는 모듈식 middleware 아키텍처로 구축됩니다. Deep agent는 다음에 접근할 수 있습니다:
+
+1. Planning tool
+2. Context와 장기 메모리를 저장하기 위한 filesystem
+3. Subagent를 생성하는 기능
+
+각 기능은 별도의 middleware로 구현됩니다. `create_deep_agent`로 deep agent를 생성하면, `TodoListMiddleware`, `FilesystemMiddleware`, `SubAgentMiddleware`가 자동으로 agent에 연결됩니다.
+
+Middleware는 조합 가능합니다—필요에 따라 agent에 원하는 만큼의 middleware를 추가하거나 제거할 수 있습니다. 모든 middleware를 독립적으로 사용할 수 있습니다.
+
+다음 섹션에서는 각 middleware가 제공하는 기능을 설명합니다.
+
+## Planning middleware
+
+Planning은 복잡한 문제를 해결하는 데 필수적입니다. 최근 Claude Code를 사용해보셨다면, 복잡한 다단계 작업을 처리하기 전에 할 일 목록을 작성하는 것을 보셨을 것입니다. 또한 더 많은 정보가 들어오면 이 할 일 목록을 즉석에서 조정하고 업데이트할 수 있다는 것도 알 수 있습니다.
+
+`TodoListMiddleware`는 agent에게 이 할 일 목록을 업데이트하기 위한 전용 tool을 제공합니다. 다단계 작업을 실행하기 전과 실행하는 동안, agent는 `write_todos` tool을 사용하여 현재 수행 중인 작업과 아직 완료해야 할 작업을 추적하도록 프롬프트됩니다.
+
+```python
+from langchain.agents import create_agent
+from langchain.agents.middleware import TodoListMiddleware
+
+# TodoListMiddleware is included by default in create_deep_agent
+# You can customize it if building a custom agent
+agent = create_agent(
+    model="anthropic:claude-sonnet-4-20250514",
+    # Custom planning instructions can be added via middleware
+    middleware=[
+        TodoListMiddleware(
+            system_prompt="Use the write_todos tool to..."  # Optional: Custom addition to the system prompt
+        ),
+    ],
+)
+```
+
+
+
+
+## Filesystem middleware
+
+Context engineering은 효과적인 agent를 구축하는 데 있어 주요 과제입니다. 특히 가변 길이 결과를 반환하는 tool(예: web_search 및 rag)을 사용할 때 어렵습니다. 긴 tool 결과가 context window를 빠르게 채울 수 있기 때문입니다.
+
+`FilesystemMiddleware`는 단기 및 장기 메모리와 상호작용하기 위한 네 가지 tool을 제공합니다:
+
+- **ls**: Filesystem의 파일 목록 조회
+- **read_file**: 파일 전체 또는 파일의 특정 줄 수 읽기
+- **write_file**: Filesystem에 새 파일 작성
+- **edit_file**: Filesystem의 기존 파일 편집
+
+```python
+from langchain.agents import create_agent
+from deepagents.middleware.filesystem import FilesystemMiddleware
+
+# FilesystemMiddleware is included by default in create_deep_agent
+# You can customize it if building a custom agent
+agent = create_agent(
+    model="anthropic:claude-sonnet-4-20250514",
+    middleware=[
+        FilesystemMiddleware(
+            long_term_memory=False,  # Enables access to long-term memory, defaults to False. You must attach a store to use long-term memory.
+            system_prompt="Write to the filesystem when...",  # Optional custom addition to the system prompt
+            custom_tool_descriptions={
+                "ls": "Use the ls tool when...",
+                "read_file": "Use the read_file tool to..."
+            }  # Optional: Custom descriptions for filesystem tools
+        ),
+    ],
+)
+```
+
+### 단기 vs. 장기 filesystem
+
+기본적으로 이러한 tool은 graph state의 로컬 "filesystem"에 작성합니다. Agent runtime에 `Store` 객체를 제공하면 장기 메모리에 저장할 수도 있으며, 이는 agent의 서로 다른 thread **간에** 지속됩니다.
+
+```python
+from langchain.agents import create_agent
+from deepagents.middleware import FilesystemMiddleware
+from langgraph.store.memory import InMemoryStore
+
+store = InMemoryStore()
+
+agent = create_agent(
+    model="anthropic:claude-sonnet-4-20250514",
+    store=store,
+    middleware=[
+        FilesystemMiddleware(
+            long_term_memory=True,
+            custom_tool_descriptions={
+                "ls": "Use the ls tool when...",
+                "read_file": "Use the read_file tool to..."
+            }  # Optional: Custom descriptions for filesystem tools
+        ),
+    ],
+)
+```
+
+
+
+
+`use_longterm_memory=True`를 활성화하고 agent runtime에 `Store`를 제공하면, **/memories/** 접두사가 붙은 모든 파일이 장기 메모리 store에 저장됩니다. LangGraph Platform에 배포된 모든 agent는 자동으로 장기 메모리 store가 제공됩니다.
+
+## Subagent middleware
+
+Subagent에게 작업을 위임하면 context가 격리되어, 작업을 깊이 있게 처리하면서도 메인(supervisor) agent의 context window를 깨끗하게 유지할 수 있습니다.
+
+Subagent middleware를 사용하면 `task` tool을 통해 subagent를 제공할 수 있습니다.
+
+```python
+from langchain_core.tools import tool
+from langchain.agents import create_agent
+from deepagents.middleware.subagents import SubAgentMiddleware
+
+
+@tool
+def get_weather(city: str) -> str:
+    """Get the weather in a city."""
+    return f"The weather in {city} is sunny."
+
+agent = create_agent(
+    model="claude-sonnet-4-20250514",
+    middleware=[
+        SubAgentMiddleware(
+            default_model="claude-sonnet-4-20250514",
+            default_tools=[],
+            subagents=[
+                {
+                    "name": "weather",
+                    "description": "This subagent can get weather in cities.",
+                    "system_prompt": "Use the get_weather tool to get the weather in a city.",
+                    "tools": [get_weather],
+                    "model": "gpt-4.1",
+                    "middleware": [],
+                }
+            ],
+        )
+    ],
+)
+```
+
+Subagent는 **name**, **description**, **system prompt**, **tools**로 정의됩니다. 또한 subagent에게 커스텀 **model**이나 추가 **middleware**를 제공할 수도 있습니다. 이는 subagent에게 메인 agent와 공유할 추가 state key를 제공하고자 할 때 특히 유용할 수 있습니다.
+
+더 복잡한 사용 사례의 경우, 사전 구축된 LangGraph graph를 subagent로 제공할 수도 있습니다.
+
+```python
+from langchain.agents import create_agent
+from deepagents.middleware.subagents import SubAgentMiddleware
+from deepagents import CompiledSubAgent
+from langgraph.graph import StateGraph
+
+# Create a custom LangGraph graph
+def create_weather_graph():
+    workflow = StateGraph(...)
+    # Build your custom graph
+    return workflow.compile()
+
+weather_graph = create_weather_graph()
+
+# Wrap it in a CompiledSubAgent
+weather_subagent = CompiledSubAgent(
+    name="weather",
+    description="This subagent can get weather in cities.",
+    runnable=weather_graph
+)
+
+agent = create_agent(
+    model="anthropic:claude-sonnet-4-20250514",
+    middleware=[
+        SubAgentMiddleware(
+            default_model="claude-sonnet-4-20250514",
+            default_tools=[],
+            subagents=[weather_subagent],
+        )
+    ],
+)
+```
+
+
+
+
+사용자 정의 subagent 외에도, 메인 agent는 항상 `general-purpose` subagent에 접근할 수 있습니다. 이 subagent는 메인 agent와 동일한 instruction을 가지며 메인 agent가 접근할 수 있는 모든 tool을 사용할 수 있습니다. `general-purpose` subagent의 주요 목적은 context 격리입니다—메인 agent는 복잡한 작업을 이 subagent에게 위임하고 중간 tool 호출로 인한 부담 없이 간결한 답변을 받을 수 있습니다.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/deepagents/middleware.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

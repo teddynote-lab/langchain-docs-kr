@@ -1,0 +1,341 @@
+---
+title: Assistant 관리
+sidebarTitle: Assistant 관리
+---
+이 가이드에서는 [assistant](/langsmith/assistants)를 생성, 구성 및 관리하는 방법을 보여드립니다.
+
+먼저, context 개념에 대한 간단한 복습으로 다음의 간단한 `call_model` node와 context schema를 살펴보겠습니다.
+이 node는 `context` 객체의 `model_name` 필드에 정의된 `model_name`을 읽고 사용하려고 시도합니다.
+
+<Tabs>
+    <Tab title="Python">
+    ```python
+    class ContextSchema(TypedDict):
+        model_name: str
+
+    builder = StateGraph(AgentState, context_schema=ContextSchema)
+
+    def call_model(state, runtime: Runtime[ContextSchema]):
+        messages = state["messages"]
+        model = _get_model(runtime.context.get("model_name", "anthropic"))
+        response = model.invoke(messages)
+        # We return a list, because this will get added to the existing list
+        return {"messages": [response]}
+    ```
+    </Tab>
+    <Tab title="Javascript">
+    ```js
+    import { Annotation } from "@langchain/langgraph";
+
+    const ContextSchema = Annotation.Root({
+        model_name: Annotation<string>,
+        system_prompt:
+    });
+
+    const builder = new StateGraph(AgentState, ContextSchema)
+
+    function callModel(state: State, runtime: Runtime[ContextSchema]) {
+      const messages = state.messages;
+      const model = _getModel(runtime.context.model_name ?? "anthropic");
+      const response = model.invoke(messages);
+      // We return a list, because this will get added to the existing list
+      return { messages: [response] };
+    }
+    ```
+    </Tab>
+</Tabs>
+
+configuration에 대한 자세한 내용은 [여기를 참조하세요](/langsmith/configuration-cloud#configuration).
+
+## Assistant 생성
+
+### LangGraph SDK
+
+assistant를 생성하려면 [LangGraph SDK](/langsmith/sdk) `create` 메서드를 사용하세요. 자세한 내용은 [Python](/langsmith/langgraph-python-sdk#langgraph_sdk.client.AssistantsClient.create) 및 [JS](/langsmith/langgraph-js-ts-sdk#create) SDK 참조 문서를 확인하세요.
+
+이 예제는 위와 동일한 context schema를 사용하며, `model_name`이 `openai`로 설정된 assistant를 생성합니다.
+
+<Tabs>
+    <Tab title="Python">
+    ```python
+    from langgraph_sdk import get_client
+
+    client = get_client(url=<DEPLOYMENT_URL>)
+    openai_assistant = await client.assistants.create(
+        # "agent" is the name of a graph we deployed
+        "agent", context={"model_name": "openai"}, name="Open AI Assistant"
+    )
+
+    print(openai_assistant)
+    ```
+    </Tab>
+    <Tab title="Javascript">
+    ```js
+    import { Client } from "@langchain/langgraph-sdk";
+
+    const client = new Client({ apiUrl: <DEPLOYMENT_URL> });
+    const openAIAssistant = await client.assistants.create({
+        graphId: 'agent',
+        name: "Open AI Assistant",
+        context: { "model_name": "openai" },
+    });
+
+    console.log(openAIAssistant);
+    ```
+    </Tab>
+    <Tab title="CURL">
+    ```bash
+    curl --request POST \
+        --url <DEPLOYMENT_URL>/assistants \
+        --header 'Content-Type: application/json' \
+        --data '{"graph_id":"agent", "context":{"model_name":"openai"}, "name": "Open AI Assistant"}'
+    ```
+    </Tab>
+</Tabs>
+
+출력:
+
+```
+{
+"assistant_id": "62e209ca-9154-432a-b9e9-2d75c7a9219b",
+"graph_id": "agent",
+"name": "Open AI Assistant"
+"context": {
+"model_name": "openai"
+}
+"metadata": {}
+"created_at": "2024-08-31T03:09:10.230718+00:00",
+"updated_at": "2024-08-31T03:09:10.230718+00:00",
+}
+```
+
+### LangSmith UI
+
+LangSmith UI에서도 assistant를 생성할 수 있습니다.
+
+deployment 내에서 "Assistants" 탭을 선택하세요. 그러면 모든 graph에 걸쳐 deployment의 모든 assistant 테이블이 로드됩니다.
+
+새 assistant를 생성하려면 "+ New assistant" 버튼을 선택하세요. 그러면 이 assistant가 사용할 graph를 지정하고, 이름, 설명 및 해당 graph의 configuration schema를 기반으로 assistant에 대한 원하는 configuration을 제공할 수 있는 양식이 열립니다.
+
+확인하려면 "Create assistant"를 클릭하세요. 그러면 assistant를 테스트할 수 있는 [Studio](/langsmith/studio)로 이동합니다. deployment의 "Assistants" 탭으로 돌아가면 테이블에서 새로 생성된 assistant를 볼 수 있습니다.
+
+## Assistant 사용
+
+### LangGraph SDK
+
+이제 `model_name`이 `openai`로 정의된 "Open AI Assistant"라는 assistant를 생성했습니다. 이제 이 configuration으로 이 assistant를 사용할 수 있습니다:
+
+<Tabs>
+    <Tab title="Python">
+    ```python
+    thread = await client.threads.create()
+    input = {"messages": [{"role": "user", "content": "who made you?"}]}
+    async for event in client.runs.stream(
+        thread["thread_id"],
+        # this is where we specify the assistant id to use
+        openai_assistant["assistant_id"],
+        input=input,
+        stream_mode="updates",
+    ):
+        print(f"Receiving event of type: {event.event}")
+        print(event.data)
+        print("\n\n")
+    ```
+    </Tab>
+    <Tab title="Javascript">
+    ```js
+    const thread = await client.threads.create();
+    const input = { "messages": [{ "role": "user", "content": "who made you?" }] };
+
+    const streamResponse = client.runs.stream(
+      thread["thread_id"],
+      // this is where we specify the assistant id to use
+      openAIAssistant["assistant_id"],
+      {
+        input,
+        streamMode: "updates"
+      }
+    );
+
+    for await (const event of streamResponse) {
+      console.log(`Receiving event of type: ${event.event}`);
+      console.log(event.data);
+      console.log("\n\n");
+    }
+    ```
+    </Tab>
+    <Tab title="CURL">
+    ```bash
+    thread_id=$(curl --request POST \
+        --url <DEPLOYMENT_URL>/threads \
+        --header 'Content-Type: application/json' \
+        --data '{}' | jq -r '.thread_id') && \
+    curl --request POST \
+        --url "<DEPLOYMENT_URL>/threads/${thread_id}/runs/stream" \
+        --header 'Content-Type: application/json' \
+        --data '{
+            "assistant_id": <OPENAI_ASSISTANT_ID>,
+            "input": {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "who made you?"
+                    }
+                ]
+            },
+            "stream_mode": [
+                "updates"
+            ]
+        }' | \
+        sed 's/\r$//' | \
+        awk '
+        /^event:/ {
+            if (data_content != "") {
+                print data_content "\n"
+            }
+            sub(/^event: /, "Receiving event of type: ", $0)
+            printf "%s...\n", $0
+            data_content = ""
+        }
+        /^data:/ {
+            sub(/^data: /, "", $0)
+            data_content = $0
+        }
+        END {
+            if (data_content != "") {
+                print data_content "\n\n"
+            }
+        }
+    '
+    ```
+    </Tab>
+</Tabs>
+
+출력:
+
+```
+Receiving event of type: metadata
+{'run_id': '1ef6746e-5893-67b1-978a-0f1cd4060e16'}
+
+
+
+Receiving event of type: updates
+{'agent': {'messages': [{'content': 'I was created by OpenAI, a research organization focused on developing and advancing artificial intelligence technology.', 'additional_kwargs': {}, 'response_metadata': {'finish_reason': 'stop', 'model_name': 'gpt-4o-2024-05-13', 'system_fingerprint': 'fp_157b3831f5'}, 'type': 'ai', 'name': None, 'id': 'run-e1a6b25c-8416-41f2-9981-f9cfe043f414', 'example': False, 'tool_calls': [], 'invalid_tool_calls': [], 'usage_metadata': None}]}}
+```
+
+### LangSmith UI
+
+deployment 내에서 "Assistants" 탭을 선택하세요. 사용하려는 assistant에 대해 **Studio** 버튼을 클릭하세요. 그러면 선택한 assistant와 함께 Studio가 열립니다. (Graph 또는 Chat 모드에서) 입력을 제출하면 선택한 assistant와 해당 configuration이 사용됩니다.
+
+## Assistant의 새 버전 생성
+
+### LangGraph SDK
+
+assistant를 편집하려면 `update` 메서드를 사용하세요. 이렇게 하면 제공된 편집 내용으로 assistant의 새 버전이 생성됩니다. 자세한 내용은 [Python](/langsmith/langgraph-python-sdk#langgraph_sdk.client.AssistantsClient.update) 및 [JS](/langsmith/langgraph-js-ts-sdk#update) SDK 참조 문서를 확인하세요.
+
+<Note>
+**참고**
+전체 context(그리고 사용 중인 경우 metadata)를 전달해야 합니다. update endpoint는 이전 버전에 의존하지 않고 처음부터 완전히 새로운 버전을 생성합니다.
+</Note>
+
+예를 들어, assistant의 system prompt를 업데이트하려면:
+
+<Tabs>
+    <Tab title="Python">
+    ```python
+    openai_assistant_v2 = await client.assistants.update(
+        openai_assistant["assistant_id"],
+        context={
+              "model_name": "openai",
+              "system_prompt": "You are an unhelpful assistant!",
+        },
+    )
+    ```
+    </Tab>
+    <Tab title="Javascript">
+    ```js
+    const openaiAssistantV2 = await client.assistants.update(
+        openai_assistant["assistant_id"],
+        {
+            context: {
+                model_name: 'openai',
+                system_prompt: 'You are an unhelpful assistant!',
+            },
+        },
+    );
+    ```
+    </Tab>
+    <Tab title="CURL">
+    ```bash
+    curl --request PATCH \
+    --url <DEPLOYMENT_URL>/assistants/<ASSISTANT_ID> \
+    --header 'Content-Type: application/json' \
+    --data '{
+    "context": {"model_name": "openai", "system_prompt": "You are an unhelpful assistant!"}
+    }'
+    ```
+    </Tab>
+</Tabs>
+
+이렇게 하면 업데이트된 parameter로 assistant의 새 버전이 생성되고 이것이 assistant의 활성 버전으로 설정됩니다. 이제 graph를 실행하고 이 assistant id를 전달하면 이 최신 버전이 사용됩니다.
+
+### LangSmith UI
+
+LangSmith UI에서도 assistant를 편집할 수 있습니다.
+
+deployment 내에서 "Assistants" 탭을 선택하세요. 그러면 모든 graph에 걸쳐 deployment의 모든 assistant 테이블이 로드됩니다.
+
+기존 assistant를 편집하려면 지정된 assistant에 대해 "Edit" 버튼을 선택하세요. 그러면 assistant의 이름, 설명 및 configuration을 편집할 수 있는 양식이 열립니다.
+
+또한 Studio를 사용하는 경우 "Manage Assistants" 버튼을 통해 assistant를 편집하고 새 버전을 생성할 수 있습니다.
+
+## 이전 assistant 버전 사용
+
+### LangGraph SDK
+
+assistant의 활성 버전을 변경할 수도 있습니다. 이렇게 하려면 `setLatest` 메서드를 사용하세요.
+
+위의 예제에서 assistant의 첫 번째 버전으로 롤백하려면:
+
+<Tabs>
+    <Tab title="Python">
+    ```python
+    await client.assistants.set_latest(openai_assistant['assistant_id'], 1)
+    ```
+    </Tab>
+    <Tab title="Javascript">
+    ```js
+    await client.assistants.setLatest(openaiAssistant['assistant_id'], 1);
+    ```
+    </Tab>
+    <Tab title="CURL">
+    ```bash
+    curl --request POST \
+    --url <DEPLOYMENT_URL>/assistants/<ASSISTANT_ID>/latest \
+    --header 'Content-Type: application/json' \
+    --data '{
+    "version": 1
+    }'
+    ```
+    </Tab>
+</Tabs>
+
+이제 graph를 실행하고 이 assistant id를 전달하면 assistant의 첫 번째 버전이 사용됩니다.
+
+### LangSmith UI
+
+Studio를 사용하는 경우, assistant의 활성 버전을 설정하려면 "Manage Assistants" 버튼을 클릭하고 사용하려는 assistant를 찾으세요. assistant와 버전을 선택한 다음 "Active" 토글을 클릭하세요. 그러면 선택한 버전을 활성화하도록 assistant가 업데이트됩니다.
+
+<Warning>
+**Assistant 삭제**
+assistant를 삭제하면 모든 버전이 삭제됩니다. 현재 단일 버전을 삭제할 수 있는 방법은 없지만, assistant를 올바른 버전으로 지정하여 사용하지 않으려는 버전을 건너뛸 수 있습니다.
+</Warning>
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/configuration-cloud.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

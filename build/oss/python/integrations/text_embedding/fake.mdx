@@ -1,0 +1,30 @@
+---
+title: Fake Embeddings
+---
+
+LangChain은 fake embedding class도 제공합니다. 이를 사용하여 파이프라인을 테스트할 수 있습니다.
+
+```python
+from langchain_community.embeddings import FakeEmbeddings
+```
+
+```python
+embeddings = FakeEmbeddings(size=1352)
+```
+
+```python
+query_result = embeddings.embed_query("foo")
+```
+
+```python
+doc_results = embeddings.embed_documents(["foo"])
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/text_embedding/fake.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,50 @@
+---
+title: Memgraph
+---
+
+>Memgraph는 실시간 쿼리 및 분석에 최적화된 고성능 인메모리 그래프 데이터베이스입니다.
+>[Memgraph 웹사이트](https://memgraph.com/)를 방문하여 시작하세요.
+
+## Installation and Setup
+
+- `pip install langchain-memgraph`로 Python SDK를 설치하세요
+
+## MemgraphQAChain
+
+사용자 입력을 기반으로 Cypher 문을 생성하고 이를 사용하여 데이터베이스에서 관련 정보를 검색할 수 있는 Memgraph 그래프 데이터베이스 래퍼가 있습니다.
+
+```python
+from langchain_memgraph.chains.graph_qa import MemgraphQAChain
+from langchain_memgraph.graphs.memgraph import MemgraphLangChain
+```
+
+[사용 예제](/oss/python/integrations/graphs/memgraph)를 참조하세요
+
+## 비구조화된 데이터로부터 Knowledge Graph 구축하기
+
+이 통합을 사용하여 비구조화된 데이터로부터 knowledge graph를 구축할 수 있습니다.
+
+```python
+from langchain_memgraph.graphs.memgraph import MemgraphLangChain
+from langchain_experimental.graph_transformers import LLMGraphTransformer
+```
+
+[사용 예제](/oss/python/integrations/graphs/memgraph)를 참조하세요
+
+## Memgraph Tools and Toolkit
+
+Memgraph는 Memgraph 데이터베이스와 상호작용할 수 있는 toolkit도 제공합니다.
+[사용 예제](/oss/python/integrations/tools/memgraph)를 참조하세요.
+
+```python
+from langchain_memgraph import MemgraphToolkit
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/memgraph.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

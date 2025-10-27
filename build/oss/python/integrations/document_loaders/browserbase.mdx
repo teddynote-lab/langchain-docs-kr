@@ -1,0 +1,69 @@
+---
+title: Browserbase
+---
+
+[Browserbase](https://browserbase.com)는 headless browser를 안정적으로 실행, 관리 및 모니터링할 수 있는 개발자 플랫폼입니다.
+
+다음 기능으로 AI 데이터 검색을 강화하세요:
+
+- 복잡한 UI에서 데이터를 추출할 수 있는 안정적인 browser를 제공하는 [Serverless Infrastructure](https://docs.browserbase.com/under-the-hood)
+- fingerprinting 전략과 자동 captcha 해결 기능이 포함된 [Stealth Mode](https://docs.browserbase.com/features/stealth-mode)
+- network timeline과 log로 Browser Session을 검사할 수 있는 [Session Debugger](https://docs.browserbase.com/features/sessions)
+- 자동화를 빠르게 디버깅할 수 있는 [Live Debug](https://docs.browserbase.com/guides/session-debug-connection/browser-remote-control)
+
+## 설치 및 설정
+
+- [browserbase.com](https://browserbase.com)에서 API key와 Project ID를 받아 환경 변수(`BROWSERBASE_API_KEY`, `BROWSERBASE_PROJECT_ID`)에 설정하세요.
+- [Browserbase SDK](http://github.com/browserbase/python-sdk)를 설치하세요:
+
+```python
+pip install browserbase
+```
+
+## 문서 로드하기
+
+`BrowserbaseLoader`를 사용하여 웹페이지를 LangChain에 로드할 수 있습니다. 선택적으로 `text_content` 매개변수를 설정하여 페이지를 텍스트 전용 표현으로 변환할 수 있습니다.
+
+```python
+import os
+
+from langchain_community.document_loaders import BrowserbaseLoader
+
+load_dotenv()
+
+BROWSERBASE_API_KEY = os.getenv("BROWSERBASE_API_KEY")
+BROWSERBASE_PROJECT_ID = os.getenv("BROWSERBASE_PROJECT_ID")
+```
+
+```python
+loader = BrowserbaseLoader(
+    api_key=BROWSERBASE_API_KEY,
+    project_id=BROWSERBASE_PROJECT_ID,
+    urls=[
+        "https://example.com",
+    ],
+    # Text mode
+    text_content=False,
+)
+
+docs = loader.load()
+print(docs[0].page_content[:61])
+```
+
+### Loader 옵션
+
+- `urls` 필수. 가져올 URL 목록입니다.
+- `text_content` 텍스트 콘텐츠만 검색합니다. 기본값은 `False`입니다.
+- `api_key` Browserbase API key입니다. 기본값은 `BROWSERBASE_API_KEY` 환경 변수입니다.
+- `project_id` Browserbase Project ID입니다. 기본값은 `BROWSERBASE_PROJECT_ID` 환경 변수입니다.
+- `session_id` 선택 사항. 기존 Session ID를 제공합니다.
+- `proxy` 선택 사항. Proxy를 활성화/비활성화합니다.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/document_loaders/browserbase.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

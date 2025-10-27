@@ -1,0 +1,407 @@
+---
+title: 대량 추적 데이터 내보내기
+sidebarTitle: 대량 추적 데이터 내보내기
+---
+
+<Info>
+**요금제 제한이 적용됩니다**
+
+Data Export 기능은 [LangSmith Plus 또는 Enterprise 요금제](https://www.langchain.com/pricing-langsmith)에서만 지원됩니다.
+</Info>
+
+LangSmith의 대량 데이터 내보내기 기능을 사용하면 추적 데이터를 외부 목적지로 내보낼 수 있습니다. 이 기능은 BigQuery, Snowflake, RedShift, Jupyter Notebooks 등과 같은 도구에서 데이터를 오프라인으로 분석하고자 할 때 유용합니다.
+
+내보내기는 특정 LangSmith 프로젝트와 날짜 범위를 대상으로 실행할 수 있습니다. 일괄 내보내기가 시작되면, 시스템이 내보내기 프로세스의 오케스트레이션과 복원력을 자동으로 처리합니다.
+데이터의 크기에 따라 내보내기에 시간이 소요될 수 있습니다. 동시에 실행할 수 있는 내보내기 작업 수에도 제한이 있습니다.
+대량 내보내기는 최대 24시간의 실행 제한 시간이 있습니다.
+
+## 목적지
+
+현재 제공된 S3 버킷 또는 S3 API 호환 버킷으로 내보내기를 지원합니다. 데이터는 [Parquet](https://parquet.apache.org/docs/overview/) 컬럼 형식으로 내보내집니다. 이 형식은 데이터를 다른 시스템으로 쉽게 가져올 수 있게 해줍니다.
+데이터 내보내기에는 [Run data format](/langsmith/run-data-format)과 동일한 데이터 필드가 포함됩니다.
+
+## 데이터 내보내기
+
+### 목적지 - S3 버킷 제공
+
+LangSmith 데이터를 내보내려면, 데이터를 내보낼 S3 버킷을 제공해야 합니다.
+
+내보내기에 필요한 정보는 다음과 같습니다:
+
+- **Bucket Name**: 데이터를 내보낼 S3 버킷의 이름
+- **Prefix**: 버킷 내에서 데이터를 내보낼 루트 프리픽스
+- **S3 Region**: 버킷의 리전(AWS S3 버킷에 필요)
+- **Endpoint URL**: S3 버킷의 엔드포인트 URL(S3 API 호환 버킷에 필요)
+- **Access Key**: S3 버킷의 액세스 키
+- **Secret Key**: S3 버킷의 시크릿 키
+
+AWS가 아닌 GCS 또는 MinIO와 같은 S3 호환 버킷도 지원하며, 이 경우 엔드포인트 URL을 반드시 제공해야 합니다.
+
+### 목적지 준비
+
+<Note>
+**셀프 호스팅 및 EU 리전 배포의 경우**
+
+아래 요청에서 셀프 호스팅 설치 또는 EU 리전 조직의 경우 LangSmith URL을 적절히 업데이트하세요.
+EU 리전의 경우 `eu.api.smith.langchain.com`을 사용하세요.
+</Note>
+
+<Note>
+**권한 필요**
+
+`backend`와 `queue` 서비스 모두 목적지 버킷에 쓰기 권한이 필요합니다:
+
+- `backend` 서비스는 내보내기 목적지가 생성될 때 목적지 버킷에 테스트 파일을 쓰려고 시도합니다.
+  삭제 권한이 있으면 테스트 파일을 삭제합니다(삭제 권한은 선택 사항).
+- `queue` 서비스는 대량 내보내기 실행과 파일을 버킷에 업로드하는 역할을 담당합니다.
+</Note>
+
+아래 예시는 cURL을 사용하여 목적지를 생성하는 방법을 보여줍니다. 플레이스홀더 값을 실제 구성 값으로 교체하세요.
+자격 증명은 시스템에서 암호화된 형태로 안전하게 저장됩니다.
+
+```bash
+curl --request POST \
+  --url 'https://api.smith.langchain.com/api/v1/bulk-exports/destinations' \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --header 'X-Tenant-Id: YOUR_WORKSPACE_ID' \
+  --data '{
+    "destination_type": "s3",
+    "display_name": "My S3 Destination",
+    "config": {
+      "bucket_name": "your-s3-bucket-name",
+      "prefix": "root_folder_prefix",
+      "region": "your aws s3 region",
+      "endpoint_url": "your endpoint url for s3 compatible buckets"
+    },
+    "credentials": {
+      "access_key_id": "YOUR_S3_ACCESS_KEY_ID",
+      "secret_access_key": "YOUR_S3_SECRET_ACCESS_KEY"
+    }
+  }'
+```
+// 목적지 생성 예시 - 실제 값으로 교체하세요
+
+반환된 `id`를 이후 대량 내보내기 작업에서 이 목적지를 참조하는 데 사용하세요.
+
+**목적지 생성 중 오류가 발생하면 [목적지 오류 디버깅](#debugging-destination-errors)에서 디버깅 방법을 참고하세요.**
+
+#### 자격 증명 구성
+
+<Note>**LangSmith Helm 버전 >= `0.10.34` (애플리케이션 버전 >= `0.10.91`) 필요**</Note>
+
+정적 `access_key_id`와 `secret_access_key` 외에도 다음과 같은 추가 자격 증명 형식을 지원합니다:
+
+- [임시 자격 증명](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html)을 사용하려면, AWS 세션 토큰을 포함하는 `credentials.session_token` 키를 내보내기 목적지 생성 시 추가로 제공하세요.
+- (셀프 호스팅 전용): [AWS IAM Roles for Service Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) (IRSA)와 같은 환경 기반 자격 증명을 사용하려면, 내보내기 목적지 생성 시 `credentials` 키를 요청에서 생략하세요.
+  이 경우 [표준 Boto3 자격 증명 위치](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#credentials)가 라이브러리에서 정의된 순서대로 확인됩니다.
+
+#### AWS S3 버킷
+
+AWS S3의 경우 `endpoint_url`을 생략하고 버킷의 리전에 맞는 region만 제공하면 됩니다.
+
+```bash
+curl --request POST \
+  --url 'https://api.smith.langchain.com/api/v1/bulk-exports/destinations' \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --header 'X-Tenant-Id: YOUR_WORKSPACE_ID' \
+  --data '{
+    "destination_type": "s3",
+    "display_name": "My AWS S3 Destination",
+    "config": {
+      "bucket_name": "my_bucket",
+      "prefix": "data_exports",
+      "region": "us-east-1"
+    },
+    "credentials": {
+      "access_key_id": "YOUR_S3_ACCESS_KEY_ID",
+      "secret_access_key": "YOUR_S3_SECRET_ACCESS_KEY"
+    }
+  }'
+```
+// AWS S3 목적지 생성 예시
+
+#### Google GCS XML S3 호환 버킷
+
+Google의 GCS 버킷을 사용할 때는 XML S3 호환 API를 사용해야 하며, 일반적으로 `https://storage.googleapis.com`인 `endpoint_url`을 제공해야 합니다.
+아래는 S3와 호환되는 GCS XML API를 사용할 때의 API 요청 예시입니다:
+
+```bash
+curl --request POST \
+  --url 'https://api.smith.langchain.com/api/v1/bulk-exports/destinations' \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --header 'X-Tenant-Id: YOUR_WORKSPACE_ID' \
+  --data '{
+    "destination_type": "s3",
+    "display_name": "My GCS Destination",
+    "config": {
+      "bucket_name": "my_bucket",
+      "prefix": "data_exports",
+      "endpoint_url": "https://storage.googleapis.com"
+    },
+    "credentials": {
+      "access_key_id": "YOUR_S3_ACCESS_KEY_ID",
+      "secret_access_key": "YOUR_S3_SECRET_ACCESS_KEY"
+    }
+  }'
+```
+// GCS XML S3 호환 목적지 생성 예시
+
+자세한 내용은 [Google 문서](https://cloud.google.com/storage/docs/interoperability#xml_api)를 참고하세요.
+
+### 내보내기 작업 생성
+
+데이터를 내보내려면 내보내기 작업을 생성해야 합니다. 이 작업에는 목적지, 프로젝트, 날짜 범위, 내보낼 데이터의 필터 표현식이 포함됩니다. 필터 표현식은 내보내는 run의 범위를 좁히는 데 사용되며, 선택 사항입니다. 필터 필드를 설정하지 않으면 모든 run이 내보내집니다. 내보내기에 적합한 필터 표현식은 [필터 쿼리 언어](/langsmith/trace-query-syntax#filter-query-language)와 [예시](/langsmith/export-traces#use-filter-query-language)를 참고하세요.
+
+아래 cURL 명령어로 작업을 생성할 수 있습니다:
+
+```bash
+curl --request POST \
+  --url 'https://api.smith.langchain.com/api/v1/bulk-exports' \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --header 'X-Tenant-Id: YOUR_WORKSPACE_ID' \
+  --data '{
+    "bulk_export_destination_id": "your_destination_id",
+    "session_id": "project_uuid",
+    "start_time": "2024-01-01T00:00:00Z",
+    "end_time": "2024-01-02T23:59:59Z",
+    "filter": "and(eq(run_type, \"llm\"), eq(name, \"ChatOpenAI\"), eq(input_key, \"messages.content\"), like(input_value, \"%messages.content%\"))"
+  }'
+```
+// 내보내기 작업 생성 예시
+
+<Note>
+`session_id`는 Tracing Project ID로, Tracing Projects 목록에서 프로젝트를 클릭하여 개별 프로젝트 보기에서 복사할 수 있습니다.
+</Note>
+
+반환된 `id`를 이후 대량 내보내기 작업에서 참조하세요.
+
+### 예약 내보내기
+
+<Note>
+LangSmith Helm 버전 >= `0.10.42` (애플리케이션 버전 >= `0.10.109`) 필요
+</Note>
+
+예약 내보내기는 주기적으로 run을 수집하여 설정된 목적지로 내보냅니다.
+예약 내보내기를 생성하려면 `interval_hours`를 포함하고 `end_time`을 제거하세요:
+
+```bash
+curl --request POST \
+  --url 'https://api.smith.langchain.com/api/v1/bulk-exports' \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --header 'X-Tenant-Id: YOUR_WORKSPACE_ID' \
+  --data '{
+    "bulk_export_destination_id": "your_destination_id",
+    "session_id": "project_uuid",
+    "start_time": "2024-01-01T00:00:00Z",
+    "filter": "and(eq(run_type, \"llm\"), eq(name, \"ChatOpenAI\"), eq(input_key, \"messages.content\"), like(input_value, \"%messages.content%\"))",
+    "interval_hours": 1
+  }'
+```
+// 예약 내보내기 작업 생성 예시
+
+**상세 내용**
+
+- `interval_hours`는 1시간 이상 168시간(1주) 이하로 설정해야 합니다.
+- 예약 내보내기에서 생성된 각 내보내기의 첫 시간 범위는 `start_time=(scheduled_export_start_time), end_time=(start_time + interval_hours)`입니다.
+    이후에는 `start_time=(previous_export_end_time), end_time=(this_export_start_time + interval_hours)`와 같이 진행됩니다.
+- 예약 내보내기에서는 `end_time`을 생략해야 합니다. 비예약 내보내기에서는 `end_time`이 반드시 필요합니다.
+- 예약 내보내기는 [내보내기 취소](#stop-an-export)를 통해 중지할 수 있습니다.
+  - 예약 내보내기에서 생성된 내보내기는 `source_bulk_export_id` 속성이 채워집니다.
+  - 필요하다면, 예약 내보내기에서 생성된 각 대량 내보내기를 별도로 취소해야 하며, 예약 내보내기 자체를 취소해도 생성된 내보내기는 **취소되지 않습니다**.
+- 생성된 내보내기는 `end_time + 10분`에 실행되어, 최근에 제출된 run을 포함할 수 있도록 합니다.
+
+**예시**
+
+만약 예약 대량 내보내기를 `start_time=2025-07-16T00:00:00Z`와 `interval_hours=6`으로 생성하면:
+
+| 내보내기 | 시작 시간              | 종료 시간              | 실행 시간              |
+| -------- | --------------------- | ---------------------- | ---------------------- |
+| 1        | 2025-07-16T00:00:00Z  | 2025-07-16T06:00:00Z   | 2025-07-16T06:10:00Z   |
+| 2        | 2025-07-16T06:00:00Z  | 2025-07-16T12:00:00Z   | 2025-07-16T12:10:00Z   |
+| 3        | 2025-07-16T12:00:00Z  | 2025-07-16T18:00:00Z   | 2025-07-16T18:10:00Z   |
+
+## 내보내기 작업 모니터링
+
+### 내보내기 상태 모니터링
+
+내보내기 작업의 상태를 모니터링하려면 아래 cURL 명령어를 사용하세요:
+
+```bash
+curl --request GET \
+  --url 'https://api.smith.langchain.com/api/v1/bulk-exports/{export_id}' \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --header 'X-Tenant-Id: YOUR_WORKSPACE_ID'
+```
+// 내보내기 상태 조회 예시
+
+`{export_id}`를 모니터링하려는 내보내기 작업의 ID로 교체하세요. 이 명령어는 지정한 내보내기 작업의 현재 상태를 조회합니다.
+
+### 내보내기별 Run 목록 조회
+
+내보내기는 일반적으로 내보내기 대상 날짜 파티션에 따라 여러 run으로 분할됩니다.
+특정 내보내기와 관련된 모든 run을 조회하려면 아래 cURL 명령어를 사용하세요:
+
+```bash
+curl --request GET \
+  --url 'https://api.smith.langchain.com/api/v1/bulk-exports/{export_id}/runs' \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --header 'X-Tenant-Id: YOUR_WORKSPACE_ID'
+```
+// 내보내기별 run 목록 조회 예시
+
+이 명령어는 지정한 내보내기와 관련된 모든 run을 가져와 run ID, 상태, 생성 시간, 내보낸 행 수 등의 정보를 제공합니다.
+
+### 모든 내보내기 목록 조회
+
+모든 내보내기 작업 목록을 조회하려면 아래 cURL 명령어를 사용하세요:
+
+```bash
+curl --request GET \
+  --url 'https://api.smith.langchain.com/api/v1/bulk-exports' \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --header 'X-Tenant-Id: YOUR_WORKSPACE_ID'
+```
+// 모든 내보내기 작업 목록 조회 예시
+
+이 명령어는 모든 내보내기 작업과 그 현재 상태, 생성 타임스탬프를 반환합니다.
+
+### 내보내기 중지
+
+기존 내보내기를 중지하려면 아래 cURL 명령어를 사용하세요:
+
+```bash
+curl --request PATCH \
+  --url 'https://api.smith.langchain.com/api/v1/bulk-exports/{export_id}' \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --header 'X-Tenant-Id: YOUR_WORKSPACE_ID' \
+  --data '{
+    "status": "Cancelled"
+}'
+```
+// 내보내기 중지 예시
+
+`{export_id}`를 취소하려는 내보내기 작업의 ID로 교체하세요. 한 번 취소된 작업은 재시작할 수 없으므로, 새 내보내기 작업을 생성해야 합니다.
+
+## 파티셔닝 방식
+
+데이터는 아래 Hive 파티션 형식으로 버킷에 내보내집니다:
+
+```
+<bucket>/<prefix>/export_id=<export_id>/tenant_id=<tenant_id>/session_id=<session_id>/runs/year=<year>/month=<month>/day=<day>
+```
+// Hive 파티션 형식 예시
+
+## 다른 시스템으로 데이터 가져오기
+
+S3와 Parquet 형식의 데이터 가져오기는 대부분의 분석 시스템에서 일반적으로 지원됩니다. 아래 문서 링크를 참고하세요:
+
+### BigQuery
+
+BigQuery로 데이터를 가져오려면 [Parquet 데이터 로드](https://cloud.google.com/bigquery/docs/loading-data-cloud-storage-parquet)와
+[Hive 파티션 로드](https://cloud.google.com/bigquery/docs/hive-partitioned-loads-gcs)를 참고하세요.
+
+### Snowflake
+
+S3에서 Snowflake로 데이터를 로드하려면 [클라우드에서 로드 문서](https://docs.snowflake.com/en/user-guide/tutorials/load-from-cloud-tutorial)를 참고하세요.
+
+### RedShift
+
+S3 또는 Parquet에서 Amazon Redshift로 데이터를 복사하려면 [AWS COPY 명령어 문서](https://docs.aws.amazon.com/redshift/latest/dg/r_COPY.html)를 참고하세요.
+
+### Clickhouse
+
+Clickhouse에서는 S3 / Parquet 형식의 데이터를 직접 쿼리할 수 있습니다. 예를 들어, GCS를 사용하는 경우 아래와 같이 데이터를 쿼리할 수 있습니다:
+
+```sql
+SELECT count(distinct id) FROM s3('https://storage.googleapis.com/<bucket>/<prefix>/export_id=<export_id>/**',
+ 'access_key_id', 'access_secret', 'Parquet')
+```
+// Clickhouse S3 쿼리 예시
+
+자세한 내용은 [Clickhouse S3 통합 문서](https://clickhouse.com/docs/en/engines/table-engines/integrations/s3)를 참고하세요.
+
+### DuckDB
+
+DuckDB에서는 S3의 데이터를 SQL로 인메모리 쿼리할 수 있습니다. [S3 import 문서](https://duckdb.org/docs/guides/network_cloud_storage/s3_import.html)를 참고하세요.
+
+## 오류 처리
+
+### 목적지 오류 디버깅
+
+목적지 API 엔드포인트는 목적지와 자격 증명이 유효하며 버킷에 쓰기 권한이 있는지 검증합니다.
+
+오류가 발생하여 디버깅이 필요하다면, [AWS CLI](https://aws.amazon.com/cli/)를 사용하여 버킷 연결을 테스트할 수 있습니다. 위에서 목적지 API에 제공한 동일한 데이터로 CLI에서 파일을 쓸 수 있어야 합니다.
+
+**AWS S3:**
+
+```bash
+aws configure
+
+# set the same access key credentials and region as you used for the destination
+> AWS Access Key ID: <access_key_id>
+> AWS Secret Access Key: <secret_access_key>
+> Default region name [us-east-1]: <region>
+
+# List buckets
+aws s3 ls /
+
+# test write permissions
+touch ./test.txt
+aws s3 cp ./test.txt s3://<bucket-name>/tmp/test.txt
+```
+// AWS CLI로 S3 연결 테스트 예시
+
+**GCS 호환 버킷:**
+
+`--endpoint-url` 옵션으로 endpoint_url을 제공해야 합니다.
+GCS의 경우 endpoint_url은 일반적으로 `https://storage.googleapis.com`입니다:
+
+```bash
+aws configure
+
+# set the same access key credentials and region as you used for the destination
+> AWS Access Key ID: <access_key_id>
+> AWS Secret Access Key: <secret_access_key>
+> Default region name [us-east-1]: <region>
+
+# List buckets
+aws s3 --endpoint-url=<endpoint_url> ls /
+
+# test write permissions
+touch ./test.txt
+aws s3 --endpoint-url=<endpoint_url> cp ./test.txt s3://<bucket-name>/tmp/test.txt
+```
+// GCS endpoint_url 연결 테스트 예시
+
+### Run 모니터링
+
+[Run 목록 API](#list-runs-for-an-export)를 사용하여 run을 모니터링할 수 있습니다. 알려진 오류가 있는 경우 run의 `errors` 필드에 추가됩니다.
+
+### 일반적인 오류
+
+다음은 자주 발생하는 오류입니다:
+
+| 오류                                 | 설명                                                                                                                                                                                                                                                                                            |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Access denied                        | blob store 자격 증명 또는 버킷이 유효하지 않습니다. 제공된 access key와 secret key 조합이 지정된 버킷에 접근하거나 필요한 작업을 수행할 권한이 없을 때 발생합니다.                                                                                                                                |
+| Bucket is not valid                  | 지정된 blob store 버킷이 유효하지 않습니다. 버킷이 존재하지 않거나 버킷에 쓰기 작업을 수행할 충분한 권한이 없을 때 발생합니다.                                                                                                                            |
+| Key ID you provided does not exist   | 제공된 blob store 자격 증명이 유효하지 않습니다. 인증에 사용된 access key ID가 올바른 키가 아닐 때 발생합니다.                                                                                                                                              |
+| Invalid endpoint                     | 제공된 endpoint_url이 유효하지 않습니다. 지정된 endpoint가 잘못된 경우 발생합니다. S3 호환 endpoint만 지원하며, 예를 들어 GCS의 경우 `https://storage.googleapis.com`, minio의 경우 `https://play.min.io` 등이 있습니다. AWS를 사용하는 경우 endpoint_url을 생략해야 합니다. |
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/data-export.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

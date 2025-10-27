@@ -1,0 +1,159 @@
+---
+title: MariaDB
+---
+
+LangChain의 MariaDB 통합(langchain-mariadb)은 MIT 라이선스로 배포되며, MariaDB 11.7.1 이상에서 작동하는 벡터 기능을 제공합니다. 제공된 구현을 그대로 사용할 수도 있고, 필요에 맞게 커스터마이즈할 수도 있습니다.
+ 주요 기능은 다음과 같습니다:
+
+* 내장된 벡터 유사도 검색
+* cosine 및 euclidean 거리 메트릭 지원
+* 강력한 메타데이터 필터링 옵션
+* connection pooling을 통한 성능 최적화
+* 테이블 및 컬럼 설정 구성 가능
+
+## 설정
+
+다음으로 MariaDB Docker 컨테이너를 실행하세요:
+
+```python
+!docker run --name mariadb-container -e MARIADB_ROOT_PASSWORD=langchain -e MARIADB_DATABASE=langchain -p 3306:3306 -d mariadb:11.7
+```
+
+### 패키지 설치
+
+이 패키지는 SQLAlchemy를 사용하지만, C/C++ 구성 요소가 필요한 MariaDB connector와 함께 사용할 때 가장 잘 작동합니다:
+
+```python
+# Debian, Ubuntu
+!sudo apt install libmariadb3 libmariadb-dev
+
+# CentOS, RHEL, Rocky Linux
+!sudo yum install MariaDB-shared MariaDB-devel
+
+# Install Python connector
+!pip install -U mariadb
+```
+
+그런 다음 `langchain-mariadb` 패키지를 설치하세요
+
+```python
+pip install -U langchain-mariadb
+
+```
+
+VectorStore는 LLM 모델과 함께 동작하며, 여기서는 예제로 `langchain-openai`를 사용합니다.
+
+```python
+pip install langchain-openai
+export OPENAI_API_KEY=...
+
+```
+
+## 초기화
+
+```python
+from langchain_core.documents import Document
+from langchain_mariadb import MariaDBStore
+from langchain_openai import OpenAIEmbeddings
+
+# connection string
+url = f"mariadb+mariadbconnector://myuser:mypassword@localhost/langchain"
+
+# Initialize vector store
+vectorstore = MariaDBStore(
+    embeddings=OpenAIEmbeddings(),
+    embedding_length=1536,
+    datasource=url,
+    collection_name="my_docs",
+)
+```
+
+## 벡터 스토어 관리
+
+### 데이터 추가
+
+메타데이터가 포함된 document 형태로 데이터를 추가할 수 있습니다:
+
+```python
+docs = [
+    Document(
+        page_content="there are cats in the pond",
+        metadata={"id": 1, "location": "pond", "topic": "animals"},
+    ),
+    Document(
+        page_content="ducks are also found in the pond",
+        metadata={"id": 2, "location": "pond", "topic": "animals"},
+    ),
+    # More documents...
+]
+vectorstore.add_documents(docs)
+```
+
+또는 선택적 메타데이터와 함께 일반 텍스트로 추가할 수 있습니다:
+
+```python
+texts = [
+    "a sculpture exhibit is also at the museum",
+    "a new coffee shop opened on Main Street",
+]
+metadatas = [
+    {"id": 6, "location": "museum", "topic": "art"},
+    {"id": 7, "location": "Main Street", "topic": "food"},
+]
+
+vectorstore.add_texts(texts=texts, metadatas=metadatas)
+```
+
+## 벡터 스토어 쿼리
+
+```python
+# Basic similarity search
+results = vectorstore.similarity_search("Hello", k=2)
+
+# Search with metadata filtering
+results = vectorstore.similarity_search("Hello", filter={"category": "greeting"})
+```
+
+### 필터 옵션
+
+시스템은 메타데이터에 대한 다양한 필터링 연산을 지원합니다:
+
+* 동등 비교: $eq
+* 비동등 비교: $ne
+* 비교: $lt, $lte, $gt, $gte
+* 리스트 연산: $in, $nin
+* 텍스트 매칭: $like, $nlike
+* 논리 연산: $and, $or, $not
+
+예시:
+
+```python
+# Search with simple filter
+results = vectorstore.similarity_search(
+    "kitty", k=10, filter={"id": {"$in": [1, 5, 2, 9]}}
+)
+
+# Search with multiple conditions (AND)
+results = vectorstore.similarity_search(
+    "ducks",
+    k=10,
+    filter={"id": {"$in": [1, 5, 2, 9]}, "location": {"$in": ["pond", "market"]}},
+)
+```
+
+## retrieval-augmented generation(RAG)용 사용법
+
+TODO: 예제 문서화
+
+## API 레퍼런스
+
+자세한 내용은 [여기](https://github.com/mariadb-corporation/langchain-mariadb)에서 저장소를 확인하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/vectorstores/mariadb.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

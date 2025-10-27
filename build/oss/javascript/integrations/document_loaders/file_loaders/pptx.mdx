@@ -1,0 +1,29 @@
+---
+title: PPTX 파일
+---
+
+이 예제는 PPTX 파일에서 데이터를 로드하는 방법을 다룹니다. 기본적으로 PPTX 파일의 모든 페이지에 대해 하나의 document가 생성됩니다.
+
+## Setup
+
+```bash npm
+npm install officeparser
+```
+## Usage, 페이지당 하나의 document
+
+```typescript
+import { PPTXLoader } from "@langchain/community/document_loaders/fs/pptx";
+
+const loader = new PPTXLoader("src/document_loaders/example_data/example.pptx");
+
+const docs = await loader.load();
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/file_loaders/pptx.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,55 @@
+---
+title: 여러 개별 파일
+---
+
+이 예제는 여러 파일 경로에서 데이터를 로드하는 방법을 다룹니다. 두 번째 인자는 파일 확장자와 loader factory의 매핑입니다. 각 파일은 일치하는 loader에 전달되며, 결과 document들은 함께 연결됩니다.
+
+예제 파일:
+
+```text
+src/document_loaders/example_data/example/
+├── example.txt
+└── example.csv
+
+src/document_loaders/example_data/example2/
+├── example.json
+└── example.jsonl
+```
+
+예제 코드:
+
+```typescript
+import { MultiFileLoader } from "@langchain/classic/document_loaders/fs/multi_file";
+import {
+  JSONLoader,
+  JSONLinesLoader,
+} from "@langchain/classic/document_loaders/fs/json";
+import { TextLoader } from "@langchain/classic/document_loaders/fs/text";
+import { CSVLoader } from "@langchain/classic/document_loaders/fs/csv";
+
+const loader = new MultiFileLoader(
+  [
+    "src/document_loaders/example_data/example/example.txt",
+    "src/document_loaders/example_data/example/example.csv",
+    "src/document_loaders/example_data/example2/example.json",
+    "src/document_loaders/example_data/example2/example.jsonl",
+  ],
+  {
+    ".json": (path) => new JSONLoader(path, "/texts"),
+    ".jsonl": (path) => new JSONLinesLoader(path, "/html"),
+    ".txt": (path) => new TextLoader(path),
+    ".csv": (path) => new CSVLoader(path, "text"),
+  }
+);
+const docs = await loader.load();
+console.log({ docs });
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/file_loaders/multi_file.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

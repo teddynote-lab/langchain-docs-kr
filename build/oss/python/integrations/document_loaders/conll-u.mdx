@@ -1,0 +1,42 @@
+```markdown
+---
+title: CoNLL-U
+---
+
+>[CoNLL-U](https://universaldependencies.org/format.html)는 CoNLL-X 형식의 개정 버전입니다. 주석은 일반 텍스트 파일(UTF-8, NFC로 정규화, 줄 바꿈 문자로 LF만 사용, 파일 끝에 LF 문자 포함)에 세 가지 유형의 줄로 인코딩됩니다:
+>
+>- 단일 탭 문자로 구분된 10개 필드에 단어/토큰의 주석을 포함하는 단어 줄; 아래 참조.
+>- 문장 경계를 표시하는 빈 줄.
+>- 해시(#)로 시작하는 주석 줄.
+
+이것은 [CoNLL-U](https://universaldependencies.org/format.html) 형식의 파일을 로드하는 방법의 예시입니다. 전체 파일은 하나의 문서로 처리됩니다. 예제 데이터(`conllu.conllu`)는 표준 UD/CoNLL-U 예제 중 하나를 기반으로 합니다.
+
+```python
+from langchain_community.document_loaders import CoNLLULoader
+```
+
+```python
+loader = CoNLLULoader("example_data/conllu.conllu")
+```
+
+```python
+document = loader.load()
+```
+
+```python
+document
+```
+
+```output
+[Document(page_content='They buy and sell books.', metadata={'source': 'example_data/conllu.conllu'})]
+```
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/document_loaders/conll-u.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

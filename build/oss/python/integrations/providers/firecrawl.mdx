@@ -1,0 +1,39 @@
+---
+title: FireCrawl
+---
+
+>[FireCrawl](https://firecrawl.dev/?ref=langchain)은 모든 웹사이트를 크롤링하여 LLM에 바로 사용할 수 있는 데이터로 변환합니다.
+> 접근 가능한 모든 하위 페이지를 크롤링하고 각 페이지에 대한 깔끔한 markdown과
+> metadata를 제공합니다. sitemap이 필요하지 않습니다.
+
+
+## Installation and Setup
+
+python SDK를 설치합니다:
+
+<CodeGroup>
+```bash pip
+pip install firecrawl-py==0.0.20
+```
+
+```bash uv
+uv add "firecrawl-py==0.0.20"
+```
+</CodeGroup>
+
+## Document loader
+
+[사용 예제](/oss/python/integrations/document_loaders/firecrawl)를 참조하세요.
+
+```python
+from langchain_community.document_loaders import FireCrawlLoader
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/firecrawl.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

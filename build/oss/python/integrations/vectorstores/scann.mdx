@@ -1,0 +1,96 @@
+```markdown
+---
+title: ScaNN
+---
+
+ScaNN (Scalable Nearest Neighbors)은 대규모 벡터 유사도 검색을 효율적으로 수행하는 방법입니다.
+
+ScaNN은 Maximum Inner Product Search를 위한 검색 공간 가지치기(pruning)와 양자화(quantization)를 포함하며, Euclidean distance와 같은 다른 거리 함수도 지원합니다. 구현은 AVX2를 지원하는 x86 프로세서에 최적화되어 있습니다. 자세한 내용은 [Google Research github](https://github.com/google-research/google-research/tree/master/scann)를 참조하세요.
+
+이 integration을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다.
+
+## Installation
+
+pip를 통해 ScaNN을 설치합니다. 또는 [ScaNN Website](https://github.com/google-research/google-research/tree/master/scann#building-from-source)의 지침에 따라 소스에서 설치할 수 있습니다.
+
+```python
+pip install -qU  scann
+```
+
+## Retrieval Demo
+
+아래에서는 Huggingface Embeddings와 함께 ScaNN을 사용하는 방법을 보여줍니다.
+
+```python
+from langchain_community.document_loaders import TextLoader
+from langchain_community.vectorstores import ScaNN
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_text_splitters import CharacterTextSplitter
+
+loader = TextLoader("state_of_the_union.txt")
+documents = loader.load()
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+docs = text_splitter.split_documents(documents)
+
+
+model_name = "sentence-transformers/all-mpnet-base-v2"
+embeddings = HuggingFaceEmbeddings(model_name=model_name)
+
+db = ScaNN.from_documents(docs, embeddings)
+query = "What did the president say about Ketanji Brown Jackson"
+docs = db.similarity_search(query)
+
+docs[0]
+```
+
+## RetrievalQA Demo
+
+다음으로, Google PaLM API와 함께 ScaNN을 사용하는 방법을 시연합니다.
+
+API key는 [developers.generativeai.google/tutorials/setup](https://developers.generativeai.google/tutorials/setup)에서 얻을 수 있습니다.
+
+```python
+from langchain.chains import RetrievalQA
+from langchain_community.chat_models.google_palm import ChatGooglePalm
+
+palm_client = ChatGooglePalm(google_api_key="YOUR_GOOGLE_PALM_API_KEY")
+
+qa = RetrievalQA.from_chain_type(
+    llm=palm_client,
+    chain_type="stuff",
+    retriever=db.as_retriever(search_kwargs={"k": 10}),
+)
+```
+
+```python
+print(qa.run("What did the president say about Ketanji Brown Jackson?"))
+```
+
+```output
+The president said that Ketanji Brown Jackson is one of our nation's top legal minds, who will continue Justice Breyer's legacy of excellence.
+```
+
+```python
+print(qa.run("What did the president say about Michael Phelps?"))
+```
+
+```output
+The president did not mention Michael Phelps in his speech.
+```
+
+## 로컬 retrieval index 저장 및 로드
+
+```python
+db.save_local("/tmp/db", "state_of_union")
+restored_db = ScaNN.load_local("/tmp/db", embeddings, index_name="state_of_union")
+```
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/vectorstores/scann.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,56 @@
+---
+title: Wolfram Alpha
+---
+
+>[WolframAlpha](https://en.wikipedia.org/wiki/WolframAlpha)는 `Wolfram Research`에서 개발한 답변 엔진입니다.
+> 외부 소스 데이터로부터 답변을 계산하여 사실적 질문에 답변합니다.
+
+이 페이지에서는 LangChain 내에서 `Wolfram Alpha API`를 사용하는 방법을 다룹니다.
+
+## Installation and Setup
+- 다음 명령어로 필요한 패키지를 설치합니다
+<CodeGroup>
+```bash pip
+pip install wolframalpha
+```
+
+```bash uv
+uv add wolframalpha
+```
+</CodeGroup>
+- wolfram alpha로 이동하여 [여기](https://developer.wolframalpha.com/)에서 개발자 계정에 가입합니다
+- 앱을 생성하고 `APP ID`를 받습니다
+- APP ID를 환경 변수 `WOLFRAM_ALPHA_APPID`로 설정합니다
+
+
+## Wrappers
+
+### Utility
+
+이 API를 래핑하는 WolframAlphaAPIWrapper utility가 존재합니다. 이 utility를 import하려면:
+
+```python
+from langchain_community.utilities.wolfram_alpha import WolframAlphaAPIWrapper
+```
+
+이 wrapper에 대한 자세한 안내는 [이 노트북](/oss/python/integrations/tools/wolfram_alpha)을 참조하세요.
+
+### Tool
+
+이 wrapper를 Tool로 쉽게 로드할 수도 있습니다 (Agent와 함께 사용).
+다음과 같이 할 수 있습니다:
+```python
+from langchain_community.agent_toolkits.load_tools import load_tools
+tools = load_tools(["wolfram-alpha"])
+```
+
+tool에 대한 자세한 정보는 [이 페이지](/oss/python/integrations/tools)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/wolfram_alpha.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

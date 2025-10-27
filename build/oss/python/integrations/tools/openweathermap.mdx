@@ -1,0 +1,125 @@
+---
+title: OpenWeatherMap
+---
+
+이 노트북은 날씨 정보를 가져오기 위해 `OpenWeatherMap` component를 사용하는 방법을 다룹니다.
+
+먼저, `OpenWeatherMap API` key에 가입해야 합니다:
+
+1. OpenWeatherMap으로 이동하여 [여기](https://openweathermap.org/api/)에서 API key에 가입하세요
+2. pip install pyowm
+
+그런 다음 몇 가지 environment variable을 설정해야 합니다:
+
+1. API KEY를 OPENWEATHERMAP_API_KEY env variable에 저장하세요
+
+## wrapper 사용하기
+
+```python
+pip install -qU pyowm
+```
+
+```output
+Note: you may need to restart the kernel to use updated packages.
+```
+
+```python
+import os
+
+from langchain_community.utilities import OpenWeatherMapAPIWrapper
+
+os.environ["OPENWEATHERMAP_API_KEY"] = ""
+
+weather = OpenWeatherMapAPIWrapper()
+```
+
+```python
+weather_data = weather.run("London,GB")
+print(weather_data)
+```
+
+```output
+In London,GB, the current weather is as follows:
+Detailed status: overcast clouds
+Wind speed: 4.12 m/s, direction: 10°
+Humidity: 51%
+Temperature:
+  - Current: 12.82°C
+  - High: 13.98°C
+  - Low: 12.01°C
+  - Feels like: 11.49°C
+Rain: {}
+Heat index: None
+Cloud cover: 100%
+```
+
+## tool 사용하기
+
+```python
+import os
+
+from langchain.agents import create_agent
+
+
+os.environ["OPENAI_API_KEY"] = ""
+os.environ["OPENWEATHERMAP_API_KEY"] = ""
+
+tools = [weather.run]
+agent = create_agent("openai:gpt-4.1-mini", tools)
+```
+
+```python
+input_message = {
+    "role": "user",
+    "content": "What's the weather like in London?",
+}
+
+for step in agent.stream(
+    {"messages": [input_message]},
+    stream_mode="values",
+):
+    step["messages"][-1].pretty_print()
+```
+
+```output
+================================ Human Message =================================
+
+What's the weather like in London?
+================================== Ai Message ==================================
+Tool Calls:
+  run (call_6vPq9neyy7oOnht29ExidE2g)
+ Call ID: call_6vPq9neyy7oOnht29ExidE2g
+  Args:
+    location: London
+================================= Tool Message =================================
+Name: run
+
+In London, the current weather is as follows:
+Detailed status: overcast clouds
+Wind speed: 4.12 m/s, direction: 10°
+Humidity: 51%
+Temperature:
+  - Current: 12.82°C
+  - High: 13.98°C
+  - Low: 12.01°C
+  - Feels like: 11.49°C
+Rain: {}
+Heat index: None
+Cloud cover: 100%
+================================== Ai Message ==================================
+
+The weather in London is currently overcast with 100% cloud cover. The temperature is around 12.82°C, feeling like 11.49°C. The wind is blowing at 4.12 m/s from the direction of 10°. Humidity is at 51%. The high for the day is 13.98°C, and the low is 12.01°C.
+```
+
+```python
+
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/tools/openweathermap.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

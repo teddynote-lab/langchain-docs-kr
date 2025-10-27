@@ -1,0 +1,55 @@
+---
+title: OpenAI 호환 모델 제공자/프록시에 연결하기
+sidebarTitle: OpenAI 호환 모델 제공자/프록시
+---
+
+LangSmith playground를 사용하면 OpenAI API와 호환되는 모든 모델을 사용할 수 있습니다. playground에서 Proxy Provider를 설정하여 모델을 활용할 수 있습니다.
+
+## OpenAI 호환 모델 배포하기
+
+많은 제공자들이 OpenAI 호환 모델 또는 프록시 서비스를 제공합니다. 다음은 몇 가지 예시입니다:
+
+* [LiteLLM Proxy](https://github.com/BerriAI/litellm?tab=readme-ov-file#quick-start-proxy---cli)
+* [Ollama](https://ollama.com/)
+
+이러한 제공자를 사용하여 모델을 배포하고 OpenAI API와 호환되는 API endpoint를 얻을 수 있습니다.
+
+자세한 내용은 전체 [specification](https://platform.openai.com/docs/api-reference/chat)을 참조하세요.
+
+## LangSmith Playground에서 모델 사용하기
+
+모델 서버를 배포한 후에는 LangSmith [Playground](/langsmith/prompt-engineering-concepts#prompt-playground)에서 사용할 수 있습니다.
+
+**Prompt Settings** 메뉴에 접근하려면:
+
+1. **Prompts** 제목 아래에서 모델 이름 옆의 톱니바퀴 <Icon icon="gear" iconType="solid" /> 아이콘을 선택합니다.
+1. **Model Configuration** 탭에서 드롭다운에서 편집할 모델을 선택합니다.
+1. **Provider** 드롭다운에서 **OpenAI Compatible Endpoint**를 선택합니다.
+1. **Base URL** 입력란에 OpenAI Compatible Endpoint를 추가합니다.
+
+    <div style={{ textAlign: 'center' }}>
+    <img
+        className="block dark:hidden"
+        src="/langsmith/images/openai-compatible-endpoint.png"
+        alt="모델이 선택되고 Provider 드롭다운에서 OpenAI Compatible Endpoint가 선택된 LangSmith UI의 Model Configuration 창."
+    />
+
+    <img
+        className="hidden dark:block"
+        src="/langsmith/images/openai-compatible-endpoint-dark.png"
+        alt="모델이 선택되고 Provider 드롭다운에서 OpenAI Compatible Endpoint가 선택된 LangSmith UI의 Model Configuration 창."
+    />
+    </div>
+
+모든 것이 올바르게 설정되었다면 playground에서 모델의 응답을 볼 수 있습니다. 이 기능을 사용하여 downstream pipeline을 호출할 수도 있습니다.
+
+모델 configuration을 저장하는 방법에 대한 정보는 [Configure prompt settings](/langsmith/managing-model-configurations)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/custom-openai-compliant-model.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

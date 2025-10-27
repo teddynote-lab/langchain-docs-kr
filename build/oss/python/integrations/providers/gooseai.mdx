@@ -1,0 +1,37 @@
+---
+title: GooseAI
+---
+
+>[GooseAI](https://goose.ai)는 NLP 서비스 배포를 더 쉽고 접근 가능하게 만듭니다.
+> `GooseAI`는 API를 통해 제공되는 완전 관리형 추론 서비스입니다.
+> 다른 잘 알려진 API들과 동등한 기능을 제공하는 `GooseAI`는 코드에서 단 2줄만 변경하여
+> 업계 최고의 경제성으로 오픈 소스 언어 모델을 제공하는 플러그 앤 플레이 솔루션을 제공합니다.
+
+## Installation and Setup
+
+- `pip install openai`로 Python SDK를 설치합니다
+- [여기](https://goose.ai/)에서 GooseAI API key를 받으세요.
+- 환경 변수(`GOOSEAI_API_KEY`)를 설정합니다.
+
+```python
+import os
+os.environ["GOOSEAI_API_KEY"] = "YOUR_API_KEY"
+```
+
+
+## LLMs
+
+[사용 예제](/oss/python/integrations/llms/gooseai)를 참조하세요.
+
+```python
+from langchain_community.llms import GooseAI
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/gooseai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

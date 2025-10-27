@@ -1,0 +1,116 @@
+---
+title: DirectoryLoader
+---
+
+
+<Tip>
+**호환성**: Node.js에서만 사용 가능합니다.
+</Tip>
+
+이 노트북은 `DirectoryLoader` [document loaders](/oss/javascript/integrations/document_loaders) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `DirectoryLoader` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain.document_loaders_fs_directory.DirectoryLoader.html)를 참조하세요.
+
+이 예제는 여러 파일이 있는 폴더에서 데이터를 로드하는 방법을 다룹니다. 두 번째 인수는 파일 확장자와 loader factory의 매핑입니다. 각 파일은 일치하는 loader로 전달되며, 결과 document들은 함께 연결됩니다.
+
+예제 폴더:
+
+```text
+src/document_loaders/example_data/example/
+├── example.json
+├── example.jsonl
+├── example.txt
+└── example.csv
+```
+
+## Overview
+
+### Integration details
+
+| Class | Package | Compatibility | Local | PY support |
+| :--- | :--- | :---: | :---: |  :---: |
+| [DirectoryLoader](https://api.js.langchain.com/classes/langchain.document_loaders_fs_directory.DirectoryLoader.html) | [langchain](https://api.js.langchain.com/modules/langchain.document_loaders_fs_directory.html) | Node-only | ✅ | ✅ |
+
+## Setup
+
+`DirectoryLoader` document loader에 액세스하려면 `langchain` 패키지를 설치해야 합니다.
+
+### Installation
+
+LangChain DirectoryLoader integration은 `langchain` 패키지에 포함되어 있습니다:
+
+<CodeGroup>
+```bash npm
+npm install langchain @langchain/core
+```
+```bash yarn
+yarn add langchain @langchain/core
+```
+```bash pnpm
+pnpm add langchain @langchain/core
+```
+</CodeGroup>
+
+## Instantiation
+
+이제 model 객체를 인스턴스화하고 document를 로드할 수 있습니다:
+
+```typescript
+import { DirectoryLoader } from "@langchain/classic/document_loaders/fs/directory";
+import {
+  JSONLoader,
+  JSONLinesLoader,
+} from "@langchain/classic/document_loaders/fs/json";
+import { TextLoader } from "@langchain/classic/document_loaders/fs/text";
+import { CSVLoader } from "@langchain/community/document_loaders/fs/csv";
+
+const loader = new DirectoryLoader(
+  "../../../../../../examples/src/document_loaders/example_data",
+  {
+    ".json": (path) => new JSONLoader(path, "/texts"),
+    ".jsonl": (path) => new JSONLinesLoader(path, "/html"),
+    ".txt": (path) => new TextLoader(path),
+    ".csv": (path) => new CSVLoader(path, "text"),
+  }
+);
+```
+
+## Load
+
+```typescript
+const docs = await loader.load()
+// disable console.warn calls
+console.warn = () => {}
+docs[0]
+```
+
+```output
+Document {
+  pageContent: 'Foo\nBar\nBaz\n\n',
+  metadata: {
+    source: '/Users/bracesproul/code/lang-chain-ai/langchainjs/examples/src/document_loaders/example_data/example.txt'
+  },
+  id: undefined
+}
+```
+
+```typescript
+console.log(docs[0].metadata)
+```
+
+```output
+{
+  source: '/Users/bracesproul/code/lang-chain-ai/langchainjs/examples/src/document_loaders/example_data/example.txt'
+}
+```
+
+## API reference
+
+모든 DirectoryLoader 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain.document_loaders_fs_directory.DirectoryLoader.html)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/file_loaders/directory.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

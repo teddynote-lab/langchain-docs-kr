@@ -1,0 +1,41 @@
+---
+title: NIBittensor
+---
+
+<Warning>
+이 모듈은 더 이상 사용되지 않으며 지원이 중단되었습니다. 아래 문서는 버전 0.2.0 이상에서 작동하지 않습니다.
+</Warning>
+
+LangChain.js는 Neural Internet의 Bittensor LLM 모델에 대한 실험적 지원을 제공합니다.
+
+다음은 예제입니다:
+
+```typescript
+import { NIBittensorLLM } from "@langchain/classic/experimental/llms/bittensor";
+
+const model = new NIBittensorLLM();
+
+const res = await model.invoke(`What is Bittensor?`);
+
+console.log({ res });
+
+/*
+  {
+    res: "\nBittensor is opensource protocol..."
+  }
+ */
+```
+
+## Related
+
+
+- [Models 가이드](/oss/javascript/langchain/models)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/llms/ni_bittensor.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

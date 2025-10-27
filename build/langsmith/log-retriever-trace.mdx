@@ -1,0 +1,91 @@
+---
+title: Retriever trace 로깅하기
+sidebarTitle: Retriever trace 로깅하기
+---
+
+<Note>
+올바른 형식으로 retriever trace를 로깅하지 않아도 문제가 발생하지 않으며 데이터는 여전히 로깅됩니다. 그러나 데이터가 retriever 단계에 특화된 방식으로 렌더링되지 않습니다.
+</Note>
+
+많은 LLM 애플리케이션은 vector database, knowledge graph 또는 다른 유형의 index에서 문서를 조회해야 합니다. Retriever trace는 retriever가 검색한 문서를 로깅하는 방법입니다. LangSmith는 trace에서 retrieval 단계에 대한 특별한 렌더링을 제공하여 retrieval 문제를 더 쉽게 이해하고 진단할 수 있도록 합니다. Retrieval 단계가 올바르게 렌더링되려면 몇 가지 작은 단계를 수행해야 합니다.
+
+1. Retriever 단계에 `run_type="retriever"`로 주석을 추가합니다.
+
+2. Retriever 단계에서 Python dictionary 또는 TypeScript object의 list를 반환합니다. 각 dictionary는 다음 key를 포함해야 합니다:
+
+   * `page_content`: 문서의 텍스트입니다.
+   * `type`: 항상 "Document"이어야 합니다.
+   * `metadata`: 문서에 대한 메타데이터를 포함하는 Python dictionary 또는 TypeScript object입니다. 이 메타데이터는 trace에 표시됩니다.
+
+다음 코드 스니펫은 Python과 TypeScript에서 retrieval 단계를 로깅하는 방법을 보여줍니다.
+
+<CodeGroup>
+
+```python Python
+from langsmith import traceable
+
+def _convert_docs(results):
+    return [
+        {
+            "page_content": r,
+            "type": "Document",
+            "metadata": {"foo": "bar"}
+        }
+        for r in results
+    ]
+
+@traceable(run_type="retriever")
+def retrieve_docs(query):
+    # Foo retriever returning hardcoded dummy documents.
+    # In production, this could be a real vector datatabase or other document index.
+    contents = ["Document contents 1", "Document contents 2", "Document contents 3"]
+    return _convert_docs(contents)
+
+retrieve_docs("User query")
+```
+
+```typescript TypeScript
+import { traceable } from "langsmith/traceable";
+
+interface Document {
+    page_content: string;
+    type: string;
+    metadata: { foo: string };
+}
+
+function convertDocs(results: string[]): Document[] {
+    return results.map((r) => ({
+        page_content: r,
+        type: "Document",
+        metadata: { foo: "bar" }
+    }));
+}
+
+const retrieveDocs = traceable((query: string): Document[] => {
+    // Foo retriever returning hardcoded dummy documents.
+    // In production, this could be a real vector database or other document index.
+    const contents = ["Document contents 1", "Document contents 2", "Document contents 3"];
+    return convertDocs(contents);
+},{
+    name: "retrieveDocs",
+    run_type: "retriever"
+} // Configuration for traceable
+);
+
+await retrieveDocs("User query");
+```
+
+</CodeGroup>
+
+다음 이미지는 trace에서 retriever 단계가 렌더링되는 방식을 보여줍니다. 각 문서와 함께 메타데이터가 포함된 내용이 표시됩니다.
+
+![](/langsmith/images/retriever-trace.png)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/log-retriever-trace.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

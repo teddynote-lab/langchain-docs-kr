@@ -1,0 +1,222 @@
+---
+title: Studio에서의 관찰 가능성
+sidebarTitle: Trace, dataset, prompt
+---
+
+LangSmith [Studio](/langsmith/studio)는 실행을 넘어 앱을 검사하고, 디버그하고, 개선할 수 있는 도구를 제공합니다. trace, dataset, prompt를 활용하여 애플리케이션의 동작을 세부적으로 확인하고, 성능을 측정하며, 출력을 개선할 수 있습니다:
+
+- [Prompt 반복 작업](#iterate-on-prompts): Graph node 내부의 prompt를 직접 수정하거나 LangSmith playground를 사용하여 수정합니다.
+- [Dataset에 대한 실험 실행](#run-experiments-over-a-dataset): LangSmith dataset에 대해 assistant를 실행하여 결과를 점수화하고 비교합니다.
+- [LangSmith trace 디버그](#debug-langsmith-traces): 추적된 실행을 Studio로 가져오고 선택적으로 로컬 agent로 복제합니다.
+- [Dataset에 node 추가](#add-node-to-dataset): Thread 기록의 일부를 평가 또는 추가 분석을 위한 dataset 예제로 변환합니다.
+
+## Prompt 반복 작업
+
+Studio는 graph의 prompt를 수정하기 위한 다음 방법을 지원합니다:
+
+- [직접 node 편집](#direct-node-editing)
+- [Playground 인터페이스](#playground)
+
+### 직접 node 편집
+
+Studio를 사용하면 graph 인터페이스에서 직접 개별 node 내부에서 사용되는 prompt를 편집할 수 있습니다.
+
+#### Graph Configuration
+
+`langgraph_nodes` 및 `langgraph_type` 키를 사용하여 prompt 필드와 관련 node를 지정하도록 [configuration](/oss/python/langgraph/use-graph-api#add-runtime-configuration)을 정의합니다.
+
+##### `langgraph_nodes`
+
+- **설명**: Configuration 필드가 연결된 graph의 node를 지정합니다.
+- **값 타입**: 문자열 배열, 각 문자열은 graph의 node 이름입니다.
+- **사용 컨텍스트**: Pydantic model의 `json_schema_extra` 딕셔너리 또는 dataclass의 `metadata["json_schema_extra"]` 딕셔너리에 포함합니다.
+- **예제**:
+  ```python
+  system_prompt: str = Field(
+      default="You are a helpful AI assistant.",
+      json_schema_extra={"langgraph_nodes": ["call_model", "other_node"]},
+  )
+  ```
+
+##### `langgraph_type`
+
+- **설명**: Configuration 필드의 타입을 지정하며, UI에서 처리되는 방식을 결정합니다.
+- **값 타입**: 문자열
+- **지원되는 값**:
+  * `"prompt"`: 필드에 UI에서 특별히 처리되어야 하는 prompt 텍스트가 포함되어 있음을 나타냅니다.
+- **사용 컨텍스트**: Pydantic model의 `json_schema_extra` 딕셔너리 또는 dataclass의 `metadata["json_schema_extra"]` 딕셔너리에 포함합니다.
+- **예제**:
+  ```python
+  system_prompt: str = Field(
+      default="You are a helpful AI assistant.",
+      json_schema_extra={
+          "langgraph_nodes": ["call_model"],
+          "langgraph_type": "prompt",
+      },
+  )
+  ```
+
+<Accordion title="전체 예제 configuration">
+
+```python
+## Using Pydantic
+from pydantic import BaseModel, Field
+from typing import Annotated, Literal
+
+class Configuration(BaseModel):
+    """The configuration for the agent."""
+
+    system_prompt: str = Field(
+        default="You are a helpful AI assistant.",
+        description="The system prompt to use for the agent's interactions. "
+        "This prompt sets the context and behavior for the agent.",
+        json_schema_extra={
+            "langgraph_nodes": ["call_model"],
+            "langgraph_type": "prompt",
+        },
+    )
+
+    model: Annotated[
+        Literal[
+            "anthropic/claude-sonnet-4-5",
+            "anthropic/claude-3-5-haiku-latest",
+            "openai/o1",
+            "openai/gpt-4o-mini",
+            "openai/o1-mini",
+            "openai/o3-mini",
+        ],
+        {"__template_metadata__": {"kind": "llm"}},
+    ] = Field(
+        default="openai/gpt-4o-mini",
+        description="The name of the language model to use for the agent's main interactions. "
+        "Should be in the form: provider/model-name.",
+        json_schema_extra={"langgraph_nodes": ["call_model"]},
+    )
+
+## Using Dataclasses
+from dataclasses import dataclass, field
+
+@dataclass(kw_only=True)
+class Configuration:
+    """The configuration for the agent."""
+
+    system_prompt: str = field(
+        default="You are a helpful AI assistant.",
+        metadata={
+            "description": "The system prompt to use for the agent's interactions. "
+            "This prompt sets the context and behavior for the agent.",
+            "json_schema_extra": {"langgraph_nodes": ["call_model"]},
+        },
+    )
+
+    model: Annotated[str, {"__template_metadata__": {"kind": "llm"}}] = field(
+        default="anthropic/claude-3-5-sonnet-20240620",
+        metadata={
+            "description": "The name of the language model to use for the agent's main interactions. "
+            "Should be in the form: provider/model-name.",
+            "json_schema_extra": {"langgraph_nodes": ["call_model"]},
+        },
+    )
+
+```
+
+</Accordion>
+
+#### UI에서 prompt 편집
+
+1. 관련 configuration 필드가 있는 node에서 톱니바퀴 아이콘을 찾습니다.
+1. 클릭하여 configuration 모달을 엽니다.
+1. 값을 편집합니다.
+1. 저장하여 현재 assistant 버전을 업데이트하거나 새 버전을 생성합니다.
+
+### Playground
+
+[Playground](/langsmith/create-a-prompt) 인터페이스를 사용하면 전체 graph를 실행하지 않고 개별 LLM 호출을 테스트할 수 있습니다:
+
+1. Thread를 선택합니다.
+1. Node에서 **View LLM Runs**를 클릭합니다. 이렇게 하면 node 내부에서 수행된 모든 LLM 호출(있는 경우)이 나열됩니다.
+1. LLM 실행을 선택하여 playground에서 엽니다.
+1. Prompt를 수정하고 다양한 model 및 tool 설정을 테스트합니다.
+1. 업데이트된 prompt를 graph로 다시 복사합니다.
+
+## Dataset에 대한 실험 실행
+
+Studio를 사용하면 미리 정의된 LangSmith [dataset](/langsmith/evaluation-concepts#datasets)에 대해 assistant를 실행하여 [평가](/langsmith/evaluation-concepts)를 실행할 수 있습니다. 이를 통해 다양한 입력에 대한 성능을 테스트하고, 출력을 참조 답변과 비교하며, 구성된 [evaluator](/langsmith/evaluation-concepts#evaluators)로 결과를 점수화할 수 있습니다.
+
+이 가이드는 Studio에서 직접 전체 end-to-end 실험을 실행하는 방법을 보여줍니다.
+
+### 전제 조건
+
+실험을 실행하기 전에 다음 사항을 확인하세요:
+
+- **LangSmith dataset**: Dataset에는 테스트하려는 입력과 선택적으로 비교를 위한 참조 출력이 포함되어야 합니다. 입력의 schema는 assistant에 필요한 입력 schema와 일치해야 합니다. Schema에 대한 자세한 내용은 [여기](/oss/python/langgraph/use-graph-api#schema)를 참조하세요. Dataset 생성에 대한 자세한 내용은 [How to Manage Datasets](/langsmith/manage-datasets-in-application#set-up-your-dataset)를 참조하세요.
+- **(선택 사항) Evaluator**: LangSmith의 dataset에 evaluator(예: LLM-as-a-Judge, heuristic 또는 custom function)를 연결할 수 있습니다. 이들은 graph가 모든 입력을 처리한 후 자동으로 실행됩니다.
+- **실행 중인 애플리케이션**: 실험은 다음에 대해 실행할 수 있습니다:
+  - [LangSmith](/langsmith/deployments)에 배포된 애플리케이션.
+  - [langgraph-cli](/langsmith/local-server)를 통해 시작된 로컬에서 실행 중인 애플리케이션.
+
+### 실험 설정
+
+1. 실험을 시작합니다. Studio 페이지의 오른쪽 상단에 있는 **Run experiment** 버튼을 클릭합니다.
+1. Dataset을 선택합니다. 나타나는 모달에서 실험에 사용할 dataset(또는 특정 dataset split)을 선택하고 **Start**를 클릭합니다.
+1. 진행 상황을 모니터링합니다. Dataset의 모든 입력이 이제 활성 assistant에 대해 실행됩니다. 오른쪽 상단의 배지를 통해 실험 진행 상황을 모니터링합니다.
+1. 실험이 백그라운드에서 실행되는 동안 Studio에서 계속 작업할 수 있습니다. 언제든지 화살표 아이콘 버튼을 클릭하여 LangSmith로 이동하고 자세한 실험 결과를 확인할 수 있습니다.
+
+## LangSmith trace 디버그
+
+이 가이드는 대화형 조사 및 디버깅을 위해 Studio에서 LangSmith trace를 여는 방법을 설명합니다.
+
+### 배포된 thread 열기
+
+1. LangSmith trace를 열고 root run을 선택합니다.
+1. **Run in Studio**를 클릭합니다.
+
+이렇게 하면 trace의 parent thread가 선택된 상태로 관련 deployment에 연결된 Studio가 열립니다.
+
+### 원격 trace로 로컬 agent 테스트
+
+이 섹션에서는 LangSmith의 원격 trace에 대해 로컬 agent를 테스트하는 방법을 설명합니다. 이를 통해 프로덕션 trace를 로컬 테스트의 입력으로 사용할 수 있으며, 개발 환경에서 agent 수정 사항을 디버그하고 검증할 수 있습니다.
+
+#### 전제 조건
+
+- LangSmith로 추적된 thread
+- [로컬에서 실행 중인 agent](/langsmith/local-server#local-development-server).
+
+<Info>
+**로컬 agent 요구 사항**
+* langgraph>=0.3.18
+* langgraph-api>=0.0.32
+* 원격 trace에 있는 것과 동일한 node 세트 포함
+</Info>
+
+#### Thread 복제
+
+1. LangSmith trace를 열고 root run을 선택합니다.
+2. **Run in Studio** 옆의 드롭다운을 클릭합니다.
+3. 로컬 agent의 URL을 입력합니다.
+4. **Clone thread locally**를 선택합니다.
+5. 여러 graph가 있는 경우 대상 graph를 선택합니다.
+
+원격 thread에서 추론되고 복사된 thread 기록과 함께 로컬 agent에 새 thread가 생성되며, 로컬에서 실행 중인 애플리케이션의 Studio로 이동합니다.
+
+## Dataset에 node 추가
+
+Thread log의 node에서 [LangSmith dataset](/langsmith/manage-datasets)에 [예제](/langsmith/evaluation-concepts#examples)를 추가합니다. 이는 agent의 개별 단계를 평가하는 데 유용합니다.
+
+1. Thread를 선택합니다.
+1. **Add to Dataset**을 클릭합니다.
+1. Dataset에 추가하려는 입력/출력이 있는 node를 선택합니다.
+1. 선택한 각 node에 대해 예제를 생성할 대상 dataset을 선택합니다. 기본적으로 특정 assistant 및 node에 대한 dataset이 선택됩니다. 이 dataset이 아직 존재하지 않으면 생성됩니다.
+1. Dataset에 추가하기 전에 필요에 따라 예제의 입력/출력을 편집합니다.
+1. 페이지 하단의 **Add to dataset**을 선택하여 선택한 모든 node를 각각의 dataset에 추가합니다.
+
+자세한 내용은 [How to evaluate an application's intermediate steps](/langsmith/evaluate-on-intermediate-steps)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/observability-studio.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

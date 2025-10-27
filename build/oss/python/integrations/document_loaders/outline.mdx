@@ -1,0 +1,81 @@
+---
+title: Outline Document Loader
+---
+
+>[Outline](https://www.getoutline.com/)은 팀 정보 공유를 위해 설계된 오픈소스 협업 지식 베이스 플랫폼입니다.
+
+이 노트북은 Outline collection에서 langchain Document를 얻는 방법을 보여줍니다.
+
+## Overview
+
+[Outline Document Loader](https://github.com/10Pines/langchain-outline)는 Outline collection을 LangChain Document로 로드하여 Retrieval-Augmented Generation (RAG) 워크플로우에 통합하는 데 사용할 수 있습니다.
+
+이 예제는 다음을 보여줍니다:
+
+* Outline 인스턴스에서 모든 문서를 로드하기 위한 Document Loader 설정하기.
+
+### Setup
+
+시작하기 전에 다음 환경 변수가 설정되어 있는지 확인하세요:
+
+* OUTLINE_API_KEY: Outline 인스턴스 인증을 위한 API key ([www.getoutline.com/developers#section/Authentication](https://www.getoutline.com/developers#section/Authentication)).
+* OUTLINE_INSTANCE_URL: Outline 인스턴스의 URL (프로토콜 포함).
+
+```python
+import os
+
+os.environ["OUTLINE_API_KEY"] = "ol_api_xyz123"
+os.environ["OUTLINE_INSTANCE_URL"] = "https://app.getoutline.com"
+```
+
+## Initialization
+
+OutlineLoader를 초기화하려면 다음 매개변수가 필요합니다:
+
+* outline_base_url: outline 인스턴스의 URL (또는 환경 변수에서 가져옴).
+* outline_api_key: Outline 인스턴스 인증을 위한 API key (또는 환경 변수에서 가져옴).
+* outline_collection_id_list: 검색할 collection id 목록. None인 경우 모두 검색됩니다.
+* page_size: Outline API가 페이지네이션된 결과를 사용하므로 API 요청당 페이지당 검색할 결과(문서) 수를 구성할 수 있습니다. 지정하지 않으면 기본값이 사용됩니다.
+
+## Instantiation
+
+```python
+# Option 1: Using environment variables (ensure they are set)
+from langchain_outline.document_loaders.outline import OutlineLoader
+
+loader = OutlineLoader()
+
+# Option 2: Passing parameters directly
+loader = OutlineLoader(
+    outline_base_url="YOUR_OUTLINE_URL", outline_api_key="YOUR_API_KEY"
+)
+```
+
+## Load
+
+Outline 인스턴스에서 사용 가능한 모든 문서를 로드하고 반환하려면
+
+```python
+loader.load()
+```
+
+## Lazy Load
+
+lazy_load 메서드를 사용하면 Outline collection에서 문서를 반복적으로 로드하여 가져온 각 문서를 생성할 수 있습니다:
+
+```python
+loader.lazy_load()
+```
+
+## API reference
+
+모든 `Outline` 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [www.getoutline.com/developers](https://www.getoutline.com/developers)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/document_loaders/outline.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

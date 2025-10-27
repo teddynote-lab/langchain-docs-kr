@@ -1,0 +1,39 @@
+---
+title: PGVector
+---
+
+이 페이지는 LangChain 내에서 Postgres [PGVector](https://github.com/pgvector/pgvector) 생태계를 사용하는 방법을 다룹니다.
+설치 및 설정, 그리고 특정 PGVector wrapper에 대한 참조, 이렇게 두 부분으로 나뉩니다.
+
+## Installation
+- `pip install pgvector` 명령어로 Python 패키지를 설치합니다
+
+
+## Setup
+1. 첫 번째 단계는 `pgvector` extension이 설치된 데이터베이스를 생성하는 것입니다.
+
+    [PGVector Installation Steps](https://github.com/pgvector/pgvector#installation)의 단계를 따라 데이터베이스와 extension을 설치하세요. docker image가 시작하기에 가장 쉬운 방법입니다.
+
+## Wrappers
+
+### VectorStore
+
+Postgres vector 데이터베이스를 감싸는 wrapper가 존재하며, 이를 통해 semantic search나 example selection을 위한 vectorstore로 사용할 수 있습니다.
+
+이 vectorstore를 import하려면:
+```python
+from langchain_community.vectorstores.pgvector import PGVector
+```
+
+### Usage
+
+PGVector Wrapper에 대한 더 자세한 안내는 [이 notebook](/oss/python/integrations/vectorstores/pgvector)을 참조하세요
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/pgvector.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

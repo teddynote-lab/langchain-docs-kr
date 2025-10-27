@@ -1,0 +1,42 @@
+---
+title: Minimax
+---
+
+`MinimaxEmbeddings` class는 Minimax API를 사용하여 주어진 텍스트에 대한 embedding을 생성합니다.
+
+# Setup
+
+Minimax model을 사용하려면 Minimax 계정, API key, 그리고 Group ID가 필요합니다.
+
+# Usage
+
+```typescript
+import { MinimaxEmbeddings } from "@langchain/classic/embeddings/minimax";
+
+export const run = async () => {
+  /* Embed queries */
+  const embeddings = new MinimaxEmbeddings();
+  const res = await embeddings.embedQuery("Hello world");
+  console.log(res);
+  /* Embed documents */
+  const documentRes = await embeddings.embedDocuments([
+    "Hello world",
+    "Bye bye",
+  ]);
+  console.log({ documentRes });
+};
+```
+
+## Related
+
+- Embedding model [개념 가이드](/oss/javascript/integrations/text_embedding)
+- Embedding model [사용 방법 가이드](/oss/javascript/integrations/text_embedding)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/text_embedding/minimax.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

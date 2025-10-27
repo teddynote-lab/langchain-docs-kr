@@ -1,0 +1,154 @@
+---
+title: Zotero
+---
+
+이 문서는 Zotero [retriever](/oss/python/langchain/retrieval) 시작하기를 도와드립니다. 모든 ZoteroRetriever 기능과 설정에 대한 자세한 문서는 [Github 페이지](https://github.com/TimBMK/langchain-zotero-retriever)를 참조하세요.
+
+### Integration 세부 정보
+
+| Retriever | Source | Package |
+| :--- | :--- | :---: |
+[ZoteroRetriever](https://github.com/TimBMK/langchain-zotero-retriever) | [Zotero API](https://www.zotero.org/support/dev/web_api/v3/start) | langchain-community |
+
+## Setup
+
+개별 쿼리에서 자동화된 추적을 원하시면, 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수 있습니다:
+
+```python
+os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
+os.environ["LANGSMITH_TRACING"] = "true"
+```
+
+### Installation
+
+이 retriever는 `langchain-zotero-retriever` package에 있습니다. `pyzotero` 의존성도 필요합니다:
+
+```python
+pip install -qU langchain-zotero-retriever pyzotero
+```
+
+## Instantiation
+
+`ZoteroRetriever` parameter는 다음을 포함합니다:
+
+- `k`: 포함할 결과 수 (기본값: 50)
+- `type`: 수행할 검색 유형. "Top"은 최상위 레벨 Zotero library item을 검색하고, "items"는 모든 Zotero library item을 반환합니다. (기본값: top)
+- `get_fulltext`: library의 item에 첨부된 전체 텍스트를 검색합니다. False이거나 첨부된 텍스트가 없으면 page_content로 빈 문자열을 반환합니다. (기본값: True)
+- `library_id`: 검색할 Zotero library의 ID. library에 연결하는 데 필수입니다.
+- `library_type`: 검색할 library 유형. 개인 library는 "user", 공유 그룹 library는 "group". (기본값: user)
+- `api_key`: 환경 변수로 설정되지 않은 경우 Zotero API key. 선택 사항이며, 비공개 그룹 library 또는 개인 library에 액세스하는 데 필요합니다. ZOTERO_API_KEY 환경 변수로 제공되면 자동으로 가져옵니다.
+
+```python
+from langchain_zotero_retriever.retrievers import ZoteroRetriever
+
+retriever = ZoteroRetriever(
+    k=10,
+    library_id="2319375",  # a public group library that does not require an API key for access
+    library_type="group",  # set this to "user" if you are using a personal library. Personal libraries require an API key
+)
+```
+
+## Usage
+
+`query` 외에도 retriever는 다음과 같은 추가 검색 parameter를 제공합니다:
+
+- `itemType`: 검색할 item 유형 (예: "book" 또는 "journalArticle")
+- `tag`: library item에 첨부된 tag를 검색 (여러 tag를 결합하는 검색 구문은 문서 참조)
+- `qmode`: 사용할 검색 모드. query가 검색하는 대상을 변경합니다. "everything"은 전체 텍스트 내용을 포함합니다. "titleCreatorYear"는 제목, 저자 및 연도를 검색합니다.
+- `since`: 지정된 library 버전 이후에 수정된 객체만 반환합니다. 기본값은 모든 것을 반환합니다.
+
+검색 구문은 Zotero API 문서를 참조하세요: [www.zotero.org/support/dev/web_api/v3/basics#search_syntax](https://www.zotero.org/support/dev/web_api/v3/basics#search_syntax)
+
+전체 API schema (사용 가능한 itemType 포함)는 다음을 참조하세요: [github.com/zotero/zotero-schema](https://github.com/zotero/zotero-schema)
+
+```python
+query = "Zuboff"
+
+retriever.invoke(query)
+```
+
+```python
+tags = [
+    "Surveillance",
+    "Digital Capitalism",
+]  # note that providing tags as a list will result in a logical AND operation
+
+retriever.invoke("", tag=tags)
+```
+
+## chain 내에서 사용
+
+Zotero API 검색이 작동하는 방식으로 인해, 사용자 질문을 ZoteroRetriever에 직접 전달하면 만족스러운 결과를 반환하지 못하는 경우가 많습니다. chain이나 agentic framework에서 사용하려면 ZoteroRetriever를 [tool](/oss/python/langchain/tools)로 변환하는 것이 좋습니다. 이렇게 하면 LLM이 사용자 쿼리를 API에 대한 더 간결한 검색 쿼리로 변환할 수 있습니다. 또한 LLM이 tag나 item type과 같은 추가 검색 parameter를 채울 수 있습니다.
+
+```python
+from typing import List, Optional, Union
+
+from langchain_core.output_parsers import PydanticToolsParser
+from langchain.tools import StructuredTool, tool
+from langchain_openai import ChatOpenAI
+
+
+def retrieve(
+    query: str,
+    itemType: Optional[str],
+    tag: Optional[Union[str, List[str]]],
+    qmode: str = "everything",
+    since: Optional[int] = None,
+):
+    retrieved_docs = retriever.invoke(
+        query, itemType=itemType, tag=tag, qmode=qmode, since=since
+    )
+    serialized_docs = "\n\n".join(
+        (
+            f"Metadata: { {key: doc.metadata[key] for key in doc.metadata if key != 'abstractNote'} }\n"
+            f"Abstract: {doc.metadata['abstractNote']}\n"
+        )
+        for doc in retrieved_docs
+    )
+
+    return serialized_docs, retrieved_docs
+
+
+description = """Search and return relevant documents from a Zotero library. The following search parameters can be used:
+
+    Args:
+        query: str: The search query to be used. Try to keep this specific and short, e.g. a specific topic or author name
+        itemType: Optional. Type of item to search for (e.g. "book" or "journalArticle"). Multiple types can be passed as a string separated by "||", e.g. "book || journalArticle". Defaults to all types.
+        tag: Optional. For searching over tags attached to library items. If documents tagged with multiple tags are to be retrieved, pass them as a list. If documents with any of the tags are to be retrieved, pass them as a string separated by "||", e.g. "tag1 || tag2"
+        qmode: Search mode to use. Changes what the query searches over. "everything" includes full-text content. "titleCreatorYear" to search over title, authors and year. Defaults to "everything".
+        since: Return only objects modified after the specified library version. Defaults to return everything.
+    """
+
+retriever_tool = StructuredTool.from_function(
+    func=retrieve,
+    name="retrieve",
+    description=description,
+    return_direct=True,
+)
+
+
+llm = ChatOpenAI(model="gpt-4o-mini-2024-07-18")
+
+llm_with_tools = llm.bind_tools([retrieve])
+
+q = "What journal articles do I have on Surveillance in the zotero library?"
+
+chain = llm_with_tools | PydanticToolsParser(tools=[retrieve])
+
+chain.invoke(q)
+```
+
+## API reference
+
+모든 ZoteroRetriever 기능과 설정에 대한 자세한 문서는 [Github 페이지](https://github.com/TimBMK/langchain-zotero-retriever)를 참조하세요.
+
+Zotero API에 대한 자세한 문서는 [Zotero API reference](https://www.zotero.org/support/dev/web_api/v3/start)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/retrievers/zotero.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

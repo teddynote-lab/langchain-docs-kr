@@ -1,0 +1,54 @@
+---
+title: Wolfram Alpha
+---
+
+이 노트북은 wolfram alpha component를 사용하는 방법을 다룹니다.
+
+먼저, Wolfram Alpha 개발자 계정을 설정하고 APP ID를 받아야 합니다:
+
+1. wolfram alpha로 이동하여 [여기](https://developer.wolframalpha.com/)에서 개발자 계정에 가입하세요
+2. 앱을 생성하고 APP ID를 받으세요
+3. pip install wolframalpha
+
+그런 다음 몇 가지 environment variable을 설정해야 합니다:
+
+1. APP ID를 WOLFRAM_ALPHA_APPID env variable에 저장하세요
+
+```python
+pip install wolframalpha
+```
+
+```python
+import os
+
+os.environ["WOLFRAM_ALPHA_APPID"] = ""
+```
+
+```python
+from langchain_community.utilities.wolfram_alpha import WolframAlphaAPIWrapper
+```
+
+```python
+wolfram = WolframAlphaAPIWrapper()
+```
+
+```python
+wolfram.run("What is 2x+5 = -3x + 7?")
+```
+
+```output
+'x = 2/5'
+```
+
+```python
+
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/tools/wolfram_alpha.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

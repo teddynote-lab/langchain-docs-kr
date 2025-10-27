@@ -1,0 +1,249 @@
+---
+title: Eden AI
+---
+
+Eden AI는 최고의 AI 제공업체들을 통합하여 AI 환경을 혁신하고 있으며, 사용자가 무한한 가능성을 열고 인공지능의 진정한 잠재력을 활용할 수 있도록 지원합니다. 올인원 종합 플랫폼을 통해 사용자는 AI 기능을 프로덕션에 매우 빠르게 배포할 수 있으며, 단일 API를 통해 AI 기능의 전체 범위에 손쉽게 액세스할 수 있습니다. (웹사이트: [edenai.co/](https://edenai.co/))
+
+이 예제는 LangChain을 사용하여 Eden AI 모델과 상호작용하는 방법을 다룹니다.
+
+-----------------------------------------------------------------------------------
+
+`EdenAI`는 단순한 모델 호출을 넘어섭니다. 다음과 같은 고급 기능을 제공합니다:
+
+- **Multiple Providers**: 다양한 제공업체가 제공하는 다양한 언어 모델에 액세스하여 사용 사례에 가장 적합한 모델을 자유롭게 선택할 수 있습니다.
+
+- **Fallback Mechanism**: 기본 제공업체를 사용할 수 없는 경우에도 원활한 작업을 보장하기 위해 fallback 메커니즘을 설정할 수 있으며, 대체 제공업체로 쉽게 전환할 수 있습니다.
+
+- **Usage Tracking**: 프로젝트별 및 API 키별로 사용 통계를 추적합니다. 이 기능을 통해 리소스 소비를 효과적으로 모니터링하고 관리할 수 있습니다.
+
+- **Monitoring and Observability**: `EdenAI`는 플랫폼에서 포괄적인 모니터링 및 관찰 가능성 도구를 제공합니다. 언어 모델의 성능을 모니터링하고, 사용 패턴을 분석하며, 애플리케이션을 최적화하기 위한 귀중한 인사이트를 얻을 수 있습니다.
+
+EDENAI의 API에 액세스하려면 API 키가 필요합니다.
+
+[app.edenai.run/user/register](https://app.edenai.run/user/register)에서 계정을 생성하고 [app.edenai.run/admin/iam/api-keys](https://app.edenai.run/admin/iam/api-keys)로 이동하여 키를 얻을 수 있습니다.
+
+키를 얻은 후 다음을 실행하여 환경 변수로 설정합니다:
+
+```bash
+export EDENAI_API_KEY="..."
+```
+
+API 참조에서 자세한 내용을 확인할 수 있습니다: [docs.edenai.co/reference](https://docs.edenai.co/reference)
+
+환경 변수를 설정하지 않으려면 EdenAI Chat Model 클래스를 초기화할 때 edenai_api_key 명명된 매개변수를 통해 키를 직접 전달할 수 있습니다.
+
+```python
+from langchain_community.chat_models.edenai import ChatEdenAI
+from langchain.messages import HumanMessage
+```
+
+```python
+chat = ChatEdenAI(
+    edenai_api_key="...", provider="openai", temperature=0.2, max_tokens=250
+)
+```
+
+```python
+messages = [HumanMessage(content="Hello !")]
+chat.invoke(messages)
+```
+
+```output
+AIMessage(content='Hello! How can I assist you today?')
+```
+
+```python
+await chat.ainvoke(messages)
+```
+
+```output
+AIMessage(content='Hello! How can I assist you today?')
+```
+
+## Streaming과 Batching
+
+`ChatEdenAI`는 streaming과 batching을 지원합니다. 아래는 예제입니다.
+
+```python
+for chunk in chat.stream(messages):
+    print(chunk.content, end="", flush=True)
+```
+
+```output
+Hello! How can I assist you today?
+```
+
+```python
+chat.batch([messages])
+```
+
+```output
+[AIMessage(content='Hello! How can I assist you today?')]
+```
+
+## Fallback 메커니즘
+
+Eden AI를 사용하면 기본 제공업체를 사용할 수 없는 경우에도 원활한 작업을 보장하기 위해 fallback 메커니즘을 설정할 수 있으며, 대체 제공업체로 쉽게 전환할 수 있습니다.
+
+```python
+chat = ChatEdenAI(
+    edenai_api_key="...",
+    provider="openai",
+    temperature=0.2,
+    max_tokens=250,
+    fallback_providers="google",
+)
+```
+
+이 예제에서는 OpenAI에 문제가 발생할 경우 Google을 백업 제공업체로 사용할 수 있습니다.
+
+Eden AI에 대한 자세한 정보는 다음 링크를 확인하세요: [docs.edenai.co/docs/additional-parameters](https://docs.edenai.co/docs/additional-parameters)
+
+## Chaining Calls
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+
+prompt = ChatPromptTemplate.from_template(
+    "What is a good name for a company that makes {product}?"
+)
+chain = prompt | chat
+```
+
+```python
+chain.invoke({"product": "healthy snacks"})
+```
+
+```output
+AIMessage(content='VitalBites')
+```
+
+## Tools
+
+### bind_tools()
+
+`ChatEdenAI.bind_tools`를 사용하면 Pydantic 클래스, dict 스키마, LangChain tools 또는 함수를 모델에 tool로 쉽게 전달할 수 있습니다.
+
+```python
+from pydantic import BaseModel, Field
+
+llm = ChatEdenAI(provider="openai", temperature=0.2, max_tokens=500)
+
+
+class GetWeather(BaseModel):
+    """Get the current weather in a given location"""
+
+    location: str = Field(..., description="The city and state, e.g. San Francisco, CA")
+
+
+llm_with_tools = llm.bind_tools([GetWeather])
+```
+
+```python
+ai_msg = llm_with_tools.invoke(
+    "what is the weather like in San Francisco",
+)
+ai_msg
+```
+
+```output
+AIMessage(content='', response_metadata={'openai': {'status': 'success', 'generated_text': None, 'message': [{'role': 'user', 'message': 'what is the weather like in San Francisco', 'tools': [{'name': 'GetWeather', 'description': 'Get the current weather in a given location', 'parameters': {'type': 'object', 'properties': {'location': {'description': 'The city and state, e.g. San Francisco, CA', 'type': 'string'}}, 'required': ['location']}}], 'tool_calls': None}, {'role': 'assistant', 'message': None, 'tools': None, 'tool_calls': [{'id': 'call_tRpAO7KbQwgTjlka70mCQJdo', 'name': 'GetWeather', 'arguments': '{"location":"San Francisco"}'}]}], 'cost': 0.000194}}, id='run-5c44c01a-d7bb-4df6-835e-bda596080399-0', tool_calls=[{'name': 'GetWeather', 'args': {'location': 'San Francisco'}, 'id': 'call_tRpAO7KbQwgTjlka70mCQJdo'}])
+```
+
+```python
+ai_msg.tool_calls
+```
+
+```output
+[{'name': 'GetWeather',
+  'args': {'location': 'San Francisco'},
+  'id': 'call_tRpAO7KbQwgTjlka70mCQJdo'}]
+```
+
+### with_structured_output()
+
+BaseChatModel.with_structured_output interface를 사용하면 채팅 모델에서 구조화된 출력을 쉽게 얻을 수 있습니다. ChatEdenAI.with_structured_output을 사용하여(내부적으로 tool-calling 사용) 모델이 특정 형식의 출력을 더 안정적으로 반환하도록 할 수 있습니다:
+
+```python
+structured_llm = llm.with_structured_output(GetWeather)
+structured_llm.invoke(
+    "what is the weather like in San Francisco",
+)
+```
+
+```output
+GetWeather(location='San Francisco')
+```
+
+### Tool 결과를 모델에 전달하기
+
+다음은 tool을 사용하는 전체 예제입니다. tool 출력을 모델에 전달하고 모델로부터 결과를 받습니다.
+
+```python
+from langchain.messages import HumanMessage, ToolMessage
+from langchain.tools import tool
+
+
+@tool
+def add(a: int, b: int) -> int:
+    """Adds `a` and `b`.
+
+    Args:
+        a: First int
+        b: Second int
+    """
+    return a + b
+
+
+llm = ChatEdenAI(
+    provider="openai",
+    max_tokens=1000,
+    temperature=0.2,
+)
+
+llm_with_tools = llm.bind_tools([add], tool_choice="required")
+
+query = "What is 11 + 11?"
+
+messages = [HumanMessage(query)]
+ai_msg = llm_with_tools.invoke(messages)
+messages.append(ai_msg)
+
+tool_call = ai_msg.tool_calls[0]
+tool_output = add.invoke(tool_call["args"])
+
+# This append the result from our tool to the model
+messages.append(ToolMessage(tool_output, tool_call_id=tool_call["id"]))
+
+llm_with_tools.invoke(messages).content
+```
+
+```output
+'11 + 11 = 22'
+```
+
+### Streaming
+
+Eden AI는 현재 streaming tool call을 지원하지 않습니다. streaming을 시도하면 단일 최종 메시지가 생성됩니다.
+
+```python
+list(llm_with_tools.stream("What's 9 + 9"))
+```
+
+```output
+/home/eden/Projects/edenai-langchain/libs/community/langchain_community/chat_models/edenai.py:603: UserWarning: stream: Tool use is not yet supported in streaming mode.
+  warnings.warn("stream: Tool use is not yet supported in streaming mode.")
+```
+
+```output
+[AIMessageChunk(content='', id='run-fae32908-ec48-4ab2-ad96-bb0d0511754f', tool_calls=[{'name': 'add', 'args': {'a': 9, 'b': 9}, 'id': 'call_n0Tm7I9zERWa6UpxCAVCweLN'}], tool_call_chunks=[{'name': 'add', 'args': '{"a": 9, "b": 9}', 'id': 'call_n0Tm7I9zERWa6UpxCAVCweLN', 'index': 0}])]
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/chat/edenai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

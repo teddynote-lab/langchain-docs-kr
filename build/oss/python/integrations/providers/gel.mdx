@@ -1,0 +1,73 @@
+---
+title: Gel
+---
+
+[Gel](https://www.geldata.com/)은 PostgreSQL 기반으로 구축된 강력한 데이터 플랫폼입니다.
+
+- 테이블과 JOIN 대신 객체와 그래프로 사고하세요.
+- 고급 Python SDK, 통합 GUI, 마이그레이션 엔진, Auth 및 AI 레이어 등을 사용하세요.
+- 로컬, 원격 또는 [완전 관리형 클라우드](https://www.geldata.com/cloud)에서 실행하세요.
+
+## 설치
+
+<CodeGroup>
+```bash pip
+pip install langchain-gel
+```
+
+```bash uv
+uv add langchain-gel
+```
+</CodeGroup>
+
+## 설정
+
+1. `gel project init`을 실행하세요
+2. 스키마를 편집하세요. LangChain vectorstore를 사용하려면 다음 타입이 필요합니다:
+
+```gel
+using extension pgvector;
+
+module default {
+    scalar type EmbeddingVector extending ext::pgvector::vector<1536>;
+
+    type Record {
+        required collection: str;
+        text: str;
+        embedding: EmbeddingVector;
+        external_id: str {
+            constraint exclusive;
+        };
+        metadata: json;
+
+        index ext::pgvector::hnsw_cosine(m := 16, ef_construction := 128)
+            on (.embedding)
+    }
+}
+```
+
+> 참고: 이것은 최소한의 설정입니다. 원하는 만큼 타입, 속성 및 링크를 자유롭게 추가하세요!
+> Gel의 스키마를 활용하는 방법에 대해 자세히 알아보려면 [문서](https://docs.geldata.com/learn/schema)를 읽어보세요.
+
+3. 마이그레이션을 실행하세요: `gel migration create && gel migrate`.
+
+## 사용법
+
+```python
+from langchain_gel import GelVectorStore
+
+vector_store = GelVectorStore(
+    embeddings=embeddings,
+)
+```
+
+전체 사용 예제는 [여기](/oss/python/integrations/vectorstores/gel)에서 확인하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/gel.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

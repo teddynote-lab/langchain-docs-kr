@@ -1,0 +1,102 @@
+---
+title: viking DB
+---
+
+>[viking DB](https://www.volcengine.com/docs/6459/1163946)는 딥 뉴럴 네트워크 및 기타 머신 러닝(ML) 모델에 의해 생성된 대규모 embedding vector를 저장, 인덱싱 및 관리하는 데이터베이스입니다.
+
+이 노트북은 VikingDB vector database와 관련된 기능을 사용하는 방법을 보여줍니다.
+
+이 integration을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다.
+
+실행하려면 [viking DB 인스턴스가 실행 중](https://www.volcengine.com/docs/6459/1165058)이어야 합니다.
+
+```python
+!pip install -U volcengine
+```
+
+VikingDBEmbeddings를 사용하려면 VikingDB API Key를 가져와야 합니다.
+
+```python
+import getpass
+import os
+
+if "OPENAI_API_KEY" not in os.environ:
+    os.environ["OPENAI_API_KEY"] = getpass.getpass("OpenAI API Key:")
+```
+
+```python
+from langchain_community.document_loaders import TextLoader
+from langchain_community.vectorstores.vikingdb import VikingDB, VikingDBConfig
+from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+```
+
+```python
+loader = TextLoader("./test.txt")
+documents = loader.load()
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=10, chunk_overlap=0)
+docs = text_splitter.split_documents(documents)
+
+embeddings = OpenAIEmbeddings()
+```
+
+```python
+db = VikingDB.from_documents(
+    docs,
+    embeddings,
+    connection_args=VikingDBConfig(
+        host="host", region="region", ak="ak", sk="sk", scheme="http"
+    ),
+    drop_old=True,
+)
+```
+
+```python
+query = "What did the president say about Ketanji Brown Jackson"
+docs = db.similarity_search(query)
+```
+
+```python
+docs[0].page_content
+```
+
+### viking DB Collections로 데이터 구획화하기
+
+동일한 viking DB 인스턴스 내의 서로 다른 collection에 관련 없는 문서를 저장하여 컨텍스트를 유지할 수 있습니다.
+
+새 collection을 생성하는 방법은 다음과 같습니다.
+
+```python
+db = VikingDB.from_documents(
+    docs,
+    embeddings,
+    connection_args=VikingDBConfig(
+        host="host", region="region", ak="ak", sk="sk", scheme="http"
+    ),
+    collection_name="collection_1",
+    drop_old=True,
+)
+```
+
+저장된 collection을 검색하는 방법은 다음과 같습니다.
+
+```python
+db = VikingDB.from_documents(
+    embeddings,
+    connection_args=VikingDBConfig(
+        host="host", region="region", ak="ak", sk="sk", scheme="http"
+    ),
+    collection_name="collection_1",
+)
+```
+
+검색 후에는 평소처럼 쿼리를 계속할 수 있습니다.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/vectorstores/vikingdb.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

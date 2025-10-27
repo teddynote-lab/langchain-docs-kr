@@ -1,0 +1,209 @@
+---
+title: RDFLib
+---
+
+>[RDFLib](https://rdflib.readthedocs.io/)는 [RDF](https://en.wikipedia.org/wiki/Resource_Description_Framework) 작업을 위한 순수 Python 패키지입니다. `RDFLib`는 `RDF` 작업에 필요한 대부분의 기능을 포함하고 있습니다:
+>
+>- RDF/XML, N3, NTriples, N-Quads, Turtle, TriX, Trig 및 JSON-LD를 위한 parser와 serializer
+>- 다양한 Store 구현으로 백업될 수 있는 Graph interface
+>- 인메모리, 디스크 영구 저장(Berkeley DB) 및 원격 SPARQL endpoint를 위한 store 구현
+>- SPARQL 1.1 구현 - SPARQL 1.1 Query 및 Update 문 지원
+>- SPARQL function 확장 메커니즘
+
+Graph database는 네트워크 형태의 모델을 기반으로 하는 애플리케이션에 탁월한 선택입니다. 이러한 graph의 구문과 의미를 표준화하기 위해 W3C는 `Semantic Web Technologies`를 권장합니다. [Semantic Web](https://www.w3.org/standards/semanticweb/)을 참조하세요.
+
+[SPARQL](https://www.w3.org/TR/sparql11-query/)은 이러한 graph에 대해 `SQL` 또는 `Cypher`와 유사한 query 언어 역할을 합니다. 이 노트북은 `SPARQL`을 생성하여 graph database에 대한 자연어 인터페이스로 LLM을 적용하는 방법을 보여줍니다.
+
+**면책 조항:** 현재까지 LLM을 통한 `SPARQL` query 생성은 여전히 다소 불안정합니다. graph를 변경하는 `UPDATE` query에는 특히 주의하세요.
+
+## 설정하기
+
+다음 python 라이브러리를 설치해야 합니다:
+
+```python
+!pip install rdflib
+```
+
+query를 실행할 수 있는 여러 소스가 있습니다. 웹의 파일, 로컬에서 사용 가능한 파일, SPARQL endpoint(예: [Wikidata](https://www.wikidata.org/wiki/Wikidata:Main_Page)), [triple store](https://www.w3.org/wiki/LargeTripleStores) 등이 있습니다.
+
+```python
+from langchain.chains import GraphSparqlQAChain
+from langchain_community.graphs import RdfGraph
+from langchain_openai import ChatOpenAI
+```
+
+```python
+graph = RdfGraph(
+    source_file="http://www.w3.org/People/Berners-Lee/card",
+    standard="rdf",
+    local_copy="test.ttl",
+)
+```
+
+소스가 읽기 전용인 경우 변경 사항을 로컬에 저장하려면 `local_file`을 제공해야 합니다.
+
+## Graph schema 정보 새로고침
+
+database의 schema가 변경되면 SPARQL query를 생성하는 데 필요한 schema 정보를 새로고침할 수 있습니다.
+
+```python
+graph.load_schema()
+```
+
+```python
+graph.get_schema
+```
+
+```output
+In the following, each IRI is followed by the local name and optionally its description in parentheses.
+The RDF graph supports the following node types:
+[xmlns.com/foaf/0.1/PersonalProfileDocument](http://xmlns.com/foaf/0.1/PersonalProfileDocument) (PersonalProfileDocument, None), [www.w3.org/ns/auth/cert#RSAPublicKey](http://www.w3.org/ns/auth/cert#RSAPublicKey) (RSAPublicKey, None), [www.w3.org/2000/10/swap/pim/contact#Male](http://www.w3.org/2000/10/swap/pim/contact#Male) (Male, None), [xmlns.com/foaf/0.1/Person](http://xmlns.com/foaf/0.1/Person) (Person, None), [www.w3.org/2006/vcard/ns#Work](http://www.w3.org/2006/vcard/ns#Work) (Work, None)
+The RDF graph supports the following relationships:
+[www.w3.org/2000/01/rdf-schema#seeAlso](http://www.w3.org/2000/01/rdf-schema#seeAlso) (seeAlso, None), [purl.org/dc/elements/1.1/title](http://purl.org/dc/elements/1.1/title) (title, None), [xmlns.com/foaf/0.1/mbox_sha1sum](http://xmlns.com/foaf/0.1/mbox_sha1sum) (mbox_sha1sum, None), [xmlns.com/foaf/0.1/maker](http://xmlns.com/foaf/0.1/maker) (maker, None), [www.w3.org/ns/solid/terms#oidcIssuer](http://www.w3.org/ns/solid/terms#oidcIssuer) (oidcIssuer, None), [www.w3.org/2000/10/swap/pim/contact#publicHomePage](http://www.w3.org/2000/10/swap/pim/contact#publicHomePage) (publicHomePage, None), [xmlns.com/foaf/0.1/openid](http://xmlns.com/foaf/0.1/openid) (openid, None), [www.w3.org/ns/pim/space#storage](http://www.w3.org/ns/pim/space#storage) (storage, None), [xmlns.com/foaf/0.1/name](http://xmlns.com/foaf/0.1/name) (name, None), [www.w3.org/2000/10/swap/pim/contact#country](http://www.w3.org/2000/10/swap/pim/contact#country) (country, None), [www.w3.org/1999/02/22-rdf-syntax-ns#type](http://www.w3.org/1999/02/22-rdf-syntax-ns#type) (type, None), [www.w3.org/ns/solid/terms#profileHighlightColor](http://www.w3.org/ns/solid/terms#profileHighlightColor) (profileHighlightColor, None), [www.w3.org/ns/pim/space#preferencesFile](http://www.w3.org/ns/pim/space#preferencesFile) (preferencesFile, None), [www.w3.org/2000/01/rdf-schema#label](http://www.w3.org/2000/01/rdf-schema#label) (label, None), [www.w3.org/ns/auth/cert#modulus](http://www.w3.org/ns/auth/cert#modulus) (modulus, None), [www.w3.org/2000/10/swap/pim/contact#participant](http://www.w3.org/2000/10/swap/pim/contact#participant) (participant, None), [www.w3.org/2000/10/swap/pim/contact#street2](http://www.w3.org/2000/10/swap/pim/contact#street2) (street2, None), [www.w3.org/2006/vcard/ns#locality](http://www.w3.org/2006/vcard/ns#locality) (locality, None), [xmlns.com/foaf/0.1/nick](http://xmlns.com/foaf/0.1/nick) (nick, None), [xmlns.com/foaf/0.1/homepage](http://xmlns.com/foaf/0.1/homepage) (homepage, None), [creativecommons.org/ns#license](http://creativecommons.org/ns#license) (license, None), [xmlns.com/foaf/0.1/givenname](http://xmlns.com/foaf/0.1/givenname) (givenname, None), [www.w3.org/2006/vcard/ns#street-address](http://www.w3.org/2006/vcard/ns#street-address) (street-address, None), [www.w3.org/2006/vcard/ns#postal-code](http://www.w3.org/2006/vcard/ns#postal-code) (postal-code, None), [www.w3.org/2000/10/swap/pim/contact#street](http://www.w3.org/2000/10/swap/pim/contact#street) (street, None), [www.w3.org/2003/01/geo/wgs84_pos#lat](http://www.w3.org/2003/01/geo/wgs84_pos#lat) (lat, None), [xmlns.com/foaf/0.1/primaryTopic](http://xmlns.com/foaf/0.1/primaryTopic) (primaryTopic, None), [www.w3.org/2006/vcard/ns#fn](http://www.w3.org/2006/vcard/ns#fn) (fn, None), [www.w3.org/2003/01/geo/wgs84_pos#location](http://www.w3.org/2003/01/geo/wgs84_pos#location) (location, None), [usefulinc.com/ns/doap#developer](http://usefulinc.com/ns/doap#developer) (developer, None), [www.w3.org/2000/10/swap/pim/contact#city](http://www.w3.org/2000/10/swap/pim/contact#city) (city, None), [www.w3.org/2006/vcard/ns#region](http://www.w3.org/2006/vcard/ns#region) (region, None), [xmlns.com/foaf/0.1/member](http://xmlns.com/foaf/0.1/member) (member, None), [www.w3.org/2003/01/geo/wgs84_pos#long](http://www.w3.org/2003/01/geo/wgs84_pos#long) (long, None), [www.w3.org/2000/10/swap/pim/contact#address](http://www.w3.org/2000/10/swap/pim/contact#address) (address, None), [xmlns.com/foaf/0.1/family_name](http://xmlns.com/foaf/0.1/family_name) (family_name, None), [xmlns.com/foaf/0.1/account](http://xmlns.com/foaf/0.1/account) (account, None), [xmlns.com/foaf/0.1/workplaceHomepage](http://xmlns.com/foaf/0.1/workplaceHomepage) (workplaceHomepage, None), [purl.org/dc/terms/title](http://purl.org/dc/terms/title) (title, None), [www.w3.org/ns/solid/terms#publicTypeIndex](http://www.w3.org/ns/solid/terms#publicTypeIndex) (publicTypeIndex, None), [www.w3.org/2000/10/swap/pim/contact#office](http://www.w3.org/2000/10/swap/pim/contact#office) (office, None), [www.w3.org/2000/10/swap/pim/contact#homePage](http://www.w3.org/2000/10/swap/pim/contact#homePage) (homePage, None), [xmlns.com/foaf/0.1/mbox](http://xmlns.com/foaf/0.1/mbox) (mbox, None), [www.w3.org/2000/10/swap/pim/contact#preferredURI](http://www.w3.org/2000/10/swap/pim/contact#preferredURI) (preferredURI, None), [www.w3.org/ns/solid/terms#profileBackgroundColor](http://www.w3.org/ns/solid/terms#profileBackgroundColor) (profileBackgroundColor, None), [schema.org/owns](http://schema.org/owns) (owns, None), [xmlns.com/foaf/0.1/based_near](http://xmlns.com/foaf/0.1/based_near) (based_near, None), [www.w3.org/2006/vcard/ns#hasAddress](http://www.w3.org/2006/vcard/ns#hasAddress) (hasAddress, None), [xmlns.com/foaf/0.1/img](http://xmlns.com/foaf/0.1/img) (img, None), [www.w3.org/2000/10/swap/pim/contact#assistant](http://www.w3.org/2000/10/swap/pim/contact#assistant) (assistant, None), [xmlns.com/foaf/0.1/title](http://xmlns.com/foaf/0.1/title) (title, None), [www.w3.org/ns/auth/cert#key](http://www.w3.org/ns/auth/cert#key) (key, None), [www.w3.org/ns/ldp#inbox](http://www.w3.org/ns/ldp#inbox) (inbox, None), [www.w3.org/ns/solid/terms#editableProfile](http://www.w3.org/ns/solid/terms#editableProfile) (editableProfile, None), [www.w3.org/2000/10/swap/pim/contact#postalCode](http://www.w3.org/2000/10/swap/pim/contact#postalCode) (postalCode, None), [xmlns.com/foaf/0.1/weblog](http://xmlns.com/foaf/0.1/weblog) (weblog, None), [www.w3.org/ns/auth/cert#exponent](http://www.w3.org/ns/auth/cert#exponent) (exponent, None), [rdfs.org/sioc/ns#avatar](http://rdfs.org/sioc/ns#avatar) (avatar, None)
+```
+
+## Graph 쿼리하기
+
+이제 graph SPARQL QA chain을 사용하여 graph에 대한 질문을 할 수 있습니다.
+
+```python
+chain = GraphSparqlQAChain.from_llm(
+    ChatOpenAI(temperature=0), graph=graph, verbose=True
+)
+```
+
+```python
+chain.run("What is Tim Berners-Lee's work homepage?")
+```
+
+```output
+> Entering new GraphSparqlQAChain chain...
+Identified intent:
+SELECT
+Generated SPARQL:
+PREFIX foaf: [xmlns.com/foaf/0.1/](http://xmlns.com/foaf/0.1/)
+SELECT ?homepage
+WHERE {
+    ?person foaf:name "Tim Berners-Lee" .
+    ?person foaf:workplaceHomepage ?homepage .
+}
+Full Context:
+[]
+
+> Finished chain.
+```
+
+```output
+"Tim Berners-Lee's work homepage is http://www.w3.org/People/Berners-Lee/."
+```
+
+## Graph 업데이트하기
+
+마찬가지로 자연어를 사용하여 graph를 업데이트, 즉 triple을 삽입할 수 있습니다.
+
+```python
+chain.run(
+    "Save that the person with the name 'Timothy Berners-Lee' has a work homepage at 'http://www.w3.org/foo/bar/'"
+)
+```
+
+```output
+> Entering new GraphSparqlQAChain chain...
+Identified intent:
+UPDATE
+Generated SPARQL:
+PREFIX foaf: [xmlns.com/foaf/0.1/](http://xmlns.com/foaf/0.1/)
+INSERT {
+    ?person foaf:workplaceHomepage [www.w3.org/foo/bar/](http://www.w3.org/foo/bar/) .
+}
+WHERE {
+    ?person foaf:name "Timothy Berners-Lee" .
+}
+
+> Finished chain.
+```
+
+```output
+'Successfully inserted triples into the graph.'
+```
+
+결과를 확인해 보겠습니다:
+
+```python
+query = (
+    """PREFIX foaf: [xmlns.com/foaf/0.1/](http://xmlns.com/foaf/0.1/)\n"""
+    """SELECT ?hp\n"""
+    """WHERE {\n"""
+    """    ?person foaf:name "Timothy Berners-Lee" . \n"""
+    """    ?person foaf:workplaceHomepage ?hp .\n"""
+    """}"""
+)
+graph.query(query)
+```
+
+```output
+[(rdflib.term.URIRef('https://www.w3.org/'),),
+ (rdflib.term.URIRef('http://www.w3.org/foo/bar/'),)]
+```
+
+## SPARQL query 반환하기
+
+`return_sparql_query` parameter를 사용하여 Sparql QA Chain에서 SPARQL query 단계를 반환할 수 있습니다.
+
+```python
+chain = GraphSparqlQAChain.from_llm(
+    ChatOpenAI(temperature=0), graph=graph, verbose=True, return_sparql_query=True
+)
+```
+
+```python
+result = chain("What is Tim Berners-Lee's work homepage?")
+print(f"SPARQL query: {result['sparql_query']}")
+print(f"Final answer: {result['result']}")
+```
+
+```output
+> Entering new GraphSparqlQAChain chain...
+Identified intent:
+SELECT
+Generated SPARQL:
+PREFIX foaf: [xmlns.com/foaf/0.1/](http://xmlns.com/foaf/0.1/)
+SELECT ?workHomepage
+WHERE {
+    ?person foaf:name "Tim Berners-Lee" .
+    ?person foaf:workplaceHomepage ?workHomepage .
+}
+Full Context:
+[]
+
+> Finished chain.
+SPARQL query: PREFIX foaf: [xmlns.com/foaf/0.1/](http://xmlns.com/foaf/0.1/)
+SELECT ?workHomepage
+WHERE {
+    ?person foaf:name "Tim Berners-Lee" .
+    ?person foaf:workplaceHomepage ?workHomepage .
+}
+Final answer: Tim Berners-Lee's work homepage is http://www.w3.org/People/Berners-Lee/.
+```
+
+```python
+print(result["sparql_query"])
+```
+
+```output
+PREFIX foaf: [xmlns.com/foaf/0.1/](http://xmlns.com/foaf/0.1/)
+SELECT ?workHomepage
+WHERE {
+    ?person foaf:name "Tim Berners-Lee" .
+    ?person foaf:workplaceHomepage ?workHomepage .
+}
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/graphs/rdflib_sparql.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

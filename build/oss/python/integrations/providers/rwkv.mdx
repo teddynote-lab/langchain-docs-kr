@@ -1,0 +1,66 @@
+---
+title: RWKV-4
+---
+
+이 페이지에서는 LangChain 내에서 `RWKV-4` wrapper를 사용하는 방법을 다룹니다.
+내용은 두 부분으로 구성됩니다: 설치 및 설정, 그리고 예제를 통한 사용법.
+
+## 설치 및 설정
+- `pip install rwkv`로 Python 패키지를 설치하세요
+- `pip install tokenizer`로 tokenizer Python 패키지를 설치하세요
+- [RWKV model](https://huggingface.co/BlinkDL/rwkv-4-raven/tree/main)을 다운로드하여 원하는 디렉터리에 배치하세요
+- [tokens file](https://raw.githubusercontent.com/BlinkDL/ChatRWKV/main/20B_tokenizer.json)을 다운로드하세요
+
+## 사용법
+
+### RWKV
+
+RWKV wrapper를 사용하려면 사전 학습된 모델 파일의 경로와 tokenizer 설정을 제공해야 합니다.
+```python
+# 프롬프트를 생성하는 helper 함수
+def generate_prompt(instruction, input=None):
+    if input:
+        return f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
+
+# Instruction:
+{instruction}
+
+# Input:
+{input}
+
+# Response:
+"""
+    else:
+        return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
+
+# Instruction:
+{instruction}
+
+# Response:
+"""
+
+# RWKV 모델 로드: 모델 파일 경로(model), 실행 전략(strategy), tokenizer 설정(tokens_path) 지정
+model = RWKV(model="./models/RWKV-4-Raven-3B-v7-Eng-20230404-ctx4096.pth", strategy="cpu fp32", tokens_path="./rwkv/20B_tokenizer.json")
+
+# 모델에 프롬프트를 전달하여 응답 생성
+response = model.invoke(generate_prompt("Once upon a time, "))
+```
+```
+RWKV VRAM
+Model | 8bit | bf16/fp16 | fp32
+14B   | 16GB | 28GB      | >50GB
+7B    | 8GB  | 14GB      | 28GB
+3B    | 2.8GB| 6GB       | 12GB
+1b5   | 1.3GB| 3GB       | 6GB
+```
+
+streaming 및 cuda 지원을 포함한 strategy에 대한 더 많은 정보는 [rwkv pip](https://pypi.org/project/rwkv/) 페이지를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/rwkv.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

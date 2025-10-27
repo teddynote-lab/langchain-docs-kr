@@ -1,0 +1,130 @@
+---
+title: LOTR (Merger Retriever)
+---
+
+>`Lord of the Retrievers (LOTR)`는 `MergerRetriever`로도 알려져 있으며, retriever 목록을 입력으로 받아 각각의 get_relevant_documents() 메서드 결과를 단일 목록으로 병합합니다. 병합된 결과는 쿼리와 관련이 있고 여러 retriever에 의해 순위가 매겨진 문서 목록이 됩니다.
+
+`MergerRetriever` 클래스는 여러 방식으로 문서 검색의 정확도를 향상시킬 수 있습니다. 첫째, 여러 retriever의 결과를 결합하여 결과의 편향 위험을 줄일 수 있습니다. 둘째, 서로 다른 retriever의 결과에 순위를 매겨 가장 관련성 높은 문서가 먼저 반환되도록 할 수 있습니다.
+
+```python
+import os
+
+import chromadb
+from langchain.retrievers import (
+    ContextualCompressionRetriever,
+    DocumentCompressorPipeline,
+    MergerRetriever,
+)
+from langchain_chroma import Chroma
+from langchain_community.document_transformers import (
+    EmbeddingsClusteringFilter,
+    EmbeddingsRedundantFilter,
+)
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_openai import OpenAIEmbeddings
+
+# Get 3 diff embeddings.
+all_mini = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+multi_qa_mini = HuggingFaceEmbeddings(model_name="multi-qa-MiniLM-L6-dot-v1")
+filter_embeddings = OpenAIEmbeddings()
+
+ABS_PATH = os.path.dirname(os.path.abspath(__file__))
+DB_DIR = os.path.join(ABS_PATH, "db")
+
+# Instantiate 2 diff chromadb indexes, each one with a diff embedding.
+client_settings = chromadb.config.Settings(
+    is_persistent=True,
+    persist_directory=DB_DIR,
+    anonymized_telemetry=False,
+)
+db_all = Chroma(
+    collection_name="project_store_all",
+    persist_directory=DB_DIR,
+    client_settings=client_settings,
+    embedding_function=all_mini,
+)
+db_multi_qa = Chroma(
+    collection_name="project_store_multi",
+    persist_directory=DB_DIR,
+    client_settings=client_settings,
+    embedding_function=multi_qa_mini,
+)
+
+# Define 2 diff retrievers with 2 diff embeddings and diff search type.
+retriever_all = db_all.as_retriever(
+    search_type="similarity", search_kwargs={"k": 5, "include_metadata": True}
+)
+retriever_multi_qa = db_multi_qa.as_retriever(
+    search_type="mmr", search_kwargs={"k": 5, "include_metadata": True}
+)
+
+# The Lord of the Retrievers will hold the output of both retrievers and can be used as any other
+# retriever on different types of chains.
+lotr = MergerRetriever(retrievers=[retriever_all, retriever_multi_qa])
+```
+
+## 병합된 retriever에서 중복 결과 제거
+
+```python
+# We can remove redundant results from both retrievers using yet another embedding.
+# Using multiples embeddings in diff steps could help reduce biases.
+filter = EmbeddingsRedundantFilter(embeddings=filter_embeddings)
+pipeline = DocumentCompressorPipeline(transformers=[filter])
+compression_retriever = ContextualCompressionRetriever(
+    base_compressor=pipeline, base_retriever=lotr
+)
+```
+
+## 병합된 retriever에서 대표 문서 샘플 선택
+
+```python
+# This filter will divide the documents vectors into clusters or "centers" of meaning.
+# Then it will pick the closest document to that center for the final results.
+# By default the result document will be ordered/grouped by clusters.
+filter_ordered_cluster = EmbeddingsClusteringFilter(
+    embeddings=filter_embeddings,
+    num_clusters=10,
+    num_closest=1,
+)
+
+# If you want the final document to be ordered by the original retriever scores
+# you need to add the "sorted" parameter.
+filter_ordered_by_retriever = EmbeddingsClusteringFilter(
+    embeddings=filter_embeddings,
+    num_clusters=10,
+    num_closest=1,
+    sorted=True,
+)
+
+pipeline = DocumentCompressorPipeline(transformers=[filter_ordered_by_retriever])
+compression_retriever = ContextualCompressionRetriever(
+    base_compressor=pipeline, base_retriever=lotr
+)
+```
+
+## 성능 저하를 방지하기 위한 결과 재정렬
+
+모델의 아키텍처와 관계없이, 10개 이상의 검색된 문서를 포함할 때 상당한 성능 저하가 발생합니다.
+간단히 말해: 모델이 긴 컨텍스트 중간에 있는 관련 정보에 접근해야 할 때, 제공된 문서를 무시하는 경향이 있습니다.
+참고: [arxiv.org/abs//2307.03172](https://arxiv.org/abs//2307.03172)
+
+```python
+# You can use an additional document transformer to reorder documents after removing redundancy.
+from langchain_community.document_transformers import LongContextReorder
+
+filter = EmbeddingsRedundantFilter(embeddings=filter_embeddings)
+reordering = LongContextReorder()
+pipeline = DocumentCompressorPipeline(transformers=[filter, reordering])
+compression_retriever_reordered = ContextualCompressionRetriever(
+    base_compressor=pipeline, base_retriever=lotr
+)
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/retrievers/merger_retriever.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

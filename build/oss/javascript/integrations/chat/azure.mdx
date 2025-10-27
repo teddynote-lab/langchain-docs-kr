@@ -1,0 +1,260 @@
+---
+title: AzureChatOpenAI
+---
+
+Azure OpenAI는 OpenAI의 강력한 언어 모델을 제공하는 Microsoft Azure 서비스입니다.
+
+이 문서는 AzureChatOpenAI [chat models](/oss/javascript/langchain/models) 시작하기를 도와드립니다. 모든 AzureChatOpenAI 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_openai.AzureChatOpenAI.html)를 참조하세요.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | [PY support](https://python.langchain.com/docs/integrations/chat/azure_chat_openai) | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [AzureChatOpenAI](https://api.js.langchain.com/classes/langchain_openai.AzureChatOpenAI.html) | [`@langchain/openai`](https://www.npmjs.com/package/@langchain/openai) | ❌ | ✅ | ✅ | ![NPM - Downloads](https://img.shields.io/npm/dm/@langchain/openai?style=flat-square&label=%20&) | ![NPM - Version](https://img.shields.io/npm/v/@langchain/openai?style=flat-square&label=%20&) |
+
+### Model features
+
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
+
+| [Tool calling](/oss/javascript/langchain/tools) | [Structured output](/oss/javascript/langchain/structured-output) | JSON mode | [Image input](/oss/javascript/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/javascript/langchain/streaming/) | [Token usage](/oss/javascript/langchain/models#token-usage) | [Logprobs](/oss/javascript/langchain/models#log-probabilities) |
+| :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ |
+
+## Setup
+
+[Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service/)는 OpenAI, Meta 등의 다양한 사전 구축 및 선별된 모델을 통해 생성형 AI 경험을 빠르게 개발할 수 있도록 돕는 클라우드 서비스입니다.
+
+LangChain.js는 [OpenAI SDK](https://github.com/openai/openai-node)의 새로운 Azure integration을 사용하여 [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service/)와의 통합을 지원합니다.
+
+Azure OpenAI와 OpenAI API의 차이점에 대해서는 [이 페이지](https://learn.microsoft.com/azure/ai-services/openai/overview)에서 자세히 알아볼 수 있습니다.
+
+### Credentials
+
+Azure 계정이 없다면 [무료 계정을 생성](https://azure.microsoft.com/free/)하여 시작할 수 있습니다.
+
+또한 Azure OpenAI 인스턴스를 배포해야 합니다. [이 가이드](https://learn.microsoft.com/azure/ai-services/openai/how-to/create-resource?pivots=web-portal)를 따라 Azure Portal에서 버전을 배포할 수 있습니다.
+
+인스턴스가 실행되면 인스턴스 이름과 키를 확인하세요. 키는 Azure Portal의 인스턴스 "Keys and Endpoint" 섹션에서 찾을 수 있습니다. 그런 다음 Node.js를 사용하는 경우 자격 증명을 환경 변수로 설정할 수 있습니다:
+
+```bash
+AZURE_OPENAI_API_INSTANCE_NAME=<YOUR_INSTANCE_NAME>
+AZURE_OPENAI_API_DEPLOYMENT_NAME=<YOUR_DEPLOYMENT_NAME>
+AZURE_OPENAI_API_KEY=<YOUR_KEY>
+AZURE_OPENAI_API_VERSION="2024-02-01"
+```
+
+모델 호출에 대한 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
+
+```bash
+# export LANGSMITH_TRACING="true"
+# export LANGSMITH_API_KEY="your-api-key"
+```
+
+### Installation
+
+LangChain AzureChatOpenAI integration은 `@langchain/openai` 패키지에 있습니다:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/openai @langchain/core
+```
+```bash yarn
+yarn add @langchain/openai @langchain/core
+```
+```bash pnpm
+pnpm add @langchain/openai @langchain/core
+```
+</CodeGroup>
+
+## Instantiation
+
+이제 모델 객체를 인스턴스화하고 chat completion을 생성할 수 있습니다:
+
+```typescript
+import { AzureChatOpenAI } from "@langchain/openai"
+
+const llm = new AzureChatOpenAI({
+    model: "gpt-4o",
+    temperature: 0,
+    maxTokens: undefined,
+    maxRetries: 2,
+    azureOpenAIApiKey: process.env.AZURE_OPENAI_API_KEY, // In Node.js defaults to process.env.AZURE_OPENAI_API_KEY
+    azureOpenAIApiInstanceName: process.env.AZURE_OPENAI_API_INSTANCE_NAME, // In Node.js defaults to process.env.AZURE_OPENAI_API_INSTANCE_NAME
+    azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME, // In Node.js defaults to process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME
+    azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION, // In Node.js defaults to process.env.AZURE_OPENAI_API_VERSION
+})
+```
+
+## Invocation
+
+```typescript
+const aiMsg = await llm.invoke([
+    [
+        "system",
+        "You are a helpful assistant that translates English to French. Translate the user sentence.",
+    ],
+    ["human", "I love programming."],
+])
+aiMsg
+```
+
+```output
+AIMessage {
+  "id": "chatcmpl-9qrWKByvVrzWMxSn8joRZAklHoB32",
+  "content": "J'adore la programmation.",
+  "additional_kwargs": {},
+  "response_metadata": {
+    "tokenUsage": {
+      "completionTokens": 8,
+      "promptTokens": 31,
+      "totalTokens": 39
+    },
+    "finish_reason": "stop"
+  },
+  "tool_calls": [],
+  "invalid_tool_calls": [],
+  "usage_metadata": {
+    "input_tokens": 31,
+    "output_tokens": 8,
+    "total_tokens": 39
+  }
+}
+```
+
+```typescript
+console.log(aiMsg.content)
+```
+
+```output
+J'adore la programmation.
+```
+
+## Using Azure Managed Identity
+
+Azure Managed Identity를 사용하는 경우 다음과 같이 자격 증명을 구성할 수 있습니다:
+
+```typescript
+import {
+  DefaultAzureCredential,
+  getBearerTokenProvider,
+} from "@azure/identity";
+import { AzureChatOpenAI } from "@langchain/openai";
+
+const credentials = new DefaultAzureCredential();
+const azureADTokenProvider = getBearerTokenProvider(
+  credentials,
+  "https://cognitiveservices.azure.com/.default"
+);
+
+const llmWithManagedIdentity = new AzureChatOpenAI({
+  azureADTokenProvider,
+  azureOpenAIApiInstanceName: "<your_instance_name>",
+  azureOpenAIApiDeploymentName: "<your_deployment_name>",
+  azureOpenAIApiVersion: "<api_version>",
+});
+```
+
+## Using a different domain
+
+인스턴스가 기본 `openai.azure.com`이 아닌 다른 도메인에서 호스팅되는 경우 대체 `AZURE_OPENAI_BASE_PATH` 환경 변수를 사용해야 합니다.
+예를 들어, `https://westeurope.api.microsoft.com/openai/deployments/{DEPLOYMENT_NAME}` 도메인에 연결하는 방법은 다음과 같습니다:
+
+```typescript
+import { AzureChatOpenAI } from "@langchain/openai";
+
+const llmWithDifferentDomain = new AzureChatOpenAI({
+  temperature: 0.9,
+  azureOpenAIApiKey: "<your_key>", // In Node.js defaults to process.env.AZURE_OPENAI_API_KEY
+  azureOpenAIApiDeploymentName: "<your_deployment_name>", // In Node.js defaults to process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME
+  azureOpenAIApiVersion: "<api_version>", // In Node.js defaults to process.env.AZURE_OPENAI_API_VERSION
+  azureOpenAIBasePath:
+    "https://westeurope.api.microsoft.com/openai/deployments", // In Node.js defaults to process.env.AZURE_OPENAI_BASE_PATH
+});
+
+```
+
+## Custom headers
+
+`configuration` 필드를 전달하여 사용자 정의 헤더를 지정할 수 있습니다:
+
+```typescript
+import { AzureChatOpenAI } from "@langchain/openai";
+
+const llmWithCustomHeaders = new AzureChatOpenAI({
+  azureOpenAIApiKey: process.env.AZURE_OPENAI_API_KEY, // In Node.js defaults to process.env.AZURE_OPENAI_API_KEY
+  azureOpenAIApiInstanceName: process.env.AZURE_OPENAI_API_INSTANCE_NAME, // In Node.js defaults to process.env.AZURE_OPENAI_API_INSTANCE_NAME
+  azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME, // In Node.js defaults to process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME
+  azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION, // In Node.js defaults to process.env.AZURE_OPENAI_API_VERSION
+  configuration: {
+    defaultHeaders: {
+      "x-custom-header": `SOME_VALUE`,
+    },
+  },
+});
+
+await llmWithCustomHeaders.invoke("Hi there!");
+```
+
+`configuration` 필드는 공식 SDK에서 허용하는 다른 `ClientOptions` 매개변수도 허용합니다.
+
+**참고:** 특정 헤더 `api-key`는 현재 이 방식으로 재정의할 수 없으며 `azureOpenAIApiKey`의 값을 통과합니다.
+
+## Migration from Azure OpenAI SDK
+
+`@langchain/azure-openai` 패키지와 함께 더 이상 사용되지 않는 Azure OpenAI SDK를 사용하고 있다면 다음 단계에 따라 새로운 Azure integration을 사용하도록 코드를 업데이트할 수 있습니다:
+
+1. 새로운 `@langchain/openai` 패키지를 설치하고 이전 `@langchain/azure-openai` 패키지를 제거합니다:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/openai
+```
+```bash yarn
+yarn add @langchain/openai
+```
+```bash pnpm
+pnpm add @langchain/openai
+```
+</CodeGroup>
+
+```bash
+npm uninstall @langchain/azure-openai
+```
+
+2. `@langchain/openai` 패키지의 새로운 @[`AzureChatOpenAI`] 클래스를 사용하도록 import를 업데이트합니다:
+
+   ```typescript
+   import { AzureChatOpenAI } from "@langchain/openai";
+   ```
+
+3. 새로운 @[`AzureChatOpenAI`] 클래스를 사용하고 필요한 매개변수를 전달하도록 코드를 업데이트합니다:
+
+   ```typescript
+   const model = new AzureChatOpenAI({
+     azureOpenAIApiKey: "<your_key>",
+     azureOpenAIApiInstanceName: "<your_instance_name>",
+     azureOpenAIApiDeploymentName: "<your_deployment_name>",
+     azureOpenAIApiVersion: "<api_version>",
+   });
+   ```
+
+   이제 생성자에 `azureOpenAIEndpoint` 매개변수 대신 `azureOpenAIApiInstanceName` 매개변수가 필요하며, API 버전을 지정하기 위해 `azureOpenAIApiVersion` 매개변수가 추가되었습니다.
+
+   - Azure Managed Identity를 사용하고 있었다면 이제 `credentials` 대신 생성자에 `azureADTokenProvider` 매개변수를 사용해야 합니다. 자세한 내용은 [Azure Managed Identity](#using-azure-managed-identity) 섹션을 참조하세요.
+
+   - 환경 변수를 사용하고 있었다면 이제 `AZURE_OPENAI_API_ENDPOINT` 대신 `AZURE_OPENAI_API_INSTANCE_NAME` 환경 변수를 설정해야 하며, API 버전을 지정하기 위해 `AZURE_OPENAI_API_VERSION` 환경 변수를 추가해야 합니다.
+
+## API reference
+
+모든 AzureChatOpenAI 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_openai.AzureChatOpenAI.html)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/chat/azure.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,54 @@
+---
+title: YouTube
+---
+
+>[YouTube Search](https://github.com/joetats/youtube_search) 패키지는 `YouTube` 비디오를 검색하며, 속도 제한이 심한 API 사용을 피합니다.
+>
+>`YouTube` 홈페이지의 form을 사용하고 결과 페이지를 스크래핑합니다.
+
+이 노트북은 YouTube를 검색하는 도구를 사용하는 방법을 보여줍니다.
+
+[https://github.com/venuv/langchain_yt_tools](https://github.com/venuv/langchain_yt_tools)에서 수정됨
+
+```python
+pip install -qU  youtube_search
+```
+
+```python
+from langchain_community.tools import YouTubeSearchTool
+```
+
+```python
+tool = YouTubeSearchTool()
+```
+
+```python
+tool.run("lex fridman")
+```
+
+```output
+"['/watch?v=VcVfceTsD0A&pp=ygUMbGV4IGZyaWVkbWFu', '/watch?v=gPfriiHBBek&pp=ygUMbGV4IGZyaWVkbWFu']"
+```
+
+반환되는 결과의 수를 지정할 수도 있습니다
+
+```python
+tool.run("lex friedman,5")
+```
+
+```output
+"['/watch?v=VcVfceTsD0A&pp=ygUMbGV4IGZyaWVkbWFu', '/watch?v=YVJ8gTnDC4Y&pp=ygUMbGV4IGZyaWVkbWFu', '/watch?v=Udh22kuLebg&pp=ygUMbGV4IGZyaWVkbWFu', '/watch?v=gPfriiHBBek&pp=ygUMbGV4IGZyaWVkbWFu', '/watch?v=L_Guz73e6fw&pp=ygUMbGV4IGZyaWVkbWFu']"
+```
+
+```python
+
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/tools/youtube.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,87 @@
+```markdown
+---
+title: PipelineAI
+---
+
+>[PipelineAI](https://pipeline.ai)를 사용하면 클라우드에서 ML 모델을 대규모로 실행할 수 있습니다. 또한 [여러 LLM 모델](https://pipeline.ai)에 대한 API 액세스를 제공합니다.
+
+이 노트북은 [PipelineAI](https://docs.pipeline.ai/docs)를 LangChain과 함께 사용하는 방법을 다룹니다.
+
+## PipelineAI 예제
+
+[이 예제는 PipelineAI가 LangChain과 통합되는 방법을 보여줍니다](https://docs.pipeline.ai/docs/langchain). 이 예제는 PipelineAI에서 작성되었습니다.
+
+## 설정
+
+`PipelineAI` API(일명 `Pipeline Cloud`)를 사용하려면 `pipeline-ai` 라이브러리가 필요합니다. `pip install pipeline-ai`를 사용하여 `pipeline-ai`를 설치하세요.
+
+```python
+# Install the package
+pip install -qU  pipeline-ai
+```
+
+## 예제
+
+### Imports
+
+```python
+import os
+
+from langchain_community.llms import PipelineAI
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+```
+
+### Environment API Key 설정
+
+PipelineAI에서 API key를 받아야 합니다. [cloud quickstart guide](https://docs.pipeline.ai/docs/cloud-quickstart)를 확인하세요. 다양한 모델을 테스트할 수 있는 10시간의 serverless GPU 컴퓨팅이 포함된 30일 무료 체험판이 제공됩니다.
+
+```python
+os.environ["PIPELINE_API_KEY"] = "YOUR_API_KEY_HERE"
+```
+
+## PipelineAI instance 생성
+
+PipelineAI를 인스턴스화할 때 사용하려는 pipeline의 id 또는 tag를 지정해야 합니다. 예: `pipeline_key = "public/gpt-j:base"`. 그런 다음 추가적인 pipeline별 keyword argument를 전달할 수 있습니다:
+
+```python
+llm = PipelineAI(pipeline_key="YOUR_PIPELINE_KEY", pipeline_kwargs={...})
+```
+
+### Prompt Template 생성
+
+질문과 답변을 위한 prompt template을 생성합니다.
+
+```python
+template = """Question: {question}
+
+Answer: Let's think step by step."""
+
+prompt = PromptTemplate.from_template(template)
+```
+
+### LLMChain 초기화
+
+```python
+llm_chain = prompt | llm | StrOutputParser()
+```
+
+### LLMChain 실행
+
+질문을 제공하고 LLMChain을 실행합니다.
+
+```python
+question = "What NFL team won the Super Bowl in the year Justin Beiber was born?"
+
+llm_chain.invoke(question)
+```
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/llms/pipelineai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

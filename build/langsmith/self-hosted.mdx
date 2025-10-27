@@ -1,0 +1,203 @@
+---
+title: Self-hosted LangSmith
+sidebarTitle: 개요
+---
+
+<Note>
+**중요**<br></br>
+Self-hosted LangSmith는 가장 규모가 크고 보안을 중요시하는 고객을 위해 설계된 Enterprise 플랜의 추가 옵션입니다. 자세한 내용은 [가격 정책](https://www.langchain.com/pricing)을 참조하세요. 귀하의 환경에서 LangSmith를 체험하기 위한 라이선스 키를 받고 싶으시다면 [영업팀에 문의](https://www.langchain.com/contact-sales)하세요.
+</Note>
+
+LangSmith는 규모, 보안 및 인프라 요구 사항에 따라 다양한 self-hosted 구성을 지원합니다. 이 페이지는 지원되는 self-hosted 모델에 대한 개요를 제공합니다:
+
+- **[LangSmith](#langsmith)**: UI 및 API에서 observability, tracing, evaluation을 포함하는 LangSmith 애플리케이션 인스턴스를 배포합니다. agent를 배포하지 않고 self-hosted 모니터링 및 평가를 원하는 팀에 가장 적합합니다.
+- **[LangSmith with deployment](#langsmith-with-deployment)**: control plane을 통해 LangGraph Server에 _graph_를 배포합니다. control plane과 data plane이 전체 LangSmith 플랫폼을 구성하여 agent 실행 및 모니터링을 위한 UI 및 API 관리를 제공합니다. 여기에는 observability, evaluation 및 deployment 관리가 포함됩니다.
+- **[Standalone server](#standalone-server)**: control plane UI 없이 LangGraph Server를 직접 배포합니다. 하나 또는 몇 개의 agent를 독립적인 서비스로 실행하는 경량 설정에 이상적이며, 확장 및 통합에 대한 완전한 제어를 제공합니다.
+
+모델 | 포함 사항 | 적합한 대상 | 방법
+------------------|------------------|----------|--------------------
+**LangSmith** | <ul><li>LangSmith app (UI + API)</li><li>Backend services (queue, playground, ACE)</li><li>Datastores: PostgreSQL, Redis, ClickHouse, optional blob storage</li></ul> | <ul><li>self-hosted observability, tracing, evaluation이 필요한 팀</li><li>agent/graph를 배포하지 않고 LangSmith app을 실행하는 경우</li></ul> | <ul><li>Docker Compose (개발/테스트)</li><li>Kubernetes + Helm (프로덕션)</li></ul>
+**LangSmith with deployment** | <ul><li>LangSmith의 모든 기능</li><li>Control plane (deployments UI, revision management, Studio)</li><li>Data plane (LangGraph Server pods)</li><li>오케스트레이션을 위한 Kubernetes operator</li></ul> | <ul><li>프라이빗 LangChain Cloud가 필요한 엔터프라이즈 팀</li><li>여러 agent/graph를 관리하기 위한 중앙 집중식 UI/API</li><li>통합된 observability 및 오케스트레이션</li></ul> | <ul><li>Kubernetes with Helm (필수)</li><li>EKS, GKE, AKS 또는 자체 관리 클러스터에서 실행</li></ul>
+**Standalone server** | <ul><li>LangGraph Server container(s)</li><li>PostgreSQL + Redis 필요 (공유 또는 전용)</li><li>tracing을 위한 선택적 LangSmith 통합</li></ul> | <ul><li>하나 또는 몇 개의 agent를 경량으로 배포</li><li>LangGraph Server를 마이크로서비스로 통합</li><li>확장 및 CI/CD를 직접 관리하려는 팀</li></ul> | <ul><li>Docker / Docker Compose (개발/테스트)</li><li>Kubernetes + Helm (프로덕션)</li><li>모든 컨테이너 런타임 또는 VM (ECS, EC2, ACI 등)</li></ul>
+
+<Note>
+배포 가이드는 다음을 참조하세요:
+
+* [Self-Hosted Full Platform 배포 방법](/langsmith/deploy-self-hosted-full-platform)
+* [Self-Hosted Standalone Server 배포 방법](/langsmith/deploy-standalone-server)
+
+지원되는 컴퓨팅 플랫폼: [Kubernetes](https://kubernetes.io/) (Control Plane용), 모든 컴퓨팅 플랫폼 (Standalone Server Only용)
+</Note>
+
+## LangSmith
+
+UI 및 API에서 observability, tracing, evaluation을 포함하는 LangSmith 애플리케이션 인스턴스를 배포하지만, control plane을 통해 agent를 배포하는 기능은 **없습니다**.
+
+포함 사항:
+
+**Services:**
+- LangSmith frontend UI
+- LangSmith backend API
+- LangSmith Platform backend
+- LangSmith Playground
+- LangSmith queue
+- LangSmith ACE (Arbitrary Code Execution) backend
+
+**Storage services:**
+- ClickHouse (trace 및 feedback 데이터)
+- PostgreSQL (운영 데이터)
+- Redis (큐잉 및 캐싱)
+- Blob storage (선택 사항이지만 프로덕션에 권장)
+
+<img
+    className="block dark:hidden"
+    src="/langsmith/images/cloud-arch-light.png"
+    alt="서비스 및 데이터스토어를 보여주는 LangSmith 아키텍처"
+/>
+
+<img
+    className="hidden dark:block"
+    src="/langsmith/images/cloud-arch-dark.png"
+    alt="서비스 및 데이터스토어를 보여주는 LangSmith 아키텍처"
+/>
+
+LangSmith UI에 액세스하고 API 요청을 보내려면 [LangSmith frontend](#langsmith-frontend) 서비스를 노출해야 합니다. 설치 방법에 따라 로드 밸런서 또는 호스트 머신에 노출된 포트가 될 수 있습니다.
+
+### Services
+
+| Service | 설명 |
+|---------|-------------|
+| <a id="langsmith-frontend"></a> **LangSmith frontend** | frontend는 Nginx를 사용하여 LangSmith UI를 제공하고 API 요청을 다른 서버로 라우팅합니다. 이것은 애플리케이션의 진입점 역할을 하며 사용자에게 노출되어야 하는 유일한 구성 요소입니다. |
+| <a id="langsmith-backend"></a> **LangSmith backend** | backend는 CRUD API 요청의 주요 진입점이며 애플리케이션의 비즈니스 로직 대부분을 처리합니다. 여기에는 frontend 및 SDK의 요청 처리, 수집을 위한 trace 준비, hub API 지원이 포함됩니다. |
+| <a id="langsmith-queue"></a> **LangSmith queue** | queue는 들어오는 trace 및 feedback을 처리하여 비동기적으로 trace 및 feedback 데이터스토어에 수집 및 저장되도록 보장하며, 데이터 무결성 검사를 처리하고 데이터스토어에 성공적으로 삽입되도록 보장하며, 데이터베이스 오류 또는 데이터베이스에 일시적으로 연결할 수 없는 상황에서 재시도를 처리합니다. |
+| <a id="langsmith-platform-backend"></a> **LangSmith platform backend** | platform backend는 주로 인증, run 수집 및 기타 대용량 작업을 처리하는 또 다른 중요한 서비스입니다. |
+| <a id="langsmith-playground"></a> **LangSmith playground** | playground는 LangSmith Playground 기능을 지원하기 위해 다양한 LLM API로 요청을 전달하는 서비스입니다. 이것은 자체 커스텀 모델 서버에 연결하는 데에도 사용할 수 있습니다. |
+| <a id="langsmith-ace-arbitrary-code-execution-backend"></a> **LangSmith ACE (Arbitrary Code Execution) backend** | ACE backend는 보안 환경에서 임의의 코드를 실행하는 서비스입니다. 이것은 LangSmith 내에서 커스텀 코드를 실행하는 것을 지원하는 데 사용됩니다. |
+
+### Storage services
+
+<Note>
+LangSmith는 기본적으로 모든 storage service를 번들로 제공합니다. 모든 storage service의 외부 버전을 사용하도록 구성할 수 있습니다. 프로덕션 환경에서는 **외부 storage service를 사용할 것을 강력히 권장합니다**.
+</Note>
+
+| Service | 설명 |
+|---------|-------------|
+| <a id="clickhouse"></a> **ClickHouse** | [ClickHouse](https://clickhouse.com/docs/en/intro)는 온라인 분석 처리(OLAP)를 위한 고성능 열 지향 SQL 데이터베이스 관리 시스템(DBMS)입니다.<br/><br/>LangSmith는 ClickHouse를 trace 및 feedback(대용량 데이터)의 주요 데이터 저장소로 사용합니다. |
+| <a id="postgresql"></a> **PostgreSQL** | [PostgreSQL](https://www.postgresql.org/about/)은 SQL 언어를 사용하고 확장하며 가장 복잡한 데이터 워크로드를 안전하게 저장하고 확장하는 많은 기능과 결합된 강력한 오픈 소스 객체 관계형 데이터베이스 시스템입니다.<br/><br/>LangSmith는 PostgreSQL을 트랜잭션 워크로드 및 운영 데이터(trace 및 feedback을 제외한 거의 모든 것)의 주요 데이터 저장소로 사용합니다. |
+| <a id="redis"></a> **Redis** | [Redis](https://github.com/redis/redis)는 디스크에 지속되는 강력한 인메모리 키-값 데이터베이스입니다. 데이터를 메모리에 보관함으로써 Redis는 캐싱과 같은 작업에 대해 높은 성능을 제공합니다.<br/><br/>LangSmith는 Redis를 큐잉 및 캐싱 작업을 지원하는 데 사용합니다. |
+| <a id="blob-storage"></a> **Blob storage** | LangSmith는 [AWS S3](https://aws.amazon.com/s3/), [Azure Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/), [Google Cloud Storage](https://cloud.google.com/storage)를 포함한 여러 blob storage 제공업체를 지원합니다.<br/><br/>LangSmith는 blob storage를 사용하여 trace artifact, feedback 첨부 파일 및 기타 대용량 데이터 객체와 같은 대용량 파일을 저장합니다. Blob storage는 선택 사항이지만 프로덕션 배포에 강력히 권장됩니다. |
+
+### Setup methods
+
+- **Docker Compose** (개발/테스트 전용)
+- **Kubernetes + Helm** (프로덕션 권장)
+
+### Setup guides
+
+- [Kubernetes에 설치](/langsmith/kubernetes) (프로덕션)
+- [Docker로 설치](/langsmith/docker) (개발 전용)
+
+## LangSmith with Deployment
+
+**LangSmith with deployment**는 [LangSmith](#langsmith) 옵션을 기반으로 구축됩니다. deployment를 활성화하는 것은 여러 agent 및 graph를 배포하고 관리하기 위한 중앙 집중식 UI 기반 플랫폼을 원하는 엔터프라이즈 팀에 이상적이며, 모든 인프라, 데이터 및 오케스트레이션을 완전히 제어할 수 있습니다.
+
+[LangSmith](#langsmith)의 모든 기능에 더해 다음이 포함됩니다:
+
+| 구성 요소 | 책임 | 실행 위치 | 관리 주체 |
+|-----------|------------------|---------------|----------------|
+| <Tooltip tip="deployment를 관리하기 위한 LangSmith UI 및 API.">Control plane</Tooltip> | <ul><li>deployment 및 revision 생성을 위한 UI</li><li>deployment 관리를 위한 API</li></ul> | 귀하의 클라우드 | 귀하 |
+| <Tooltip tip="LangGraph Server 및 agent가 실행되는 런타임 환경.">Data plane</Tooltip> | <ul><li>deployment를 조정하기 위한 Operator/listener</li><li>LangGraph Servers (agents/graphs)</li><li>지원 서비스 (Postgres, Redis 등)</li></ul> | 귀하의 클라우드 | 귀하 |
+
+control plane과 data plane 모두를 자체 인프라 내에서 완전히 실행합니다. 모든 구성 요소의 프로비저닝 및 관리는 귀하의 책임입니다.
+
+<Note>
+[control plane](/langsmith/control-plane) 및 [data plane](/langsmith/data-plane) 아키텍처 개념에 대해 자세히 알아보세요.
+</Note>
+
+<img
+    className="block dark:hidden"
+    src="/langsmith/images/full-platform-with-deployment-light.png"
+    alt="control plane 및 data plane이 포함된 전체 플랫폼 아키텍처"
+/>
+
+<img
+    className="hidden dark:block"
+    src="/langsmith/images/full-platform-with-deployment-dark.png"
+    alt="control plane 및 data plane이 포함된 전체 플랫폼 아키텍처"
+/>
+
+### Requirements
+
+1. 클라우드에 [self-hosted LangSmith 인스턴스](#langsmith)가 이미 설치되어 있어야 합니다
+2. Kubernetes 클러스터 (control plane 및 data plane에 필요)
+3. `langgraph-cli` 또는 [Studio](/langsmith/studio)를 사용하여 로컬에서 graph를 테스트합니다
+4. `langgraph build`로 Docker 이미지를 빌드합니다
+5. LangSmith control plane UI를 통해 또는 선택한 컨테이너 도구를 통해 LangGraph Server를 배포합니다
+6. 모든 agent는 LangSmith 인스턴스에 구성된 ingress 뒤의 Kubernetes 서비스로 배포됩니다
+
+### Supported compute platforms
+
+- **Kubernetes**: LangSmith with deployment는 모든 Kubernetes 클러스터에서 control plane 및 data plane 인프라 실행을 지원합니다.
+
+### Setup guide
+
+<Tip>
+LangSmith 인스턴스에서 이 기능을 활성화하려면 [Self-Hosted Full Platform 배포 가이드](/langsmith/deploy-self-hosted-full-platform)를 따르세요.
+</Tip>
+
+## Standalone Server
+
+**Standalone server** 옵션은 LangSmith를 실행하는 가장 경량이고 유연한 방법입니다. 다른 모델과 달리 LangGraph Server와 필요한 지원 서비스(PostgreSQL, Redis 등)로 구성된 단순화된 <Tooltip tip="LangGraph Server 및 agent가 실행되는 런타임 환경.">data plane</Tooltip>만 관리합니다.
+
+포함 사항:
+
+| 구성 요소 | 책임 | 실행 위치 | 관리 주체 |
+|-----------|------------------|---------------|----------------|
+| **Control plane** | n/a | n/a | n/a |
+| **Data plane** | <ul><li>LangGraph Servers</li><li>Postgres, Redis 등</li></ul> | 귀하의 클라우드 | 귀하 |
+
+이 옵션은 확장, 배포 및 CI/CD 파이프라인에 대한 완전한 제어를 제공하면서도 tracing 및 evaluation을 위해 LangSmith와의 선택적 통합을 허용합니다.
+
+<Warning>
+serverless 환경에서 standalone server를 실행하지 마세요. scale-to-zero는 작업 손실을 유발할 수 있으며 확장이 안정적으로 작동하지 않습니다.
+</Warning>
+
+<img
+    className="block dark:hidden"
+    src="/langsmith/images/standalone-server-light.png"
+    alt="Standalone server 아키텍처"
+/>
+
+<img
+    className="hidden dark:block"
+    src="/langsmith/images/standalone-server-dark.png"
+    alt="Standalone server 아키텍처"
+/>
+
+### Workflow
+
+1. `langgraph-cli` 또는 [Studio](/langsmith/studio)를 사용하여 로컬에서 graph를 정의하고 테스트합니다
+2. agent를 Docker 이미지로 패키징합니다
+3. 선택한 컴퓨팅 플랫폼(Kubernetes, Docker, VM)에 LangGraph Server를 배포합니다
+4. 선택적으로 LangSmith API key 및 endpoint를 구성하여 서버가 trace 및 evaluation을 LangSmith(self-hosted 또는 SaaS)로 다시 보고하도록 합니다
+
+### Supported compute platforms
+
+- **Kubernetes**: LangSmith Helm chart를 사용하여 Kubernetes 클러스터에서 LangGraph Server를 실행합니다. 이것은 프로덕션급 배포에 권장되는 옵션입니다.
+
+- **Docker**: Docker를 지원하는 모든 컴퓨팅 플랫폼(로컬 개발 머신, VM, ECS 등)에서 실행합니다. 이것은 개발 또는 소규모 워크로드에 가장 적합합니다.
+
+### Setup guide
+
+<Tip>
+[LangGraph Server](/langsmith/langgraph-server)를 설정하려면 [how-to 가이드](/langsmith/deploy-standalone-server)를 참조하세요.
+</Tip>
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/self-hosted.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

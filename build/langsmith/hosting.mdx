@@ -1,0 +1,82 @@
+---
+title: LangSmith 호스팅
+sidebarTitle: LangSmith 호스팅
+mode: wide
+---
+
+이 섹션에서는 **LangSmith**를 호스팅하고 관리하는 방법을 다룹니다: 관찰성, 평가 및 에이전트 배포 기능을 지원하는 인프라, 서비스 및 데이터 저장소입니다.
+
+<Callout icon="building" color="#2563EB" iconType="regular">
+**LangSmith 인프라를 설정하거나 유지 관리하는 경우 여기서 시작하세요.** 에이전트 애플리케이션을 배포할 준비가 되었다면, [배포 섹션](/langsmith/deployments)에서 애플리케이션 구조, 배포 구성 및 Cloud 배포 가이드를 확인하세요.
+</Callout>
+
+## 호스팅 옵션 선택
+
+LangSmith를 다음 세 가지 모드 중 하나로 배포할 수 있습니다:
+- [**Cloud**](/langsmith/cloud): LangChain이 완전히 관리
+- [**Hybrid**](/langsmith/hybrid): LangChain이 <Tooltip tip="배포를 관리하기 위한 LangSmith UI 및 API입니다.">control plane</Tooltip>을 관리하고, 사용자가 <Tooltip tip="LangGraph Server와 에이전트가 실행되는 런타임 환경입니다.">data plane</Tooltip>을 호스팅
+- [**Self-hosted**](/langsmith/self-hosted): 사용자가 인프라 내에서 전체 스택을 관리
+
+<Columns cols={3}>
+  <Card
+    title="Cloud"
+    icon="cloud"
+    iconType="solid"
+    href="/langsmith/cloud"
+    cta="시작하기"
+  >
+    LangChain의 클라우드에서 모든 구성 요소를 완전히 관리형으로 실행합니다.
+  </Card>
+
+  <Card
+    title="Hybrid"
+    icon="cloud"
+    href="/langsmith/hybrid"
+    cta="Hybrid 설정하기"
+  >
+    **(Enterprise)** LangChain이 control plane을 관리하는 동안 클라우드에서 실행되는 data plane을 관리합니다.
+  </Card>
+
+  <Card
+    title="Self-hosted"
+    icon="server"
+    iconType="solid"
+    href="/langsmith/self-hosted"
+    cta="Self-hosted 실행하기"
+  >
+    **(Enterprise)** 전체 LangSmith를 실행하거나 control plane UI 없이 독립형 LangGraph Server를 실행합니다.
+  </Card>
+</Columns>
+
+### 비교
+
+호스팅 옵션 비교는 다음 표를 참조하세요:
+
+| Feature | **Cloud** | **Hybrid** | **Self-Hosted** |
+|---------|-----------|------------|-----------------|
+| **Infrastructure 위치** | LangChain의 클라우드 | 분리: Control plane은 LangChain 클라우드, data plane은 사용자 클라우드 | 사용자 클라우드 |
+| **업데이트 관리 주체** | LangChain | LangChain (control plane), 사용자 (data plane) | 사용자 |
+| **앱 CI/CD 관리 주체** | LangChain | 사용자 | 사용자 |
+| **애플리케이션 배포 가능 여부** | ✅ 가능 | ✅ 가능 | ✅ 가능 (전체 플랫폼 옵션 사용 시) |
+| **관찰성 데이터 위치** | LangChain 클라우드 | LangChain 클라우드 | 사용자 클라우드 |
+| **[가격](https://www.langchain.com/plans)** | Plus tier | Enterprise | Enterprise |
+| **적합한 경우** | 빠른 설정, 관리형 인프라 | 데이터 레지던시 요구사항 + 관리형 control plane | 완전한 제어, 데이터 격리 |
+
+<Tip>
+테스트 및 개발을 위해 [LangGraph Server를 로컬에서 무료로 실행](/langsmith/local-server)할 수 있습니다.
+</Tip>
+
+### 관련 항목
+
+- [Plans](https://langchain.com/pricing)
+- [Pricing](https://www.langchain.com/plans)
+- [Observability](/langsmith/observability)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/hosting.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

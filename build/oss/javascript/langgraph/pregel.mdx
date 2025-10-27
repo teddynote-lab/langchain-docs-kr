@@ -1,0 +1,381 @@
+---
+title: LangGraph runtime
+sidebarTitle: Runtime
+---
+
+
+
+
+
+[`Pregel`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.Pregel.html)은 LangGraph의 runtime을 구현하며, LangGraph 애플리케이션의 실행을 관리합니다.
+
+[StateGraph](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html)를 컴파일하거나 [entrypoint](https://langchain-ai.github.io/langgraphjs/reference/functions/langgraph.entrypoint.html)를 생성하면 입력과 함께 호출할 수 있는 [`Pregel`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.Pregel.html) 인스턴스가 생성됩니다.
+
+
+이 가이드는 runtime을 높은 수준에서 설명하고 Pregel을 사용하여 애플리케이션을 직접 구현하는 방법을 제공합니다.
+
+
+
+> **참고:** [`Pregel`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.Pregel.html) runtime은 그래프를 사용한 대규모 병렬 계산의 효율적인 방법을 설명하는 [Google의 Pregel 알고리즘](https://research.google/pubs/pub37252/)의 이름을 따서 명명되었습니다.
+
+
+## 개요
+
+LangGraph에서 Pregel은 [**actors**](https://en.wikipedia.org/wiki/Actor_model)와 **channels**를 단일 애플리케이션으로 결합합니다. **Actors**는 channels에서 데이터를 읽고 channels에 데이터를 씁니다. Pregel은 **Pregel Algorithm**/**Bulk Synchronous Parallel** 모델을 따라 애플리케이션의 실행을 여러 단계로 구성합니다.
+
+각 단계는 세 가지 단계로 구성됩니다:
+
+* **Plan**: 이 단계에서 실행할 **actors**를 결정합니다. 예를 들어, 첫 번째 단계에서는 특수 **input** channels를 구독하는 **actors**를 선택하고, 후속 단계에서는 이전 단계에서 업데이트된 channels를 구독하는 **actors**를 선택합니다.
+* **Execution**: 선택된 모든 **actors**를 병렬로 실행하며, 모두 완료되거나, 하나가 실패하거나, 타임아웃에 도달할 때까지 실행합니다. 이 단계에서 channel 업데이트는 다음 단계까지 actors에게 보이지 않습니다.
+* **Update**: 이 단계에서 **actors**가 작성한 값으로 channels를 업데이트합니다.
+
+실행할 **actors**가 선택되지 않거나 최대 단계 수에 도달할 때까지 반복합니다.
+
+## Actors
+
+**actor**는 `PregelNode`입니다. channels를 구독하고, 데이터를 읽고, 데이터를 씁니다. Pregel 알고리즘의 **actor**로 생각할 수 있습니다. `PregelNodes`는 LangChain의 Runnable 인터페이스를 구현합니다.
+
+## Channels
+
+Channels는 actors(PregelNodes) 간의 통신에 사용됩니다. 각 channel은 값 타입, 업데이트 타입, 업데이트 함수를 가지며, 업데이트 함수는 일련의 업데이트를 받아 저장된 값을 수정합니다. Channels는 한 chain에서 다른 chain으로 데이터를 보내거나, chain에서 미래 단계의 자신에게 데이터를 보내는 데 사용할 수 있습니다. LangGraph는 여러 내장 channels를 제공합니다:
+
+
+
+* @[`LastValue`]: 기본 channel로, channel에 전송된 마지막 값을 저장하며, 입력 및 출력 값이나 한 단계에서 다음 단계로 데이터를 전송하는 데 유용합니다.
+* @[`Topic`]: 구성 가능한 PubSub Topic으로, **actors** 간에 여러 값을 전송하거나 출력을 누적하는 데 유용합니다. 값을 중복 제거하거나 여러 단계에 걸쳐 값을 누적하도록 구성할 수 있습니다.
+* [`BinaryOperatorAggregate`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.BinaryOperatorAggregate.html): 지속적인 값을 저장하며, 현재 값과 channel에 전송된 각 업데이트에 이진 연산자를 적용하여 업데이트됩니다. 여러 단계에 걸쳐 집계를 계산하는 데 유용합니다. 예: `total = BinaryOperatorAggregate(int, operator.add)`
+
+
+## 예제
+
+
+
+대부분의 사용자는 [StateGraph](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html) API 또는 [entrypoint](https://langchain-ai.github.io/langgraphjs/reference/functions/langgraph.entrypoint.html) decorator를 통해 Pregel과 상호 작용하지만, Pregel과 직접 상호 작용하는 것도 가능합니다.
+
+
+다음은 Pregel API에 대한 이해를 돕기 위한 몇 가지 예제입니다.
+
+<Tabs>
+    <Tab title="단일 노드">
+
+
+    ```typescript
+    import { EphemeralValue } from "@langchain/langgraph/channels";
+    import { Pregel, NodeBuilder } from "@langchain/langgraph/pregel";
+
+    const node1 = new NodeBuilder()
+      .subscribeOnly("a")
+      .do((x: string) => x + x)
+      .writeTo("b");
+
+    const app = new Pregel({
+      nodes: { node1 },
+      channels: {
+        a: new EphemeralValue<string>(),
+        b: new EphemeralValue<string>(),
+      },
+      inputChannels: ["a"],
+      outputChannels: ["b"],
+    });
+
+    await app.invoke({ a: "foo" });
+    ```
+
+    ```console
+    { b: 'foofoo' }
+    ```
+
+    </Tab>
+    <Tab title="여러 노드">
+
+
+    ```typescript
+    import { LastValue, EphemeralValue } from "@langchain/langgraph/channels";
+    import { Pregel, NodeBuilder } from "@langchain/langgraph/pregel";
+
+    const node1 = new NodeBuilder()
+      .subscribeOnly("a")
+      .do((x: string) => x + x)
+      .writeTo("b");
+
+    const node2 = new NodeBuilder()
+      .subscribeOnly("b")
+      .do((x: string) => x + x)
+      .writeTo("c");
+
+    const app = new Pregel({
+      nodes: { node1, node2 },
+      channels: {
+        a: new EphemeralValue<string>(),
+        b: new LastValue<string>(),
+        c: new EphemeralValue<string>(),
+      },
+      inputChannels: ["a"],
+      outputChannels: ["b", "c"],
+    });
+
+    await app.invoke({ a: "foo" });
+    ```
+
+    ```console
+    { b: 'foofoo', c: 'foofoofoofoo' }
+    ```
+
+    </Tab>
+    <Tab title="Topic">
+
+
+    ```typescript
+    import { EphemeralValue, Topic } from "@langchain/langgraph/channels";
+    import { Pregel, NodeBuilder } from "@langchain/langgraph/pregel";
+
+    const node1 = new NodeBuilder()
+      .subscribeOnly("a")
+      .do((x: string) => x + x)
+      .writeTo("b", "c");
+
+    const node2 = new NodeBuilder()
+      .subscribeTo("b")
+      .do((x: { b: string }) => x.b + x.b)
+      .writeTo("c");
+
+    const app = new Pregel({
+      nodes: { node1, node2 },
+      channels: {
+        a: new EphemeralValue<string>(),
+        b: new EphemeralValue<string>(),
+        c: new Topic<string>({ accumulate: true }),
+      },
+      inputChannels: ["a"],
+      outputChannels: ["c"],
+    });
+
+    await app.invoke({ a: "foo" });
+    ```
+
+    ```console
+    { c: ['foofoo', 'foofoofoofoo'] }
+    ```
+
+    </Tab>
+    <Tab title="BinaryOperatorAggregate">
+    이 예제는 [`BinaryOperatorAggregate`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.BinaryOperatorAggregate.html) channel을 사용하여 reducer를 구현하는 방법을 보여줍니다.
+
+
+
+    ```typescript
+    import { EphemeralValue, BinaryOperatorAggregate } from "@langchain/langgraph/channels";
+    import { Pregel, NodeBuilder } from "@langchain/langgraph/pregel";
+
+    const node1 = new NodeBuilder()
+      .subscribeOnly("a")
+      .do((x: string) => x + x)
+      .writeTo("b", "c");
+
+    const node2 = new NodeBuilder()
+      .subscribeOnly("b")
+      .do((x: string) => x + x)
+      .writeTo("c");
+
+    const reducer = (current: string, update: string) => {
+      if (current) {
+        return current + " | " + update;
+      } else {
+        return update;
+      }
+    };
+
+    const app = new Pregel({
+      nodes: { node1, node2 },
+      channels: {
+        a: new EphemeralValue<string>(),
+        b: new EphemeralValue<string>(),
+        c: new BinaryOperatorAggregate<string>({ operator: reducer }),
+      },
+      inputChannels: ["a"],
+      outputChannels: ["c"],
+    });
+
+    await app.invoke({ a: "foo" });
+    ```
+
+    </Tab>
+    <Tab title="순환">
+
+
+    이 예제는 chain이 구독하는 channel에 쓰도록 하여 그래프에 순환을 도입하는 방법을 보여줍니다. `null` 값이 channel에 쓰일 때까지 실행이 계속됩니다.
+
+    ```typescript
+    import { EphemeralValue } from "@langchain/langgraph/channels";
+    import { Pregel, NodeBuilder, ChannelWriteEntry } from "@langchain/langgraph/pregel";
+
+    const exampleNode = new NodeBuilder()
+      .subscribeOnly("value")
+      .do((x: string) => x.length < 10 ? x + x : null)
+      .writeTo(new ChannelWriteEntry("value", { skipNone: true }));
+
+    const app = new Pregel({
+      nodes: { exampleNode },
+      channels: {
+        value: new EphemeralValue<string>(),
+      },
+      inputChannels: ["value"],
+      outputChannels: ["value"],
+    });
+
+    await app.invoke({ value: "a" });
+    ```
+
+    ```console
+    { value: 'aaaaaaaaaaaaaaaa' }
+    ```
+
+    </Tab>
+</Tabs>
+
+## 고수준 API
+
+LangGraph는 Pregel 애플리케이션을 생성하기 위한 두 가지 고수준 API를 제공합니다: [StateGraph (Graph API)](/oss/javascript/langgraph/graph-api)와 [Functional API](/oss/javascript/langgraph/functional-api)입니다.
+
+<Tabs>
+    <Tab title="StateGraph (Graph API)">
+
+
+    [StateGraph (Graph API)](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html)는 Pregel 애플리케이션 생성을 단순화하는 더 높은 수준의 추상화입니다. 노드와 엣지의 그래프를 정의할 수 있습니다. 그래프를 컴파일하면 StateGraph API가 자동으로 Pregel 애플리케이션을 생성합니다.
+
+    ```typescript
+    import { START, StateGraph } from "@langchain/langgraph";
+
+    interface Essay {
+      topic: string;
+      content?: string;
+      score?: number;
+    }
+
+    const writeEssay = (essay: Essay) => {
+      return {
+        content: `Essay about ${essay.topic}`,
+      };
+    };
+
+    const scoreEssay = (essay: Essay) => {
+      return {
+        score: 10
+      };
+    };
+
+    const builder = new StateGraph<Essay>({
+      channels: {
+        topic: null,
+        content: null,
+        score: null,
+      }
+    })
+      .addNode("writeEssay", writeEssay)
+      .addNode("scoreEssay", scoreEssay)
+      .addEdge(START, "writeEssay")
+      .addEdge("writeEssay", "scoreEssay");
+
+    // Compile the graph.
+    // This will return a Pregel instance.
+    const graph = builder.compile();
+    ```
+
+
+    컴파일된 Pregel 인스턴스는 노드와 channels 목록과 연결됩니다. 노드와 channels를 출력하여 검사할 수 있습니다.
+
+
+
+    ```typescript
+    console.log(graph.nodes);
+    ```
+
+    다음과 같은 내용이 표시됩니다:
+
+    ```console
+    {
+      __start__: PregelNode { ... },
+      writeEssay: PregelNode { ... },
+      scoreEssay: PregelNode { ... }
+    }
+    ```
+
+    ```typescript
+    console.log(graph.channels);
+    ```
+
+    다음과 같은 내용이 표시됩니다:
+
+    ```console
+    {
+      topic: LastValue { ... },
+      content: LastValue { ... },
+      score: LastValue { ... },
+      __start__: EphemeralValue { ... },
+      writeEssay: EphemeralValue { ... },
+      scoreEssay: EphemeralValue { ... },
+      'branch:__start__:__self__:writeEssay': EphemeralValue { ... },
+      'branch:__start__:__self__:scoreEssay': EphemeralValue { ... },
+      'branch:writeEssay:__self__:writeEssay': EphemeralValue { ... },
+      'branch:writeEssay:__self__:scoreEssay': EphemeralValue { ... },
+      'branch:scoreEssay:__self__:writeEssay': EphemeralValue { ... },
+      'branch:scoreEssay:__self__:scoreEssay': EphemeralValue { ... },
+      'start:writeEssay': EphemeralValue { ... }
+    }
+    ```
+
+    </Tab>
+    <Tab title="Functional API">
+
+
+    [Functional API](/oss/javascript/langgraph/functional-api)에서는 [`entrypoint`](https://langchain-ai.github.io/langgraphjs/reference/functions/langgraph.entrypoint.html)를 사용하여 Pregel 애플리케이션을 생성할 수 있습니다. `entrypoint` decorator를 사용하면 입력을 받아 출력을 반환하는 함수를 정의할 수 있습니다.
+
+    ```typescript
+    import { MemorySaver } from "@langchain/langgraph";
+    import { entrypoint } from "@langchain/langgraph/func";
+
+    interface Essay {
+      topic: string;
+      content?: string;
+      score?: number;
+    }
+
+    const checkpointer = new MemorySaver();
+
+    const writeEssay = entrypoint(
+      { checkpointer, name: "writeEssay" },
+      async (essay: Essay) => {
+        return {
+          content: `Essay about ${essay.topic}`,
+        };
+      }
+    );
+
+    console.log("Nodes: ");
+    console.log(writeEssay.nodes);
+    console.log("Channels: ");
+    console.log(writeEssay.channels);
+    ```
+
+    ```console
+    Nodes:
+    { writeEssay: PregelNode { ... } }
+    Channels:
+    {
+      __start__: EphemeralValue { ... },
+      __end__: LastValue { ... },
+      __previous__: LastValue { ... }
+    }
+    ```
+
+    </Tab>
+</Tabs>
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langgraph/pregel.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,39 @@
+---
+title: AINetwork
+---
+
+>[AI Network](https://www.ainetwork.ai/build-on-ain)는 대규모 AI 모델을 수용하도록 설계된 레이어 1 블록체인으로,
+> [$AIN token](https://www.ainetwork.ai/token)으로 구동되는 분산형 GPU 네트워크를 활용하여
+> AI 기반 `NFT`(`AINFT`)를 강화합니다.
+
+
+## 설치 및 설정
+
+`ain-py` python 패키지를 설치해야 합니다.
+
+<CodeGroup>
+```bash pip
+pip install ain-py
+```
+
+```bash uv
+uv add ain-py
+```
+</CodeGroup>
+`AIN_BLOCKCHAIN_ACCOUNT_PRIVATE_KEY` 환경 변수를 AIN Blockchain Account Private Key로 설정해야 합니다.
+## Toolkit
+
+[사용 예시](/oss/python/integrations/tools/ainetwork)를 참조하세요.
+
+```python
+from langchain_community.agent_toolkits.ainetwork.toolkit import AINetworkToolkit
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/ainetwork.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

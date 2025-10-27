@@ -1,0 +1,52 @@
+---
+title: DocArray
+---
+
+> [DocArray](https://docarray.jina.ai/)는 텍스트, 이미지, 오디오, 비디오, 3D 메시 등을 포함한 중첩되고 비구조화된 멀티모달 데이터를 전송하기 위한 라이브러리입니다. 딥러닝 엔지니어가 Pythonic API를 사용하여 멀티모달 데이터를 효율적으로 처리, 임베딩, 검색, 추천, 저장 및 전송할 수 있도록 합니다.
+
+
+## Installation and Setup
+
+`docarray` python package를 설치해야 합니다.
+
+<CodeGroup>
+```bash pip
+pip install docarray
+```
+
+```bash uv
+uv add docarray
+```
+</CodeGroup>
+
+## Vector Store
+
+LangChain은 `DocArray` 라이브러리의 `In-memory` 및 `HNSW` vector store에 대한 액세스를 제공합니다.
+
+[사용 예제](/oss/python/integrations/vectorstores/docarray_hnsw)를 참조하세요.
+
+```python
+from langchain_community.vectorstores import DocArrayHnswSearch
+```
+[사용 예제](/oss/python/integrations/vectorstores/docarray_in_memory)를 참조하세요.
+
+```python
+from langchain_community.vectorstores DocArrayInMemorySearch
+```
+
+## Retriever
+
+[사용 예제](/oss/python/integrations/retrievers/docarray_retriever)를 참조하세요.
+
+```python
+from langchain_community.retrievers import DocArrayRetriever
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/docarray.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

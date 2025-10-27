@@ -1,0 +1,32 @@
+```markdown
+---
+title: Yuque
+---
+
+>[Yuque](https://www.yuque.com/)는 문서 협업을 위한 전문 클라우드 기반 팀 지식 베이스입니다.
+
+이 노트북은 `Yuque`에서 문서를 로드하는 방법을 다룹니다.
+
+[개인 설정](https://www.yuque.com/settings/tokens) 페이지에서 개인 아바타를 클릭하여 personal access token을 얻을 수 있습니다.
+
+```python
+from langchain_community.document_loaders import YuqueLoader
+```
+
+```python
+loader = YuqueLoader(access_token="<your_personal_access_token>")
+```
+
+```python
+docs = loader.load()
+```
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/document_loaders/yuque.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

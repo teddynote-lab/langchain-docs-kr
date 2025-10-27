@@ -1,0 +1,74 @@
+---
+title: Token으로 분할하기
+---
+
+Language model에는 token 제한이 있습니다. Token 제한을 초과해서는 안 됩니다. [텍스트를 chunk로 분할](/oss/javascript/integrations/splitters/)할 때 token 수를 세는 것이 좋습니다. 많은 tokenizer가 있습니다. 텍스트에서 token을 셀 때는 language model에서 사용하는 것과 동일한 tokenizer를 사용해야 합니다.
+
+
+
+## js-tiktoken
+
+<Note>
+**[js-tiktoken](https://github.com/dqbd/tiktoken)은 `OpenAI`가 만든 `BPE` tokenizer의 JavaScript 버전입니다.**
+</Note>
+
+@[TokenTextSplitter]를 사용하여 `tiktoken`으로 사용된 token을 추정할 수 있습니다. OpenAI model에 대해 더 정확할 것입니다.
+
+1. 텍스트 분할 방법: 전달된 문자로 분할.
+2. Chunk 크기 측정 방법: `tiktoken` tokenizer로 측정.
+
+<CodeGroup>
+```bash npm
+npm install @langchain/textsplitters
+```
+
+```bash pnpm
+pnpm install @langchain/textsplitters
+```
+
+```bash yarn
+yarn add @langchain/textsplitters
+```
+
+```bash bun
+bun add @langchain/textsplitters
+```
+</CodeGroup>
+
+```ts
+import { TokenTextSplitter } from "@langchain/textsplitters";
+import { readFileSync } from "fs";
+
+// Example: read a long document
+const stateOfTheUnion = readFileSync("state_of_the_union.txt", "utf8");
+```
+
+@[TokenTextSplitter]로 분할한 다음 `tiktoken`으로 chunk를 병합하려면 @[TokenTextSplitter]를 초기화할 때 `encodingName`(예: cl100k_base)을 전달하세요. 이 method의 분할은 `tiktoken` tokenizer로 측정한 chunk 크기보다 클 수 있습니다.
+
+```ts
+import { TokenTextSplitter } from "@langchain/textsplitters";
+
+// Example: use cl100k_base encoding
+const splitter = new TokenTextSplitter({ encodingName: "cl100k_base", chunkSize: 10, chunkOverlap: 0 });
+
+const texts = splitter.splitText(stateOfTheUnion);
+console.log(texts[0]);
+```
+```output
+Madam Speaker, Madam Vice President, our First Lady and Second Gentleman. Members of Congress and the Cabinet. Justices of the Supreme Court. My fellow Americans.
+
+Last year COVID-19 kept us apart. This year we are finally together again.
+
+Tonight, we meet as Democrats Republicans and Independents. But most importantly as Americans.
+
+With a duty to one another to the American people to the Constitution.
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/integrations/splitters/split_by_token.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

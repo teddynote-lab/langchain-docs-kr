@@ -1,0 +1,323 @@
+---
+title: 빠른 시작
+---
+
+
+
+이 빠른 시작 가이드는 간단한 설정에서 완전히 작동하는 AI 에이전트까지 단 몇 분 만에 안내합니다.
+
+## 기본 에이전트 만들기
+
+질문에 답하고 도구를 호출할 수 있는 간단한 에이전트를 만드는 것부터 시작하세요. 이 에이전트는 Claude Sonnet 4.5를 언어 모델로 사용하고, 기본 날씨 함수를 도구로 사용하며, 간단한 프롬프트로 동작을 안내합니다.
+
+```python
+from langchain.agents import create_agent
+
+
+def get_weather(city: str) -> str:
+    """Get weather for a given city."""
+    return f"It's always sunny in {city}!"
+
+agent = create_agent(
+    model="anthropic:claude-sonnet-4-5",
+    tools=[get_weather],
+    system_prompt="You are a helpful assistant",
+)
+
+# Run the agent
+agent.invoke(
+    {"messages": [{"role": "user", "content": "what is the weather in sf"}]}
+)
+```
+
+
+
+
+<Info>
+    이 예제를 위해서는 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 설정하고 API 키를 받아야 합니다. 그런 다음 터미널에서 `ANTHROPIC_API_KEY` 환경 변수를 설정하세요.
+</Info>
+
+## 실제 에이전트 만들기
+
+다음으로, 주요 프로덕션 개념을 보여주는 실용적인 날씨 예보 에이전트를 만들어 보겠습니다:
+
+1. **상세한 시스템 프롬프트**로 더 나은 에이전트 동작 구현
+2. **도구 생성**으로 외부 데이터와 통합
+3. **모델 구성**으로 일관된 응답 제공
+4. **구조화된 출력**으로 예측 가능한 결과 생성
+5. **대화 메모리**로 채팅과 같은 상호작용 구현
+6. **에이전트 생성 및 실행**으로 완전히 작동하는 에이전트 만들기
+
+각 단계를 살펴보겠습니다:
+
+<Steps>
+    <Step title="시스템 프롬프트 정의">
+        시스템 프롬프트는 에이전트의 역할과 동작을 정의합니다. 구체적이고 실행 가능하게 작성하세요:
+
+        ```python wrap
+        SYSTEM_PROMPT = """You are an expert weather forecaster, who speaks in puns.
+
+        You have access to two tools:
+
+        - get_weather_for_location: use this to get the weather for a specific location
+        - get_user_location: use this to get the user's location
+
+        If a user asks you for the weather, make sure you know the location. If you can tell from the question that they mean wherever they are, use the get_user_location tool to find their location."""
+        ```
+
+
+
+    </Step>
+    <Step title="도구 생성">
+        [Tools](/oss/python/langchain/tools)는 모델이 정의한 함수를 호출하여 외부 시스템과 상호작용할 수 있게 합니다.
+        도구는 [runtime context](/oss/python/langchain/runtime)에 의존할 수 있으며 [agent memory](/oss/python/langchain/short-term-memory)와도 상호작용할 수 있습니다.
+
+        아래에서 `get_user_location` 도구가 runtime context를 어떻게 사용하는지 확인하세요:
+
+        ```python
+        from dataclasses import dataclass
+        from langchain.tools import tool, ToolRuntime
+
+        @tool
+        def get_weather_for_location(city: str) -> str:
+            """Get weather for a given city."""
+            return f"It's always sunny in {city}!"
+
+        @dataclass
+        class Context:
+            """Custom runtime context schema."""
+            user_id: str
+
+        @tool
+        def get_user_location(runtime: ToolRuntime[Context]) -> str:
+            """Retrieve user information based on user ID."""
+            user_id = runtime.context.user_id
+            return "Florida" if user_id == "1" else "SF"
+        ```
+
+        <Tip>
+            도구는 잘 문서화되어야 합니다: 도구의 이름, 설명, 인자 이름이 모델의 프롬프트의 일부가 됩니다.
+            LangChain의 [`@tool` decorator](https://reference.langchain.com/python/langchain/tools/#langchain.tools.tool)는 메타데이터를 추가하고 `ToolRuntime` 파라미터를 통한 runtime injection을 가능하게 합니다.
+        </Tip>
+
+
+
+    </Step>
+    <Step title="모델 구성">
+        사용 사례에 맞는 올바른 [parameters](/oss/python/langchain/models#parameters)로 [language model](/oss/python/langchain/models)을 설정하세요:
+
+        ```python
+        from langchain.chat_models import init_chat_model
+
+        model = init_chat_model(
+            "anthropic:claude-sonnet-4-5",
+            temperature=0.5,
+            timeout=10,
+            max_tokens=1000
+        )
+        ```
+
+
+
+    </Step>
+    <Step title="응답 형식 정의">
+        선택적으로, 에이전트 응답이 특정 스키마와 일치해야 하는 경우 구조화된 응답 형식을 정의하세요.
+
+        ```python
+        from dataclasses import dataclass
+
+        # We use a dataclass here, but Pydantic models are also supported.
+        @dataclass
+        class ResponseFormat:
+            """Response schema for the agent."""
+            # A punny response (always required)
+            punny_response: str
+            # Any interesting information about the weather if available
+            weather_conditions: str | None = None
+        ```
+
+
+
+    </Step>
+    <Step title="메모리 추가">
+        상호작용 간 상태를 유지하기 위해 에이전트에 [memory](/oss/python/langchain/short-term-memory)를 추가하세요. 이를 통해 에이전트가 이전 대화와 컨텍스트를 기억할 수 있습니다.
+
+        ```python
+        from langgraph.checkpoint.memory import InMemorySaver
+
+        checkpointer = InMemorySaver()
+        ```
+
+
+
+
+        <Info>
+            프로덕션 환경에서는 데이터베이스에 저장하는 영구 checkpointer를 사용하세요.
+            자세한 내용은 [Add and manage memory](/oss/python/langgraph/add-memory#manage-short-term-memory)를 참조하세요.
+        </Info>
+    </Step>
+    <Step title="에이전트 생성 및 실행">
+        이제 모든 구성 요소로 에이전트를 조립하고 실행하세요!
+
+        ```python
+        agent = create_agent(
+            model=model,
+            system_prompt=SYSTEM_PROMPT,
+            tools=[get_user_location, get_weather_for_location],
+            context_schema=Context,
+            response_format=ResponseFormat,
+            checkpointer=checkpointer
+        )
+
+        # `thread_id` is a unique identifier for a given conversation.
+        config = {"configurable": {"thread_id": "1"}}
+
+        response = agent.invoke(
+            {"messages": [{"role": "user", "content": "what is the weather outside?"}]},
+            config=config,
+            context=Context(user_id="1")
+        )
+
+        print(response['structured_response'])
+        # ResponseFormat(
+        #     punny_response="Florida is still having a 'sun-derful' day! The sunshine is playing 'ray-dio' hits all day long! I'd say it's the perfect weather for some 'solar-bration'! If you were hoping for rain, I'm afraid that idea is all 'washed up' - the forecast remains 'clear-ly' brilliant!",
+        #     weather_conditions="It's always sunny in Florida!"
+        # )
+
+
+        # Note that we can continue the conversation using the same `thread_id`.
+        response = agent.invoke(
+            {"messages": [{"role": "user", "content": "thank you!"}]},
+            config=config,
+            context=Context(user_id="1")
+        )
+
+        print(response['structured_response'])
+        # ResponseFormat(
+        #     punny_response="You're 'thund-erfully' welcome! It's always a 'breeze' to help you stay 'current' with the weather. I'm just 'cloud'-ing around waiting to 'shower' you with more forecasts whenever you need them. Have a 'sun-sational' day in the Florida sunshine!",
+        #     weather_conditions=None
+        # )
+        ```
+
+
+    </Step>
+</Steps>
+
+<Expandable title="전체 예제 코드">
+```python
+from dataclasses import dataclass
+
+from langchain.agents import create_agent
+from langchain.chat_models import init_chat_model
+from langchain.tools import tool, ToolRuntime
+from langgraph.checkpoint.memory import InMemorySaver
+
+
+# Define system prompt
+SYSTEM_PROMPT = """You are an expert weather forecaster, who speaks in puns.
+
+You have access to two tools:
+
+- get_weather_for_location: use this to get the weather for a specific location
+- get_user_location: use this to get the user's location
+
+If a user asks you for the weather, make sure you know the location. If you can tell from the question that they mean wherever they are, use the get_user_location tool to find their location."""
+
+# Define context schema
+@dataclass
+class Context:
+    """Custom runtime context schema."""
+    user_id: str
+
+# Define tools
+@tool
+def get_weather_for_location(city: str) -> str:
+    """Get weather for a given city."""
+    return f"It's always sunny in {city}!"
+
+@tool
+def get_user_location(runtime: ToolRuntime[Context]) -> str:
+    """Retrieve user information based on user ID."""
+    user_id = runtime.context.user_id
+    return "Florida" if user_id == "1" else "SF"
+
+# Configure model
+model = init_chat_model(
+    "anthropic:claude-sonnet-4-5",
+    temperature=0
+)
+
+# Define response format
+@dataclass
+class ResponseFormat:
+    """Response schema for the agent."""
+    # A punny response (always required)
+    punny_response: str
+    # Any interesting information about the weather if available
+    weather_conditions: str | None = None
+
+# Set up memory
+checkpointer = InMemorySaver()
+
+# Create agent
+agent = create_agent(
+    model=model,
+    system_prompt=SYSTEM_PROMPT,
+    tools=[get_user_location, get_weather_for_location],
+    context_schema=Context,
+    response_format=ResponseFormat,
+    checkpointer=checkpointer
+)
+
+# Run agent
+# `thread_id` is a unique identifier for a given conversation.
+config = {"configurable": {"thread_id": "1"}}
+
+response = agent.invoke(
+    {"messages": [{"role": "user", "content": "what is the weather outside?"}]},
+    config=config,
+    context=Context(user_id="1")
+)
+
+print(response['structured_response'])
+# ResponseFormat(
+#     punny_response="Florida is still having a 'sun-derful' day! The sunshine is playing 'ray-dio' hits all day long! I'd say it's the perfect weather for some 'solar-bration'! If you were hoping for rain, I'm afraid that idea is all 'washed up' - the forecast remains 'clear-ly' brilliant!",
+#     weather_conditions="It's always sunny in Florida!"
+# )
+
+
+# Note that we can continue the conversation using the same `thread_id`.
+response = agent.invoke(
+    {"messages": [{"role": "user", "content": "thank you!"}]},
+    config=config,
+    context=Context(user_id="1")
+)
+
+print(response['structured_response'])
+# ResponseFormat(
+#     punny_response="You're 'thund-erfully' welcome! It's always a 'breeze' to help you stay 'current' with the weather. I'm just 'cloud'-ing around waiting to 'shower' you with more forecasts whenever you need them. Have a 'sun-sational' day in the Florida sunshine!",
+#     weather_conditions=None
+# )
+```
+
+
+
+
+</Expandable>
+
+축하합니다! 이제 다음을 수행할 수 있는 AI 에이전트를 갖게 되었습니다:
+
+- **컨텍스트 이해**하고 대화 기억하기
+- **여러 도구를** 지능적으로 사용하기
+- **구조화된 응답**을 일관된 형식으로 제공하기
+- **사용자별 정보**를 컨텍스트를 통해 처리하기
+- **대화 상태**를 상호작용 간 유지하기
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/quickstart.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

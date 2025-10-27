@@ -1,0 +1,112 @@
+---
+title: AnalyticDB
+---
+
+[AnalyticDB for PostgreSQL](https://www.alibabacloud.com/help/en/analyticdb-for-postgresql/latest/product-introduction-overview)은 대용량 데이터를 온라인으로 분석하도록 설계된 대규모 병렬 처리(MPP) 데이터 웨어하우징 서비스입니다.
+
+`AnalyticDB for PostgreSQL`은 오픈 소스 `Greenplum Database` 프로젝트를 기반으로 개발되었으며 `Alibaba Cloud`의 심층적인 확장으로 강화되었습니다. AnalyticDB for PostgreSQL은 ANSI SQL 2003 구문과 PostgreSQL 및 Oracle 데이터베이스 생태계와 호환됩니다. 또한 AnalyticDB for PostgreSQL은 행 저장소와 열 저장소를 모두 지원합니다. AnalyticDB for PostgreSQL은 페타바이트 규모의 데이터를 높은 성능 수준으로 오프라인 처리하며 높은 동시성의 온라인 쿼리를 지원합니다.
+
+이 노트북은 `AnalyticDB` vector database와 관련된 기능을 사용하는 방법을 보여줍니다.
+
+실행하려면 [AnalyticDB](https://www.alibabacloud.com/help/en/analyticdb-for-postgresql/latest/product-introduction-overview) 인스턴스가 실행 중이어야 합니다:
+
+- [AnalyticDB Cloud Vector Database](https://www.alibabacloud.com/product/hybriddb-postgresql) 사용.
+
+<Tip>
+**호환성**
+
+Node.js에서만 사용 가능합니다.
+</Tip>
+
+## Setup
+
+LangChain.js는 AnalyticDB vectorstore의 연결 풀로 [node-postgres](https://node-postgres.com/)를 허용합니다.
+
+```bash npm
+npm install -S pg
+```
+그리고 배치 벡터를 빠르게 추가하려면 [pg-copy-streams](https://github.com/brianc/node-pg-copy-streams)가 필요합니다.
+
+```bash npm
+npm install -S pg-copy-streams
+```
+<Tip>
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/javascript/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install @langchain/openai @langchain/community @langchain/core
+```
+
+## Usage
+
+<Warning>
+**보안**
+
+사용자 이름과 같은 사용자 생성 데이터는 collection name의 입력으로 사용되어서는 안 됩니다.
+**이는 SQL Injection으로 이어질 수 있습니다!**
+</Warning>
+
+```typescript
+import { AnalyticDBVectorStore } from "@langchain/community/vectorstores/analyticdb";
+import { OpenAIEmbeddings } from "@langchain/openai";
+
+const connectionOptions = {
+  host: process.env.ANALYTICDB_HOST || "localhost",
+  port: Number(process.env.ANALYTICDB_PORT) || 5432,
+  database: process.env.ANALYTICDB_DATABASE || "your_database",
+  user: process.env.ANALYTICDB_USERNAME || "username",
+  password: process.env.ANALYTICDB_PASSWORD || "password",
+};
+
+const vectorStore = await AnalyticDBVectorStore.fromTexts(
+  ["foo", "bar", "baz"],
+  [{ page: 1 }, { page: 2 }, { page: 3 }],
+  new OpenAIEmbeddings(),
+  { connectionOptions }
+);
+const result = await vectorStore.similaritySearch("foo", 1);
+console.log(JSON.stringify(result));
+// [{"pageContent":"foo","metadata":{"page":1}}]
+
+await vectorStore.addDocuments([{ pageContent: "foo", metadata: { page: 4 } }]);
+
+const filterResult = await vectorStore.similaritySearch("foo", 1, {
+  page: 4,
+});
+console.log(JSON.stringify(filterResult));
+// [{"pageContent":"foo","metadata":{"page":4}}]
+
+const filterWithScoreResult = await vectorStore.similaritySearchWithScore(
+  "foo",
+  1,
+  { page: 3 }
+);
+console.log(JSON.stringify(filterWithScoreResult));
+// [[{"pageContent":"baz","metadata":{"page":3}},0.26075905561447144]]
+
+const filterNoMatchResult = await vectorStore.similaritySearchWithScore(
+  "foo",
+  1,
+  { page: 5 }
+);
+console.log(JSON.stringify(filterNoMatchResult));
+// []
+
+// need to manually close the Connection pool
+await vectorStore.end();
+```
+
+## Related
+
+- Vector store [개념 가이드](/oss/javascript/integrations/vectorstores)
+- Vector store [사용 방법 가이드](/oss/javascript/integrations/vectorstores)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/vectorstores/analyticdb.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

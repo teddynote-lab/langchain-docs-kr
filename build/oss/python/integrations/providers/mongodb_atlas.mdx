@@ -1,0 +1,118 @@
+---
+title: MongoDB Atlas
+---
+
+>[MongoDB Atlas](https://www.mongodb.com/docs/atlas/)는 AWS, Azure, GCP에서 사용 가능한 완전 관리형 클라우드
+> 데이터베이스입니다. 이제 MongoDB 문서 데이터에 대한 네이티브
+> Vector Search를 지원합니다.
+
+## Installation and Setup
+
+[상세 구성 지침](/oss/python/integrations/vectorstores/mongodb_atlas)을 참조하세요.
+
+`langchain-mongodb` python package를 설치해야 합니다.
+
+<CodeGroup>
+```bash pip
+pip install langchain-mongodb
+```
+
+```bash uv
+uv add langchain-mongodb
+```
+</CodeGroup>
+
+## Vector Store
+
+[사용 예제](/oss/python/integrations/vectorstores/mongodb_atlas)를 참조하세요.
+
+```python
+from langchain_mongodb import MongoDBAtlasVectorSearch
+```
+
+## Retrievers
+
+### Full Text Search Retriever
+
+>`Hybrid Search Retriever`는 Lucene의 표준(`BM25`) analyzer를 사용하여
+> 전체 텍스트 검색을 수행합니다.
+
+```python
+from langchain_mongodb.retrievers import MongoDBAtlasFullTextSearchRetriever
+```
+
+### Hybrid Search Retriever
+
+>`Hybrid Search Retriever`는 vector 검색과 전체 텍스트 검색을 결합하여
+> `Reciprocal Rank Fusion`(`RRF`) 알고리즘을 통해 가중치를 부여합니다.
+
+```python
+from langchain_mongodb.retrievers import MongoDBAtlasHybridSearchRetriever
+```
+
+## Model Caches
+
+### MongoDBCache
+
+MongoDB에 간단한 cache를 저장하기 위한 추상화입니다. 이것은 Semantic Caching을 사용하지 않으며, 생성 전에 collection에 index를 만들 필요도 없습니다.
+
+이 cache를 import하려면:
+```python
+from langchain_mongodb.cache import MongoDBCache
+```
+
+LLM에서 이 cache를 사용하려면:
+```python
+from langchain_core.globals import set_llm_cache
+
+# use any embedding provider...
+from tests.integration_tests.vectorstores.fake_embeddings import FakeEmbeddings
+
+mongodb_atlas_uri = "<YOUR_CONNECTION_STRING>"
+COLLECTION_NAME="<YOUR_CACHE_COLLECTION_NAME>"
+DATABASE_NAME="<YOUR_DATABASE_NAME>"
+
+set_llm_cache(MongoDBCache(
+    connection_string=mongodb_atlas_uri,
+    collection_name=COLLECTION_NAME,
+    database_name=DATABASE_NAME,
+))
+```
+
+
+### MongoDBAtlasSemanticCache
+Semantic caching을 사용하면 사용자 입력과 이전에 캐시된 결과 간의 의미적 유사성을 기반으로 캐시된 prompt를 검색할 수 있습니다. 내부적으로 MongoDBAtlas를 cache와 vectorstore로 모두 사용합니다.
+MongoDBAtlasSemanticCache는 `MongoDBAtlasVectorSearch`를 상속하며 작동하려면 Atlas Vector Search Index가 정의되어 있어야 합니다. index 설정 방법은 [사용 예제](/oss/python/integrations/vectorstores/mongodb_atlas)를 참조하세요.
+
+이 cache를 import하려면:
+```python
+from langchain_mongodb.cache import MongoDBAtlasSemanticCache
+```
+
+LLM에서 이 cache를 사용하려면:
+```python
+from langchain_core.globals import set_llm_cache
+
+# use any embedding provider...
+from tests.integration_tests.vectorstores.fake_embeddings import FakeEmbeddings
+
+mongodb_atlas_uri = "<YOUR_CONNECTION_STRING>"
+COLLECTION_NAME="<YOUR_CACHE_COLLECTION_NAME>"
+DATABASE_NAME="<YOUR_DATABASE_NAME>"
+
+set_llm_cache(MongoDBAtlasSemanticCache(
+    embedding=FakeEmbeddings(),
+    connection_string=mongodb_atlas_uri,
+    collection_name=COLLECTION_NAME,
+    database_name=DATABASE_NAME,
+))
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/mongodb_atlas.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

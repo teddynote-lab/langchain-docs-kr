@@ -1,0 +1,89 @@
+---
+title: Epsilla
+---
+
+>[Epsilla](https://www.epsilla.com)는 vector indexing을 위해 고급 parallel graph traversal 기술을 활용하는 오픈소스 vector database입니다. Epsilla는 GPL-3.0 라이선스로 제공됩니다.
+
+이 integration을 사용하려면 `pip install -qU langchain-community`로 `langchain-community`를 설치해야 합니다
+
+이 notebook은 `Epsilla` vector database와 관련된 기능을 사용하는 방법을 보여줍니다.
+
+사전 요구사항으로, 실행 중인 Epsilla vector database가 필요하며(예: docker image를 통해), `pyepsilla` package를 설치해야 합니다. 전체 문서는 [docs](https://epsilla-inc.gitbook.io/epsilladb/quick-start)에서 확인하세요.
+
+```python
+!pip/pip3 install pyepsilla
+```
+
+[`OpenAIEmbeddings`](https://reference.langchain.com/python/integrations/langchain_openai/OpenAIEmbeddings/)를 사용하려면 OpenAI API Key를 가져와야 합니다.
+
+```python
+import getpass
+import os
+
+if "OPENAI_API_KEY" not in os.environ:
+    os.environ["OPENAI_API_KEY"] = getpass.getpass("OpenAI API Key:")
+```
+
+OpenAI API Key: ········
+
+```python
+from langchain_community.vectorstores import Epsilla
+from langchain_openai import OpenAIEmbeddings
+```
+
+```python
+from langchain_community.document_loaders import TextLoader
+from langchain_text_splitters import CharacterTextSplitter
+
+loader = TextLoader("../../how_to/state_of_the_union.txt")
+documents = loader.load()
+
+documents = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0).split_documents(
+    documents
+)
+
+embeddings = OpenAIEmbeddings()
+```
+
+Epsilla vectordb는 기본 host "localhost"와 port "8888"로 실행되고 있습니다. 기본값 대신 custom db path, db name 및 collection name을 사용합니다.
+
+```python
+from pyepsilla import vectordb
+
+client = vectordb.Client()
+vector_store = Epsilla.from_documents(
+    documents,
+    embeddings,
+    client,
+    db_path="/tmp/mypath",
+    db_name="MyDB",
+    collection_name="MyCollection",
+)
+```
+
+```python
+query = "What did the president say about Ketanji Brown Jackson"
+docs = vector_store.similarity_search(query)
+print(docs[0].page_content)
+```
+
+In state after state, new laws have been passed, not only to suppress the vote, but to subvert entire elections.
+
+We cannot let this happen.
+
+Tonight. I call on the Senate to: Pass the Freedom to Vote Act. Pass the John Lewis Voting Rights Act. And while you're at it, pass the Disclose Act so Americans can know who is funding our elections.
+
+Tonight, I'd like to honor someone who has dedicated his life to serve this country: Justice Stephen Breyer—an Army veteran, Constitutional scholar, and retiring Justice of the United States Supreme Court. Justice Breyer, thank you for your service.
+
+One of the most serious constitutional responsibilities a President has is nominating someone to serve on the United States Supreme Court.
+
+And I did that 4 days ago, when I nominated Circuit Court of Appeals Judge Ketanji Brown Jackson. One of our nation's top legal minds, who will continue Justice Breyer's legacy of excellence.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/vectorstores/epsilla.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

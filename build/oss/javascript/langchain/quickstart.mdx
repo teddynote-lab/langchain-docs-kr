@@ -1,0 +1,346 @@
+---
+title: 빠른 시작
+---
+
+
+
+이 빠른 시작 가이드는 간단한 설정에서 완전히 작동하는 AI 에이전트까지 단 몇 분 만에 안내합니다.
+
+## 기본 에이전트 만들기
+
+질문에 답하고 도구를 호출할 수 있는 간단한 에이전트를 만드는 것부터 시작하세요. 이 에이전트는 Claude Sonnet 4.5를 언어 모델로 사용하고, 기본 날씨 함수를 도구로 사용하며, 간단한 프롬프트로 동작을 안내합니다.
+
+
+
+```ts
+import { createAgent, tool } from "langchain";
+import * as z from "zod";
+
+const getWeather = tool(
+  (input) => `It's always sunny in ${input.city}!`,
+  {
+    name: "get_weather",
+    description: "Get the weather for a given city",
+    schema: z.object({
+      city: z.string().describe("The city to get the weather for"),
+    }),
+  }
+);
+
+const agent = createAgent({
+  model: "anthropic:claude-sonnet-4-5",
+  tools: [getWeather],
+});
+
+console.log(
+  await agent.invoke({
+    messages: [{ role: "user", content: "What's the weather in Tokyo?" }],
+  })
+);
+```
+
+
+<Info>
+    이 예제를 위해서는 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 설정하고 API 키를 받아야 합니다. 그런 다음 터미널에서 `ANTHROPIC_API_KEY` 환경 변수를 설정하세요.
+</Info>
+
+## 실제 에이전트 만들기
+
+다음으로, 주요 프로덕션 개념을 보여주는 실용적인 날씨 예보 에이전트를 만들어 보겠습니다:
+
+1. **상세한 시스템 프롬프트**로 더 나은 에이전트 동작 구현
+2. **도구 생성**으로 외부 데이터와 통합
+3. **모델 구성**으로 일관된 응답 제공
+4. **구조화된 출력**으로 예측 가능한 결과 생성
+5. **대화 메모리**로 채팅과 같은 상호작용 구현
+6. **에이전트 생성 및 실행**으로 완전히 작동하는 에이전트 만들기
+
+각 단계를 살펴보겠습니다:
+
+<Steps>
+    <Step title="시스템 프롬프트 정의">
+        시스템 프롬프트는 에이전트의 역할과 동작을 정의합니다. 구체적이고 실행 가능하게 작성하세요:
+
+
+
+        ```ts
+        const systemPrompt = `You are an expert weather forecaster, who speaks in puns.
+
+        You have access to two tools:
+
+        - get_weather_for_location: use this to get the weather for a specific location
+        - get_user_location: use this to get the user's location
+
+        If a user asks you for the weather, make sure you know the location. If you can tell from the question that they mean wherever they are, use the get_user_location tool to find their location.`;
+        ```
+
+    </Step>
+    <Step title="도구 생성">
+
+
+        [Tools](/oss/javascript/langchain/tools)는 에이전트가 호출할 수 있는 함수입니다. 종종 도구는 외부 시스템에 연결하려고 하며, 이를 위해 runtime 구성에 의존합니다. 여기서 `getUserLocation` 도구가 정확히 그렇게 하는 것을 확인하세요:
+
+        ```ts
+        import { type Runtime } from "@langchain/langgraph";
+        import { tool } from "langchain";
+        import * as z from "zod";
+
+        const getWeather = tool(
+          (input) => `It's always sunny in ${input.city}!`,
+          {
+            name: "get_weather_for_location",
+            description: "Get the weather for a given city",
+            schema: z.object({
+              city: z.string().describe("The city to get the weather for"),
+            }),
+          }
+        );
+
+        type AgentRuntime = Runtime<{ user_id: string }>;
+
+        const getUserLocation = tool(
+          (_, config: AgentRuntime) => {
+            const { user_id } = config.context;
+            return user_id === "1" ? "Florida" : "SF";
+          },
+          {
+            name: "get_user_location",
+            description: "Retrieve user information based on user ID",
+          }
+        );
+        ```
+
+        <Note>
+            [Zod](https://zod.dev/)는 미리 정의된 스키마를 검증하고 파싱하는 라이브러리입니다. 도구의 입력 스키마를 정의하는 데 사용하여 에이전트가 올바른 인자로만 도구를 호출하도록 할 수 있습니다.
+
+            또는 `schema` 속성을 [JSON schema](https://json-schema.org/overview/what-is-jsonschema) 객체로 정의할 수 있습니다. JSON 스키마는 런타임에 검증되지 **않는다**는 점을 유의하세요.
+
+            <Accordion title="예제: 도구 입력에 JSON schema 사용하기">
+                ```ts
+                const getWeather = tool(
+                  ({ city }) => `It's always sunny in ${city}!`,
+                  {
+                    name: "get_weather_for_location",
+                    description: "Get the weather for a given city",
+                    schema: {
+                      type: "object",
+                      properties: {
+                        city: {
+                          type: "string",
+                          description: "The city to get the weather for"
+                        }
+                      },
+                      required: ["city"]
+                    },
+                  }
+                );
+            ```
+            </Accordion>
+        </Note>
+
+    </Step>
+    <Step title="모델 구성">
+        사용 사례에 맞는 올바른 [parameters](/oss/javascript/langchain/models#parameters)로 [language model](/oss/javascript/langchain/models)을 설정하세요:
+
+
+
+        ```ts
+        import { initChatModel } from "langchain";
+
+        const model = await initChatModel(
+          "anthropic:claude-sonnet-4-5",
+          { temperature: 0.5, timeout: 10, maxTokens: 1000 }
+        );
+        ```
+
+    </Step>
+    <Step title="응답 형식 정의">
+
+
+        선택적으로, 에이전트 응답이 특정 스키마와 일치해야 하는 경우 구조화된 응답 형식을 정의하세요.
+
+        ```ts
+        const responseFormat = z.object({
+          punny_response: z.string(),
+          weather_conditions: z.string().optional(),
+        });
+        ```
+
+    </Step>
+    <Step title="메모리 추가">
+        상호작용 간 상태를 유지하기 위해 에이전트에 [memory](/oss/javascript/langchain/short-term-memory)를 추가하세요. 이를 통해 에이전트가 이전 대화와 컨텍스트를 기억할 수 있습니다.
+
+
+
+        ```ts
+        import { MemorySaver } from "@langchain/langgraph";
+
+        const checkpointer = new MemorySaver();
+        ```
+
+
+        <Info>
+            프로덕션 환경에서는 데이터베이스에 저장하는 영구 checkpointer를 사용하세요.
+            자세한 내용은 [Add and manage memory](/oss/javascript/langgraph/add-memory#manage-short-term-memory)를 참조하세요.
+        </Info>
+    </Step>
+    <Step title="에이전트 생성 및 실행">
+        이제 모든 구성 요소로 에이전트를 조립하고 실행하세요!
+
+
+        ```ts
+        import { createAgent } from "langchain";
+
+        const agent = createAgent({
+          model: "anthropic:claude-sonnet-4-5",
+          prompt: systemPrompt,
+          tools: [getUserLocation, getWeather],
+          responseFormat,
+          checkpointer,
+        });
+
+        // `thread_id` is a unique identifier for a given conversation.
+        const config = {
+          configurable: { thread_id: "1" },
+          context: { user_id: "1" },
+        };
+
+        const response = await agent.invoke(
+          { messages: [{ role: "user", content: "what is the weather outside?" }] },
+          config
+        );
+        console.log(response.structuredResponse);
+        // {
+        //   punny_response: "Florida is still having a 'sun-derful' day ...",
+        //   weather_conditions: "It's always sunny in Florida!"
+        // }
+
+        // Note that we can continue the conversation using the same `thread_id`.
+        const thankYouResponse = await agent.invoke(
+          { messages: [{ role: "user", content: "thank you!" }] },
+          config
+        );
+        console.log(thankYouResponse.structuredResponse);
+        // {
+        //   punny_response: "You're 'thund-erfully' welcome! ...",
+        //   weather_conditions: undefined
+        // }
+        ```
+
+    </Step>
+</Steps>
+
+<Expandable title="전체 예제 코드">
+
+
+
+```ts
+import { createAgent, tool, initChatModel } from "langchain";
+import { MemorySaver, type Runtime } from "@langchain/langgraph";
+import * as z from "zod";
+
+// Define system prompt
+const systemPrompt = `You are an expert weather forecaster, who speaks in puns.
+
+You have access to two tools:
+
+- get_weather_for_location: use this to get the weather for a specific location
+- get_user_location: use this to get the user's location
+
+If a user asks you for the weather, make sure you know the location. If you can tell from the question that they mean wherever they are, use the get_user_location tool to find their location.`;
+
+// Define tools
+const getWeather = tool(
+  ({ city }) => `It's always sunny in ${city}!`,
+  {
+    name: "get_weather_for_location",
+    description: "Get the weather for a given city",
+    schema: z.object({
+      city: z.string(),
+    }),
+  }
+);
+
+const getUserLocation = tool(
+  (_, config: Runtime<{ user_id: string}>) => {
+    const { user_id } = config.context;
+    return user_id === "1" ? "Florida" : "SF";
+  },
+  {
+    name: "get_user_location",
+    description: "Retrieve user information based on user ID",
+    schema: z.object({}),
+  }
+);
+
+// Configure model
+const model = await initChatModel(
+  "anthropic:claude-sonnet-4-5",
+  { temperature: 0 }
+);
+
+// Define response format
+const responseFormat = z.object({
+  punny_response: z.string(),
+  weather_conditions: z.string().optional(),
+});
+
+// Set up memory
+const checkpointer = new MemorySaver();
+
+// Create agent
+const agent = createAgent({
+  model: "anthropic:claude-sonnet-4-5",
+  prompt: systemPrompt,
+  tools: [getUserLocation, getWeather],
+  responseFormat,
+  checkpointer,
+});
+
+// Run agent
+// `thread_id` is a unique identifier for a given conversation.
+const config = {
+  configurable: { thread_id: "1" },
+  context: { user_id: "1" },
+};
+
+const response = await agent.invoke(
+  { messages: [{ role: "user", content: "what is the weather outside?" }] },
+  config
+);
+console.log(response.structuredResponse);
+// {
+//   punny_response: "Florida is still having a 'sun-derful' day! The sunshine is playing 'ray-dio' hits all day long! I'd say it's the perfect weather for some 'solar-bration'! If you were hoping for rain, I'm afraid that idea is all 'washed up' - the forecast remains 'clear-ly' brilliant!",
+//   weather_conditions: "It's always sunny in Florida!"
+// }
+
+// Note that we can continue the conversation using the same `thread_id`.
+const thankYouResponse = await agent.invoke(
+  { messages: [{ role: "user", content: "thank you!" }] },
+  config
+);
+console.log(thankYouResponse.structuredResponse);
+// {
+//   punny_response: "You're 'thund-erfully' welcome! It's always a 'breeze' to help you stay 'current' with the weather. I'm just 'cloud'-ing around waiting to 'shower' you with more forecasts whenever you need them. Have a 'sun-sational' day in the Florida sunshine!",
+//   weather_conditions: undefined
+// }
+```
+
+</Expandable>
+
+축하합니다! 이제 다음을 수행할 수 있는 AI 에이전트를 갖게 되었습니다:
+
+- **컨텍스트 이해**하고 대화 기억하기
+- **여러 도구를** 지능적으로 사용하기
+- **구조화된 응답**을 일관된 형식으로 제공하기
+- **사용자별 정보**를 컨텍스트를 통해 처리하기
+- **대화 상태**를 상호작용 간 유지하기
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/quickstart.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

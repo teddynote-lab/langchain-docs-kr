@@ -1,0 +1,47 @@
+---
+title: Airbyte
+---
+
+>[Airbyte](https://github.com/airbytehq/airbyte)는 API, 데이터베이스 및 파일에서 웨어하우스 및 레이크로 데이터를 전송하는 ELT 파이프라인을 위한 데이터 통합 플랫폼입니다. 데이터 웨어하우스 및 데이터베이스에 대한 가장 큰 규모의 ELT connector 카탈로그를 보유하고 있습니다.
+
+## Installation and Setup
+
+<CodeGroup>
+```bash pip
+pip install -U langchain-airbyte
+```
+
+```bash uv
+uv add langchain-airbyte
+```
+</CodeGroup>
+
+<Note>
+**현재 `langchain-airbyte` 라이브러리는 Pydantic v2를 지원하지 않습니다.**
+
+이 패키지를 사용하려면 Pydantic v1로 다운그레이드하세요.
+
+또한 이 패키지는 현재 Python 3.10+ 버전이 필요합니다.
+
+</Note>
+
+통합 패키지는 설정해야 하는 전역 환경 변수가 필요하지 않지만, 일부 통합(예: `source-github`)은 자격 증명을 전달해야 할 수 있습니다.
+
+## Document loader
+
+### AirbyteLoader
+
+[사용 예제](/oss/python/integrations/document_loaders/airbyte)를 참조하세요.
+
+```python
+from langchain_airbyte import AirbyteLoader
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/airbyte.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

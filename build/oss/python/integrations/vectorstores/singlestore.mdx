@@ -1,0 +1,335 @@
+---
+title: SingleStoreVectorStore
+---
+
+>[SingleStore](https://singlestore.com/)는 [클라우드](https://www.singlestore.com/cloud/) 및 온프레미스 환경 모두에서 탁월한 성능을 발휘하도록 설계된 강력하고 고성능의 분산 SQL 데이터베이스 솔루션입니다. 다양한 기능을 갖추고 있으며, 원활한 배포 옵션을 제공하면서 비교할 수 없는 성능을 제공합니다.
+
+SingleStore의 두드러진 특징은 vector 저장 및 연산에 대한 고급 지원으로, 텍스트 유사도 매칭과 같은 복잡한 AI 기능이 필요한 애플리케이션에 이상적인 선택입니다. [dot_product](https://docs.singlestore.com/managed-service/en/reference/sql-reference/vector-functions/dot_product.html) 및 [euclidean_distance](https://docs.singlestore.com/managed-service/en/reference/sql-reference/vector-functions/euclidean_distance.html)와 같은 내장 vector 함수를 통해 SingleStore는 개발자가 정교한 알고리즘을 효율적으로 구현할 수 있도록 지원합니다.
+
+SingleStore 내에서 vector 데이터를 활용하고자 하는 개발자를 위해 [vector 데이터 작업](https://docs.singlestore.com/managed-service/en/developer-resources/functional-extensions/working-with-vector-data.html)의 복잡한 내용을 안내하는 포괄적인 튜토리얼이 제공됩니다. 이 튜토리얼은 SingleStoreDB 내의 Vector Store를 다루며, vector 유사도 기반 검색을 용이하게 하는 기능을 보여줍니다. vector index를 활용하여 쿼리를 놀라운 속도로 실행할 수 있어 관련 데이터를 신속하게 검색할 수 있습니다.
+
+또한 SingleStore의 Vector Store는 [Lucene 기반 full-text indexing](https://docs.singlestore.com/cloud/developer-resources/functional-extensions/working-with-full-text-search/)과 원활하게 통합되어 강력한 텍스트 유사도 검색을 가능하게 합니다. 사용자는 문서 metadata 객체의 선택된 필드를 기반으로 검색 결과를 필터링하여 쿼리 정확도를 향상시킬 수 있습니다.
+
+SingleStore를 차별화하는 것은 vector 및 full-text 검색을 다양한 방식으로 결합할 수 있는 능력으로, 유연성과 다양성을 제공합니다. 텍스트 또는 vector 유사도로 사전 필터링하고 가장 관련성 높은 데이터를 선택하거나, 가중 합계 접근 방식을 사용하여 최종 유사도 점수를 계산하는 등 개발자는 여러 옵션을 사용할 수 있습니다.
+
+본질적으로 SingleStore는 vector 데이터를 관리하고 쿼리하기 위한 포괄적인 솔루션을 제공하며, AI 기반 애플리케이션을 위한 비교할 수 없는 성능과 유연성을 제공합니다.
+
+| Class | Package | JS support |
+| :--- | :--- |  :---: |
+| SingleStoreVectorStore | langchain_singlestore | ✅ |
+
+<Note>
+**langchain-community 버전 `SingleStoreDB` (deprecated)의 경우**
+
+[v0.2 문서](https://python.langchain.com/v0.2/docs/integrations/vectorstores/singlestoredb/)를 참조하세요.
+
+</Note>
+
+## Setup
+
+SingleStore vector store에 액세스하려면 `langchain-singlestore` integration package를 설치해야 합니다.
+pip install -qU "langchain-singlestore"
+
+## Initialization
+
+`SingleStoreVectorStore`를 초기화하려면 [`Embeddings`](https://reference.langchain.com/python/langchain_core/embeddings/#langchain_core.embeddings.embeddings.Embeddings) 객체와 SingleStore 데이터베이스에 대한 연결 매개변수가 필요합니다.
+
+### Required Parameters
+
+- **embedding** (`Embeddings`): 텍스트 embedding model.
+
+### Optional Parameters
+
+- **distance_strategy** (`DistanceStrategy`): vector 거리 계산 전략. 기본값은 `DOT_PRODUCT`입니다. 옵션:
+  - `DOT_PRODUCT`: 두 vector의 스칼라 곱을 계산합니다.
+  - `EUCLIDEAN_DISTANCE`: 두 vector 간의 유클리드 거리를 계산합니다.
+
+- **table_name** (`str`): 테이블 이름. 기본값은 `embeddings`입니다.
+- **content_field** (`str`): 콘텐츠 저장 필드. 기본값은 `content`입니다.
+- **metadata_field** (`str`): metadata 저장 필드. 기본값은 `metadata`입니다.
+- **vector_field** (`str`): vector 저장 필드. 기본값은 `vector`입니다.
+- **id_field** (`str`): ID 저장 필드. 기본값은 `id`입니다.
+
+- **use_vector_index** (`bool`): vector indexing을 활성화합니다 (SingleStore 8.5+ 필요). 기본값은 `False`입니다.
+- **vector_index_name** (`str`): vector index의 이름. `use_vector_index`가 `False`이면 무시됩니다.
+- **vector_index_options** (`dict`): vector index에 대한 옵션. `use_vector_index`가 `False`이면 무시됩니다.
+- **vector_size** (`int`): vector의 크기. `use_vector_index`가 `True`이면 필수입니다.
+
+- **use_full_text_search** (`bool`): 콘텐츠에 대한 full-text indexing을 활성화합니다. 기본값은 `False`입니다.
+
+### Connection Pool Parameters
+
+- **pool_size** (`int`): pool의 활성 연결 수. 기본값은 `5`입니다.
+- **max_overflow** (`int`): `pool_size`를 초과하는 최대 연결 수. 기본값은 `10`입니다.
+- **timeout** (`float`): 연결 timeout(초). 기본값은 `30`입니다.
+
+### Database Connection Parameters
+
+- **host** (`str`): 데이터베이스의 hostname, IP 또는 URL.
+- **user** (`str`): 데이터베이스 사용자 이름.
+- **password** (`str`): 데이터베이스 비밀번호.
+- **port** (`int`): 데이터베이스 포트. 기본값은 `3306`입니다.
+- **database** (`str`): 데이터베이스 이름.
+
+### Additional Options
+
+- **pure_python** (`bool`): pure Python 모드를 활성화합니다.
+- **local_infile** (`bool`): 로컬 파일 업로드를 허용합니다.
+- **charset** (`str`): 문자열 값의 character set.
+- **ssl_key**, **ssl_cert**, **ssl_ca** (`str`): SSL 파일 경로.
+- **ssl_disabled** (`bool`): SSL을 비활성화합니다.
+- **ssl_verify_cert** (`bool`): 서버의 인증서를 확인합니다.
+- **ssl_verify_identity** (`bool`): 서버의 identity를 확인합니다.
+- **autocommit** (`bool`): autocommit을 활성화합니다.
+- **results_type** (`str`): 쿼리 결과의 구조 (예: `tuples`, `dicts`).
+
+```python
+import os
+
+from langchain_singlestore.vectorstores import SingleStoreVectorStore
+
+os.environ["SINGLESTOREDB_URL"] = "root:pass@localhost:3306/db"
+
+vector_store = SingleStoreVectorStore(embeddings=embeddings)
+```
+
+## Manage vector store
+
+`SingleStoreVectorStore`는 Document의 ID가 정수라고 가정합니다. 다음은 vector store를 관리하는 방법의 예시입니다.
+
+### Add items to vector store
+
+다음과 같이 vector store에 문서를 추가할 수 있습니다:
+
+```python
+pip install -qU langchain-core
+```
+
+```python
+from langchain_core.documents import Document
+
+docs = [
+    Document(
+        page_content="""In the parched desert, a sudden rainstorm brought relief,
+            as the droplets danced upon the thirsty earth, rejuvenating the landscape
+            with the sweet scent of petrichor.""",
+        metadata={"category": "rain"},
+    ),
+    Document(
+        page_content="""Amidst the bustling cityscape, the rain fell relentlessly,
+            creating a symphony of pitter-patter on the pavement, while umbrellas
+            bloomed like colorful flowers in a sea of gray.""",
+        metadata={"category": "rain"},
+    ),
+    Document(
+        page_content="""High in the mountains, the rain transformed into a delicate
+            mist, enveloping the peaks in a mystical veil, where each droplet seemed to
+            whisper secrets to the ancient rocks below.""",
+        metadata={"category": "rain"},
+    ),
+    Document(
+        page_content="""Blanketing the countryside in a soft, pristine layer, the
+            snowfall painted a serene tableau, muffling the world in a tranquil hush
+            as delicate flakes settled upon the branches of trees like nature's own
+            lacework.""",
+        metadata={"category": "snow"},
+    ),
+    Document(
+        page_content="""In the urban landscape, snow descended, transforming
+            bustling streets into a winter wonderland, where the laughter of
+            children echoed amidst the flurry of snowballs and the twinkle of
+            holiday lights.""",
+        metadata={"category": "snow"},
+    ),
+    Document(
+        page_content="""Atop the rugged peaks, snow fell with an unyielding
+            intensity, sculpting the landscape into a pristine alpine paradise,
+            where the frozen crystals shimmered under the moonlight, casting a
+            spell of enchantment over the wilderness below.""",
+        metadata={"category": "snow"},
+    ),
+]
+
+
+vector_store.add_documents(docs)
+```
+
+### Update items in vector store
+
+vector store에서 기존 문서를 업데이트하려면 다음 코드를 사용하세요:
+
+```python
+updated_document = Document(
+    page_content="qux", metadata={"source": "https://another-example.com"}
+)
+
+vector_store.update_documents(document_id="1", document=updated_document)
+```
+
+### Delete items from vector store
+
+vector store에서 문서를 삭제하려면 다음 코드를 사용하세요:
+
+```python
+vector_store.delete(ids=["3"])
+```
+
+## Query vector store
+
+vector store가 생성되고 관련 문서가 추가되면 chain 또는 agent를 실행하는 동안 쿼리하고 싶을 것입니다.
+
+### Query directly
+
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
+
+```python
+results = vector_store.similarity_search(query="trees in the snow", k=1)
+for doc in results:
+    print(f"* {doc.page_content} [{doc.metadata}]")
+```
+
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
+
+- TODO: Edit and then run code cell to generate output
+
+```python
+results = vector_store.similarity_search_with_score(query="trees in the snow", k=1)
+for doc, score in results:
+    print(f"* [SIM={score:3f}] {doc.page_content} [{doc.metadata}]")
+```
+
+### Metadata filtering
+
+SingleStoreDB는 metadata 필드를 기반으로 사전 필터링을 통해 검색 결과를 향상하고 개선할 수 있도록 하여 검색 기능을 향상시킵니다. 이 기능은 개발자와 데이터 분석가가 쿼리를 미세 조정하여 검색 결과가 요구 사항에 정확히 맞춤화되도록 합니다. 특정 metadata 속성을 사용하여 검색 결과를 필터링함으로써 사용자는 쿼리 범위를 좁혀 관련 데이터 하위 집합에만 집중할 수 있습니다.
+
+```python
+query = "trees branches"
+docs = vector_store.similarity_search(
+    query, filter={"category": "snow"}
+)  # Find documents that correspond to the query and has category "snow"
+print(docs[0].page_content)
+```
+
+### Vector index
+
+SingleStore DB 버전 8.5 이상에서 [ANN vector indexes](https://docs.singlestore.com/cloud/reference/sql-reference/vector-functions/vector-indexing/)를 활용하여 검색 효율성을 향상시키세요. vector store 객체 생성 시 `use_vector_index=True`를 설정하여 이 기능을 활성화할 수 있습니다. 또한 vector의 차원이 기본 OpenAI embedding 크기인 1536과 다른 경우 `vector_size` 매개변수를 적절히 지정해야 합니다.
+
+### Search strategies
+
+SingleStoreDB는 특정 사용 사례와 사용자 선호도에 맞게 세심하게 제작된 다양한 검색 전략을 제공합니다. 기본 `VECTOR_ONLY` 전략은 `dot_product` 또는 `euclidean_distance`와 같은 vector 연산을 사용하여 vector 간의 유사도 점수를 직접 계산하는 반면, `TEXT_ONLY`는 Lucene 기반 full-text 검색을 사용하며 특히 텍스트 중심 애플리케이션에 유리합니다. 균형 잡힌 접근 방식을 원하는 사용자를 위해 `FILTER_BY_TEXT`는 vector 비교를 수행하기 전에 먼저 텍스트 유사도를 기반으로 결과를 개선하는 반면, `FILTER_BY_VECTOR`는 vector 유사도를 우선시하여 최적의 일치를 위해 텍스트 유사도를 평가하기 전에 결과를 필터링합니다. 특히 `FILTER_BY_TEXT`와 `FILTER_BY_VECTOR` 모두 작동을 위해 full-text index가 필요합니다. 또한 `WEIGHTED_SUM`은 vector 및 텍스트 유사도에 가중치를 부여하여 최종 유사도 점수를 계산하는 정교한 전략으로 등장하지만, dot_product 거리 계산만 독점적으로 사용하며 full-text index도 필요합니다. 이러한 다양한 전략은 사용자가 고유한 요구 사항에 따라 검색을 미세 조정할 수 있도록 하여 효율적이고 정확한 데이터 검색 및 분석을 용이하게 합니다. 또한 `FILTER_BY_TEXT`, `FILTER_BY_VECTOR` 및 `WEIGHTED_SUM` 전략으로 예시되는 SingleStoreDB의 하이브리드 접근 방식은 vector 및 텍스트 기반 검색을 원활하게 혼합하여 효율성과 정확성을 극대화하며, 사용자가 다양한 애플리케이션에 대해 플랫폼의 기능을 완전히 활용할 수 있도록 합니다.
+
+```python
+from langchain_singlestore.vectorstores import DistanceStrategy
+
+docsearch = SingleStoreVectorStore.from_documents(
+    docs,
+    embeddings,
+    distance_strategy=DistanceStrategy.DOT_PRODUCT,  # Use dot product for similarity search
+    use_vector_index=True,  # Use vector index for faster search
+    use_full_text_search=True,  # Use full text index
+)
+
+vectorResults = docsearch.similarity_search(
+    "rainstorm in parched desert, rain",
+    k=1,
+    search_strategy=SingleStoreVectorStore.SearchStrategy.VECTOR_ONLY,
+    filter={"category": "rain"},
+)
+print(vectorResults[0].page_content)
+
+textResults = docsearch.similarity_search(
+    "rainstorm in parched desert, rain",
+    k=1,
+    search_strategy=SingleStoreVectorStore.SearchStrategy.TEXT_ONLY,
+)
+print(textResults[0].page_content)
+
+filteredByTextResults = docsearch.similarity_search(
+    "rainstorm in parched desert, rain",
+    k=1,
+    search_strategy=SingleStoreVectorStore.SearchStrategy.FILTER_BY_TEXT,
+    filter_threshold=0.1,
+)
+print(filteredByTextResults[0].page_content)
+
+filteredByVectorResults = docsearch.similarity_search(
+    "rainstorm in parched desert, rain",
+    k=1,
+    search_strategy=SingleStoreVectorStore.SearchStrategy.FILTER_BY_VECTOR,
+    filter_threshold=0.1,
+)
+print(filteredByVectorResults[0].page_content)
+
+weightedSumResults = docsearch.similarity_search(
+    "rainstorm in parched desert, rain",
+    k=1,
+    search_strategy=SingleStoreVectorStore.SearchStrategy.WEIGHTED_SUM,
+    text_weight=0.2,
+    vector_weight=0.8,
+)
+print(weightedSumResults[0].page_content)
+```
+
+### Query by turning into retriever
+
+vector store를 retriever로 변환하여 chain에서 더 쉽게 사용할 수도 있습니다.
+
+```python
+retriever = vector_store.as_retriever(search_kwargs={"k": 1})
+retriever.invoke("trees in the snow")
+```
+
+## Multi-modal Example: Leveraging CLIP and OpenClip Embeddings
+
+multi-modal 데이터 분석 영역에서 이미지와 텍스트와 같은 다양한 정보 유형의 통합이 점점 더 중요해지고 있습니다. 이러한 통합을 용이하게 하는 강력한 도구 중 하나는 [CLIP](https://openai.com/research/clip)으로, 이미지와 텍스트를 모두 공유 의미 공간에 embedding할 수 있는 최첨단 model입니다. 이를 통해 CLIP은 유사도 검색을 통해 다양한 modality에서 관련 콘텐츠를 검색할 수 있습니다.
+
+예를 들어, multi-modal 데이터를 효과적으로 분석하려는 애플리케이션 시나리오를 고려해 보겠습니다. 이 예제에서는 CLIP의 framework를 활용하는 [OpenClip multimodal embeddings](/oss/python/integrations/text_embedding/open_clip)의 기능을 활용합니다. OpenClip을 사용하면 해당 이미지와 함께 텍스트 설명을 원활하게 embedding하여 포괄적인 분석 및 검색 작업을 가능하게 합니다. 텍스트 쿼리를 기반으로 시각적으로 유사한 이미지를 식별하거나 특정 시각적 콘텐츠와 관련된 관련 텍스트 구절을 찾는 등 OpenClip은 사용자가 놀라운 효율성과 정확성으로 multi-modal 데이터에서 통찰력을 탐색하고 추출할 수 있도록 지원합니다.
+
+```python
+pip install -U langchain openai lanchain-singlestore langchain-experimental
+```
+
+```python
+import os
+
+from langchain_experimental.open_clip import OpenCLIPEmbeddings
+from langchain_singlestore.vectorstores import SingleStoreVectorStore
+
+os.environ["SINGLESTOREDB_URL"] = "root:pass@localhost:3306/db"
+
+TEST_IMAGES_DIR = "../../modules/images"
+
+docsearch = SingleStoreVectorStore(OpenCLIPEmbeddings())
+
+image_uris = sorted(
+    [
+        os.path.join(TEST_IMAGES_DIR, image_name)
+        for image_name in os.listdir(TEST_IMAGES_DIR)
+        if image_name.endswith(".jpg")
+    ]
+)
+
+# Add images
+docsearch.add_images(uris=image_uris)
+```
+
+## Usage for retrieval-augmented generation
+
+retrieval-augmented generation (RAG)에 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
+
+- [LangChain으로 RAG 앱 구축하기](/oss/python/langchain/rag)
+- [Agentic RAG](/oss/python/langgraph/agentic-rag)
+- [Retrieval 문서](/oss/python/langchain/retrieval)
+
+## API reference
+
+모든 SingleStore Document Loader 기능 및 구성에 대한 자세한 문서는 github 페이지를 참조하세요: [https://github.com/singlestore-labs/langchain-singlestore/](https://github.com/singlestore-labs/langchain-singlestore/)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/vectorstores/singlestore.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

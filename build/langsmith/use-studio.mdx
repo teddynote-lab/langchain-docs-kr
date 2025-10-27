@@ -1,0 +1,148 @@
+---
+title: Studio 사용 방법
+sidebarTitle: Run, assistant, thread
+---
+
+이 페이지는 Studio에서 사용할 핵심 워크플로우를 설명합니다. 애플리케이션 실행, assistant 구성 관리, 대화 thread 작업 방법을 설명합니다. 각 섹션에는 graph 모드(graph 실행의 전체 기능 보기)와 chat 모드(경량 대화형 인터페이스) 모두의 단계가 포함되어 있습니다:
+
+- [애플리케이션 실행](#run-application): 애플리케이션 또는 agent를 실행하고 동작을 관찰합니다.
+- [Assistant 관리](#manage-assistants): 애플리케이션에서 사용하는 assistant 구성을 생성, 편집 및 선택합니다.
+- [Thread 관리](#manage-threads): thread를 보고 정리하며, 디버깅을 위해 과거 run을 fork하거나 편집합니다.
+
+## Run application
+
+<Tabs>
+<Tab title="Graph">
+
+### Specify input
+
+1. 페이지 왼쪽의 graph 인터페이스 아래 **Input** 섹션에서 graph에 대한 입력을 정의합니다. Studio는 graph의 정의된 [state schema](/oss/python/langgraph/graph-api/#schema)를 기반으로 입력 양식을 렌더링하려고 시도합니다. 이를 비활성화하려면 **View Raw** 버튼을 클릭하면 JSON 편집기가 표시됩니다.
+1. **Input** 섹션 상단의 위 또는 아래 화살표를 클릭하여 이전에 제출한 입력을 전환하고 사용합니다.
+
+### Run settings
+
+#### Assistant
+
+run에 사용할 [assistant](/langsmith/assistants)를 지정하려면:
+
+1. 왼쪽 하단의 **Settings** 버튼을 클릭합니다. assistant가 현재 선택되어 있으면 버튼에 assistant 이름이 표시됩니다. assistant가 선택되지 않은 경우 **Manage Assistants**라고 표시됩니다.
+1. 실행할 assistant를 선택합니다.
+1. 모달 상단의 **Active** 토글을 클릭하여 활성화합니다.
+
+자세한 내용은 [Assistant 관리](#manage-assistants)를 참조하세요.
+
+#### Streaming
+
+**Submit** 옆의 드롭다운을 클릭하고 토글을 클릭하여 streaming을 활성화하거나 비활성화합니다.
+
+#### Breakpoints
+
+breakpoint와 함께 graph를 실행하려면:
+
+1. **Interrupt**를 클릭합니다.
+1. node를 선택하고 해당 node가 실행되기 전 또는 후에 일시 중지할지 여부를 선택합니다.
+1. thread 로그에서 **Continue**를 클릭하여 실행을 재개합니다.
+
+breakpoint에 대한 자세한 내용은 [Human-in-the-loop](/oss/python/langchain/human-in-the-loop)를 참조하세요.
+
+### Submit run
+
+지정된 입력 및 run 설정으로 run을 제출하려면:
+
+1. **Submit** 버튼을 클릭합니다. 이렇게 하면 기존에 선택된 [thread](/oss/python/langgraph/persistence#threads)에 [run](/langsmith/assistants#execution)이 추가됩니다. 현재 선택된 thread가 없으면 새 thread가 생성됩니다.
+1. 진행 중인 run을 취소하려면 **Cancel** 버튼을 클릭합니다.
+
+</Tab>
+<Tab title="Chat">
+
+대화 패널 하단에서 chat 애플리케이션에 대한 입력을 지정합니다.
+
+1. **Send message** 버튼을 클릭하여 입력을 Human 메시지로 제출하고 응답을 스트리밍으로 받습니다.
+
+진행 중인 run을 취소하려면:
+
+1. **Cancel**을 클릭합니다.
+1. **Show tool calls** 토글을 클릭하여 대화에서 tool call을 숨기거나 표시합니다.
+
+</Tab>
+</Tabs>
+
+## Manage assistants
+
+Studio를 사용하면 assistant를 보고, 편집하고, 업데이트할 수 있으며, 이러한 assistant 구성을 사용하여 graph를 실행할 수 있습니다.
+
+개념적인 세부 사항은 [Assistants 개요](/langsmith/assistants/)를 참조하세요.
+
+<Tabs>
+<Tab title="Graph">
+
+assistant를 보려면:
+
+1. 왼쪽 하단의 **Manage Assistants**를 클릭합니다. 선택한 graph에 대한 모든 assistant를 볼 수 있는 모달이 열립니다.
+1. **Active**로 표시할 assistant와 해당 버전을 지정합니다. LangSmith는 run이 제출될 때 이 assistant를 사용합니다.
+
+**Default configuration** 옵션이 활성화되어 있으며, 이는 graph에 정의된 기본 구성을 반영합니다. 이 구성에 대한 편집은 런타임 구성을 업데이트하는 데 사용되지만, **Create new assistant**를 클릭하지 않는 한 새 assistant를 업데이트하거나 생성하지 않습니다.
+
+</Tab>
+<Tab title="Chat">
+
+Chat 모드를 사용하면 페이지 상단의 드롭다운 선택기를 통해 graph의 다른 assistant를 전환할 수 있습니다. assistant를 생성, 편집 또는 삭제하려면 Graph 모드를 사용하세요.
+
+</Tab>
+</Tabs>
+
+## Manage threads
+
+Studio는 서버에 저장된 모든 [thread](/oss/python/langgraph/persistence#threads)를 보고 상태를 편집할 수 있는 도구를 제공합니다. graph 모드와 chat 모드 모두에서 새 thread를 생성하고, thread 간에 전환하고, 과거 상태를 수정할 수 있습니다.
+
+<Tabs>
+<Tab title="Graph">
+
+### View threads
+
+1. 오른쪽 패널 상단에서 드롭다운 메뉴를 선택하여 기존 thread를 봅니다.
+1. 원하는 thread를 선택하면 thread 기록이 페이지 오른쪽에 표시됩니다.
+1. 새 thread를 생성하려면 **+ New Thread**를 클릭하고 [run을 제출](#run-application)합니다.
+1. thread에서 더 세부적인 정보를 보려면 페이지 상단의 슬라이더를 오른쪽으로 드래그합니다. 정보를 덜 보려면 슬라이더를 왼쪽으로 드래그합니다. 또한 개별 turn, node 및 state의 key를 축소하거나 확장합니다.
+1. 다른 렌더링 형식을 위해 `Pretty`와 `JSON` 모드 간에 전환합니다.
+
+### Edit thread history
+
+thread의 상태를 편집하려면:
+
+1. 원하는 node 옆의 <Icon icon="pencil"/> **Edit node state**를 선택합니다.
+1. 원하는 대로 node의 출력을 편집하고 **Fork**를 클릭하여 확인합니다. 이렇게 하면 선택한 node의 checkpoint에서 새로운 forked run이 생성됩니다.
+
+상태를 편집하지 않고 주어진 checkpoint에서 thread를 다시 실행하려면 **Re-run from here**를 클릭합니다. 이렇게 하면 선택한 checkpoint에서 다시 새로운 forked run이 생성됩니다. 이는 선택한 assistant와 같이 상태에 특정하지 않은 변경 사항으로 다시 실행하는 데 유용합니다.
+
+</Tab>
+<Tab title="Chat">
+
+1. 페이지 오른쪽 패널에서 모든 thread를 봅니다.
+1. 원하는 thread를 선택하면 thread 기록이 중앙 패널에 표시됩니다.
+1. 새 thread를 생성하려면 **+**를 클릭하고 run을 제출합니다.
+
+thread에서 human 메시지를 편집하려면:
+
+1. human 메시지 아래의 <Icon icon="pencil"/> **Edit node state**를 클릭합니다.
+1. 원하는 대로 메시지를 편집하고 제출합니다. 이렇게 하면 대화 기록의 새 fork가 생성됩니다.
+1. AI 메시지를 다시 생성하려면 AI 메시지 아래의 재시도 아이콘을 클릭합니다.
+
+</Tab>
+</Tabs>
+
+## Next steps
+
+Studio에서 완료할 수 있는 작업에 대한 자세한 내용은 다음 가이드를 참조하세요:
+
+- [Prompt 반복 작업](/langsmith/observability-studio)
+- [Dataset에 대한 실험 실행](/langsmith/observability-studio#run-experiments-over-a-dataset)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/use-studio.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

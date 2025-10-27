@@ -1,0 +1,231 @@
+---
+title: Apify Dataset
+---
+
+이 가이드는 [Apify](https://apify.com)를 LangChain과 함께 사용하여 Apify Dataset에서 문서를 로드하는 방법을 보여줍니다.
+
+## Overview
+
+[Apify](https://apify.com)는 웹 스크래핑 및 데이터 추출을 위한 클라우드 플랫폼으로,
+다양한 웹 스크래핑, 크롤링 및 데이터 추출 사용 사례를 위한 2천 개 이상의
+즉시 사용 가능한 앱(_Actors_)으로 구성된 [생태계](https://apify.com/store)를 제공합니다.
+
+이 가이드는 [Apify Dataset](https://docs.apify.com/platform/storage/dataset)에서 문서를 로드하는 방법을 보여줍니다.
+Apify Dataset은 제품 목록이나 Google SERP와 같은 구조화된 웹 스크래핑 결과를 저장하기 위해 구축된
+확장 가능한 추가 전용 스토리지이며, JSON, CSV 또는 Excel과 같은 다양한 형식으로 내보낼 수 있습니다.
+
+Dataset은 일반적으로 다양한 Actor의 결과를 저장하는 데 사용됩니다.
+예를 들어, [Website Content Crawler](https://apify.com/apify/website-content-crawler) Actor는
+문서, 지식 베이스, 헬프 센터 또는 블로그와 같은 웹사이트를 깊이 크롤링한 다음,
+웹페이지의 텍스트 콘텐츠를 dataset에 저장하여 벡터 데이터베이스에 문서를 공급하고
+정보 검색에 사용할 수 있습니다.
+또 다른 예로 [RAG Web Browser](https://apify.com/apify/rag-web-browser) Actor가 있는데,
+이는 Google Search를 쿼리하고 결과에서 상위 N개 페이지를 스크래핑한 다음,
+대규모 언어 모델의 추가 처리를 위해 Markdown 형식으로 정리된 콘텐츠를 반환합니다.
+
+## Setup
+
+먼저 공식 Apify client를 설치해야 합니다:
+
+```bash npm
+npm install apify-client
+```
+<Tip>
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/javascript/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install hnswlib-node @langchain/openai @langchain/community @langchain/core
+```
+
+또한 가입하고 [Apify API token](https://console.apify.com/settings/integrations)을 받아야 합니다.
+
+## Usage
+
+### 새 Dataset에서 (웹사이트 크롤링 및 Apify Dataset에 데이터 저장)
+
+Apify 플랫폼에 기존 dataset이 없는 경우, Actor를 호출하고 결과를 기다려서 document loader를 초기화해야 합니다.
+아래 예제에서는 [Website Content Crawler](https://apify.com/apify/website-content-crawler) Actor를 사용하여
+LangChain 문서를 크롤링하고, 결과를 Apify Dataset에 저장한 다음, `ApifyDatasetLoader`를 사용하여 dataset을 로드합니다.
+이 데모에서는 빠른 Cheerio crawler 타입을 사용하고 크롤링할 페이지 수를 10개로 제한합니다.
+
+**참고:** Website Content Crawler 실행은 웹사이트의 크기에 따라 시간이 걸릴 수 있습니다. 대규모 사이트의 경우 몇 시간 또는 며칠이 걸릴 수 있습니다!
+
+다음은 예제입니다:
+
+```typescript
+import { ApifyDatasetLoader } from "@langchain/community/document_loaders/web/apify_dataset";
+import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
+import { OpenAIEmbeddings, ChatOpenAI } from "@langchain/openai";
+import { Document } from "@langchain/core/documents";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { createStuffDocumentsChain } from "@langchain/classic/chains/combine_documents";
+import { createRetrievalChain } from "@langchain/classic/chains/retrieval";
+
+const APIFY_API_TOKEN = "YOUR-APIFY-API-TOKEN"; // or set as process.env.APIFY_API_TOKEN
+const OPENAI_API_KEY = "YOUR-OPENAI-API-KEY"; // or set as process.env.OPENAI_API_KEY
+
+/*
+ * datasetMappingFunction is a function that maps your Apify dataset format to LangChain documents.
+ * In the below example, the Apify dataset format looks like this:
+ * {
+ *   "url": "https://apify.com",
+ *   "text": "Apify is the best web scraping and automation platform."
+ * }
+ */
+const loader = await ApifyDatasetLoader.fromActorCall(
+  "apify/website-content-crawler",
+  {
+    maxCrawlPages: 10,
+    crawlerType: "cheerio",
+    startUrls: [{ url: "https://js.langchain.com/docs/" }],
+  },
+  {
+    datasetMappingFunction: (item) =>
+      new Document({
+        pageContent: (item.text || "") as string,
+        metadata: { source: item.url },
+      }),
+    clientOptions: {
+      token: APIFY_API_TOKEN,
+    },
+  }
+);
+
+const docs = await loader.load();
+
+const vectorStore = await HNSWLib.fromDocuments(
+  docs,
+  new OpenAIEmbeddings({ apiKey: OPENAI_API_KEY })
+);
+
+const model = new ChatOpenAI({
+  model: "gpt-4o-mini",
+  temperature: 0,
+  apiKey: OPENAI_API_KEY,
+});
+
+const questionAnsweringPrompt = ChatPromptTemplate.fromMessages([
+  [
+    "system",
+    "Answer the user's questions based on the below context:\n\n{context}",
+  ],
+  ["human", "{input}"],
+]);
+
+const combineDocsChain = await createStuffDocumentsChain({
+  llm: model,
+  prompt: questionAnsweringPrompt,
+});
+
+const chain = await createRetrievalChain({
+  retriever: vectorStore.asRetriever(),
+  combineDocsChain,
+});
+
+const res = await chain.invoke({ input: "What is LangChain?" });
+
+console.log(res.answer);
+console.log(res.context.map((doc) => doc.metadata.source));
+
+/*
+  LangChain is a framework for developing applications powered by language models.
+  [
+    'https://js.langchain.com/docs/',
+    'https://js.langchain.com/docs/modules/chains/',
+    'https://js.langchain.com/docs/modules/chains/llmchain/',
+    'https://js.langchain.com/docs/category/functions-4'
+  ]
+*/
+```
+
+## 기존 Dataset에서
+
+이미 Actor를 실행했고 Apify 플랫폼에 기존 dataset이 있는 경우, constructor를 사용하여 document loader를 직접 초기화할 수 있습니다
+
+```typescript
+import { ApifyDatasetLoader } from "@langchain/community/document_loaders/web/apify_dataset";
+import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
+import { OpenAIEmbeddings, ChatOpenAI } from "@langchain/openai";
+import { Document } from "@langchain/core/documents";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { createRetrievalChain } from "@langchain/classic/chains/retrieval";
+import { createStuffDocumentsChain } from "@langchain/classic/chains/combine_documents";
+
+const APIFY_API_TOKEN = "YOUR-APIFY-API-TOKEN"; // or set as process.env.APIFY_API_TOKEN
+const OPENAI_API_KEY = "YOUR-OPENAI-API-KEY"; // or set as process.env.OPENAI_API_KEY
+
+/*
+ * datasetMappingFunction is a function that maps your Apify dataset format to LangChain documents.
+ * In the below example, the Apify dataset format looks like this:
+ * {
+ *   "url": "https://apify.com",
+ *   "text": "Apify is the best web scraping and automation platform."
+ * }
+ */
+const loader = new ApifyDatasetLoader("your-dataset-id", {
+  datasetMappingFunction: (item) =>
+    new Document({
+      pageContent: (item.text || "") as string,
+      metadata: { source: item.url },
+    }),
+  clientOptions: {
+    token: APIFY_API_TOKEN,
+  },
+});
+
+const docs = await loader.load();
+
+const vectorStore = await HNSWLib.fromDocuments(
+  docs,
+  new OpenAIEmbeddings({ apiKey: OPENAI_API_KEY })
+);
+
+const model = new ChatOpenAI({
+  model: "gpt-4o-mini",
+  temperature: 0,
+  apiKey: OPENAI_API_KEY,
+});
+
+const questionAnsweringPrompt = ChatPromptTemplate.fromMessages([
+  [
+    "system",
+    "Answer the user's questions based on the below context:\n\n{context}",
+  ],
+  ["human", "{input}"],
+]);
+
+const combineDocsChain = await createStuffDocumentsChain({
+  llm: model,
+  prompt: questionAnsweringPrompt,
+});
+
+const chain = await createRetrievalChain({
+  retriever: vectorStore.asRetriever(),
+  combineDocsChain,
+});
+
+const res = await chain.invoke({ input: "What is LangChain?" });
+
+console.log(res.answer);
+console.log(res.context.map((doc) => doc.metadata.source));
+
+/*
+  LangChain is a framework for developing applications powered by language models.
+  [
+    'https://js.langchain.com/docs/',
+    'https://js.langchain.com/docs/modules/chains/',
+    'https://js.langchain.com/docs/modules/chains/llmchain/',
+    'https://js.langchain.com/docs/category/functions-4'
+  ]
+*/
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/web_loaders/apify_dataset.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

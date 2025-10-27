@@ -1,0 +1,86 @@
+---
+title: 외부 PostgreSQL 데이터베이스에 연결하기
+sidebarTitle: 외부 PostgreSQL 데이터베이스에 연결하기
+---
+
+LangSmith는 트랜잭션 워크로드와 운영 데이터(실행 데이터를 제외한 거의 모든 것)의 주요 데이터 저장소로 PostgreSQL 데이터베이스를 사용합니다. 기본적으로 LangSmith Self-Hosted는 내부 PostgreSQL 데이터베이스를 사용합니다. 하지만 LangSmith가 외부 PostgreSQL 데이터베이스를 사용하도록 구성할 수 있습니다. 외부 PostgreSQL 데이터베이스를 구성하면 데이터베이스의 백업, 확장 및 기타 운영 작업을 더 쉽게 관리할 수 있습니다.
+
+## Requirements
+
+* LangSmith 인스턴스가 네트워크로 액세스할 수 있는 프로비저닝된 PostgreSQL 데이터베이스. 다음과 같은 관리형 PostgreSQL 서비스를 사용하는 것을 권장합니다:
+
+  * [Amazon RDS](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html)
+  * [Google Cloud SQL](https://cloud.google.com/curated-resources/cloud-sql#section-1)
+  * [Azure Database for PostgreSQL](https://azure.microsoft.com/en-us/products/postgresql#features)
+
+* 참고: PostgreSQL 버전 >= 14만 공식적으로 지원합니다.
+
+* PostgreSQL 데이터베이스에 대한 관리자 액세스 권한이 있는 사용자. 이 사용자는 필요한 테이블, 인덱스 및 스키마를 생성하는 데 사용됩니다.
+
+* 이 사용자는 데이터베이스에서 extension을 생성할 수 있는 권한도 필요합니다. btree\_gin, btree\_gist, pgcrypto, citext, ltree, pg\_trgm extension을 사용하거나 설치를 시도합니다.
+
+* public이 아닌 다른 스키마를 사용하는 경우, extension이 활성화된 다른 스키마가 없는지 확인하거나 검색 경로에 해당 스키마를 포함해야 합니다.
+
+* pgbouncer 및 기타 connection pooler에 대한 지원은 커뮤니티 기반입니다. 커뮤니티 멤버들은 pgbouncer가 `pool_mode` = `session`과 적절한 `ignore_startup_parameters` 설정(작성 시점 기준으로 `search_path`와 `lock_timeout`을 무시해야 함)으로 작동했다고 보고했습니다. connection pool을 오염시키지 않도록 주의가 필요하며, 어느 정도의 PostgreSQL 전문 지식이 권장됩니다. LangChain Inc는 현재 pgbouncer, amazon rds proxy 또는 기타 pooler에 대한 공식 테스트 커버리지나 상업적 지원에 대한 로드맵 계획이 없지만, 커뮤니티는 GitHub issue를 통해 지원에 대해 논의하고 협력할 수 있습니다.
+
+* 기본적으로 최소 2개의 vCPU와 8GB 메모리를 가진 인스턴스를 권장합니다. 하지만 실제 요구 사항은 워크로드와 사용자 수에 따라 달라집니다. PostgreSQL 인스턴스를 모니터링하고 필요에 따라 확장하는 것을 권장합니다.
+
+## Connection String
+
+PostgreSQL 데이터베이스에 대한 connection string을 제공해야 합니다. 이 connection string에는 다음 정보가 포함되어야 합니다:
+
+* Host
+* Port
+* Database
+* Username
+* Password(특수 문자가 있는 경우 url encode해야 합니다)
+* URL params
+
+다음과 같은 형식을 취합니다:
+
+```
+username:password@host:port/database?<url_params>
+```
+
+connection string의 예시는 다음과 같습니다:
+
+```
+myuser:mypassword@myhost:5432/mydatabase?sslmode=disable
+```
+
+url parameter가 없는 경우 connection string은 다음과 같습니다:
+
+```
+myuser:mypassword@myhost:5432/mydatabase
+```
+
+## Configuration
+
+connection string을 준비했다면 LangSmith 인스턴스가 외부 PostgreSQL 데이터베이스를 사용하도록 구성할 수 있습니다. LangSmith Helm Chart 설치의 `values` 파일 또는 Docker 설치의 `.env` 파일을 수정하여 이를 수행할 수 있습니다.
+
+<CodeGroup>
+
+```yaml Helm
+postgres:
+  external:
+    enabled: true
+    connectionUrl: "Your connection url"
+```
+
+```bash Docker
+# In your .env file
+POSTGRES_DATABASE_URI="Your connection url"
+```
+
+</CodeGroup>
+
+구성이 완료되면 LangSmith 인스턴스를 재설치할 수 있습니다. 모든 것이 올바르게 구성되었다면 LangSmith 인스턴스가 이제 외부 PostgreSQL 데이터베이스를 사용하게 됩니다.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/self-host-external-postgres.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

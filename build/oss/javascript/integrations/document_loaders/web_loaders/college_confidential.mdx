@@ -1,0 +1,31 @@
+---
+title: College Confidential
+---
+
+이 예제는 Cheerio를 사용하여 College Confidential 웹사이트에서 데이터를 로드하는 방법을 다룹니다. 각 페이지마다 하나의 document가 생성됩니다.
+
+## Setup
+
+```bash npm
+npm install @langchain/community @langchain/core cheerio
+```
+## Usage
+
+```typescript
+import { CollegeConfidentialLoader } from "@langchain/community/document_loaders/web/college_confidential";
+
+const loader = new CollegeConfidentialLoader(
+  "https://www.collegeconfidential.com/colleges/brown-university/"
+);
+
+const docs = await loader.load();
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/web_loaders/college_confidential.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

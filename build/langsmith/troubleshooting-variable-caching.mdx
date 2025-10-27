@@ -1,0 +1,51 @@
+---
+title: 변수 캐싱 문제 해결
+sidebarTitle: 변수 캐싱 문제 해결
+---
+
+추적 프로젝트에서 trace가 표시되지 않거나 잘못된 프로젝트/워크스페이스에 trace가 기록되는 경우, LangSmith의 기본 environment variable 캐싱으로 인한 문제일 수 있습니다. 이는 특히 Jupyter notebook 내에서 LangSmith를 실행할 때 흔히 발생합니다. 다음 단계에 따라 문제를 진단하고 해결하세요:
+
+## 1. Environment Variable 확인
+
+먼저 다음을 실행하여 environment variable이 올바르게 설정되었는지 확인하세요:
+
+```python
+import os
+print(os.getenv("LANGSMITH_PROJECT"))
+print(os.getenv("LANGSMITH_TRACING"))
+print(os.getenv("LANGSMITH_ENDPOINT"))
+print(os.getenv("LANGSMITH_API_KEY"))
+```
+
+출력이 .env 파일에 정의된 내용과 일치하지 않으면 environment variable 캐싱으로 인한 문제일 가능성이 높습니다.
+
+## 2. 캐시 지우기
+
+다음 명령으로 캐시된 environment variable을 지우세요:
+
+```python
+utils.get_env_var.cache_clear()
+```
+
+## 3. Environment Variable 다시 로드
+
+다음을 실행하여 .env 파일에서 environment variable을 다시 로드하세요:
+
+```python
+from dotenv import load_dotenv
+import os
+load_dotenv(<path to .env file>, override=True)
+```
+
+다시 로드한 후 environment variable이 올바르게 설정되어야 합니다.
+
+문제가 계속 발생하면 공유 Slack 채널이나 이메일 지원(Plus 및 Enterprise 플랜에서 사용 가능)을 통해 문의하거나 [LangChain Forum](https://forum.langchain.com/)에 문의해 주세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/troubleshooting-variable-caching.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,141 @@
+---
+title: OCI Data Science Model Deployment Endpoint
+---
+
+[OCI Data Science](https://docs.oracle.com/en-us/iaas/data-science/using/home.htm)는 데이터 과학 팀이 Oracle Cloud Infrastructure에서 머신러닝 모델을 구축, 학습 및 관리할 수 있는 완전 관리형 서버리스 플랫폼입니다.
+
+> 최신 업데이트, 예제 및 실험적 기능은 [ADS LangChain Integration](https://accelerated-data-science.readthedocs.io/en/latest/user_guide/large_language_model/langchain_models.html)을 참조하세요.
+
+이 노트북은 [OCI Data Science Model Deployment](https://docs.oracle.com/en-us/iaas/data-science/using/model-dep-about.htm)에 호스팅된 LLM을 사용하는 방법을 다룹니다.
+
+인증을 위해 [oracle-ads](https://accelerated-data-science.readthedocs.io/en/latest/user_guide/cli/authentication.html) 라이브러리를 사용하여 endpoint 호출에 필요한 자격 증명을 자동으로 로드합니다.
+
+```python
+!pip3 install oracle-ads
+```
+
+## 사전 요구사항
+
+### 모델 배포
+
+OCI Data Science Model deployment의 [AI Quick Actions](https://docs.oracle.com/en-us/iaas/data-science/using/ai-quick-actions.htm)를 사용하여 foundation model을 쉽게 배포, 미세 조정 및 평가할 수 있습니다. 추가 배포 예제는 [Oracle GitHub samples repository](https://github.com/oracle-samples/oci-data-science-ai-samples/blob/main/ai-quick-actions/llama3-with-smc.md)를 참조하세요.
+
+### 정책
+
+OCI Data Science Model Deployment endpoint에 액세스하는 데 필요한 [정책](https://docs.oracle.com/en-us/iaas/data-science/using/model-dep-policies-auth.htm#model_dep_policies_auth__predict-endpoint)이 있는지 확인하세요.
+
+## 설정
+
+모델을 배포한 후 호출에 필요한 다음 매개변수를 설정해야 합니다:
+
+- **`endpoint`**: 배포된 모델의 model HTTP endpoint입니다. 예: `https://modeldeployment.<region>.oci.customer-oci.com/<md_ocid>/predict`.
+
+### 인증
+
+ads 또는 환경 변수를 통해 인증을 설정할 수 있습니다. OCI Data Science Notebook Session에서 작업할 때 resource principal을 활용하여 다른 OCI 리소스에 액세스할 수 있습니다. 더 많은 옵션은 [여기](https://accelerated-data-science.readthedocs.io/en/latest/user_guide/cli/authentication.html)를 참조하세요.
+
+## 예제
+
+```python
+import ads
+from langchain_community.llms import OCIModelDeploymentLLM
+
+# Set authentication through ads
+# Use resource principal are operating within a
+# OCI service that has resource principal based
+# authentication configured
+ads.set_auth("resource_principal")
+
+# Create an instance of OCI Model Deployment Endpoint
+# Replace the endpoint uri and model name with your own
+# Using generic class as entry point, you will be able
+# to pass model parameters through model_kwargs during
+# instantiation.
+llm = OCIModelDeploymentLLM(
+    endpoint="https://modeldeployment.<region>.oci.customer-oci.com/<md_ocid>/predict",
+    model="odsc-llm",
+)
+
+# Run the LLM
+llm.invoke("Who is the first president of United States?")
+```
+
+```python
+import ads
+from langchain_community.llms import OCIModelDeploymentVLLM
+
+# Set authentication through ads
+# Use resource principal are operating within a
+# OCI service that has resource principal based
+# authentication configured
+ads.set_auth("resource_principal")
+
+# Create an instance of OCI Model Deployment Endpoint
+# Replace the endpoint uri and model name with your own
+# Using framework specific class as entry point, you will
+# be able to pass model parameters in constructor.
+llm = OCIModelDeploymentVLLM(
+    endpoint="https://modeldeployment.<region>.oci.customer-oci.com/<md_ocid>/predict",
+)
+
+# Run the LLM
+llm.invoke("Who is the first president of United States?")
+```
+
+```python
+import os
+
+from langchain_community.llms import OCIModelDeploymentTGI
+
+# Set authentication through environment variables
+# Use API Key setup when you are working from a local
+# workstation or on platform which does not support
+# resource principals.
+os.environ["OCI_IAM_TYPE"] = "api_key"
+os.environ["OCI_CONFIG_PROFILE"] = "default"
+os.environ["OCI_CONFIG_LOCATION"] = "~/.oci"
+
+# Set endpoint through environment variables
+# Replace the endpoint uri with your own
+os.environ["OCI_LLM_ENDPOINT"] = (
+    "https://modeldeployment.<region>.oci.customer-oci.com/<md_ocid>/predict"
+)
+
+# Create an instance of OCI Model Deployment Endpoint
+# Using framework specific class as entry point, you will
+# be able to pass model parameters in constructor.
+llm = OCIModelDeploymentTGI()
+
+# Run the LLM
+llm.invoke("Who is the first president of United States?")
+```
+
+### 비동기 호출
+
+```python
+await llm.ainvoke("Tell me a joke.")
+```
+
+### Streaming 호출
+
+```python
+for chunk in llm.stream("Tell me a joke."):
+    print(chunk, end="", flush=True)
+```
+
+## API reference
+
+모든 기능 및 구성에 대한 포괄적인 세부 정보는 각 클래스의 API reference 문서를 참조하세요:
+
+- [OCIModelDeploymentLLM](https://python.langchain.com/api_reference/community/llms/langchain_community.llms.oci_data_science_model_deployment_endpoint.OCIModelDeploymentLLM.html)
+- [OCIModelDeploymentVLLM](https://python.langchain.com/api_reference/community/llms/langchain_community.llms.oci_data_science_model_deployment_endpoint.OCIModelDeploymentVLLM.html)
+- [OCIModelDeploymentTGI](https://python.langchain.com/api_reference/community/llms/langchain_community.llms.oci_data_science_model_deployment_endpoint.OCIModelDeploymentTGI.html)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/llms/oci_model_deployment_endpoint.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

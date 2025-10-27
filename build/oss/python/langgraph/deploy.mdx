@@ -1,0 +1,31 @@
+---
+title: 배포
+---
+
+import deploy from '/snippets/oss/deploy.mdx';
+
+LangSmith는 에이전트를 프로덕션 시스템으로 전환하는 가장 빠른 방법입니다. 기존 호스팅 플랫폼은 상태를 유지하지 않는 단기 실행 웹 앱을 위해 구축되었지만, LangGraph는 **상태를 유지하는 장기 실행 에이전트를 위해 특별히 설계**되어 몇 분 만에 리포지토리에서 안정적인 클라우드 배포로 전환할 수 있습니다.
+
+## 사전 요구사항
+
+시작하기 전에 다음 사항을 확인하세요:
+
+* [GitHub 계정](https://github.com/)
+* [LangSmith 계정](https://smith.langchain.com/) (무료 가입)
+
+## 에이전트 배포하기
+
+### 1. GitHub에 리포지토리 생성하기
+
+LangSmith에 배포하려면 애플리케이션 코드가 GitHub 리포지토리에 있어야 합니다. 공개 및 비공개 리포지토리 모두 지원됩니다. 이 빠른 시작 가이드에서는 먼저 [로컬 서버 설정 가이드](/oss/python/langgraph/studio#setup-local-langgraph-server)를 따라 앱이 LangGraph와 호환되는지 확인하세요. 그런 다음 코드를 리포지토리에 푸시하세요.
+
+<deploy />
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langgraph/deploy.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

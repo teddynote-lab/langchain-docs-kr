@@ -1,0 +1,78 @@
+---
+title: Aleph Alpha
+---
+
+[Luminous 시리즈](https://docs.aleph-alpha.com/docs/category/luminous/)는 대규모 언어 모델 제품군입니다.
+
+이 예제는 LangChain을 사용하여 Aleph Alpha 모델과 상호작용하는 방법을 다룹니다.
+
+```python
+# Installing the langchain package needed to use the integration
+pip install -qU langchain-community
+```
+
+```python
+# Install the package
+pip install -qU  aleph-alpha-client
+```
+
+```python
+# create a new token: https://docs.aleph-alpha.com/docs/account/#create-a-new-token
+
+from getpass import getpass
+
+ALEPH_ALPHA_API_KEY = getpass()
+```
+
+```output
+········
+```
+
+```python
+from langchain_community.llms import AlephAlpha
+from langchain_core.prompts import PromptTemplate
+```
+
+```python
+template = """Q: {question}
+
+A:"""
+
+prompt = PromptTemplate.from_template(template)
+```
+
+```python
+llm = AlephAlpha(
+    model="luminous-extended",
+    maximum_tokens=20,
+    stop_sequences=["Q:"],
+    aleph_alpha_api_key=ALEPH_ALPHA_API_KEY,
+)
+```
+
+```python
+llm_chain = prompt | llm
+```
+
+```python
+question = "What is AI?"
+
+llm_chain.invoke({"question": question})
+```
+
+```output
+' Artificial Intelligence is the simulation of human intelligence processes by machines.\n\n'
+```
+
+```python
+
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/llms/aleph_alpha.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

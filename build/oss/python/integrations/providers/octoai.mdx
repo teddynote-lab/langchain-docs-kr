@@ -1,0 +1,46 @@
+---
+title: OctoAI
+---
+
+>[OctoAI](https://docs.octoai.cloud/docs)는 효율적인 컴퓨팅에 대한 쉬운 액세스를 제공하며
+> 사용자가 선택한 AI 모델을 애플리케이션에 통합할 수 있도록 합니다.
+> `OctoAI` 컴퓨팅 서비스는 AI 애플리케이션을 쉽게 실행, 튜닝 및 확장할 수 있도록 도와줍니다.
+
+
+## 설치 및 설정
+
+- `openai` Python 패키지를 설치합니다:
+  ```bash
+  pip install openai
+  ```
+- `OctoAI`에 등록하고 [OctoAI 계정 페이지](https://octoai.cloud/settings)에서 API Token을 받으세요.
+
+
+## Chat models
+
+[사용 예제](/oss/python/integrations/chat/octoai)를 참조하세요.
+
+```python
+from langchain_community.chat_models import ChatOctoAI
+```
+## LLMs
+
+[사용 예제](/oss/python/integrations/llms/octoai)를 참조하세요.
+
+```python
+from langchain_community.llms.octoai_endpoint import OctoAIEndpoint
+```
+## Embedding models
+
+```python
+from langchain_community.embeddings.octoai_embeddings import OctoAIEmbeddings
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/octoai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

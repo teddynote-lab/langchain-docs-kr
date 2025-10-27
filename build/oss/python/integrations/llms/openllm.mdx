@@ -1,0 +1,50 @@
+---
+title: OpenLLM
+---
+
+[🦾 OpenLLM](https://github.com/bentoml/OpenLLM)은 개발자가 **단일 명령**으로 모든 **오픈소스 LLM**을 **OpenAI 호환 API** endpoint로 실행할 수 있게 해줍니다.
+
+- 🔬 빠르고 프로덕션 사용을 위해 구축됨
+- 🚂 llama3, qwen2, gemma 등과 많은 **양자화된** 버전 지원 [전체 목록](https://github.com/bentoml/openllm-models)
+- ⛓️ OpenAI 호환 API
+- 💬 내장된 ChatGPT 스타일 UI
+- 🔥 최첨단 inference backend를 통한 가속화된 LLM 디코딩
+- 🌥️ 엔터프라이즈급 클라우드 배포 준비 완료 (Kubernetes, Docker 및 BentoCloud)
+
+## 설치
+
+[PyPI](https://pypi.org/project/openllm/)를 통해 `openllm` 설치
+
+```python
+pip install -qU  openllm
+```
+
+## 로컬에서 OpenLLM server 실행하기
+
+LLM server를 시작하려면 `openllm hello` 명령을 사용하세요:
+
+```bash
+openllm hello
+```
+
+## Wrapper
+
+```python
+from langchain_community.llms import OpenLLM
+
+server_url = "http://localhost:3000"  # Replace with remote host if you are running on a remote server
+llm = OpenLLM(base_url=server_url, api_key="na")
+```
+
+```python
+llm("To build a LLM from scratch, the following are the steps:")
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/llms/openllm.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>
