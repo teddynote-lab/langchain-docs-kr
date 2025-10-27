@@ -1,0 +1,254 @@
+---
+title: Databricks Vector Search
+---
+
+
+[Databricks Vector Search](https://docs.databricks.com/en/generative-ai/vector-search.html)는 벡터 데이터베이스에 메타데이터를 포함한 데이터의 벡터 표현을 저장할 수 있는 서버리스 유사도 검색 엔진입니다. Vector Search를 사용하면 Unity Catalog에서 관리하는 Delta 테이블에서 자동 업데이트되는 벡터 검색 인덱스를 생성하고 간단한 API로 쿼리하여 가장 유사한 벡터를 반환할 수 있습니다.
+
+이 노트북은 LangChain을 Databricks Vector Search와 함께 사용하는 방법을 보여줍니다.
+
+## Setup
+
+Databricks 모델에 액세스하려면 Databricks 계정을 생성하고, 자격 증명을 설정하고(Databricks 워크스페이스 외부에 있는 경우에만), 필요한 패키지를 설치해야 합니다.
+
+### Credentials (Databricks 외부에 있는 경우에만)
+
+Databricks 내부에서 LangChain 앱을 실행하는 경우 이 단계를 건너뛸 수 있습니다.
+
+그렇지 않은 경우, Databricks 워크스페이스 호스트명과 개인 액세스 토큰을 각각 `DATABRICKS_HOST` 및 `DATABRICKS_TOKEN` 환경 변수에 수동으로 설정해야 합니다. 액세스 토큰을 얻는 방법은 [Authentication Documentation](https://docs.databricks.com/en/dev-tools/auth/index.html#databricks-personal-access-tokens)을 참조하세요.
+
+```python
+import getpass
+import os
+
+os.environ["DATABRICKS_HOST"] = "https://your-databricks-workspace"
+if "DATABRICKS_TOKEN" not in os.environ:
+    os.environ["DATABRICKS_TOKEN"] = getpass.getpass(
+        "Enter your Databricks access token: "
+    )
+```
+
+### Installation
+
+LangChain Databricks 통합은 `databricks-langchain` 패키지에 포함되어 있습니다.
+
+```python
+pip install -qU databricks-langchain
+```
+
+### Vector Search Endpoint와 Index 생성 (아직 생성하지 않은 경우)
+
+이 섹션에서는 클라이언트 SDK를 사용하여 Databricks Vector Search endpoint와 index를 생성합니다.
+
+이미 endpoint와 index가 있는 경우 이 섹션을 건너뛰고 "Instantiation" 섹션으로 바로 이동할 수 있습니다.
+
+먼저 Databricks VectorSearch 클라이언트를 인스턴스화합니다:
+
+```python
+from databricks.vector_search.client import VectorSearchClient
+
+client = VectorSearchClient()
+```
+
+다음으로 새로운 VectorSearch endpoint를 생성합니다.
+
+```python
+endpoint_name = "<your-endpoint-name>"
+
+client.create_endpoint(name=endpoint_name, endpoint_type="STANDARD")
+```
+
+마지막으로 endpoint에서 쿼리할 수 있는 index를 생성합니다. Databricks Vector Search에는 두 가지 유형의 index가 있으며 `DatabricksVectorSearch` 클래스는 두 가지 사용 사례를 모두 지원합니다.
+
+* **Delta Sync Index**는 소스 Delta Table과 자동으로 동기화되며, Delta Table의 기본 데이터가 변경됨에 따라 자동으로 증분 업데이트됩니다.
+
+* **Direct Vector Access Index**는 벡터와 메타데이터의 직접 읽기 및 쓰기를 지원합니다. 사용자는 REST API 또는 Python SDK를 사용하여 이 테이블을 업데이트할 책임이 있습니다.
+
+또한 delta-sync index의 경우 Databricks 관리 임베딩 또는 자체 관리 임베딩(LangChain embeddings 클래스를 통해)을 사용하도록 선택할 수 있습니다.
+
+다음 코드는 **direct-access** index를 생성합니다. 다른 유형의 index를 생성하는 방법은 [Databricks documentation](https://docs.databricks.com/en/generative-ai/create-query-vector-search.html)을 참조하세요.
+
+```python
+index_name = "<your-index-name>"  # Format: "<catalog>.<schema>.<index-name>"
+
+index = client.create_direct_access_index(
+    endpoint_name=endpoint_name,
+    index_name=index_name,
+    primary_key="id",
+    # Dimension of the embeddings. Please change according to the embedding model you are using.
+    embedding_dimension=3072,
+    # A column to store the embedding vectors for the text data
+    embedding_vector_column="text_vector",
+    schema={
+        "id": "string",
+        "text": "string",
+        "text_vector": "array<float>",
+        # Optional metadata columns
+        "source": "string",
+    },
+)
+
+index.describe()
+```
+
+## Instantiation
+
+`DatabricksVectorSearch`의 인스턴스화는 index가 Databricks 관리 임베딩을 사용하는지 또는 자체 관리 임베딩(선택한 LangChain Embeddings 객체)을 사용하는지에 따라 약간 다릅니다.
+
+Databricks 관리 임베딩을 사용하는 delta-sync index를 사용하는 경우:
+
+```python
+from databricks_langchain import DatabricksVectorSearch
+
+vector_store = DatabricksVectorSearch(
+    endpoint=endpoint_name,
+    index_name=index_name,
+)
+```
+
+direct-access index 또는 자체 관리 임베딩을 사용하는 delta-sync index를 사용하는 경우,
+임베딩에 사용할 임베딩 모델과 소스 테이블의 텍스트 컬럼도 제공해야 합니다:
+
+<EmbeddingTabs/>
+
+```python
+# | output: false
+# | echo: false
+from langchain_openai import OpenAIEmbeddings
+
+embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
+```
+
+```python
+vector_store = DatabricksVectorSearch(
+    endpoint=endpoint_name,
+    index_name=index_name,
+    embedding=embeddings,
+    # The column name in the index that contains the text data to be embedded
+    text_column="document_content",
+)
+```
+
+## Manage vector store
+
+### vector store에 항목 추가
+
+참고: `add_documents` 메서드를 통한 vector store에 항목 추가는 **direct-access** index에서만 지원됩니다.
+
+```python
+from langchain_core.documents import Document
+
+document_1 = Document(page_content="foo", metadata={"source": "https://example.com"})
+
+document_2 = Document(page_content="bar", metadata={"source": "https://example.com"})
+
+document_3 = Document(page_content="baz", metadata={"source": "https://example.com"})
+
+documents = [document_1, document_2, document_3]
+
+vector_store.add_documents(documents=documents, ids=["1", "2", "3"])
+```
+
+```output
+['1', '2', '3']
+```
+
+### vector store에서 항목 삭제
+
+참고: `delete` 메서드를 통한 vector store에서 항목 삭제는 **direct-access** index에서만 지원됩니다.
+
+```python
+vector_store.delete(ids=["3"])
+```
+
+```output
+True
+```
+
+## Query vector store
+
+vector store가 생성되고 관련 문서가 추가되면 체인이나 에이전트를 실행하는 동안 쿼리하고 싶을 것입니다.
+
+### 직접 쿼리
+
+간단한 유사도 검색은 다음과 같이 수행할 수 있습니다:
+
+```python
+results = vector_store.similarity_search(
+    query="thud", k=1, filter={"source": "https://example.com"}
+)
+for doc in results:
+    print(f"* {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+* foo [{'id': '1'}]
+```
+
+참고: 기본적으로 유사도 검색은 primary key와 텍스트 컬럼만 반환합니다. 문서와 연결된 사용자 정의 메타데이터를 검색하려면 vector store를 초기화할 때 `columns` 매개변수에 추가 컬럼을 전달하세요.
+
+```python
+vector_store = DatabricksVectorSearch(
+    endpoint=endpoint_name,
+    index_name=index_name,
+    embedding=embeddings,
+    text_column="text",
+    columns=["source"],
+)
+
+results = vector_store.similarity_search(query="thud", k=1)
+for doc in results:
+    print(f"* {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+* foo [{'source': 'https://example.com', 'id': '1'}]
+```
+
+유사도 검색을 실행하고 해당 점수를 받으려면 다음을 실행할 수 있습니다:
+
+```python
+results = vector_store.similarity_search_with_score(
+    query="thud", k=1, filter={"source": "https://example.com"}
+)
+for doc, score in results:
+    print(f"* [SIM={score:3f}] {doc.page_content} [{doc.metadata}]")
+```
+
+```output
+* [SIM=0.414035] foo [{'source': 'https://example.com', 'id': '1'}]
+```
+
+### retriever로 변환하여 쿼리
+
+체인에서 더 쉽게 사용할 수 있도록 vector store를 retriever로 변환할 수도 있습니다.
+
+```python
+retriever = vector_store.as_retriever(search_type="mmr", search_kwargs={"k": 1})
+retriever.invoke("thud")
+```
+
+```output
+[Document(metadata={'source': 'https://example.com', 'id': '1'}, page_content='foo')]
+```
+
+## Usage for retrieval-augmented generation
+
+retrieval-augmented generation (RAG)에 이 vector store를 사용하는 방법에 대한 가이드는 다음 섹션을 참조하세요:
+
+* [Tutorials](/oss/python/langchain/rag)
+* [How-to: Question and answer with RAG](https://python.langchain.com/docs/how_to/#qa-with-rag)
+* [Retrieval conceptual docs](https://python.langchain.com/docs/concepts/retrieval)
+
+## API reference
+
+모든 DatabricksVectorSearch 기능 및 구성에 대한 자세한 문서는 API reference를 참조하세요: [api-docs.databricks.com/python/databricks-ai-bridge/latest/databricks_langchain.html#databricks_langchain.DatabricksVectorSearch](https://api-docs.databricks.com/python/databricks-ai-bridge/latest/databricks_langchain.html#databricks_langchain.DatabricksVectorSearch)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/vectorstores/databricks_vector_search.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

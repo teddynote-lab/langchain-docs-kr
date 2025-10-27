@@ -1,0 +1,90 @@
+---
+title: UI에서 실험 필터링하는 방법
+sidebarTitle: UI에서 실험 필터링
+---
+
+LangSmith를 사용하면 피드백 점수와 메타데이터로 이전 실험을 필터링하여 관심 있는 실험만 쉽게 찾을 수 있습니다.
+
+
+## 배경: 실험에 메타데이터 추가하기
+
+SDK에서 실험을 실행할 때 메타데이터를 첨부하여 UI에서 필터링하기 쉽게 만들 수 있습니다. 이는 실험을 실행할 때 어떤 축으로 드릴다운하고 싶은지 알고 있는 경우 유용합니다.
+
+예제에서는 사용된 모델, 모델 제공자, 그리고 알려진 prompt ID와 관련된 메타데이터를 실험에 첨부할 것입니다:
+
+```python
+models = {
+    "openai-gpt-4o": ChatOpenAI(model="gpt-4o", temperature=0),
+    "openai-gpt-4o-mini": ChatOpenAI(model="gpt-4o-mini", temperature=0),
+    "anthropic-claude-3-sonnet-20240229": ChatAnthropic(temperature=0, model_name="claude-3-sonnet-20240229")
+}
+
+prompts = {
+    "singleminded": "always answer questions with the word banana.",
+    "fruitminded": "always discuss fruit in your answers.",
+    "basic": "you are a chatbot."
+}
+
+def answer_evaluator(run, example) -> dict:
+    llm = ChatOpenAI(model="gpt-4o", temperature=0)
+    answer_grader = hub.pull("langchain-ai/rag-answer-vs-reference") | llm
+    score = answer_grader.invoke(
+        {
+            "question": example.inputs["question"],
+            "correct_answer": example.outputs["answer"],
+            "student_answer": run.outputs,
+        }
+    )
+    return {"key": "correctness", "score": score["Score"]}
+
+dataset_name = "Filterable Dataset"
+
+for model_type, model in models.items():
+    for prompt_type, prompt in prompts.items():
+        def predict(example):
+            return model.invoke(
+                [("system", prompt), ("user", example["question"])]
+            )
+
+        model_provider = model_type.split("-")[0]
+        model_name = model_type[len(model_provider) + 1:]
+
+        evaluate(
+            predict,
+            data=dataset_name,
+            evaluators=[answer_evaluator],
+            # ADD IN METADATA HERE!!
+            metadata={
+                "model_provider": model_provider,
+                "model_name": model_name,
+                "prompt_id": prompt_type
+            }
+        )
+```
+
+## UI에서 실험 필터링하기
+
+UI에서는 기본적으로 실행된 모든 실험을 볼 수 있습니다.
+
+![](/langsmith/images/filter-all-experiments.png)
+
+예를 들어, openai 모델을 선호하는 경우 쉽게 필터링하여 openai 모델 내의 점수만 먼저 볼 수 있습니다:
+
+![](/langsmith/images/filter-openai.png)
+
+필터를 중첩할 수 있어서 정확성에 대한 낮은 점수를 필터링하여 관련 실험만 비교할 수 있습니다:
+
+![](/langsmith/images/filter-feedback.png)
+
+마지막으로 필터를 지우고 재설정할 수 있습니다. 예를 들어, `singleminded` prompt에서 명확한 승자가 있다는 것을 확인했다면, 필터링 설정을 변경하여 다른 모델 제공자의 모델도 이와 잘 작동하는지 확인할 수 있습니다:
+
+![](/langsmith/images/filter-singleminded.png)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/filter-experiments-ui.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,217 @@
+---
+title: Kuzu
+---
+
+> [Kùzu](https://kuzudb.com/)는 임베디드 가능하고, 확장 가능하며, 매우 빠른 그래프 데이터베이스입니다.
+> MIT 라이선스로 허용적으로 라이선스되어 있으며, 소스 코드는 [여기](https://github.com/kuzudb/kuzu)에서 확인할 수 있습니다.
+
+> Kùzu의 주요 특징:
+>
+>- 성능 및 확장성: 그래프를 위한 최신의 최첨단 join 알고리즘을 구현합니다.
+>- 사용성: 서버가 없는 임베디드 아키텍처로 설정 및 시작이 매우 쉽습니다.
+>- 상호 운용성: 외부 컬럼 형식, CSV, JSON 및 관계형 데이터베이스에서 데이터를 편리하게 스캔하고 복사할 수 있습니다.
+>- 구조화된 property graph 모델: 구조가 추가된 property graph 모델을 구현합니다.
+>- Cypher 지원: 선언적 쿼리 언어인 Cypher로 그래프를 편리하게 쿼리할 수 있습니다.
+
+> Kùzu의 [문서](https://docs.kuzudb.com/)를 방문하여 시작하세요.
+
+## 설정하기
+
+Kùzu는 임베디드 데이터베이스(프로세스 내에서 실행)이므로 관리할 서버가 없습니다. 시작하려면 다음 종속성을 설치하세요:
+
+```bash
+pip install -U langchain-kuzu langchain-openai langchain-experimental
+```
+
+이것은 Kùzu와 LangChain 통합, 그리고 OpenAI의 LLM을 사용할 수 있도록 OpenAI Python 패키지를 설치합니다. 다른 LLM 제공자를 사용하려면 LangChain과 함께 제공되는 해당 Python 패키지를 설치할 수 있습니다.
+
+로컬 머신에서 Kùzu 데이터베이스를 생성하고 연결하는 방법은 다음과 같습니다:
+
+```python
+import kuzu
+
+db = kuzu.Database("test_db")
+conn = kuzu.Connection(db)
+```
+
+## `KuzuGraph` 생성하기
+
+Kùzu의 LangChain 통합은 비구조화된 텍스트에서 그래프를 생성하고 업데이트하는 것을 편리하게 만들며, LangChain의 LLM chain의 강력함을 활용하는 Text2Cypher 파이프라인을 통해 그래프를 쿼리할 수 있습니다. 시작하려면 위에서 생성한 database 객체를 `KuzuGraph` 생성자와 함께 사용하는 `KuzuGraph` 객체를 생성합니다.
+
+```python
+from langchain_kuzu.graphs.kuzu_graph import KuzuGraph
+
+graph = KuzuGraph(db, allow_dangerous_requests=True)
+```
+
+다음 텍스트를 그래프로 변환하고 싶다고 가정해봅시다:
+
+```python
+text = "Tim Cook is the CEO of Apple. Apple has its headquarters in California."
+```
+
+LLM을 사용하여 텍스트에서 노드와 관계를 추출하기 위해 `LLMGraphTransformer`를 사용할 것입니다.
+그래프를 더 유용하게 만들기 위해 다음 스키마를 정의하여 LLM이 스키마와 일치하는 노드와 관계만 추출하도록 합니다.
+
+```python
+# Define schema
+allowed_nodes = ["Person", "Company", "Location"]
+allowed_relationships = [
+    ("Person", "IS_CEO_OF", "Company"),
+    ("Company", "HAS_HEADQUARTERS_IN", "Location"),
+]
+```
+
+`LLMGraphTransformer` 클래스는 텍스트를 그래프 문서 목록으로 변환하는 편리한 방법을 제공합니다.
+
+```python
+from langchain_core.documents import Document
+from langchain_experimental.graph_transformers import LLMGraphTransformer
+from langchain_openai import ChatOpenAI
+
+# Define the LLMGraphTransformer
+llm_transformer = LLMGraphTransformer(
+    llm=ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=OPENAI_API_KEY),
+    allowed_nodes=allowed_nodes,
+    allowed_relationships=allowed_relationships,
+)
+
+documents = [Document(page_content=text)]
+graph_documents = llm_transformer.convert_to_graph_documents(documents)
+```
+
+```python
+graph_documents[:2]
+```
+
+```output
+[GraphDocument(nodes=[Node(id='Tim Cook', type='Person', properties={}), Node(id='Apple', type='Company', properties={}), Node(id='California', type='Location', properties={})], relationships=[Relationship(source=Node(id='Tim Cook', type='Person', properties={}), target=Node(id='Apple', type='Company', properties={}), type='IS_CEO_OF', properties={}), Relationship(source=Node(id='Apple', type='Company', properties={}), target=Node(id='California', type='Location', properties={}), type='HAS_HEADQUARTERS_IN', properties={})], source=Document(metadata={}, page_content='Tim Cook is the CEO of Apple. Apple has its headquarters in California.'))]
+```
+
+그런 다음 위에서 정의한 `KuzuGraph` 객체의 `add_graph_documents` 메서드를 호출하여 그래프 문서를 Kùzu 데이터베이스에 수집할 수 있습니다.
+`include_source` 인수를 `True`로 설정하여 각 엔티티 노드와 그것이 유래한 소스 문서 간의 관계도 생성합니다.
+
+```python
+# Add the graph document to the graph
+graph.add_graph_documents(
+    graph_documents,
+    include_source=True,
+)
+```
+
+## `KuzuQAChain` 생성하기
+
+Text2Cypher 파이프라인을 통해 그래프를 쿼리하려면 `KuzuQAChain` 객체를 정의할 수 있습니다. 그런 다음 위에서 정의한 `test_db` 디렉토리에 저장된 기존 데이터베이스에 연결하여 쿼리로 chain을 호출할 수 있습니다.
+
+```python
+from langchain_kuzu.chains.graph_qa.kuzu import KuzuQAChain
+
+# Create the KuzuQAChain with verbosity enabled to see the generated Cypher queries
+chain = KuzuQAChain.from_llm(
+    llm=ChatOpenAI(model="gpt-4o-mini", temperature=0.3, api_key=OPENAI_API_KEY),
+    graph=graph,
+    verbose=True,
+    allow_dangerous_requests=True,
+)
+```
+
+LLM이 응답에서 지나치게 간결해지는 것을 피하기 위해 0보다 약간 높은 temperature를 설정했습니다.
+
+QA chain을 사용하여 몇 가지 질문을 해봅시다.
+
+```python
+chain.invoke("Who is the CEO of Apple?")
+```
+
+```output
+> Entering new KuzuQAChain chain...
+Generated Cypher:
+MATCH (p:Person)-[:IS_CEO_OF]->(c:Company {id: 'Apple'}) RETURN p
+Full Context:
+[{'p': {'_id': {'offset': 0, 'table': 1}, '_label': 'Person', 'id': 'Tim Cook', 'type': 'entity'}}]
+
+> Finished chain.
+```
+
+```output
+{'query': 'Who is the CEO of Apple?',
+ 'result': 'Tim Cook is the CEO of Apple.'}
+```
+
+```python
+chain.invoke("Where is Apple headquartered?")
+```
+
+```output
+> Entering new KuzuQAChain chain...
+Generated Cypher:
+MATCH (c:Company {id: 'Apple'})-[:HAS_HEADQUARTERS_IN]->(l:Location) RETURN l
+Full Context:
+[{'l': {'_id': {'offset': 0, 'table': 2}, '_label': 'Location', 'id': 'California', 'type': 'entity'}}]
+
+> Finished chain.
+```
+
+```output
+{'query': 'Where is Apple headquartered?',
+ 'result': 'Apple is headquartered in California.'}
+```
+
+## 그래프 스키마 새로고침
+
+그래프를 변경하거나 업데이트하는 경우, Text2Cypher chain이 Cypher 문을 생성하는 데 사용하는 새로고침된 스키마 정보를 검사할 수 있습니다.
+chain을 호출할 때 자동으로 호출되므로 매번 수동으로 `refresh_schema()`를 호출할 필요가 없습니다.
+
+```python
+graph.refresh_schema()
+
+print(graph.get_schema)
+```
+
+```output
+Node properties: [{'properties': [('id', 'STRING'), ('type', 'STRING')], 'label': 'Person'}, {'properties': [('id', 'STRING'), ('type', 'STRING')], 'label': 'Location'}, {'properties': [('id', 'STRING'), ('text', 'STRING'), ('type', 'STRING')], 'label': 'Chunk'}, {'properties': [('id', 'STRING'), ('type', 'STRING')], 'label': 'Company'}]
+Relationships properties: [{'properties': [], 'label': 'HAS_HEADQUARTERS_IN'}, {'properties': [('label', 'STRING'), ('triplet_source_id', 'STRING')], 'label': 'MENTIONS_Chunk_Person'}, {'properties': [('label', 'STRING'), ('triplet_source_id', 'STRING')], 'label': 'MENTIONS_Chunk_Location'}, {'properties': [], 'label': 'IS_CEO_OF'}, {'properties': [('label', 'STRING'), ('triplet_source_id', 'STRING')], 'label': 'MENTIONS_Chunk_Company'}]
+Relationships: ['(:Company)-[:HAS_HEADQUARTERS_IN]->(:Location)', '(:Chunk)-[:MENTIONS_Chunk_Person]->(:Person)', '(:Chunk)-[:MENTIONS_Chunk_Location]->(:Location)', '(:Person)-[:IS_CEO_OF]->(:Company)', '(:Chunk)-[:MENTIONS_Chunk_Company]->(:Company)']
+```
+
+## Cypher 및 답변 생성에 별도의 LLM 사용
+
+Cypher 생성과 답변 생성에 서로 다른 LLM을 사용하기 위해 `cypher_llm`과 `qa_llm`을 별도로 지정할 수 있습니다.
+
+```python
+chain = KuzuQAChain.from_llm(
+    cypher_llm=ChatOpenAI(temperature=0, model="gpt-4o-mini"),
+    qa_llm=ChatOpenAI(temperature=0, model="gpt-4"),
+    graph=graph,
+    verbose=True,
+    allow_dangerous_requests=True,
+)
+```
+
+```python
+chain.invoke("Who is the CEO of Apple?")
+```
+
+```output
+> Entering new KuzuQAChain chain...
+Generated Cypher:
+MATCH (p:Person)-[:IS_CEO_OF]->(c:Company {id: 'Apple'}) RETURN p.id, p.type
+Full Context:
+[{'p.id': 'Tim Cook', 'p.type': 'entity'}]
+
+> Finished chain.
+```
+
+```output
+{'query': 'Who is the CEO of Apple?',
+ 'result': 'Tim Cook is the CEO of Apple.'}
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/graphs/kuzu_db.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

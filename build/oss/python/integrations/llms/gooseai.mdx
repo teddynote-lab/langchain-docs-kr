@@ -1,0 +1,86 @@
+```markdown
+---
+title: GooseAI
+---
+
+`GooseAI`는 API를 통해 제공되는 완전 관리형 NLP-as-a-Service입니다. GooseAI는 [이러한 모델들](https://goose.ai/docs/models)에 대한 액세스를 제공합니다.
+
+이 노트북은 LangChain을 [GooseAI](https://goose.ai/)와 함께 사용하는 방법을 다룹니다.
+
+## openai 설치
+
+GooseAI API를 사용하려면 `openai` 패키지가 필요합니다. `pip install openai`를 사용하여 `openai`를 설치하세요.
+
+```python
+pip install -qU  langchain-openai
+```
+
+## Imports
+
+```python
+import os
+
+from langchain.chains import LLMChain
+from langchain_community.llms import GooseAI
+from langchain_core.prompts import PromptTemplate
+```
+
+## Environment API Key 설정
+
+GooseAI에서 API key를 받아야 합니다. 다양한 모델을 테스트할 수 있도록 $10의 무료 크레딧이 제공됩니다.
+
+```python
+from getpass import getpass
+
+GOOSEAI_API_KEY = getpass()
+```
+
+```python
+os.environ["GOOSEAI_API_KEY"] = GOOSEAI_API_KEY
+```
+
+## GooseAI instance 생성
+
+model name, max tokens generated, temperature 등과 같은 다양한 parameter를 지정할 수 있습니다.
+
+```python
+llm = GooseAI()
+```
+
+## Prompt Template 생성
+
+Question and Answer를 위한 prompt template을 생성합니다.
+
+```python
+template = """Question: {question}
+
+Answer: Let's think step by step."""
+
+prompt = PromptTemplate.from_template(template)
+```
+
+## LLMChain 초기화
+
+```python
+llm_chain = LLMChain(prompt=prompt, llm=llm)
+```
+
+## LLMChain 실행
+
+질문을 제공하고 LLMChain을 실행합니다.
+
+```python
+question = "What NFL team won the Super Bowl in the year Justin Beiber was born?"
+
+llm_chain.run(question)
+```
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/llms/gooseai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

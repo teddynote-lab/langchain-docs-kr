@@ -1,0 +1,50 @@
+---
+title: Spider
+---
+
+[Spider](https://spider.cloud/?ref=langchainjs)는 [가장 빠른](https://github.com/spider-rs/spider/blob/main/benches/BENCHMARKS.md#benchmark-results) 크롤러입니다. AI를 사용한 커스텀 액션으로 크롤링을 수행하면서 모든 웹사이트를 순수 HTML, markdown, metadata 또는 텍스트로 변환할 수 있습니다.
+
+## Overview
+
+Spider를 사용하면 탐지를 방지하기 위한 고성능 proxy를 사용하고, AI 액션을 캐싱하며, 크롤링 상태를 위한 webhook, 예약된 크롤링 등을 활용할 수 있습니다.
+
+이 가이드는 [Spider](https://spider.cloud/)를 사용하여 웹사이트를 크롤링/스크래핑하고 LangChain의 `SpiderLoader`로 LLM 준비된 문서를 로드하는 방법을 보여줍니다.
+
+## Setup
+
+[spider.cloud](https://spider.cloud/)에서 자신의 Spider API key를 발급받으세요.
+
+## Usage
+
+다음은 `SpiderLoader`를 사용하는 예제입니다:
+
+Spider는 두 가지 스크래핑 모드인 `scrape`와 `crawl`을 제공합니다. Scrape는 제공된 url의 콘텐츠만 가져오는 반면, crawl은 제공된 url의 콘텐츠를 가져오고 하위 페이지를 따라 더 깊이 크롤링합니다.
+
+```typescript
+import { SpiderLoader } from "@langchain/community/document_loaders/web/spider";
+
+const loader = new SpiderLoader({
+  url: "https://spider.cloud", // The URL to scrape
+  apiKey: process.env.SPIDER_API_KEY, // Optional, defaults to `SPIDER_API_KEY` in your env.
+  mode: "scrape", // The mode to run the crawler in. Can be "scrape" for single urls or "crawl" for deeper scraping following subpages
+  // params: {
+  //   // optional parameters based on Spider API docs
+  //   // For API documentation, visit https://spider.cloud/docs/api
+  // },
+});
+
+const docs = await loader.load();
+```
+
+### Additional Parameters
+
+사용 가능한 모든 `params`는 [Spider 문서](https://spider.cloud/docs/api)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/web_loaders/spider.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

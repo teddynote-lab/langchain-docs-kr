@@ -1,0 +1,42 @@
+---
+title: SerpAPI
+---
+
+이 페이지는 LangChain 내에서 SerpAPI 검색 API를 사용하는 방법을 다룹니다.
+설치 및 설정, 그리고 특정 SerpAPI wrapper에 대한 참조, 이렇게 두 부분으로 나뉩니다.
+
+## 설치 및 설정
+- `pip install google-search-results`로 필요한 패키지를 설치합니다
+- SerpAPI api key를 발급받고 환경 변수(`SERPAPI_API_KEY`)로 설정합니다
+
+## Wrappers
+
+### Utility
+
+이 API를 감싸는 SerpAPI utility가 존재합니다. 이 utility를 import하려면:
+
+```python
+from langchain_community.utilities import SerpAPIWrapper
+```
+
+이 wrapper에 대한 더 자세한 안내는 [이 노트북](/oss/python/integrations/tools/serpapi)을 참조하세요.
+
+### Tool
+
+이 wrapper를 Tool로 쉽게 로드할 수도 있습니다 (Agent와 함께 사용하기 위해).
+다음과 같이 할 수 있습니다:
+```python
+from langchain_community.agent_toolkits.load_tools import load_tools
+tools = load_tools(["serpapi"])
+```
+
+이에 대한 자세한 정보는 [이 페이지](/oss/python/integrations/tools)를 참조하세요
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/serpapi.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

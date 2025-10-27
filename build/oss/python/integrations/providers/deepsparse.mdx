@@ -1,0 +1,45 @@
+---
+title: DeepSparse
+---
+
+이 페이지는 LangChain 내에서 [DeepSparse](https://github.com/neuralmagic/deepsparse) inference runtime을 사용하는 방법을 다룹니다.
+설치 및 설정, 그리고 DeepSparse 사용 예제의 두 부분으로 나뉩니다.
+
+## 설치 및 설정
+
+- `pip install deepsparse`로 Python 패키지를 설치합니다
+- [SparseZoo model](https://sparsezoo.neuralmagic.com/?useCase=text_generation)을 선택하거나 [Optimum 사용](https://github.com/neuralmagic/notebooks/blob/main/notebooks/opt-text-generation-deepsparse-quickstart/OPT_Text_Generation_DeepSparse_Quickstart.ipynb)하여 지원되는 모델을 ONNX로 내보냅니다
+
+
+## LLMs
+
+DeepSparse LLM wrapper가 존재하며, 다음과 같이 접근할 수 있습니다:
+
+```python
+from langchain_community.llms import DeepSparse
+```
+
+모든 모델에 대해 통합된 인터페이스를 제공합니다:
+
+```python
+llm = DeepSparse(model='zoo:nlg/text_generation/codegen_mono-350m/pytorch/huggingface/bigpython_bigquery_thepile/base-none')
+
+print(llm.invoke('def fib():'))
+```
+
+`config` 매개변수를 사용하여 추가 매개변수를 전달할 수 있습니다:
+
+```python
+config = {'max_generated_tokens': 256}
+
+llm = DeepSparse(model='zoo:nlg/text_generation/codegen_mono-350m/pytorch/huggingface/bigpython_bigquery_thepile/base-none', config=config)
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/deepsparse.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

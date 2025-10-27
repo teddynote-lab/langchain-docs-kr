@@ -1,0 +1,34 @@
+---
+title: trace를 공개적으로 공유하거나 공유 해제하기
+sidebarTitle: trace를 공개적으로 공유하거나 공유 해제하기
+---
+
+<Warning>
+**trace를 공개적으로 공유하면 링크를 가진 누구나 접근할 수 있습니다. 민감한 정보를 공유하지 않도록 주의하세요.**
+
+self-hosted 또는 hybrid LangSmith 배포가 VPC 내에 있는 경우, 공개 링크는 VPC 내에서 인증된 멤버만 접근할 수 있습니다. 보안 강화를 위해 네트워크에 접근 권한이 있는 사용자만 접근할 수 있는 private URL로 인스턴스를 구성하는 것을 권장합니다.
+</Warning>
+
+trace를 공개적으로 공유하려면, trace view의 오른쪽 상단에 있는 **Share** 버튼을 클릭하세요.
+![](/langsmith/images/share-trace.png)
+
+trace 링크를 복사할 수 있는 대화 상자가 열립니다.
+
+공유된 trace는 LangSmith 계정이 없어도 링크를 가진 누구나 접근할 수 있습니다. trace를 볼 수는 있지만 편집할 수는 없습니다.
+
+trace를 "공유 해제"하려면 다음 중 하나를 수행하세요:
+
+1. 공개적으로 공유된 trace의 오른쪽 상단에 있는 **Public**을 클릭한 다음 대화 상자에서 **Unshare**를 클릭하여 **Unshare**를 선택합니다.
+   ![](/langsmith/images/unshare-trace.png)
+
+2. **Settings** -> **Shared URLs**를 클릭하여 조직의 공개 공유 trace 목록으로 이동한 다음, 공유 해제하려는 trace 옆의 **Unshare**를 클릭합니다.
+   ![](/langsmith/images/unshare-trace-list-share.png)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/share-trace.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

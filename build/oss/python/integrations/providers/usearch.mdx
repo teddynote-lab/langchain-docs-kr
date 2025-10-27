@@ -1,0 +1,39 @@
+---
+title: USearch
+---
+
+>[USearch](https://unum-cloud.github.io/usearch/)는 더 작고 빠른 단일 파일 벡터 검색 엔진입니다.
+
+>`USearch`의 기본 기능은 `FAISS`와 동일하며, Approximate Nearest Neighbors 검색을 조사해본 적이 있다면 인터페이스가 익숙하게 느껴질 것입니다.
+> `USearch`와 `FAISS` 모두 `HNSW` 알고리즘을 사용하지만, 설계 원칙에서 크게 다릅니다. `USearch`는 컴팩트하며 성능 저하 없이 FAISS와 광범위하게 호환되고, 사용자 정의 메트릭과 적은 의존성에 주로 초점을 맞추고 있습니다.
+>
+## 설치 및 설정
+
+`usearch` python package를 설치해야 합니다.
+
+<CodeGroup>
+```bash pip
+pip install usearch
+```
+
+```bash uv
+uv add usearch
+```
+</CodeGroup>
+
+## Vector Store
+
+[사용 예제](/oss/python/integrations/vectorstores/usearch)를 참조하세요.
+
+```python
+from langchain_community.vectorstores import USearch
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/usearch.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

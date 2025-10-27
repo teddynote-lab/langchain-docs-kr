@@ -1,0 +1,105 @@
+---
+title: Memorize
+---
+
+비지도 학습을 사용하여 정보를 기억하도록 LLM 자체를 fine-tuning합니다.
+
+이 도구는 fine-tuning을 지원하는 LLM이 필요합니다. 현재는 `langchain.llms import GradientLLM`만 지원됩니다.
+
+## Imports
+
+```python
+import os
+
+from langchain.agents import AgentExecutor, AgentType, initialize_agent, load_tools
+from langchain.chains import LLMChain
+from langchain.memory import ConversationBufferMemory
+from langchain_community.llms import GradientLLM
+```
+
+## Environment API Key 설정
+
+Gradient AI에서 API key를 받아야 합니다. 다양한 모델을 테스트하고 fine-tuning할 수 있는 $10의 무료 크레딧이 제공됩니다.
+
+```python
+from getpass import getpass
+
+if not os.environ.get("GRADIENT_ACCESS_TOKEN", None):
+    # Access token under https://auth.gradient.ai/select-workspace
+    os.environ["GRADIENT_ACCESS_TOKEN"] = getpass("gradient.ai access token:")
+if not os.environ.get("GRADIENT_WORKSPACE_ID", None):
+    # `ID` listed in `$ gradient workspace list`
+    # also displayed after login at at https://auth.gradient.ai/select-workspace
+    os.environ["GRADIENT_WORKSPACE_ID"] = getpass("gradient.ai workspace id:")
+if not os.environ.get("GRADIENT_MODEL_ADAPTER_ID", None):
+    # `ID` listed in `$ gradient model list --workspace-id "$GRADIENT_WORKSPACE_ID"`
+    os.environ["GRADIENT_MODEL_ID"] = getpass("gradient.ai model id:")
+```
+
+선택사항: Environment 변수 `GRADIENT_ACCESS_TOKEN`과 `GRADIENT_WORKSPACE_ID`를 검증하여 현재 배포된 모델을 확인합니다.
+
+## `GradientLLM` 인스턴스 생성
+
+모델 이름, 생성할 최대 토큰 수, temperature 등 다양한 파라미터를 지정할 수 있습니다.
+
+```python
+llm = GradientLLM(
+    model_id=os.environ["GRADIENT_MODEL_ID"],
+    # # optional: set new credentials, they default to environment variables
+    # gradient_workspace_id=os.environ["GRADIENT_WORKSPACE_ID"],
+    # gradient_access_token=os.environ["GRADIENT_ACCESS_TOKEN"],
+)
+```
+
+## Tools 로드
+
+```python
+tools = load_tools(["memorize"], llm=llm)
+```
+
+## Agent 초기화
+
+```python
+agent = initialize_agent(
+    tools,
+    llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True,
+    # memory=ConversationBufferMemory(memory_key="chat_history", return_messages=True),
+)
+```
+
+## Agent 실행
+
+agent에게 텍스트 조각을 기억하도록 요청합니다.
+
+```python
+agent.run(
+    "Please remember the fact in detail:\nWith astonishing dexterity, Zara Tubikova set a world record by solving a 4x4 Rubik's Cube variation blindfolded in under 20 seconds, employing only their feet."
+)
+```
+
+```output
+> Entering new AgentExecutor chain...
+I should memorize this fact.
+Action: Memorize
+Action Input: Zara T
+Observation: Train complete. Loss: 1.6853971333333335
+Thought:I now know the final answer.
+Final Answer: Zara Tubikova set a world
+
+> Finished chain.
+```
+
+```output
+'Zara Tubikova set a world'
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/tools/memorize.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,195 @@
+---
+title: Stateless 실행
+sidebarTitle: Stateless 실행
+---
+대부분의 경우, LangSmith Deployment에 구현된 영구 상태를 통해 이전 실행을 추적하기 위해 graph를 실행할 때 client에 `thread_id`를 제공합니다. 그러나 실행을 영구적으로 저장할 필요가 없다면 내장된 영구 상태를 사용할 필요가 없으며 stateless 실행을 생성할 수 있습니다.
+
+## Setup
+
+먼저 client를 설정해보겠습니다:
+
+<Tabs>
+    <Tab title="Python">
+    ```python
+    from langgraph_sdk import get_client
+
+    client = get_client(url=<DEPLOYMENT_URL>)
+    # Using the graph deployed with the name "agent"
+    assistant_id = "agent"
+    # create thread
+    thread = await client.threads.create()
+    ```
+    </Tab>
+    <Tab title="Javascript">
+    ```js
+    import { Client } from "@langchain/langgraph-sdk";
+
+    const client = new Client({ apiUrl: <DEPLOYMENT_URL> });
+    // Using the graph deployed with the name "agent"
+    const assistantId = "agent";
+    // create thread
+    const thread = await client.threads.create();
+    ```
+    </Tab>
+    <Tab title="CURL">
+    ```bash
+    curl --request POST \
+        --url <DEPLOYMENT_URL>/assistants/search \
+        --header 'Content-Type: application/json' \
+        --data '{
+            "limit": 10,
+            "offset": 0
+        }' | jq -c 'map(select(.config == null or .config == {})) | .[0].graph_id' && \
+    curl --request POST \
+        --url <DEPLOYMENT_URL>/threads \
+        --header 'Content-Type: application/json' \
+        --data '{}'
+    ```
+    </Tab>
+</Tabs>
+
+## Stateless streaming
+
+상태 속성이 있는 실행에서 streaming하는 방식과 거의 동일한 방식으로 stateless 실행의 결과를 streaming할 수 있지만, `thread_id` parameter에 값을 전달하는 대신 `None`을 전달합니다:
+
+<Tabs>
+    <Tab title="Python">
+    ```python
+    input = {
+        "messages": [
+            {"role": "user", "content": "Hello! My name is Bagatur and I am 26 years old."}
+        ]
+    }
+
+    async for chunk in client.runs.stream(
+        # Don't pass in a thread_id and the stream will be stateless
+        None,
+        assistant_id,
+        input=input,
+        stream_mode="updates",
+    ):
+        if chunk.data and "run_id" not in chunk.data:
+            print(chunk.data)
+    ```
+    </Tab>
+    <Tab title="Javascript">
+    ```js
+    let input = {
+      messages: [
+        { role: "user", content: "Hello! My name is Bagatur and I am 26 years old." }
+      ]
+    };
+
+    const streamResponse = client.runs.stream(
+      // Don't pass in a thread_id and the stream will be stateless
+      null,
+      assistantId,
+      {
+        input,
+        streamMode: "updates"
+      }
+    );
+    for await (const chunk of streamResponse) {
+      if (chunk.data && !("run_id" in chunk.data)) {
+        console.log(chunk.data);
+      }
+    }
+    ```
+    </Tab>
+    <Tab title="CURL">
+    ```bash
+    curl --request POST \
+        --url <DEPLOYMENT_URL>/runs/stream \
+        --header 'Content-Type: application/json' \
+        --data "{
+            \"assistant_id\": \"agent\",
+            \"input\": {\"messages\": [{\"role\": \"human\", \"content\": \"Hello! My name is Bagatur and I am 26 years old.\"}]},
+            \"stream_mode\": [
+                \"updates\"
+            ]
+        }" | jq -c 'select(.data and (.data | has("run_id") | not)) | .data'
+    ```
+    </Tab>
+</Tabs>
+
+Output:
+
+```
+{'agent': {'messages': [{'content': "Hello Bagatur! It's nice to meet you. Thank you for introducing yourself and sharing your age. Is there anything specific you'd like to know or discuss? I'm here to help with any questions or topics you're interested in.", 'additional_kwargs': {}, 'response_metadata': {}, 'type': 'ai', 'name': None, 'id': 'run-489ec573-1645-4ce2-a3b8-91b391d50a71', 'example': False, 'tool_calls': [], 'invalid_tool_calls': [], 'usage_metadata': None}]}}
+```
+
+## Stateless 결과 대기
+
+Streaming 외에도 다음과 같이 `.wait` function을 사용하여 stateless 결과를 기다릴 수 있습니다:
+
+<Tabs>
+    <Tab title="Python">
+    ```python
+    stateless_run_result = await client.runs.wait(
+        None,
+        assistant_id,
+        input=input,
+    )
+    print(stateless_run_result)
+    ```
+    </Tab>
+    <Tab title="Javascript">
+    ```js
+    let statelessRunResult = await client.runs.wait(
+      null,
+      assistantId,
+      { input: input }
+    );
+    console.log(statelessRunResult);
+    ```
+    </Tab>
+    <Tab title="CURL">
+    ```bash
+    curl --request POST \
+        --url <DEPLOYMENT_URL>/runs/wait \
+        --header 'Content-Type: application/json' \
+        --data '{
+            "assistant_id": <ASSISTANT_IDD>,
+        }'
+    ```
+    </Tab>
+</Tabs>
+
+Output:
+
+```
+{
+'messages': [
+{
+'content': 'Hello! My name is Bagatur and I am 26 years old.',
+'additional_kwargs': {},
+'response_metadata': {},
+'type': 'human',
+'name': None,
+'id': '5e088543-62c2-43de-9d95-6086ad7f8b48',
+'example': False}
+,
+{
+'content': "Hello Bagatur! It's nice to meet you. Thank you for introducing yourself and sharing your age. Is there anything specific you'd like to know or discuss? I'm here to help with any questions or topics you'd like to explore.",
+'additional_kwargs': {},
+'response_metadata': {},
+'type': 'ai',
+'name': None,
+'id': 'run-d6361e8d-4d4c-45bd-ba47-39520257f773',
+'example': False,
+'tool_calls': [],
+'invalid_tool_calls': [],
+'usage_metadata': None
+}
+]
+}
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/stateless-runs.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

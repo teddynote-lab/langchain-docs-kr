@@ -1,0 +1,54 @@
+---
+title: Gradient AI
+---
+
+`GradientEmbeddings` 클래스는 Gradient AI API를 사용하여 주어진 텍스트에 대한 embedding을 생성합니다.
+
+## Setup
+
+공식 Gradient Node SDK를 peer dependency로 설치해야 합니다:
+
+```bash npm
+npm i @langchain/community @langchain/core @gradientai/nodejs-sdk
+```
+Gradient AI API를 사용하기 위해 다음 환경 변수를 설정해야 합니다.
+
+```
+export GRADIENT_ACCESS_TOKEN=<YOUR_ACCESS_TOKEN>
+export GRADIENT_WORKSPACE_ID=<YOUR_WORKSPACE_ID>
+```
+또는 GradientAI 클래스 인스턴스화 시 각각 `gradientAccessKey`와 `workspaceId`로 설정할 수 있습니다.
+예를 들어:
+
+```typescript
+const model = new GradientEmbeddings({
+  gradientAccessKey: "My secret Access Token"
+  workspaceId: "My secret workspace id"
+});
+```
+
+## Usage
+
+```typescript
+import { GradientEmbeddings } from "@langchain/community/embeddings/gradient_ai";
+
+const model = new GradientEmbeddings({});
+const res = await model.embedQuery(
+  "What would be a good company name a company that makes colorful socks?"
+);
+console.log({ res });
+```
+
+## Related
+
+- Embedding model [개념 가이드](/oss/javascript/integrations/text_embedding)
+- Embedding model [사용 방법 가이드](/oss/javascript/integrations/text_embedding)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/text_embedding/gradient_ai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

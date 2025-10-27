@@ -1,0 +1,49 @@
+---
+title: LlamaIndex
+---
+
+>[LlamaIndex](https://www.llamaindex.ai/)는 LLM 애플리케이션 구축을 위한 선도적인 데이터 프레임워크입니다
+
+
+## Installation and Setup
+
+`llama-index` python 패키지를 설치해야 합니다.
+
+<CodeGroup>
+```bash pip
+pip install llama-index
+```
+
+```bash uv
+uv add llama-index
+```
+</CodeGroup>
+
+[설치 지침](https://docs.llamaindex.ai/en/stable/getting_started/installation/)을 참조하세요.
+
+## Retrievers
+
+### LlamaIndexRetriever
+
+>LlamaIndex 데이터 구조를 기반으로 소스와 함께 질문-답변을 수행하는 데 사용됩니다.
+
+```python
+from langchain_community.retrievers.llama_index import LlamaIndexRetriever
+```
+
+### LlamaIndexGraphRetriever
+
+>LlamaIndex 그래프 데이터 구조를 기반으로 소스와 함께 질문-답변을 수행하는 데 사용됩니다.
+
+```python
+from langchain_community.retrievers.llama_index import LlamaIndexGraphRetriever
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/llama_index.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

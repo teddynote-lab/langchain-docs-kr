@@ -1,0 +1,157 @@
+---
+title: Amazon Textract
+---
+
+>[Amazon Textract](https://docs.aws.amazon.com/managedservices/latest/userguide/textract.html)는 스캔된 문서에서 텍스트, 필기체 및 데이터를 자동으로 추출하는 기계 학습(ML) 서비스입니다.
+>
+>단순한 광학 문자 인식(OCR)을 넘어 양식과 표에서 데이터를 식별하고, 이해하며, 추출합니다. 오늘날 많은 기업들은 PDF, 이미지, 표, 양식과 같은 스캔된 문서에서 수동으로 데이터를 추출하거나, 수동 구성이 필요한(양식이 변경될 때마다 업데이트해야 하는) 단순한 OCR 소프트웨어를 사용합니다. 이러한 수동적이고 비용이 많이 드는 프로세스를 극복하기 위해 `Textract`는 ML을 사용하여 모든 유형의 문서를 읽고 처리하며, 수동 작업 없이 텍스트, 필기체, 표 및 기타 데이터를 정확하게 추출합니다.
+
+`Textract`는 `JPEG`, `PNG`, `PDF`, `TIFF` 파일 형식을 지원합니다. 자세한 정보는 [문서](https://docs.aws.amazon.com/textract/latest/dg/limits-document.html)에서 확인할 수 있습니다.
+
+다음 예제들은 `Amazon Textract`를 LangChain과 DocumentLoader로 결합하여 사용하는 방법을 보여줍니다.
+
+```python
+pip install -qU  boto3 langchain-openai tiktoken python-dotenv
+```
+
+```python
+pip install -qU  "amazon-textract-caller>=0.2.0"
+```
+
+## 예제 1: 로컬 파일에서 로드하기
+
+첫 번째 예제는 로컬 파일을 사용하며, 내부적으로 Amazon Textract 동기 API [DetectDocumentText](https://docs.aws.amazon.com/textract/latest/dg/API_DetectDocumentText.html)로 전송됩니다.
+
+로컬 파일이나 HTTP://와 같은 URL endpoint는 Textract에서 한 페이지 문서로 제한됩니다.
+여러 페이지 문서는 S3에 있어야 합니다. 이 샘플 파일은 jpeg입니다.
+
+```python
+from langchain_community.document_loaders import AmazonTextractPDFLoader
+
+loader = AmazonTextractPDFLoader("example_data/alejandro_rosalez_sample-small.jpeg")
+documents = loader.load()
+```
+
+파일의 출력
+
+```python
+documents
+```
+
+```output
+[Document(page_content='Patient Information First Name: ALEJANDRO Last Name: ROSALEZ Date of Birth: 10/10/1982 Sex: M Marital Status: MARRIED Email Address: Address: 123 ANY STREET City: ANYTOWN State: CA Zip Code: 12345 Phone: 646-555-0111 Emergency Contact 1: First Name: CARLOS Last Name: SALAZAR Phone: 212-555-0150 Relationship to Patient: BROTHER Emergency Contact 2: First Name: JANE Last Name: DOE Phone: 650-555-0123 Relationship FRIEND to Patient: Did you feel fever or feverish lately? Yes No Are you having shortness of breath? Yes No Do you have a cough? Yes No Did you experience loss of taste or smell? Yes No Where you in contact with any confirmed COVID-19 positive patients? Yes No Did you travel in the past 14 days to any regions affected by COVID-19? Yes No Patient Information First Name: ALEJANDRO Last Name: ROSALEZ Date of Birth: 10/10/1982 Sex: M Marital Status: MARRIED Email Address: Address: 123 ANY STREET City: ANYTOWN State: CA Zip Code: 12345 Phone: 646-555-0111 Emergency Contact 1: First Name: CARLOS Last Name: SALAZAR Phone: 212-555-0150 Relationship to Patient: BROTHER Emergency Contact 2: First Name: JANE Last Name: DOE Phone: 650-555-0123 Relationship FRIEND to Patient: Did you feel fever or feverish lately? Yes No Are you having shortness of breath? Yes No Do you have a cough? Yes No Did you experience loss of taste or smell? Yes No Where you in contact with any confirmed COVID-19 positive patients? Yes No Did you travel in the past 14 days to any regions affected by COVID-19? Yes No ', metadata={'source': 'example_data/alejandro_rosalez_sample-small.jpeg', 'page': 1})]
+```
+
+## 예제 2: URL에서 로드하기
+
+다음 예제는 HTTPS endpoint에서 파일을 로드합니다.
+Amazon Textract는 모든 여러 페이지 문서가 S3에 저장되어야 하므로 단일 페이지여야 합니다.
+
+```python
+from langchain_community.document_loaders import AmazonTextractPDFLoader
+
+loader = AmazonTextractPDFLoader(
+    "https://amazon-textract-public-content.s3.us-east-2.amazonaws.com/langchain/alejandro_rosalez_sample_1.jpg"
+)
+documents = loader.load()
+```
+
+```python
+documents
+```
+
+```output
+[Document(page_content='Patient Information First Name: ALEJANDRO Last Name: ROSALEZ Date of Birth: 10/10/1982 Sex: M Marital Status: MARRIED Email Address: Address: 123 ANY STREET City: ANYTOWN State: CA Zip Code: 12345 Phone: 646-555-0111 Emergency Contact 1: First Name: CARLOS Last Name: SALAZAR Phone: 212-555-0150 Relationship to Patient: BROTHER Emergency Contact 2: First Name: JANE Last Name: DOE Phone: 650-555-0123 Relationship FRIEND to Patient: Did you feel fever or feverish lately? Yes No Are you having shortness of breath? Yes No Do you have a cough? Yes No Did you experience loss of taste or smell? Yes No Where you in contact with any confirmed COVID-19 positive patients? Yes No Did you travel in the past 14 days to any regions affected by COVID-19? Yes No Patient Information First Name: ALEJANDRO Last Name: ROSALEZ Date of Birth: 10/10/1982 Sex: M Marital Status: MARRIED Email Address: Address: 123 ANY STREET City: ANYTOWN State: CA Zip Code: 12345 Phone: 646-555-0111 Emergency Contact 1: First Name: CARLOS Last Name: SALAZAR Phone: 212-555-0150 Relationship to Patient: BROTHER Emergency Contact 2: First Name: JANE Last Name: DOE Phone: 650-555-0123 Relationship FRIEND to Patient: Did you feel fever or feverish lately? Yes No Are you having shortness of breath? Yes No Do you have a cough? Yes No Did you experience loss of taste or smell? Yes No Where you in contact with any confirmed COVID-19 positive patients? Yes No Did you travel in the past 14 days to any regions affected by COVID-19? Yes No ', metadata={'source': 'example_data/alejandro_rosalez_sample-small.jpeg', 'page': 1})]
+```
+
+## 예제 3: 여러 페이지 PDF 문서 로드하기
+
+여러 페이지 문서를 처리하려면 문서가 S3에 있어야 합니다. 샘플 문서는 us-east-2의 버킷에 있으며, 성공하려면 동일한 region에서 Textract를 호출해야 하므로 client에 region_name을 설정하고 loader에 전달하여 us-east-2에서 Textract가 호출되도록 합니다. 또는 us-east-2에서 notebook을 실행하거나, AWS_DEFAULT_REGION을 us-east-2로 설정하거나, 다른 환경에서 실행할 때 아래 셀과 같이 해당 region name으로 boto3 Textract client를 전달할 수도 있습니다.
+
+```python
+import boto3
+
+textract_client = boto3.client("textract", region_name="us-east-2")
+
+file_path = "s3://amazon-textract-public-content/langchain/layout-parser-paper.pdf"
+loader = AmazonTextractPDFLoader(file_path, client=textract_client)
+documents = loader.load()
+```
+
+이제 응답을 검증하기 위해 페이지 수를 가져옵니다(전체 응답을 출력하면 매우 길 것입니다...). 16페이지를 예상합니다.
+
+```python
+len(documents)
+```
+
+```output
+16
+```
+
+## 예제 4: 출력 형식 사용자 정의하기
+
+Amazon Textract가 PDF를 처리할 때 헤더, 푸터, 페이지 번호와 같은 요소를 포함한 모든 텍스트를 추출합니다. 이러한 추가 정보는 "노이즈"가 될 수 있으며 출력의 효과를 감소시킬 수 있습니다.
+
+문서의 2D 레이아웃을 깨끗한 1차원 텍스트 문자열로 변환하는 프로세스를 linearization이라고 합니다.
+
+AmazonTextractPDFLoader는 `linearization_config` 매개변수를 통해 이 프로세스를 정밀하게 제어할 수 있습니다. 이를 사용하여 최종 출력에서 제외할 요소를 지정할 수 있습니다.
+
+다음 예제는 헤더, 푸터 및 그림을 숨겨 훨씬 깨끗한 텍스트 블록을 생성하는 방법을 보여줍니다. 더 고급 사용 사례는 이 [AWS 블로그 게시물](https://aws.amazon.com/blogs/machine-learning/amazon-textracts-new-layout-feature-introduces-efficiencies-in-general-purpose-and-generative-ai-document-processing-tasks/)을 참조하세요.
+
+```python
+from langchain_community.document_loaders import AmazonTextractPDFLoader
+from textractor.data.text_linearization_config import TextLinearizationConfig
+
+loader = AmazonTextractPDFLoader(
+    "s3://amazon-textract-public-content/langchain/layout-parser-paper.pdf",
+    linearization_config=TextLinearizationConfig(
+        hide_header_layout=True,
+        hide_footer_layout=True,
+        hide_figure_layout=True,
+    ),
+)
+documents = loader.load()
+```
+
+## LangChain chain에서 AmazonTextractPDFLoader 사용하기 (예: OpenAI)
+
+AmazonTextractPDFLoader는 다른 loader들과 동일한 방식으로 chain에서 사용할 수 있습니다.
+Textract 자체에는 이 예제의 QA chain과 유사한 기능을 제공하는 [Query 기능](https://docs.aws.amazon.com/textract/latest/dg/API_Query.html)이 있으므로 확인해볼 가치가 있습니다.
+
+```python
+# You can store your OPENAI_API_KEY in a .env file as well
+# import os
+# from dotenv import load_dotenv
+
+# load_dotenv()
+```
+
+```python
+# Or set the OpenAI key in the environment directly
+import os
+
+os.environ["OPENAI_API_KEY"] = "your-OpenAI-API-key"
+```
+
+```python
+from langchain.chains.question_answering import load_qa_chain
+from langchain_openai import OpenAI
+
+chain = load_qa_chain(llm=OpenAI(), chain_type="map_reduce")
+query = ["Who are the authors?"]
+
+chain.run(input_documents=documents, question=query)
+```
+
+```output
+' The authors are Zejiang Shen, Ruochen Zhang, Melissa Dell, Benjamin Charles Germain Lee, Jacob Carlson, Weining Li, Gardner, M., Grus, J., Neumann, M., Tafjord, O., Dasigi, P., Liu, N., Peters, M., Schmitz, M., Zettlemoyer, L., Lukasz Garncarek, Powalski, R., Stanislawek, T., Topolski, B., Halama, P., Gralinski, F., Graves, A., Fernández, S., Gomez, F., Schmidhuber, J., Harley, A.W., Ufkes, A., Derpanis, K.G., He, K., Gkioxari, G., Dollár, P., Girshick, R., He, K., Zhang, X., Ren, S., Sun, J., Kay, A., Lamiroy, B., Lopresti, D., Mears, J., Jakeway, E., Ferriter, M., Adams, C., Yarasavage, N., Thomas, D., Zwaard, K., Li, M., Cui, L., Huang,'
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/document_loaders/amazon_textract.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

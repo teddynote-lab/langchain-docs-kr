@@ -1,0 +1,204 @@
+---
+title: Cassandra
+---
+
+<Tip>
+**호환성**
+
+Node.js에서만 사용 가능합니다.
+</Tip>
+
+[Apache Cassandra®](https://cassandra.apache.org/_/index.html)는 NoSQL, 행 지향, 높은 확장성과 가용성을 가진 데이터베이스입니다.
+
+Apache Cassandra의 [최신 버전](<https://cwiki.apache.org/confluence/display/CASSANDRA/CEP-30%3A+Approximate+Nearest+Neighbor(ANN)+Vector+Search+via+Storage-Attached+Indexes>)은 Vector Similarity Search를 기본적으로 지원합니다.
+
+## Setup
+
+먼저 Cassandra Node.js driver를 설치하세요:
+
+<Tip>
+[LangChain 패키지 설치에 대한 일반적인 지침은 이 섹션을 참조하세요](/oss/javascript/langchain/install).
+</Tip>
+
+```bash npm
+npm install cassandra-driver @langchain/community @langchain/openai @langchain/core
+```
+데이터베이스 제공업체에 따라 데이터베이스에 연결하는 방법의 세부 사항이 다를 수 있습니다. vector store 구성의 일부로 사용될 `configConnection` 문서를 생성합니다.
+
+### Apache Cassandra®
+
+Vector search는 [Apache Cassandra® 5.0](https://cassandra.apache.org/_/Apache-Cassandra-5.0-Moving-Toward-an-AI-Driven-Future.html) 이상에서 지원됩니다. 표준 연결 문서를 사용할 수 있습니다. 예를 들어:
+
+```typescript
+const configConnection = {
+  contactPoints: ['h1', 'h2'],
+  localDataCenter: 'datacenter1',
+  credentials: {
+    username: <...> as string,
+    password: <...> as string,
+  },
+};
+```
+### Astra DB
+
+Astra DB는 클라우드 네이티브 Cassandra-as-a-Service 플랫폼입니다.
+
+1. [Astra DB 계정](https://astra.datastax.com/register)을 생성하세요.
+2. [vector 지원 데이터베이스](https://astra.datastax.com/createDatabase)를 생성하세요.
+3. 데이터베이스를 위한 [token](https://docs.datastax.com/en/astra/docs/manage-application-tokens.html)을 생성하세요.
+
+```typescript
+const configConnection = {
+  serviceProviderArgs: {
+    astra: {
+      token: <...> as string,
+      endpoint: <...> as string,
+    },
+  },
+};
+```
+`endpoint:` 대신 `datacenterID:` 속성과 선택적으로 `regionName:`을 제공할 수 있습니다.
+
+## Indexing docs
+
+```typescript
+import { CassandraStore } from "@langchain/classic/vectorstores/cassandra";
+import { OpenAIEmbeddings } from "@langchain/openai";
+
+// The configConnection document is defined above
+const config = {
+  ...configConnection,
+  keyspace: "test",
+  dimensions: 1536,
+  table: "test",
+  indices: [{ name: "name", value: "(name)" }],
+  primaryKey: {
+    name: "id",
+    type: "int",
+  },
+  metadataColumns: [
+    {
+      name: "name",
+      type: "text",
+    },
+  ],
+};
+
+const vectorStore = await CassandraStore.fromTexts(
+  ["I am blue", "Green yellow purple", "Hello there hello"],
+  [
+    { id: 2, name: "2" },
+    { id: 1, name: "1" },
+    { id: 3, name: "3" },
+  ],
+  new OpenAIEmbeddings(),
+  cassandraConfig
+);
+```
+## Querying docs
+
+```typescript
+const results = await vectorStore.similaritySearch("Green yellow purple", 1);
+```
+또는 필터링된 쿼리:
+
+```typescript
+const results = await vectorStore.similaritySearch("B", 1, { name: "Bubba" });
+```
+## Vector Types
+
+Cassandra는 `cosine` (기본값), `dot_product`, `euclidean` similarity search를 지원합니다. 이는 vector store가 처음 생성될 때 정의되며, constructor parameter `vectorType`에서 지정됩니다. 예를 들어:
+
+```typescript
+  ...,
+  vectorType: "dot_product",
+  ...
+```
+## Indices
+
+Version 5에서 Cassandra는 Storage Attached Indexes, 즉 SAI를 도입했습니다. 이를 통해 partition key를 지정하지 않고도 `WHERE` 필터링이 가능하며, 비등식과 같은 추가 연산자 타입을 사용할 수 있습니다. `indices` parameter로 이를 정의할 수 있으며, 각각 `name`과 `value` 항목을 포함하는 0개 이상의 dictionary를 허용합니다.
+
+Indices는 선택 사항이지만, non-partition column에서 필터링된 쿼리를 사용하는 경우 필요합니다.
+
+- `name` 항목은 객체 이름의 일부입니다. `test_table`이라는 테이블에서 `name: "some_column"`을 가진 index는 `idx_test_table_some_column`이 됩니다.
+- `value` 항목은 index가 생성되는 column이며, `(`와 `)`로 둘러싸여 있습니다. 위의 column `some_column`의 경우 `value: "(some_column)"`으로 지정됩니다.
+- 선택적 `options` 항목은 `CREATE CUSTOM INDEX` 문의 `WITH OPTIONS =` 절에 전달되는 map입니다. 이 map의 특정 항목은 index 타입에 따라 다릅니다.
+
+```typescript
+  indices: [{ name: "some_column", value: "(some_column)" }],
+```
+## Advanced Filtering
+
+기본적으로 filter는 등식 `=`으로 적용됩니다. `indices` 항목이 있는 필드의 경우, index에서 지원하는 값의 문자열로 `operator`를 제공할 수 있습니다. 이 경우 하나 이상의 filter를 singleton 또는 list로 지정할 수 있습니다 (list는 `AND`로 결합됩니다). 예를 들어:
+
+```typescript
+   { name: "create_datetime", operator: ">", value: some_datetime_variable }
+```
+또는
+
+```typescript
+[
+  { userid: userid_variable },
+  { name: "create_datetime", operator: ">", value: some_date_variable },
+];
+```
+`value`는 단일 값 또는 배열일 수 있습니다. 배열이 아니거나 `value`에 요소가 하나만 있는 경우, 결과 쿼리는 `${name} ${operator} ?` 형태가 되며 `value`가 `?`에 바인딩됩니다.
+
+`value` 배열에 요소가 두 개 이상인 경우, `name`에서 따옴표로 묶이지 않은 `?`의 개수를 세고 `value`의 길이에서 빼며, 이 개수만큼의 `?`가 연산자의 오른쪽에 배치됩니다. `?`가 두 개 이상이면 `(`와 `)`로 캡슐화됩니다. 예: `(?, ?, ?)`.
+
+이는 연산자의 왼쪽에 바인드 값을 용이하게 하며, 일부 함수에 유용합니다. 예를 들어 geo-distance filter:
+
+```typescript
+{
+  name: "GEO_DISTANCE(coord, ?)",
+  operator: "<",
+  value: [new Float32Array([53.3730617,-6.3000515]), 10000],
+},
+```
+## Data Partitioning and Composite Keys
+
+일부 시스템에서는 사용자별 또는 세션별로 데이터를 분할하고자 할 수 있습니다. Cassandra의 데이터는 항상 분할됩니다. 기본적으로 이 라이브러리는 첫 번째 primary key 필드로 분할합니다. record의 primary (고유) key를 구성하는 여러 column을 지정할 수 있으며, 선택적으로 partition key의 일부가 되어야 하는 필드를 표시할 수 있습니다. 예를 들어, vector store는 `userid`와 `collectionid` 모두로 분할될 수 있으며, 추가 필드 `docid`와 `docpart`가 개별 항목을 고유하게 만듭니다:
+
+```typescript
+  ...,
+  primaryKey: [
+    {name: "userid", type: "text", partition: true},
+    {name: "collectionid", type: "text", partition: true},
+    {name: "docid", type: "text"},
+    {name: "docpart", type: "int"},
+  ],
+  ...
+```
+검색할 때, 이러한 column에 대한 `indices`를 정의하지 않고도 filter에 partition key를 포함할 수 있습니다. 모든 partition key를 지정할 필요는 없지만, 키의 첫 번째 것들을 지정해야 합니다. 위의 예에서 `{userid: userid_variable}` 및 `{userid: userid_variable, collectionid: collectionid_variable}`의 filter를 지정할 수 있지만, `{collectionid: collectionid_variable}`만의 filter를 지정하려면 `indices` 목록에 `collectionid`를 포함해야 합니다.
+
+## Additional Configuration Options
+
+구성 문서에서 추가 선택적 parameter가 제공됩니다. 기본값은 다음과 같습니다:
+
+```typescript
+  ...,
+  maxConcurrency: 25,
+  batchSize: 1,
+  withClause: "",
+  ...
+```
+
+| Parameter        | Usage                                                                                                                                                                                                                        |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `maxConcurrency` | 주어진 시간에 Cassandra로 전송될 동시 요청의 수입니다.                                                                                                                                                      |
+| `batchSize`      | 단일 요청으로 Cassandra에 전송될 문서의 수입니다. 값 > 1을 사용할 때는 batch 크기가 Cassandra parameter `batch_size_fail_threshold_in_kb`를 초과하지 않도록 해야 합니다. Batch는 unlogged입니다. |
+| `withClause`     | Cassandra 테이블은 선택적 `WITH` 절로 생성될 수 있습니다. 일반적으로 필요하지 않지만 완전성을 위해 제공됩니다.                                                                                                  |
+
+## Related
+
+- Vector store [개념 가이드](/oss/javascript/integrations/vectorstores)
+- Vector store [how-to 가이드](/oss/javascript/integrations/vectorstores)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/vectorstores/cassandra.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

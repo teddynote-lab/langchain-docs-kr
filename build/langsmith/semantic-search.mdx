@@ -1,0 +1,135 @@
+---
+title: 에이전트 배포에 시맨틱 검색 추가하는 방법
+sidebarTitle: 에이전트 배포에 시맨틱 검색 추가하기
+---
+
+이 가이드는 배포의 크로스 스레드 [store](/oss/python/langgraph/persistence#memory-store)에 시맨틱 검색을 추가하는 방법을 설명합니다. 이를 통해 에이전트가 시맨틱 유사도를 기반으로 메모리 및 기타 문서를 검색할 수 있습니다.
+
+## 사전 요구 사항
+
+* 배포 환경 ([배포를 위한 애플리케이션 설정 방법](/langsmith/setup-app-requirements-txt) 참조) 및 [호스팅 옵션](/langsmith/hosting)에 대한 세부 정보
+* 임베딩 제공자의 API 키 (이 경우 OpenAI)
+* `langchain >= 0.3.8` (아래의 문자열 형식을 사용하는 경우)
+
+## 단계
+
+1. `langgraph.json` 설정 파일을 업데이트하여 store 구성을 포함시킵니다:
+
+```json
+{
+    ...
+    "store": {
+        "index": {
+            "embed": "openai:text-embedding-3-small",
+            "dims": 1536,
+            "fields": ["$"]
+        }
+    }
+}
+```
+
+이 구성은:
+
+* 임베딩 생성을 위해 OpenAI의 text-embedding-3-small 모델을 사용합니다
+* 임베딩 차원을 1536으로 설정합니다 (모델의 출력과 일치)
+* 저장된 데이터의 모든 필드를 인덱싱합니다 (`["$"]`는 모든 것을 인덱싱한다는 의미이며, `["text", "metadata.title"]`과 같이 특정 필드를 지정할 수도 있습니다)
+
+1. 위의 문자열 임베딩 형식을 사용하려면 종속성에 `langchain >= 0.3.8`이 포함되어 있는지 확인하세요:
+
+```toml
+# In pyproject.toml
+[project]
+dependencies = [
+    "langchain>=0.3.8"
+]
+```
+
+또는 [requirements.txt](/langsmith/setup-app-requirements-txt)를 사용하는 경우:
+
+```
+langchain>=0.3.8
+```
+
+## 사용법
+
+구성이 완료되면 [nodes](/oss/python/langgraph/graph-api#nodes)에서 시맨틱 검색을 사용할 수 있습니다. store는 메모리를 구성하기 위해 namespace tuple이 필요합니다:
+
+```python
+def search_memory(state: State, *, store: BaseStore):
+    # Search the store using semantic similarity
+    # The namespace tuple helps organize different types of memories
+    # e.g., ("user_facts", "preferences") or ("conversation", "summaries")
+    results = store.search(
+        namespace=("memory", "facts"),  # Organize memories by type
+        query="your search query",
+        limit=3  # number of results to return
+    )
+    return results
+```
+
+## 커스텀 임베딩
+
+커스텀 임베딩을 사용하려면 커스텀 임베딩 함수의 경로를 전달할 수 있습니다:
+
+```json
+{
+    ...
+    "store": {
+        "index": {
+            "embed": "path/to/embedding_function.py:embed",
+            "dims": 1536,
+            "fields": ["$"]
+        }
+    }
+}
+```
+
+배포는 지정된 경로에서 함수를 찾습니다. 함수는 async여야 하며 문자열 리스트를 받아야 합니다:
+
+```python
+# path/to/embedding_function.py
+from openai import AsyncOpenAI
+
+client = AsyncOpenAI()
+
+async def aembed_texts(texts: list[str]) -> list[list[float]]:
+    """Custom embedding function that must:
+    1. Be async
+    2. Accept a list of strings
+    3. Return a list of float arrays (embeddings)
+    """
+    response = await client.embeddings.create(
+        model="text-embedding-3-small",
+        input=texts
+    )
+    return [e.embedding for e in response.data]
+```
+
+## API를 통한 쿼리
+
+LangGraph SDK를 사용하여 store를 쿼리할 수도 있습니다. SDK는 async 작업을 사용하므로:
+
+```python
+from langgraph_sdk import get_client
+
+async def search_store():
+    client = get_client()
+    results = await client.store.search_items(
+        ("memory", "facts"),
+        query="your search query",
+        limit=3  # number of results to return
+    )
+    return results
+
+# Use in an async context
+results = await search_store()
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/semantic-search.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

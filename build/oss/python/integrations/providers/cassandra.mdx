@@ -1,0 +1,114 @@
+---
+title: Cassandra
+---
+
+> [Apache Cassandra®](https://cassandra.apache.org/)는 NoSQL, row-oriented, 높은 확장성과 가용성을 제공하는 데이터베이스입니다.
+> 버전 5.0부터 [vector search 기능](https://cassandra.apache.org/doc/trunk/cassandra/vector-search/overview.html)을 제공합니다.
+
+이 페이지에 설명된 통합은 `Cassandra`뿐만 아니라 다른 CQL 호환 데이터베이스,
+즉 `Cassandra Query Language` 프로토콜을 사용하는 데이터베이스에서도 사용할 수 있습니다.
+
+
+## Installation and Setup
+
+다음 Python package를 설치하세요:
+
+<CodeGroup>
+```bash pip
+pip install "cassio>=0.1.6"
+```
+
+```bash uv
+uv add "cassio>=0.1.6"
+```
+</CodeGroup>
+
+## Vector Store
+
+```python
+from langchain_community.vectorstores import Cassandra
+```
+
+자세한 내용은 [예제 노트북](/oss/python/integrations/vectorstores/cassandra)에서 확인하세요.
+
+## LLM Cache
+
+```python
+from langchain.globals import set_llm_cache
+from langchain_community.cache import CassandraCache
+set_llm_cache(CassandraCache())
+```
+
+## Semantic LLM Cache
+
+```python
+from langchain.globals import set_llm_cache
+from langchain_community.cache import CassandraSemanticCache
+set_llm_cache(CassandraSemanticCache(
+    embedding=my_embedding,
+    table_name="my_store",
+))
+```
+
+## Document loader
+
+```python
+from langchain_community.document_loaders import CassandraLoader
+```
+
+자세한 내용은 [예제 노트북](/oss/python/integrations/document_loaders/cassandra)에서 확인하세요.
+
+#### Attribution statement
+
+> Apache Cassandra, Cassandra 및 Apache는
+> 미국 및/또는 기타 국가에서 [Apache Software Foundation](http://www.apache.org/)의
+> 등록 상표 또는 상표입니다.
+
+## Toolkit
+
+`Cassandra Database toolkit`은 AI 엔지니어가 agent를
+Cassandra 데이터와 효율적으로 통합할 수 있도록 지원합니다.
+
+```python
+from langchain_community.agent_toolkits.cassandra_database.toolkit import (
+    CassandraDatabaseToolkit,
+)
+```
+
+자세한 내용은 [예제 노트북](/oss/python/integrations/tools/cassandra_database)에서 확인하세요.
+
+
+Cassandra Database 개별 tool:
+
+### Get Schema
+
+Apache Cassandra 데이터베이스에서 keyspace의 schema를 가져오는 tool입니다.
+
+```python
+from langchain_community.tools import GetSchemaCassandraDatabaseTool
+```
+
+### Get Table Data
+
+Apache Cassandra 데이터베이스의 table에서 데이터를 가져오는 tool입니다.
+
+```python
+from langchain_community.tools import GetTableDataCassandraDatabaseTool
+```
+
+### Query
+
+제공된 CQL로 Apache Cassandra 데이터베이스를 쿼리하는 tool입니다.
+
+```python
+from langchain_community.tools import QueryCassandraDatabaseTool
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/cassandra.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

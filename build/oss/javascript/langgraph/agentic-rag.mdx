@@ -1,0 +1,558 @@
+---
+title: 커스텀 RAG 에이전트 만들기
+sidebarTitle: 커스텀 RAG 에이전트
+---
+
+
+
+## 개요
+
+이 튜토리얼에서는 LangGraph를 사용하여 [retrieval](/oss/javascript/langchain/retrieval) 에이전트를 만들어 보겠습니다.
+
+LangChain은 [LangGraph](/oss/javascript/langgraph/overview) 프리미티브를 사용하여 구현된 내장 [agent](/oss/javascript/langchain/agents) 구현을 제공합니다. 더 깊은 커스터마이징이 필요한 경우, 에이전트를 LangGraph에서 직접 구현할 수 있습니다. 이 가이드는 retrieval 에이전트의 예제 구현을 보여줍니다. [Retrieval](/oss/javascript/langchain/retrieval) 에이전트는 LLM이 vectorstore에서 컨텍스트를 검색할지 또는 사용자에게 직접 응답할지 결정하도록 하려는 경우에 유용합니다.
+
+튜토리얼을 마치면 다음을 수행하게 됩니다:
+
+1. 검색에 사용될 문서를 가져오고 전처리합니다.
+2. 의미론적 검색을 위해 해당 문서를 인덱싱하고 에이전트를 위한 retriever tool을 생성합니다.
+3. retriever tool을 언제 사용할지 결정할 수 있는 agentic RAG 시스템을 구축합니다.
+
+![Hybrid RAG](/images/langgraph-hybrid-rag-tutorial.png)
+
+### 개념
+
+다음 개념들을 다룰 것입니다:
+
+- [document loaders](/oss/javascript/integrations/document_loaders), [text splitters](/oss/javascript/integrations/splitters), [embeddings](/oss/javascript/integrations/text_embedding), [vector stores](/oss/javascript/integrations/vectorstores)를 사용한 [Retrieval](/oss/javascript/langchain/retrieval)
+- state, nodes, edges, conditional edges를 포함한 LangGraph [Graph API](/oss/javascript/langgraph/graph-api)
+
+## Setup
+
+필요한 패키지를 다운로드하고 API 키를 설정해 봅시다:
+
+
+
+<CodeGroup>
+```bash npm
+npm install @langchain/langgraph @langchain/openai @langchain/community @langchain/textsplitters
+```
+
+```bash pnpm
+pnpm install @langchain/langgraph @langchain/openai @langchain/community @langchain/textsplitters
+```
+
+```bash yarn
+yarn add @langchain/langgraph @langchain/openai @langchain/community @langchain/textsplitters
+```
+
+```bash bun
+bun add @langchain/langgraph @langchain/openai @langchain/community @langchain/textsplitters
+```
+</CodeGroup>
+
+
+
+<Tip>
+  LangSmith에 가입하여 LangGraph 프로젝트의 문제를 빠르게 발견하고 성능을 개선하세요. [LangSmith](https://docs.smith.langchain.com)를 사용하면 trace 데이터를 활용하여 LangGraph로 구축된 LLM 앱을 디버그, 테스트 및 모니터링할 수 있습니다.
+</Tip>
+
+## 1. 문서 전처리
+
+
+
+1. RAG 시스템에서 사용할 문서를 가져옵니다. [Lilian Weng의 훌륭한 블로그](https://lilianweng.github.io/)에서 가장 최근의 페이지 세 개를 사용하겠습니다. `CheerioWebBaseLoader`를 사용하여 페이지의 콘텐츠를 가져오는 것부터 시작하겠습니다:
+  ```typescript
+  import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
+
+  const urls = [
+    "https://lilianweng.github.io/posts/2023-06-23-agent/",
+    "https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/",
+    "https://lilianweng.github.io/posts/2023-10-25-adv-attack-llm/",
+  ];
+
+  const docs = await Promise.all(
+    urls.map((url) => new CheerioWebBaseLoader(url).load()),
+  );
+  ```
+2. 가져온 문서를 vectorstore에 인덱싱하기 위해 더 작은 청크로 분할합니다:
+  ```typescript
+  import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+
+  const docsList = docs.flat();
+
+  const textSplitter = new RecursiveCharacterTextSplitter({
+    chunkSize: 500,
+    chunkOverlap: 50,
+  });
+  const docSplits = await textSplitter.splitDocuments(docsList);
+  ```
+
+
+## 2. retriever tool 생성
+
+이제 분할된 문서가 있으므로, 의미론적 검색에 사용할 vector store에 인덱싱할 수 있습니다.
+
+
+
+1. 인메모리 vector store와 OpenAI embeddings를 사용합니다:
+  ```typescript
+  import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
+  import { OpenAIEmbeddings } from "@langchain/openai";
+
+  const vectorStore = await MemoryVectorStore.fromDocuments(
+    docSplits,
+    new OpenAIEmbeddings(),
+  );
+
+  const retriever = vectorStore.asRetriever();
+  ```
+2. LangChain의 사전 구축된 `createRetrieverTool`을 사용하여 retriever tool을 생성합니다:
+  ```typescript
+  import { createRetrieverTool } from "@langchain/classic/tools/retriever";
+
+  const tool = createRetrieverTool(
+    retriever,
+    {
+      name: "retrieve_blog_posts",
+      description:
+        "Search and return information about Lilian Weng blog posts on LLM agents, prompt engineering, and adversarial attacks on LLMs.",
+    },
+  );
+  const tools = [tool];
+  ```
+
+
+## 3. 쿼리 생성
+
+이제 agentic RAG 그래프를 위한 컴포넌트([nodes](/oss/javascript/langgraph/graph-api#nodes)와 [edges](/oss/javascript/langgraph/graph-api#edges))를 구축하기 시작하겠습니다.
+
+
+
+1. `generateQueryOrRespond` node를 구축합니다. 현재 그래프 state(메시지 리스트)를 기반으로 응답을 생성하기 위해 LLM을 호출합니다. 입력 메시지가 주어지면, retriever tool을 사용하여 검색할지 또는 사용자에게 직접 응답할지 결정합니다. `.bindTools`를 통해 앞서 생성한 `tools`에 대한 액세스 권한을 chat model에 부여하고 있다는 점에 유의하세요:
+  ```typescript
+  import { ChatOpenAI } from "@langchain/openai";
+
+  async function generateQueryOrRespond(state) {
+    const { messages } = state;
+    const model = new ChatOpenAI({
+      model: "gpt-4o",
+      temperature: 0,
+    }).bindTools(tools);  // [!code highlight]
+
+    const response = await model.invoke(messages);
+    return {
+      messages: [response],
+    };
+  }
+  ```
+2. 임의의 입력으로 시도해 봅니다:
+  ```typescript
+  import { HumanMessage } from "@langchain/core/messages";
+
+  const input = { messages: [new HumanMessage("hello!")] };
+  const result = await generateQueryOrRespond(input);
+  console.log(result.messages[0]);
+  ```
+  **출력:**
+  ```
+  AIMessage {
+    content: "Hello! How can I help you today?",
+    tool_calls: []
+  }
+  ```
+3. 의미론적 검색이 필요한 질문을 합니다:
+  ```typescript
+  const input = {
+    messages: [
+      new HumanMessage("What does Lilian Weng say about types of reward hacking?")
+    ]
+  };
+  const result = await generateQueryOrRespond(input);
+  console.log(result.messages[0]);
+  ```
+  **출력:**
+  ```
+  AIMessage {
+    content: "",
+    tool_calls: [
+      {
+        name: "retrieve_blog_posts",
+        args: { query: "types of reward hacking" },
+        id: "call_...",
+        type: "tool_call"
+      }
+    ]
+  }
+  ```
+
+
+## 4. 문서 평가
+
+
+
+1. 검색된 문서가 질문과 관련이 있는지 판단하기 위해 node — `gradeDocuments` — 를 추가합니다. 문서 평가를 위해 Zod를 사용한 구조화된 출력을 가진 모델을 사용합니다. 또한 평가 결과를 확인하고 이동할 node의 이름을 반환하는 [conditional edge](/oss/javascript/langgraph/graph-api#conditional-edges) — `checkRelevance` — 를 추가합니다(`generate` 또는 `rewrite`):
+  ```typescript
+  import * as z from "zod";
+  import { ChatPromptTemplate } from "@langchain/core/prompts";
+  import { ChatOpenAI } from "@langchain/openai";
+  import { AIMessage } from "@langchain/core/messages";
+
+  const prompt = ChatPromptTemplate.fromTemplate(
+    `You are a grader assessing relevance of retrieved docs to a user question.
+    Here are the retrieved docs:
+    \n ------- \n
+    {context}
+    \n ------- \n
+    Here is the user question: {question}
+    If the content of the docs are relevant to the users question, score them as relevant.
+    Give a binary score 'yes' or 'no' score to indicate whether the docs are relevant to the question.
+    Yes: The docs are relevant to the question.
+    No: The docs are not relevant to the question.`,
+  );
+
+  const gradeDocumentsSchema = z.object({
+    binaryScore: z.string().describe("Relevance score 'yes' or 'no'"),  // [!code highlight]
+  })
+
+  async function gradeDocuments(state) {
+    const { messages } = state;
+
+    const model = new ChatOpenAI({
+      model: "gpt-4o",
+      temperature: 0,
+    }).withStructuredOutput(gradeDocumentsSchema);
+
+    const score = await chain.invoke({
+      question: messages.at(0)?.content,
+      context: messages.at(-1)?.content,
+    });
+
+    if (score.binaryScore === "yes") {
+      return "generate";
+    }
+    return "rewrite";
+  }
+  ```
+2. tool 응답에 관련 없는 문서가 있는 경우로 실행합니다:
+  ```typescript
+  const input = {
+    messages: [
+        new HumanMessage("What does Lilian Weng say about types of reward hacking?"),
+        new AIMessage({
+            tool_calls: [
+                {
+                    type: "tool_call"
+                    name: "retrieve_blog_posts",
+                    args: { query: "types of reward hacking" },
+                    id: "1",
+                }
+            ]
+        }),
+        new ToolMessage({
+            content: "meow",
+            tool_call_id: "1",
+        })
+    ]
+  }
+  const result = await gradeDocuments(input);
+  ```
+3. 관련 문서가 그렇게 분류되는지 확인합니다:
+  ```typescript
+  const input = {
+    messages: [
+        new HumanMessage("What does Lilian Weng say about types of reward hacking?"),
+        new AIMessage({
+            tool_calls: [
+                {
+                    type: "tool_call"
+                    name: "retrieve_blog_posts",
+                    args: { query: "types of reward hacking" },
+                    id: "1",
+                }
+            ]
+        }),
+        new ToolMessage({
+            content: "reward hacking can be categorized into two types: environment or goal misspecification, and reward tampering",
+            tool_call_id: "1",
+        })
+    ]
+  }
+  const result = await gradeDocuments(input);
+  ```
+
+
+## 5. 질문 재작성
+
+
+
+1. `rewrite` node를 구축합니다. retriever tool은 잠재적으로 관련 없는 문서를 반환할 수 있으며, 이는 원래 사용자 질문을 개선할 필요가 있음을 나타냅니다. 이를 위해 `rewrite` node를 호출합니다:
+  ```typescript
+  import { ChatPromptTemplate } from "@langchain/core/prompts";
+  import { ChatOpenAI } from "@langchain/openai";
+
+  const rewritePrompt = ChatPromptTemplate.fromTemplate(
+    `Look at the input and try to reason about the underlying semantic intent / meaning. \n
+    Here is the initial question:
+    \n ------- \n
+    {question}
+    \n ------- \n
+    Formulate an improved question:`,
+  );
+
+  async function rewrite(state) {
+    const { messages } = state;
+    const question = messages.at(0)?.content;
+
+    const model = new ChatOpenAI({
+      model: "gpt-4o",
+      temperature: 0,
+    });
+
+    const response = await rewritePrompt.pipe(model).invoke({ question });
+    return {
+      messages: [response],
+    };
+  }
+  ```
+2. 시도해 봅니다:
+  ```typescript
+  import { HumanMessage, AIMessage, ToolMessage } from "@langchain/core/messages";
+
+  const input = {
+    messages: [
+      new HumanMessage("What does Lilian Weng say about types of reward hacking?"),
+      new AIMessage({
+        content: "",
+        tool_calls: [
+          {
+            id: "1",
+            name: "retrieve_blog_posts",
+            args: { query: "types of reward hacking" },
+            type: "tool_call"
+          }
+        ]
+      }),
+      new ToolMessage({ content: "meow", tool_call_id: "1" })
+    ]
+  };
+
+  const response = await rewrite(input);
+  console.log(response.messages[0].content);
+  ```
+  **출력:**
+  ```
+  What are the different types of reward hacking described by Lilian Weng, and how does she explain them?
+  ```
+
+
+## 6. 답변 생성
+
+
+
+1. `generate` node를 구축합니다: grader 검사를 통과하면, 원래 질문과 검색된 컨텍스트를 기반으로 최종 답변을 생성할 수 있습니다:
+  ```typescript
+  import { ChatPromptTemplate } from "@langchain/core/prompts";
+  import { ChatOpenAI } from "@langchain/openai";
+
+  async function generate(state) {
+    const { messages } = state;
+    const question = messages.at(0)?.content;
+    const context = messages.at(-1)?.content;
+
+    const prompt = ChatPromptTemplate.fromTemplate(
+    `You are an assistant for question-answering tasks.
+        Use the following pieces of retrieved context to answer the question.
+        If you don't know the answer, just say that you don't know.
+        Use three sentences maximum and keep the answer concise.
+        Question: {question}
+        Context: {context}`
+    );
+
+    const llm = new ChatOpenAI({
+      model: "gpt-4o",
+      temperature: 0,
+    });
+
+    const ragChain = prompt.pipe(llm);
+
+    const response = await ragChain.invoke({
+      context,
+      question,
+    });
+
+    return {
+      messages: [response],
+    };
+  }
+  ```
+2. 시도해 봅니다:
+  ```typescript
+  import { HumanMessage, AIMessage, ToolMessage } from "@langchain/core/messages";
+
+  const input = {
+    messages: [
+      new HumanMessage("What does Lilian Weng say about types of reward hacking?"),
+      new AIMessage({
+        content: "",
+        tool_calls: [
+          {
+            id: "1",
+            name: "retrieve_blog_posts",
+            args: { query: "types of reward hacking" },
+            type: "tool_call"
+          }
+        ]
+      }),
+      new ToolMessage({
+        content: "reward hacking can be categorized into two types: environment or goal misspecification, and reward tampering",
+        tool_call_id: "1"
+      })
+    ]
+  };
+
+  const response = await generate(input);
+  console.log(response.messages[0].content);
+  ```
+  **출력:**
+  ```
+  Lilian Weng categorizes reward hacking into two types: environment or goal misspecification, and reward tampering. She considers reward hacking as a broad concept that includes both of these categories. Reward hacking occurs when an agent exploits flaws or ambiguities in the reward function to achieve high rewards without performing the intended behaviors.
+  ```
+
+
+## 7. 그래프 조립
+
+이제 모든 nodes와 edges를 완전한 그래프로 조립하겠습니다:
+
+
+
+* `generateQueryOrRespond`로 시작하여 retriever tool을 호출해야 하는지 판단합니다
+* conditional edge를 사용하여 다음 단계로 라우팅합니다:
+  * `generateQueryOrRespond`가 `tool_calls`를 반환한 경우, retriever tool을 호출하여 컨텍스트를 검색합니다
+  * 그렇지 않으면, 사용자에게 직접 응답합니다
+* 질문과의 관련성에 대해 검색된 문서 콘텐츠를 평가하고(`gradeDocuments`) 다음 단계로 라우팅합니다:
+  * 관련이 없는 경우, `rewrite`를 사용하여 질문을 재작성한 다음 `generateQueryOrRespond`를 다시 호출합니다
+  * 관련이 있는 경우, `generate`로 진행하여 검색된 문서 컨텍스트가 포함된 @[`ToolMessage`]를 사용하여 최종 응답을 생성합니다
+
+```typescript
+import { StateGraph, START, END } from "@langchain/langgraph";
+import { ToolNode } from "@langchain/langgraph/prebuilt";
+import { AIMessage } from "langchain";
+
+// Create a ToolNode for the retriever
+const toolNode = new ToolNode(tools);
+
+// Helper function to determine if we should retrieve
+function shouldRetrieve(state) {
+  const { messages } = state;
+  const lastMessage = messages.at(-1);
+
+  if (AIMessage.isInstance(lastMessage) && lastMessage.tool_calls.length) {
+    return "retrieve";
+  }
+  return END;
+}
+
+// Define the graph
+const builder = new StateGraph(GraphState)
+  .addNode("generateQueryOrRespond", generateQueryOrRespond)
+  .addNode("retrieve", toolNode)
+  .addNode("gradeDocuments", gradeDocuments)
+  .addNode("rewrite", rewrite)
+  .addNode("generate", generate)
+  // Add edges
+  .addEdge(START, "generateQueryOrRespond")
+  // Decide whether to retrieve
+  .addConditionalEdges("generateQueryOrRespond", shouldRetrieve)
+  .addEdge("retrieve", "gradeDocuments")
+  // Edges taken after grading documents
+  .addConditionalEdges(
+    "gradeDocuments",
+    // Route based on grading decision
+    (state) => {
+      // The gradeDocuments function returns either "generate" or "rewrite"
+      const lastMessage = state.messages.at(-1);
+      return lastMessage.content === "generate" ? "generate" : "rewrite";
+    }
+  )
+  .addEdge("generate", END)
+  .addEdge("rewrite", "generateQueryOrRespond");
+
+// Compile
+const graph = builder.compile();
+```
+
+
+## 8. agentic RAG 실행
+
+이제 질문으로 실행하여 완전한 그래프를 테스트해 봅시다:
+
+
+
+```typescript
+import { HumanMessage } from "@langchain/core/messages";
+
+const inputs = {
+  messages: [
+    new HumanMessage("What does Lilian Weng say about types of reward hacking?")
+  ]
+};
+
+for await (const output of await graph.stream(inputs)) {
+  for (const [key, value] of Object.entries(output)) {
+    const lastMsg = output[key].messages[output[key].messages.length - 1];
+    console.log(`Output from node: '${key}'`);
+    console.log({
+      type: lastMsg._getType(),
+      content: lastMsg.content,
+      tool_calls: lastMsg.tool_calls,
+    });
+    console.log("---\n");
+  }
+}
+```
+
+**출력:**
+
+```
+Output from node: 'generateQueryOrRespond'
+{
+  type: 'ai',
+  content: '',
+  tool_calls: [
+    {
+      name: 'retrieve_blog_posts',
+      args: { query: 'types of reward hacking' },
+      id: 'call_...',
+      type: 'tool_call'
+    }
+  ]
+}
+---
+
+Output from node: 'retrieve'
+{
+  type: 'tool',
+  content: '(Note: Some work defines reward tampering as a distinct category...\n' +
+    'At a high level, reward hacking can be categorized into two types: environment or goal misspecification, and reward tampering.\n' +
+    '...',
+  tool_calls: undefined
+}
+---
+
+Output from node: 'generate'
+{
+  type: 'ai',
+  content: 'Lilian Weng categorizes reward hacking into two types: environment or goal misspecification, and reward tampering. She considers reward hacking as a broad concept that includes both of these categories. Reward hacking occurs when an agent exploits flaws or ambiguities in the reward function to achieve high rewards without performing the intended behaviors.',
+  tool_calls: []
+}
+---
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langgraph/agentic-rag.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

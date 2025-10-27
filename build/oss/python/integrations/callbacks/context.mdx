@@ -1,0 +1,125 @@
+---
+title: Context
+---
+
+>[Context](https://context.ai/)는 LLM 기반 제품 및 기능을 위한 사용자 분석을 제공합니다.
+
+`Context`를 사용하면 30분 이내에 사용자를 이해하고 사용자 경험을 개선할 수 있습니다.
+
+이 가이드에서는 Context와 통합하는 방법을 보여드리겠습니다.
+
+## Installation and Setup
+
+```python
+pip install -qU  langchain langchain-openai langchain-community context-python
+```
+
+### API Credentials 얻기
+
+Context API token을 얻으려면:
+
+1. Context 계정 내 설정 페이지([with.context.ai/settings](https://with.context.ai/settings))로 이동합니다.
+2. 새 API Token을 생성합니다.
+3. 이 token을 안전한 곳에 저장합니다.
+
+### Context 설정
+
+`ContextCallbackHandler`를 사용하려면 LangChain에서 handler를 import하고 Context API token으로 인스턴스화합니다.
+
+handler를 사용하기 전에 `context-python` 패키지가 설치되어 있는지 확인하세요.
+
+```python
+from langchain_community.callbacks.context_callback import ContextCallbackHandler
+```
+
+```python
+import os
+
+token = os.environ["CONTEXT_API_TOKEN"]
+
+context_callback = ContextCallbackHandler(token)
+```
+
+## Usage
+
+### Chat model 내에서 Context callback 사용
+
+Context callback handler는 사용자와 AI assistant 간의 대화 내용을 직접 기록하는 데 사용할 수 있습니다.
+
+```python
+import os
+
+from langchain.messages import HumanMessage, SystemMessage
+from langchain_openai import ChatOpenAI
+
+token = os.environ["CONTEXT_API_TOKEN"]
+
+chat = ChatOpenAI(
+    headers={"user_id": "123"}, temperature=0, callbacks=[ContextCallbackHandler(token)]
+)
+
+messages = [
+    SystemMessage(
+        content="You are a helpful assistant that translates English to French."
+    ),
+    HumanMessage(content="I love programming."),
+]
+
+print(chat(messages))
+```
+
+### Chains 내에서 Context callback 사용
+
+Context callback handler는 chain의 입력과 출력을 기록하는 데에도 사용할 수 있습니다. chain의 중간 단계는 기록되지 않으며 시작 입력과 최종 출력만 기록됩니다.
+
+__Note:__ chat model과 chain에 동일한 context 객체를 전달해야 합니다.
+
+잘못된 예:
+>
+> ```python
+> chat = ChatOpenAI(temperature=0.9, callbacks=[ContextCallbackHandler(token)])
+> chain = LLMChain(llm=chat, prompt=chat_prompt_template, callbacks=[ContextCallbackHandler(token)])
+> ```
+
+올바른 예:
+>
+>```python
+>handler = ContextCallbackHandler(token)
+>chat = ChatOpenAI(temperature=0.9, callbacks=[callback])
+>chain = LLMChain(llm=chat, prompt=chat_prompt_template, callbacks=[callback])
+>```
+
+```python
+import os
+
+from langchain.chains import LLMChain
+from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts.chat import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+)
+from langchain_openai import ChatOpenAI
+
+token = os.environ["CONTEXT_API_TOKEN"]
+
+human_message_prompt = HumanMessagePromptTemplate(
+    prompt=PromptTemplate(
+        template="What is a good name for a company that makes {product}?",
+        input_variables=["product"],
+    )
+)
+chat_prompt_template = ChatPromptTemplate.from_messages([human_message_prompt])
+callback = ContextCallbackHandler(token)
+chat = ChatOpenAI(temperature=0.9, callbacks=[callback])
+chain = LLMChain(llm=chat, prompt=chat_prompt_template, callbacks=[callback])
+print(chain.run("colorful socks"))
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/callbacks/context.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

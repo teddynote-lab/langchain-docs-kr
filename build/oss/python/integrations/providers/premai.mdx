@@ -1,0 +1,442 @@
+---
+title: PremAI
+---
+
+[PremAI](https://premai.io/)는 Generative AI로 구동되는 강력하고 프로덕션 준비가 완료된 애플리케이션 생성을 간소화하는 올인원 플랫폼입니다. 개발 프로세스를 간소화함으로써 PremAI를 사용하면 사용자 경험 향상과 애플리케이션의 전반적인 성장 촉진에 집중할 수 있습니다. [플랫폼](https://docs.premai.io/quick-start)을 사용하여 빠르게 시작할 수 있습니다.
+
+## ChatPremAI
+
+이 예제는 `ChatPremAI`를 사용하여 다양한 chat model과 상호작용하기 위해 LangChain을 사용하는 방법을 다룹니다.
+
+### Installation 및 setup
+
+먼저 `langchain`과 `premai-sdk`를 설치합니다. 다음 명령어를 입력하여 설치할 수 있습니다:
+
+<CodeGroup>
+```bash pip
+pip install premai langchain
+```
+
+```bash uv
+uv add premai langchain
+```
+</CodeGroup>
+
+계속 진행하기 전에 PremAI에 계정을 만들고 이미 프로젝트를 생성했는지 확인하세요. 그렇지 않은 경우 PremAI 플랫폼을 시작하려면 [quick start](https://docs.premai.io/introduction) 가이드를 참조하세요. 첫 번째 프로젝트를 생성하고 API key를 가져오세요.
+
+```python
+from langchain.messages import HumanMessage, SystemMessage
+from langchain_community.chat_models import ChatPremAI
+```
+
+### LangChain에서 PremAI client setup
+
+필요한 module을 import한 후 client를 설정해 봅시다. 지금은 `project_id`가 `8`이라고 가정하겠습니다. 하지만 반드시 자신의 project-id를 사용하세요. 그렇지 않으면 오류가 발생합니다.
+
+langchain과 prem을 함께 사용하려면 chat-client에 model name을 전달하거나 parameter를 설정할 필요가 없습니다. 기본적으로 [LaunchPad](https://docs.premai.io/get-started/launchpad)에서 사용된 model name과 parameter를 사용합니다.
+
+> 참고: client를 설정하는 동안 `model`이나 `temperature` 또는 `max_tokens`와 같은 다른 parameter를 변경하면 LaunchPad에서 사용된 기존 기본 구성을 재정의합니다.
+
+```python
+import os
+import getpass
+
+if "PREMAI_API_KEY" not in os.environ:
+    os.environ["PREMAI_API_KEY"] = getpass.getpass("PremAI API Key:")
+
+chat = ChatPremAI(project_id=1234, model_name="gpt-4o")
+```
+
+### Chat Completions
+
+`ChatPremAI`는 두 가지 method를 지원합니다: `invoke` (`generate`와 동일)와 `stream`.
+
+첫 번째는 정적 결과를 제공합니다. 반면 두 번째는 token을 하나씩 스트리밍합니다. chat과 같은 completion을 생성하는 방법은 다음과 같습니다.
+
+```python
+human_message = HumanMessage(content="Who are you?")
+
+response = chat.invoke([human_message])
+print(response.content)
+```
+
+다음과 같이 system prompt를 제공할 수 있습니다:
+
+```python
+system_message = SystemMessage(content="You are a friendly assistant.")
+human_message = HumanMessage(content="Who are you?")
+
+chat.invoke([system_message, human_message])
+```
+
+model을 호출하는 동안 generation parameter를 변경할 수도 있습니다. 방법은 다음과 같습니다:
+
+```python
+chat.invoke(
+    [system_message, human_message],
+    temperature = 0.7, max_tokens = 20, top_p = 0.95
+)
+```
+
+> 여기에 system prompt를 배치하면 플랫폼에서 애플리케이션을 배포하는 동안 고정된 system prompt를 재정의합니다.
+
+> 모든 optional parameter는 [여기](https://docs.premai.io/get-started/sdk#optional-parameters)에서 찾을 수 있습니다. [지원되는 parameter](https://docs.premai.io/get-started/sdk#optional-parameters) 이외의 parameter는 model을 호출하기 전에 자동으로 제거됩니다.
+
+### Prem Repositories를 사용한 Native RAG 지원
+
+Prem Repositories는 사용자가 문서(.txt, .pdf 등)를 업로드하고 해당 repository를 LLM에 연결할 수 있게 해줍니다. Prem repository를 native RAG로 생각할 수 있으며, 각 repository는 vector database로 간주될 수 있습니다. 여러 repository를 연결할 수 있습니다. repository에 대한 자세한 내용은 [여기](https://docs.premai.io/get-started/repositories)에서 확인할 수 있습니다.
+
+Repository는 langchain premai에서도 지원됩니다. 방법은 다음과 같습니다.
+
+```python
+query = "Which models are used for dense retrieval"
+repository_ids = [1985,]
+repositories = dict(
+    ids=repository_ids,
+    similarity_threshold=0.3,
+    limit=3
+)
+```
+
+먼저 일부 repository id로 repository를 정의합니다. id가 유효한 repository id인지 확인하세요. repository id를 얻는 방법에 대한 자세한 내용은 [여기](https://docs.premai.io/get-started/repositories)에서 확인할 수 있습니다.
+
+> 참고: `model_name`과 유사하게 `repositories` argument를 invoke하면 launchpad에 연결된 repository를 잠재적으로 재정의하게 됩니다.
+
+이제 RAG 기반 generation을 invoke하기 위해 repository를 chat object와 연결합니다.
+
+```python
+import json
+
+response = chat.invoke(query, max_tokens=100, repositories=repositories)
+
+print(response.content)
+print(json.dumps(response.response_metadata, indent=4))
+```
+
+출력은 다음과 같습니다.
+
+```bash
+Dense retrieval models typically include:
+
+1. **BERT-based Models**: Such as DPR (Dense Passage Retrieval) which uses BERT for encoding queries and passages.
+2. **ColBERT**: A model that combines BERT with late interaction mechanisms.
+3. **ANCE (Approximate Nearest Neighbor Negative Contrastive Estimation)**: Uses BERT and focuses on efficient retrieval.
+4. **TCT-ColBERT**: A variant of ColBERT that uses a two-tower
+{
+    "document_chunks": [
+        {
+            "repository_id": 1985,
+            "document_id": 1306,
+            "chunk_id": 173899,
+            "document_name": "[D] Difference between sparse and dense information\u2026",
+            "similarity_score": 0.3209080100059509,
+            "content": "with the difference or anywhere\nwhere I can read about it?\n\n\n      17                  9\n\n\n      u/ScotiabankCanada        \u2022  Promoted\n\n\n                       Accelerate your study permit process\n                       with Scotiabank's Student GIC\n                       Program. We're here to help you tur\u2026\n\n\n                       startright.scotiabank.com         Learn More\n\n\n                            Add a Comment\n\n\nSort by:   Best\n\n\n      DinosParkour      \u2022 1y ago\n\n\n     Dense Retrieval (DR) m"
+        }
+    ]
+}
+```
+
+따라서 Prem Platform을 사용할 때 자체 RAG pipeline을 만들 필요가 없다는 의미입니다. Prem은 자체 RAG 기술을 사용하여 Retrieval Augmented Generation에 대한 최고 수준의 성능을 제공합니다.
+
+> 이상적으로는 Retrieval Augmented Generation을 얻기 위해 여기에 Repository ID를 연결할 필요가 없습니다. prem platform에서 repository를 연결한 경우 동일한 결과를 얻을 수 있습니다.
+
+### Streaming
+
+이 섹션에서는 langchain과 PremAI를 사용하여 token을 스트리밍하는 방법을 살펴보겠습니다. 방법은 다음과 같습니다.
+
+```python
+import sys
+
+for chunk in chat.stream("hello how are you"):
+    sys.stdout.write(chunk.content)
+    sys.stdout.flush()
+```
+
+위와 유사하게 system-prompt와 generation parameter를 재정의하려면 다음을 추가해야 합니다:
+
+```python
+import sys
+
+for chunk in chat.stream(
+    "hello how are you",
+    system_prompt = "You are an helpful assistant", temperature = 0.7, max_tokens = 20
+):
+    sys.stdout.write(chunk.content)
+    sys.stdout.flush()
+```
+
+이렇게 하면 token이 하나씩 스트리밍됩니다.
+
+> 참고: 현재로서는 streaming과 함께 RAG가 지원되지 않습니다. 그러나 API를 통해서는 여전히 지원합니다. 자세한 내용은 [여기](https://docs.premai.io/get-started/chat-completion-sse)에서 확인할 수 있습니다.
+
+## Prem Templates
+
+Prompt Template 작성은 매우 복잡할 수 있습니다. Prompt template은 길고 관리하기 어려우며 개선하고 애플리케이션 전체에서 동일하게 유지하기 위해 지속적으로 조정해야 합니다.
+
+**Prem**을 사용하면 prompt 작성 및 관리가 매우 쉬워집니다. [launchpad](https://docs.premai.io/get-started/launchpad) 내의 **_Templates_** 탭을 사용하면 필요한 만큼 많은 prompt를 작성하고 SDK 내에서 사용하여 해당 prompt를 사용하는 애플리케이션을 실행할 수 있습니다. Prompt Template에 대한 자세한 내용은 [여기](https://docs.premai.io/get-started/prem-templates)에서 확인할 수 있습니다.
+
+LangChain과 함께 Prem Template을 기본적으로 사용하려면 `HumanMessage`에 id를 전달해야 합니다. 이 id는 prompt template의 변수 이름이어야 합니다. [`HumanMessage`](https://reference.langchain.com/python/langchain/messages/#langchain.messages.HumanMessage)의 `content`는 해당 변수의 값이어야 합니다.
+
+예를 들어 prompt template이 다음과 같다고 가정해 봅시다:
+
+```text
+Say hello to my name and say a feel-good quote
+from my age. My name is: {name} and age is {age}
+```
+
+이제 human_messages는 다음과 같아야 합니다:
+
+```python
+human_messages = [
+    HumanMessage(content="Shawn", id="name"),
+    HumanMessage(content="22", id="age")
+]
+```
+
+이 `human_messages`를 ChatPremAI Client에 전달하세요. 참고: Prem Template으로 generation을 invoke하려면 추가 `template_id`를 전달하는 것을 잊지 마세요. `template_id`를 모르는 경우 [문서](https://docs.premai.io/get-started/prem-templates)에서 자세히 알아볼 수 있습니다. 예제는 다음과 같습니다:
+
+```python
+template_id = "78069ce8-xxxxx-xxxxx-xxxx-xxx"
+response = chat.invoke([human_message], template_id=template_id)
+```
+
+Prem Template은 Streaming에서도 사용할 수 있습니다.
+
+## Prem Embeddings
+
+이 섹션에서는 LangChain과 함께 `PremEmbeddings`를 사용하여 다양한 embedding model에 액세스하는 방법을 다룹니다. module을 import하고 API Key를 설정하는 것부터 시작하겠습니다.
+
+```python
+import os
+import getpass
+from langchain_community.embeddings import PremEmbeddings
+
+
+if os.environ.get("PREMAI_API_KEY") is None:
+    os.environ["PREMAI_API_KEY"] = getpass.getpass("PremAI API Key:")
+
+```
+
+많은 최첨단 embedding model을 지원합니다. 지원되는 LLM 및 embedding model 목록은 [여기](https://docs.premai.io/get-started/supported-models)에서 확인할 수 있습니다. 이 예제에서는 `text-embedding-3-large` model을 사용하겠습니다.
+
+```python
+model = "text-embedding-3-large"
+embedder = PremEmbeddings(project_id=8, model=model)
+
+query = "Hello, this is a test query"
+query_result = embedder.embed_query(query)
+
+# Let's print the first five elements of the query embedding vector
+
+print(query_result[:5])
+```
+
+<Note>
+chat과 달리 PremAIEmbeddings에서는 `model_name` argument 설정이 필수입니다.
+</Note>
+
+마지막으로 샘플 document를 embedding해 봅시다.
+
+```python
+documents = [
+    "This is document1",
+    "This is document2",
+    "This is document3"
+]
+
+doc_result = embedder.embed_documents(documents)
+
+# Similar to the previous result, let's print the first five element
+# of the first document vector
+
+print(doc_result[0][:5])
+```
+
+```python
+print(f"Dimension of embeddings: {len(query_result)}")
+```
+
+Dimension of embeddings: 3072
+
+```python
+doc_result[:5]
+```
+
+>결과:
+>
+>[-0.02129288576543331,
+ 0.0008162345038726926,
+ -0.004556538071483374,
+ 0.02918623760342598,
+ -0.02547479420900345]
+
+## Tool/Function Calling
+
+LangChain PremAI는 tool/function calling을 지원합니다. Tool/function calling을 사용하면 model이 사용자 정의 schema와 일치하는 출력을 생성하여 주어진 prompt에 응답할 수 있습니다.
+
+- tool calling에 대한 모든 세부 정보는 [문서](https://docs.premai.io/get-started/function-calling)에서 확인할 수 있습니다.
+- langchain tool calling에 대한 자세한 내용은 [문서의 이 부분](https://python.langchain.com/v0.1/docs/modules/model_io/chat/function_calling)에서 확인할 수 있습니다.
+
+**참고:**
+
+> 현재 버전의 LangChain ChatPremAI는 streaming 지원과 함께 function/tool calling을 지원하지 않습니다. function calling과 함께 streaming 지원은 곧 제공될 예정입니다.
+
+### model에 tool 전달하기
+
+tool을 전달하고 LLM이 호출해야 하는 tool을 선택하도록 하려면 tool schema를 전달해야 합니다. tool schema는 함수가 수행하는 작업, 함수의 각 argument가 무엇인지 등에 대한 적절한 docstring과 함께 함수 정의입니다. 다음은 schema가 포함된 몇 가지 간단한 산술 함수입니다.
+
+**참고:**
+> function/tool schema를 정의할 때 함수 argument에 대한 정보를 추가하는 것을 잊지 마세요. 그렇지 않으면 오류가 발생합니다.
+
+```python
+from langchain.tools import tool
+from pydantic import BaseModel, Field
+
+# Define the schema for function arguments
+class OperationInput(BaseModel):
+    a: int = Field(description="First number")
+    b: int = Field(description="Second number")
+
+
+# Now define the function where schema for argument will be OperationInput
+@tool("add", args_schema=OperationInput, return_direct=True)
+def add(a: int, b: int) -> int:
+    """Adds `a` and `b`.
+
+    Args:
+        a: First int
+        b: Second int
+    """
+    return a + b
+
+
+@tool("multiply", args_schema=OperationInput, return_direct=True)
+def multiply(a: int, b: int) -> int:
+    """Multiplies a and b.
+
+    Args:
+        a: First int
+        b: Second int
+    """
+    return a * b
+```
+
+### LLM에 tool schema binding하기
+
+이제 `bind_tools` method를 사용하여 위의 함수를 "tool"로 변환하고 model과 binding합니다. 이는 model을 invoke할 때마다 이러한 tool 정보를 전달한다는 의미입니다.
+
+```python
+tools = [add, multiply]
+llm_with_tools = chat.bind_tools(tools)
+```
+
+이후 tool과 binding된 model로부터 응답을 받습니다.
+
+```python
+query = "What is 3 * 12? Also, what is 11 + 49?"
+
+messages = [HumanMessage(query)]
+ai_msg = llm_with_tools.invoke(messages)
+```
+
+보시다시피 chat model이 tool과 binding되면 주어진 prompt를 기반으로 올바른 tool 세트를 순차적으로 호출합니다.
+
+```python
+ai_msg.tool_calls
+```
+
+**출력**
+
+```python
+[{'name': 'multiply',
+  'args': {'a': 3, 'b': 12},
+  'id': 'call_A9FL20u12lz6TpOLaiS6rFa8'},
+ {'name': 'add',
+  'args': {'a': 11, 'b': 49},
+  'id': 'call_MPKYGLHbf39csJIyb5BZ9xIk'}]
+```
+
+위에 표시된 이 message를 LLM에 추가하여 context 역할을 하고 LLM이 호출한 모든 함수를 인식하도록 합니다.
+
+```python
+messages.append(ai_msg)
+```
+
+tool calling은 두 단계로 이루어지는데:
+
+1. 첫 번째 호출에서는 LLM이 tool하기로 결정한 모든 tool을 수집하여 더 정확하고 hallucination이 없는 결과를 제공하기 위한 추가 context로 결과를 얻을 수 있습니다.
+
+2. 두 번째 호출에서는 LLM이 결정한 tool 세트를 parsing하고 실행한 다음(우리의 경우 LLM이 추출한 argument로 정의한 함수가 됩니다) 이 결과를 LLM에 전달합니다.
+
+```python
+from langchain.messages import ToolMessage
+
+for tool_call in ai_msg.tool_calls:
+    selected_tool = {"add": add, "multiply": multiply}[tool_call["name"].lower()]
+    tool_output = selected_tool.invoke(tool_call["args"])
+    messages.append(ToolMessage(tool_output, tool_call_id=tool_call["id"]))
+```
+
+마지막으로 context에 함수 응답이 추가된 상태로 (tool과 binding된) LLM을 호출합니다.
+
+```python
+response = llm_with_tools.invoke(messages)
+print(response.content)
+```
+
+**출력**
+
+```txt
+The final answers are:
+
+- 3 * 12 = 36
+- 11 + 49 = 60
+```
+
+### tool schema 정의하기: Pydantic class `Optional`
+
+위에서는 `tool` decorator를 사용하여 schema를 정의하는 방법을 보여주었지만 Pydantic을 사용하여 schema를 동등하게 정의할 수 있습니다. Pydantic은 tool input이 더 복잡할 때 유용합니다:
+
+```python
+from langchain_core.output_parsers.openai_tools import PydanticToolsParser
+
+class add(BaseModel):
+    """Add two integers together."""
+
+    a: int = Field(..., description="First integer")
+    b: int = Field(..., description="Second integer")
+
+
+class multiply(BaseModel):
+    """Multiply two integers together."""
+
+    a: int = Field(..., description="First integer")
+    b: int = Field(..., description="Second integer")
+
+
+tools = [add, multiply]
+```
+
+이제 chat model에 binding하고 직접 결과를 얻을 수 있습니다:
+
+```python
+chain = llm_with_tools | PydanticToolsParser(tools=[multiply, add])
+chain.invoke(query)
+```
+
+**출력**
+
+```txt
+[multiply(a=3, b=12), add(a=11, b=49)]
+```
+
+이제 위에서 수행한 것처럼 이것을 parsing하고 이 함수를 실행한 다음 LLM을 다시 호출하여 결과를 얻습니다.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/premai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,57 @@
+---
+title: NucliaDB
+---
+
+로컬 NucliaDB 인스턴스를 사용하거나 [Nuclia Cloud](https://nuclia.cloud)을 사용할 수 있습니다.
+
+로컬 인스턴스를 사용할 때는 텍스트가 올바르게 벡터화되고 인덱싱되도록 Nuclia Understanding API 키가 필요합니다. [https://nuclia.cloud](https://nuclia.cloud)에서 무료 계정을 생성한 후, [NUA 키를 생성](https://docs.nuclia.dev/docs/docs/using/understanding/intro)할 수 있습니다.
+
+```python
+pip install -qU  langchain langchain-community nuclia
+```
+
+## nuclia.cloud에서 사용하기
+
+```python
+from langchain_community.vectorstores.nucliadb import NucliaDB
+
+API_KEY = "YOUR_API_KEY"
+
+ndb = NucliaDB(knowledge_box="YOUR_KB_ID", local=False, api_key=API_KEY)
+```
+
+## 로컬 인스턴스에서 사용하기
+
+참고: 기본적으로 `backend`는 `http://localhost:8080`으로 설정됩니다.
+
+```python
+from langchain_community.vectorstores.nucliadb import NucliaDB
+
+ndb = NucliaDB(knowledge_box="YOUR_KB_ID", local=True, backend="http://my-local-server")
+```
+
+## Knowledge Box에 텍스트 추가 및 삭제
+
+```python
+ids = ndb.add_texts(["This is a new test", "This is a second test"])
+```
+
+```python
+ndb.delete(ids=ids)
+```
+
+## Knowledge Box에서 검색하기
+
+```python
+results = ndb.similarity_search("Who was inspired by Ada Lovelace?")
+print(results[0].page_content)
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/vectorstores/nucliadb.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,101 @@
+---
+title: "Text splitter"
+---
+
+**Text splitter**는 대용량 문서를 개별적으로 검색 가능하고 모델의 context window 제한에 맞는 작은 chunk로 분할합니다.
+
+문서를 분할하는 여러 전략이 있으며, 각각 고유한 장점이 있습니다.
+
+<Tip>
+대부분의 사용 사례에서는 [RecursiveCharacterTextSplitter](/oss/python/integrations/splitters/recursive_text_splitter)로 시작하세요. context를 유지하면서 chunk 크기를 관리하는 균형을 제공합니다. 이 기본 전략은 즉시 잘 작동하며, 특정 애플리케이션에 대한 성능을 미세 조정해야 하는 경우에만 조정을 고려해야 합니다.
+</Tip>
+
+## Text 구조 기반
+
+Text는 자연스럽게 단락, 문장, 단어와 같은 계층적 단위로 구성됩니다. 이러한 고유한 구조를 활용하여 분할 전략을 수립할 수 있으며, 자연스러운 언어 흐름을 유지하고, 분할 내에서 의미적 일관성을 유지하며, 다양한 수준의 텍스트 세분성에 적응하는 분할을 생성할 수 있습니다. LangChain의 `RecursiveCharacterTextSplitter`는 이 개념을 구현합니다:
+
+- [RecursiveCharacterTextSplitter](/oss/python/integrations/splitters/recursive_text_splitter)는 더 큰 단위(예: 단락)를 그대로 유지하려고 시도합니다.
+- 단위가 chunk 크기를 초과하면 다음 수준(예: 문장)으로 이동합니다.
+- 필요한 경우 이 프로세스는 단어 수준까지 계속됩니다.
+
+사용 예시:
+
+```python
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=100, chunk_overlap=0)
+texts = text_splitter.split_text(document)
+```
+
+
+
+**사용 가능한 text splitter**:
+- [재귀적으로 텍스트 분할](/oss/python/integrations/splitters/recursive_text_splitter)
+
+## 길이 기반
+
+직관적인 전략은 문서의 길이를 기반으로 분할하는 것입니다. 이 간단하면서도 효과적인 접근 방식은 각 chunk가 지정된 크기 제한을 초과하지 않도록 보장합니다. 길이 기반 분할의 주요 이점:
+
+- 간단한 구현
+- 일관된 chunk 크기
+- 다양한 모델 요구 사항에 쉽게 적응 가능
+
+길이 기반 분할의 유형:
+
+- Token 기반: 언어 모델과 작업할 때 유용한 token 수를 기반으로 텍스트를 분할합니다.
+- Character 기반: 다양한 유형의 텍스트에서 더 일관성 있을 수 있는 문자 수를 기반으로 텍스트를 분할합니다.
+
+LangChain의 CharacterTextSplitter를 사용한 token 기반 분할 구현 예시:
+
+```python
+from langchain_text_splitters import CharacterTextSplitter
+
+text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
+    encoding_name="cl100k_base", chunk_size=100, chunk_overlap=0
+)
+texts = text_splitter.split_text(document)
+```
+
+
+
+**사용 가능한 text splitter**:
+- [Token으로 분할](/oss/python/integrations/splitters/split_by_token)
+- [문자로 분할](/oss/python/integrations/splitters/character_text_splitter)
+
+## Document 구조 기반
+
+일부 문서는 HTML, Markdown 또는 JSON 파일과 같은 고유한 구조를 가지고 있습니다. 이러한 경우 문서의 구조를 기반으로 분할하는 것이 유익합니다. 구조가 종종 의미적으로 관련된 텍스트를 자연스럽게 그룹화하기 때문입니다. 구조 기반 분할의 주요 이점:
+
+- 문서의 논리적 구성을 보존합니다
+- 각 chunk 내에서 context를 유지합니다
+- 검색 또는 요약과 같은 다운스트림 작업에 더 효과적일 수 있습니다
+
+구조 기반 분할의 예시:
+
+- Markdown: header를 기반으로 분할(예: #, ##, ###)
+- HTML: tag를 사용하여 분할
+- JSON: object 또는 array element로 분할
+- Code: function, class 또는 논리적 블록으로 분할
+
+**사용 가능한 text splitter**:
+- [Markdown 분할](/oss/python/integrations/splitters/markdown_header_metadata_splitter)
+- [JSON 분할](/oss/python/integrations/splitters/recursive_json_splitter)
+- [코드 분할](/oss/python/integrations/splitters/code_splitter)
+- [HTML 분할](/oss/python/integrations/splitters/split_html)
+
+
+
+## Provider별
+
+<Columns cols={3}>
+<Card title="WRITER" icon="link" href="/oss/python/integrations/splitters/writer" arrow="true" cta="가이드 보기" />
+</Columns>
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/integrations/splitters/index.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

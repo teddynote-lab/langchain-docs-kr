@@ -1,0 +1,57 @@
+---
+title: LangChain 설치하기
+sidebarTitle: 설치
+---
+
+
+
+LangChain package를 설치하려면:
+
+<CodeGroup>
+    ```bash pip
+    pip install -U langchain
+    ```
+
+    ```bash uv
+    uv add langchain
+    ```
+</CodeGroup>
+
+
+
+
+LangChain은 수백 개의 LLM과 수천 개의 다른 integration을 제공합니다. 이들은 독립적인 provider package에 포함되어 있습니다. 예를 들어:
+
+<CodeGroup>
+    ```bash pip
+    # Installing the OpenAI integration
+    pip install -U langchain-openai
+
+    # Installing the Anthropic integration
+    pip install -U langchain-anthropic
+    ```
+    ```bash uv
+    # Installing the OpenAI integration
+    uv add langchain-openai
+
+    # Installing the Anthropic integration
+    uv add langchain-anthropic
+    ```
+</CodeGroup>
+
+
+
+
+
+<Tip>
+사용 가능한 integration의 전체 목록은 [Integrations 탭](/oss/python/integrations/providers/overview)을 참조하세요.
+</Tip>
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/install.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,80 @@
+---
+title: Bodo DataFrames
+---
+
+[Bodo DataFrames](https://github.com/bodo-ai/Bodo)는 대규모 Python 데이터 처리를 위한 고성능 DataFrame 라이브러리이며 Pandas를 대체할 수 있습니다. 간단히 다음을:
+
+```python
+import pandas as pd
+```
+
+다음으로 교체하면:
+
+```python
+import bodo.pandas as pd
+```
+
+Pandas 워크로드를 자동으로 확장하고 가속화할 수 있습니다.
+Bodo DataFrames는 Pandas와 호환되므로, 검증이 쉽고 효율적이며 Pandas의 일반적인 한계를 넘어 확장 가능한 LLM 코드 생성의 이상적인 대상입니다.
+
+우리의 통합 패키지는 효율성과 확장성을 위해 Bodo DataFrames를 사용하여 대규모 데이터셋에 대한 질문을 에이전트에게 할 수 있는 toolkit을 제공합니다.
+
+내부적으로 Bodo DataFrames는 lazy evaluation을 사용하여 Pandas 작업 시퀀스를 최적화하고, 메모리보다 큰 데이터셋 처리를 가능하게 하기 위해 operator를 통해 데이터를 스트리밍하며, 노트북에서 대규모 클러스터까지 쉽게 확장할 수 있는 효율적인 병렬 실행을 위해 MPI 기반 고성능 컴퓨팅 기술을 활용합니다.
+
+## 설치 및 설정
+
+```bash pip
+pip install -U langchain_bodo
+```
+
+## Toolkit
+
+[langchain-bodo 패키지](https://pypi.org/project/langchain-bodo/)는 Bodo DataFrames를 사용하여 대규모 데이터셋에 대한 질문에 답할 수 있는 에이전트를 생성하는 기능을 제공합니다.
+더 자세한 사용 예제는 [Bodo DataFrames tools 페이지](/oss/python/integrations/tools/bodo)를 참조하세요.
+
+**참고: 이 기능은 내부적으로 `Python` 에이전트를 사용하며, LLM이 생성한 Python 코드를 실행합니다 - LLM이 생성한 Python 코드가 유해할 경우 위험할 수 있습니다. 주의해서 사용하세요.**
+
+```python
+from langchain_bodo import create_bodo_dataframes_agent
+```
+
+### 사용 예제
+
+아래 코드를 실행하기 전에 [titanic 데이터셋](https://raw.githubusercontent.com/pandas-dev/pandas/main/doc/data/titanic.csv)을 복사하여 로컬에 `titanic.csv`로 저장하세요.
+
+```python
+import bodo.pandas as pd
+from langchain_openai import OpenAI
+
+df = pd.read_csv("titanic.csv")
+agent = create_bodo_dataframes_agent(
+    OpenAI(temperature=0), df, verbose=True, allow_dangerous_code=True
+)
+```
+
+```python
+agent.invoke("how many rows are there?")
+```
+
+```output
+> Entering new AgentExecutor chain...
+Thought: I can use the len() function to get the number of rows in the dataframe.
+Action: python_repl_ast
+Action Input: len(df)891891 is the number of rows in the dataframe.
+Final Answer: 891
+
+> Finished chain.
+```
+
+```output
+{'input': 'how many rows are there?', 'output': '891'}
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/bodo.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,35 @@
+---
+title: Lantern
+---
+
+이 페이지는 LangChain 내에서 [Lantern](https://github.com/lanterndata/lantern)을 사용하는 방법을 다룹니다.
+두 부분으로 나뉘어 있습니다: 설정, 그리고 특정 Lantern wrapper에 대한 참조입니다.
+
+## Setup
+1. 첫 번째 단계는 `lantern` extension이 설치된 database를 생성하는 것입니다.
+
+    [Lantern Installation Guide](https://github.com/lanterndata/lantern#-quick-install)의 단계를 따라 database와 extension을 설치하세요. docker image가 시작하기에 가장 쉬운 방법입니다.
+
+## Wrappers
+
+### VectorStore
+
+Postgres vector database를 감싸는 wrapper가 존재하며, 이를 통해 semantic search나 example selection을 위한 vectorstore로 사용할 수 있습니다.
+
+이 vectorstore를 import하려면:
+```python
+from langchain_community.vectorstores import Lantern
+```
+
+### Usage
+
+Lantern Wrapper에 대한 더 자세한 안내는 [이 notebook](/oss/python/integrations/vectorstores/lantern)을 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/lantern.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

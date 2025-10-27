@@ -1,0 +1,61 @@
+---
+title: Async Chromium
+---
+
+Chromium은 브라우저 자동화를 제어하는 데 사용되는 라이브러리인 Playwright에서 지원하는 브라우저 중 하나입니다.
+
+`p.chromium.launch(headless=True)`를 실행하면 Chromium의 headless 인스턴스를 시작합니다.
+
+Headless 모드는 브라우저가 그래픽 사용자 인터페이스 없이 실행되는 것을 의미합니다.
+
+아래 예제에서는 `AsyncChromiumLoader`를 사용하여 페이지를 로드한 다음, [`Html2TextTransformer`](/oss/python/integrations/document_transformers/html2text/)를 사용하여 HTML 태그 및 기타 의미론적 정보를 제거합니다.
+
+```python
+pip install -qU playwright beautifulsoup4 html2text
+!playwright install
+```
+
+**참고:** Jupyter notebook을 사용하는 경우, 다음과 같이 문서를 로드하기 전에 `nest_asyncio`를 설치하고 적용해야 할 수도 있습니다:
+
+```python
+!pip install nest-asyncio
+import nest_asyncio
+
+nest_asyncio.apply()
+```
+
+```python
+from langchain_community.document_loaders import AsyncChromiumLoader
+
+urls = ["https://docs.smith.langchain.com/"]
+loader = AsyncChromiumLoader(urls, user_agent="MyAppUserAgent")
+docs = loader.load()
+docs[0].page_content[0:100]
+```
+
+```output
+'<!DOCTYPE html><html lang="en" dir="ltr" class="docs-wrapper docs-doc-page docs-version-2.0 plugin-d'
+```
+
+이제 transformer를 사용하여 문서를 더 읽기 쉬운 형식으로 변환해 보겠습니다:
+
+```python
+from langchain_community.document_transformers import Html2TextTransformer
+
+html2text = Html2TextTransformer()
+docs_transformed = html2text.transform_documents(docs)
+docs_transformed[0].page_content[0:500]
+```
+
+```output
+'Skip to main content\n\nGo to API Docs\n\nSearch`⌘``K`\n\nGo to App\n\n  * Quick start\n  * Tutorials\n\n  * How-to guides\n\n  * Concepts\n\n  * Reference\n\n  * Pricing\n  * Self-hosting\n\n  * LangGraph Cloud\n\n  *   * Quick start\n\nOn this page\n\n# Get started with LangSmith\n\n**LangSmith** is a platform for building production-grade LLM applications. It\nallows you to closely monitor and evaluate your application, so you can ship\nquickly and with confidence. Use of LangChain is not necessary - LangSmith\nworks on it'
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/document_loaders/async_chromium.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

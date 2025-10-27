@@ -1,0 +1,105 @@
+---
+title: 자주 묻는 질문
+sidebarTitle: 가격 FAQ
+---
+
+## 질문과 답변
+
+### 새로운 사용자에게 가격 정책이 적용되기 전부터 LangSmith를 사용하고 있었습니다. 제 계정에는 언제 가격 정책이 적용되나요?
+
+이미 LangSmith를 사용하고 계셨다면, 2024년 7월부터 사용량에 대한 요금이 청구됩니다. 그 시점에 좌석을 추가하거나 월간 무료 trace 할당량을 초과하여 사용하려면 LangSmith에 신용카드를 등록하거나 영업팀에 문의해야 합니다. 더 높은 rate limit과 특별한 배포 옵션을 제공하는 Enterprise 플랜에 관심이 있으시다면, [영업팀에 문의](https://www.langchain.com/contact-sales)하여 자세한 내용을 확인하거나 구매하실 수 있습니다.
+
+### 어떤 플랜이 저에게 적합한가요?
+
+개인 개발자라면 Developer 플랜이 소규모 프로젝트에 적합한 선택입니다.
+
+LangSmith에서 협업하고자 하는 팀이라면 Plus 플랜을 확인해보세요. **AI 애플리케이션을 구축하는 초기 단계 스타트업**이라면, 할인된 가격과 넉넉한 월간 무료 trace 할당량을 제공하는 Startup 플랜을 이용하실 수 있습니다. 자세한 내용은 [Startup 문의 양식](https://airtable.com/app8ZrGLtHAtFVO1o/pagfLAmdTz4ep7TGu/form)을 통해 문의해주세요.
+
+더 고급 관리 기능, 인증 및 권한 부여, 배포 옵션, 지원 또는 연간 청구서 발행이 필요하다면 Enterprise 플랜이 적합합니다. 자세한 내용은 [영업 문의 양식](https://www.langchain.com/contact-sales)을 통해 문의해주세요.
+
+### 좌석(seat)이란 무엇인가요?
+
+좌석은 조직 내의 고유한 사용자를 의미합니다. 청구할 좌석 수를 결정하기 위해 초대된 사용자를 포함한 총 사용자 수를 고려합니다.
+
+### Trace란 무엇인가요?
+
+Trace는 애플리케이션 chain 또는 agent, evaluator 실행, 또는 playground 실행의 한 번의 완전한 호출을 의미합니다. 다음은 단일 trace의 [예시](https://smith.langchain.com/public/17c24270-9f74-47e7-b70c-d508afc448fa/r)입니다.
+
+### Ingested event란 무엇인가요?
+
+Ingested event는 LangSmith로 전송되는 모든 개별적인 trace 관련 데이터를 의미합니다. 여기에는 다음이 포함됩니다:
+
+* Trace 내 run step 시작 시 전송되는 input, output 및 metadata
+* Trace 내 run step 종료 시 전송되는 input, output 및 metadata
+* Run step 또는 trace에 대한 feedback
+
+### Rate 또는 사용량 제한에 도달했습니다. 어떻게 해야 하나요?
+
+LangSmith 계정에 처음 가입하면 월 5000개의 trace로 제한된 Personal organization을 받게 됩니다. 이 제한에 도달한 후에도 계속 trace를 전송하려면 신용카드를 추가하여 Developer 또는 Plus 플랜으로 업그레이드하세요. [Plans and Billing](https://smith.langchain.com/settings/payments)으로 이동하여 업그레이드할 수 있습니다.
+
+마찬가지로 현재 플랜의 rate limit에 도달했다면, 더 높은 제한을 받기 위해 상위 플랜으로 업그레이드하거나 [support@langchain.dev](mailto:support@langchain.dev)로 문의하세요.
+
+### Developer 계정을 Plus 또는 Enterprise 플랜으로 업그레이드할 수 있나요?
+
+네, Developer 플랜 사용자는 [Plans and Billing](https://smith.langchain.com/settings/payments) 페이지에서 Plus 플랜으로 쉽게 업그레이드할 수 있습니다. Enterprise 플랜의 경우 [영업팀에 문의](https://www.langchain.com/contact-sales)하여 필요사항을 논의해주세요.
+
+### 청구는 어떻게 이루어지나요?
+
+**좌석(Seats)**
+
+좌석은 매월 1일에 월별로 청구됩니다. 월 중간에 구매한 추가 좌석은 일할 계산되어 구매 후 1일 이내에 청구됩니다. 월 중간에 제거된 좌석은 환불되지 않습니다.
+
+**Traces**
+
+계정에 카드가 등록되어 있는 한, trace를 처리하고 전월에 제출한 trace에 대해 매월 1일에 청구합니다. 원하는 경우 사용량 제한을 설정하여 특정 월에 발생할 수 있는 최대 요금을 제한할 수 있습니다.
+
+### Tracing에 지출하는 금액을 제한할 수 있나요?
+
+[Usage configuration](https://smith.langchain.com/settings/payments) 페이지에서 월별로 LangSmith에 전송할 수 있는 trace 수에 대한 제한을 설정할 수 있습니다.
+
+<Note>
+편의를 위해 사용량 제한의 달러 가치를 표시하지만, 이 제한은 달러 금액이 아닌 trace 수로 평가됩니다. 예를 들어, 넉넉한 무료 trace 할당량이 제공되는 startup 플랜 티어가 승인된 경우, 사용량 제한이 자동으로 변경되지 않습니다.
+
+현재 제품 내에서 지출 제한을 설정할 수는 없습니다.
+</Note>
+
+### 이번 달 현재까지의 사용량을 어떻게 추적할 수 있나요?
+
+Organization의 Settings 섹션에서 **Usage** 하위 섹션을 확인할 수 있습니다. 여기에서 지난 30일, 60일 또는 90일 동안의 일일 청구 가능한 LangSmith trace 수 그래프를 볼 수 있습니다. 이 데이터는 1-2시간 지연되므로 당일의 실제 실행 수보다 약간 뒤처질 수 있습니다.
+
+### 청구서에 대해 질문이 있습니다...
+
+Developer 및 Plus 플랜 티어의 고객은 [support@langchain.dev](mailto:support@langchain.dev)로 이메일을 보내주세요. Enterprise 플랜 고객은 담당 영업 담당자에게 직접 문의하세요.
+
+Enterprise 플랜 고객은 청구서를 통해 연간 청구됩니다.
+
+### Support에서 무엇을 기대할 수 있나요?
+
+Developer 플랜에서는 [LangChain community Slack](https://www.langchain.com/join-community)에서 커뮤니티 기반 지원을 이용할 수 있습니다.
+
+Plus 플랜에서는 LangSmith 관련 질문에 대해 [support@langchain.dev](mailto:support@langchain.dev)에서 우선적인 이메일 지원을 받을 수 있으며, 다음 영업일 내에 응답하기 위해 최선을 다합니다.
+
+Enterprise 플랜에서는 Slack 채널, 전담 고객 성공 관리자, 그리고 LangSmith 및 LangChain 질문을 다루는 월간 체크인을 통한 최고급 지원을 받을 수 있습니다. 디버깅, agent 및 RAG 기술, 평가 접근 방식, 인지 아키텍처 검토 등 모든 것을 도와드릴 수 있습니다. 사용자 환경에서 LangSmith를 실행하는 추가 기능을 구매하신 경우, 대기 중인 인프라 엔지니어링 팀과 함께 배포 및 새 릴리스도 지원합니다.
+
+### 내 데이터는 어디에 저장되나요?
+
+미국 또는 EU 지역 중 하나를 선택하여 가입할 수 있습니다. 자세한 내용은 [cloud architecture reference](/langsmith/cloud#cloud-architecture-and-scalability)를 참조하세요. Enterprise 플랜을 이용하시는 경우, AWS, GCP 또는 Azure의 kubernetes 클러스터에서 LangSmith를 실행하도록 제공할 수 있어 데이터가 사용자 환경을 벗어나지 않습니다.
+
+### LangSmith는 어떤 보안 프레임워크를 준수하나요?
+
+SOC 2 Type II, GDPR 및 HIPAA를 준수합니다.
+
+[trust.langchain.com](https://trust.langchain.com)에서 보안 정책 및 태세에 대한 자세한 정보를 요청할 수 있습니다. BAA는 Enterprise 플랜 고객과만 체결합니다.
+
+### LangSmith에 전송하는 데이터로 학습하나요?
+
+귀하의 데이터로 학습하지 않으며, 귀하는 데이터에 대한 모든 권리를 소유합니다. 자세한 내용은 [LangSmith Terms of Service](https://langchain.dev/terms-of-service)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/pricing-faq.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,109 @@
+---
+title: Oracle Cloud Infrastructure Generative AI
+---
+
+Oracle Cloud Infrastructure (OCI) Generative AI는 다양한 사용 사례를 다루는 최첨단의 커스터마이징 가능한 대규모 언어 모델(LLM) 세트를 제공하는 완전 관리형 서비스이며, 단일 API를 통해 사용할 수 있습니다.
+OCI Generative AI 서비스를 사용하면 바로 사용 가능한 사전 학습된 모델에 액세스하거나, 전용 AI 클러스터에서 자체 데이터를 기반으로 파인튜닝된 커스텀 모델을 생성하고 호스팅할 수 있습니다. 서비스 및 API에 대한 자세한 문서는 __[여기](https://docs.oracle.com/en-us/iaas/Content/generative-ai/home.htm)__와 __[여기](https://docs.oracle.com/en-us/iaas/api/#/en/generative-ai/20231130/)__에서 확인할 수 있습니다.
+
+이 노트북은 LangChain과 함께 OCI의 Generative AI complete 모델을 사용하는 방법을 설명합니다.
+
+## Setup
+
+oci sdk와 langchain-community 패키지가 설치되어 있는지 확인하세요
+
+```python
+!pip install -U oci langchain-community
+```
+
+## Usage
+
+```python
+from langchain_community.llms.oci_generative_ai import OCIGenAI
+
+llm = OCIGenAI(
+    model_id="cohere.command",
+    service_endpoint="https://inference.generativeai.us-chicago-1.oci.oraclecloud.com",
+    compartment_id="MY_OCID",
+    model_kwargs={"temperature": 0, "max_tokens": 500},
+)
+
+response = llm.invoke("Tell me one fact about earth", temperature=0.7)
+print(response)
+```
+
+#### Chaining with prompt templates
+
+```python
+from langchain_core.prompts import PromptTemplate
+
+llm = OCIGenAI(
+    model_id="cohere.command",
+    service_endpoint="https://inference.generativeai.us-chicago-1.oci.oraclecloud.com",
+    compartment_id="MY_OCID",
+    model_kwargs={"temperature": 0, "max_tokens": 500},
+)
+
+prompt = PromptTemplate(input_variables=["query"], template="{query}")
+llm_chain = prompt | llm
+
+response = llm_chain.invoke("what is the capital of france?")
+print(response)
+```
+
+#### Streaming
+
+```python
+llm = OCIGenAI(
+    model_id="cohere.command",
+    service_endpoint="https://inference.generativeai.us-chicago-1.oci.oraclecloud.com",
+    compartment_id="MY_OCID",
+    model_kwargs={"temperature": 0, "max_tokens": 500},
+)
+
+for chunk in llm.stream("Write me a song about sparkling water."):
+    print(chunk, end="", flush=True)
+```
+
+## Authentication
+
+LlamaIndex에서 지원되는 인증 방법은 다른 OCI 서비스에서 사용되는 방법과 동일하며, __[표준 SDK 인증](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/sdk_authentication_methods.htm)__ 방법, 특히 API Key, session token, instance principal, resource principal을 따릅니다.
+
+API key는 위 예제에서 사용된 기본 인증 방법입니다. 다음 예제는 다른 인증 방법(session token)을 사용하는 방법을 보여줍니다
+
+```python
+llm = OCIGenAI(
+    model_id="cohere.command",
+    service_endpoint="https://inference.generativeai.us-chicago-1.oci.oraclecloud.com",
+    compartment_id="MY_OCID",
+    auth_type="SECURITY_TOKEN",
+    auth_profile="MY_PROFILE",  # replace with your profile name
+    auth_file_location="MY_CONFIG_FILE_LOCATION",  # replace with file location where profile name configs present
+)
+```
+
+## Dedicated AI Cluster
+
+전용 AI 클러스터에서 호스팅되는 모델에 액세스하려면 __[endpoint를 생성](https://docs.oracle.com/en-us/iaas/api/#/en/generative-ai-inference/20231130/)__하고, 할당된 OCID(현재 'ocid1.generativeaiendpoint.oc1.us-chicago-1'로 시작)를 모델 ID로 사용합니다.
+
+전용 AI 클러스터에서 호스팅되는 모델에 액세스할 때는 두 개의 추가 필수 매개변수("provider"와 "context_size")로 OCIGenAI 인터페이스를 초기화해야 합니다.
+
+```python
+llm = OCIGenAI(
+    model_id="ocid1.generativeaiendpoint.oc1.us-chicago-1....",
+    service_endpoint="https://inference.generativeai.us-chicago-1.oci.oraclecloud.com",
+    compartment_id="DEDICATED_COMPARTMENT_OCID",
+    auth_profile="MY_PROFILE",  # replace with your profile name,
+    auth_file_location="MY_CONFIG_FILE_LOCATION",  # replace with file location where profile name configs present
+    provider="MODEL_PROVIDER",  # e.g., "cohere" or "meta"
+    context_size="MODEL_CONTEXT_SIZE",  # e.g., 128000
+)
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/llms/oci_generative_ai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

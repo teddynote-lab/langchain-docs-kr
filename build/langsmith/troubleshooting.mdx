@@ -1,0 +1,216 @@
+---
+title: 문제 해결
+sidebarTitle: 문제 해결
+---
+
+이 가이드는 LangSmith의 자체 호스팅 인스턴스를 실행할 때 발생할 수 있는 일반적인 문제를 안내합니다.
+
+LangSmith를 실행하는 동안 예기치 않은 500 오류, 느린 성능 또는 기타 문제가 발생할 수 있습니다. 이 가이드는 이러한 문제를 진단하고 해결하는 데 도움이 됩니다.
+
+## 유용한 정보 얻기
+
+문제를 진단하고 해결하려면 먼저 관련 정보를 검색해야 합니다. 다음 섹션에서는 Kubernetes 또는 Docker 설정에서 이를 수행하는 방법과 유용한 브라우저 정보를 가져오는 방법을 설명합니다.
+
+일반적으로 분석하려는 주요 서비스는 다음과 같습니다:
+
+- `langsmith-backend`: CRUD API 요청, 비즈니스 로직, frontend 및 SDK의 요청, 수집을 위한 trace 준비, hub API를 처리합니다.
+- `langsmith-platform-backend`: 인증, run 수집 및 기타 대용량 작업을 처리합니다.
+- `langsmith-queue`: 들어오는 trace 및 피드백, 비동기 수집 및 데이터 저장소로의 지속성, 데이터 무결성 검사, 데이터베이스 오류 또는 연결 문제 발생 시 재시도를 처리합니다.
+
+이러한 서비스에 대한 자세한 내용은 [아키텍처 개요](/langsmith/architectural-overview)를 참조하세요.
+
+#### Kubernetes
+
+문제 해결의 첫 번째 단계는 LangSmith 배포에 대한 중요한 디버깅 정보를 수집하는 것입니다. 서비스 로그, kubernetes 이벤트 및 컨테이너의 리소스 사용률은 문제의 근본 원인을 식별하는 데 도움이 될 수 있습니다.
+
+[k8s 문제 해결 스크립트](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/scripts/get_k8s_debugging_info.sh)를 실행하여 관련된 모든 kubernetes 정보를 가져와 조사를 위해 폴더에 출력할 수 있습니다. 이 스크립트는 또한 공유를 위해 이 폴더를 zip 파일로 압축합니다. 다음은 `langsmith` namespace에서 langsmith 배포가 시작되었다고 가정할 때 이 스크립트를 실행하는 예시입니다:
+
+```bash
+bash get_k8s_debugging_info.sh --namespace langsmith
+```
+
+그런 다음 생성된 폴더의 내용을 검사하여 관련 오류나 정보를 확인할 수 있습니다. LangSmith 팀의 디버깅 지원을 받으려면 이 zip 파일을 팀과 공유하세요.
+
+#### Docker
+
+Docker에서 실행하는 경우 다음 명령을 실행하여 배포 로그를 확인할 수 있습니다:
+
+```bash
+docker compose logs >> logs.txt
+```
+
+#### 브라우저 오류
+
+브라우저 오류로 나타나는 문제가 발생한 경우 주요 정보를 포함할 수 있는 HAR 파일을 검사하는 것이 도움이 될 수 있습니다. HAR 파일을 얻으려면 다양한 브라우저에 대한 간단한 프로세스를 설명하는 [이 가이드](https://support.zendesk.com/hc/en-us/articles/4408828867098-Generating-a-HAR-file-for-troubleshooting)를 따를 수 있습니다.
+
+그런 다음 [Google의 HAR 분석기](https://toolbox.googleapps.com/apps/har_analyzer/)를 사용하여 조사할 수 있습니다. 또한 디버깅을 돕기 위해 HAR 파일을 LangSmith 팀에 보낼 수도 있습니다.
+
+## 일반적인 문제
+
+### *DB::Exception: Cannot reserve 1.00 MiB, not enough space: While executing WaitForAsyncInsert. (NOT\_ENOUGH\_SPACE)*
+
+이 오류는 ClickHouse의 디스크 공간이 부족할 때 발생합니다. ClickHouse에 사용 가능한 디스크 공간을 늘려야 합니다.
+
+#### Kubernetes
+
+Kubernetes에서는 ClickHouse PVC의 크기를 늘려야 합니다. 이를 위해 다음 단계를 수행할 수 있습니다:
+
+1. PVC의 storage class를 가져옵니다: `kubectl get pvc data-langsmith-clickhouse-0 -n <namespace> -o jsonpath='{.spec.storageClassName}'`
+
+2. storage class에 AllowVolumeExpansion: true가 있는지 확인합니다: `kubectl get sc <storage-class-name> -o jsonpath='{.allowVolumeExpansion}'`
+
+   * false인 경우 일부 storage class는 볼륨 확장을 허용하도록 업데이트할 수 있습니다.
+   * storage class를 업데이트하려면 `kubectl patch sc <storage-class-name> -p '{"allowVolumeExpansion": true}'`를 실행할 수 있습니다.
+   * 실패하는 경우 올바른 설정으로 새 storage class를 생성해야 할 수 있습니다.
+
+3. pvc를 편집하여 새 크기를 설정합니다: `kubectl edit pvc data-langsmith-clickhouse-0 -n <namespace>` 또는 `kubectl patch pvc data-langsmith-clickhouse-0 '{"spec":{"resources":{"requests":{"storage":"100Gi"}}}}' -n <namespace>`
+
+4. helm chart `langsmith_config.yaml`을 새 크기(예: `100 Gi`)로 업데이트합니다.
+
+5. clickhouse statefulset을 삭제합니다: `kubectl delete statefulset langsmith-clickhouse --cascade=orphan -n <namespace>`
+
+6. 업데이트된 크기로 helm chart를 적용합니다 (업그레이드 가이드는 [여기](/langsmith/self-host-upgrades)를 참조하세요)
+
+7. 이제 pvc가 새 크기를 가져야 합니다. `kubectl get pvc` 및 `kubectl exec langsmith-clickhouse-0 -- bash -c "df"`를 실행하여 확인합니다.
+
+#### Docker
+
+Docker에서는 ClickHouse 볼륨의 크기를 늘려야 합니다. 이를 위해 다음 단계를 수행할 수 있습니다:
+
+1. LangSmith 인스턴스를 중지합니다. `docker compose down`
+2. bind mount를 사용하는 경우 마운트 포인트의 크기를 늘려야 합니다.
+3. docker `volume`을 사용하는 경우 볼륨/docker에 더 많은 공간을 할당해야 합니다.
+
+### *error: Dirty database version 'version'. Fix and force version*
+
+이 오류는 ClickHouse 데이터베이스가 마이그레이션과 일치하지 않는 상태일 때 발생합니다. 이전 데이터베이스 버전으로 재설정한 다음 업그레이드/마이그레이션을 다시 실행해야 합니다.
+
+#### Kubernetes
+
+1. 이전 버전으로 마이그레이션을 강제 실행합니다. 여기서 version = dirty version - 1입니다.
+
+```bash
+kubectl exec -it deployments/langsmith-backend -- bash -c 'migrate -source "file://clickhouse/migrations" -database "clickhouse://$CLICKHOUSE_HOST:$CLICKHOUSE_NATIVE_PORT?username=$CLICKHOUSE_USER&password=$CLICKHOUSE_PASSWORD&database=$CLICKHOUSE_DB&x-multi-statement=true&x-migrations-table-engine=MergeTree&secure=$CLICKHOUSE_TLS" force <version>'
+```
+
+1. 업그레이드/마이그레이션을 다시 실행합니다.
+
+#### Docker
+
+1. 이전 버전으로 마이그레이션을 강제 실행합니다. 여기서 version = dirty version - 1입니다.
+
+```bash
+docker compose exec langchain-backend migrate -source "file://clickhouse/migrations" -database "clickhouse://$CLICKHOUSE_HOST:$CLICKHOUSE_NATIVE_PORT?username=$CLICKHOUSE_USER&password=$CLICKHOUSE_PASSWORD&database=$CLICKHOUSE_DB&x-multi-statement=true&x-migrations-table-engine=MergeTree&secure=$CLICKHOUSE_TLS" force <version>
+```
+
+1. 업그레이드/마이그레이션을 다시 실행합니다.
+
+### *413 - Request Entity Too Large*
+
+이 오류는 요청 크기가 허용된 최대 크기를 초과할 때 발생합니다. Nginx 구성에서 최대 요청 크기를 늘려야 합니다.
+
+#### Kubernetes
+
+1. `langsmith_config.yaml`을 편집하고 `frontend.maxBodySize` [값](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/values.yaml#L519)을 늘립니다. 다음과 같이 보일 수 있습니다:
+
+```yaml
+frontend:
+  maxBodySize: "100M"
+```
+
+2. 클러스터에 변경 사항을 적용합니다.
+
+### *Details: code: 497, message: default: Not enough privileges. To execute this query, it's necessary to have the grant CREATE ROW POLICY ON default.feedbacks\_rmt*
+
+이 오류는 사용자가 Clickhouse에서 row policy를 생성하는 데 필요한 권한이 없을 때 발생합니다. Docker 배포를 배포할 때 github repo에서 `users.xml` 파일도 복사해야 합니다. 이렇게 하면 `users.xml` 파일에 `<access_management>` 태그가 추가되어 사용자가 row policy를 생성할 수 있습니다. 다음은 사용할 것으로 예상되는 기본 `users.xml` 파일입니다.
+
+```xml
+<clickhouse>
+    <users>
+        <default>
+            <access_management>1</access_management>
+            <named_collection_control>1</named_collection_control>
+            <show_named_collections>1</show_named_collections>
+            <show_named_collections_secrets>1</show_named_collections_secrets>
+            <profile>default</profile>
+        </default>
+    </users>
+    <profiles>
+        <default>
+            <async_insert>1</async_insert>
+            <async_insert_max_data_size>2000000</async_insert_max_data_size>
+            <wait_for_async_insert>0</wait_for_async_insert>
+            <parallel_view_processing>1</parallel_view_processing>
+            <allow_simdjson>0</allow_simdjson>
+            <lightweight_deletes_sync>0</lightweight_deletes_sync>
+        </default>
+    </profiles>
+</clickhouse>
+```
+
+일부 환경에서는 마운트 포인트가 컨테이너에서 쓰기 가능하지 않을 수 있습니다. 이러한 경우 `users.xml` 파일이 포함된 사용자 정의 이미지를 빌드하는 것이 좋습니다.
+
+예시 `Dockerfile`:
+
+```dockerfile
+FROM clickhouse/clickhouse-server:24.8
+COPY ./users.xml /etc/clickhouse-server/users.d/users.xml
+```
+
+그런 다음 다음 단계를 수행합니다:
+
+1. 사용자 정의 이미지를 빌드합니다.
+
+```bash
+docker build -t <image-name> .
+```
+
+2. 사용자 정의 이미지를 사용하도록 `docker-compose.yaml`을 업데이트합니다. users.xml 마운트 포인트를 제거해야 합니다.
+
+```yaml
+langchain-clickhouse:
+  image: <image-name>
+```
+
+3. LangSmith 인스턴스를 재시작합니다.
+
+```bash
+docker compose down --volumes
+docker compose up
+```
+
+### *AquaSec으로 클러스터를 실행할 때 ClickHouse가 시작되지 않음*
+
+일부 환경에서는 AquaSec이 ClickHouse가 올바르게 시작되는 것을 방해할 수 있습니다. 이는 ClickHouse pod가 로그를 출력하지 않고 준비 상태로 표시되지 않는 것으로 나타날 수 있습니다.
+일반적으로 이는 AquaSec에 의해 `LD_PRELOAD`가 설정되어 ClickHouse를 방해하기 때문입니다. 이를 해결하려면 ClickHouse 배포에 다음 환경 변수를 추가할 수 있습니다:
+
+#### Kubernetes
+
+`langsmith_config.yaml`(또는 해당 구성 파일)을 편집하고 `AQUA_SKIP_LD_PRELOAD` 환경 변수를 설정합니다:
+
+```yaml
+clickhouse:
+  statefulSet:
+    extraEnv:
+      - name: AQUA_SKIP_LD_PRELOAD
+        value: "true"
+```
+
+#### Docker
+
+`docker-compose.yaml`을 편집하고 `AQUA_SKIP_LD_PRELOAD` 환경 변수를 설정합니다:
+
+```yaml
+langchain-clickhouse:
+  environment:
+    - AQUA_SKIP_LD_PRELOAD=true
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/troubleshooting.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

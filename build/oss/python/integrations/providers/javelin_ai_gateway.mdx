@@ -1,0 +1,105 @@
+---
+title: Javelin AI Gateway
+---
+
+[Javelin AI Gateway](https://www.getjavelin.io) 서비스는 AI 애플리케이션을 위한 고성능 엔터프라이즈급 API Gateway입니다.
+이는 조직 내에서 OpenAI, Cohere, Anthropic 및 커스텀 large language model과 같은 다양한 large language model (LLM) 제공업체의 사용 및 액세스를 간소화하도록 설계되었으며,
+모든 LLM 상호작용에 대한 강력한 액세스 보안을 통합합니다.
+
+Javelin은 특정 LLM 관련 요청을 처리하기 위한 통합 endpoint를 제공하여 LLM과의 상호작용을 단순화하는 high-level interface를 제공합니다.
+
+자세한 내용은 Javelin AI Gateway [문서](https://docs.getjavelin.io)를 참조하세요.
+[Javelin Python SDK](https://www.github.com/getjavelin/javelin-python)는 AI 애플리케이션에 쉽게 임베드할 수 있는 사용하기 쉬운 client library입니다.
+
+## Installation 및 Setup
+
+Javelin AI Gateway와 상호작용하기 위해 `javelin_sdk`를 설치하세요:
+
+<CodeGroup>
+```bash pip
+pip install 'javelin_sdk'
+```
+
+```bash uv
+uv add javelin_sdk
+```
+</CodeGroup>
+
+Javelin의 API key를 environment variable로 설정하세요:
+
+```sh
+export JAVELIN_API_KEY=...
+```
+
+## Completions 예제
+
+```python
+from langchain.chains import LLMChain
+from langchain_community.llms import JavelinAIGateway
+from langchain_core.prompts import PromptTemplate
+
+route_completions = "eng_dept03"
+
+gateway = JavelinAIGateway(
+    gateway_uri="http://localhost:8000",
+    route=route_completions,
+    model_name="text-davinci-003",
+)
+
+llmchain = LLMChain(llm=gateway, prompt=prompt)
+result = llmchain.run("podcast player")
+
+print(result)
+
+```
+
+## Embeddings 예제
+
+```python
+from langchain_community.embeddings import JavelinAIGatewayEmbeddings
+from langchain_openai import OpenAIEmbeddings
+
+embeddings = JavelinAIGatewayEmbeddings(
+    gateway_uri="http://localhost:8000",
+    route="embeddings",
+)
+
+print(embeddings.embed_query("hello"))
+print(embeddings.embed_documents(["hello"]))
+```
+
+## Chat 예제
+```python
+from langchain_community.chat_models import ChatJavelinAIGateway
+from langchain.messages import HumanMessage, SystemMessage
+
+messages = [
+    SystemMessage(
+        content="You are a helpful assistant that translates English to French."
+    ),
+    HumanMessage(
+        content="Artificial Intelligence has the power to transform humanity and make the world a better place"
+    ),
+]
+
+chat = ChatJavelinAIGateway(
+    gateway_uri="http://localhost:8000",
+    route="mychatbot_route",
+    model_name="gpt-3.5-turbo"
+    params={
+        "temperature": 0.1
+    }
+)
+
+print(chat(messages))
+
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/javelin_ai_gateway.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

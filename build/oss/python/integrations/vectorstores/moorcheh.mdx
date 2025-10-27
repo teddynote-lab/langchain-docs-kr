@@ -1,0 +1,178 @@
+---
+title: "Moorcheh"
+description: "Maximally Informative Binarization (MIB)와 Information-Theoretic Score (ITS)를 사용하는 초고속 시맨틱 검색 엔진 및 vector store"
+---
+
+# Moorcheh
+
+[Moorcheh](https://www.moorcheh.ai/)는 초고속 시맨틱 검색 엔진이자 vector store입니다. L2 또는 Cosine과 같은 단순 거리 기반 metric 대신, Moorcheh는 Maximally Informative Binarization (MIB)와 Information-Theoretic Score (ITS)를 사용하여 정확한 문서 청크를 검색합니다.
+
+이 튜토리얼에서는 Moorcheh와 LangChain을 사용하여 텍스트 문서와 vector embedding을 업로드하고 저장하며, 모든 쿼리에 대해 관련 청크를 검색하는 방법을 설명합니다.
+
+## 설정
+
+먼저 필요한 패키지를 설치하세요:
+
+```bash
+pip install langchain-moorcheh
+```
+
+## 초기화
+
+Moorcheh 시작하기
+
+1. [Moorcheh Console](https://console.moorcheh.ai/)에서 회원가입하거나 로그인하세요.
+2. "API Keys" 탭으로 이동하여 API key를 생성하세요.
+3. 생성한 키를 환경 변수 `MOORCHEH_API_KEY`로 저장하세요(아래에서 사용합니다).
+4. 데이터를 저장할 namespace를 생성하려면:
+   - 콘솔에서 "Namespaces" 탭을 열고 "Create namespace"를 클릭하거나,
+   - 다음 섹션의 vector store 코드를 사용해 프로그래밍 방식으로 초기화하세요.
+5. API key를 사용하여 namespace를 생성하고, 문서를 업로드하며, 답변을 조회할 수 있습니다.
+
+Moorcheh SDK function에 대한 더 자세한 내용은 [GitHub repository](https://github.com/moorcheh-ai/moorcheh-python-sdk)를 참고하세요.
+
+## 패키지 임포트
+
+아래 패키지를 임포트하세요:
+
+```python
+from langchain_moorcheh import MoorchehVectorStore
+from moorcheh_sdk import MoorchehClient
+
+import logging
+import os
+from uuid import uuid4
+import asyncio
+from typing import Any, List, Optional, Literal, Tuple, Type, TypeVar, Sequence
+from langchain_core.documents import Document
+from langchain_core.embeddings import Embeddings
+from langchain_core.vectorstores import VectorStore
+from google.colab import userdata
+```
+
+## 코드 설정
+
+환경 변수에 Moorcheh API Key를 설정하세요:
+
+```python
+MOORCHEH_API_KEY = os.environ['MOORCHEH_API_KEY']
+```
+
+namespace 이름과 타입을 설정하고 vector store를 생성하세요:
+
+```python
+namespace = "your_namespace_name"
+namespace_type = "text" # or vector
+store = MoorchehVectorStore(
+            api_key=MOORCHEH_API_KEY,
+            namespace=namespace,
+            namespace_type=namespace_type
+        )
+```
+
+## 문서 추가
+
+```python
+document_1 = Document(
+    page_content="Brewed a fresh cup of Ethiopian coffee and paired it with a warm croissant.",
+    metadata={"source": "blog"},
+)
+
+document_2 = Document(
+    page_content="Tomorrow's weather will be sunny with light winds, reaching a high of 78°F.",
+    metadata={"source": "news"},
+)
+
+document_3 = Document(
+    page_content="Experimenting with LangChain for an AI-powered note-taking assistant!",
+    metadata={"source": "tweet"},
+)
+
+document_4 = Document(
+    page_content="Local bakery donates 500 loaves of bread to the community food bank.",
+    metadata={"source": "news"},
+)
+
+document_5 = Document(
+    page_content="That concert last night was absolutely unforgettable—what a performance!",
+    metadata={"source": "tweet"},
+)
+
+document_6 = Document(
+    page_content="Check out our latest article: 5 ways to boost productivity while working from home.",
+    metadata={"source": "website"},
+)
+
+document_7 = Document(
+    page_content="The ultimate guide to mastering homemade pizza dough.",
+    metadata={"source": "website"},
+)
+
+document_8 = Document(
+    page_content="LangGraph just made multi-agent workflows way easier—seriously impressive!",
+    metadata={"source": "tweet"},
+)
+
+document_9 = Document(
+    page_content="Oil prices rose 3% today after unexpected supply cuts from major exporters.",
+    metadata={"source": "news"},
+)
+
+document_10 = Document(
+    page_content="I really hope this post doesn't vanish into the digital void…",
+    metadata={"source": "tweet"},
+)
+
+documents = [
+    document_1,
+    document_2,
+    document_3,
+    document_4,
+    document_5,
+    document_6,
+    document_7,
+    document_8,
+    document_9,
+    document_10,
+]
+
+uuids = [str(uuid4()) for _ in range(len(documents))]
+
+store.add_documents(documents=documents, ids=uuids)
+```
+
+## 문서 삭제
+
+```python
+store.delete(ids=["chunk_id_here"])
+```
+
+## 쿼리 엔진
+
+namespace를 생성하고 문서를 업로드한 후에는, vector store를 통해 문서에 대한 쿼리를 직접 실행할 수 있습니다. 원하는 쿼리와 해당 쿼리에 답할 LLM을 설정하세요. 지원되는 LLM에 대한 자세한 내용은 [Github page](https://github.com/moorcheh-ai/moorcheh-python-sdk)를 방문하세요.
+
+```python
+query = "Give me a brief summary of the provided documents"
+answer = store.generative_answer(query, ai_model = "anthropic.claude-3-7-sonnet-20250219-v1:0")
+print(answer)
+```
+
+## 추가 자료
+
+Moorcheh에 대해 더 알아보려면 아래 자료를 참고하세요:
+
+*   [Github 페이지](https://github.com/moorcheh-ai/moorcheh-python-sdk)
+*   [예제 Github 페이지](https://github.com/moorcheh-ai/moorcheh-examples)
+*   [웹사이트](https://www.moorcheh.ai/)
+*   [문서](https://console.moorcheh.ai/docs)
+*   [YouTube](https://www.youtube.com/@moorchehai)
+*   [X](https://x.com/moorcheh_ai)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/vectorstores/moorcheh.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

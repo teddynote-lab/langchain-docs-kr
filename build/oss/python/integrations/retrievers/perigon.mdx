@@ -1,0 +1,334 @@
+---
+title: Perigon
+---
+
+Perigon API suite는 글로벌 뉴스와 이벤트에 대한 빠르고 구조화된 액세스를 제공하여 실시간 데이터 기반 제품을 구축할 수 있도록 도와줍니다. 새로운 위험을 추적하거나, 관련 기사를 표시하거나, 핵심 인사이트를 발견하는 등 Perigon은 이를 프로그래밍 방식으로 수행할 수 있는 도구를 제공합니다.
+
+기존의 키워드 기반 검색과 달리 Perigon의 semantic search 기능은 쿼리를 맥락적으로 이해하고 관련 문서를 반환할 수 있습니다.
+
+이 노트북은 뉴스 기사와 Wikipedia 콘텐츠 모두에 대해 LangChain과 함께 Perigon의 retriever를 사용하는 방법을 보여줍니다.
+
+## Setup
+
+### Installation
+
+LangChain Perigon integration package를 설치합니다:
+
+```python
+pip install -qU langchain-perigon
+
+# and some deps for this notebook
+pip install -qU langchain langchain-openai langchain-community
+```
+
+### Credentials
+
+이 integration을 사용하려면 Perigon API key가 필요합니다. [Perigon.io](https://perigon.io/)에서 가입하여 API key를 받으세요.
+
+```python
+import getpass
+import os
+
+if not os.environ.get("PERIGON_API_KEY"):
+    os.environ["PERIGON_API_KEY"] = getpass.getpass("Perigon API key:\n")
+```
+
+## ArticlesRetriever 사용하기
+
+ArticlesRetriever를 사용하면 semantic search 기능을 사용하여 뉴스 기사를 검색할 수 있습니다:
+
+### 기본 사용법
+
+```python
+from langchain_perigon import ArticlesRetriever
+
+# Create a new instance of the ArticlesRetriever
+# PERIGON_API_KEY is automatically read from environment variables
+retriever = ArticlesRetriever()
+
+try:
+    # Search for articles using semantic search
+    documents = retriever.invoke("artificial intelligence developments")
+
+    # Check if we got results
+    if not documents:
+        print("No articles found for the given query.")
+    else:
+        print(f"Found {len(documents)} articles")
+
+        # Display first 3 results with metadata
+        for doc in documents[:3]:
+            # Safely extract metadata with fallbacks
+            print(f"Title: {doc.metadata.get('title', 'N/A')}")
+            print(f"URL: {doc.metadata.get('url', 'N/A')}")
+            print(f"Published: {doc.metadata.get('publishedAt', 'N/A')}")
+            print(f"Content: {doc.page_content[:200]}...")
+            print("-" * 80)
+except Exception as e:
+    print(f"Error retrieving articles: {e}")
+```
+
+### 필터링을 사용한 고급 기능
+
+고급 필터링 옵션을 사용하여 검색 결과를 좁힐 수 있습니다:
+
+```python
+from langchain_perigon import ArticlesRetriever, ArticlesFilter
+
+# Create retriever with custom parameters
+# PERIGON_API_KEY is automatically read from environment variables
+retriever = ArticlesRetriever(
+    k=10  # Number of results to return
+)
+
+# Define advanced filter options
+options: ArticlesFilter = {
+    "size": 10,
+    "showReprints": False,  # Exclude reprints
+    "filter": {
+        "country": "us",  # Only US articles
+        "category": "tech",  # Technology category
+        "source": ["techcrunch.com", "wired.com"]  # Specific sources
+    }
+}
+
+try:
+    # Search with advanced filters applied
+    documents = retriever.invoke("machine learning breakthroughs", options=options)
+
+    if not documents:
+        print("No articles found matching the filter criteria.")
+    else:
+        print(f"Found {len(documents)} filtered articles")
+
+        # Display results with relevant metadata
+        for doc in documents[:3]:
+            print(f"Title: {doc.metadata.get('title', 'N/A')}")
+            print(f"Source: {doc.metadata.get('source', 'N/A')}")
+            print(f"Category: {doc.metadata.get('category', 'N/A')}")
+            print(f"Content: {doc.page_content[:150]}...")
+            print("-" * 80)
+
+except Exception as e:
+    print(f"Error retrieving filtered articles: {e}")
+```
+
+### 위치 기반 필터링
+
+지리적 관련성으로 기사를 필터링할 수 있습니다:
+
+```python
+from langchain_perigon.types import ArticlesFilter
+from langchain_perigon import ArticlesRetriever
+
+retriever = ArticlesRetriever()
+
+# Filter by location
+location_options: ArticlesFilter = {
+    "size": 5,
+    "filter": {"country": "us", "state": "CA", "city": "San Francisco"},
+}
+
+documents = retriever.invoke("startup funding rounds", options=location_options)
+
+print(f"Found {len(documents)} San Francisco startup articles")
+for doc in documents:
+    print(f"Title: {doc.metadata.get('title', 'N/A')}")
+    print("-" * 60)
+```
+
+## WikipediaRetriever 사용하기
+
+WikipediaRetriever는 풍부한 메타데이터와 함께 Wikipedia 콘텐츠에 대한 semantic search 기능을 제공합니다:
+
+### 기본 사용법
+
+```python
+from langchain_perigon import WikipediaRetriever
+
+# Create a new instance of the WikipediaRetriever
+# PERIGON_API_KEY is automatically read from environment variables
+wiki_retriever = WikipediaRetriever()
+
+try:
+    # Search for Wikipedia articles using semantic search
+    documents = wiki_retriever.invoke("quantum computing")
+
+    # Validate results before processing
+    if not documents:
+        print("No Wikipedia articles found for the given query.")
+    else:
+        print(f"Found {len(documents)} Wikipedia articles")
+
+        # Display first 3 results with rich metadata
+        for doc in documents[:3]:
+            # Extract Wikipedia-specific metadata safely
+            print(f"Title: {doc.metadata.get('title', 'N/A')}")
+            print(f"Pageviews: {doc.metadata.get('pageviews', 'N/A')}")
+            print(f"Wikidata ID: {doc.metadata.get('wikidataId', 'N/A')}")
+            print(f"Content: {doc.page_content[:200]}...")
+            print("-" * 80)
+except Exception as e:
+    print(f"Error retrieving Wikipedia articles: {e}")
+```
+
+### 고급 Wikipedia 검색
+
+인기도, 카테고리 및 기타 메타데이터로 Wikipedia 결과를 필터링할 수 있습니다:
+
+```python
+from langchain_perigon import WikipediaRetriever, WikipediaOptions
+
+# Create retriever with custom parameters
+# PERIGON_API_KEY is automatically read from environment variables
+wiki_retriever = WikipediaRetriever(k=5)
+
+# Define advanced filter options
+wiki_options: WikipediaOptions = {
+    "size": 5,
+    "pageviewsFrom": 100,  # Only popular pages with 100+ daily views
+    "filter": {
+        "wikidataInstanceOfLabel": ["academic discipline"],
+        "category": ["Computer science", "Physics"],
+    },
+}
+
+# Search with filters
+documents = wiki_retriever.invoke("machine learning", options=wiki_options)
+
+print(f"Found {len(documents)} academic Wikipedia articles")
+for doc in documents:
+    print(f"Title: {doc.metadata.get('title', 'N/A')}")
+    print(f"Daily pageviews: {doc.metadata.get('pageviews', 'N/A')}")
+    print(f"Instance of: {doc.metadata.get('wikidataInstanceOf', 'N/A')}")
+    print(f"Wiki code: {doc.metadata.get('wikiCode', 'N/A')}")
+    print("-" * 80)
+```
+
+### 시간 기반 Wikipedia 필터링
+
+수정 날짜로 Wikipedia 기사를 필터링합니다:
+
+```python
+from langchain_perigon import WikipediaRetriever, WikipediaOptions
+
+wiki_retriever = WikipediaRetriever()
+
+# Filter by recent revisions
+recent_options: WikipediaOptions = {
+    "size": 10,
+    "wiki_revision_from": "2025-09-22T00:00:00.000",  # Recently updated articles
+    "filter": {"with_pageviews": True},  # Only articles with pageview data
+}
+
+documents = wiki_retriever.invoke("artificial intelligence", options=recent_options)
+
+print(f"Found {len(documents)} recently updated AI articles")
+for doc in documents:
+    print(f"Title: {doc.metadata.get('title', 'N/A')}")
+    print(f"Last revision: {doc.metadata.get('wikiRevisionTs', 'N/A')}")
+    print(f"Pageviews: {doc.metadata.get('pageviews', 'N/A')}")
+    print("-" * 60)
+
+```
+
+## Async 사용법
+
+두 retriever 모두 더 나은 성능을 위해 비동기 작업을 지원합니다:
+
+```python
+import asyncio
+from langchain_perigon import (
+    ArticlesRetriever,
+    WikipediaRetriever,
+    ArticlesFilter,
+    WikipediaOptions,
+)
+
+
+async def search_both():
+    """Perform concurrent searches across news articles and Wikipedia.
+
+    Returns:
+        tuple: (news_articles, wikipedia_docs) - Results from both retrievers
+
+    Raises:
+        Exception: If either retriever fails or API errors occur
+    """
+    # Initialize retrievers with automatic API key detection
+    articles_retriever = ArticlesRetriever()
+    wiki_retriever = WikipediaRetriever()
+
+    # Configure search options for targeted results
+    articles_options: ArticlesFilter = {
+        "size": 3,  # Limit to 3 articles for faster response
+        "filter": {
+            "country": "us",      # US-based news sources
+            "category": "tech",   # Technology category only
+        },
+    }
+
+    # Filter Wikipedia results by popularity (pageviews)
+    wiki_options: WikipediaOptions = {
+        "size": 3,           # Limit to 3 articles
+        "pageviewsFrom": 50  # Only articles with 50+ daily views
+    }
+
+    try:
+        # Perform concurrent async searches for better performance
+        articles_task = articles_retriever.ainvoke(
+            "climate change", options=articles_options
+        )
+        wiki_task = wiki_retriever.ainvoke(
+            "climate change", options=wiki_options
+        )
+
+        # Wait for both searches to complete simultaneously
+        articles, wiki_docs = await asyncio.gather(
+            articles_task, wiki_task, return_exceptions=True
+        )
+
+        # Handle potential exceptions from either retriever
+        if isinstance(articles, Exception):
+            print(f"Articles retrieval failed: {articles}")
+            articles = []
+        if isinstance(wiki_docs, Exception):
+            print(f"Wikipedia retrieval failed: {wiki_docs}")
+            wiki_docs = []
+
+        return articles, wiki_docs
+
+    except Exception as e:
+        print(f"Error in concurrent search: {e}")
+        return [], []
+
+
+# Run async search with error handling
+try:
+    articles, wiki_docs = asyncio.run(search_both())
+
+    # Display results summary
+    print(f"Found {len(articles)} news articles and {len(wiki_docs)} Wikipedia articles")
+
+    # Show sample results if available
+    if articles:
+        print(f"Sample article: {articles[0].metadata.get('title', 'N/A')}")
+    if wiki_docs:
+        print(f"Sample Wikipedia: {wiki_docs[0].metadata.get('title', 'N/A')}")
+
+except Exception as e:
+    print(f"Async search failed: {e}")
+```
+
+## API reference
+
+모든 Perigon API 기능 및 구성에 대한 자세한 문서는 [Perigon API documentation](https://dev.perigon.io/docs)을 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/retrievers/perigon.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

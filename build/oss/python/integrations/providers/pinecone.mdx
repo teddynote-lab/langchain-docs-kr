@@ -1,0 +1,109 @@
+---
+title: Pinecone
+---
+
+>[Pinecone](https://docs.pinecone.io/docs/overview)은 광범위한 기능을 제공하는 vector database입니다.
+
+
+## Installation and Setup
+
+Python SDK를 설치합니다:
+
+<CodeGroup>
+```bash pip
+pip install langchain-pinecone
+```
+
+```bash uv
+uv add langchain-pinecone
+```
+</CodeGroup>
+
+
+## Vector store
+
+Pinecone index를 감싸는 wrapper가 존재하여, semantic search나 example selection을 위한 vectorstore로 사용할 수 있습니다.
+
+```python
+from langchain_pinecone import PineconeVectorStore
+```
+
+Pinecone vectorstore에 대한 자세한 안내는 [이 notebook](/oss/python/integrations/vectorstores/pinecone)을 참조하세요.
+
+### Sparse Vector store
+
+LangChain의 `PineconeSparseVectorStore`는 Pinecone의 sparse English model을 사용하여 sparse retrieval을 가능하게 합니다. 텍스트를 sparse vector로 매핑하고 문서 추가 및 유사도 검색을 지원합니다.
+
+```python
+from langchain_pinecone import PineconeSparseVectorStore
+
+# Initialize sparse vector store
+vector_store = PineconeSparseVectorStore(
+    index=my_index,
+    embedding_model="pinecone-sparse-english-v0"
+)
+# Add documents
+vector_store.add_documents(documents)
+# Query
+results = vector_store.similarity_search("your query", k=3)
+```
+
+자세한 안내는 [Pinecone Sparse Vector Store notebook](/oss/python/integrations/vectorstores/pinecone_sparse)을 참조하세요.
+
+### Sparse Embedding
+
+LangChain의 `PineconeSparseEmbeddings`는 Pinecone의 `pinecone-sparse-english-v0` model을 사용하여 sparse embedding 생성을 제공합니다.
+
+```python
+from langchain_pinecone.embeddings import PineconeSparseEmbeddings
+
+# Initialize sparse embeddings
+sparse_embeddings = PineconeSparseEmbeddings(
+    model="pinecone-sparse-english-v0"
+)
+# Embed a single query (returns SparseValues)
+query_embedding = sparse_embeddings.embed_query("sample text")
+
+# Embed multiple documents (returns list of SparseValues)
+docs = ["Document 1 content", "Document 2 content"]
+doc_embeddings = sparse_embeddings.embed_documents(docs)
+```
+
+자세한 사용법은 [Pinecone Sparse Embeddings notebook](/oss/python/integrations/vectorstores/pinecone_sparse)을 참조하세요.
+
+
+## Retrievers
+
+### Pinecone Hybrid Search
+
+<CodeGroup>
+```bash pip
+pip install pinecone pinecone-text
+```
+
+```bash uv
+uv add pinecone pinecone-text
+```
+</CodeGroup>
+
+```python
+from langchain_community.retrievers import (
+    PineconeHybridSearchRetriever,
+)
+```
+
+자세한 정보는 [이 notebook](/oss/python/integrations/retrievers/pinecone_hybrid_search)을 참조하세요.
+
+
+### Self Query retriever
+
+Pinecone vector store는 self-querying을 위한 retriever로 사용할 수 있습니다.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/pinecone.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

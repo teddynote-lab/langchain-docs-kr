@@ -1,0 +1,46 @@
+```mdx
+---
+title: Subtitle
+---
+
+>[SubRip 파일 형식](https://en.wikipedia.org/wiki/SubRip#SubRip_file_format)은 `Matroska` 멀티미디어 컨테이너 형식 웹사이트에서 "아마도 모든 자막 형식 중 가장 기본적인 형식"으로 설명됩니다. `SubRip (SubRip Text)` 파일은 `.srt` 확장자로 명명되며, 빈 줄로 구분된 그룹으로 된 일반 텍스트의 형식화된 줄을 포함합니다. 자막은 1부터 시작하여 순차적으로 번호가 매겨집니다. 사용되는 타임코드 형식은 hours:minutes:seconds,milliseconds이며, 시간 단위는 두 자리 0으로 채워진 숫자로 고정되고 소수 부분은 세 자리 0으로 채워진 숫자로 고정됩니다(00:00:00,000). 프로그램이 프랑스에서 작성되었기 때문에 소수 구분 기호로 쉼표가 사용됩니다.
+
+subtitle (`.srt`) 파일에서 데이터를 로드하는 방법
+
+[여기에서 예제 .srt 파일을 다운로드](https://www.opensubtitles.org/en/subtitles/5575150/star-wars-the-clone-wars-crisis-at-the-heart-en)하세요.
+
+```python
+pip install -qU  pysrt
+```
+
+```python
+from langchain_community.document_loaders import SRTLoader
+```
+
+```python
+loader = SRTLoader(
+    "example_data/Star_Wars_The_Clone_Wars_S06E07_Crisis_at_the_Heart.srt"
+)
+```
+
+```python
+docs = loader.load()
+```
+
+```python
+docs[0].page_content[:100]
+```
+
+```output
+'<i>Corruption discovered\nat the core of the Banking Clan!</i> <i>Reunited, Rush Clovis\nand Senator A'
+```
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/document_loaders/subtitle.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

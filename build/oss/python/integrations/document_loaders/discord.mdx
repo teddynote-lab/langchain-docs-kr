@@ -1,0 +1,52 @@
+```markdown
+---
+title: Discord
+---
+
+>[Discord](https://discord.com/)는 VoIP 및 인스턴트 메시징 소셜 플랫폼입니다. 사용자는 음성 통화, 영상 통화, 텍스트 메시징, 미디어 및 파일을 개인 채팅이나 "서버"라고 불리는 커뮤니티의 일부로 공유할 수 있습니다. 서버는 초대 링크를 통해 접근할 수 있는 영구적인 채팅방과 음성 채널의 모음입니다.
+
+다음 단계에 따라 `Discord` 데이터를 다운로드하세요:
+
+1. **사용자 설정**으로 이동합니다
+2. **개인정보 및 보안**으로 이동합니다
+3. **내 모든 데이터 요청**으로 이동하여 **데이터 요청** 버튼을 클릭합니다
+
+데이터를 받기까지 30일이 걸릴 수 있습니다. Discord에 등록된 이메일 주소로 이메일을 받게 됩니다. 해당 이메일에는 개인 Discord 데이터를 다운로드할 수 있는 다운로드 버튼이 있습니다.
+
+```python
+import os
+
+import pandas as pd
+```
+
+```python
+path = input('Please enter the path to the contents of the Discord "messages" folder: ')
+li = []
+for f in os.listdir(path):
+    expected_csv_path = os.path.join(path, f, "messages.csv")
+    csv_exists = os.path.isfile(expected_csv_path)
+    if csv_exists:
+        df = pd.read_csv(expected_csv_path, index_col=None, header=0)
+        li.append(df)
+
+df = pd.concat(li, axis=0, ignore_index=True, sort=False)
+```
+
+```python
+from langchain_community.document_loaders.discord import DiscordChatLoader
+```
+
+```python
+loader = DiscordChatLoader(df, user_id_col="ID")
+print(loader.load())
+```
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/document_loaders/discord.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

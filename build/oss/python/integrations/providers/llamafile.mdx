@@ -1,0 +1,40 @@
+---
+title: Llamafile
+---
+
+>[llamafile](https://github.com/Mozilla-Ocho/llamafile)은 단일 파일로 LLM을 배포하고 실행할 수 있게 해줍니다.
+
+>`llamafile`은 개발자와 최종 사용자 모두에게 오픈 LLM을 훨씬 더 접근하기 쉽게 만듭니다.
+> `llamafile`은 [llama.cpp](https://github.com/ggerganov/llama.cpp)와
+> [Cosmopolitan Libc](https://github.com/jart/cosmopolitan)를 하나의 프레임워크로 결합하여
+> LLM의 모든 복잡성을 단일 파일 실행 파일("llamafile"이라고 함)로 축소하여
+> 대부분의 컴퓨터에서 설치 없이 로컬로 실행할 수 있도록 합니다.
+
+
+## 설치 및 설정
+
+[설치 지침](https://github.com/Mozilla-Ocho/llamafile?tab=readme-ov-file#quickstart)을 참조하세요.
+
+## LLMs
+
+[사용 예제](/oss/python/integrations/llms/llamafile)를 참조하세요.
+
+```python
+from langchain_community.llms.llamafile import Llamafile
+```
+
+## Embedding models
+
+
+```python
+from langchain_community.embeddings import LlamafileEmbeddings
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/llamafile.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

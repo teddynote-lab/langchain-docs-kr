@@ -1,0 +1,79 @@
+---
+title: Time-Weighted Retriever
+---
+
+Time-Weighted Retriever는 유사성 외에도 최신성을 고려하는 retriever입니다. 점수 계산 알고리즘은 다음과 같습니다:
+
+```typescript
+let score = (1.0 - this.decayRate) ** hoursPassed + vectorRelevance;
+```
+
+특히, 위의 `hoursPassed`는 객체가 생성된 이후의 시간이 아니라 retriever의 객체가 마지막으로 액세스된 이후의 시간을 나타냅니다. 즉, 자주 액세스되는 객체는 "신선한" 상태로 유지되며 더 높은 점수를 받습니다.
+
+`this.decayRate`는 0과 1 사이의 구성 가능한 십진수입니다. 낮은 숫자는 문서가 더 오래 "기억"된다는 것을 의미하며, 높은 숫자는 최근에 액세스된 문서에 강하게 가중치를 부여합니다.
+
+decay rate를 정확히 0 또는 1로 설정하면 `hoursPassed`가 무관해지고 이 retriever는 표준 vector lookup과 동일하게 됩니다.
+
+## 사용법
+
+이 예제는 vector store로 `TimeWeightedVectorStoreRetriever`를 초기화하는 방법을 보여줍니다.
+필수 metadata로 인해 모든 document는 vector store 자체가 아닌 **retriever**의 `addDocuments` method를 사용하여 백엔드 vector store에 추가해야 한다는 점에 유의해야 합니다.
+
+```typescript
+import { TimeWeightedVectorStoreRetriever } from "@langchain/classic/retrievers/time_weighted";
+import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
+import { OpenAIEmbeddings } from "@langchain/openai";
+
+const vectorStore = new MemoryVectorStore(new OpenAIEmbeddings());
+
+const retriever = new TimeWeightedVectorStoreRetriever({
+  vectorStore,
+  memoryStream: [],
+  searchKwargs: 2,
+});
+
+const documents = [
+  "My name is John.",
+  "My name is Bob.",
+  "My favourite food is pizza.",
+  "My favourite food is pasta.",
+  "My favourite food is sushi.",
+].map((pageContent) => ({ pageContent, metadata: {} }));
+
+// All documents must be added using this method on the retriever (not the vector store!)
+// so that the correct access history metadata is populated
+await retriever.addDocuments(documents);
+
+const results1 = await retriever.invoke("What is my favourite food?");
+
+console.log(results1);
+
+/*
+[
+  Document { pageContent: 'My favourite food is pasta.', metadata: {} }
+]
+ */
+
+const results2 = await retriever.invoke("What is my favourite food?");
+
+console.log(results2);
+
+/*
+[
+  Document { pageContent: 'My favourite food is pasta.', metadata: {} }
+]
+ */
+```
+
+## 관련 문서
+
+- [Retrieval 가이드](/oss/javascript/langchain/retrieval)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/retrievers/time-weighted-retriever.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

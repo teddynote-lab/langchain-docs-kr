@@ -1,0 +1,58 @@
+---
+title: Friendli AI
+---
+
+> [FriendliAI](https://friendli.ai/)는 높은 수요의 AI 워크로드에 맞춤화된 확장 가능하고 효율적인 배포 옵션으로
+> AI 애플리케이션 성능을 향상시키고 비용 절감을 최적화합니다.
+
+## 설치 및 설정
+
+`friendli-client` python 패키지를 설치합니다.
+
+<CodeGroup>
+```bash pip
+pip install -U langchain_community friendli-client
+```
+
+```bash uv
+uv add langchain_community friendli-client
+```
+</CodeGroup>
+
+[Friendli Suite](https://suite.friendli.ai/)에 로그인하여 Personal Access Token을 생성하고,
+이를 `FRIENDLI_TOKEN` 환경 변수로 설정합니다.
+
+
+## Chat models
+
+[사용 예제](/oss/python/integrations/chat/friendli)를 참조하세요.
+
+```python
+from langchain_community.chat_models.friendli import ChatFriendli
+
+chat = ChatFriendli(model='meta-llama-3.1-8b-instruct')
+
+for m in chat.stream("Tell me fun things to do in NYC"):
+    print(m.content, end="", flush=True)
+```
+
+## LLMs
+
+[사용 예제](/oss/python/integrations/llms/friendli)를 참조하세요.
+
+```python
+from langchain_community.llms.friendli import Friendli
+
+llm = Friendli(model='meta-llama-3.1-8b-instruct')
+
+print(llm.invoke("def bubble_sort(): "))
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/friendli.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

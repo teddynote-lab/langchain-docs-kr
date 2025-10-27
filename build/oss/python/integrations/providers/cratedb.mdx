@@ -1,0 +1,214 @@
+---
+title: CrateDB
+---
+
+> [CrateDB]는 복잡한 쿼리에서도 거의 실시간으로 대량의 데이터를 저장하고
+> 분석하기 위한 분산 및 확장 가능한 SQL 데이터베이스입니다. PostgreSQL과 호환되며,
+> Lucene 기반이고 Elasticsearch에서 상속받았습니다.
+
+
+## Installation and Setup
+
+### CrateDB 설정
+CrateDB를 빠르게 시작하는 두 가지 방법이 있습니다. 또는
+다른 [CrateDB installation options]를 선택할 수 있습니다.
+
+#### 로컬 머신에서 CrateDB 시작
+예시: Docker 또는 Podman을 사용하여 보안이 비활성화된 단일 노드 CrateDB 인스턴스를 실행합니다.
+프로덕션 환경에서는 권장되지 않습니다.
+
+```bash
+docker run --name=cratedb --rm \
+  --publish=4200:4200 --publish=5432:5432 --env=CRATE_HEAP_SIZE=2g \
+  crate:latest -Cdiscovery.type=single-node
+```
+
+#### CrateDB Cloud에 클러스터 배포
+[CrateDB Cloud]는 관리형 CrateDB 서비스입니다.
+[무료 평가판][CrateDB Cloud Console]에 가입하세요.
+
+### Client 설치
+[langchain-cratedb] 패키지의 최신 버전과 이 튜토리얼에 필요한
+몇 가지 다른 패키지를 설치합니다.
+
+<CodeGroup>
+```bash pip
+pip install -U langchain-cratedb langchain-openai unstructured
+```
+
+```bash uv
+uv add langchain-cratedb langchain-openai unstructured
+```
+</CodeGroup>
+
+
+## Documentation
+CrateDB wrapper에 대한 자세한 안내는
+[using LangChain with CrateDB]를 참조하세요. CrateDB가 제공하는 다른 기능에 대해 알아보려면
+[all features of CrateDB]도 참조하세요.
+
+
+## Features
+LangChain용 CrateDB adapter는 CrateDB를 vector store,
+document loader, 그리고 chat message 저장소로 사용하기 위한 API를 제공합니다.
+
+### Vector Store
+유사도 검색 및 기타 목적을 위해 `FLOAT_VECTOR`와 `KNN_MATCH`를 활용한
+CrateDB vector store 기능을 사용합니다. [CrateDBVectorStore Tutorial]도 참조하세요.
+
+유효한 OpenAI API key를 설정했는지 확인하세요.
+```bash
+export OPENAI_API_KEY=sk-XJZ...
+```
+```python
+from langchain_community.document_loaders import UnstructuredURLLoader
+from langchain_cratedb import CrateDBVectorStore
+from langchain_openai import OpenAIEmbeddings
+from langchain.text_splitter import CharacterTextSplitter
+
+loader = UnstructuredURLLoader(urls=["https://github.com/langchain-ai/langchain/raw/refs/tags/langchain-core==0.3.28/docs/docs/how_to/state_of_the_union.txt"])
+documents = loader.load()
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+docs = text_splitter.split_documents(documents)
+
+embeddings = OpenAIEmbeddings()
+
+# Connect to a self-managed CrateDB instance on localhost.
+CONNECTION_STRING = "crate://?schema=testdrive"
+
+store = CrateDBVectorStore.from_documents(
+    documents=docs,
+    embedding=embeddings,
+    collection_name="state_of_the_union",
+    connection=CONNECTION_STRING,
+)
+
+query = "What did the president say about Ketanji Brown Jackson"
+docs_with_score = store.similarity_search_with_score(query)
+```
+
+### Document Loader
+SQLAlchemy 기반의 document loader `CrateDBLoader`를 사용하여
+CrateDB 데이터베이스 테이블에서 문서를 로드합니다. [CrateDBLoader Tutorial]도 참조하세요.
+
+애플리케이션에서 document loader를 사용하려면:
+```python
+import sqlalchemy as sa
+from langchain_community.utilities import SQLDatabase
+from langchain_cratedb import CrateDBLoader
+
+# Connect to a self-managed CrateDB instance on localhost.
+CONNECTION_STRING = "crate://?schema=testdrive"
+
+db = SQLDatabase(engine=sa.create_engine(CONNECTION_STRING))
+
+loader = CrateDBLoader(
+    'SELECT * FROM sys.summits LIMIT 42',
+    db=db,
+)
+documents = loader.load()
+```
+
+### Chat Message History
+CrateDB를 chat message 저장소로 사용합니다.
+[CrateDBChatMessageHistory Tutorial]도 참조하세요.
+
+애플리케이션에서 chat message history를 사용하려면:
+```python
+from langchain_cratedb import CrateDBChatMessageHistory
+
+# Connect to a self-managed CrateDB instance on localhost.
+CONNECTION_STRING = "crate://?schema=testdrive"
+
+message_history = CrateDBChatMessageHistory(
+    session_id="test-session",
+    connection=CONNECTION_STRING,
+)
+
+message_history.add_user_message("hi!")
+```
+
+### Full Cache
+standard / full cache는 제공된 prompt가 이미 접한 것과 정확히 동일할 때
+LLM 호출을 방지합니다.
+[CrateDBCache Example]도 참조하세요.
+
+애플리케이션에서 full cache를 사용하려면:
+```python
+import sqlalchemy as sa
+from langchain.globals import set_llm_cache
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_cratedb import CrateDBCache
+
+# Configure cache.
+engine = sa.create_engine("crate://crate@localhost:4200/?schema=testdrive")
+set_llm_cache(CrateDBCache(engine))
+
+# Invoke LLM conversation.
+llm = ChatOpenAI(
+    model_name="chatgpt-4o-latest",
+    temperature=0.7,
+)
+print()
+print("Asking with full cache:")
+answer = llm.invoke("What is the answer to everything?")
+print(answer.content)
+```
+
+### Semantic Cache
+
+semantic cache는 사용자 입력과 이전에 캐시된 입력 간의 의미적 유사성을 기반으로
+캐시된 prompt를 검색할 수 있게 합니다. 또한 필요하지 않을 때
+LLM 호출을 방지합니다.
+[CrateDBSemanticCache Example]도 참조하세요.
+
+애플리케이션에서 semantic cache를 사용하려면:
+```python
+import sqlalchemy as sa
+from langchain.globals import set_llm_cache
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_cratedb import CrateDBSemanticCache
+
+# Configure embeddings.
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+
+# Configure cache.
+engine = sa.create_engine("crate://crate@localhost:4200/?schema=testdrive")
+set_llm_cache(
+    CrateDBSemanticCache(
+        embedding=embeddings,
+        connection=engine,
+        search_threshold=1.0,
+    )
+)
+
+# Invoke LLM conversation.
+llm = ChatOpenAI(model_name="chatgpt-4o-latest")
+print()
+print("Asking with semantic cache:")
+answer = llm.invoke("What is the answer to everything?")
+print(answer.content)
+```
+
+
+[all features of CrateDB]: https://cratedb.com/docs/guide/feature/
+[CrateDB]: https://cratedb.com/database
+[CrateDB Cloud]: https://cratedb.com/database/cloud
+[CrateDB Cloud Console]: https://console.cratedb.cloud/?utm_source=langchain&utm_content=documentation
+[CrateDB installation options]: https://cratedb.com/docs/guide/install/
+[CrateDBCache Example]: https://github.com/crate/langchain-cratedb/blob/main/examples/basic/cache.py
+[CrateDBSemanticCache Example]: https://github.com/crate/langchain-cratedb/blob/main/examples/basic/cache.py
+[CrateDBChatMessageHistory Tutorial]: https://github.com/crate/cratedb-examples/blob/main/topic/machine-learning/llm-langchain/conversational_memory.ipynb
+[CrateDBLoader Tutorial]: https://github.com/crate/cratedb-examples/blob/main/topic/machine-learning/llm-langchain/document_loader.ipynb
+[CrateDBVectorStore Tutorial]: https://github.com/crate/cratedb-examples/blob/main/topic/machine-learning/llm-langchain/vector_search.ipynb
+[langchain-cratedb]: https://pypi.org/project/langchain-cratedb/
+[using LangChain with CrateDB]: https://cratedb.com/docs/guide/integrate/langchain/
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/cratedb.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

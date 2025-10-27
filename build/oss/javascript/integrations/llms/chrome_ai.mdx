@@ -1,0 +1,126 @@
+---
+title: ChromeAI
+---
+
+<Info>
+**이 기능은 **실험적**이며 변경될 수 있습니다.**
+</Info>
+
+<Note>
+Google의 `Built-in AI Early Preview Program`은 현재 베타 버전입니다. 액세스 신청 또는 자세한 정보는 [이 링크](https://developer.chrome.com/docs/ai/built-in)를 참조하세요.
+</Note>
+
+ChromeAI는 Gemini Nano를 활용하여 인터넷 연결 없이 브라우저 또는 [worker](https://developer.mozilla.org/en-US/docs/Web/API/Worker)에서 직접 LLM을 실행합니다.
+이를 통해 데이터가 소비자의 기기를 벗어나지 않고도 더 빠르고 프라이빗한 모델을 실행할 수 있습니다.
+
+## 시작하기
+
+프로그램 액세스 권한을 받은 후, Google이 제공하는 지침에 따라 모델을 다운로드하세요.
+
+다운로드가 완료되면 브라우저에서 다음과 같이 `ChromeAI`를 사용할 수 있습니다:
+
+```typescript
+import { ChromeAI } from "@langchain/community/experimental/llms/chrome_ai";
+
+const model = new ChromeAI({
+  temperature: 0.5, // Optional, defaults to 0.5
+  topK: 40, // Optional, defaults to 40
+});
+
+const response = await model.invoke("Write me a short poem please");
+
+/*
+  In the realm where moonlight weaves its hue,
+  Where dreams and secrets gently intertwine,
+  There's a place of tranquility and grace,
+  Where whispers of the night find their place.
+
+  Beneath the canopy of starlit skies,
+  Where dreams take flight and worries cease,
+  A haven of tranquility, pure and true,
+  Where the heart finds solace, finding dew.
+
+  In this realm where dreams find their release,
+  Where the soul finds peace, at every peace,
+  Let us wander, lost in its embrace,
+  Finding solace in this tranquil space.
+*/
+```
+
+### Streaming
+
+`ChromeAI`는 streaming 출력도 지원합니다:
+
+```typescript
+import { ChromeAI } from "@langchain/community/experimental/llms/chrome_ai";
+
+const model = new ChromeAI({
+  temperature: 0.5, // Optional, defaults to 0.5
+  topK: 40, // Optional, defaults to 40
+});
+
+for await (const chunk of await model.stream("How are you?")) {
+  console.log(chunk);
+}
+
+/*
+  As
+   an
+   AI
+   language
+   model
+  ,
+   I
+   don
+  '
+  t
+   have
+   personal
+   experiences
+   or
+   the
+   ability
+   to
+   experience
+   emotions
+  .
+   Therefore
+  ,
+   I
+   cannot
+   directly
+   answer
+   the
+   question
+   "
+  How
+   are
+   you
+  ?".
+
+
+
+  May
+   I
+   suggest
+   answering
+   something
+   else
+  ?
+*/
+```
+
+## 관련 문서
+
+
+- [Models 가이드](/oss/javascript/langchain/models)
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/llms/chrome_ai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,969 @@
+---
+title: "Vector store"
+---
+
+## 개요
+
+[Vector store](/oss/javascript/integrations/vectorstores)는 [임베딩된](/oss/javascript/integrations/text_embedding) 데이터를 저장하고 유사도 검색을 수행합니다.
+
+```mermaid
+flowchart LR
+
+    subgraph "📥 Indexing phase (store)"
+        A[📄 Documents] --> B[🔢 Embedding model]
+        B --> C[🔘 Embedding vectors]
+        C --> D[(Vector store)]
+    end
+
+    subgraph "📤 Query phase (retrieval)"
+        E[❓ Query text] --> F[🔢 Embedding model]
+        F --> G[🔘 Query vector]
+        G --> H[🔍 Similarity search]
+        H --> D
+        D --> I[📄 Top-k results]
+    end
+```
+
+### Interface
+
+LangChain은 vector store를 위한 통합 interface를 제공하여 다음을 수행할 수 있습니다:
+
+- `addDocuments` - store에 document를 추가합니다.
+- `delete` - ID로 저장된 document를 제거합니다.
+- `similaritySearch` - 의미적으로 유사한 document를 쿼리합니다.
+
+이 추상화를 통해 애플리케이션 로직을 변경하지 않고도 다양한 구현 간에 전환할 수 있습니다.
+
+### Initialization
+
+LangChain의 대부분의 vectorstore는 vector store를 초기화할 때 embedding model을 인수로 받습니다.
+
+```typescript
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
+
+const embeddings = new OpenAIEmbeddings({
+  model: "text-embedding-3-small",
+});
+const vectorStore = new MemoryVectorStore(embeddings);
+```
+
+### Document 추가하기
+
+`addDocuments` function을 사용하여 vector store에 document를 추가할 수 있습니다.
+
+```typescript
+import { Document } from "@langchain/core/documents";
+const document = new Document({
+  pageContent: "Hello world",
+});
+await vectorStore.addDocuments([document]);
+```
+
+### Document 삭제하기
+
+`delete` function을 사용하여 vector store에서 document를 삭제할 수 있습니다.
+
+```typescript
+await vectorStore.delete({
+  filter: {
+    pageContent: "Hello world",
+  },
+});
+```
+
+### Similarity search
+
+`similaritySearch`를 사용하여 의미론적 쿼리를 실행하면 가장 가까운 임베딩된 document가 반환됩니다:
+
+```typescript
+const results = await vectorStore.similaritySearch("Hello world", 10);
+```
+
+
+많은 vector store가 다음과 같은 parameter를 지원합니다:
+
+* `k` — 반환할 결과 수
+* `filter` — metadata 기반 조건부 필터링
+
+### Similarity metric 및 indexing
+
+Embedding 유사도는 다음을 사용하여 계산될 수 있습니다:
+
+* **Cosine similarity**
+* **Euclidean distance**
+* **Dot product**
+
+효율적인 검색은 종종 HNSW(Hierarchical Navigable Small World)와 같은 indexing 방법을 사용하지만, 구체적인 내용은 vector store에 따라 다릅니다.
+
+### Metadata filtering
+
+Metadata(예: source, date)로 필터링하면 검색 결과를 개선할 수 있습니다:
+
+```typescript
+vectorStore.similaritySearch("query", 2, { source: "tweets" });
+```
+
+<important>
+Metadata 기반 필터링 지원은 구현에 따라 다릅니다.
+자세한 내용은 선택한 vector store의 문서를 확인하세요.
+</important>
+
+## 주요 통합
+
+**Embedding model 선택:**
+
+<AccordionGroup>
+<Accordion title="OpenAI">
+
+dependency 설치:
+
+<CodeGroup>
+
+```bash npm
+npm i @langchain/openai
+```
+```bash yarn
+yarn add @langchain/openai
+```
+```bash pnpm
+pnpm add @langchain/openai
+```
+</CodeGroup>
+
+환경 변수 추가:
+
+```bash
+OPENAI_API_KEY=your-api-key
+```
+
+Model 인스턴스화:
+
+```typescript
+import { OpenAIEmbeddings } from "@langchain/openai";
+
+const embeddings = new OpenAIEmbeddings({
+  model: "text-embedding-3-large"
+});
+```
+
+</Accordion>
+<Accordion title="Azure">
+
+dependency 설치
+
+<CodeGroup>
+
+```bash npm
+npm i @langchain/openai
+```
+```bash yarn
+yarn add @langchain/openai
+```
+
+```bash pnpm
+pnpm add @langchain/openai
+```
+</CodeGroup>
+
+환경 변수 추가:
+
+```bash
+AZURE_OPENAI_API_INSTANCE_NAME=<YOUR_INSTANCE_NAME>
+AZURE_OPENAI_API_KEY=<YOUR_KEY>
+AZURE_OPENAI_API_VERSION="2024-02-01"
+```
+
+Model 인스턴스화:
+
+```typescript
+import { AzureOpenAIEmbeddings } from "@langchain/openai";
+
+const embeddings = new AzureOpenAIEmbeddings({
+  azureOpenAIApiEmbeddingsDeploymentName: "text-embedding-ada-002"
+});
+```
+
+</Accordion>
+
+<Accordion title="AWS">
+
+dependency 설치:
+
+<CodeGroup>
+
+```bash npm
+npm i @langchain/aws
+```
+
+```bash yarn
+yarn add @langchain/aws
+```
+
+```bash pnpm
+pnpm add @langchain/aws
+```
+
+</CodeGroup>
+
+환경 변수 추가:
+
+```bash
+BEDROCK_AWS_REGION=your-region
+```
+
+Model 인스턴스화:
+
+```typescript
+import { BedrockEmbeddings } from "@langchain/aws";
+
+const embeddings = new BedrockEmbeddings({
+  model: "amazon.titan-embed-text-v1"
+});
+```
+
+</Accordion>
+<Accordion title="Google Gemini">
+
+dependency 설치:
+
+<CodeGroup>
+```bash npm
+npm i @langchain/google-genai
+```
+
+```bash yarn
+yarn add @langchain/google-genai
+```
+
+```bash pnpm
+pnpm add @langchain/google-genai
+```
+</CodeGroup>
+
+환경 변수 추가:
+
+```bash
+GOOGLE_API_KEY=your-api-key
+```
+
+Model 인스턴스화:
+
+```typescript
+import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
+
+const embeddings = new GoogleGenerativeAIEmbeddings({
+  model: "text-embedding-004"
+});
+```
+
+</Accordion>
+<Accordion title="Google Vertex">
+
+dependency 설치:
+
+<CodeGroup>
+
+```bash npm
+npm i @langchain/google-vertexai
+```
+
+```bash yarn
+yarn add @langchain/google-vertexai
+```
+
+```bash pnpm
+pnpm add @langchain/google-vertexai
+```
+</CodeGroup>
+
+환경 변수 추가:
+
+```bash
+GOOGLE_APPLICATION_CREDENTIALS=credentials.json
+```
+
+Model 인스턴스화:
+
+```typescript
+import { VertexAIEmbeddings } from "@langchain/google-vertexai";
+
+const embeddings = new VertexAIEmbeddings({
+  model: "gemini-embedding-001"
+});
+```
+
+</Accordion>
+<Accordion title="MistralAI">
+
+dependency 설치:
+
+<CodeGroup>
+```bash npm
+npm i @langchain/mistralai
+```
+
+```bash yarn
+yarn add @langchain/mistralai
+```
+
+```bash pnpm
+pnpm add @langchain/mistralai
+```
+</CodeGroup>
+
+환경 변수 추가:
+
+```bash
+MISTRAL_API_KEY=your-api-key
+```
+
+Model 인스턴스화:
+
+```typescript
+import { MistralAIEmbeddings } from "@langchain/mistralai";
+
+const embeddings = new MistralAIEmbeddings({
+  model: "mistral-embed"
+});
+```
+
+</Accordion>
+<Accordion title="Cohere">
+
+dependency 설치:
+
+<CodeGroup>
+```bash npm
+npm i @langchain/cohere
+```
+
+```bash yarn
+yarn add @langchain/cohere
+```
+
+```bash pnpm
+pnpm add @langchain/cohere
+```
+
+</CodeGroup>
+
+환경 변수 추가:
+
+```bash
+COHERE_API_KEY=your-api-key
+```
+
+Model 인스턴스화:
+
+```typescript
+import { CohereEmbeddings } from "@langchain/cohere";
+
+const embeddings = new CohereEmbeddings({
+  model: "embed-english-v3.0"
+});
+```
+
+</Accordion>
+<Accordion title="Ollama">
+
+dependency 설치:
+
+<CodeGroup>
+```bash npm
+npm i @langchain/ollama
+```
+
+```bash yarn
+yarn add @langchain/ollama
+```
+
+```bash pnpm
+pnpm add @langchain/ollama
+```
+</CodeGroup>
+
+Model 인스턴스화:
+
+```typescript
+import { OllamaEmbeddings } from "@langchain/ollama";
+
+const embeddings = new OllamaEmbeddings({
+  model: "llama2",
+  baseUrl: "http://localhost:11434", // Default value
+});
+```
+
+</Accordion>
+</AccordionGroup>
+
+**Vector store 선택:**
+
+<AccordionGroup>
+<Accordion title="Memory">
+
+<CodeGroup>
+```bash
+npm i langchain
+```
+
+```bash yarn
+yarn add langchain
+```
+
+```bash pnpm
+pnpm add langchain
+```
+</CodeGroup>
+
+```typescript
+import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
+
+const vectorStore = new MemoryVectorStore(embeddings);
+```
+
+</Accordion>
+<Accordion title="Chroma">
+
+<CodeGroup>
+
+```bash npm
+npm i @langchain/community
+```
+
+```bash yarn
+yarn add @langchain/community
+```
+
+```bash pnpm
+pnpm add @langchain/community
+```
+
+</CodeGroup>
+
+```typescript
+import { Chroma } from "@langchain/community/vectorstores/chroma";
+
+const vectorStore = new Chroma(embeddings, {
+  collectionName: "a-test-collection",
+});
+```
+
+</Accordion>
+<Accordion title="FAISS">
+
+<CodeGroup>
+
+```bash npm
+npm i @langchain/community
+```
+
+```bash yarn
+yarn add @langchain/community
+```
+
+```bash
+pnpm add @langchain/community
+```
+
+</CodeGroup>
+
+```typescript
+import { FaissStore } from "@langchain/community/vectorstores/faiss";
+
+const vectorStore = new FaissStore(embeddings, {});
+```
+
+</Accordion>
+<Accordion title="MongoDB">
+
+<CodeGroup>
+
+```bash npm
+npm i @langchain/mongodb
+```
+
+```bash yarn
+yarn add @langchain/mongodb
+```
+
+```bash pnpm
+pnpm add @langchain/mongodb
+```
+
+</CodeGroup>
+
+```typescript
+import { MongoDBAtlasVectorSearch } from "@langchain/mongodb"
+import { MongoClient } from "mongodb";
+
+const client = new MongoClient(process.env.MONGODB_ATLAS_URI || "");
+const collection = client
+  .db(process.env.MONGODB_ATLAS_DB_NAME)
+  .collection(process.env.MONGODB_ATLAS_COLLECTION_NAME);
+
+const vectorStore = new MongoDBAtlasVectorSearch(embeddings, {
+  collection,
+  indexName: "vector_index",
+  textKey: "text",
+  embeddingKey: "embedding",
+});
+```
+
+</Accordion>
+<Accordion title="PGVector">
+
+<CodeGroup>
+
+```bash npm
+npm i @langchain/community
+```
+
+```bash yarn
+yarn add @langchain/community
+```
+
+```bash pnpm
+pnpm add @langchain/community
+```
+
+</CodeGroup>
+
+```typescript
+import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
+
+const vectorStore = await PGVectorStore.initialize(embeddings, {});
+```
+
+</Accordion>
+<Accordion title="Pinecone">
+
+<CodeGroup>
+
+```bash npm
+npm i @langchain/pinecone
+```
+
+```bash yarn
+yarn add @langchain/pinecone
+```
+
+```bash pnpm
+pnpm add @langchain/pinecone
+```
+
+</CodeGroup>
+
+```typescript
+import { PineconeStore } from "@langchain/pinecone";
+import { Pinecone as PineconeClient } from "@pinecone-database/pinecone";
+
+const pinecone = new PineconeClient();
+const vectorStore = new PineconeStore(embeddings, {
+  pineconeIndex,
+  maxConcurrency: 5,
+});
+```
+
+</Accordion>
+<Accordion title="Qdrant">
+
+<CodeGroup>
+```bash npm
+npm i @langchain/qdrant
+```
+
+```bash yarn
+yarn add @langchain/qdrant
+```
+
+```bash pnpm
+pnpm add @langchain/qdrant
+```
+
+</CodeGroup>
+
+```typescript
+import { QdrantVectorStore } from "@langchain/qdrant";
+
+const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
+  url: process.env.QDRANT_URL,
+  collectionName: "langchainjs-testing",
+});
+```
+
+</Accordion>
+</AccordionGroup>
+
+LangChain.js는 다양한 vector store와 통합됩니다. 아래에서 전체 목록을 확인할 수 있습니다:
+
+## 모든 vector store
+
+<Columns cols={3}>
+  <Card
+    title="AnalyticDB"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/analyticdb"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Astra DB"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/astradb"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Azion EdgeSQL"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/azion-edgesql"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Azure AI Search"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/azure_aisearch"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Azure Cosmos DB for MongoDB vCore"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/azure_cosmosdb_mongodb"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Azure Cosmos DB for NoSQL"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/azure_cosmosdb_nosql"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Cassandra"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/cassandra"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Chroma"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/chroma"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="ClickHouse"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/clickhouse"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="CloseVector"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/closevector"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Cloudflare Vectorize"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/cloudflare_vectorize"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Convex"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/convex"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Couchbase"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/couchbase"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Elasticsearch"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/elasticsearch"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Faiss"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/faiss"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Google Cloud SQL for PostgreSQL"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/google_cloudsql_pg"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Google Vertex AI Matching Engine"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/googlevertexai"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="SAP HANA Cloud Vector Engine"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/hanavector"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="HNSWLib"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/hnswlib"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="LanceDB"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/lancedb"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="libSQL"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/libsql"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="MariaDB"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/mariadb"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="In-memory"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/memory"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Milvus"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/milvus"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Momento Vector Index (MVI)"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/momento_vector_index"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="MongoDB Atlas"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/mongodb_atlas"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="MyScale"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/myscale"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Neo4j Vector Index"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/neo4jvector"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Neon Postgres"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/neon"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="OpenSearch"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/opensearch"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="PGVector"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/pgvector"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Pinecone"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/pinecone"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Prisma"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/prisma"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Qdrant"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/qdrant"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Redis"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/redis"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Rockset"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/rockset"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="SingleStore"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/singlestore"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Supabase"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/supabase"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Tigris"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/tigris"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Turbopuffer"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/turbopuffer"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="TypeORM"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/typeorm"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Typesense"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/typesense"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Upstash Vector"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/upstash"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="USearch"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/usearch"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Vectara"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/vectara"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Vercel Postgres"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/vercel_postgres"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Voy"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/voy"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Weaviate"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/weaviate"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Xata"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/xata"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Zep Open Source"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/zep"
+    arrow="true"
+    cta="가이드 보기"
+  />
+  <Card
+    title="Zep Cloud"
+    icon="link"
+    href="/oss/javascript/integrations/vectorstores/zep_cloud"
+    arrow="true"
+    cta="가이드 보기"
+  />
+</Columns>
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/vectorstores/index.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

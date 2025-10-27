@@ -1,0 +1,92 @@
+---
+title: InMemoryByteStore
+---
+
+이 가이드는 in-memory [key-value stores](/oss/python/integrations/stores) 시작하기를 도와드립니다. 모든 `InMemoryByteStore` 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/core/stores/langchain_core.stores.InMemoryByteStore.html)를 참조하세요.
+
+## Overview
+
+`InMemoryByteStore`는 Python dictionary에 모든 것을 저장하는 `ByteStore`의 비영구적 구현입니다. 이는 데모 및 Python 프로세스의 수명을 넘어서는 영속성이 필요하지 않은 경우를 위한 것입니다.
+
+### Integration details
+
+| Class | Package | Local | [JS support](https://js.langchain.com/docs/integrations/stores/in_memory/) | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: |
+| [InMemoryByteStore](https://python.langchain.com/api_reference/core/stores/langchain_core.stores.InMemoryByteStore.html) | [langchain-core](https://python.langchain.com/api_reference/core/index.html) | ✅ | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain_core?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain_core?style=flat-square&label=%20) |
+
+### Installation
+
+LangChain `InMemoryByteStore` integration은 `langchain-core` package에 포함되어 있습니다:
+
+```python
+pip install -qU langchain-core
+```
+
+## Instantiation
+
+이제 byte store를 인스턴스화할 수 있습니다:
+
+```python
+from langchain_core.stores import InMemoryByteStore
+
+kv_store = InMemoryByteStore()
+```
+
+## Usage
+
+`mset` method를 사용하여 다음과 같이 key 아래에 데이터를 설정할 수 있습니다:
+
+```python
+kv_store.mset(
+    [
+        ["key1", b"value1"],
+        ["key2", b"value2"],
+    ]
+)
+
+kv_store.mget(
+    [
+        "key1",
+        "key2",
+    ]
+)
+```
+
+```output
+[b'value1', b'value2']
+```
+
+그리고 `mdelete` method를 사용하여 데이터를 삭제할 수 있습니다:
+
+```python
+kv_store.mdelete(
+    [
+        "key1",
+        "key2",
+    ]
+)
+
+kv_store.mget(
+    [
+        "key1",
+        "key2",
+    ]
+)
+```
+
+```output
+[None, None]
+```
+
+## API reference
+
+모든 `InMemoryByteStore` 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/core/stores/langchain_core.stores.InMemoryByteStore.html](https://python.langchain.com/api_reference/core/stores/langchain_core.stores.InMemoryByteStore.html)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/stores/in_memory.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

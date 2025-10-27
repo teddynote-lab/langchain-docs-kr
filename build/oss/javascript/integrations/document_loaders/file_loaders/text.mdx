@@ -1,0 +1,87 @@
+---
+title: TextLoader
+---
+
+<Tip>
+**호환성**: Node.js에서만 사용 가능합니다.
+</Tip>
+
+이 노트북은 `TextLoader` [document loaders](/oss/javascript/integrations/document_loaders) 시작하기에 대한 간단한 개요를 제공합니다. 모든 `TextLoader` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain.document_loaders_fs_text.TextLoader.html)를 참조하세요.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Compatibility | Local | PY support |
+| :--- | :--- | :---: | :---: |  :---: |
+| [TextLoader](https://api.js.langchain.com/classes/langchain.document_loaders_fs_text.TextLoader.html) | [langchain](https://api.js.langchain.com/modules/langchain.document_loaders_fs_text.html) | Node-only | ✅ | ❌ |
+
+## Setup
+
+`TextLoader` document loader에 접근하려면 `langchain` 패키지를 설치해야 합니다.
+
+### Installation
+
+LangChain TextLoader integration은 `langchain` 패키지에 포함되어 있습니다:
+
+<CodeGroup>
+```bash npm
+npm install langchain
+```
+```bash yarn
+yarn add langchain
+```
+```bash pnpm
+pnpm add langchain
+```
+</CodeGroup>
+
+## Instantiation
+
+이제 model 객체를 인스턴스화하고 document를 로드할 수 있습니다:
+
+```typescript
+import { TextLoader } from "@langchain/classic/document_loaders/fs/text"
+
+const loader = new TextLoader("../../../../../../examples/src/document_loaders/example_data/example.txt")
+```
+
+## Load
+
+```typescript
+const docs = await loader.load()
+docs[0]
+```
+
+```output
+Document {
+  pageContent: 'Foo\nBar\nBaz\n\n',
+  metadata: {
+    source: '../../../../../../examples/src/document_loaders/example_data/example.txt'
+  },
+  id: undefined
+}
+```
+
+```typescript
+console.log(docs[0].metadata)
+```
+
+```output
+{
+  source: '../../../../../../examples/src/document_loaders/example_data/example.txt'
+}
+```
+
+## API reference
+
+모든 TextLoader 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain.document_loaders_fs_text.TextLoader.html)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/file_loaders/text.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

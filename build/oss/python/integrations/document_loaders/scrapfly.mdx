@@ -1,0 +1,65 @@
+---
+title: ScrapFly
+---
+
+[ScrapFly](https://scrapfly.io/)는 headless browser 기능, proxy, anti-bot 우회 기능을 갖춘 웹 스크래핑 API입니다. 웹 페이지 데이터를 LLM이 접근 가능한 markdown 또는 text 형식으로 추출할 수 있습니다.
+
+#### 설치
+
+pip을 사용하여 ScrapFly Python SDK와 필요한 LangChain package를 설치합니다:
+
+```shell
+pip install scrapfly-sdk langchain langchain-community
+```
+
+#### 사용법
+
+```python
+from langchain_community.document_loaders import ScrapflyLoader
+
+scrapfly_loader = ScrapflyLoader(
+    ["https://web-scraping.dev/products"],
+    api_key="Your ScrapFly API key",  # Get your API key from https://www.scrapfly.io/
+    continue_on_failure=True,  # Ignore unprocessable web pages and log their exceptions
+)
+
+# Load documents from URLs as markdown
+documents = scrapfly_loader.load()
+print(documents)
+```
+
+ScrapflyLoader는 스크래핑 요청을 커스터마이징하기 위해 ScrapeConfig 객체를 전달할 수도 있습니다. 전체 기능 세부사항과 API params는 문서를 참조하세요: [scrapfly.io/docs/scrape-api/getting-started](https://scrapfly.io/docs/scrape-api/getting-started)
+
+```python
+from langchain_community.document_loaders import ScrapflyLoader
+
+scrapfly_scrape_config = {
+    "asp": True,  # Bypass scraping blocking and antibot solutions, like Cloudflare
+    "render_js": True,  # Enable JavaScript rendering with a cloud headless browser
+    "proxy_pool": "public_residential_pool",  # Select a proxy pool (datacenter or residnetial)
+    "country": "us",  # Select a proxy location
+    "auto_scroll": True,  # Auto scroll the page
+    "js": "",  # Execute custom JavaScript code by the headless browser
+}
+
+scrapfly_loader = ScrapflyLoader(
+    ["https://web-scraping.dev/products"],
+    api_key="Your ScrapFly API key",  # Get your API key from https://www.scrapfly.io/
+    continue_on_failure=True,  # Ignore unprocessable web pages and log their exceptions
+    scrape_config=scrapfly_scrape_config,  # Pass the scrape_config object
+    scrape_format="markdown",  # The scrape result format, either `markdown`(default) or `text`
+)
+
+# Load documents from URLs as markdown
+documents = scrapfly_loader.load()
+print(documents)
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/document_loaders/scrapfly.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

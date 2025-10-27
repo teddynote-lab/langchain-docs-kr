@@ -1,0 +1,42 @@
+---
+title: Hugging Face의 Instruct Embeddings
+---
+
+>[Hugging Face sentence-transformers](https://huggingface.co/sentence-transformers)는 최첨단 문장, 텍스트 및 이미지 임베딩을 위한 Python 프레임워크입니다.
+>instruct embedding 모델 중 하나가 `HuggingFaceInstructEmbeddings` 클래스에서 사용됩니다.
+
+```python
+from langchain_community.embeddings import HuggingFaceInstructEmbeddings
+```
+
+```python
+embeddings = HuggingFaceInstructEmbeddings(
+    query_instruction="Represent the query for retrieval: "
+)
+```
+
+```output
+load INSTRUCTOR_Transformer
+max_seq_length  512
+```
+
+```python
+text = "This is a test document."
+```
+
+```python
+query_result = embeddings.embed_query(text)
+```
+
+```python
+
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/text_embedding/instruct_embeddings.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

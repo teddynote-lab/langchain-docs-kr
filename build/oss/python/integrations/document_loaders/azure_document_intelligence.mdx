@@ -1,0 +1,126 @@
+---
+title: Azure AI Document Intelligence
+---
+
+>[Azure AI Document Intelligence](https://aka.ms/doc-intelligence) (이전 명칭 `Azure Form Recognizer`)는 머신러닝 기반 서비스로,
+>디지털 또는 스캔된 PDF, 이미지, Office 및 HTML 파일에서 텍스트(필기 포함), 표, 문서 구조(예: 제목, 섹션 제목 등) 및 키-값 쌍을 추출합니다.
+>
+>Document Intelligence는 `PDF`, `JPEG/JPG`, `PNG`, `BMP`, `TIFF`, `HEIF`, `DOCX`, `XLSX`, `PPTX` 및 `HTML`을 지원합니다.
+
+`Document Intelligence`를 사용하는 현재 loader 구현은 페이지별로 콘텐츠를 통합하여 LangChain document로 변환할 수 있습니다. 기본 출력 형식은 markdown이며, 의미론적 문서 청킹을 위해 `MarkdownHeaderTextSplitter`와 쉽게 연결할 수 있습니다. 또한 `mode="single"` 또는 `mode="page"`를 사용하여 단일 페이지의 순수 텍스트를 반환하거나 페이지별로 분할된 문서를 반환할 수 있습니다.
+
+## 사전 요구 사항
+
+3개의 미리보기 지역 중 하나에 Azure AI Document Intelligence 리소스가 필요합니다: **East US**, **West US2**, **West Europe** - 리소스가 없는 경우 [이 문서](https://learn.microsoft.com/azure/ai-services/document-intelligence/create-document-intelligence-resource?view=doc-intel-4.0.0)를 참조하여 생성하세요. loader에 매개변수로 `<endpoint>`와 `<key>`를 전달해야 합니다.
+
+```python
+pip install -qU  langchain langchain-community azure-ai-documentintelligence
+```
+
+## 예제 1
+
+첫 번째 예제는 Azure AI Document Intelligence로 전송될 로컬 파일을 사용합니다.
+
+초기화된 document analysis client를 사용하여 DocumentIntelligenceLoader의 인스턴스를 생성할 수 있습니다:
+
+```python
+from langchain_community.document_loaders import AzureAIDocumentIntelligenceLoader
+
+file_path = "<filepath>"
+endpoint = "<endpoint>"
+key = "<key>"
+loader = AzureAIDocumentIntelligenceLoader(
+    api_endpoint=endpoint, api_key=key, file_path=file_path, api_model="prebuilt-layout"
+)
+
+documents = loader.load()
+```
+
+기본 출력은 markdown 형식 콘텐츠를 포함하는 하나의 LangChain document를 포함합니다:
+
+```python
+documents
+```
+
+## 예제 2
+
+입력 파일은 공개 URL 경로일 수도 있습니다. 예: [raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/rest-api/layout.png](https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/rest-api/layout.png).
+
+```python
+url_path = "<url>"
+loader = AzureAIDocumentIntelligenceLoader(
+    api_endpoint=endpoint, api_key=key, url_path=url_path, api_model="prebuilt-layout"
+)
+
+documents = loader.load()
+```
+
+```python
+documents
+```
+
+## 예제 3
+
+`mode="page"`를 지정하여 페이지별로 문서를 로드할 수도 있습니다.
+
+```python
+from langchain_community.document_loaders import AzureAIDocumentIntelligenceLoader
+
+file_path = "<filepath>"
+endpoint = "<endpoint>"
+key = "<key>"
+loader = AzureAIDocumentIntelligenceLoader(
+    api_endpoint=endpoint,
+    api_key=key,
+    file_path=file_path,
+    api_model="prebuilt-layout",
+    mode="page",
+)
+
+documents = loader.load()
+```
+
+출력은 각 페이지가 리스트의 별도 document로 저장됩니다:
+
+```python
+for document in documents:
+    print(f"Page Content: {document.page_content}")
+    print(f"Metadata: {document.metadata}")
+```
+
+## 예제 4
+
+`analysis_feature=["ocrHighResolution"]`을 지정하여 추가 기능을 활성화할 수도 있습니다. 자세한 내용은 다음을 참조하세요: [aka.ms/azsdk/python/documentintelligence/analysisfeature](https://aka.ms/azsdk/python/documentintelligence/analysisfeature).
+
+```python
+from langchain_community.document_loaders import AzureAIDocumentIntelligenceLoader
+
+file_path = "<filepath>"
+endpoint = "<endpoint>"
+key = "<key>"
+analysis_features = ["ocrHighResolution"]
+loader = AzureAIDocumentIntelligenceLoader(
+    api_endpoint=endpoint,
+    api_key=key,
+    file_path=file_path,
+    api_model="prebuilt-layout",
+    analysis_features=analysis_features,
+)
+
+documents = loader.load()
+```
+
+출력은 고해상도 추가 기능으로 인식된 LangChain document를 포함합니다:
+
+```python
+documents
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/document_loaders/azure_document_intelligence.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

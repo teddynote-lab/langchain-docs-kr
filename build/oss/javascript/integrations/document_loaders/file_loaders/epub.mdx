@@ -1,0 +1,43 @@
+---
+title: EPUB 파일
+---
+
+이 예제는 EPUB 파일에서 데이터를 로드하는 방법을 다룹니다. 기본적으로 EPUB 파일의 각 챕터마다 하나의 document가 생성되며, `splitChapters` 옵션을 `false`로 설정하여 이 동작을 변경할 수 있습니다.
+
+# Setup
+
+```bash npm
+npm install @langchain/community @langchain/core epub2 html-to-text
+```
+# Usage, 챕터당 하나의 document
+
+```typescript
+import { EPubLoader } from "@langchain/community/document_loaders/fs/epub";
+
+const loader = new EPubLoader("src/document_loaders/example_data/example.epub");
+
+const docs = await loader.load();
+```
+# Usage, 파일당 하나의 document
+
+```typescript
+import { EPubLoader } from "@langchain/community/document_loaders/fs/epub";
+
+const loader = new EPubLoader(
+  "src/document_loaders/example_data/example.epub",
+  {
+    splitChapters: false,
+  }
+);
+
+const docs = await loader.load();
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/file_loaders/epub.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

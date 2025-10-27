@@ -1,0 +1,80 @@
+---
+title: prompt 생성하기
+sidebarTitle: prompt 생성하기
+---
+
+왼쪽 사이드바 또는 애플리케이션 홈페이지에서 이동하세요.
+
+![](/langsmith/images/empty-playground.png)
+
+## prompt 작성하기
+
+왼쪽에는 편집 가능한 prompt 뷰가 있습니다.
+
+prompt는 메시지로 구성되며, 각 메시지는 `system`, `human`, `ai`를 포함한 "role"을 가집니다.
+
+### Template format
+
+기본 template format은 `f-string`이지만, model 옆의 설정 아이콘 -> prompt format -> template format을 클릭하여 prompt template format을 `mustache`로 변경할 수 있습니다. template format에 대한 자세한 내용은 [여기](/langsmith/prompt-engineering-concepts#f-string-vs-mustache)에서 확인하세요.
+![](/langsmith/images/template-format.png)
+
+### template variable 추가하기
+
+prompt의 강력함은 prompt에서 variable을 사용할 수 있는 능력에서 나옵니다. variable을 사용하여 prompt에 동적 콘텐츠를 추가할 수 있습니다. 다음 두 가지 방법 중 하나로 template variable을 추가하세요:
+
+1. prompt에 `{{variable_name}}`을 추가합니다 (`f-string`의 경우 각 측면에 중괄호 하나, `mustache`의 경우 두 개). ![](/langsmith/images/prompt-with-variable.png)
+
+2. 템플릿화하려는 텍스트를 강조 표시하고 나타나는 툴팁 버튼을 클릭합니다. variable의 이름을 입력하고 변환합니다. ![](/langsmith/images/convert-to-variable.gif)
+
+variable을 추가하면 prompt variable에 대한 샘플 입력을 입력할 수 있는 공간이 표시됩니다. prompt를 테스트할 값으로 이를 채웁니다. ![](/langsmith/images/prompt-inputs.png)
+
+### Structured output
+
+prompt에 output schema를 추가하면 구조화된 형식으로 output을 얻을 수 있습니다. structured output에 대한 자세한 내용은 [여기](/langsmith/prompt-engineering-concepts#structured-output)에서 확인하세요. ![](/langsmith/images/structured-output.png)
+
+### Tools
+
+prompt editor 하단의 `+ Tool` 버튼을 클릭하여 tool을 추가할 수도 있습니다. tool 사용 방법에 대한 자세한 내용은 [여기](/langsmith/use-tools)를 참조하세요.
+
+## prompt 실행하기
+
+"Start"를 클릭하여 prompt를 실행합니다.
+
+![](/langsmith/images/create-a-prompt-run.png)
+
+## prompt 저장하기
+
+prompt를 저장하려면 "Save" 버튼을 클릭하고 prompt 이름을 지정한 다음 "private" 또는 "public"으로 설정할지 결정합니다. Private prompt는 workspace에만 표시되며, public prompt는 누구나 검색할 수 있습니다.
+
+Playground 설정에서 선택한 model과 configuration은 prompt와 함께 저장됩니다. prompt를 다시 열면 model과 configuration이 저장된 버전에서 자동으로 로드됩니다. ![](/langsmith/images/save-prompt.png)
+
+<Check>
+처음으로 public prompt를 생성할 때 LangChain Hub handle을 설정하라는 메시지가 표시됩니다. 모든 public prompt는 이 handle에 연결됩니다. 공유 workspace에서는 이 handle이 전체 workspace에 대해 설정됩니다.
+</Check>
+
+![](/langsmith/images/public-handle.png)
+
+## prompt 보기
+
+첫 번째 prompt를 생성했습니다! prompts 탭에서 prompt 테이블을 확인하세요.
+
+![](/langsmith/images/prompt-table.png)
+
+## metadata 추가하기
+
+prompt에 metadata를 추가하려면 prompt를 클릭한 다음 이름 옆의 "Edit" 연필 아이콘을 클릭합니다. 이렇게 하면 description, README, use case를 포함하여 prompt에 대한 추가 정보를 추가할 수 있는 곳으로 이동합니다. public prompt의 경우 이 정보는 LangChain Hub에서 prompt를 보는 모든 사람에게 표시됩니다.
+
+![](/langsmith/images/pencil.png) ![](/langsmith/images/edit-prompt.png)
+
+# 다음 단계
+
+이제 prompt를 생성했으므로 애플리케이션 코드에서 사용할 수 있습니다. [프로그래밍 방식으로 prompt를 가져오는 방법](/langsmith/manage-prompts-programmatically#pull-a-prompt)을 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/create-a-prompt.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

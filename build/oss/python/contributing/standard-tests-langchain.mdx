@@ -1,0 +1,178 @@
+---
+title: Standard test 사용하기
+sidebarTitle: Standard tests
+---
+
+**Standard test는 통합이 예상대로 작동하는지 확인합니다.**
+
+자신을 위한 custom class를 만들거나 LangChain 통합에 게시하려는 경우, 예상대로 작동하는지 확인하기 위해 test를 추가해야 합니다. LangChain은 각 통합 유형에 대한 포괄적인 [test 세트](https://pypi.org/project/langchain-tests/)를 제공합니다. 이 가이드는 각 통합 유형에 LangChain의 standard test suite를 추가하는 방법을 보여줍니다.
+
+## Setup
+
+먼저 필요한 dependency를 설치합니다:
+
+<CardGroup cols={2}>
+    <Card title="langchain-core" icon="cube" href="https://github.com/langchain-ai/langchain/tree/master/libs/core#readme" arrow>
+        custom component를 정의하기 위해 import할 interface를 정의합니다
+    </Card>
+
+    <Card title="langchain-tests" icon="flask" href="https://github.com/langchain-ai/langchain/tree/master/libs/standard-tests#readme" arrow>
+        standard test와 이를 실행하는 데 필요한 `pytest` plugin을 제공합니다
+    </Card>
+</CardGroup>
+
+
+
+<Warning>
+    새 버전의 `langchain-tests`에 추가된 test가 CI/CD pipeline을 중단시킬 수 있으므로, 예상치 못한 변경을 방지하기 위해 [`langchain-tests`](https://pypi.org/project/langchain-tests/#history)의 최신 버전으로 고정하는 것을 권장합니다.
+</Warning>
+
+
+<CodeGroup>
+    ```bash pip
+    pip install -U langchain-core
+    pip install -U langchain-tests
+    ```
+    ```bash uv
+    uv add langchain-core
+    uv add langchain-tests
+    ```
+</CodeGroup>
+
+
+
+
+`langchain-tests` package에는 2개의 namespace가 있습니다:
+
+<AccordionGroup>
+    <Accordion title="Unit tests" icon="gear">
+        **위치**: `langchain_tests.unit_tests`
+
+
+
+        component를 격리된 상태에서 외부 서비스에 접근하지 않고 테스트하도록 설계되었습니다
+
+        [API reference 보기](https://reference.langchain.com/python/langchain_tests/unit_tests)
+    </Accordion>
+
+    <Accordion title="Integration tests" icon="network-wired">
+        **위치**: `langchain_tests.integration_tests`
+
+
+
+        외부 서비스(특히 component가 상호작용하도록 설계된 외부 서비스)에 접근하여 component를 테스트하도록 설계되었습니다
+
+        [API reference 보기](https://reference.langchain.com/python/langchain_tests/integration_tests)
+    </Accordion>
+</AccordionGroup>
+
+두 유형의 test 모두 [`pytest`](https://docs.pytest.org/en/stable/) class 기반 test suite로 구현됩니다.
+
+
+## Standard test 구현하기
+
+통합 유형에 따라 unit test, integration test 중 하나 또는 둘 다를 구현해야 합니다.
+
+통합 유형에 대한 standard test suite를 subclass화하면 해당 유형에 대한 전체 standard test 모음을 얻을 수 있습니다. test 실행이 성공하려면, 주어진 test는 model이 테스트되는 기능을 지원하는 경우에만 통과해야 합니다. 그렇지 않으면 test를 건너뛰어야 합니다.
+
+서로 다른 통합은 고유한 기능 세트를 제공하므로, LangChain이 제공하는 대부분의 standard test는 false positive를 방지하기 위해 **기본적으로 opt-in**입니다. 따라서 통합이 지원하는 기능을 나타내기 위해 property를 override해야 합니다 - 예시는 아래를 참조하세요.
+
+```python tests/integration_tests/test_standard.py
+# Indicate that a chat model supports image inputs
+
+class TestChatParrotLinkStandard(ChatModelIntegrationTests):
+    # ... other required properties
+
+    @property
+    def supports_image_inputs(self) -> bool:
+        return True  # (The default is False)
+```
+
+
+
+<Note>
+    package의 root를 기준으로 다음 하위 디렉토리에 test를 구성해야 합니다:
+    - unit test의 경우 `tests/unit_tests`
+    - integration test의 경우 `tests/integration_tests`
+</Note>
+
+구성 가능한 기능의 전체 목록과 기본값을 보려면 standard test의 [API reference](https://reference.langchain.com/python/langchain_tests)를 방문하세요.
+
+
+
+
+{/*
+TODO update when added to new refs
+<Columns cols={2}>
+    <Card title="Unit tests" href="https://python.langchain.com/api_reference/standard_tests/unit_tests.html" icon="gear" arrow />
+    <Card title="Integration tests" href="https://python.langchain.com/api_reference/standard_tests/integration_tests.html" icon="network-wired" arrow />
+</Columns>
+
+ */}
+
+다음은 인기 있는 통합의 standard test 구현 예시입니다:
+
+<Tabs>
+    <Tab title="Unit tests">
+        <Columns cols={3}>
+            <Card title="ChatOpenAI" href="https://github.com/langchain-ai/langchain/blob/master/libs/partners/openai/tests/unit_tests/chat_models/test_base_standard.py" arrow>Unit tests</Card>
+            <Card title="ChatAnthropic" href="https://github.com/langchain-ai/langchain/blob/master/libs/partners/anthropic/tests/unit_tests/test_standard.py" arrow>Unit tests</Card>
+            <Card title="ChatGenAI" href="https://github.com/langchain-ai/langchain-google/blob/main/libs/genai/tests/unit_tests/test_standard.py" arrow>Unit tests</Card>
+        </Columns>
+
+    </Tab>
+    <Tab title="Integration tests">
+        <Columns cols={3}>
+            <Card title="ChatOpenAI" href="https://github.com/langchain-ai/langchain/blob/master/libs/partners/openai/tests/integration_tests/chat_models/test_base_standard.py" arrow>Integration tests</Card>
+            <Card title="ChatAnthropic" href="https://github.com/langchain-ai/langchain/blob/master/libs/partners/anthropic/tests/integration_tests/test_standard.py" arrow>Integration tests</Card>
+            <Card title="ChatGenAI" href="https://github.com/langchain-ai/langchain-google/blob/main/libs/genai/tests/integration_tests/test_standard.py" arrow>Integration tests</Card>
+        </Columns>
+
+    </Tab>
+</Tabs>
+
+---
+
+## Test 실행하기
+
+template에서 통합을 bootstrap하는 경우, unit test와 integration test를 실행하기 위한 target이 포함된 `Makefile`이 제공됩니다:
+
+```bash
+make test
+make integration_test
+```
+
+그렇지 않은 경우, 권장 디렉토리 구조를 따르면 다음과 같이 test를 실행할 수 있습니다:
+
+```bash
+# Run all tests
+uv run --group test pytest tests/unit_tests/
+uv run --group test --group test_integration pytest -n auto tests/integration_tests/
+
+# For certain unit tests, you may need to set certain flags and environment variables:
+TIKTOKEN_CACHE_DIR=tiktoken_cache uv run --group test pytest --disable-socket --allow-unix-socket tests/unit_tests/
+
+# Run a specific test file
+uv run --group test pytest tests/integration_tests/test_chat_models.py
+
+# Run a specific test function in a file
+uv run --group test pytest tests/integration_tests/test_chat_models.py::test_chat_completions
+
+# Run a specific test function within a class
+uv run --group test pytest tests/integration_tests/test_chat_models.py::TestChatParrotLinkIntegration::test_chat_completions
+```
+
+
+
+## 문제 해결
+
+사용 가능한 standard test suite의 전체 목록과 포함된 test에 대한 정보 및 일반적인 문제 해결 방법은 [Standard Tests API Reference](https://reference.langchain.com/python/langchain_tests)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/contributing/standard-tests-langchain.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

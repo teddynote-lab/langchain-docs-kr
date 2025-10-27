@@ -1,0 +1,30 @@
+---
+title: Hazy Research
+---
+
+이 페이지는 LangChain 내에서 Hazy Research 생태계를 사용하는 방법을 다룹니다.
+설치 및 설정, 그리고 특정 Hazy Research wrapper에 대한 참조, 이렇게 두 부분으로 나뉩니다.
+
+## Installation and Setup
+- `manifest`를 사용하려면 `pip install manifest-ml`로 설치하세요
+
+## Wrappers
+
+### LLM
+
+Hazy Research의 `manifest` 라이브러리를 감싸는 LLM wrapper가 있습니다.
+`manifest`는 여러 모델 제공자를 감싸는 python 라이브러리이며, 캐싱, 히스토리 등을 추가로 제공합니다.
+
+이 wrapper를 사용하려면:
+```python
+from langchain_community.llms.manifest import ManifestWrapper
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/hazy_research.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

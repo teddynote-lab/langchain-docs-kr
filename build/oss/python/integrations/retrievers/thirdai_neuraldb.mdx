@@ -1,0 +1,107 @@
+---
+title: NeuralDB
+---
+
+NeuralDB는 ThirdAI에서 개발한 CPU 친화적이고 fine-tuning 가능한 retrieval 엔진입니다.
+
+### **초기화**
+
+두 가지 초기화 방법이 있습니다:
+
+- From Scratch: 기본 모델
+- From Checkpoint: 이전에 저장된 모델 로드
+
+다음의 모든 초기화 방법에서 `THIRDAI_KEY` environment variable이 설정되어 있으면 `thirdai_key` parameter를 생략할 수 있습니다.
+
+ThirdAI API key는 [www.thirdai.com/try-bolt/](https://www.thirdai.com/try-bolt/)에서 얻을 수 있습니다.
+
+```python
+from langchain_community.retrievers import NeuralDBRetriever
+
+# From scratch
+retriever = NeuralDBRetriever.from_scratch(thirdai_key="your-thirdai-key")
+
+# From checkpoint
+retriever = NeuralDBRetriever.from_checkpoint(
+    # Path to a NeuralDB checkpoint. For example, if you call
+    # retriever.save("/path/to/checkpoint.ndb") in one script, then you can
+    # call NeuralDBRetriever.from_checkpoint("/path/to/checkpoint.ndb") in
+    # another script to load the saved model.
+    checkpoint="/path/to/checkpoint.ndb",
+    thirdai_key="your-thirdai-key",
+)
+```
+
+### **문서 소스 삽입**
+
+```python
+retriever.insert(
+    # If you have PDF, DOCX, or CSV files, you can directly pass the paths to the documents
+    sources=["/path/to/doc.pdf", "/path/to/doc.docx", "/path/to/doc.csv"],
+    # When True this means that the underlying model in the NeuralDB will
+    # undergo unsupervised pretraining on the inserted files. Defaults to True.
+    train=True,
+    # Much faster insertion with a slight drop in performance. Defaults to True.
+    fast_mode=True,
+)
+
+from thirdai import neural_db as ndb
+
+retriever.insert(
+    # If you have files in other formats, or prefer to configure how
+    # your files are parsed, then you can pass in NeuralDB document objects
+    # like this.
+    sources=[
+        ndb.PDF(
+            "/path/to/doc.pdf",
+            version="v2",
+            chunk_size=100,
+            metadata={"published": 2022},
+        ),
+        ndb.Unstructured("/path/to/deck.pptx"),
+    ]
+)
+```
+
+### **문서 검색**
+
+retriever를 쿼리하려면 표준 LangChain retriever method인 `get_relevant_documents`를 사용할 수 있으며, 이는 LangChain Document object의 list를 반환합니다. 각 document object는 인덱싱된 파일의 텍스트 청크를 나타냅니다. 예를 들어, 인덱싱된 PDF 파일 중 하나의 단락을 포함할 수 있습니다. 텍스트 외에도 document의 metadata field에는 document의 ID, 이 document의 소스(어떤 파일에서 왔는지), document의 score와 같은 정보가 포함됩니다.
+
+```python
+# This returns a list of LangChain Document objects
+documents = retriever.invoke("query", top_k=10)
+```
+
+### **Fine tuning**
+
+NeuralDBRetriever는 사용자 행동과 도메인별 지식에 맞게 fine-tuning될 수 있습니다. 두 가지 방법으로 fine-tuning할 수 있습니다:
+
+1. Association: retriever는 source phrase를 target phrase와 연관시킵니다. retriever가 source phrase를 보면 target phrase와 관련된 결과도 고려합니다.
+2. Upvoting: retriever는 특정 query에 대한 document의 score를 높입니다. 이는 retriever를 사용자 행동에 맞게 fine-tuning하려는 경우 유용합니다. 예를 들어, 사용자가 "how is a car manufactured"를 검색하고 id 52인 반환된 document를 좋아한다면, "how is a car manufactured" query에 대해 id 52인 document를 upvote할 수 있습니다.
+
+```python
+retriever.associate(source="source phrase", target="target phrase")
+retriever.associate_batch(
+    [
+        ("source phrase 1", "target phrase 1"),
+        ("source phrase 2", "target phrase 2"),
+    ]
+)
+
+retriever.upvote(query="how is a car manufactured", document_id=52)
+retriever.upvote_batch(
+    [
+        ("query 1", 52),
+        ("query 2", 20),
+    ]
+)
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/retrievers/thirdai_neuraldb.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

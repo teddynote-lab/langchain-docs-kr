@@ -1,0 +1,124 @@
+---
+title: CassandraByteStore
+---
+
+이 문서는 Cassandra [key-value stores](/oss/python/integrations/stores) 시작하기를 도와드립니다. 모든 `CassandraByteStore` 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/storage/langchain_community.storage.cassandra.CassandraByteStore.html)를 참조하세요.
+
+## Overview
+
+[Cassandra](https://cassandra.apache.org/)는 NoSQL, row-oriented, 높은 확장성과 가용성을 제공하는 데이터베이스입니다.
+
+### Integration details
+
+| Class | Package | Local | [JS support](https://js.langchain.com/docs/integrations/stores/cassandra_storage) | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: |
+| [CassandraByteStore](https://python.langchain.com/api_reference/community/storage/langchain_community.storage.cassandra.CassandraByteStore.html) | [langchain-community](https://python.langchain.com/api_reference/community/index.html) | ✅ | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain_community?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain_community?style=flat-square&label=%20) |
+
+## Setup
+
+`CassandraByteStore`는 Cassandra 인스턴스에 데이터를 저장하는 `ByteStore`의 구현체입니다.
+store key는 문자열이어야 하며 Cassandra 테이블의 `row_id` 컬럼에 매핑됩니다.
+store `bytes` 값은 Cassandra 테이블의 `body_blob` 컬럼에 매핑됩니다.
+
+### Installation
+
+LangChain `CassandraByteStore` integration은 `langchain-community` 패키지에 포함되어 있습니다. 사용하는 초기화 방법에 따라 peer dependency로 `cassio` 패키지 또는 `cassandra-driver` 패키지도 설치해야 합니다:
+
+```python
+pip install -qU langchain-community
+pip install -qU cassandra-driver
+pip install -qU cassio
+```
+
+또한 [Cassandra driver documentation](https://docs.datastax.com/en/developer/python-driver/latest/api/cassandra/cluster/#module-cassandra.cluster)에 설명된 대로 `cassandra.cluster.Session` 객체를 생성해야 합니다. 세부 사항은 (예: 네트워크 설정 및 인증과 함께) 다양하지만, 다음과 같을 수 있습니다:
+
+## Instantiation
+
+먼저 [Cassandra driver documentation](https://docs.datastax.com/en/developer/python-driver/latest/api/cassandra/cluster/#module-cassandra.cluster)에 설명된 대로 `cassandra.cluster.Session` 객체를 생성해야 합니다. 세부 사항은 (예: 네트워크 설정 및 인증과 함께) 다양하지만, 다음과 같을 수 있습니다:
+
+```python
+from cassandra.cluster import Cluster
+
+cluster = Cluster()
+session = cluster.connect()
+```
+
+그런 다음 store를 생성할 수 있습니다! Cassandra 인스턴스의 기존 keyspace 이름도 제공해야 합니다:
+
+```python
+from langchain_community.storage import CassandraByteStore
+
+kv_store = CassandraByteStore(
+    table="my_store",
+    session=session,
+    keyspace="<YOUR KEYSPACE>",
+)
+```
+
+## Usage
+
+`mset` 메서드를 사용하여 다음과 같이 key 아래에 데이터를 설정할 수 있습니다:
+
+```python
+kv_store.mset(
+    [
+        ["key1", b"value1"],
+        ["key2", b"value2"],
+    ]
+)
+
+kv_store.mget(
+    [
+        "key1",
+        "key2",
+    ]
+)
+```
+
+그리고 `mdelete` 메서드를 사용하여 데이터를 삭제할 수 있습니다:
+
+```python
+kv_store.mdelete(
+    [
+        "key1",
+        "key2",
+    ]
+)
+
+kv_store.mget(
+    [
+        "key1",
+        "key2",
+    ]
+)
+```
+
+## Init using `cassio`
+
+cassio를 사용하여 session과 keyspace를 구성하는 것도 가능합니다.
+
+```python
+import cassio
+
+cassio.init(contact_points="127.0.0.1", keyspace="<YOUR KEYSPACE>")
+
+store = CassandraByteStore(
+    table="my_store",
+)
+
+store.mset([("k1", b"v1"), ("k2", b"v2")])
+print(store.mget(["k1", "k2"]))
+```
+
+## API reference
+
+모든 `CassandraByteStore` 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/storage/langchain_community.storage.cassandra.CassandraByteStore.html](https://python.langchain.com/api_reference/community/storage/langchain_community.storage.cassandra.CassandraByteStore.html)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/stores/cassandra.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

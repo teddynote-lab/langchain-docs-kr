@@ -1,0 +1,40 @@
+---
+title: SWI-Prolog
+---
+
+SWI-Prolog은 포괄적인 무료 Prolog 환경을 제공합니다.
+
+## Installation and Setup
+
+SWI-Prolog이 설치되면, pip을 사용하여 lanchain-prolog를 설치하세요:
+
+<CodeGroup>
+```bash pip
+pip install langchain-prolog
+```
+
+```bash uv
+uv add langchain-prolog
+```
+</CodeGroup>
+
+## Tools
+
+`PrologTool` 클래스는 Prolog 규칙을 사용하여 답변을 생성하는 langchain tool을 생성할 수 있게 해줍니다.
+
+```python
+from langchain_prolog import PrologConfig, PrologTool
+```
+
+[사용 예제](/oss/python/integrations/tools/prolog_tool)를 참조하세요.
+
+Prolog 규칙을 사용하여 답변을 생성하는 LangChain runnable을 생성할 수 있게 해주는 `PrologRunnable`의 사용 예제는 동일한 가이드를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/prolog.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

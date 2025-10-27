@@ -1,0 +1,275 @@
+---
+title: Activeloop Deep Lake
+---
+
+>[Activeloop Deep Lake](https://docs.deeplake.ai/)는 embedding과 text, json, image, audio, video 등을 포함한 메타데이터를 저장하는 Multi-Modal Vector Store입니다. 데이터를 로컬, 클라우드 또는 Activeloop storage에 저장합니다. embedding과 그 속성을 포함한 hybrid search를 수행합니다.
+
+이 notebook은 `Activeloop Deep Lake`와 관련된 기본 기능을 소개합니다. `Deep Lake`는 embedding을 저장할 수 있지만, 모든 유형의 데이터를 저장할 수 있습니다. 버전 관리, 쿼리 엔진 및 딥러닝 프레임워크를 위한 streaming dataloader를 갖춘 serverless data lake입니다.
+
+자세한 내용은 Deep Lake [문서](https://docs.deeplake.ai/)를 참조하세요.
+
+## 설정
+
+```python
+pip install -qU  langchain-openai langchain-deeplake tiktoken
+```
+
+## Activeloop에서 제공하는 예제
+
+[LangChain과의 통합](https://docs.activeloop.ai/tutorials/vector-store/deep-lake-vector-store-in-langchain).
+
+## 로컬 Deep Lake
+
+```python
+from langchain_deeplake.vectorstores import DeeplakeVectorStore
+from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import CharacterTextSplitter
+```
+
+```python
+import getpass
+import os
+
+if "OPENAI_API_KEY" not in os.environ:
+    os.environ["OPENAI_API_KEY"] = getpass.getpass("OpenAI API Key:")
+
+if "ACTIVELOOP_TOKEN" not in os.environ:
+    os.environ["ACTIVELOOP_TOKEN"] = getpass.getpass("activeloop token:")
+```
+
+```python
+from langchain_community.document_loaders import TextLoader
+
+loader = TextLoader("../../how_to/state_of_the_union.txt")
+documents = loader.load()
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+docs = text_splitter.split_documents(documents)
+
+embeddings = OpenAIEmbeddings()
+```
+
+### 로컬 dataset 생성
+
+`./my_deeplake/`에 로컬로 dataset을 생성한 다음 유사도 검색을 실행합니다. Deeplake+LangChain 통합은 내부적으로 Deep Lake dataset을 사용하므로 `dataset`과 `vector store`는 상호 교환적으로 사용됩니다. 자신의 클라우드 또는 Deep Lake storage에 dataset을 생성하려면 [경로를 적절히 조정](https://docs.deeplake.ai/latest/getting-started/storage-and-creds/storage-options/)하세요.
+
+```python
+db = DeeplakeVectorStore(
+    dataset_path="./my_deeplake/", embedding_function=embeddings, overwrite=True
+)
+db.add_documents(docs)
+# or shorter
+# db = DeepLake.from_documents(docs, dataset_path="./my_deeplake/", embedding_function=embeddings, overwrite=True)
+```
+
+### Dataset 쿼리
+
+```python
+query = "What did the president say about Ketanji Brown Jackson"
+docs = db.similarity_search(query)
+```
+
+```python
+print(docs[0].page_content)
+```
+
+나중에 embedding을 다시 계산하지 않고 dataset을 다시 로드할 수 있습니다
+
+```python
+db = DeeplakeVectorStore(
+    dataset_path="./my_deeplake/", embedding_function=embeddings, read_only=True
+)
+docs = db.similarity_search(query)
+```
+
+`read_only=True`로 설정하면 업데이트가 필요하지 않을 때 vector store의 우발적인 수정을 방지합니다. 이는 명시적으로 의도하지 않는 한 데이터가 변경되지 않도록 보장합니다. 의도하지 않은 업데이트를 피하기 위해 이 인수를 지정하는 것이 일반적으로 좋은 관행입니다.
+
+### Retrieval Question/Answering
+
+```python
+from langchain.chains import RetrievalQA
+from langchain_openai import ChatOpenAI
+
+qa = RetrievalQA.from_chain_type(
+    llm=ChatOpenAI(model="gpt-3.5-turbo"),
+    chain_type="stuff",
+    retriever=db.as_retriever(),
+)
+```
+
+```python
+query = "What did the president say about Ketanji Brown Jackson"
+qa.run(query)
+```
+
+### 메타데이터의 속성 기반 필터링
+
+문서가 생성된 연도를 포함하는 메타데이터가 있는 또 다른 vector store를 생성해 보겠습니다.
+
+```python
+import random
+
+for d in docs:
+    d.metadata["year"] = random.randint(2012, 2014)
+
+db = DeeplakeVectorStore.from_documents(
+    docs, embeddings, dataset_path="./my_deeplake/", overwrite=True
+)
+```
+
+```python
+db.similarity_search(
+    "What did the president say about Ketanji Brown Jackson",
+    filter={"metadata": {"year": 2013}},
+)
+```
+
+### 거리 함수 선택
+
+거리 함수 `L2`는 Euclidean, `cos`는 cosine similarity
+
+```python
+db.similarity_search(
+    "What did the president say about Ketanji Brown Jackson?", distance_metric="l2"
+)
+```
+
+### Maximal Marginal relevance
+
+Maximal marginal relevance 사용
+
+```python
+db.max_marginal_relevance_search(
+    "What did the president say about Ketanji Brown Jackson?"
+)
+```
+
+### Dataset 삭제
+
+```python
+db.delete_dataset()
+```
+
+## 클라우드(Activeloop, AWS, GCS 등) 또는 메모리의 Deep Lake dataset
+
+기본적으로 Deep Lake dataset은 로컬에 저장됩니다. 메모리, Deep Lake Managed DB 또는 모든 object storage에 저장하려면 vector store를 생성할 때 [해당 경로와 자격 증명을 제공](https://docs.deeplake.ai/latest/getting-started/storage-and-creds/storage-options/)할 수 있습니다. 일부 경로는 Activeloop에 등록하고 [여기에서 검색](https://app.activeloop.ai/)할 수 있는 API token을 생성해야 합니다.
+
+```python
+os.environ["ACTIVELOOP_TOKEN"] = activeloop_token
+```
+
+```python
+# Embed and store the texts
+username = "<USERNAME_OR_ORG>"  # your username on app.activeloop.ai
+dataset_path = f"hub://{username}/langchain_testing_python"  # could be also ./local/path (much faster locally), s3://bucket/path/to/dataset, gcs://path/to/dataset, etc.
+
+docs = text_splitter.split_documents(documents)
+
+embedding = OpenAIEmbeddings()
+db = DeeplakeVectorStore(
+    dataset_path=dataset_path, embedding_function=embeddings, overwrite=True
+)
+ids = db.add_documents(docs)
+```
+
+```python
+query = "What did the president say about Ketanji Brown Jackson"
+docs = db.similarity_search(query)
+print(docs[0].page_content)
+```
+
+```python
+# Embed and store the texts
+username = "<USERNAME_OR_ORG>"  # your username on app.activeloop.ai
+dataset_path = f"hub://{username}/langchain_testing"
+
+docs = text_splitter.split_documents(documents)
+
+embedding = OpenAIEmbeddings()
+db = DeeplakeVectorStore(
+    dataset_path=dataset_path,
+    embedding_function=embeddings,
+    overwrite=True,
+)
+ids = db.add_documents(docs)
+```
+
+### TQL Search
+
+또한 similarity_search method 내에서 쿼리 실행이 지원되며, Deep Lake의 Tensor Query Language(TQL)를 사용하여 쿼리를 지정할 수 있습니다.
+
+```python
+search_id = db.dataset["ids"][0]
+```
+
+```python
+docs = db.similarity_search(
+    query=None,
+    tql=f"SELECT * WHERE ids == '{search_id}'",
+)
+```
+
+```python
+db.dataset.summary()
+```
+
+### AWS S3에 vector store 생성
+
+```python
+dataset_path = "s3://BUCKET/langchain_test"  # could be also ./local/path (much faster locally), hub://bucket/path/to/dataset, gcs://path/to/dataset, etc.
+
+embedding = OpenAIEmbeddings()
+db = DeeplakeVectorStore.from_documents(
+    docs,
+    dataset_path=dataset_path,
+    embedding=embeddings,
+    overwrite=True,
+    creds={
+        "aws_access_key_id": os.environ["AWS_ACCESS_KEY_ID"],
+        "aws_secret_access_key": os.environ["AWS_SECRET_ACCESS_KEY"],
+        "aws_session_token": os.environ["AWS_SESSION_TOKEN"],  # Optional
+    },
+)
+```
+
+## Deep Lake API
+
+`db.vectorstore`에서 Deep Lake dataset에 액세스할 수 있습니다
+
+```python
+# get structure of the dataset
+db.dataset.summary()
+```
+
+```python
+# get embeddings numpy array
+embeds = db.dataset["embeddings"][:]
+```
+
+### 로컬 dataset을 클라우드로 전송
+
+이미 생성된 dataset을 클라우드로 복사합니다. 클라우드에서 로컬로도 전송할 수 있습니다.
+
+```python
+import deeplake
+
+username = "<USERNAME_OR_ORG>"  # your username on app.activeloop.ai
+source = f"hub://{username}/langchain_testing"  # could be local, s3, gcs, etc.
+destination = f"hub://{username}/langchain_test_copy"  # could be local, s3, gcs, etc.
+
+
+deeplake.copy(src=source, dst=destination)
+```
+
+```python
+db = DeeplakeVectorStore(dataset_path=destination, embedding_function=embeddings)
+db.add_documents(docs)
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/vectorstores/activeloop_deeplake.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

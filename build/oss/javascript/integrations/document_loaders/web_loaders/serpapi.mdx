@@ -1,0 +1,81 @@
+---
+title: SerpAPI Loader
+---
+
+이 가이드는 LangChain에서 SerpAPI를 사용하여 웹 검색 결과를 로드하는 방법을 보여줍니다.
+
+## Overview
+
+[SerpAPI](https://serpapi.com/)는 다양한 검색 엔진의 검색 결과에 대한 액세스를 제공하는 실시간 API입니다. 경쟁사 분석 및 순위 추적과 같은 작업에 일반적으로 사용됩니다. 모든 검색 엔진의 결과 페이지에서 데이터를 스크래핑하고, 추출하고, 이해할 수 있도록 비즈니스를 지원합니다.
+
+이 가이드는 LangChain의 `SerpAPILoader`를 사용하여 웹 검색 결과를 로드하는 방법을 보여줍니다. `SerpAPILoader`는 SerpAPI에서 웹 검색 결과를 로드하고 처리하는 프로세스를 단순화합니다.
+
+## Setup
+
+[SerpAPI API key](https://serpapi.com/dashboard)를 가입하고 받아야 합니다.
+
+## Usage
+
+다음은 `SerpAPILoader`를 사용하는 방법의 예시입니다:
+
+```typescript
+import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
+import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
+import { SerpAPILoader } from "@langchain/community/document_loaders/web/serpapi";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { createStuffDocumentsChain } from "@langchain/classic/chains/combine_documents";
+import { createRetrievalChain } from "@langchain/classic/chains/retrieval";
+
+// Initialize the necessary components
+const llm = new ChatOpenAI({
+  model: "gpt-4o-mini",
+});
+const embeddings = new OpenAIEmbeddings();
+const apiKey = "Your SerpAPI API key";
+
+// Define your question and query
+const question = "Your question here";
+const query = "Your query here";
+
+// Use SerpAPILoader to load web search results
+const loader = new SerpAPILoader({ q: query, apiKey });
+const docs = await loader.load();
+
+// Use MemoryVectorStore to store the loaded documents in memory
+const vectorStore = await MemoryVectorStore.fromDocuments(docs, embeddings);
+
+const questionAnsweringPrompt = ChatPromptTemplate.fromMessages([
+  [
+    "system",
+    "Answer the user's questions based on the below context:\n\n{context}",
+  ],
+  ["human", "{input}"],
+]);
+
+const combineDocsChain = await createStuffDocumentsChain({
+  llm,
+  prompt: questionAnsweringPrompt,
+});
+
+const chain = await createRetrievalChain({
+  retriever: vectorStore.asRetriever(),
+  combineDocsChain,
+});
+
+const res = await chain.invoke({
+  input: question,
+});
+
+console.log(res.answer);
+```
+
+이 예시에서 `SerpAPILoader`는 웹 검색 결과를 로드하는 데 사용되며, 이 결과는 `MemoryVectorStore`를 사용하여 메모리에 저장됩니다. 그런 다음 retrieval chain을 사용하여 메모리에서 가장 관련성 높은 문서를 검색하고 이러한 문서를 기반으로 질문에 답변합니다. 이는 `SerpAPILoader`가 웹 검색 결과를 로드하고 처리하는 프로세스를 어떻게 간소화할 수 있는지 보여줍니다.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/web_loaders/serpapi.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

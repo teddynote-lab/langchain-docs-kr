@@ -1,0 +1,206 @@
+---
+title: CloseVector
+---
+
+<Tip>
+**호환성**
+
+브라우저와 Node.js 모두에서 사용 가능
+</Tip>
+
+[CloseVector](https://closevector.getmegaportal.com/)는 브라우저와 Node.js 모두에서 실행할 수 있는 크로스 플랫폼 vector database입니다. 예를 들어, Node.js에서 index를 생성한 다음 브라우저에서 로드/쿼리할 수 있습니다. 자세한 내용은 [CloseVector Docs](https://closevector-docs.getmegaportal.com/)를 참조하세요.
+
+## Setup
+
+### CloseVector Web
+
+```bash npm
+npm install -S closevector-web
+```
+### CloseVector Node
+
+```bash npm
+npm install -S closevector-node
+```
+<Tip>
+LangChain 패키지 설치에 대한 일반적인 지침은 [이 섹션](/oss/javascript/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install @langchain/openai @langchain/community @langchain/core
+```
+
+## Usage
+
+### 텍스트로부터 새로운 index 생성하기
+
+```typescript
+// If you want to import the browser version, use the following line instead:
+// import { CloseVectorWeb } from "@langchain/community/vectorstores/closevector/web";
+import { CloseVectorNode } from "@langchain/community/vectorstores/closevector/node";
+import { OpenAIEmbeddings } from "@langchain/openai";
+
+export const run = async () => {
+  // If you want to import the browser version, use the following line instead:
+  // const vectorStore = await CloseVectorWeb.fromTexts(
+  const vectorStore = await CloseVectorNode.fromTexts(
+    ["Hello world", "Bye bye", "hello nice world"],
+    [{ id: 2 }, { id: 1 }, { id: 3 }],
+    new OpenAIEmbeddings()
+  );
+
+  const resultOne = await vectorStore.similaritySearch("hello world", 1);
+  console.log(resultOne);
+};
+```
+
+### loader로부터 새로운 index 생성하기
+
+```typescript
+// If you want to import the browser version, use the following line instead:
+// import { CloseVectorWeb } from "@langchain/community/vectorstores/closevector/web";
+import { CloseVectorNode } from "@langchain/community/vectorstores/closevector/node";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { TextLoader } from "@langchain/classic/document_loaders/fs/text";
+
+// Create docs with a loader
+const loader = new TextLoader("src/document_loaders/example_data/example.txt");
+const docs = await loader.load();
+
+// Load the docs into the vector store
+// If you want to import the browser version, use the following line instead:
+// const vectorStore = await CloseVectorWeb.fromDocuments(
+const vectorStore = await CloseVectorNode.fromDocuments(
+  docs,
+  new OpenAIEmbeddings()
+);
+
+// Search for the most similar document
+const resultOne = await vectorStore.similaritySearch("hello world", 1);
+console.log(resultOne);
+```
+
+### CloseVector CDN에 index 저장하고 다시 로드하기
+
+CloseVector는 클라우드에 index를 저장/로드하는 기능을 지원합니다. 이 기능을 사용하려면 [CloseVector](https://closevector.getmegaportal.com/)에서 계정을 생성해야 합니다. [CloseVector Docs](https://closevector-docs.getmegaportal.com/)를 읽고 [로그인](https://closevector.getmegaportal.com/)하여 먼저 API key를 생성하세요.
+
+```typescript
+// If you want to import the browser version, use the following line instead:
+// import { CloseVectorWeb } from "@langchain/community/vectorstores/closevector/web";
+import { CloseVectorNode } from "@langchain/community/vectorstores/closevector/node";
+import { CloseVectorWeb } from "@langchain/community/vectorstores/closevector/web";
+import { OpenAIEmbeddings } from "@langchain/openai";
+
+// Create a vector store through any method, here from texts as an example
+// If you want to import the browser version, use the following line instead:
+// const vectorStore = await CloseVectorWeb.fromTexts(
+const vectorStore = await CloseVectorNode.fromTexts(
+  ["Hello world", "Bye bye", "hello nice world"],
+  [{ id: 2 }, { id: 1 }, { id: 3 }],
+  new OpenAIEmbeddings(),
+  undefined,
+  {
+    key: "your access key",
+    secret: "your secret",
+  }
+);
+
+// Save the vector store to cloud
+await vectorStore.saveToCloud({
+  description: "example",
+  public: true,
+});
+
+const { uuid } = vectorStore.instance;
+
+// Load the vector store from cloud
+// const loadedVectorStore = await CloseVectorWeb.load(
+const loadedVectorStore = await CloseVectorNode.loadFromCloud({
+  uuid,
+  embeddings: new OpenAIEmbeddings(),
+  credentials: {
+    key: "your access key",
+    secret: "your secret",
+  },
+});
+
+// If you want to import the node version, use the following lines instead:
+// const loadedVectorStoreOnNode = await CloseVectorNode.loadFromCloud({
+//   uuid,
+//   embeddings: new OpenAIEmbeddings(),
+//   credentials: {
+//     key: "your access key",
+//     secret: "your secret"
+//   }
+// });
+
+const loadedVectorStoreOnBrowser = await CloseVectorWeb.loadFromCloud({
+  uuid,
+  embeddings: new OpenAIEmbeddings(),
+  credentials: {
+    key: "your access key",
+    secret: "your secret",
+  },
+});
+
+// vectorStore and loadedVectorStore are identical
+const result = await loadedVectorStore.similaritySearch("hello world", 1);
+console.log(result);
+
+// or
+const resultOnBrowser = await loadedVectorStoreOnBrowser.similaritySearch(
+  "hello world",
+  1
+);
+console.log(resultOnBrowser);
+```
+
+### 파일에 index 저장하고 다시 로드하기
+
+```typescript
+// If you want to import the browser version, use the following line instead:
+// import { CloseVectorWeb } from "@langchain/community/vectorstores/closevector/web";
+import { CloseVectorNode } from "@langchain/community/vectorstores/closevector/node";
+import { OpenAIEmbeddings } from "@langchain/openai";
+
+// Create a vector store through any method, here from texts as an example
+// If you want to import the browser version, use the following line instead:
+// const vectorStore = await CloseVectorWeb.fromTexts(
+const vectorStore = await CloseVectorNode.fromTexts(
+  ["Hello world", "Bye bye", "hello nice world"],
+  [{ id: 2 }, { id: 1 }, { id: 3 }],
+  new OpenAIEmbeddings()
+);
+
+// Save the vector store to a directory
+const directory = "your/directory/here";
+
+await vectorStore.save(directory);
+
+// Load the vector store from the same directory
+// If you want to import the browser version, use the following line instead:
+// const loadedVectorStore = await CloseVectorWeb.load(
+const loadedVectorStore = await CloseVectorNode.load(
+  directory,
+  new OpenAIEmbeddings()
+);
+
+// vectorStore and loadedVectorStore are identical
+const result = await loadedVectorStore.similaritySearch("hello world", 1);
+console.log(result);
+```
+
+## Related
+
+- Vector store [개념 가이드](/oss/javascript/integrations/vectorstores)
+- Vector store [how-to 가이드](/oss/javascript/integrations/vectorstores)
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/vectorstores/closevector.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

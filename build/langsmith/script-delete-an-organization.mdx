@@ -1,0 +1,82 @@
+---
+title: 조직 삭제
+sidebarTitle: 조직 삭제
+---
+
+LangSmith UI는 현재 self-hosted LangSmith 인스턴스에서 개별 조직 삭제를 지원하지 않습니다. 그러나 ClickHouse의 모든 materialized view(runs_history view 제외)와 runs 및 feedbacks 테이블에서 모든 trace를 직접 제거한 다음 Postgres tenants 테이블에서 Organization을 제거하면 이를 수행할 수 있습니다.
+
+이 명령은 Organization ID를 인수로 사용합니다.
+
+### Prerequisites
+
+다음 도구/항목을 준비했는지 확인하세요.
+
+1. kubectl
+
+   * [https://kubernetes.io/docs/tasks/tools/](https://kubernetes.io/docs/tasks/tools/)
+
+2. PostgreSQL client
+
+   * [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
+
+3. PostgreSQL database 연결:
+
+   * Host
+   * Port
+   * Username
+     * bundled 버전을 사용하는 경우 `postgres`입니다
+   * Password
+     * bundled 버전을 사용하는 경우 `postgres`입니다
+   * Database name
+     * bundled 버전을 사용하는 경우 `postgres`입니다
+
+4. Clickhouse database 자격 증명
+
+   * Host
+   * Port
+   * Username
+     * bundled 버전을 사용하는 경우 `default`입니다
+   * Password
+     * bundled 버전을 사용하는 경우 `password`입니다
+   * Database name
+     * bundled 버전을 사용하는 경우 `default`입니다
+
+5. migration script를 실행할 머신에서 PostgreSQL database로의 연결
+
+   * bundled 버전을 사용하는 경우 postgresql service를 로컬 머신으로 port forward해야 할 수 있습니다.
+   * `kubectl port-forward svc/langsmith-postgres 5432:5432`를 실행하여 postgresql service를 로컬 머신으로 port forward하세요.
+
+6. migration script를 실행할 머신에서 Clickhouse database로의 연결
+
+   * bundled 버전을 사용하는 경우 clickhouse service를 로컬 머신으로 port forward해야 할 수 있습니다.
+     * `kubectl port-forward svc/langsmith-clickhouse 8123:8123`을 실행하여 clickhouse service를 로컬 머신으로 port forward하세요.
+   * Clickhouse Cloud를 사용하는 경우 --ssl flag를 지정하고 port `8443`을 사용해야 합니다
+
+7. 조직을 삭제하는 script
+
+   * [여기](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/scripts/delete_organization_sh)에서 script를 다운로드할 수 있습니다
+
+### 단일 조직에 대한 삭제 script 실행
+
+다음 명령을 실행하여 조직 제거 script를 실행하세요:
+
+```bash
+sh delete_organization.sh <postgres_url> <clickhouse_url> --organization_id <organization_id>
+```
+
+예를 들어, port-forwarding과 함께 bundled 버전을 사용하는 경우 명령은 다음과 같습니다:
+
+```bash
+sh delete_organization.sh "postgres://postgres:postgres@localhost:5432/postgres" "clickhouse://default:password@localhost:8123/default" --organization_id 4ec70ec7-0808-416a-b836-7100aeec934b
+```
+
+LangSmith UI를 방문하면 이제 조직이 더 이상 존재하지 않는 것을 확인할 수 있습니다.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/script-delete-an-organization.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

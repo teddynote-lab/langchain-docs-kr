@@ -1,0 +1,110 @@
+---
+title: Cohere
+---
+
+<Warning>
+**현재 Cohere 모델을 text completion 모델로 사용하는 방법을 설명하는 페이지를 보고 계십니다. 많은 인기 있는 Cohere 모델은 [chat completion 모델](/oss/python/langchain/models)입니다.**
+
+[이 페이지](/oss/python/integrations/chat/cohere/)를 찾고 계실 수 있습니다.
+</Warning>
+
+>[Cohere](https://cohere.ai/about)는 기업이 인간-기계 상호작용을 개선할 수 있도록 자연어 처리 모델을 제공하는 캐나다 스타트업입니다.
+
+모든 속성과 메서드에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/llms/langchain_community.llms.cohere.Cohere.html)를 참조하세요.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/llms/cohere/) | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [Cohere](https://python.langchain.com/api_reference/community/llms/langchain_community.llms.cohere.Cohere.html) | [langchain-community](https://python.langchain.com/api_reference/community/index.html) | ❌ | beta | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain_community?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain_community?style=flat-square&label=%20) |
+
+## Setup
+
+이 통합은 `langchain-community` 패키지에 포함되어 있습니다. 또한 `cohere` 패키지 자체도 설치해야 합니다. 다음과 같이 설치할 수 있습니다:
+
+### Credentials
+
+[Cohere API key](https://cohere.com/)를 발급받고 `COHERE_API_KEY` 환경 변수를 설정해야 합니다:
+
+```python
+import getpass
+import os
+
+if "COHERE_API_KEY" not in os.environ:
+    os.environ["COHERE_API_KEY"] = getpass.getpass()
+```
+
+### Installation
+
+```python
+pip install -U langchain-community langchain-cohere
+```
+
+최고 수준의 observability를 위해 [LangSmith](https://smith.langchain.com/)를 설정하는 것도 도움이 됩니다(필수는 아님)
+
+```python
+os.environ["LANGSMITH_TRACING"] = "true"
+# os.environ["LANGSMITH_API_KEY"] = getpass.getpass()
+```
+
+## Invocation
+
+Cohere는 모든 [LLM](/oss/python/langchain/models) 기능을 지원합니다:
+
+```python
+from langchain_cohere import Cohere
+from langchain.messages import HumanMessage
+```
+
+```python
+model = Cohere(max_tokens=256, temperature=0.75)
+```
+
+```python
+message = "Knock knock"
+model.invoke(message)
+```
+
+```output
+" Who's there?"
+```
+
+```python
+await model.ainvoke(message)
+```
+
+```output
+" Who's there?"
+```
+
+```python
+for chunk in model.stream(message):
+    print(chunk, end="", flush=True)
+```
+
+```output
+ Who's there?
+```
+
+```python
+model.batch([message])
+```
+
+```output
+[" Who's there?"]
+```
+
+## API reference
+
+모든 `Cohere` llm 기능과 구성에 대한 자세한 문서는 API reference를 참조하세요: [python.langchain.com/api_reference/community/llms/langchain_community.llms.cohere.Cohere.html](https://python.langchain.com/api_reference/community/llms/langchain_community.llms.cohere.Cohere.html)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/llms/cohere.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

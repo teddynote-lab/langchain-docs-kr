@@ -1,0 +1,155 @@
+---
+title: BedrockChat
+---
+
+[Amazon Bedrock](https://aws.amazon.com/bedrock/)은 AI21 Labs, Anthropic, Cohere, Meta, Stability AI, Amazon과 같은 주요 AI 기업의 고성능 foundation model(FM)을 단일 API를 통해 제공하는 완전 관리형 서비스입니다. 보안, 프라이버시 및 책임 있는 AI를 갖춘 생성형 AI 애플리케이션을 구축하는 데 필요한 광범위한 기능을 제공합니다.
+
+이 가이드는 Amazon Bedrock [chat model](/oss/javascript/langchain/models) 시작하기를 도와드립니다. 모든 `BedrockChat` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_chat_models_bedrock.BedrockChat.html)를 참조하세요.
+
+<Tip>
+더 새로운 [`ChatBedrockConverse` chat model이 전용 `@langchain/aws` integration package를 통해 사용 가능합니다](/oss/javascript/integrations/chat/bedrock_converse). 이 패키지를 사용하여 더 많은 모델에서 [tool calling](/oss/javascript/langchain/tools)을 사용할 수 있습니다.
+</Tip>
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | [PY support](https://python.langchain.com/docs/integrations/chat/bedrock/) | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [`BedrockChat`](https://api.js.langchain.com/classes/langchain_community_chat_models_bedrock.BedrockChat.html) | [`@langchain/community`](https://npmjs.com/@langchain/community) | ❌ | ✅ | ✅ | ![NPM - Downloads](https://img.shields.io/npm/dm/@langchain/community?style=flat-square&label=%20&) | ![NPM - Version](https://img.shields.io/npm/v/@langchain/community?style=flat-square&label=%20&) |
+
+### Model features
+
+특정 기능 사용 방법에 대한 가이드는 아래 표 헤더의 링크를 참조하세요.
+
+| [Tool calling](/oss/javascript/langchain/tools) | [Structured output](/oss/javascript/langchain/structured-output) | JSON mode | [Image input](/oss/javascript/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/javascript/langchain/streaming/) | [Token usage](/oss/javascript/langchain/models#token-usage) | [Logprobs](/oss/javascript/langchain/models#log-probabilities) |
+| :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ |
+
+## Setup
+
+Bedrock model에 액세스하려면 AWS 계정을 생성하고, Bedrock API 서비스를 설정하고, access key ID와 secret key를 받고, `@langchain/community` integration package를 설치해야 합니다.
+
+### Credentials
+
+AWS에 가입하고 자격 증명을 설정하려면 [AWS 문서](https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html)를 참조하세요. 또한 [다음 지침](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html)에 따라 계정에 대한 model access를 활성화해야 합니다.
+
+model 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
+
+```bash
+# export LANGSMITH_TRACING="true"
+# export LANGSMITH_API_KEY="your-api-key"
+```
+
+### Installation
+
+LangChain `BedrockChat` integration은 `@langchain/community` package에 있습니다. 또한 여러 공식 AWS package를 peer dependency로 설치해야 합니다:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/community @langchain/core @aws-crypto/sha256-js @aws-sdk/credential-provider-node @smithy/protocol-http @smithy/signature-v4 @smithy/eventstream-codec @smithy/util-utf8 @aws-sdk/types
+```
+```bash yarn
+yarn add @langchain/community @langchain/core @aws-crypto/sha256-js @aws-sdk/credential-provider-node @smithy/protocol-http @smithy/signature-v4 @smithy/eventstream-codec @smithy/util-utf8 @aws-sdk/types
+```
+```bash pnpm
+pnpm add @langchain/community @langchain/core @aws-crypto/sha256-js @aws-sdk/credential-provider-node @smithy/protocol-http @smithy/signature-v4 @smithy/eventstream-codec @smithy/util-utf8 @aws-sdk/types
+```
+</CodeGroup>
+
+@aws-sdk/credential-provider-node dependency를 생략하고 web entrypoint를 사용하여 Edge function이나 Cloudflare Workers와 같은 web 환경에서도 BedrockChat을 사용할 수 있습니다:
+
+<CodeGroup>
+```bash npm
+npm install @langchain/community @langchain/core @aws-crypto/sha256-js @smithy/protocol-http @smithy/signature-v4 @smithy/eventstream-codec @smithy/util-utf8 @aws-sdk/types
+```
+```bash yarn
+yarn add @langchain/community @langchain/core @aws-crypto/sha256-js @smithy/protocol-http @smithy/signature-v4 @smithy/eventstream-codec @smithy/util-utf8 @aws-sdk/types
+```
+```bash pnpm
+pnpm add @langchain/community @langchain/core @aws-crypto/sha256-js @smithy/protocol-http @smithy/signature-v4 @smithy/eventstream-codec @smithy/util-utf8 @aws-sdk/types
+```
+</CodeGroup>
+
+## Instantiation
+
+현재 chat model integration에서는 Anthropic, Cohere, Mistral model만 지원됩니다. AI21 또는 Amazon의 foundation model에 대해서는 [text generation Bedrock variant](/oss/javascript/integrations/llms/bedrock/)를 참조하세요.
+
+AWS 인증 방법은 여러 가지가 있습니다 - 아래 예제는 환경 변수에 설정된 access key, secret access key 및 region을 사용합니다:
+
+```typescript
+import { BedrockChat } from "@langchain/community/chat_models/bedrock";
+
+const llm = new BedrockChat({
+  model: "anthropic.claude-3-5-sonnet-20240620-v1:0",
+  region: process.env.BEDROCK_AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.BEDROCK_AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.BEDROCK_AWS_SECRET_ACCESS_KEY!,
+  },
+  // endpointUrl: "custom.amazonaws.com",
+  // modelKwargs: {
+  //   anthropic_version: "bedrock-2023-05-31",
+  // },
+});
+```
+
+## Invocation
+
+```typescript
+const aiMsg = await llm.invoke([
+  [
+    "system",
+    "You are a helpful assistant that translates English to French. Translate the user sentence.",
+  ],
+  ["human", "I love programming."],
+])
+aiMsg
+```
+
+```output
+AIMessage {
+  "content": "J'adore la programmation.",
+  "additional_kwargs": {
+    "id": "msg_bdrk_01RwhfuWkLLcp7ks1X3u8bwd"
+  },
+  "response_metadata": {
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-3-5-sonnet-20240620",
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 29,
+      "output_tokens": 11
+    }
+  },
+  "tool_calls": [],
+  "invalid_tool_calls": []
+}
+```
+
+```typescript
+console.log(aiMsg.content)
+```
+
+```output
+J'adore la programmation.
+```
+
+## Tool calling
+
+Bedrock model의 tool calling은 [다른 model](/oss/javascript/langchain/tools)과 유사한 방식으로 작동하지만, 모든 Bedrock model이 tool calling을 지원하는 것은 아닙니다. 자세한 내용은 [AWS model 문서](https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html)를 참조하세요.
+
+## API reference
+
+모든 `BedrockChat` 기능 및 구성에 대한 자세한 문서는 [API reference](https://api.js.langchain.com/classes/langchain_community_chat_models_bedrock.BedrockChat.html)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/chat/bedrock.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

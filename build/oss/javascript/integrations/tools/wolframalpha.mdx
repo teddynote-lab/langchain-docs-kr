@@ -1,0 +1,37 @@
+---
+title: WolframAlpha Tool
+---
+
+WolframAlpha tool은 agent와 chain을 WolframAlpha의 최첨단 계산 지능 엔진에 연결합니다.
+
+## Setup
+
+[WolframAlpha portal](https://developer.wolframalpha.com/)에서 앱을 생성하고 `appid`를 발급받아야 합니다.
+
+## Usage
+
+```typescript
+import { WolframAlphaTool } from "@langchain/community/tools/wolframalpha";
+
+const tool = new WolframAlphaTool({
+  appid: "YOUR_APP_ID",
+});
+
+const res = await tool.invoke("What is 2 * 2?");
+
+console.log(res);
+```
+
+## Related
+
+- Tool [개념 가이드](/oss/javascript/langchain/tools)
+- Tool [사용 방법 가이드](/oss/javascript/langchain/tools)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/tools/wolframalpha.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

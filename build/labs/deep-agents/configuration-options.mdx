@@ -1,0 +1,131 @@
+---
+title: 구성 옵션
+---
+
+Deep Agents는 에이전트의 동작과 기능을 사용자 정의할 수 있는 여러 구성 옵션을 제공합니다:
+
+- **Tools** (필수): 에이전트와 모든 하위 에이전트가 액세스할 수 있는 도구입니다.
+- **Instructions** (필수): 에이전트의 프롬프트의 일부로 사용되는 사용자 정의 지침입니다. 이는 내장된 시스템 프롬프트를 보완합니다.
+- **Sub-agents**: 특정 작업을 위한 전문화된 하위 에이전트입니다.
+- **Model**: 에이전트에 사용할 모델입니다.
+
+## Tools
+
+필수. 에이전트와 모든 하위 에이전트가 액세스할 수 있는 도구 목록입니다.
+
+## Instructions
+
+필수. 에이전트의 프롬프트의 일부로 사용되는 사용자 정의 지침입니다. 이는 내장된 시스템 프롬프트를 보완합니다.
+
+## Sub-agents
+
+특정 작업을 위한 전문화된 하위 에이전트를 정의합니다:
+
+<CodeGroup>
+
+```python Python
+subagents = [{
+    "name": "research-agent",
+    "description": "Used to research more in depth questions",
+    "prompt": sub_research_prompt,
+    "tools": ["internet_search"]  # Optional: defaults to all tools
+}]
+
+agent = create_deep_agent(
+    tools=tools,
+    instructions=prompt,
+    subagents=subagents
+)
+```
+
+```typescript JavaScript
+interface SubAgent {
+  name: string;
+  description: string;
+  prompt: string;
+  tools?: string[];
+}
+
+const researchSubAgent: SubAgent = {
+  name: "research-agent",
+  description: "Used to research more in depth questions",
+  prompt: subResearchPrompt,
+};
+
+const agent = createDeepAgent({
+  tools,
+  instructions: prompt,
+  subagents: [researchSubAgent]
+});
+```
+
+</CodeGroup>
+
+## Model
+
+Python과 JavaScript 구현 모두 기본적으로 `"claude-sonnet-4-20250514"`를 사용하지만 사용자 정의 모델을 지원합니다:
+
+<CodeGroup>
+
+```python Python
+from langchain_openai import ChatOpenAI
+
+custom_model = ChatOpenAI(model="gpt-4")
+agent = create_deep_agent(
+    tools=tools,
+    instructions=instructions,
+    model=custom_model
+)
+```
+
+```typescript JavaScript
+import { ChatOpenAI } from "@langchain/openai";
+
+const customModel = new ChatOpenAI({ model: "gpt-4" });
+const agent = createDeepAgent({
+  tools,
+  instructions,
+  model: customModel
+});
+```
+
+</CodeGroup>
+
+### Custom models
+
+<Note>
+
+Custom model은 Python 구현에서만 지원됩니다.
+
+</Note>
+
+기본적으로 `deepagents`는 `"claude-sonnet-4-20250514"`를 사용합니다. [LangChain model object](https://python.langchain.com/docs/integrations/chat/)를 전달하여 이를 사용자 정의할 수 있습니다.
+
+예를 들어, Ollama를 통해 OpenAI의 `gpt-oss` model을 사용합니다:
+
+```python
+# pip install langchain langchain-ollama
+
+from deepagents import create_deep_agent
+
+# ... existing agent definitions ...
+
+model = init_chat_model(
+    model="ollama:gpt-oss:20b",
+)
+agent = create_deep_agent(
+    tools=tools,
+    instructions=instructions,
+    model=model,
+    ...
+)
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/labs/deep-agents/configuration-options.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

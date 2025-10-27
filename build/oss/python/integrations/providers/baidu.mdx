@@ -1,0 +1,85 @@
+---
+title: Baidu
+---
+
+>[Baidu Cloud](https://cloud.baidu.com/)는 베이징에 본사를 둔 `Baidu, Inc.`에서 제공하는 클라우드 서비스입니다.
+> 클라우드 스토리지 서비스, 클라이언트 소프트웨어,
+> 파일 관리, 리소스 공유 및 Third Party Integration을 제공합니다.
+
+
+## Installation and Setup
+
+[여기](https://cloud.baidu.com/product/wenxinworkshop)에서 `Qianfan` `AK` 및 `SK` 키를 등록하고 받으세요.
+
+## LLMs
+
+### Baidu Qianfan
+
+[사용 예제](/oss/python/integrations/llms/baidu_qianfan_endpoint)를 참조하세요.
+
+```python
+from langchain_community.llms import QianfanLLMEndpoint
+```
+
+## Chat models
+
+### Qianfan Chat Endpoint
+
+[사용 예제](/oss/python/integrations/chat/baidu_qianfan_endpoint)를 참조하세요.
+다른 [사용 예제](/oss/python/integrations/chat/ernie)도 참조하세요.
+
+```python
+from langchain_community.chat_models import QianfanChatEndpoint
+```
+
+## Embedding models
+
+### Baidu Qianfan
+
+[사용 예제](/oss/python/integrations/text_embedding/baidu_qianfan_endpoint)를 참조하세요.
+다른 [사용 예제](/oss/python/integrations/text_embedding/ernie)도 참조하세요.
+
+```python
+from langchain_community.embeddings import QianfanEmbeddingsEndpoint
+```
+
+## Document loaders
+
+### Baidu BOS Directory Loader
+
+```python
+from langchain_community.document_loaders.baiducloud_bos_directory import BaiduBOSDirectoryLoader
+```
+
+### Baidu BOS File Loader
+
+```python
+from langchain_community.document_loaders.baiducloud_bos_file import BaiduBOSFileLoader
+```
+
+## Vector stores
+
+### Baidu Cloud ElasticSearch VectorSearch
+
+[사용 예제](/oss/python/integrations/vectorstores/baiducloud_vector_search)를 참조하세요.
+
+```python
+from langchain_community.vectorstores import BESVectorStore
+```
+
+### Baidu VectorDB
+
+[사용 예제](/oss/python/integrations/vectorstores/baiduvectordb)를 참조하세요.
+
+```python
+from langchain_community.vectorstores import BaiduVectorDB
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/baidu.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

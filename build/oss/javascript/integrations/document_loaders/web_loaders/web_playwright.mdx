@@ -1,0 +1,105 @@
+---
+title: Playwright를 사용한 웹페이지
+---
+
+<Tip>
+**호환성**
+
+Node.js에서만 사용 가능합니다.
+</Tip>
+
+이 예제는 Playwright를 사용하여 웹페이지에서 데이터를 로드하는 방법을 다룹니다. 각 웹페이지마다 하나의 document가 생성됩니다.
+
+Playwright는 Chromium, Firefox, WebKit을 포함한 여러 브라우저 엔진을 제어하기 위한 고수준 API를 제공하는 Node.js 라이브러리입니다. Playwright를 사용하여 웹 페이지 상호작용을 자동화할 수 있으며, JavaScript 렌더링이 필요한 동적 웹 페이지에서 데이터를 추출할 수 있습니다.
+
+더 가벼운 솔루션을 원하고 로드하려는 웹페이지가 JavaScript 렌더링을 필요로 하지 않는다면, 대신 [`CheerioWebBaseLoader`](/oss/javascript/integrations/document_loaders/web_loaders/web_cheerio)를 사용할 수 있습니다.
+
+## Setup
+
+```bash npm
+npm install @langchain/community @langchain/core playwright
+```
+## Usage
+
+```typescript
+import { PlaywrightWebBaseLoader } from "@langchain/community/document_loaders/web/playwright";
+
+/**
+ * Loader uses `page.content()`
+ * as default evaluate function
+ **/
+const loader = new PlaywrightWebBaseLoader("https://www.tabnews.com.br/");
+
+const docs = await loader.load();
+```
+## Options
+
+다음은 PlaywrightWebBaseLoaderOptions interface를 사용하여 PlaywrightWebBaseLoader constructor에 전달할 수 있는 매개변수에 대한 설명입니다:
+
+```typescript
+type PlaywrightWebBaseLoaderOptions = {
+  launchOptions?: LaunchOptions;
+  gotoOptions?: PlaywrightGotoOptions;
+  evaluate?: PlaywrightEvaluate;
+};
+```
+1. `launchOptions`: playwright.chromium.launch() 메서드에 전달할 추가 옵션을 지정하는 선택적 객체입니다. 여기에는 브라우저를 headless 모드로 실행하기 위한 headless 플래그와 같은 옵션이 포함될 수 있습니다.
+
+2. `gotoOptions`: page.goto() 메서드에 전달할 추가 옵션을 지정하는 선택적 객체입니다. 여기에는 최대 탐색 시간을 밀리초 단위로 지정하는 timeout 옵션이나, 탐색을 성공으로 간주할 시점을 지정하는 waitUntil 옵션과 같은 옵션이 포함될 수 있습니다.
+
+3. `evaluate`: 사용자 정의 평가 함수를 사용하여 페이지에서 JavaScript 코드를 평가하는 데 사용할 수 있는 선택적 함수입니다. 이는 페이지에서 데이터를 추출하거나, 페이지 요소와 상호작용하거나, 특정 HTTP 응답을 처리하는 데 유용할 수 있습니다. 이 함수는 평가 결과를 포함하는 문자열로 resolve되는 Promise를 반환해야 합니다.
+
+이러한 옵션을 `PlaywrightWebBaseLoader` constructor에 전달함으로써 loader의 동작을 사용자 정의하고 Playwright의 강력한 기능을 사용하여 웹 페이지를 스크래핑하고 상호작용할 수 있습니다.
+
+다음은 기본 예제입니다:
+
+```typescript
+import {
+  PlaywrightWebBaseLoader,
+  Page,
+  Browser,
+} from "@langchain/community/document_loaders/web/playwright";
+
+const url = "https://www.tabnews.com.br/";
+const loader = new PlaywrightWebBaseLoader(url);
+const docs = await loader.load();
+
+// raw HTML page content
+const extractedContents = docs[0].pageContent;
+```
+그리고 더 고급 예제입니다:
+
+```typescript
+import {
+  PlaywrightWebBaseLoader,
+  Page,
+  Browser,
+} from "@langchain/community/document_loaders/web/playwright";
+
+const loader = new PlaywrightWebBaseLoader("https://www.tabnews.com.br/", {
+  launchOptions: {
+    headless: true,
+  },
+  gotoOptions: {
+    waitUntil: "domcontentloaded",
+  },
+  /** Pass custom evaluate, in this case you get page and browser instances */
+  async evaluate(page: Page, browser: Browser, response: Response | null) {
+    await page.waitForResponse("https://www.tabnews.com.br/va/view");
+
+    const result = await page.evaluate(() => document.body.innerHTML);
+    return result;
+  },
+});
+
+const docs = await loader.load();
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/web_loaders/web_playwright.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

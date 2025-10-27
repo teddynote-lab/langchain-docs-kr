@@ -1,0 +1,164 @@
+---
+title: vLLM
+---
+
+[vLLM](https://vllm.readthedocs.io/en/latest/index.html)은 LLM inference 및 serving을 위한 빠르고 사용하기 쉬운 라이브러리로, 다음과 같은 기능을 제공합니다:
+
+* 최첨단 serving throughput
+* PagedAttention을 사용한 효율적인 attention key 및 value memory 관리
+* 들어오는 요청의 continuous batching
+* 최적화된 CUDA kernel
+
+이 notebook은 langchain과 vLLM을 사용하여 LLM을 사용하는 방법을 다룹니다.
+
+사용하려면 `vllm` python package가 설치되어 있어야 합니다.
+
+```python
+pip install -qU  vllm -q
+```
+
+```python
+from langchain_community.llms import VLLM
+
+llm = VLLM(
+    model="mosaicml/mpt-7b",
+    trust_remote_code=True,  # mandatory for hf models
+    max_new_tokens=128,
+    top_k=10,
+    top_p=0.95,
+    temperature=0.8,
+)
+
+print(llm.invoke("What is the capital of France ?"))
+```
+
+```output
+INFO 08-06 11:37:33 llm_engine.py:70] Initializing an LLM engine with config: model='mosaicml/mpt-7b', tokenizer='mosaicml/mpt-7b', tokenizer_mode=auto, trust_remote_code=True, dtype=torch.bfloat16, use_dummy_weights=False, download_dir=None, use_np_weights=False, tensor_parallel_size=1, seed=0)
+INFO 08-06 11:37:41 llm_engine.py:196] # GPU blocks: 861, # CPU blocks: 512
+```
+```output
+Processed prompts: 100%|██████████| 1/1 [00:00<00:00,  2.00it/s]
+```
+```output
+What is the capital of France ? The capital of France is Paris.
+```
+
+## LLMChain에 model 통합하기
+
+```python
+from langchain.chains import LLMChain
+from langchain_core.prompts import PromptTemplate
+
+template = """Question: {question}
+
+Answer: Let's think step by step."""
+prompt = PromptTemplate.from_template(template)
+
+llm_chain = LLMChain(prompt=prompt, llm=llm)
+
+question = "Who was the US president in the year the first Pokemon game was released?"
+
+print(llm_chain.invoke(question))
+```
+
+```output
+Processed prompts: 100%|██████████| 1/1 [00:01<00:00,  1.34s/it]
+```
+```output
+1. The first Pokemon game was released in 1996.
+2. The president was Bill Clinton.
+3. Clinton was president from 1993 to 2001.
+4. The answer is Clinton.
+```
+
+## Distributed Inference
+
+vLLM은 distributed tensor-parallel inference 및 serving을 지원합니다.
+
+LLM class로 multi-GPU inference를 실행하려면 `tensor_parallel_size` argument를 사용하려는 GPU 수로 설정하세요. 예를 들어, 4개의 GPU에서 inference를 실행하려면
+
+```python
+from langchain_community.llms import VLLM
+
+llm = VLLM(
+        model="mosaicml/mpt-30b",
+        tensor_parallel_size=4,
+        trust_remote_code=True,  # mandatory for hf models
+)
+
+llm.invoke("What is the future of AI?")
+```
+
+## Quantization
+
+vLLM은 `awq` quantization을 지원합니다. 이를 활성화하려면 `vllm_kwargs`에 `quantization`을 전달하세요.
+
+```python
+llm_q = VLLM(
+        model="TheBloke/Llama-2-7b-Chat-AWQ",
+        trust_remote_code=True,
+        max_new_tokens=512,
+        vllm_kwargs={"quantization": "awq"},
+)
+```
+
+## OpenAI-Compatible Server
+
+vLLM은 OpenAI API protocol을 모방하는 server로 배포될 수 있습니다. 이를 통해 vLLM을 OpenAI API를 사용하는 애플리케이션의 drop-in replacement로 사용할 수 있습니다.
+
+이 server는 OpenAI API와 동일한 형식으로 쿼리할 수 있습니다.
+
+### OpenAI-Compatible Completion
+
+```python
+from langchain_community.llms import VLLMOpenAI
+
+llm = VLLMOpenAI(
+        openai_api_key="EMPTY",
+        openai_api_base="http://localhost:8000/v1",
+        model_name="tiiuae/falcon-7b",
+        model_kwargs={"stop": ["."]},
+)
+print(llm.invoke("Rome is"))
+```
+
+```output
+ a city that is filled with history, ancient buildings, and art around every corner
+```
+
+## LoRA adapter
+
+LoRA adapter는 `SupportsLoRA`를 구현하는 모든 vLLM model과 함께 사용할 수 있습니다.
+
+```python
+from langchain_community.llms import VLLM
+from vllm.lora.request import LoRARequest
+
+llm = VLLM(
+        model="meta-llama/Llama-3.2-3B-Instruct",
+        max_new_tokens=300,
+        top_k=1,
+        top_p=0.90,
+        temperature=0.1,
+        vllm_kwargs={
+        "gpu_memory_utilization": 0.5,
+        "enable_lora": True,
+        "max_model_len": 350,
+    },
+)
+LoRA_ADAPTER_PATH = "path/to/adapter"
+lora_adapter = LoRARequest("lora_adapter", 1, LoRA_ADAPTER_PATH)
+
+print(
+        llm.invoke("What are some popular Korean street foods?", lora_request=lora_adapter)
+)
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/llms/vllm.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

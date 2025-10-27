@@ -1,0 +1,114 @@
+---
+title: Steam Toolkit
+---
+
+>[Steam (Wikipedia)](https://en.wikipedia.org/wiki/Steam_(service))은 `Valve Corporation`에서 개발한 비디오 게임 디지털 배포 서비스 및 스토어입니다. Valve의 게임에 대한 게임 업데이트를 자동으로 제공하며, 서드파티 타이틀 배포로 확장되었습니다. `Steam`은 Valve Anti-Cheat 조치가 포함된 게임 서버 매치메이킹, 소셜 네트워킹 및 게임 스트리밍 서비스와 같은 다양한 기능을 제공합니다.
+
+>[Steam](https://store.steampowered.com/about/)은 게임을 플레이하고, 토론하고, 제작하기 위한 최고의 목적지입니다.
+
+Steam toolkit은 두 가지 도구를 제공합니다:
+
+- `Game Details`
+- `Recommended Games`
+
+이 가이드는 LangChain과 함께 Steam API를 사용하여 현재 Steam Game Inventory를 기반으로 Steam 게임 추천을 검색하거나 제공한 일부 Steam 게임에 대한 정보를 수집하는 방법을 안내합니다.
+
+## 설정
+
+두 개의 python 라이브러리를 설치해야 합니다.
+
+## Imports
+
+```python
+pip install -qU python-steam-api python-decouple steamspypi
+```
+
+```output
+Note: you may need to restart the kernel to use updated packages.
+```
+
+## 환경 변수 할당
+
+이 toolkit을 사용하려면 OpenAI API Key, Steam API key([여기](https://steamcommunity.com/dev/apikey)에서 발급) 및 본인의 SteamID가 필요합니다. Steam API Key를 받으면 아래에 환경 변수로 입력할 수 있습니다.
+toolkit은 인증을 위해 "STEAM_KEY" API Key를 환경 변수로 읽으므로 여기에 설정하세요. 또한 "OPENAI_API_KEY"와 "STEAM_ID"도 설정해야 합니다.
+
+```python
+import os
+
+os.environ["STEAM_KEY"] = ""
+os.environ["STEAM_ID"] = ""
+os.environ["OPENAI_API_KEY"] = ""
+```
+
+## 초기화
+
+LLM, SteamWebAPIWrapper, SteamToolkit 그리고 가장 중요한 langchain agent를 초기화하여 쿼리를 처리합니다!
+
+## 예제
+
+```python
+from langchain_community.agent_toolkits.steam.toolkit import SteamToolkit
+from langchain_community.utilities.steam import SteamWebAPIWrapper
+
+steam = SteamWebAPIWrapper()
+tools = [steam.run]
+```
+
+```python
+from langchain.agents import create_agent
+
+agent = create_agent("openai:gpt-4.1-mini", tools)
+```
+
+```python
+events = agent.stream(
+    {"messages": [("user", "can you give the information about the game Terraria?")]},
+    stream_mode="values",
+)
+for event in events:
+    event["messages"][-1].pretty_print()
+```
+
+```output
+================================ Human Message =================================
+
+can you give the information about the game Terraria?
+================================== Ai Message ==================================
+Tool Calls:
+  run (call_6vHAXSIL2MPugXxlv5uyf9Xk)
+ Call ID: call_6vHAXSIL2MPugXxlv5uyf9Xk
+  Args:
+    mode: get_games_details
+    game: Terraria
+================================= Tool Message =================================
+Name: run
+
+The id is: [105600]
+The link is: https://store.steampowered.com/app/105600/Terraria/?snr=1_7_15__13
+The price is: $9.99
+The summary of the game is: Dig, Fight, Explore, Build:  The very world is at your fingertips as you fight for survival, fortune, and glory.   Will you delve deep into cavernous expanses in search of treasure and raw materials with which to craft ever-evolving gear, machinery, and aesthetics?   Perhaps you will choose instead to seek out ever-greater foes to test your mettle in combat?   Maybe you will decide to construct your own city to house the host of mysterious allies you may encounter along your travels? In the World of Terraria, the choice is yours!Blending elements of classic action games with the freedom of sandbox-style creativity, Terraria is a unique gaming experience where both the journey and the destination are completely in the player’s control.   The Terraria adventure is truly as unique as the players themselves!  Are you up for the monumental task of exploring, creating, and defending a world of your own?   Key features: Sandbox Play  Randomly generated worlds Free Content Updates
+The supported languages of the game are: English, French, Italian, German, Spanish - Spain, Polish, Portuguese - Brazil, Russian, Simplified Chinese
+
+================================== Ai Message ==================================
+
+Terraria is a game where you can dig, fight, explore, and build in a world that is totally at your fingertips. The game gives you the freedom to survive, seek fortune, and achieve glory. You can explore cavernous expanses in search of treasure and materials to craft various gear, machinery, and aesthetic items. Alternatively, you can challenge powerful foes or construct your own city to house mysterious allies you may encounter. The game blends classic action elements with sandbox-style creativity, offering a unique experience where your journey and destination are controlled by you.
+
+Key features of Terraria include sandbox play, randomly generated worlds, and free content updates.
+
+The game is priced at $9.99 and supports multiple languages including English, French, Italian, German, Spanish (Spain), Polish, Portuguese (Brazil), Russian, and Simplified Chinese.
+
+You can find more information and purchase it here: [Terraria on Steam](https://store.steampowered.com/app/105600/Terraria/?snr=1_7_15__13).
+```
+
+```python
+
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/tools/steam.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

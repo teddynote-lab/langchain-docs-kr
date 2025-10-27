@@ -1,0 +1,79 @@
+```markdown
+---
+title: Arcee
+---
+
+>[Arcee](https://www.arcee.ai/about/about-us)는 SLM(작고, 특화되고, 안전하며, 확장 가능한 언어 모델)의 개발을 지원합니다.
+
+이 노트북은 `ArceeRetriever` class를 사용하여 Arcee의 `Domain Adapted Language Models`(`DALMs`)에 대한 관련 문서를 검색하는 방법을 보여줍니다.
+
+### 설정
+
+`ArceeRetriever`를 사용하기 전에 Arcee API key가 `ARCEE_API_KEY` environment variable로 설정되어 있는지 확인하세요. api key를 named parameter로 전달할 수도 있습니다.
+
+```python
+from langchain_community.retrievers import ArceeRetriever
+
+retriever = ArceeRetriever(
+    model="DALM-PubMed",
+    # arcee_api_key="ARCEE-API-KEY" # if not already set in the environment
+)
+```
+
+### 추가 구성
+
+필요에 따라 `arcee_api_url`, `arcee_app_url`, `model_kwargs`와 같은 `ArceeRetriever`의 parameter들을 구성할 수도 있습니다.
+object 초기화 시 `model_kwargs`를 설정하면 이후 모든 검색에 대해 filters와 size가 기본값으로 사용됩니다.
+
+```python
+retriever = ArceeRetriever(
+    model="DALM-PubMed",
+    # arcee_api_key="ARCEE-API-KEY", # if not already set in the environment
+    arcee_api_url="https://custom-api.arcee.ai",  # default is https://api.arcee.ai
+    arcee_app_url="https://custom-app.arcee.ai",  # default is https://app.arcee.ai
+    model_kwargs={
+        "size": 5,
+        "filters": [
+            {
+                "field_name": "document",
+                "filter_type": "fuzzy_search",
+                "value": "Einstein",
+            }
+        ],
+    },
+)
+```
+
+### 문서 검색
+
+query를 제공하여 업로드된 context에서 관련 문서를 검색할 수 있습니다. 다음은 예시입니다:
+
+```python
+query = "Can AI-driven music therapy contribute to the rehabilitation of patients with disorders of consciousness?"
+documents = retriever.invoke(query)
+```
+
+### 추가 parameter
+
+Arcee를 사용하면 `filters`를 적용하고 검색된 문서의 `size`(개수 기준)를 설정할 수 있습니다. Filters는 결과를 좁히는 데 도움이 됩니다. 다음은 이러한 parameter들을 사용하는 방법입니다:
+
+```python
+# Define filters
+filters = [
+    {"field_name": "document", "filter_type": "fuzzy_search", "value": "Music"},
+    {"field_name": "year", "filter_type": "strict_search", "value": "1905"},
+]
+
+# Retrieve documents with filters and size params
+documents = retriever.invoke(query, size=5, filters=filters)
+```
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/retrievers/arcee.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

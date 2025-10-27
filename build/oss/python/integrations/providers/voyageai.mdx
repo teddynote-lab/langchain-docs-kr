@@ -1,0 +1,49 @@
+---
+title: VoyageAI
+---
+
+VoyageAI와 관련된 모든 기능
+
+>[VoyageAI](https://www.voyageai.com/) Voyage AI는 더 나은 검색 품질을 위해 귀하의 도메인과 회사에 맞춤화된 embedding model을 구축합니다.
+
+## Installation and Setup
+
+다음 명령어로 integration package를 설치하세요
+<CodeGroup>
+```bash pip
+pip install langchain-voyageai
+```
+
+```bash uv
+uv add langchain-voyageai
+```
+</CodeGroup>
+
+VoyageAI API key를 발급받아 환경 변수(`VOYAGE_API_KEY`)로 설정하세요
+
+
+## Text Embedding Model
+
+[사용 예제](/oss/python/integrations/text_embedding/voyageai)를 참조하세요
+
+```python
+from langchain_voyageai import VoyageAIEmbeddings
+```
+
+
+## Reranking
+
+[사용 예제](/oss/python/integrations/document_transformers/voyageai-reranker)를 참조하세요
+
+```python
+from langchain_voyageai import VoyageAIRerank
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/voyageai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

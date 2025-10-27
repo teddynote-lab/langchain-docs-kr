@@ -1,0 +1,58 @@
+---
+title: Kùzu
+---
+
+> [Kùzu](https://kuzudb.com/)는 임베디드 가능하고, 확장 가능하며, 매우 빠른 그래프 데이터베이스입니다.
+> MIT 라이선스로 허용적으로 라이선스되어 있으며, 소스 코드는 [여기](https://github.com/kuzudb/kuzu)에서 확인할 수 있습니다.
+
+> Kùzu의 주요 특징:
+>- 성능 및 확장성: 그래프를 위한 최신의 최첨단 join 알고리즘을 구현합니다.
+>- 사용성: 서버가 없는 임베디드 아키텍처로 설정 및 시작이 매우 쉽습니다.
+>- 상호 운용성: 외부 컬럼 형식, CSV, JSON 및 관계형 데이터베이스에서 데이터를 편리하게 스캔하고 복사할 수 있습니다.
+>- 구조화된 property graph 모델: 구조가 추가된 property graph 모델을 구현합니다.
+>- Cypher 지원: 선언적 쿼리 언어인 Cypher로 그래프를 편리하게 쿼리할 수 있습니다.
+
+> Kùzu의 [문서](https://docs.kuzudb.com/)를 방문하여 시작하세요.
+
+
+## Installation and Setup
+
+다음과 같이 Python SDK를 설치합니다:
+
+<CodeGroup>
+```bash pip
+pip install -U langchain-kuzu
+```
+
+```bash uv
+uv add langchain-kuzu
+```
+</CodeGroup>
+
+## Usage
+
+## Graphs
+
+[사용 예제](/oss/python/integrations/graphs/kuzu_db)를 참조하세요.
+
+```python
+from langchain_kuzu.graphs.kuzu_graph import KuzuGraph
+```
+
+## Chains
+
+[사용 예제](/oss/python/integrations/graphs/kuzu_db/#creating-kuzuqachain)를 참조하세요.
+
+```python
+from langchain_kuzu.chains.graph_qa.kuzu import KuzuQAChain
+```
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/kuzu.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,45 @@
+---
+title: NLP Cloud
+---
+
+>[NLP Cloud](https://docs.nlpcloud.com/#introduction)는 가장 진보된 AI 엔진을 사용하고, 자신의 데이터로 자체 엔진을 훈련할 수 있는 인공지능 플랫폼입니다.
+
+[embeddings](https://docs.nlpcloud.com/#embeddings) endpoint는 다음 모델을 제공합니다:
+
+* `paraphrase-multilingual-mpnet-base-v2`: Paraphrase Multilingual MPNet Base V2는 Sentence Transformers 기반의 매우 빠른 모델로, 50개 이상의 언어에서 embeddings 추출에 완벽하게 적합합니다 (전체 목록은 여기에서 확인하세요).
+
+```python
+pip install -qU  nlpcloud
+```
+
+```python
+from langchain_community.embeddings import NLPCloudEmbeddings
+```
+
+```python
+import os
+
+os.environ["NLPCLOUD_API_KEY"] = "xxx"
+nlpcloud_embd = NLPCloudEmbeddings()
+```
+
+```python
+text = "This is a test document."
+```
+
+```python
+query_result = nlpcloud_embd.embed_query(text)
+```
+
+```python
+doc_result = nlpcloud_embd.embed_documents([text])
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/text_embedding/nlp_cloud.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

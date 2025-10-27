@@ -1,0 +1,99 @@
+---
+title: Clarifai
+---
+
+>[Clarifai](https://www.clarifai.com/)는 데이터 탐색, 데이터 라벨링, 모델 학습, 평가 및 추론에 이르는 전체 AI 라이프사이클을 제공하는 AI 플랫폼입니다.
+
+이 예제는 LangChain을 사용하여 `Clarifai` [models](https://clarifai.com/explore/models)와 상호작용하는 방법을 다룹니다. 특히 텍스트 embedding 모델은 [여기](https://clarifai.com/explore/models?page=1&perPage=24&filterData=%5B%7B%22field%22%3A%22model_type_id%22%2C%22value%22%3A%5B%22text-embedder%22%5D%7D%5D)에서 찾을 수 있습니다.
+
+Clarifai를 사용하려면 계정과 Personal Access Token (PAT) key가 필요합니다.
+PAT를 얻거나 생성하려면 [여기를 확인하세요](https://clarifai.com/settings/security).
+
+# Dependencies
+
+```python
+# Install required dependencies
+pip install -qU  clarifai
+```
+
+# Imports
+
+여기서는 personal access token을 설정합니다. Clarifai 계정의 [settings/security](https://clarifai.com/settings/security)에서 PAT를 찾을 수 있습니다.
+
+```python
+# Please login and get your API key from  https://clarifai.com/settings/security
+from getpass import getpass
+
+CLARIFAI_PAT = getpass()
+```
+
+```python
+# Import the required modules
+from langchain.chains import LLMChain
+from langchain_community.embeddings import ClarifaiEmbeddings
+from langchain_core.prompts import PromptTemplate
+```
+
+# Input
+
+LLM Chain과 함께 사용할 prompt template을 생성합니다:
+
+```python
+template = """Question: {question}
+
+Answer: Let's think step by step."""
+
+prompt = PromptTemplate.from_template(template)
+```
+
+# Setup
+
+모델이 있는 application의 user id와 app id를 설정합니다. [clarifai.com/explore/models](https://clarifai.com/explore/models)에서 공개 모델 목록을 찾을 수 있습니다.
+
+또한 model id와 필요한 경우 model version id를 초기화해야 합니다. 일부 모델은 여러 버전이 있으므로 작업에 적합한 버전을 선택할 수 있습니다.
+
+```python
+USER_ID = "clarifai"
+APP_ID = "main"
+MODEL_ID = "BAAI-bge-base-en-v15"
+MODEL_URL = "https://clarifai.com/clarifai/main/models/BAAI-bge-base-en-v15"
+
+# Further you can also provide a specific model version as the model_version_id arg.
+# MODEL_VERSION_ID = "MODEL_VERSION_ID"
+```
+
+```python
+# Initialize a Clarifai embedding model
+embeddings = ClarifaiEmbeddings(user_id=USER_ID, app_id=APP_ID, model_id=MODEL_ID)
+
+# Initialize a clarifai embedding model using model URL
+embeddings = ClarifaiEmbeddings(model_url=MODEL_URL)
+
+# Alternatively you can initialize clarifai class with pat argument.
+```
+
+```python
+text = "roses are red violets are blue."
+text2 = "Make hay while the sun shines."
+```
+
+embed_query function을 사용하여 텍스트 한 줄을 embedding할 수 있습니다!
+
+```python
+query_result = embeddings.embed_query(text)
+```
+
+텍스트/문서 목록을 embedding하려면 embed_documents function을 사용하세요.
+
+```python
+doc_result = embeddings.embed_documents([text, text2])
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/text_embedding/clarifai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

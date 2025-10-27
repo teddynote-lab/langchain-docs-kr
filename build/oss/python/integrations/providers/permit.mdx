@@ -1,0 +1,46 @@
+---
+title: Permit
+---
+
+[Permit.io](https://permit.io/)는 세밀한 접근 제어 및 정책 시행을 제공합니다. LangChain과 함께 Permit 검사를 통합하여 승인된 사용자만 LLM 애플리케이션에서 데이터에 접근하거나 검색할 수 있도록 보장할 수 있습니다.
+
+## 설치 및 설정
+
+<CodeGroup>
+```bash pip
+pip install langchain-permit
+pip install permit
+```
+
+```bash uv
+uv add langchain-permit
+uv add permit
+```
+</CodeGroup>
+
+Permit PDP 및 자격 증명에 대한 환경 변수를 설정하세요:
+
+```python
+export PERMIT_API_KEY="your_permit_api_key"
+export PERMIT_PDP_URL="http://localhost:7766"   # or your real PDP endpoint
+```
+
+PDP가 실행 중이고 구성되어 있는지 확인하세요. 정책 설정에 대해서는
+[Permit 문서](https://docs.permit.io/sdk/python/quickstart-python/#2-setup-your-pdp-policy-decision-point-container)를 참조하세요.
+
+## Tools
+
+사용 가능한 tool에 대한 자세한 내용은 [여기](/oss/python/integrations/tools/permit)를 참조하세요.
+
+## Retrievers
+
+사용 가능한 retriever에 대한 자세한 내용은 [여기](/oss/python/integrations/retrievers/permit)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/permit.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

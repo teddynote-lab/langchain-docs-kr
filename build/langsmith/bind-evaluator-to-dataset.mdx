@@ -1,0 +1,81 @@
+---
+title: 실험에서 evaluator 자동 실행하기
+sidebarTitle: 실험에서 evaluator 실행하기
+---
+
+LangSmith는 SDK를 통해 생성된 실험을 평가하는 두 가지 방법을 지원합니다:
+
+* **프로그래밍 방식으로**, 코드에서 evaluator를 지정하는 방법 (자세한 내용은 [이 가이드](/langsmith/evaluate-llm-application)를 참조하세요)
+* UI에서 **dataset에 evaluator를 바인딩**하는 방법. 이렇게 하면 SDK를 통해 설정한 evaluator 외에도 새로 생성되는 모든 실험에서 evaluator가 자동으로 실행됩니다. 이는 애플리케이션(target function)을 반복 개선하면서 모든 실험에 대해 실행하려는 표준 evaluator 세트가 있을 때 유용합니다.
+
+## Dataset에 evaluator 구성하기
+
+1. 사이드바에서 **Datasets and Experiments** 탭을 클릭합니다.
+2. evaluator를 구성할 dataset을 선택합니다.
+3. **+ Evaluator** 버튼을 클릭하여 dataset에 evaluator를 추가합니다. evaluator를 구성할 수 있는 패널이 열립니다.
+
+<Note>
+dataset에 evaluator를 구성하면 evaluator가 구성된 이후에 생성된 실험 실행에만 영향을 미칩니다. evaluator가 구성되기 전에 생성된 실험 실행의 평가에는 영향을 미치지 않습니다.
+</Note>
+
+## LLM-as-a-judge evaluator
+
+dataset에 evaluator를 바인딩하는 프로세스는 Playground에서 LLM-as-a-judge evaluator를 구성하는 프로세스와 매우 유사합니다. [Playground에서 LLM-as-a-judge evaluator 구성하기](/langsmith/llm-as-judge?mode=ui)에 대한 지침을 참조하세요.
+
+## Custom code evaluator
+
+dataset에 code evaluator를 바인딩하는 프로세스는 online evaluation에서 code evaluator를 구성하는 프로세스와 매우 유사합니다. [code evaluator 구성하기](/langsmith/online-evaluations#configure-a-custom-code-evaluator)에 대한 지침을 참조하세요.
+
+online evaluation에서 code evaluator를 구성하는 것과 dataset에 code evaluator를 바인딩하는 것의 유일한 차이점은 custom code evaluator가 dataset의 `Example`에 포함된 output을 참조할 수 있다는 것입니다.
+
+dataset에 바인딩된 custom code evaluator의 경우, evaluator function은 두 개의 인자를 받습니다:
+
+* `Run` ([참조](/langsmith/run-data-format)). 실험의 새로운 실행을 나타냅니다. 예를 들어, SDK를 통해 실험을 실행한 경우 테스트 중인 chain 또는 model의 input/output이 포함됩니다.
+* `Example` ([참조](/langsmith/example-data-format)). 테스트 중인 chain 또는 model이 사용하는 dataset의 참조 example을 나타냅니다. Run과 Example의 `inputs`는 동일해야 합니다. Example에 참조 `outputs`가 있는 경우 이를 사용하여 run의 output과 비교하여 점수를 매길 수 있습니다.
+
+아래 코드는 output이 참조 output과 정확히 일치하는지 확인하는 간단한 evaluator function의 예시를 보여줍니다.
+
+<CodeGroup>
+
+```python Python
+import numpy as np
+
+def perform_eval(run, example):
+    # run is a Run object
+    # example is an Example object
+    output = run['outputs']['output']
+    ref_output = example['outputs']['outputs']
+    output_match = np.array_equal(output, ref_output)
+
+    return { "exact_match": output_match }
+```
+
+```javascript JavaScript
+function perform_eval(run, example) {
+    // run is a Run object
+    // example is an Example object
+    const output = run.outputs.output;
+    const refOutput = example.outputs.outputs;
+
+    // Deep equality check for arrays/objects
+    const outputMatch = JSON.stringify(output) === JSON.stringify(refOutput);
+
+    return { "exact_match": outputMatch };
+}
+```
+
+</CodeGroup>
+
+## 다음 단계
+
+* [experiments 탭](/langsmith/analyze-an-experiment)에서 실험 결과 분석하기
+* [comparison view](/langsmith/compare-experiment-results)에서 실험 결과 비교하기
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/bind-evaluator-to-dataset.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,117 @@
+---
+title: Human-in-the-loop
+description: 민감한 tool 작업에 대한 사람의 승인을 구성하는 방법을 알아보세요
+---
+
+일부 tool 작업은 민감할 수 있으며 실행 전에 사람의 승인이 필요할 수 있습니다. Deep agent는 LangGraph의 interrupt 기능을 통해 human-in-the-loop workflow를 지원합니다. `interrupt_on` parameter를 사용하여 승인이 필요한 tool을 구성할 수 있습니다.
+
+## 기본 구성
+
+`interrupt_on` parameter는 tool 이름을 interrupt 구성에 매핑하는 dictionary를 받습니다. 각 tool은 다음과 같이 구성할 수 있습니다:
+
+- **`True`**: 기본 동작으로 interrupt 활성화 (approve, edit, reject 허용)
+- **`False`**: 이 tool에 대한 interrupt 비활성화
+- **`{"allowed_decisions": [...]}`**: 특정 허용 결정이 있는 사용자 정의 구성
+
+
+
+```typescript
+// TODO: Add JS implementation
+```
+
+
+## Decision 유형
+
+`allowed_decisions` list는 tool 호출을 검토할 때 사람이 취할 수 있는 작업을 제어합니다:
+
+- **`"approve"`**: agent가 제안한 원래 argument로 tool 실행
+- **`"edit"`**: 실행 전에 tool argument 수정
+- **`"reject"`**: 이 tool 호출 실행을 완전히 건너뜀
+
+각 tool에 대해 사용 가능한 decision을 사용자 정의할 수 있습니다:
+
+
+
+```typescript
+// TODO: Add JS implementation
+```
+
+
+## Interrupt 처리
+
+Interrupt가 트리거되면 agent는 실행을 일시 중지하고 제어권을 반환합니다. 결과에서 interrupt를 확인하고 적절하게 처리하세요.
+
+
+
+```typescript
+// TODO: Add JS implementation
+```
+
+
+## 여러 tool 호출
+
+Agent가 승인이 필요한 여러 tool을 호출하면 모든 interrupt가 단일 interrupt로 일괄 처리됩니다. 각각에 대해 순서대로 decision을 제공해야 합니다.
+
+
+
+```typescript
+// TODO: Add JS implementation
+```
+
+
+## Tool argument 편집
+
+허용된 decision에 `"edit"`이 있으면 실행 전에 tool argument를 수정할 수 있습니다:
+
+
+
+```typescript
+// TODO: Add JS implementation
+```
+
+
+## Subagent interrupt
+
+각 subagent는 main agent의 설정을 재정의하는 자체 `interrupt_on` 구성을 가질 수 있습니다:
+
+
+
+```typescript
+// TODO: Add JS implementation
+```
+
+
+Subagent가 interrupt를 트리거하면 처리 방법은 동일합니다 – `__interrupt__`를 확인하고 `Command`로 재개하세요.
+
+## 모범 사례
+
+### 항상 checkpointer 사용
+
+Human-in-the-loop는 interrupt와 재개 사이에 agent 상태를 유지하기 위해 checkpointer가 필요합니다:
+
+
+
+### 동일한 thread ID 사용
+
+재개할 때 동일한 `thread_id`를 가진 동일한 config를 사용해야 합니다:
+
+
+
+### Decision 순서를 action과 일치
+
+Decision list는 `action_requests`의 순서와 일치해야 합니다:
+
+
+
+### 위험도에 따라 구성 조정
+
+위험 수준에 따라 다른 tool을 구성하세요:
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/deepagents/human-in-the-loop.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

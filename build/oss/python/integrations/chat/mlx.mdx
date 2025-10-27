@@ -1,0 +1,161 @@
+---
+title: MLX
+---
+
+이 노트북은 `MLX` LLM을 chat model로 사용하는 방법을 보여줍니다.
+
+특히 다음을 수행합니다:
+
+1. [MLXPipeline](https://github.com/langchain-ai/langchain/blob/master/libs/community/langchain_community/llms/mlx_pipeline.py) 활용하기,
+2. `ChatMLX` class를 활용하여 이러한 LLM들이 LangChain의 [Chat Messages](https://python.langchain.com/docs/modules/model_io/chat/#messages) 추상화와 인터페이스할 수 있도록 하기.
+3. 오픈소스 LLM을 사용하여 `ChatAgent` pipeline을 구동하는 방법 시연하기
+
+```python
+pip install -qU  mlx-lm transformers huggingface_hub
+```
+
+## 1. LLM 인스턴스화하기
+
+선택할 수 있는 세 가지 LLM 옵션이 있습니다.
+
+```python
+from langchain_community.llms.mlx_pipeline import MLXPipeline
+
+llm = MLXPipeline.from_model_id(
+    "mlx-community/quantized-gemma-2b-it",
+    pipeline_kwargs={"max_tokens": 10, "temp": 0.1},
+)
+```
+
+## 2. chat template을 적용하기 위해 `ChatMLX` 인스턴스화하기
+
+chat model과 전달할 메시지들을 인스턴스화합니다.
+
+```python
+from langchain_community.chat_models.mlx import ChatMLX
+from langchain.messages import HumanMessage
+
+messages = [
+    HumanMessage(
+        content="What happens when an unstoppable force meets an immovable object?"
+    ),
+]
+
+chat_model = ChatMLX(llm=llm)
+```
+
+LLM 호출을 위해 chat message들이 어떻게 포맷되는지 확인합니다.
+
+```python
+chat_model._to_chat_prompt(messages)
+```
+
+model을 호출합니다.
+
+```python
+res = chat_model.invoke(messages)
+print(res.content)
+```
+
+## 3. agent로 테스트해보기
+
+여기서는 `gemma-2b-it`을 zero-shot `ReAct` Agent로 테스트합니다. 아래 예제는 [여기](https://python.langchain.com/docs/modules/agents/agent_types/react#using-chat-models)에서 가져왔습니다.
+
+> 참고: 이 섹션을 실행하려면 [SerpAPI Token](https://serpapi.com/)을 환경 변수로 저장해야 합니다: `SERPAPI_API_KEY`
+
+```python
+from langchain_classic import hub
+from langchain.agents import AgentExecutor, load_tools
+from langchain.agents.format_scratchpad import format_log_to_str
+from langchain.agents.output_parsers import (
+    ReActJsonSingleInputOutputParser,
+)
+from langchain.tools.render import render_text_description
+from langchain_community.utilities import SerpAPIWrapper
+```
+
+`react-json` 스타일 prompt와 검색 엔진 및 계산기에 대한 액세스 권한으로 agent를 구성합니다.
+
+```python
+# setup tools
+tools = load_tools(["serpapi", "llm-math"], llm=llm)
+
+# setup ReAct style prompt
+# Based on 'hwchase17/react' prompt modification, cause mlx does not support the `System` role
+human_prompt = """
+Answer the following questions as best you can. You have access to the following tools:
+
+{tools}
+
+The way you use the tools is by specifying a json blob.
+Specifically, this json should have a `action` key (with the name of the tool to use) and a `action_input` key (with the input to the tool going here).
+
+The only values that should be in the "action" field are: {tool_names}
+
+The $JSON_BLOB should only contain a SINGLE action, do NOT return a list of multiple actions. Here is an example of a valid $JSON_BLOB:
+
+\`\`\`
+{{
+  "action": $TOOL_NAME,
+  "action_input": $INPUT
+}}
+\`\`\`
+
+ALWAYS use the following format:
+
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action:
+\`\`\`
+$JSON_BLOB
+\`\`\`
+Observation: the result of the action
+... (this Thought/Action/Observation can repeat N times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
+
+Begin! Reminder to always use the exact characters `Final Answer` when responding.
+
+{input}
+
+{agent_scratchpad}
+
+"""
+
+prompt = human_prompt.partial(
+    tools=render_text_description(tools),
+    tool_names=", ".join([t.name for t in tools]),
+)
+
+# define the agent
+chat_model_with_stop = chat_model.bind(stop=["\nObservation"])
+agent = (
+    {
+        "input": lambda x: x["input"],
+        "agent_scratchpad": lambda x: format_log_to_str(x["intermediate_steps"]),
+    }
+    | prompt
+    | chat_model_with_stop
+    | ReActJsonSingleInputOutputParser()
+)
+
+# instantiate AgentExecutor
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+```
+
+```python
+agent_executor.invoke(
+    {
+        "input": "Who is Leo DiCaprio's girlfriend? What is her current age raised to the 0.43 power?"
+    }
+)
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/chat/mlx.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

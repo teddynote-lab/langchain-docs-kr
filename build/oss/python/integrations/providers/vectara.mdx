@@ -1,0 +1,209 @@
+---
+title: Vectara
+---
+
+[Vectara](https://vectara.com/)는 미션 크리티컬 애플리케이션을 위한 엔터프라이즈 준비성에 중점을 둔 신뢰할 수 있는 AI Assistant 및 Agent 플랫폼입니다.
+Vectara serverless RAG-as-a-service는 사용하기 쉬운 API를 통해 RAG의 모든 구성 요소를 제공합니다:
+
+1. 파일(PDF, PPT, DOCX 등)에서 텍스트를 추출하는 방법
+2. 최첨단 성능을 제공하는 ML 기반 chunking
+3. [Boomerang](https://vectara.com/how-boomerang-takes-retrieval-augmented-generation-to-the-next-level-via-grounded-generation/) embeddings model
+4. 텍스트 chunk와 embedding vector가 저장되는 자체 내부 vector database
+5. query를 자동으로 embedding으로 인코딩하고 가장 관련성 높은 텍스트 세그먼트를 검색하는 query service. [Hybrid Search](https://docs.vectara.com/docs/api-reference/search-apis/lexical-matching) 지원 및 [다국어 relevance reranker](https://www.vectara.com/blog/deep-dive-into-vectara-multilingual-reranker-v1-state-of-the-art-reranker-across-100-languages), [MMR](https://vectara.com/get-diverse-results-and-comprehensive-summaries-with-vectaras-mmr-reranker/), [UDF reranker](https://www.vectara.com/blog/rag-with-user-defined-functions-based-reranking)와 같은 여러 reranking 옵션 포함
+6. 검색된 문서(context)를 기반으로 인용을 포함한 [generative summary](https://docs.vectara.com/docs/learn/grounded-generation/grounded-generation-overview)를 생성하는 LLM
+
+자세한 정보:
+
+- [Documentation](https://docs.vectara.com/docs/)
+- [API Playground](https://docs.vectara.com/docs/rest-api/)
+- [Quickstart](https://docs.vectara.com/docs/quickstart)
+
+이 notebook은 Vectara를 Vector Store로만 사용할 때(요약 없이)의 기본 검색 기능을 보여줍니다: `similarity_search`와 `similarity_search_with_score`, 그리고 LangChain `as_retriever` 기능 사용을 포함합니다.
+
+## Setup
+
+`VectaraVectorStore`를 사용하려면 먼저 partner package를 설치해야 합니다.
+
+```python
+!uv pip install -U pip && uv pip install -qU langchain-vectara
+```
+
+# Getting Started
+
+시작하려면 다음 단계를 따르세요:
+
+1. 아직 계정이 없다면 [가입](https://www.vectara.com/integrations/langchain)하여 무료 Vectara 평가판을 받으세요.
+2. 계정 내에서 하나 이상의 corpus를 생성할 수 있습니다. 각 corpus는 입력 문서에서 수집된 텍스트 데이터를 저장하는 영역을 나타냅니다. corpus를 생성하려면 **"Create Corpus"** 버튼을 사용하세요. 그런 다음 corpus에 이름과 설명을 제공합니다. 선택적으로 필터링 속성을 정의하고 일부 고급 옵션을 적용할 수 있습니다. 생성된 corpus를 클릭하면 상단에 이름과 corpus ID를 볼 수 있습니다.
+3. 다음으로 corpus에 액세스하기 위한 API key를 생성해야 합니다. corpus 보기에서 **"Access Control"** 탭을 클릭한 다음 **"Create API Key"** 버튼을 클릭하세요. key에 이름을 지정하고 query-only 또는 query+index 중 선택하세요. "Create"를 클릭하면 활성 API key가 생성됩니다. 이 key는 기밀로 유지하세요.
+
+LangChain과 Vectara를 사용하려면 `corpus_key`와 `api_key` 두 값이 필요합니다.
+`VECTARA_API_KEY`를 LangChain에 두 가지 방법으로 제공할 수 있습니다:
+
+1. 환경에 다음 두 변수를 포함: `VECTARA_API_KEY`.
+
+   예를 들어, os.environ과 getpass를 사용하여 다음과 같이 이러한 변수를 설정할 수 있습니다:
+
+```python
+import os
+import getpass
+
+os.environ["VECTARA_API_KEY"] = getpass.getpass("Vectara API Key:")
+```
+
+2. `Vectara` vectorstore constructor에 추가:
+
+```python
+vectara = Vectara(
+    vectara_api_key=vectara_api_key
+)
+```
+
+이 notebook에서는 환경에 제공된다고 가정합니다.
+
+```python
+import os
+
+os.environ["VECTARA_API_KEY"] = "<VECTARA_API_KEY>"
+os.environ["VECTARA_CORPUS_KEY"] = "VECTARA_CORPUS_KEY"
+
+from langchain_vectara import Vectara
+from langchain_vectara.vectorstores import (
+    ChainReranker,
+    CorpusConfig,
+    CustomerSpecificReranker,
+    File,
+    GenerationConfig,
+    MmrReranker,
+    SearchConfig,
+    VectaraQueryConfig,
+)
+
+vectara = Vectara(vectara_api_key=os.getenv("VECTARA_API_KEY"))
+```
+
+먼저 state-of-the-union 텍스트를 Vectara에 로드합니다.
+
+로컬 처리나 chunking이 필요하지 않은 add_files interface를 사용한다는 점에 유의하세요 - Vectara는 파일 내용을 받아 필요한 모든 전처리, chunking 및 embedding을 수행하여 knowledge store에 저장합니다.
+
+이 경우 .txt 파일을 사용하지만 다른 많은 [파일 유형](https://docs.vectara.com/docs/api-reference/indexing-apis/file-upload/file-upload-filetypes)에서도 동일하게 작동합니다.
+
+```python
+corpus_key = os.getenv("VECTARA_CORPUS_KEY")
+file_obj = File(
+    file_path="../document_loaders/example_data/state_of_the_union.txt",
+    metadata={"source": "text_file"},
+)
+vectara.add_files([file_obj], corpus_key)
+```
+
+```output
+['state_of_the_union.txt']
+```
+
+## Vectara RAG (retrieval augmented generation)
+
+이제 검색 및 요약 옵션을 제어하기 위해 `VectaraQueryConfig` 객체를 생성합니다:
+- 요약을 활성화하고, LLM이 상위 7개의 일치하는 chunk를 선택하고 영어로 응답하도록 지정합니다
+
+이 구성을 사용하여 `as_rag` 메서드를 통해 전체 Vectara RAG pipeline을 캡슐화하는 LangChain `Runnable` 객체를 생성해 보겠습니다:
+
+```python
+generation_config = GenerationConfig(
+    max_used_search_results=7,
+    response_language="eng",
+    generation_preset_name="vectara-summary-ext-24-05-med-omni",
+    enable_factual_consistency_score=True,
+)
+search_config = SearchConfig(
+    corpora=[CorpusConfig(corpus_key=corpus_key)],
+    limit=25,
+    reranker=ChainReranker(
+        rerankers=[
+            CustomerSpecificReranker(reranker_id="rnk_272725719", limit=100),
+            MmrReranker(diversity_bias=0.2, limit=100),
+        ]
+    ),
+)
+
+config = VectaraQueryConfig(
+    search=search_config,
+    generation=generation_config,
+)
+
+query_str = "what did Biden say?"
+
+rag = vectara.as_rag(config)
+rag.invoke(query_str)["answer"]
+```
+
+```output
+"President Biden discussed several key issues in his recent statements. He emphasized the importance of keeping schools open and noted that with a high vaccination rate and reduced hospitalizations, most Americans can safely return to normal activities without masks [1]. He addressed the need to hold social media platforms accountable for their impact on children and called for stronger privacy protections and mental health services [2]. Biden also announced measures against Russia, including preventing its central bank from defending the Ruble and targeting Russian oligarchs' assets, as part of efforts to weaken Russia's economy and military [3]. Additionally, he highlighted the importance of protecting women's rights, specifically the right to choose as affirmed in Roe v. Wade [5]. Lastly, he advocated for funding the police with necessary resources and training to ensure community safety [6]."
+```
+
+다음과 같이 streaming interface를 사용할 수도 있습니다:
+
+```python
+output = {}
+curr_key = None
+for chunk in rag.stream(query_str):
+    for key in chunk:
+        if key not in output:
+            output[key] = chunk[key]
+        else:
+            output[key] += chunk[key]
+        if key == "answer":
+            print(chunk[key], end="", flush=True)
+        curr_key = key
+```
+
+```output
+President Biden emphasized several key points in his statements. He highlighted the importance of keeping schools open and noted that with a high vaccination rate and reduced hospitalizations, most Americans can safely return to normal activities without masks [1]. He addressed the need to hold social media platforms accountable for their impact on children and called for stronger privacy protections and mental health services [2]. Biden also discussed measures against Russia, including preventing their central bank from defending the Ruble and targeting Russian oligarchs' assets [3]. Additionally, he reaffirmed the commitment to protect women's rights, particularly the right to choose as affirmed in Roe v. Wade [5]. Lastly, he advocated for funding the police to ensure community safety [6].
+```
+
+Vectara를 VectorStore로 사용하는 방법에 대한 자세한 내용은 [이 notebook](../vectorstores/vectara.ipynb)을 참조하세요.
+
+## Vectara Chat
+
+LangChain을 사용하여 챗봇을 만드는 대부분의 경우, 채팅 세션의 기록을 유지하고 해당 기록을 사용하여 챗봇이 대화 기록을 인식하도록 하는 특별한 `memory` 구성 요소를 통합해야 합니다.
+
+Vectara Chat을 사용하면 이 모든 것이 Vectara에 의해 백엔드에서 자동으로 수행됩니다.
+
+```python
+generation_config = GenerationConfig(
+    max_used_search_results=7,
+    response_language="eng",
+    generation_preset_name="vectara-summary-ext-24-05-med-omni",
+    enable_factual_consistency_score=True,
+)
+search_config = SearchConfig(
+    corpora=[CorpusConfig(corpus_key=corpus_key, limit=25)],
+    reranker=MmrReranker(diversity_bias=0.2),
+)
+
+config = VectaraQueryConfig(
+    search=search_config,
+    generation=generation_config,
+)
+
+
+bot = vectara.as_chat(config)
+
+bot.invoke("What did the president say about Ketanji Brown Jackson?")["answer"]
+```
+
+```output
+'The president stated that nominating someone to serve on the United States Supreme Court is one of the most serious constitutional responsibilities he has. He nominated Circuit Court of Appeals Judge Ketanji Brown Jackson, describing her as one of the nation’s top legal minds who will continue Justice Breyer’s legacy of excellence [1].'
+```
+
+## Vectara as self-querying retriever
+
+Vectara는 자연어 query에서 metadata filter expression을 자동으로 생성하여 검색 정밀도를 향상시키는 Intelligent Query Rewriting 옵션을 제공합니다. 이 기능은 사용자 query를 분석하고, 관련 metadata filter를 추출하며, 핵심 정보 요구에 집중하도록 query를 재구성합니다.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/vectara.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

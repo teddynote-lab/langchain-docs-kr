@@ -1,0 +1,42 @@
+---
+title: Roam
+---
+
+>[ROAM](https://roamresearch.com/)은 네트워크화된 사고를 위한 노트 작성 도구로, 개인 지식 베이스를 만들기 위해 설계되었습니다.
+
+이 노트북은 Roam 데이터베이스에서 문서를 로드하는 방법을 다룹니다. 이는 [여기](https://github.com/JimmyLv/roam-qa)의 예제 저장소에서 많은 영감을 받았습니다.
+
+## 🧑 자신의 데이터셋을 수집하기 위한 지침
+
+Roam Research에서 데이터셋을 내보내세요. 오른쪽 상단의 점 세 개를 클릭한 다음 `Export`를 클릭하면 됩니다.
+
+내보낼 때 `Markdown & CSV` 형식 옵션을 선택해야 합니다.
+
+이렇게 하면 다운로드 폴더에 `.zip` 파일이 생성됩니다. `.zip` 파일을 이 저장소로 이동하세요.
+
+다음 명령을 실행하여 zip 파일의 압축을 해제하세요 (필요에 따라 `Export...`를 자신의 파일 이름으로 바꾸세요).
+
+```shell
+unzip Roam-Export-1675782732639.zip -d Roam_DB
+```
+
+```python
+from langchain_community.document_loaders import RoamLoader
+```
+
+```python
+loader = RoamLoader("Roam_DB")
+```
+
+```python
+docs = loader.load()
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/document_loaders/roam.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

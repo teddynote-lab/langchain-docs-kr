@@ -1,0 +1,149 @@
+---
+title: 에이전트 성능 평가하기
+---
+
+
+
+에이전트의 성능을 평가하려면 `LangSmith` [evaluations](https://docs.smith.langchain.com/evaluation)을 사용할 수 있습니다. 먼저 최종 출력이나 trajectory와 같은 에이전트의 결과를 판단할 evaluator 함수를 정의해야 합니다. 평가 기법에 따라 참조 출력이 필요할 수도 있고 필요하지 않을 수도 있습니다:
+
+
+
+```typescript
+type EvaluatorParams = {
+    outputs: Record<string, any>;
+    referenceOutputs: Record<string, any>;
+};
+
+function evaluator({ outputs, referenceOutputs }: EvaluatorParams) {
+    // compare agent outputs against reference outputs
+    const outputMessages = outputs.messages;
+    const referenceMessages = referenceOutputs.messages;
+    const score = compareMessages(outputMessages, referenceMessages);
+    return { key: "evaluator_score", score: score };
+}
+```
+
+
+시작하려면 `AgentEvals` 패키지의 사전 구축된 evaluator를 사용할 수 있습니다:
+
+
+
+```bash
+npm install agentevals
+```
+
+
+## Evaluator 생성하기
+
+에이전트 성능을 평가하는 일반적인 방법은 trajectory(도구를 호출하는 순서)를 참조 trajectory와 비교하는 것입니다:
+
+
+
+```typescript
+import { createTrajectoryMatchEvaluator } from "agentevals/trajectory/match";
+
+const outputs = [
+    {
+        role: "assistant",
+        tool_calls: [
+        {
+            function: {
+            name: "get_weather",
+            arguments: JSON.stringify({ city: "san francisco" }),
+            },
+        },
+        {
+            function: {
+            name: "get_directions",
+            arguments: JSON.stringify({ destination: "presidio" }),
+            },
+        },
+        ],
+    },
+];
+
+const referenceOutputs = [
+    {
+        role: "assistant",
+        tool_calls: [
+        {
+            function: {
+            name: "get_weather",
+            arguments: JSON.stringify({ city: "san francisco" }),
+            },
+        },
+        ],
+    },
+];
+
+// Create the evaluator
+const evaluator = createTrajectoryMatchEvaluator({
+  // Specify how the trajectories will be compared. `superset` will accept output trajectory as valid if it's a superset of the reference one. Other options include: strict, unordered and subset
+  trajectoryMatchMode: "superset", // [!code highlight]
+});
+
+// Run the evaluator
+const result = evaluator({
+    outputs: outputs,
+    referenceOutputs: referenceOutputs,
+});
+```
+
+
+1. trajectory를 비교하는 방법을 지정합니다. `superset`은 출력 trajectory가 참조 trajectory의 상위 집합인 경우 유효한 것으로 인정합니다. 다른 옵션으로는 [strict](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#strict-match), [unordered](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#unordered-match), [subset](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#subset-and-superset-match)이 있습니다
+
+다음 단계로, [trajectory match evaluator 커스터마이징](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#agent-trajectory-match) 방법에 대해 자세히 알아보세요.
+
+### LLM-as-a-judge
+
+LLM을 사용하여 trajectory를 참조 출력과 비교하고 점수를 출력하는 LLM-as-a-judge evaluator를 사용할 수 있습니다:
+
+
+
+```typescript
+import {
+    createTrajectoryLlmAsJudge,
+    TRAJECTORY_ACCURACY_PROMPT_WITH_REFERENCE,
+} from "agentevals/trajectory/llm";
+
+const evaluator = createTrajectoryLlmAsJudge({
+    prompt: TRAJECTORY_ACCURACY_PROMPT_WITH_REFERENCE,
+    model: "openai:o3-mini",
+});
+```
+
+
+## Evaluator 실행하기
+
+Evaluator를 실행하려면 먼저 [LangSmith dataset](https://docs.smith.langchain.com/evaluation/concepts#datasets)을 생성해야 합니다. 사전 구축된 AgentEvals evaluator를 사용하려면 다음 스키마를 가진 dataset이 필요합니다:
+
+* **input**: `{"messages": [...]}` 에이전트를 호출할 입력 메시지.
+* **output**: `{"messages": [...]}` 에이전트 출력에서 예상되는 메시지 히스토리. trajectory 평가의 경우 assistant 메시지만 유지하도록 선택할 수 있습니다.
+
+
+
+```typescript
+import { Client } from "langsmith";
+import { createAgent } from "langchain";
+import { createTrajectoryMatchEvaluator } from "agentevals/trajectory/match";
+
+const client = new Client();
+const agent = createAgent({...});
+const evaluator = createTrajectoryMatchEvaluator({...});
+
+const experimentResults = await client.evaluate(
+    (inputs) => agent.invoke(inputs),
+    // replace with your dataset name
+    { data: "<Name of your dataset>" },
+    { evaluators: [evaluator] }
+);
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/evals.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

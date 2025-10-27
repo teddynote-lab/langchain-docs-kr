@@ -1,0 +1,59 @@
+---
+title: Yeager.ai
+---
+
+이 페이지는 [Yeager.ai](https://yeager.ai)를 사용하여 LangChain tool과 agent를 생성하는 방법을 다룹니다.
+
+## Yeager.ai란 무엇인가요?
+Yeager.ai는 AI agent와 tool을 생성하는 과정을 단순화하도록 설계된 생태계입니다.
+
+No-code LangChain Agent Builder인 yAgents를 특징으로 하며, 사용자가 AI 솔루션을 쉽게 구축, 테스트 및 배포할 수 있도록 합니다. LangChain framework를 활용하여 yAgents는 다양한 language model 및 리소스와의 원활한 통합을 가능하게 하며, 다양한 애플리케이션에 걸쳐 개발자, 연구자 및 AI 애호가에게 적합합니다.
+
+## yAgents
+LangChain tool을 쉽게 구축, 프로토타입 제작 및 배포할 수 있도록 도와주는 Low code generative agent입니다.
+
+### 사용 방법은?
+<CodeGroup>
+```bash pip
+pip install yeagerai-agent
+yeagerai-agent
+```
+
+```bash uv
+uv add yeagerai-agent
+yeagerai-agent
+```
+</CodeGroup>
+http://127.0.0.1:7860 으로 이동하세요
+
+이렇게 하면 필요한 dependency가 설치되고 시스템에 yAgents가 설정됩니다. 첫 실행 후 yAgents는 .env 파일을 생성하며, 여기에 OpenAI API key를 입력할 수 있습니다. "Settings" 탭 아래의 Gradio interface에서 직접 동일한 작업을 수행할 수도 있습니다.
+
+`OPENAI_API_KEY=<your_openai_api_key_here>`
+
+GPT-4 사용을 권장합니다. 그러나 문제가 충분히 세분화되면 GPT-3에서도 작동할 수 있습니다.
+
+### yAgents로 Tool 생성 및 실행하기
+yAgents를 사용하면 AI 기반 tool을 쉽게 생성하고 실행할 수 있습니다. 다음은 프로세스에 대한 간략한 개요입니다:
+1. tool 생성: tool을 생성하려면 yAgents에 자연어 prompt를 제공하세요. prompt는 tool의 목적과 기능을 명확하게 설명해야 합니다. 예를 들어:
+`create a tool that returns the n-th prime number`
+
+2. toolkit에 tool 로드: yAgents에 tool을 로드하려면 그렇게 하라는 명령을 yAgents에 제공하기만 하면 됩니다. 예를 들어:
+`load the tool that you just created it into your toolkit`
+
+3. tool 실행: tool이나 agent를 실행하려면 tool의 이름과 필요한 parameter를 포함하는 명령을 yAgents에 제공하기만 하면 됩니다. 예를 들어:
+`generate the 50th prime number`
+
+작동 방식에 대한 비디오는 [여기](https://www.youtube.com/watch?v=KA5hCM3RaWE)에서 볼 수 있습니다.
+
+yAgents에 익숙해지면 더 고급 tool과 agent를 생성하여 작업을 자동화하고 생산성을 향상시킬 수 있습니다.
+
+자세한 내용은 [yAgents의 Github](https://github.com/yeagerai/yeagerai-agent) 또는 [문서](https://yeagerai.gitbook.io/docs/general/welcome-to-yeager.ai)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/yeagerai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,94 @@
+---
+title: SearchApiLoader
+---
+
+이 가이드는 LangChain에서 SearchApi를 사용하여 웹 검색 결과를 로드하는 방법을 보여줍니다.
+
+## Overview
+
+[SearchApi](https://www.searchapi.io/)는 개발자에게 [Google Search](https://www.searchapi.io/docs/google),
+[Google News](https://www.searchapi.io/docs/google-news), [Google Scholar](https://www.searchapi.io/docs/google-scholar), [YouTube Transcripts](https://www.searchapi.io/docs/youtube-transcripts) 등 다양한 검색 엔진의 결과에 대한 액세스를 제공하는 실시간 API입니다. 이러한 검색 엔진은 문서에서 찾을 수 있습니다.
+이 API를 통해 개발자와 기업은 이러한 모든 검색 엔진의 결과 페이지에서 직접 의미 있는 데이터를 스크래핑하고 추출하여 다양한 사용 사례에 대한 귀중한 인사이트를 제공할 수 있습니다.
+
+이 가이드는 LangChain에서 `SearchApiLoader`를 사용하여 웹 검색 결과를 로드하는 방법을 보여줍니다. `SearchApiLoader`는 SearchApi에서 웹 검색 결과를 로드하고 처리하는 프로세스를 단순화합니다.
+
+## Setup
+
+[SearchApi API key](https://www.searchapi.io/)를 가입하고 받아야 합니다.
+
+## Usage
+
+다음은 `SearchApiLoader`를 사용하는 예제입니다:
+
+```typescript
+import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
+import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
+import { TokenTextSplitter } from "@langchain/textsplitters";
+import { SearchApiLoader } from "@langchain/community/document_loaders/web/searchapi";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { createStuffDocumentsChain } from "@langchain/classic/chains/combine_documents";
+import { createRetrievalChain } from "@langchain/classic/chains/retrieval";
+
+// Initialize the necessary components
+const llm = new ChatOpenAI({
+  model: "gpt-3.5-turbo-1106",
+});
+const embeddings = new OpenAIEmbeddings();
+const apiKey = "Your SearchApi API key";
+
+// Define your question and query
+const question = "Your question here";
+const query = "Your query here";
+
+// Use SearchApiLoader to load web search results
+const loader = new SearchApiLoader({ q: query, apiKey, engine: "google" });
+const docs = await loader.load();
+
+const textSplitter = new TokenTextSplitter({
+  chunkSize: 800,
+  chunkOverlap: 100,
+});
+
+const splitDocs = await textSplitter.splitDocuments(docs);
+
+// Use MemoryVectorStore to store the loaded documents in memory
+const vectorStore = await MemoryVectorStore.fromDocuments(
+  splitDocs,
+  embeddings
+);
+
+const questionAnsweringPrompt = ChatPromptTemplate.fromMessages([
+  [
+    "system",
+    "Answer the user's questions based on the below context:\n\n{context}",
+  ],
+  ["human", "{input}"],
+]);
+
+const combineDocsChain = await createStuffDocumentsChain({
+  llm,
+  prompt: questionAnsweringPrompt,
+});
+
+const chain = await createRetrievalChain({
+  retriever: vectorStore.asRetriever(),
+  combineDocsChain,
+});
+
+const res = await chain.invoke({
+  input: question,
+});
+
+console.log(res.answer);
+```
+
+이 예제에서 `SearchApiLoader`는 웹 검색 결과를 로드하는 데 사용되며, 이는 `MemoryVectorStore`를 사용하여 메모리에 저장됩니다. 그런 다음 retrieval chain을 사용하여 메모리에서 가장 관련성 높은 문서를 검색하고 이러한 문서를 기반으로 질문에 답변합니다. 이는 `SearchApiLoader`가 웹 검색 결과를 로드하고 처리하는 프로세스를 어떻게 간소화할 수 있는지 보여줍니다.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/web_loaders/searchapi.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

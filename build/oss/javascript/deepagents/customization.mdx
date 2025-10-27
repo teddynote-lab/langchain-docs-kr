@@ -1,0 +1,58 @@
+---
+title: Deep Agent 커스터마이징
+sidebarTitle: 커스터마이징
+description: system prompt, tool, subagent 등을 사용하여 deep agent를 커스터마이징하는 방법을 알아보세요
+---
+
+## Model
+
+기본적으로 `deepagents`는 `"claude-sonnet-4-5-20250929"`를 사용합니다. [LangChain model 객체](https://python.langchain.com/docs/integrations/chat/)를 전달하여 이를 커스터마이징할 수 있습니다.
+
+
+
+```typescript
+// TODO: Add JS implementation
+```
+
+
+## System prompt
+
+Deep agent는 Claude Code의 system prompt에서 영감을 받은 내장 system prompt를 제공합니다. 기본 system prompt에는 내장 planning tool, file system tool 및 subagent 사용에 대한 자세한 지침이 포함되어 있습니다.
+
+특정 사용 사례에 맞춘 각 deep agent에는 해당 사용 사례에 특화된 커스텀 system prompt가 포함되어야 합니다.
+
+
+
+```typescript
+// TODO: Add JS implementation
+```
+
+
+## Tools
+
+Tool-calling agent와 마찬가지로 deep agent는 액세스할 수 있는 최상위 레벨 tool 세트를 가져옵니다.
+
+
+
+```typescript
+// TODO: Add JS implementation
+```
+
+
+제공하는 tool 외에도 deep agent는 다음과 같은 여러 기본 tool에 액세스할 수 있습니다:
+
+- `write_todos` – agent의 to-do list 업데이트
+- `ls` – agent의 filesystem에 있는 모든 파일 나열
+- `read_file` – agent의 filesystem에서 파일 읽기
+- `write_file` – agent의 filesystem에 새 파일 작성
+- `edit_file` – agent의 filesystem에서 기존 파일 편집
+- `task` – 특정 작업을 처리할 subagent 생성
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/deepagents/customization.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

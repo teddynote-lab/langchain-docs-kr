@@ -1,0 +1,36 @@
+---
+title: Taskade
+---
+
+[Taskade](https://www.taskade.com)는 AI 기반 글쓰기, 프로젝트 관리 및 작업 자동화를 위한 최고의 도구입니다. 여러분의 제2의 두뇌로 설계된 Taskade는 프로젝트 실행을 단순화하고 처음부터 끝까지 팀 협업을 향상시킵니다.
+
+## 개요
+
+[Taskade](https://www.taskade.com)를 사용하면 작업을 자동화하고 워크플로우를 간소화하기 위해 자체 AI agent 팀을 구축, 훈련 및 배포할 수 있습니다. Taskade는 구조화된 목록부터 현대적인 테이블과 마인드맵까지 아이디어 구상, 협업 및 실행 도구를 완벽하게 결합하여 제공하며, 모두 고유한 워크플로우에 맞게 사용자 정의하고 필요에 따라 조정할 수 있습니다.
+
+```typescript
+import { TaskadeProjectLoader } from "@langchain/community/document_loaders/web/taskade";
+
+const loader = new TaskadeProjectLoader({
+  personalAccessToken: "TASKADE_PERSONAL_ACCESS_TOKEN", // or load it from process.env.TASKADE_PERSONAL_ACCESS_TOKEN
+  projectId: "projectId",
+});
+const docs = await loader.load();
+
+console.log({ docs });
+```
+
+브라우저에서 프로젝트를 열고 URL에서 추출하여 Taskade project id를 찾을 수 있습니다:
+
+```
+https://www.taskade.com/d/<YOUR PROJECT ID HERE>
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/web_loaders/taskade.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,40 @@
+---
+title: Fauna
+---
+
+>[Fauna](https://fauna.com/)는 지역, 클라우드 또는 전 세계에 걸쳐 확장 가능한 관계형 ACID 호환 데이터베이스의 강력함과 문서의 유연성을 결합한 분산 문서-관계형 데이터베이스입니다.
+
+
+## Installation and Setup
+
+secret key를 가져와야 합니다.
+자세한 내용은 [가이드](https://docs.fauna.com/fauna/current/learn/security_model/)를 참조하세요.
+
+`fauna` package를 설치해야 합니다.
+
+<CodeGroup>
+```bash pip
+pip install -U fauna
+```
+
+```bash uv
+uv add fauna
+```
+</CodeGroup>
+
+## Document Loader
+
+[사용 예제](/oss/python/integrations/document_loaders/fauna)를 참조하세요.
+
+```python
+from langchain_community.document_loaders.fauna import FaunaLoader
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/fauna.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -1,0 +1,214 @@
+---
+title: Outlines
+---
+
+>[Outlines](https://github.com/dottxt-ai/outlines)는 제약 조건이 있는 언어 생성을 위한 Python 라이브러리입니다. 다양한 언어 모델에 대한 통합 인터페이스를 제공하며, regex 매칭, 타입 제약, JSON schema, context-free grammar와 같은 기술을 사용하여 구조화된 생성을 가능하게 합니다.
+
+Outlines는 다음을 포함한 여러 backend를 지원합니다:
+- Hugging Face Transformers
+- llama.cpp
+- vLLM
+- MLX
+
+이 통합을 통해 LangChain에서 Outlines 모델을 사용할 수 있으며, LLM과 chat model 인터페이스를 모두 제공합니다.
+
+## 설치 및 설정
+
+LangChain에서 Outlines를 사용하려면 Outlines 라이브러리를 설치해야 합니다:
+
+<CodeGroup>
+```bash pip
+pip install outlines
+```
+
+```bash uv
+uv add outlines
+```
+</CodeGroup>
+
+선택한 backend에 따라 추가 종속성을 설치해야 할 수 있습니다:
+
+- Transformers의 경우: `pip install transformers torch datasets`
+- llama.cpp의 경우: `pip install llama-cpp-python`
+- vLLM의 경우: `pip install vllm`
+- MLX의 경우: `pip install mlx`
+
+## LLM
+
+LangChain에서 Outlines를 LLM으로 사용하려면 `Outlines` 클래스를 사용할 수 있습니다:
+
+```python
+from langchain_community.llms import Outlines
+```
+
+## Chat Models
+
+LangChain에서 Outlines를 chat model로 사용하려면 `ChatOutlines` 클래스를 사용할 수 있습니다:
+
+```python
+from langchain_community.chat_models import ChatOutlines
+```
+
+## Model 구성
+
+`Outlines`와 `ChatOutlines` 클래스는 유사한 구성 옵션을 공유합니다:
+
+```python
+model = Outlines(
+    model="meta-llama/Llama-2-7b-chat-hf",  # Model identifier
+    backend="transformers",  # Backend to use (transformers, llamacpp, vllm, or mlxlm)
+    max_tokens=256,  # Maximum number of tokens to generate
+    stop=["\n"],  # Optional list of stop strings
+    streaming=True,  # Whether to stream the output
+    # Additional parameters for structured generation:
+    regex=None,
+    type_constraints=None,
+    json_schema=None,
+    grammar=None,
+    # Additional model parameters:
+    model_kwargs={"temperature": 0.7}
+)
+```
+
+### Model Identifier
+
+`model` 파라미터는 다음과 같을 수 있습니다:
+- Hugging Face 모델 이름 (예: "meta-llama/Llama-2-7b-chat-hf")
+- 모델의 로컬 경로
+- GGUF 모델의 경우, 형식은 "repo_id/file_name"입니다 (예: "TheBloke/Llama-2-7B-Chat-GGUF/llama-2-7b-chat.Q4_K_M.gguf")
+
+### Backend 옵션
+
+`backend` 파라미터는 사용할 backend를 지정합니다:
+- `"transformers"`: Hugging Face Transformers 모델용 (기본값)
+- `"llamacpp"`: llama.cpp를 사용하는 GGUF 모델용
+- `"transformers_vision"`: vision-language 모델용 (예: LLaVA)
+- `"vllm"`: vLLM 라이브러리를 사용하는 모델용
+- `"mlxlm"`: MLX 프레임워크를 사용하는 모델용
+
+### 구조화된 생성
+
+Outlines는 구조화된 생성을 위한 여러 방법을 제공합니다:
+
+1. **Regex 매칭**:
+   ```python
+   model = Outlines(
+       model="meta-llama/Llama-2-7b-chat-hf",
+       regex=r"((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)"
+   )
+   ```
+   이렇게 하면 생성된 텍스트가 지정된 regex 패턴(이 경우 유효한 IP 주소)과 일치하도록 보장합니다.
+
+2. **타입 제약**:
+   ```python
+   model = Outlines(
+       model="meta-llama/Llama-2-7b-chat-hf",
+       type_constraints=int
+   )
+   ```
+   이는 출력을 유효한 Python 타입(int, float, bool, datetime.date, datetime.time, datetime.datetime)으로 제한합니다.
+
+3. **JSON Schema**:
+   ```python
+   from pydantic import BaseModel
+
+   class Person(BaseModel):
+       name: str
+       age: int
+
+   model = Outlines(
+       model="meta-llama/Llama-2-7b-chat-hf",
+       json_schema=Person
+   )
+   ```
+   이렇게 하면 생성된 출력이 지정된 JSON schema 또는 Pydantic 모델을 준수하도록 보장합니다.
+
+4. **Context-Free Grammar**:
+   ```python
+   model = Outlines(
+       model="meta-llama/Llama-2-7b-chat-hf",
+       grammar="""
+           ?start: expression
+           ?expression: term (("+" | "-") term)*
+           ?term: factor (("*" | "/") factor)*
+           ?factor: NUMBER | "-" factor | "(" expression ")"
+           %import common.NUMBER
+       """
+   )
+   ```
+   이는 EBNF 형식으로 지정된 context-free grammar를 준수하는 텍스트를 생성합니다.
+
+## 사용 예제
+
+### LLM 예제
+
+```python
+from langchain_community.llms import Outlines
+
+llm = Outlines(model="meta-llama/Llama-2-7b-chat-hf", max_tokens=100)
+result = llm.invoke("Tell me a short story about a robot.")
+print(result)
+```
+### Chat Model 예제
+
+```python
+from langchain_community.chat_models import ChatOutlines
+from langchain.messages import HumanMessage, SystemMessage
+
+chat = ChatOutlines(model="meta-llama/Llama-2-7b-chat-hf", max_tokens=100)
+messages = [
+    SystemMessage(content="You are a helpful AI assistant."),
+    HumanMessage(content="What's the capital of France?")
+]
+result = chat.invoke(messages)
+print(result.content)
+```
+### Streaming 예제
+
+```python
+from langchain_community.chat_models import ChatOutlines
+from langchain.messages import HumanMessage
+
+chat = ChatOutlines(model="meta-llama/Llama-2-7b-chat-hf", streaming=True)
+for chunk in chat.stream("Tell me a joke about programming."):
+    print(chunk.content, end="", flush=True)
+print()
+```
+### 구조화된 출력 예제
+
+```python
+from langchain_community.llms import Outlines
+from pydantic import BaseModel
+
+class MovieReview(BaseModel):
+    title: str
+    rating: int
+    summary: str
+
+llm = Outlines(
+    model="meta-llama/Llama-2-7b-chat-hf",
+    json_schema=MovieReview
+)
+result = llm.invoke("Write a short review for the movie 'Inception'.")
+print(result)
+```
+## 추가 기능
+
+### Tokenizer 접근
+
+모델의 기본 tokenizer에 접근할 수 있습니다:
+
+```python
+tokenizer = llm.tokenizer
+encoded = tokenizer.encode("Hello, world!")
+decoded = tokenizer.decode(encoded)
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/outlines.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

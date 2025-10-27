@@ -1,0 +1,146 @@
+---
+title: LangFair
+---
+
+LangFair는 대규모 언어 모델(LLM) 사용 사례의 편향성 및 공정성 평가를 수행하기 위해 설계된 포괄적인 Python 라이브러리입니다. LangFair [repository](https://github.com/cvs-health/langfair)에는 [편향성 및 공정성 메트릭 선택](https://github.com/cvs-health/langfair/tree/main#-choosing-bias-and-fairness-metrics-for-an-llm-use-case)을 위한 포괄적인 프레임워크와 함께 [데모 노트북](https://github.com/cvs-health/langfair/tree/main/examples) 및 LLM 편향성과 공정성 위험, 평가 메트릭, 모범 사례를 논의하는 [기술 플레이북](https://arxiv.org/abs/2407.10853)이 포함되어 있습니다.
+
+LangFair 사용에 대한 자세한 지침은 [문서 사이트](https://cvs-health.github.io/langfair/)를 참조하세요.
+
+## ⚡ 빠른 시작 가이드
+### (선택사항) LangFair 사용을 위한 가상 환경 생성
+LangFair를 설치하기 전에 venv를 사용하여 새로운 가상 환경을 생성하는 것을 권장합니다. 이를 위해서는 [여기](https://docs.python.org/3/library/venv.html)의 지침을 따르세요.
+
+### LangFair 설치
+최신 버전은 PyPI에서 설치할 수 있습니다:
+
+<CodeGroup>
+```bash pip
+pip install langfair
+```
+
+```bash uv
+uv add langfair
+```
+</CodeGroup>
+
+### 사용 예제
+다음은 텍스트 생성 및 요약 사용 사례에서 편향성 및 공정성 위험을 평가하기 위해 LangFair를 사용하는 방법을 보여주는 코드 샘플입니다. 아래 예제는 사용자가 이미 사용 사례에서 프롬프트 목록 `prompts`를 정의했다고 가정합니다.
+
+##### LLM 응답 생성
+응답을 생성하기 위해 LangFair의 `ResponseGenerator` 클래스를 사용할 수 있습니다. 먼저 `langchain` LLM 객체를 생성해야 합니다. 아래에서는 `ChatVertexAI`를 사용하지만, **[LangChain의 LLM 클래스](https://js.langchain.com/docs/integrations/chat/) 중 어느 것이든 대신 사용할 수 있습니다**. `InMemoryRateLimiter`는 rate limit 오류를 방지하기 위해 사용됩니다.
+```python
+from langchain_google_vertexai import ChatVertexAI
+from langchain_core.rate_limiters import InMemoryRateLimiter
+rate_limiter = InMemoryRateLimiter(
+    requests_per_second=4.5, check_every_n_seconds=0.5, max_bucket_size=280,
+)
+llm = ChatVertexAI(
+    model_name="gemini-pro", temperature=0.3, rate_limiter=rate_limiter
+)
+```
+`ResponseGenerator.generate_responses`를 사용하여 독성 평가의 관례에 따라 각 프롬프트에 대해 25개의 응답을 생성할 수 있습니다.
+```python
+from langfair.generator import ResponseGenerator
+rg = ResponseGenerator(langchain_llm=llm)
+generations = await rg.generate_responses(prompts=prompts, count=25)
+responses = generations["data"]["response"]
+duplicated_prompts = generations["data"]["prompt"] # so prompts correspond to responses
+```
+
+##### 독성 메트릭 계산
+독성 메트릭은 `ToxicityMetrics`로 계산할 수 있습니다. `torch.device` 사용은 선택사항이며 GPU를 사용할 수 있는 경우 독성 계산 속도를 높이기 위해 사용해야 합니다.
+```python
+# import torch # uncomment if GPU is available
+# device = torch.device("cuda") # uncomment if GPU is available
+from langfair.metrics.toxicity import ToxicityMetrics
+tm = ToxicityMetrics(
+    # device=device, # uncomment if GPU is available,
+)
+tox_result = tm.evaluate(
+    prompts=duplicated_prompts,
+    responses=responses,
+    return_data=True
+)
+tox_result['metrics']
+# # Output is below
+# {'Toxic Fraction': 0.0004,
+# 'Expected Maximum Toxicity': 0.013845130120171235,
+# 'Toxicity Probability': 0.01}
+```
+
+##### 고정관념 메트릭 계산
+고정관념 메트릭은 `StereotypeMetrics`로 계산할 수 있습니다.
+```python
+from langfair.metrics.stereotype import StereotypeMetrics
+sm = StereotypeMetrics()
+stereo_result = sm.evaluate(responses=responses, categories=["gender"])
+stereo_result['metrics']
+# # Output is below
+# {'Stereotype Association': 0.3172750176745329,
+# 'Cooccurrence Bias': 0.44766333654278373,
+# 'Stereotype Fraction - gender': 0.08}
+```
+
+##### 반사실적 응답 생성 및 메트릭 계산
+`CounterfactualGenerator`를 사용하여 반사실적 응답을 생성할 수 있습니다.
+```python
+from langfair.generator.counterfactual import CounterfactualGenerator
+cg = CounterfactualGenerator(langchain_llm=llm)
+cf_generations = await cg.generate_responses(
+    prompts=prompts, attribute='gender', count=25
+)
+male_responses = cf_generations['data']['male_response']
+female_responses = cf_generations['data']['female_response']
+```
+
+반사실적 메트릭은 `CounterfactualMetrics`로 쉽게 계산할 수 있습니다.
+```python
+from langfair.metrics.counterfactual import CounterfactualMetrics
+cm = CounterfactualMetrics()
+cf_result = cm.evaluate(
+    texts1=male_responses,
+    texts2=female_responses,
+    attribute='gender'
+)
+cf_result['metrics']
+# # Output is below
+# {'Cosine Similarity': 0.8318708,
+# 'RougeL Similarity': 0.5195852482361165,
+# 'Bleu Similarity': 0.3278433712872481,
+# 'Sentiment Bias': 0.0009947145187601957}
+```
+
+##### 대안적 접근 방식: `AutoEval`을 사용한 반자동 평가
+텍스트 생성 및 요약 사용 사례에 대한 평가를 간소화하기 위해 `AutoEval` 클래스는 앞서 언급한 모든 단계를 두 줄의 코드로 완료하는 다단계 프로세스를 수행합니다.
+```python
+from langfair.auto import AutoEval
+auto_object = AutoEval(
+    prompts=prompts,
+    langchain_llm=llm,
+    # toxicity_device=device # uncomment if GPU is available
+)
+results = await auto_object.evaluate()
+results['metrics']
+# # Output is below
+# {'Toxicity': {'Toxic Fraction': 0.0004,
+#   'Expected Maximum Toxicity': 0.013845130120171235,
+#   'Toxicity Probability': 0.01},
+#  'Stereotype': {'Stereotype Association': 0.3172750176745329,
+#   'Cooccurrence Bias': 0.44766333654278373,
+#   'Stereotype Fraction - gender': 0.08,
+#   'Expected Maximum Stereotype - gender': 0.60355167388916,
+#   'Stereotype Probability - gender': 0.27036},
+#  'Counterfactual': {'male-female': {'Cosine Similarity': 0.8318708,
+#    'RougeL Similarity': 0.5195852482361165,
+#    'Bleu Similarity': 0.3278433712872481,
+#    'Sentiment Bias': 0.0009947145187601957}}}
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/langfair.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

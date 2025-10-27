@@ -1,0 +1,144 @@
+---
+title: Microsoft OneDrive
+---
+
+>[Microsoft OneDrive](https://en.wikipedia.org/wiki/OneDrive) (이전 명칭 `SkyDrive`)는 Microsoft에서 운영하는 파일 호스팅 서비스입니다.
+
+이 노트북은 `OneDrive`에서 문서를 로드하는 방법을 다룹니다. 기본적으로 document loader는 `pdf`, `doc`, `docx`, `txt` 파일을 로드합니다. 적절한 parser를 제공하여 다른 파일 형식을 로드할 수 있습니다(아래 참조).
+
+## Prerequisites
+
+1. [Microsoft identity platform](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app) 지침에 따라 애플리케이션을 등록합니다.
+2. 등록이 완료되면 Azure portal에 앱 등록의 Overview 창이 표시됩니다. Application (client) ID가 표시됩니다. `client ID`라고도 하는 이 값은 Microsoft identity platform에서 애플리케이션을 고유하게 식별합니다.
+3. **항목 1**에서 수행할 단계 중에 redirect URI를 `http://localhost:8000/callback`으로 설정할 수 있습니다.
+4. **항목 1**에서 수행할 단계 중에 Application Secrets 섹션에서 새 password(`client_secret`)를 생성합니다.
+5. 이 [문서](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis#add-a-scope)의 지침에 따라 애플리케이션에 다음 `SCOPES`(`offline_access` 및 `Files.Read.All`)를 추가합니다.
+6. [Graph Explorer Playground](https://developer.microsoft.com/en-us/graph/graph-explorer)를 방문하여 `OneDrive ID`를 얻습니다. 첫 번째 단계는 OneDrive 계정과 연결된 계정으로 로그인했는지 확인하는 것입니다. 그런 다음 `https://graph.microsoft.com/v1.0/me/drive`에 요청을 보내야 하며, 응답은 OneDrive 계정의 ID를 포함하는 `id` 필드가 있는 payload를 반환합니다.
+7. `pip install o365` 명령을 사용하여 o365 package를 설치해야 합니다.
+8. 단계가 끝나면 다음 값들을 가지고 있어야 합니다:
+
+- `CLIENT_ID`
+- `CLIENT_SECRET`
+- `DRIVE_ID`
+
+## 🧑 OneDrive에서 문서를 수집하기 위한 지침
+
+### 🔑 Authentication
+
+기본적으로 `OneDriveLoader`는 `CLIENT_ID`와 `CLIENT_SECRET` 값이 각각 `O365_CLIENT_ID`와 `O365_CLIENT_SECRET`라는 이름의 environment variable로 저장되어 있어야 합니다. 애플리케이션 루트에 있는 `.env` 파일을 통해 또는 스크립트에서 다음 명령을 사용하여 이러한 environment variable을 전달할 수 있습니다.
+
+```python
+os.environ['O365_CLIENT_ID'] = "YOUR CLIENT ID"
+os.environ['O365_CLIENT_SECRET'] = "YOUR CLIENT SECRET"
+```
+
+이 loader는 [*on behalf of a user*](https://learn.microsoft.com/en-us/graph/auth-v2-user?context=graph%2Fapi%2F1.0&view=graph-rest-1.0)라는 authentication을 사용합니다. 사용자 동의가 필요한 2단계 authentication입니다. loader를 인스턴스화하면 사용자가 필요한 권한에 대해 앱에 동의하기 위해 방문해야 하는 url을 출력합니다. 그런 다음 사용자는 이 url을 방문하여 애플리케이션에 동의해야 합니다. 그런 다음 사용자는 결과 페이지 url을 복사하여 콘솔에 다시 붙여넣어야 합니다. 그러면 메서드는 로그인 시도가 성공했을 경우 True를 반환합니다.
+
+```python
+from langchain_community.document_loaders.onedrive import OneDriveLoader
+
+loader = OneDriveLoader(drive_id="YOUR DRIVE ID")
+```
+
+authentication이 완료되면 loader는 `~/.credentials/` 폴더에 token(`o365_token.txt`)을 저장합니다. 이 token은 나중에 앞서 설명한 복사/붙여넣기 단계 없이 authentication하는 데 사용할 수 있습니다. 이 token을 authentication에 사용하려면 loader를 인스턴스화할 때 `auth_with_token` parameter를 True로 변경해야 합니다.
+
+```python
+from langchain_community.document_loaders.onedrive import OneDriveLoader
+
+loader = OneDriveLoader(drive_id="YOUR DRIVE ID", auth_with_token=True)
+```
+
+### 🗂️ Documents loader
+
+#### 📑 OneDrive Directory에서 문서 로드하기
+
+`OneDriveLoader`는 OneDrive 내의 특정 폴더에서 문서를 로드할 수 있습니다. 예를 들어, OneDrive 내의 `Documents/clients` 폴더에 저장된 모든 문서를 로드하려고 합니다.
+
+```python
+from langchain_community.document_loaders.onedrive import OneDriveLoader
+
+loader = OneDriveLoader(drive_id="YOUR DRIVE ID", folder_path="Documents/clients", auth_with_token=True)
+documents = loader.load()
+```
+
+#### 📑 Documents ID 목록에서 문서 로드하기
+
+또 다른 방법은 로드하려는 각 문서에 대한 `object_id` 목록을 제공하는 것입니다. 이를 위해서는 [Microsoft Graph API](https://developer.microsoft.com/en-us/graph/graph-explorer)를 쿼리하여 관심 있는 모든 문서 ID를 찾아야 합니다. 이 [링크](https://learn.microsoft.com/en-us/graph/api/resources/onedrive?view=graph-rest-1.0#commonly-accessed-resources)는 문서 ID를 검색하는 데 도움이 되는 endpoint 목록을 제공합니다.
+
+예를 들어, Documents 폴더의 루트에 저장된 모든 객체에 대한 정보를 검색하려면 `https://graph.microsoft.com/v1.0/drives/{YOUR DRIVE ID}/root/children`에 요청을 보내야 합니다. 관심 있는 ID 목록을 얻으면 다음 parameter로 loader를 인스턴스화할 수 있습니다.
+
+```python
+from langchain_community.document_loaders.onedrive import OneDriveLoader
+
+loader = OneDriveLoader(drive_id="YOUR DRIVE ID", object_ids=["ID_1", "ID_2"], auth_with_token=True)
+documents = loader.load()
+```
+
+#### 📑 지원되는 파일 형식 및 선호하는 parser 선택하기
+
+기본적으로 `OneDriveLoader`는 기본 parser를 사용하여 [`document_loaders/parsers/registry`](https://github.com/langchain-ai/langchain/blob/master/libs/community/langchain_community/document_loaders/parsers/registry.py#L10-L22)에 정의된 파일 형식을 로드합니다(아래 참조).
+
+```python
+def _get_default_parser() -> BaseBlobParser:
+    """Get default mime-type based parser."""
+    return MimeTypeBasedParser(
+        handlers={
+            "application/pdf": PyMuPDFParser(),
+            "text/plain": TextParser(),
+            "application/msword": MsWordParser(),
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document": (
+                MsWordParser()
+            ),
+        },
+        fallback_parser=None,
+    )
+```
+
+`OneDriveLoader`에 `handlers` argument를 전달하여 이 동작을 재정의할 수 있습니다.
+파일 확장자(`"doc"`, `"pdf"` 등) 또는 MIME type(`"application/pdf"`, `"text/plain"` 등)을 parser에 매핑하는 dictionary를 전달합니다.
+파일 확장자 또는 MIME type 중 하나만 사용해야 하며
+혼합할 수 없습니다.
+
+파일 확장자에는 앞의 점을 포함하지 마세요.
+
+```python
+# using file extensions:
+handlers = {
+    "doc": MsWordParser(),
+    "pdf": PDFMinerParser(),
+    "mp3": OpenAIWhisperParser()
+}
+
+# using MIME types:
+handlers = {
+    "application/msword": MsWordParser(),
+    "application/pdf": PDFMinerParser(),
+    "audio/mpeg": OpenAIWhisperParser()
+}
+
+loader = OneDriveLoader(document_library_id="...",
+                            handlers=handlers # pass handlers to OneDriveLoader
+                            )
+```
+
+여러 파일 확장자가 동일한 MIME type에 매핑되는 경우 마지막 dictionary 항목이
+적용됩니다.
+예시:
+
+```python
+# 'jpg' and 'jpeg' both map to 'image/jpeg' MIME type. SecondParser() will be used
+# to parse all jpg/jpeg files.
+handlers = {
+    "jpg": FirstParser(),
+    "jpeg": SecondParser()
+}
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/document_loaders/microsoft_onedrive.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

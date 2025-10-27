@@ -1,0 +1,89 @@
+### 2. LangSmith에 배포하기
+
+<Steps>
+<Step title="LangSmith Deployments로 이동">
+    [LangSmith](https://smith.langchain.com/)에 로그인하세요. 왼쪽 사이드바에서 **Deployments**를 선택하세요.
+</Step>
+<Step title="새 deployment 생성">
+    **+ New Deployment** 버튼을 클릭하세요. 필수 필드를 입력할 수 있는 창이 열립니다.
+</Step>
+<Step title="repository 연결">
+    처음 사용하는 경우이거나 이전에 연결되지 않은 private repository를 추가하는 경우, **Add new account** 버튼을 클릭하고 안내에 따라 GitHub 계정을 연결하세요.
+</Step>
+<Step title="repository 배포">
+    애플리케이션의 repository를 선택하세요. **Submit**을 클릭하여 배포하세요. 완료까지 약 15분이 소요될 수 있습니다. **Deployment details** 뷰에서 상태를 확인할 수 있습니다.
+</Step>
+</Steps>
+
+### 3. Studio에서 애플리케이션 테스트하기
+
+애플리케이션이 배포되면:
+
+1. 방금 생성한 deployment를 선택하여 자세한 내용을 확인하세요.
+2. 오른쪽 상단의 **Studio** 버튼을 클릭하세요. Studio가 열리면서 graph가 표시됩니다.
+
+### 4. deployment의 API URL 가져오기
+
+1. LangGraph의 **Deployment details** 뷰에서 **API URL**을 클릭하여 클립보드에 복사하세요.
+2. `URL`을 클릭하여 클립보드에 복사하세요.
+
+### 5. API 테스트하기
+
+이제 API를 테스트할 수 있습니다:
+
+<Tabs>
+<Tab title="Python">
+1. LangGraph Python 설치:
+```shell
+pip install langgraph-sdk
+```
+2. agent에 메시지 보내기:
+```python
+from langgraph_sdk import get_sync_client # or get_client for async
+
+client = get_sync_client(url="your-deployment-url", api_key="your-langsmith-api-key")
+
+for chunk in client.runs.stream(
+    None,    # Threadless run
+    "agent", # Name of agent. Defined in langgraph.json.
+    input={
+        "messages": [{
+            "role": "human",
+            "content": "What is LangGraph?",
+        }],
+    },
+    stream_mode="updates",
+):
+    print(f"Receiving new event of type: {chunk.event}...")
+    print(chunk.data)
+    print("\n\n")
+```
+</Tab>
+
+
+<Tab title="Rest API">
+```bash
+curl -s --request POST \
+    --url <DEPLOYMENT_URL>/runs/stream \
+    --header 'Content-Type: application/json' \
+    --header "X-Api-Key: <LANGSMITH API KEY> \
+    --data "{
+        \"assistant_id\": \"agent\", `# Name of agent. Defined in langgraph.json.`
+        \"input\": {
+            \"messages\": [
+                {
+                    \"role\": \"human\",
+                    \"content\": \"What is LangGraph?\"
+                }
+            ]
+        },
+        \"stream_mode\": \"updates\"
+    }"
+```
+</Tab>
+</Tabs>
+
+<Tip>
+LangSmith는 self-hosted 및 hybrid를 포함한 추가 호스팅 옵션을 제공합니다. 자세한 내용은 [Hosting overview](/langsmith/hosting)를 참조하세요.
+</Tip>
+```

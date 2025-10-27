@@ -1,0 +1,60 @@
+---
+title: OpenDataLoader PDF
+---
+
+> **안전하고, 오픈 소스이며, 고성능 — AI를 위한 PDF**
+
+> [OpenDataLoader PDF](https://github.com/opendataloader-project/opendataloader-pdf)는 PDF를 JSON, Markdown 또는 Html로 변환하여 최신 AI 스택(LLM, 벡터 검색, RAG)에 바로 사용할 수 있도록 합니다.
+> 
+> 문서 레이아웃(제목, 목록, 표, 읽기 순서)을 재구성하여 콘텐츠를 더 쉽게 청크, 인덱싱 및 쿼리할 수 있습니다.
+> 빠른 휴리스틱 규칙 기반 추론으로 구동되며, 로컬 머신에서 완전히 실행되고 대규모 문서 세트에 대한 높은 처리량을 제공합니다.
+> AI 안전성이 기본적으로 활성화되어 있으며, PDF에 포함된 프롬프트 인젝션 가능성이 있는 콘텐츠를 자동으로 필터링하여 다운스트림 위험을 줄입니다.
+
+## Requirements
+- Python >= 3.9
+- 시스템 `PATH`에서 사용 가능한 Java 11 이상
+- opendataloader-pdf >= 1.1.1
+
+## Installation
+```bash
+pip install -U langchain-opendataloader-pdf
+```
+
+## Quick start
+```python
+from langchain_opendataloader_pdf import OpenDataLoaderPDFLoader
+
+loader = OpenDataLoaderPDFLoader(
+    file_path=["path/to/document.pdf", "path/to/folder"], 
+    format="text"
+)
+documents = loader.load()
+
+for doc in documents:
+    print(doc.metadata, doc.page_content[:80])
+```
+
+## Parameters
+
+| Parameter                | Type                  | Required   | Default      | Description                                                                                                        |
+|--------------------------|-----------------------| ---------- |--------------|--------------------------------------------------------------------------------------------------------------------|
+| `file_path`              | `List[str]`           | ✅ Yes     | —            | 처리할 하나 이상의 PDF 파일 경로 또는 디렉토리.                                                              |
+| `format`                 | `str`                 | No         | `None`       | 출력 형식 (예: `"json"`, `"html"`, `"markdown"`, `"text"`).                                                  |
+| `quiet`                  | `bool`                | No         | `False`      | `True`일 때 CLI 로깅 출력을 억제합니다.                                                                         |
+| `content_safety_off`     | `Optional[List[str]]` | No         | `None`       | 비활성화할 콘텐츠 안전 필터 목록 (예: `"all"`, `"hidden-text"`, `"off-page"`, `"tiny"`, `"hidden-ocg"`). |
+
+## Additional Resources
+
+- [LangChain OpenDataLoader PDF integration GitHub](https://github.com/opendataloader-project/langchain-opendataloader-pdf)
+- [LangChain OpenDataLoader PDF integration PyPI package](https://pypi.org/project/langchain-opendataloader-pdf/)
+- [OpenDataLoader PDF GitHub](https://github.com/opendataloader-project/opendataloader-pdf)
+- [OpenDataLoader PDF Homepage](https://opendataloader.org/)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/opendataloader_pdf.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

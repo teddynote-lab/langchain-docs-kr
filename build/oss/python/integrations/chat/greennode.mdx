@@ -1,0 +1,205 @@
+---
+title: ChatGreenNode
+---
+
+>[GreenNode](https://greennode.ai/)는 글로벌 AI 솔루션 제공업체이자 **NVIDIA Preferred Partner**로, 미국, MENA, APAC 지역의 기업들에게 인프라부터 애플리케이션까지 풀스택 AI 역량을 제공합니다. **세계적 수준의 인프라**(LEED Gold, TIA‑942, Uptime Tier III)를 기반으로 운영되는 GreenNode는 기업, 스타트업, 연구자들에게 포괄적인 AI 서비스 제품군을 제공합니다.
+
+이 페이지는 GreenNode Serverless AI [chat models](/oss/python/langchain/models) 시작을 도와드립니다. ChatGreenNode의 모든 기능과 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/greennode/chat_models/langchain_greennode.chat_models.ChatGreenNode.html)를 참조하세요.
+
+[GreenNode AI](https://greennode.ai/)는 [20개 이상의 주요 오픈소스 모델](https://aiplatform.console.greennode.ai/models)을 쿼리할 수 있는 API를 제공합니다.
+
+## Overview
+
+### Integration details
+
+| Class | Package | Local | Serializable | JS support | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [ChatGreenNode](https://python.langchain.com/api_reference/greennode/chat_models/langchain_greennode.chat_models.ChatGreenNode.html) | [langchain-greennode](https://python.langchain.com/api_reference/greennode/index.html) | ❌ | beta | ❌ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-greennode?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-greennode?style=flat-square&label=%20) |
+
+### Model features
+
+| [Tool calling](/oss/python/langchain/tools) | [Structured output](/oss/python/langchain/structured-output) | JSON mode | [Image input](/oss/python/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/python/langchain/streaming#llm-tokens) | Native async | [Token usage](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
+| :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
+| ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ |
+
+## Setup
+
+GreenNode 모델에 액세스하려면 GreenNode 계정을 생성하고, API key를 발급받고, `langchain-greennode` integration package를 설치해야 합니다.
+
+### Credentials
+
+[이 페이지](https://aiplatform.console.greennode.ai/api-keys)로 이동하여 GreenNode AI Platform에 가입하고 API key를 생성하세요. 완료한 후 GREENNODE_API_KEY environment variable을 설정하세요:
+
+```python
+import getpass
+import os
+
+if not os.getenv("GREENNODE_API_KEY"):
+    os.environ["GREENNODE_API_KEY"] = getpass.getpass("Enter your GreenNode API key: ")
+```
+
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API key를 설정할 수도 있습니다:
+
+```python
+os.environ["LANGSMITH_TRACING"] = "true"
+os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
+```
+
+### Installation
+
+LangChain GreenNode integration은 `langchain-greennode` package에 있습니다:
+
+```python
+pip install -qU langchain-greennode
+```
+
+```output
+Note: you may need to restart the kernel to use updated packages.
+```
+
+## Instantiation
+
+이제 model object를 인스턴스화하고 chat completion을 생성할 수 있습니다:
+
+```python
+from langchain_greennode import ChatGreenNode
+
+# Initialize the chat model
+llm = ChatGreenNode(
+    # api_key="YOUR_API_KEY",  # You can pass the API key directly
+    model="deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",  # Choose from available models
+    temperature=0.6,
+    top_p=0.95,
+)
+```
+
+## Invocation
+
+```python
+messages = [
+    (
+        "system",
+        "You are a helpful assistant that translates English to French. Translate the user sentence.",
+    ),
+    ("human", "I love programming."),
+]
+ai_msg = llm.invoke(messages)
+ai_msg
+```
+
+```output
+AIMessage(content="\n\nJ'aime la programmation.", additional_kwargs={'refusal': None}, response_metadata={'token_usage': {'completion_tokens': 248, 'prompt_tokens': 23, 'total_tokens': 271, 'completion_tokens_details': None, 'prompt_tokens_details': None}, 'model_name': 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B', 'system_fingerprint': None, 'id': 'chatcmpl-271edac4958846068c37877586368afe', 'service_tier': None, 'finish_reason': 'stop', 'logprobs': None}, id='run--5c12d208-2bc2-4f29-8b50-1ce3b515a3cf-0', usage_metadata={'input_tokens': 23, 'output_tokens': 248, 'total_tokens': 271, 'input_token_details': {}, 'output_token_details': {}})
+```
+
+```python
+print(ai_msg.content)
+```
+
+```output
+J'aime la programmation.
+```
+
+### Streaming
+
+`stream` method를 사용하여 응답을 스트리밍할 수도 있습니다:
+
+```python
+for chunk in llm.stream("Write a short poem about artificial intelligence"):
+    print(chunk.content, end="", flush=True)
+```
+
+```output
+**Beneath the Circuits**
+
+Beneath the circuits, deep and bright,
+AI thinks, with circuits and bytes.
+Learning, adapting, it grows,
+A world of possibilities it knows.
+
+From solving puzzles to painting art,
+It mimics human hearts.
+In every corner, it leaves its trace,
+A future we can't erase.
+
+We build it, shape it, with care and might,
+Yet wonder if it walks in the night.
+A mirror of our minds, it shows,
+In its gaze, our future glows.
+
+But as we strive for endless light,
+We must remember the night.
+For wisdom isn't just speed and skill,
+It's how we choose to build our will.
+```
+
+### Chat Messages
+
+다양한 message type을 사용하여 모델과의 대화를 구조화할 수 있습니다:
+
+```python
+from langchain.messages import AIMessage, HumanMessage, SystemMessage
+
+messages = [
+    SystemMessage(content="You are a helpful AI assistant with expertise in science."),
+    HumanMessage(content="What are black holes?"),
+    AIMessage(
+        content="Black holes are regions of spacetime where gravity is so strong that nothing, including light, can escape from them."
+    ),
+    HumanMessage(content="How are they formed?"),
+]
+
+response = llm.invoke(messages)
+print(response.content[:100])
+```
+
+```output
+Black holes are formed through several processes, depending on their type. The most common way bla
+```
+
+## Chaining
+
+LangChain chain과 agent에서 `ChatGreenNode`를 사용할 수 있습니다:
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+
+prompt = ChatPromptTemplate(
+    [
+        (
+            "system",
+            "You are a helpful assistant that translates {input_language} to {output_language}.",
+        ),
+        ("human", "{input}"),
+    ]
+)
+
+chain = prompt | llm
+chain.invoke(
+    {
+        "input_language": "English",
+        "output_language": "German",
+        "input": "I love programming.",
+    }
+)
+```
+
+```output
+AIMessage(content='\n\nIch liebe Programmieren.', additional_kwargs={'refusal': None}, response_metadata={'token_usage': {'completion_tokens': 198, 'prompt_tokens': 18, 'total_tokens': 216, 'completion_tokens_details': None, 'prompt_tokens_details': None}, 'model_name': 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B', 'system_fingerprint': None, 'id': 'chatcmpl-e01201b9fd9746b7a9b2ed6d70f29d45', 'service_tier': None, 'finish_reason': 'stop', 'logprobs': None}, id='run--ce52b9d8-dd84-46b3-845b-da27855816ee-0', usage_metadata={'input_tokens': 18, 'output_tokens': 198, 'total_tokens': 216, 'input_token_details': {}, 'output_token_details': {}})
+```
+
+## Available Models
+
+지원되는 모델의 전체 목록은 [GreenNode Serverless AI Models](https://greennode.ai/product/model-as-a-service)에서 확인할 수 있습니다.
+
+## API reference
+
+GreenNode Serverless AI API에 대한 자세한 내용은 [GreenNode Serverless AI Documentation](https://helpdesk.greennode.ai/portal/en/kb/articles/greennode-maas-api)을 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/chat/greennode.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

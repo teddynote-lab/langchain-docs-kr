@@ -1,0 +1,384 @@
+---
+title: Vercel AI SDK로 추적하기 (레거시)
+sidebarTitle: Vercel AI SDK로 추적하기 (레거시)
+---
+
+<Warning>
+이 페이지는 AI SDK 실행을 추적하는 이전 방법을 문서화합니다. OTEL 설정이 필요하지 않은 더 간단하고 일반적인 방법은 [새로운 가이드](/langsmith/trace-with-vercel-ai-sdk)를 참조하세요.
+</Warning>
+
+OpenTelemetry(OTEL)를 사용하여 Vercel AI SDK의 실행을 LangSmith로 추적할 수 있습니다. 이 가이드는 예제를 통해 설명합니다.
+
+<Note>
+JavaScript의 많은 인기 있는 [OpenTelemetry 구현](https://www.npmjs.com/package/@opentelemetry/sdk-node)은 현재 실험적이며,
+특히 LangSmith를 다른 provider와 함께 계측할 때 프로덕션 환경에서 불규칙하게 동작할 수 있습니다. AI SDK 5를 사용하는 경우,
+[AI SDK 실행 추적을 위한 권장 접근 방식](/langsmith/trace-with-vercel-ai-sdk)을 사용할 것을 강력히 권장합니다.
+</Note>
+
+## 0. 설치
+
+Vercel AI SDK와 필요한 OTEL 패키지를 설치합니다. 아래 코드 스니펫에서는 OpenAI 통합을 사용하지만, 다른 옵션도 사용할 수 있습니다.
+
+<CodeGroup>
+
+```bash npm
+npm install ai @ai-sdk/openai zod
+```
+
+```bash yarn
+yarn add ai @ai-sdk/openai zod
+```
+
+
+```bash pnpm
+pnpm add ai @ai-sdk/openai zod
+```
+
+</CodeGroup>
+
+<CodeGroup>
+
+```bash npm
+npm install @opentelemetry/sdk-trace-base @opentelemetry/exporter-trace-otlp-proto @opentelemetry/context-async-hooks
+```
+
+```bash yarn
+yarn add @opentelemetry/sdk-trace-base @opentelemetry/exporter-trace-otlp-proto @opentelemetry/context-async-hooks
+```
+
+```bash pnpm
+pnpm add @opentelemetry/sdk-trace-base @opentelemetry/exporter-trace-otlp-proto @opentelemetry/context-async-hooks
+```
+
+</CodeGroup>
+
+## 1. 환경 구성
+
+```bash
+export LANGSMITH_TRACING=true
+export LANGSMITH_API_KEY=<your-api-key>
+export LANGSMITH_OTEL_ENABLED=true
+
+# This example uses OpenAI, but you can use any LLM provider of choice
+export OPENAI_API_KEY=<your-openai-api-key>
+```
+## 2. 추적 로깅
+
+### Node.js
+
+추적을 시작하려면 코드 시작 부분에서 `initializeOTEL` 메서드를 import하고 호출해야 합니다:
+
+```typescript
+import { initializeOTEL } from "langsmith/experimental/otel/setup";
+
+const { DEFAULT_LANGSMITH_SPAN_PROCESSOR } = initializeOTEL();
+```
+
+그런 다음, 추적하려는 AI SDK 호출에 `experimental_telemetry` 인수를 추가합니다.
+
+<Info>
+애플리케이션이 종료되기 전에 남은 추적을 LangSmith로 플러시하기 위해 `await DEFAULT_LANGSMITH_SPAN_PROCESSOR.shutdown();`을 호출하는 것을 잊지 마세요.
+</Info>
+
+```typescript
+import { generateText } from "ai";
+import { openai } from "@ai-sdk/openai";
+
+let result;
+try {
+  result = await generateText({
+    model: openai("gpt-4.1-nano"),
+    prompt: "Write a vegetarian lasagna recipe for 4 people.",
+    experimental_telemetry: {
+      isEnabled: true,
+    },
+  });
+} finally {
+  await DEFAULT_LANGSMITH_SPAN_PROCESSOR.shutdown();
+}
+```
+
+LangSmith 대시보드에서 [이와 같은](https://smith.langchain.com/public/21d33490-d522-4928-a944-a09e988d539c/r) 추적을 볼 수 있습니다.
+
+tool 호출이 있는 실행도 추적할 수 있습니다:
+
+```typescript
+import { generateText, tool } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { z } from "zod";
+
+await generateText({
+  model: openai("gpt-4.1-nano"),
+  messages: [
+    {
+      role: "user",
+      content: "What are my orders and where are they? My user ID is 123",
+    },
+  ],
+  tools: {
+    listOrders: tool({
+      description: "list all orders",
+      parameters: z.object({ userId: z.string() }),
+      execute: async ({ userId }) =>
+        `User ${userId} has the following orders: 1`,
+    }),
+    viewTrackingInformation: tool({
+      description: "view tracking information for a specific order",
+      parameters: z.object({ orderId: z.string() }),
+      execute: async ({ orderId }) =>
+        `Here is the tracking information for ${orderId}`,
+    }),
+  },
+  experimental_telemetry: {
+    isEnabled: true,
+  },
+  maxSteps: 10,
+});
+```
+
+결과는 [이와 같은](https://smith.langchain.com/public/e6122734-2762-4ae0-986b-0cbe4d68692f/r) 추적이 됩니다.
+
+### `traceable`과 함께 사용
+
+AI SDK tool 호출 주변이나 내부에 `traceable` 호출을 래핑할 수 있습니다. 이렇게 하는 경우, 각 `traceable`에 전달할 LangSmith `client` 인스턴스를 초기화한 다음 `client.awaitPendingTraceBatches();`를 호출하여 모든 추적이 플러시되도록 하는 것을 권장합니다. 이렇게 하면 `DEFAULT_LANGSMITH_SPAN_PROCESSOR`에서 `shutdown()` 또는 `forceFlush()`를 수동으로 호출할 필요가 없습니다. 다음은 예제입니다:
+
+```typescript
+import { initializeOTEL } from "langsmith/experimental/otel/setup";
+
+initializeOTEL();
+
+import { Client } from "langsmith";
+import { traceable } from "langsmith/traceable";
+import { generateText, tool } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { z } from "zod";
+
+const client = new Client();
+
+const wrappedText = traceable(
+  async (content: string) => {
+    const { text } = await generateText({
+      model: openai("gpt-4.1-nano"),
+      messages: [{ role: "user", content }],
+      tools: {
+        listOrders: tool({
+          description: "list all orders",
+          parameters: z.object({ userId: z.string() }),
+          execute: async ({ userId }) => {
+            const getOrderNumber = traceable(
+              async () => {
+                return "1234";
+              },
+              { name: "getOrderNumber" }
+            );
+            const orderNumber = await getOrderNumber();
+            return `User ${userId} has the following order: ${orderNumber}`;
+          },
+        }),
+      },
+      experimental_telemetry: {
+        isEnabled: true,
+      },
+      maxSteps: 10,
+    });
+    return { text };
+  },
+  { name: "parentTraceable", client }
+);
+
+let result;
+try {
+  result = await wrappedText("What are my orders?");
+} finally {
+  await client.awaitPendingTraceBatches();
+}
+```
+
+결과 추적은 [이와 같이](https://smith.langchain.com/public/296a0134-f3d4-4e54-afc7-b18f2c190911/r) 보입니다.
+
+### Next.js
+
+먼저, [`@vercel/otel`](https://www.npmjs.com/package/@vercel/otel) 패키지를 설치합니다:
+
+<CodeGroup>
+
+```bash npm
+npm install @vercel/otel
+```
+
+```bash yarn
+yarn add @vercel/otel
+```
+
+```bash pnpm
+pnpm add @vercel/otel
+```
+
+</CodeGroup>
+
+그런 다음, 루트 디렉토리에 [`instrumentation.ts`](https://nextjs.org/docs/app/guides/instrumentation) 파일을 설정합니다.
+`initializeOTEL`을 호출하고 결과로 나온 `DEFAULT_LANGSMITH_SPAN_PROCESSOR`를 `registerOTEL(...)` 호출의 `spanProcessors` 필드에 전달합니다.
+다음과 같이 보여야 합니다:
+
+```typescript
+import { registerOTel } from "@vercel/otel";
+import { initializeOTEL } from "langsmith/experimental/otel/setup";
+
+const { DEFAULT_LANGSMITH_SPAN_PROCESSOR } = initializeOTEL({});
+
+export function register() {
+  registerOTel({
+    serviceName: "your-project-name",
+    spanProcessors: [DEFAULT_LANGSMITH_SPAN_PROCESSOR],
+  });
+}
+```
+
+마지막으로, API route에서 `initializeOTEL`을 호출하고 AI SDK 호출에 `experimental_telemetry` 필드를 추가합니다:
+
+```typescript
+import { generateText } from "ai";
+import { openai } from "@ai-sdk/openai";
+
+import { initializeOTEL } from "langsmith/experimental/otel/setup";
+
+initializeOTEL();
+
+export async function GET() {
+  const { text } = await generateText({
+    model: openai("gpt-4.1-nano"),
+    messages: [{ role: "user", content: "Why is the sky blue?" }],
+    experimental_telemetry: {
+      isEnabled: true,
+    },
+  });
+
+  return new Response(text);
+}
+```
+
+더 세밀한 제어를 위해 코드의 일부를 `traceables`로 래핑할 수도 있습니다.
+
+### Sentry
+
+Sentry를 사용하는 경우, 아래 예제와 같이 LangSmith trace exporter를 Sentry의 기본 OpenTelemetry 계측에 연결할 수 있습니다.
+
+<Warning>
+작성 시점 기준으로 Sentry는 OTEL v1 패키지만 지원합니다. LangSmith는 v1과 v2를 모두 지원하지만, 계측이 작동하려면 OTEL v1 패키지를 설치해야 합니다.
+
+<CodeGroup>
+
+```bash npm
+npm install @opentelemetry/sdk-trace-base@1.30.1 @opentelemetry/exporter-trace-otlp-proto@0.57.2 @opentelemetry/context-async-hooks@1.30.1
+```
+
+```bash yarn
+yarn add @opentelemetry/sdk-trace-base@1.30.1 @opentelemetry/exporter-trace-otlp-proto@0.57.2 @opentelemetry/context-async-hooks@1.30.1
+```
+
+```bash pnpm
+pnpm add @opentelemetry/sdk-trace-base@1.30.1 @opentelemetry/exporter-trace-otlp-proto@0.57.2 @opentelemetry/context-async-hooks@1.30.1
+```
+
+</CodeGroup>
+</Warning>
+
+```typescript
+import { initializeOTEL } from "langsmith/experimental/otel/setup";
+import { LangSmithOTLPTraceExporter } from "langsmith/experimental/otel/exporter";
+import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
+import { traceable } from "langsmith/traceable";
+import { generateText, tool } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { z } from "zod";
+import * as Sentry from "@sentry/node";
+import { Client } from "langsmith";
+
+const exporter = new LangSmithOTLPTraceExporter();
+const spanProcessor = new BatchSpanProcessor(exporter);
+
+const sentry = Sentry.init({
+  dsn: "...",
+  tracesSampleRate: 1.0,
+  openTelemetrySpanProcessors: [spanProcessor],
+});
+
+initializeOTEL({
+  globalTracerProvider: sentry?.traceProvider,
+});
+
+const wrappedText = traceable(
+  async (content: string) => {
+    const { text } = await generateText({
+      model: openai("gpt-4.1-nano"),
+      messages: [{ role: "user", content }],
+      experimental_telemetry: {
+        isEnabled: true,
+      },
+      maxSteps: 10,
+    });
+    return { text };
+  },
+  { name: "parentTraceable" }
+);
+
+let result;
+try {
+  result = await wrappedText("What color is the sky?");
+} finally {
+  await sentry?.traceProvider?.shutdown();
+}
+```
+
+
+## 기타 메타데이터 추가
+
+LangSmith UI에서 추적을 구성하고 필터링하는 데 도움이 되도록 추적에 다른 메타데이터를 추가할 수 있습니다:
+
+```typescript {highlight={9}}
+import { generateText } from "ai";
+import { openai } from "@ai-sdk/openai";
+
+await generateText({
+  model: openai("gpt-4.1-nano"),
+  prompt: "Write a vegetarian lasagna recipe for 4 people.",
+  experimental_telemetry: {
+    isEnabled: true,
+    metadata: { userId: "123", language: "english" },
+  },
+});
+```
+
+메타데이터는 LangSmith 대시보드에서 볼 수 있으며 특정 추적을 필터링하고 검색하는 데 사용할 수 있습니다.
+AI SDK는 내부 하위 span에도 메타데이터를 전파합니다.
+
+## 실행 이름 사용자 정의
+
+`experimental_telemetry`에 `ls_run_name`이라는 메타데이터 키를 전달하여 실행 이름을 사용자 정의할 수 있습니다.
+
+```typescript
+import { generateText } from "ai";
+import { openai } from "@ai-sdk/openai";
+
+await generateText({
+  model: openai("gpt-4o-mini"),
+  prompt: "Write a vegetarian lasagna recipe for 4 people.",
+  experimental_telemetry: {
+    isEnabled: true,
+    // highlight-start
+    metadata: {
+      ls_run_name: "my-custom-run-name",
+    },
+    // highlight-end
+  },
+});
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/legacy-trace-with-vercel-ai-sdk.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

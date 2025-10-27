@@ -1,0 +1,185 @@
+```markdown
+---
+title: trace nesting 문제 해결
+sidebarTitle: trace nesting 문제 해결
+---
+
+LangSmith SDK, LangGraph, LangChain으로 tracing할 때, tracing은 자동으로 올바른 context를 전파하여 parent trace 내에서 실행된 코드가 UI의 예상 위치에 렌더링되도록 해야 합니다.
+
+child run이 별도의 trace로 이동하는 것을 보게 된다면(그리고 최상위 레벨에 나타난다면), 다음과 같은 알려진 "edge case" 중 하나가 원인일 수 있습니다.
+
+## Python
+
+다음은 Python으로 빌드할 때 "분리된" trace의 일반적인 원인을 설명합니다.
+
+### asyncio를 사용한 context 전파
+
+Python 버전 < 3.11에서 async 호출(특히 streaming과 함께)을 사용할 때 trace nesting 문제가 발생할 수 있습니다. 이는 Python의 `asyncio`가 버전 3.11에서야 [context 전달에 대한 완전한 지원을 추가](https://docs.python.org/3/library/asyncio-task.html#asyncio.create_task)했기 때문입니다.
+
+#### 이유
+
+LangChain과 LangSmith SDK는 [contextvars](https://docs.python.org/3/library/contextvars.html)를 사용하여 tracing 정보를 암시적으로 전파합니다. Python 3.11 이상에서는 이것이 원활하게 작동합니다. 그러나 이전 버전(3.8, 3.9, 3.10)에서는 `asyncio` task가 적절한 `contextvar` 지원이 부족하여 trace가 분리될 수 있습니다.
+
+#### 해결 방법
+
+1. **Python 버전 업그레이드 (권장)** 가능하다면 자동 context 전파를 위해 Python 3.11 이상으로 업그레이드하세요.
+
+2. **수동 Context 전파** 업그레이드가 불가능한 경우, tracing context를 수동으로 전파해야 합니다. 방법은 설정에 따라 다릅니다:
+
+   a) **LangGraph 또는 LangChain 사용** parent `config`를 child 호출에 전달하세요:
+
+   ```python
+   import asyncio
+   from langchain_core.runnables import RunnableConfig, RunnableLambda
+
+   @RunnableLambda
+   async def my_child_runnable(
+       inputs: str,
+       # The config arg (present in parent_runnable below) is optional
+   ):
+       yield "A"
+       yield "response"
+
+   @RunnableLambda
+   async def parent_runnable(inputs: str, config: RunnableConfig):
+       async for chunk in my_child_runnable.astream(inputs, config):
+           yield chunk
+
+   async def main():
+       return [val async for val in parent_runnable.astream("call")]
+
+   asyncio.run(main())
+   ```
+
+   b) **LangSmith 직접 사용** run tree를 직접 전달하세요:
+
+   ```python
+   import asyncio
+   import langsmith as ls
+
+   @ls.traceable
+   async def my_child_function(inputs: str):
+       yield "A"
+       yield "response"
+
+   @ls.traceable
+   async def parent_function(
+       inputs: str,
+       # The run tree can be auto-populated by the decorator
+       run_tree: ls.RunTree,
+   ):
+       async for chunk in my_child_function(inputs, langsmith_extra={"parent": run_tree}):
+           yield chunk
+
+   async def main():
+       return [val async for val in parent_function("call")]
+
+   asyncio.run(main())
+   ```
+
+   c) **Decorated 코드와 LangGraph/LangChain 결합** 수동 handoff를 위해 기술을 조합하여 사용하세요:
+
+   ```python
+   import asyncio
+   import langsmith as ls
+   from langchain_core.runnables import RunnableConfig, RunnableLambda
+
+   @RunnableLambda
+   async def my_child_runnable(inputs: str):
+       yield "A"
+       yield "response"
+
+   @ls.traceable
+   async def my_child_function(inputs: str, run_tree: ls.RunTree):
+       with ls.tracing_context(parent=run_tree):
+           async for chunk in my_child_runnable.astream(inputs):
+               yield chunk
+
+   @RunnableLambda
+   async def parent_runnable(inputs: str, config: RunnableConfig):
+       # @traceable decorated functions can directly accept a RunnableConfig when passed in via "config"
+       async for chunk in my_child_function(inputs, langsmith_extra={"config": config}):
+           yield chunk
+
+   @ls.traceable
+   async def parent_function(inputs: str, run_tree: ls.RunTree):
+       # You can set the tracing context manually
+       with ls.tracing_context(parent=run_tree):
+           async for chunk in parent_runnable.astream(inputs):
+               yield chunk
+
+   async def main():
+       return [val async for val in parent_function("call")]
+
+   asyncio.run(main())
+   ```
+
+### threading을 사용한 context 전파
+
+tracing을 시작하고 단일 trace 내에서 child task에 병렬 처리를 적용하고 싶은 것은 일반적입니다. Python의 stdlib `ThreadPoolExecutor`는 기본적으로 tracing을 중단시킵니다.
+
+#### 이유
+
+Python의 contextvars는 새 thread 내에서 비어있는 상태로 시작됩니다. trace 연속성을 유지하기 위한 두 가지 접근 방식이 있습니다:
+
+#### 해결 방법
+
+1. **LangSmith의 ContextThreadPoolExecutor 사용**
+
+   LangSmith는 자동으로 context 전파를 처리하는 `ContextThreadPoolExecutor`를 제공합니다:
+
+   ```python
+   from langsmith.utils import ContextThreadPoolExecutor
+   from langsmith import traceable
+
+   @traceable
+   def outer_func():
+       with ContextThreadPoolExecutor() as executor:
+           inputs = [1, 2]
+           r = list(executor.map(inner_func, inputs))
+
+   @traceable
+   def inner_func(x):
+       print(x)
+
+   outer_func()
+   ```
+
+2. **parent run tree 수동 제공**
+
+   또는 parent run tree를 inner function에 수동으로 전달할 수 있습니다:
+
+   ```python
+   from langsmith import traceable, get_current_run_tree
+   from concurrent.futures import ThreadPoolExecutor
+
+   @traceable
+   def outer_func():
+       rt = get_current_run_tree()
+       with ThreadPoolExecutor() as executor:
+           r = list(
+               executor.map(
+                   lambda x: inner_func(x, langsmith_extra={"parent": rt}), [1, 2]
+               )
+           )
+
+   @traceable
+   def inner_func(x):
+       print(x)
+
+   outer_func()
+   ```
+
+이 접근 방식에서는 `get_current_run_tree()`를 사용하여 현재 run tree를 가져오고 `langsmith_extra` parameter를 사용하여 inner function에 전달합니다.
+
+두 방법 모두 별도의 thread에서 실행되더라도 inner function 호출이 초기 trace stack 아래에 올바르게 집계되도록 보장합니다.
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/langsmith/nest-traces.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

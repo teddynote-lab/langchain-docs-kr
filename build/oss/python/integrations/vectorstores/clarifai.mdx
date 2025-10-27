@@ -1,0 +1,215 @@
+---
+title: Clarifai
+---
+
+>[Clarifai](https://www.clarifai.com/)는 데이터 탐색, 데이터 라벨링, 모델 학습, 평가 및 추론에 이르는 전체 AI 라이프사이클을 제공하는 AI 플랫폼입니다. Clarifai application은 input을 업로드한 후 vector database로 사용할 수 있습니다.
+
+이 노트북은 `Clarifai` vector database와 관련된 기능을 사용하는 방법을 보여줍니다. 텍스트 의미 검색 기능을 시연하는 예제가 제공됩니다. Clarifai는 이미지, 비디오 프레임을 사용한 의미 검색과 지역화된 검색([Rank](https://docs.clarifai.com/api-guide/search/rank) 참조) 및 속성 검색([Filter](https://docs.clarifai.com/api-guide/search/filter) 참조)도 지원합니다.
+
+Clarifai를 사용하려면 계정과 Personal Access Token (PAT) key가 필요합니다.
+PAT를 얻거나 생성하려면 [여기를 확인하세요](https://clarifai.com/settings/security).
+
+# Dependencies
+
+```python
+# Install required dependencies
+pip install -qU  clarifai langchain-community
+```
+
+# Imports
+
+여기서는 personal access token을 설정합니다. 플랫폼의 settings/security에서 PAT를 찾을 수 있습니다.
+
+```python
+# Please login and get your API key from  https://clarifai.com/settings/security
+from getpass import getpass
+
+CLARIFAI_PAT = getpass()
+```
+
+```output
+ ········
+```
+
+```python
+# Import the required modules
+from langchain_community.document_loaders import TextLoader
+from langchain_community.vectorstores import Clarifai
+from langchain_text_splitters import CharacterTextSplitter
+```
+
+# Setup
+
+텍스트 데이터가 업로드될 user id와 app id를 설정합니다. 참고: application을 생성할 때 텍스트 문서를 인덱싱하기 위한 적절한 base workflow(예: Language-Understanding workflow)를 선택하세요.
+
+먼저 [Clarifai](https://clarifai.com/login)에서 계정을 생성한 다음 application을 만들어야 합니다.
+
+```python
+USER_ID = "USERNAME_ID"
+APP_ID = "APPLICATION_ID"
+NUMBER_OF_DOCS = 2
+```
+
+## From Texts
+
+텍스트 목록에서 Clarifai vectorstore를 생성합니다. 이 섹션에서는 각 텍스트를 해당 metadata와 함께 Clarifai Application에 업로드합니다. 그런 다음 Clarifai Application을 사용하여 관련 텍스트를 찾기 위한 의미 검색을 수행할 수 있습니다.
+
+```python
+texts = [
+    "I really enjoy spending time with you",
+    "I hate spending time with my dog",
+    "I want to go for a run",
+    "I went to the movies yesterday",
+    "I love playing soccer with my friends",
+]
+
+metadatas = [
+    {"id": i, "text": text, "source": "book 1", "category": ["books", "modern"]}
+    for i, text in enumerate(texts)
+]
+```
+
+또는 input에 사용자 정의 input id를 제공하는 옵션도 있습니다.
+
+```python
+idlist = ["text1", "text2", "text3", "text4", "text5"]
+metadatas = [
+    {"id": idlist[i], "text": text, "source": "book 1", "category": ["books", "modern"]}
+    for i, text in enumerate(texts)
+]
+```
+
+```python
+# There is an option to initialize clarifai vector store with pat as argument!
+clarifai_vector_db = Clarifai(
+    user_id=USER_ID,
+    app_id=APP_ID,
+    number_of_docs=NUMBER_OF_DOCS,
+)
+```
+
+clarifai app에 데이터를 업로드합니다.
+
+```python
+# upload with metadata and custom input ids.
+response = clarifai_vector_db.add_texts(texts=texts, ids=idlist, metadatas=metadatas)
+
+# upload without metadata (Not recommended)- Since you will not be able to perform Search operation with respect to metadata.
+# custom input_id (optional)
+response = clarifai_vector_db.add_texts(texts=texts)
+```
+
+clarifai vector DB store를 생성하고 모든 input을 app에 직접 수집할 수 있습니다.
+
+```python
+clarifai_vector_db = Clarifai.from_texts(
+    user_id=USER_ID,
+    app_id=APP_ID,
+    texts=texts,
+    metadatas=metadatas,
+)
+```
+
+similarity search function을 사용하여 유사한 텍스트를 검색합니다.
+
+```python
+docs = clarifai_vector_db.similarity_search("I would like to see you")
+docs
+```
+
+```output
+[Document(page_content='I really enjoy spending time with you', metadata={'text': 'I really enjoy spending time with you', 'id': 'text1', 'source': 'book 1', 'category': ['books', 'modern']})]
+```
+
+또한 metadata로 검색 결과를 필터링할 수 있습니다.
+
+```python
+# There is lots powerful filtering you can do within an app by leveraging metadata filters.
+# This one will limit the similarity query to only the texts that have key of "source" matching value of "book 1"
+book1_similar_docs = clarifai_vector_db.similarity_search(
+    "I would love to see you", filter={"source": "book 1"}
+)
+
+# you can also use lists in the input's metadata and then select things that match an item in the list. This is useful for categories like below:
+book_category_similar_docs = clarifai_vector_db.similarity_search(
+    "I would love to see you", filter={"category": ["books"]}
+)
+```
+
+## From Documents
+
+Document 목록에서 Clarifai vectorstore를 생성합니다. 이 섹션에서는 각 document를 해당 metadata와 함께 Clarifai Application에 업로드합니다. 그런 다음 Clarifai Application을 사용하여 관련 document를 찾기 위한 의미 검색을 수행할 수 있습니다.
+
+```python
+loader = TextLoader("your_local_file_path.txt")
+documents = loader.load()
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+docs = text_splitter.split_documents(documents)
+```
+
+```python
+USER_ID = "USERNAME_ID"
+APP_ID = "APPLICATION_ID"
+NUMBER_OF_DOCS = 4
+```
+
+clarifai vector DB class를 생성하고 모든 document를 clarifai App에 수집합니다.
+
+```python
+clarifai_vector_db = Clarifai.from_documents(
+    user_id=USER_ID,
+    app_id=APP_ID,
+    documents=docs,
+    number_of_docs=NUMBER_OF_DOCS,
+)
+```
+
+```python
+docs = clarifai_vector_db.similarity_search("Texts related to population")
+docs
+```
+
+## From existing App
+
+Clarifai에는 API 또는 UI를 통해 application(본질적으로 프로젝트)에 데이터를 추가하는 훌륭한 도구가 있습니다. 대부분의 사용자는 LangChain과 상호작용하기 전에 이미 이 작업을 완료했을 것이므로 이 예제에서는 기존 app의 데이터를 사용하여 검색을 수행합니다. [API 문서](https://docs.clarifai.com/api-guide/data/create-get-update-delete)와 [UI 문서](https://docs.clarifai.com/portal-guide/data)를 확인하세요. 그런 다음 Clarifai Application을 사용하여 관련 document를 찾기 위한 의미 검색을 수행할 수 있습니다.
+
+```python
+USER_ID = "USERNAME_ID"
+APP_ID = "APPLICATION_ID"
+NUMBER_OF_DOCS = 4
+```
+
+```python
+clarifai_vector_db = Clarifai(
+    user_id=USER_ID,
+    app_id=APP_ID,
+    number_of_docs=NUMBER_OF_DOCS,
+)
+```
+
+```python
+docs = clarifai_vector_db.similarity_search(
+    "Texts related to ammuniction and president wilson"
+)
+```
+
+```python
+docs[0].page_content
+```
+
+```output
+"President Wilson, generally acclaimed as the leader of the world's democracies,\nphrased for civilization the arguments against autocracy in the great peace conference\nafter the war. The President headed the American delegation to that conclave of world\nre-construction. With him as delegates to the conference were Robert Lansing, Secretary\nof State; Henry White, former Ambassador to France and Italy; Edward M. House and\nGeneral Tasker H. Bliss.\nRepresenting American Labor at the International Labor conference held in Paris\nsimultaneously with the Peace Conference were Samuel Gompers, president of the\nAmerican Federation of Labor; William Green, secretary-treasurer of the United Mine\nWorkers of America; John R. Alpine, president of the Plumbers' Union; James Duncan,\npresident of the International Association of Granite Cutters; Frank Duffy, president of\nthe United Brotherhood of Carpenters and Joiners, and Frank Morrison, secretary of the\nAmerican Federation of Labor.\nEstimating the share of each Allied nation in the great victory, mankind will\nconclude that the heaviest cost in proportion to prewar population and treasure was paid\nby the nations that first felt the shock of war, Belgium, Serbia, Poland and France. All\nfour were the battle-grounds of huge armies, oscillating in a bloody frenzy over once\nfertile fields and once prosperous towns.\nBelgium, with a population of 8,000,000, had a casualty list of more than 350,000;\nFrance, with its casualties of 4,000,000 out of a population (including its colonies) of\n90,000,000, is really the martyr nation of the world. Her gallant poilus showed the world\nhow cheerfully men may die in defense of home and liberty. Huge Russia, including\nhapless Poland, had a casualty list of 7,000,000 out of its entire population of\n180,000,000. The United States out of a population of 110,000,000 had a casualty list of\n236,117 for nineteen months of war; of these 53,169 were killed or died of disease;\n179,625 were wounded; and 3,323 prisoners or missing."
+```
+
+```python
+
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/vectorstores/clarifai.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

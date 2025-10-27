@@ -1,0 +1,110 @@
+---
+title: Convex
+---
+
+LangChain.js는 [Convex](https://convex.dev/)를 [vector store](https://docs.convex.dev/vector-search)로 지원하며, 표준 유사도 검색을 지원합니다.
+
+## Setup
+
+### 프로젝트 생성
+
+작동하는 [Convex](https://docs.convex.dev/) 프로젝트를 설정합니다. 예를 들어 다음을 사용할 수 있습니다:
+
+```bash
+npm create convex@latest
+```
+
+### 데이터베이스 accessor 추가
+
+`convex/langchain/db.ts`에 query 및 mutation helper를 추가합니다:
+
+```ts title="convex/langchain/db.ts"
+export * from "@langchain/community/utils/convex";
+```
+
+### schema 구성
+
+schema를 설정합니다 (vector indexing을 위해):
+
+```ts title="convex/schema.ts"
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
+
+export default defineSchema({
+  documents: defineTable({
+    embedding: v.array(v.number()),
+    text: v.string(),
+    metadata: v.any(),
+  }).vectorIndex("byEmbedding", {
+    vectorField: "embedding",
+    dimensions: 1536,
+  }),
+});
+```
+
+## Usage
+
+<Tip>
+[LangChain 패키지 설치에 대한 일반적인 지침은 이 섹션을 참조하세요](/oss/javascript/langchain/install).
+</Tip>
+
+```bash npm
+npm install @langchain/openai @langchain/community @langchain/core
+```
+
+### Ingestion
+
+```typescript
+import { ConvexVectorStore } from "@langchain/community/vectorstores/convex";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { action } from "./_generated/server.js";
+
+export const ingest = action({
+  args: {},
+  handler: async (ctx) => {
+    await ConvexVectorStore.fromTexts(
+      ["Hello world", "Bye bye", "What's this?"],
+      [{ prop: 2 }, { prop: 1 }, { prop: 3 }],
+      new OpenAIEmbeddings(),
+      { ctx }
+    );
+  },
+});
+```
+
+### Search
+
+```typescript
+"use node";
+
+import { ConvexVectorStore } from "@langchain/community/vectorstores/convex";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { v } from "convex/values";
+import { action } from "./_generated/server.js";
+
+export const search = action({
+  args: {
+    query: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const vectorStore = new ConvexVectorStore(new OpenAIEmbeddings(), { ctx });
+
+    const resultOne = await vectorStore.similaritySearch(args.query, 1);
+    console.log(resultOne);
+  },
+});
+```
+
+## Related
+
+- Vector store [개념 가이드](/oss/javascript/integrations/vectorstores)
+- Vector store [how-to 가이드](/oss/javascript/integrations/vectorstores)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/vectorstores/convex.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

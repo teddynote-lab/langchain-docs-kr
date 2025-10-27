@@ -1,0 +1,51 @@
+---
+title: Activeloop Deep Lake
+---
+
+>[Activeloop Deep Lake](https://docs.activeloop.ai/)는 Deep Learning 애플리케이션을 위한 data lake로, vector store로 사용할 수 있습니다.
+
+## 왜 Deep Lake인가?
+
+- 단순한 (multi-modal) vector store 이상입니다. 나중에 dataset을 사용하여 자체 LLM model을 fine-tune할 수 있습니다.
+- embedding뿐만 아니라 자동 버전 관리와 함께 원본 데이터도 저장합니다.
+- 진정한 serverless입니다. 별도의 서비스가 필요하지 않으며 주요 클라우드 제공업체(`AWS S3`, `GCS` 등)와 함께 사용할 수 있습니다.
+
+
+## 추가 리소스
+
+1. [Ultimate Guide to LangChain & Deep Lake: Build ChatGPT to Answer Questions on Your Financial Data](https://www.activeloop.ai/resources/ultimate-guide-to-lang-chain-deep-lake-build-chat-gpt-to-answer-questions-on-your-financial-data/)
+2. [Twitter the-algorithm codebase analysis with Deep Lake](https://github.com/langchain-ai/langchain/blob/v0.3/cookbook/twitter-the-algorithm-analysis-deeplake.ipynb)
+3. Deep Lake의 [whitepaper](https://www.deeplake.ai/whitepaper)와 [academic paper](https://arxiv.org/pdf/2209.10785.pdf)입니다
+4. 검토 가능한 추가 리소스 모음입니다: [Deep Lake](https://github.com/activeloopai/deeplake), [Get started](https://docs.activeloop.ai/getting-started) 및 [Tutorials](https://docs.activeloop.ai/hub-tutorials)
+
+## 설치 및 설정
+
+Python package를 설치합니다:
+
+<CodeGroup>
+```bash pip
+pip install deeplake
+```
+
+```bash uv
+uv add deeplake
+```
+</CodeGroup>
+
+
+## VectorStore
+
+```python
+from langchain_community.vectorstores import DeepLake
+```
+
+[사용 예제](/oss/python/integrations/vectorstores/activeloop_deeplake)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/activeloop_deeplake.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

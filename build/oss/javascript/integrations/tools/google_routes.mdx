@@ -1,0 +1,93 @@
+---
+title: Google Routes Tool
+---
+
+Google Routes Tool은 agent가 Google Routes API를 활용하여 두 개 이상의 목적지 사이의 경로를 찾을 수 있도록 합니다. 도보, 대중교통, 자동차, 오토바이, 자전거로 경로를 검색할 수 있습니다.
+
+## Setup
+
+[Google에서 API key를 발급](https://developers.google.com/maps/documentation/places/web-service/overview)받고 [Routes API를 활성화](https://console.cloud.google.com/apis/library/routes.googleapis.com)해야 합니다. 그런 다음 API key를 `process.env.GOOGLE_ROUTES_API_KEY`로 설정하거나 `apiKey` constructor argument로 전달하세요.
+
+## Usage
+
+<Tip>
+LangChain package 설치에 대한 일반적인 지침은 [이 섹션](/oss/javascript/langchain/install)을 참조하세요.
+</Tip>
+
+```bash npm
+npm install @langchain/openai @langchain/community @langchain/core
+```
+
+```typescript
+import { GoogleRoutesAPI } from "@langchain/community/tools/google_routes";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { ChatOpenAI } from "@langchain/openai";
+import { AgentExecutor, createToolCallingAgent } from "@langchain/classic/agents";
+
+export async function run() {
+  const tools = [new GoogleRoutesAPI()];
+
+  const llm = new ChatOpenAI({
+    model: "gpt-3.5-turbo-0125",
+  });
+
+  const prompt = ChatPromptTemplate.fromMessages([
+    ["system", "You are a helpful assistant"],
+    ["placeholder", "{chat_history}"],
+    ["human", "{input}"],
+    ["placeholder", "{agent_scratchpad}"],
+  ]);
+
+  const agent = await createToolCallingAgent({
+    llm,
+    tools,
+    prompt,
+  });
+
+  const agentExecutor = new AgentExecutor({
+    agent,
+    tools,
+  });
+
+  const result = await agentExecutor.invoke({
+    input: "How to go from the Eiffel Tower to the Louvre Museum by transit?",
+  });
+
+  console.log(result);
+
+  /* {
+    input: 'How to go from the Eiffel Tower to the Louvre Museum by transit?',
+    output: 'To travel from the Eiffel Tower to the Louvre Museum by transit, here is the route information:\n' +
+      '\n' +
+      '- Departure: Eiffel Tower\n' +
+      '- Arrival: Louvre Museum\n' +
+      '- Distance: 4.1 km\n' +
+      '- Duration: 18 minutes\n' +
+      '- Transit Fare: €2.15\n' +
+      '\n' +
+      'Travel Instructions:\n' +
+      "1. Walk to Pont d'Iéna\n" +
+      '2. Take bus 72 towards Gare de Lyon - Maison de La RATP\n' +
+      '3. Walk to your destination\n' +
+      '\n' +
+      'Departure Time: 22:03\n' +
+      'Arrival Time: 22:15\n' +
+      '\n' +
+      'Please follow these instructions to reach the Louvre Museum from the Eiffel Tower.'
+  } */
+}
+```
+
+## Related
+
+- Tool [개념 가이드](/oss/javascript/langchain/tools)
+- Tool [사용 방법 가이드](/oss/javascript/langchain/tools)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/tools/google_routes.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

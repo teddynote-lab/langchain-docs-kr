@@ -1,0 +1,262 @@
+```markdown
+---
+title: Ollama Functions
+---
+
+<Warning>
+**LangChain Ollama 통합 패키지는 tool calling을 공식적으로 지원합니다. [문서를 보려면 여기를 클릭하세요](/oss/javascript/integrations/chat/ollama#tools).**
+
+
+</Warning>
+
+LangChain은 [Ollama](https://github.com/jmorganca/ollama)를 통해 로컬에서 실행되는 오픈 소스 모델에 대한 실험적 wrapper를 제공하며,
+이는 OpenAI Functions와 동일한 API를 제공합니다.
+
+더 강력하고 성능이 뛰어난 모델일수록 복잡한 schema 및/또는 여러 function을 더 잘 처리합니다. 아래 예제는
+[Mistral](https://ollama.ai/library/mistral)을 사용합니다.
+
+<Warning>
+**이것은 tool calling 지원을 기본적으로 제공하지 않는 모델에 이를 추가하려는 실험적 wrapper입니다. 주의해서 사용하세요.**
+
+
+</Warning>
+
+## Setup
+
+로컬 Ollama 인스턴스를 설정하고 실행하려면 [이 지침](https://github.com/jmorganca/ollama)을 따르세요.
+
+## Initialize model
+
+표준 `ChatOllama` 인스턴스를 초기화하는 것과 동일한 방식으로 이 wrapper를 초기화할 수 있습니다:
+
+```typescript
+import { OllamaFunctions } from "@langchain/community/experimental/chat_models/ollama_functions";
+
+const model = new OllamaFunctions({
+  temperature: 0.1,
+  model: "mistral",
+});
+```
+
+## Passing in functions
+
+이제 OpenAI와 동일한 방식으로 function을 전달할 수 있습니다:
+
+```typescript
+import { ChatOllama } from "@langchain/ollama";
+import { HumanMessage } from "@langchain/core/messages";
+
+const model = new ChatOllama({
+  temperature: 0.1,
+  model: "mistral",
+})
+  .bindTools([
+    {
+      name: "get_current_weather",
+      description: "Get the current weather in a given location",
+      parameters: {
+        type: "object",
+        properties: {
+          location: {
+            type: "string",
+            description: "The city and state, e.g. San Francisco, CA",
+          },
+          unit: { type: "string", enum: ["celsius", "fahrenheit"] },
+        },
+        required: ["location"],
+      },
+    },
+  ])
+  .withConfig({
+    // You can set the `tool_choice` arg to force the model to use a function
+    tool_choice: "get_current_weather",
+  });
+
+const response = await model.invoke([
+  new HumanMessage({
+    content: "What's the weather in Boston?",
+  }),
+]);
+
+console.log(response);
+
+/*
+  AIMessage {
+    content: '',
+    additional_kwargs: {
+      function_call: {
+        name: 'get_current_weather',
+        arguments: '{"location":"Boston, MA","unit":"fahrenheit"}'
+      }
+    }
+  }
+*/
+```
+
+## Using for extraction
+
+```typescript
+import * as z from "zod";
+
+import { ChatOllama } from "@langchain/ollama";
+import { PromptTemplate } from "@langchain/core/prompts";
+import { JsonOutputFunctionsParser } from "@langchain/core/output_parsers/openai_functions";
+
+const EXTRACTION_TEMPLATE = `Extract and save the relevant entities mentioned in the following passage together with their properties.
+
+Passage:
+{input}
+`;
+
+const prompt = PromptTemplate.fromTemplate(EXTRACTION_TEMPLATE);
+
+// Use Zod for easier schema declaration
+const schema = z.object({
+  people: z.array(
+    z.object({
+      name: z.string().describe("The name of a person"),
+      height: z.number().describe("The person's height"),
+      hairColor: z.optional(z.string()).describe("The person's hair color"),
+    })
+  ),
+});
+
+const model = new ChatOllama({
+  temperature: 0.1,
+  model: "mistral",
+})
+  .bindTools([
+    {
+      name: "information_extraction",
+      description: "Extracts the relevant information from the passage.",
+      schema,
+    },
+  ])
+  .withConfig({
+    tool_choice: "information_extraction",
+  });
+
+// Use a JsonOutputFunctionsParser to get the parsed JSON response directly.
+const chain = prompt.pipe(model).pipe(new JsonOutputFunctionsParser());
+
+const response = await chain.invoke({
+  input:
+    "Alex is 5 feet tall. Claudia is 1 foot taller than Alex and jumps higher than him. Claudia has orange hair and Alex is blonde.",
+});
+
+console.log(JSON.stringify(response, null, 2));
+
+/*
+{
+  "people": [
+    {
+      "name": "Alex",
+      "height": 5,
+      "hairColor": "blonde"
+    },
+    {
+      "name": "Claudia",
+      "height": {
+        "$num": 1,
+        "add": [
+          {
+            "name": "Alex",
+            "prop": "height"
+          }
+        ]
+      },
+      "hairColor": "orange"
+    }
+  ]
+}
+*/
+```
+
+<Tip>
+[여기](https://smith.langchain.com/public/74692bfc-0224-4221-b187-ddbf20d7ecc0/r)에서 간단한 LangSmith trace를 확인할 수 있습니다
+</Tip>
+
+## Customization
+
+내부적으로 이것은 Ollama의 JSON mode를 사용하여 출력을 JSON으로 제한한 다음, tool schema를 JSON schema로 prompt에 전달합니다.
+
+모델마다 강점이 다르기 때문에 자체 system prompt를 전달하는 것이 도움이 될 수 있습니다. 다음은 예제입니다:
+
+```typescript
+import { ChatOllama } from "@langchain/ollama";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+
+// Custom system prompt to format tools. You must encourage the model
+// to wrap output in a JSON object with "tool" and "tool_input" properties.
+const toolSystemPromptTemplate = `You have access to the following tools:
+
+{tools}
+
+To use a tool, respond with a JSON object with the following structure:
+{{
+  "tool": <name of the called tool>,
+  "tool_input": <parameters for the tool matching the above JSON schema>
+}}`;
+
+const model = new ChatOllama({
+  temperature: 0.1,
+  model: "mistral",
+})
+  .bindTools([
+    {
+      name: "get_current_weather",
+      description: "Get the current weather in a given location",
+      parameters: {
+        type: "object",
+        properties: {
+          location: {
+            type: "string",
+            description: "The city and state, e.g. San Francisco, CA",
+          },
+          unit: { type: "string", enum: ["celsius", "fahrenheit"] },
+        },
+        required: ["location"],
+      },
+    },
+  ])
+  .withConfig({
+    // You can set the `tool_choice` arg to force the model to use a function
+    tool_choice: "get_current_weather",
+  });
+
+const response = await model.invoke([
+  new SystemMessage(toolSystemPromptTemplate),
+  new HumanMessage({
+    content: "What's the weather in Boston?",
+  }),
+]);
+
+console.log(response);
+
+/*
+  AIMessage {
+    content: '',
+    additional_kwargs: {
+      function_call: {
+        name: 'get_current_weather',
+        arguments: '{"location":"Boston, MA","unit":"fahrenheit"}'
+      }
+    }
+  }
+*/
+```
+
+## Related
+
+- Chat model [개념 가이드](/oss/javascript/langchain/models)
+- Chat model [사용 방법 가이드](/oss/javascript/langchain/models)
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/chat/ollama_functions.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

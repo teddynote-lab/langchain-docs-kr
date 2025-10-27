@@ -1,0 +1,153 @@
+---
+title: Gmail Toolkit
+---
+
+이 문서는 GMail [toolkit](/oss/python/langchain/tools#toolkits) 시작하기를 도와드립니다. 이 toolkit은 GMail API와 상호작용하여 메시지를 읽고, 초안을 작성하고, 메시지를 보내는 등의 작업을 수행합니다. 모든 GmailToolkit 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/google_community/gmail/langchain_google_community.gmail.toolkit.GmailToolkit.html)를 참조하세요.
+
+## Setup
+
+이 toolkit을 사용하려면 [Gmail API 문서](https://developers.google.com/gmail/api/quickstart/python#authorize_credentials_for_a_desktop_application)에 설명된 대로 자격 증명을 설정해야 합니다. `credentials.json` 파일을 다운로드한 후 Gmail API를 사용할 수 있습니다.
+
+### Installation
+
+이 toolkit은 `langchain-google-community` 패키지에 포함되어 있습니다. `gmail` extra가 필요합니다:
+
+```python
+pip install -qU langchain-google-community\[gmail\]
+```
+
+개별 tool의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API key를 설정하세요:
+
+```python
+os.environ["LANGSMITH_TRACING"] = "true"
+os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
+```
+
+## Instantiation
+
+기본적으로 toolkit은 로컬 `credentials.json` 파일을 읽습니다. `Credentials` 객체를 수동으로 제공할 수도 있습니다.
+
+```python
+from langchain_google_community import GmailToolkit
+
+toolkit = GmailToolkit()
+```
+
+### Customizing Authentication
+
+내부적으로 다음 메서드를 사용하여 `googleapi` resource가 생성됩니다.
+더 많은 인증 제어를 위해 `googleapi` resource를 수동으로 빌드할 수 있습니다.
+
+```python
+from langchain_google_community.gmail.utils import (
+    build_resource_service,
+    get_gmail_credentials,
+)
+
+# Can review scopes here https://developers.google.com/gmail/api/auth/scopes
+# For instance, readonly scope is 'https://www.googleapis.com/auth/gmail.readonly'
+credentials = get_gmail_credentials(
+    token_file="token.json",
+    scopes=["https://mail.google.com/"],
+    client_secrets_file="credentials.json",
+)
+api_resource = build_resource_service(credentials=credentials)
+toolkit = GmailToolkit(api_resource=api_resource)
+```
+
+## Tools
+
+사용 가능한 tool 보기:
+
+```python
+tools = toolkit.get_tools()
+tools
+```
+
+```output
+[GmailCreateDraft(api_resource=<googleapiclient.discovery.Resource object at 0x1094509d0>),
+ GmailSendMessage(api_resource=<googleapiclient.discovery.Resource object at 0x1094509d0>),
+ GmailSearch(api_resource=<googleapiclient.discovery.Resource object at 0x1094509d0>),
+ GmailGetMessage(api_resource=<googleapiclient.discovery.Resource object at 0x1094509d0>),
+ GmailGetThread(api_resource=<googleapiclient.discovery.Resource object at 0x1094509d0>)]
+```
+
+- [GmailCreateDraft](https://python.langchain.com/api_reference/google_community/gmail/langchain_google_community.gmail.create_draft.GmailCreateDraft.html)
+- [GmailSendMessage](https://python.langchain.com/api_reference/google_community/gmail/langchain_google_community.gmail.send_message.GmailSendMessage.html)
+- [GmailSearch](https://python.langchain.com/api_reference/google_community/gmail/langchain_google_community.gmail.search.GmailSearch.html)
+- [GmailGetMessage](https://python.langchain.com/api_reference/google_community/gmail/langchain_google_community.gmail.get_message.GmailGetMessage.html)
+- [GmailGetThread](https://python.langchain.com/api_reference/google_community/gmail/langchain_google_community.gmail.get_thread.GmailGetThread.html)
+
+## Use within an agent
+
+아래는 toolkit을 [agent](/oss/python/langchain/agents)에 통합하는 방법을 보여줍니다.
+
+LLM 또는 chat model이 필요합니다:
+
+<ChatModelTabs customVarName="llm" />
+
+```python
+# | output: false
+# | echo: false
+
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+```
+
+```python
+from langchain.agents import create_agent
+
+
+agent_executor = create_agent(llm, tools)
+```
+
+```python
+example_query = "Draft an email to fake@fake.com thanking them for coffee."
+
+events = agent_executor.stream(
+    {"messages": [("user", example_query)]},
+    stream_mode="values",
+)
+for event in events:
+    event["messages"][-1].pretty_print()
+```
+
+```output
+================================ Human Message =================================
+
+Draft an email to fake@fake.com thanking them for coffee.
+================================== Ai Message ==================================
+Tool Calls:
+  create_gmail_draft (call_slGkYKZKA6h3Mf1CraUBzs6M)
+ Call ID: call_slGkYKZKA6h3Mf1CraUBzs6M
+  Args:
+    message: Dear Fake,
+
+I wanted to take a moment to thank you for the coffee yesterday. It was a pleasure catching up with you. Let's do it again soon!
+
+Best regards,
+[Your Name]
+    to: ['fake@fake.com']
+    subject: Thank You for the Coffee
+================================= Tool Message =================================
+Name: create_gmail_draft
+
+Draft created. Draft Id: r-7233782721440261513
+================================== Ai Message ==================================
+
+I have drafted an email to fake@fake.com thanking them for the coffee. You can review and send it from your email draft with the subject "Thank You for the Coffee".
+```
+
+## API reference
+
+모든 `GmailToolkit` 기능 및 구성에 대한 자세한 문서는 [API reference](https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.gmail.toolkit.GmailToolkit.html)를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/tools/gmail.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

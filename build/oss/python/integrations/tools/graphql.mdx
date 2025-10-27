@@ -1,0 +1,146 @@
+---
+title: GraphQL
+---
+
+>[GraphQL](https://graphql.org/)은 API를 위한 쿼리 언어이자 데이터에 대한 쿼리를 실행하기 위한 런타임입니다. `GraphQL`은 API의 데이터에 대한 완전하고 이해하기 쉬운 설명을 제공하며, 클라이언트가 필요한 것만 정확히 요청할 수 있는 권한을 부여하고, 시간이 지남에 따라 API를 더 쉽게 발전시킬 수 있게 하며, 강력한 개발자 도구를 가능하게 합니다.
+
+Agent에 제공되는 tool 목록에 `BaseGraphQLTool`을 포함시킴으로써, Agent가 필요한 모든 목적을 위해 GraphQL API에서 데이터를 쿼리할 수 있는 능력을 부여할 수 있습니다.
+
+이 Jupyter Notebook은 Agent와 함께 `GraphQLAPIWrapper` component를 사용하는 방법을 보여줍니다.
+
+이 예제에서는 다음 endpoint에서 사용 가능한 공개 `Star Wars GraphQL API`를 사용합니다: [swapi-graphql.netlify.app/graphql](https://swapi-graphql.netlify.app/graphql) .
+
+먼저, `httpx`와 `gql` Python package를 설치해야 합니다.
+
+```python
+pip install httpx gql > /dev/null
+```
+
+```output
+Note: you may need to restart the kernel to use updated packages.
+```
+
+```python
+pip install -qU  langchain-community
+```
+
+```output
+Note: you may need to restart the kernel to use updated packages.
+```
+
+이제 지정된 Star Wars API endpoint로 BaseGraphQLTool instance를 생성하고 tool을 사용하여 Agent를 초기화해 보겠습니다.
+
+```python
+import os
+
+os.environ["OPENAI_API_KEY"] = ""
+```
+
+```python
+from langchain_community.agent_toolkits.load_tools import load_tools
+
+tools = load_tools(
+    ["graphql"],
+    graphql_endpoint="https://swapi-graphql.netlify.app/graphql",
+)
+```
+
+```python
+from langchain.agents import create_agent
+
+
+agent = create_agent("openai:gpt-4.1-mini", tools)
+```
+
+이제 Agent를 사용하여 Star Wars GraphQL API에 대한 쿼리를 실행할 수 있습니다. Agent에게 모든 Star Wars 영화와 개봉 날짜를 나열하도록 요청해 보겠습니다.
+
+```python
+graphql_fields = """allFilms {
+    films {
+      title
+      director
+      releaseDate
+      speciesConnection {
+        species {
+          name
+          classification
+          homeworld {
+            name
+          }
+        }
+      }
+    }
+  }
+
+"""
+
+suffix = "Search for the titles of all the stawars films stored in the graphql database that has this schema "
+
+input_message = {
+    "role": "user",
+    "content": suffix + graphql_fields,
+}
+
+for step in agent.stream(
+    {"messages": [input_message]},
+    stream_mode="values",
+):
+    step["messages"][-1].pretty_print()
+```
+
+```output
+================================ Human Message =================================
+
+Search for the titles of all the stawars films stored in the graphql database that has this schema allFilms {
+    films {
+      title
+      director
+      releaseDate
+      speciesConnection {
+        species {
+          name
+          classification
+          homeworld {
+            name
+          }
+        }
+      }
+    }
+  }
+
+
+================================== Ai Message ==================================
+Tool Calls:
+  query_graphql (call_tN5A0dBbfOMewuw8Yy13bYpW)
+ Call ID: call_tN5A0dBbfOMewuw8Yy13bYpW
+  Args:
+    tool_input: query { allFilms { films { title } } }
+================================= Tool Message =================================
+Name: query_graphql
+
+"{\n  \"allFilms\": {\n    \"films\": [\n      {\n        \"title\": \"A New Hope\"\n      },\n      {\n        \"title\": \"The Empire Strikes Back\"\n      },\n      {\n        \"title\": \"Return of the Jedi\"\n      },\n      {\n        \"title\": \"The Phantom Menace\"\n      },\n      {\n        \"title\": \"Attack of the Clones\"\n      },\n      {\n        \"title\": \"Revenge of the Sith\"\n      }\n    ]\n  }\n}"
+================================== Ai Message ==================================
+
+The titles of all the Star Wars films stored in the database are:
+1. A New Hope
+2. The Empire Strikes Back
+3. Return of the Jedi
+4. The Phantom Menace
+5. Attack of the Clones
+6. Revenge of the Sith
+
+If you would like more information about any of these films, please let me know!
+```
+
+```python
+
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/tools/graphql.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

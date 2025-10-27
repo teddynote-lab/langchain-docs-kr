@@ -1,0 +1,316 @@
+---
+title: Nebius
+---
+
+`NebiusRetriever`는 [Nebius AI Studio](https://studio.nebius.ai/)의 embedding을 사용하여 효율적인 유사도 검색을 가능하게 합니다. 고품질 embedding model을 활용하여 문서에 대한 의미론적 검색을 수행합니다.
+
+이 retriever는 문서 컬렉션에 대해 유사도 검색을 수행해야 하지만 vector를 vector database에 저장할 필요가 없는 시나리오에 최적화되어 있습니다. matrix 연산을 사용하여 메모리 내에서 vector 유사도 검색을 수행하므로 중간 규모의 문서 컬렉션에 효율적입니다.
+
+## Setup
+
+### Installation
+
+Nebius integration은 pip를 통해 설치할 수 있습니다:
+
+```python
+pip install -U langchain-nebius
+```
+
+### Credentials
+
+Nebius는 초기화 parameter `api_key`로 전달하거나 환경 변수 `NEBIUS_API_KEY`로 설정할 수 있는 API key가 필요합니다. [Nebius AI Studio](https://studio.nebius.ai/)에서 계정을 생성하여 API key를 얻을 수 있습니다.
+
+```python
+import getpass
+import os
+
+# Make sure you've set your API key as an environment variable
+if "NEBIUS_API_KEY" not in os.environ:
+    os.environ["NEBIUS_API_KEY"] = getpass.getpass("Enter your Nebius API key: ")
+```
+
+## Instantiation
+
+`NebiusRetriever`는 `NebiusEmbeddings` instance와 문서 목록이 필요합니다. 초기화 방법은 다음과 같습니다:
+
+```python
+from langchain_core.documents import Document
+from langchain_nebius import NebiusEmbeddings, NebiusRetriever
+
+# Create sample documents
+docs = [
+    Document(
+        page_content="Paris is the capital of France", metadata={"country": "France"}
+    ),
+    Document(
+        page_content="Berlin is the capital of Germany", metadata={"country": "Germany"}
+    ),
+    Document(
+        page_content="Rome is the capital of Italy", metadata={"country": "Italy"}
+    ),
+    Document(
+        page_content="Madrid is the capital of Spain", metadata={"country": "Spain"}
+    ),
+    Document(
+        page_content="London is the capital of the United Kingdom",
+        metadata={"country": "UK"},
+    ),
+    Document(
+        page_content="Moscow is the capital of Russia", metadata={"country": "Russia"}
+    ),
+    Document(
+        page_content="Washington DC is the capital of the United States",
+        metadata={"country": "USA"},
+    ),
+    Document(
+        page_content="Tokyo is the capital of Japan", metadata={"country": "Japan"}
+    ),
+    Document(
+        page_content="Beijing is the capital of China", metadata={"country": "China"}
+    ),
+    Document(
+        page_content="Canberra is the capital of Australia",
+        metadata={"country": "Australia"},
+    ),
+]
+
+# Initialize embeddings
+embeddings = NebiusEmbeddings()
+
+# Create retriever
+retriever = NebiusRetriever(
+    embeddings=embeddings,
+    docs=docs,
+    k=3,  # Number of documents to return
+)
+```
+
+## Usage
+
+### Retrieve Relevant Documents
+
+retriever를 사용하여 query와 관련된 문서를 찾을 수 있습니다:
+
+```python
+# Query for European capitals
+query = "What are some capitals in Europe?"
+results = retriever.invoke(query)
+
+print(f"Query: {query}")
+print(f"Top {len(results)} results:")
+for i, doc in enumerate(results):
+    print(f"{i + 1}. {doc.page_content} (Country: {doc.metadata['country']})")
+```
+
+```output
+Query: What are some capitals in Europe?
+Top 3 results:
+1. Paris is the capital of France (Country: France)
+2. Berlin is the capital of Germany (Country: Germany)
+3. Rome is the capital of Italy (Country: Italy)
+```
+
+### get_relevant_documents 사용하기
+
+`get_relevant_documents` method를 직접 사용할 수도 있습니다 (단, `invoke`가 권장되는 interface입니다):
+
+```python
+# Query for Asian countries
+query = "What are the capitals in Asia?"
+results = retriever.get_relevant_documents(query)
+
+print(f"Query: {query}")
+print(f"Top {len(results)} results:")
+for i, doc in enumerate(results):
+    print(f"{i + 1}. {doc.page_content} (Country: {doc.metadata['country']})")
+```
+
+```output
+Query: What are the capitals in Asia?
+Top 3 results:
+1. Beijing is the capital of China (Country: China)
+2. Tokyo is the capital of Japan (Country: Japan)
+3. Canberra is the capital of Australia (Country: Australia)
+```
+
+### 결과 수 사용자 정의
+
+query 시점에 `k`를 parameter로 전달하여 결과 수를 조정할 수 있습니다:
+
+```python
+# Query for a specific country, with custom k
+query = "Where is France?"
+results = retriever.invoke(query, k=1)  # Override default k
+
+print(f"Query: {query}")
+print(f"Top {len(results)} result:")
+for i, doc in enumerate(results):
+    print(f"{i + 1}. {doc.page_content} (Country: {doc.metadata['country']})")
+```
+
+```output
+Query: Where is France?
+Top 1 result:
+1. Paris is the capital of France (Country: France)
+```
+
+### Async Support
+
+NebiusRetriever는 async 작업을 지원합니다:
+
+```python
+import asyncio
+
+
+async def retrieve_async():
+    query = "What are some capital cities?"
+    results = await retriever.ainvoke(query)
+
+    print(f"Async query: {query}")
+    print(f"Top {len(results)} results:")
+    for i, doc in enumerate(results):
+        print(f"{i + 1}. {doc.page_content} (Country: {doc.metadata['country']})")
+
+
+await retrieve_async()
+```
+
+```output
+Async query: What are some capital cities?
+Top 3 results:
+1. Washington DC is the capital of the United States (Country: USA)
+2. Canberra is the capital of Australia (Country: Australia)
+3. Paris is the capital of France (Country: France)
+```
+
+### 빈 문서 처리
+
+```python
+# Create a retriever with empty documents
+empty_retriever = NebiusRetriever(
+    embeddings=embeddings,
+    docs=[],
+    k=2,  # Empty document list
+)
+
+# Test the retriever with empty docs
+results = empty_retriever.invoke("What are the capitals of European countries?")
+print(f"Number of results: {len(results)}")
+```
+
+```output
+Number of results: 0
+```
+
+## Use within a chain
+
+NebiusRetriever는 LangChain RAG pipeline에서 원활하게 작동합니다. 다음은 NebiusRetriever를 사용하여 간단한 RAG chain을 생성하는 예제입니다:
+
+```python
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_nebius import ChatNebius
+
+# Initialize LLM
+llm = ChatNebius(model="meta-llama/Llama-3.3-70B-Instruct-fast")
+
+# Create a prompt template
+prompt = ChatPromptTemplate.from_template(
+    """
+Answer the question based only on the following context:
+
+Context:
+{context}
+
+Question: {question}
+"""
+)
+
+
+# Format documents function
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
+# Create RAG chain
+rag_chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+# Run the chain
+answer = rag_chain.invoke("What are three European capitals?")
+print(answer)
+```
+
+```output
+Based on the context provided, three European capitals are:
+
+1. Paris
+2. Berlin
+3. Rome
+```
+
+### Search Tool 생성하기
+
+`NebiusRetrievalTool`을 사용하여 agent용 tool을 생성할 수 있습니다:
+
+```python
+from langchain_nebius import NebiusRetrievalTool
+
+# Create a retrieval tool
+tool = NebiusRetrievalTool(
+    retriever=retriever,
+    name="capital_search",
+    description="Search for information about capital cities around the world",
+)
+
+# Use the tool
+result = tool.invoke({"query": "capitals in Europe", "k": 3})
+print("Tool results:")
+print(result)
+```
+
+```output
+Tool results:
+Document 1:
+Paris is the capital of France
+
+Document 2:
+Berlin is the capital of Germany
+
+Document 3:
+Rome is the capital of Italy
+```
+
+## How It Works
+
+NebiusRetriever는 다음과 같이 작동합니다:
+
+1. 초기화 중:
+   - 제공된 문서를 저장합니다
+   - 제공된 NebiusEmbeddings를 사용하여 모든 문서에 대한 embedding을 계산합니다
+   - 이러한 embedding은 빠른 검색을 위해 메모리에 저장됩니다
+
+2. 검색 중 (`invoke` 또는 `get_relevant_documents`):
+   - 동일한 embedding model을 사용하여 query를 embedding합니다
+   - query embedding과 모든 문서 embedding 간의 유사도 점수를 계산합니다
+   - 유사도 순으로 정렬된 상위 k개의 문서를 반환합니다
+
+이 접근 방식은 별도의 vector database가 필요 없으면서도 고품질 의미론적 검색을 제공하므로 중간 규모의 문서 컬렉션에 효율적입니다.
+
+## API reference
+
+Nebius AI Studio API에 대한 자세한 내용은 [Nebius AI Studio Documentation](https://studio.nebius.com/api-reference)을 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/retrievers/nebius.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

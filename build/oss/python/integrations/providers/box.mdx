@@ -1,0 +1,189 @@
+---
+title: Box
+---
+
+[Box](https://box.com)는 Intelligent Content Cloud로, 조직이 협업을 촉진하고, 전체 콘텐츠 라이프사이클을 관리하며, 중요한 콘텐츠를 보호하고, 엔터프라이즈 AI로 비즈니스 워크플로우를 혁신할 수 있도록 하는 단일 플랫폼입니다. 2005년에 설립된 Box는 AstraZeneca, JLL, Morgan Stanley, Nationwide를 포함한 주요 글로벌 조직의 업무를 간소화합니다.
+
+이 패키지에서는 Box 콘텐츠를 AI 워크플로우에 포함시킬 수 있는 여러 가지 방법을 제공합니다.
+
+### 설치 및 설정
+
+<CodeGroup>
+```bash pip
+pip install -U langchain-box
+```
+
+```bash uv
+uv add langchain-box
+```
+</CodeGroup>
+
+# langchain-box
+
+이 패키지는 Box와의 LangChain 통합을 포함하고 있습니다. Box에 대한 자세한 정보는 [개발자 문서](https://developer.box.com)를 확인하세요.
+
+## 사전 요구사항
+
+Box와 통합하려면 다음 몇 가지가 필요합니다:
+
+* Box 인스턴스 — 현재 Box 고객이 아니라면 [무료 개발자 계정](https://account.box.com/signup/n/developer#ty9l3)에 가입하세요.
+* Box 앱 — [앱 생성 방법](https://developer.box.com/guides/getting-started/first-application/)에 대한 자세한 내용
+* Box 인스턴스에서 승인된 앱 — 이는 관리자가 수행합니다.
+좋은 소식은 무료 개발자 계정을 사용하는 경우 본인이 관리자라는 것입니다.
+[앱 승인하기](https://developer.box.com/guides/authorization/custom-app-approval/#manual-approval)
+
+## 인증
+
+`box-langchain` 패키지는 인증에 대한 유연성을 제공합니다. 가장 기본적인 인증 방법은 개발자 토큰을 사용하는 것입니다. 이는 [Box 개발자 콘솔](https://account.box.com/developers/console)의 구성 화면에서 찾을 수 있습니다. 이 토큰은 의도적으로 수명이 짧으며(1시간) 개발용으로 제공됩니다. 이 토큰을 사용하여 환경에 `BOX_DEVELOPER_TOKEN`으로 추가하거나, loader에 직접 전달하거나, `BoxAuth` 인증 헬퍼 클래스를 사용할 수 있습니다.
+
+아래 섹션에서 loader에 직접 전달하는 방법을 다루겠습니다.
+
+### BoxAuth 헬퍼 클래스
+
+`BoxAuth`는 다음 인증 방법을 지원합니다:
+
+* Token — 개발자 토큰 또는 Box SDK를 통해 생성된 모든 토큰
+* Service account를 사용한 JWT
+* 지정된 사용자를 사용한 JWT
+* Service account를 사용한 CCG
+* 지정된 사용자를 사용한 CCG
+
+<Note>
+**JWT 인증을 사용하는 경우, 공개/개인 키 쌍을 생성한 후 Box 개발자 콘솔에서 구성을 다운로드해야 합니다.**
+
+이 파일을 애플리케이션 디렉토리 구조 어딘가에 배치하세요. `BoxAuth` 헬퍼 클래스를 사용할 때 이 파일의 경로를 사용하게 됩니다.
+</Note>
+
+자세한 내용은 [Box 애플리케이션 설정 방법](https://developer.box.com/guides/getting-started/first-application/)을 참고하고, 다양한 인증 옵션에 대한 자세한 내용은 [Box 인증 가이드](https://developer.box.com/guides/authentication/select/)를 확인하세요.
+
+예제:
+
+**Token**
+
+```python
+from langchain_box.document_loaders import BoxLoader
+from langchain_box.utilities import BoxAuth, BoxAuthType
+
+auth = BoxAuth(
+    auth_type=BoxAuthType.TOKEN,
+    box_developer_token=box_developer_token
+)
+
+loader = BoxLoader(
+    box_auth=auth,
+    ...
+)
+```
+
+**Service account를 사용한 JWT**
+
+```python
+from langchain_box.document_loaders import BoxLoader
+from langchain_box.utilities import BoxAuth, BoxAuthType
+
+auth = BoxAuth(
+    auth_type=BoxAuthType.JWT,
+    box_jwt_path=box_jwt_path
+)
+
+loader = BoxLoader(
+    box_auth=auth,
+    ...
+```
+
+**지정된 사용자를 사용한 JWT**
+
+```python
+from langchain_box.document_loaders import BoxLoader
+from langchain_box.utilities import BoxAuth, BoxAuthType
+
+auth = BoxAuth(
+    auth_type=BoxAuthType.JWT,
+    box_jwt_path=box_jwt_path,
+    box_user_id=box_user_id
+)
+
+loader = BoxLoader(
+    box_auth=auth,
+    ...
+```
+
+**Service account를 사용한 CCG**
+
+```python
+from langchain_box.document_loaders import BoxLoader
+from langchain_box.utilities import BoxAuth, BoxAuthType
+
+auth = BoxAuth(
+    auth_type=BoxAuthType.CCG,
+    box_client_id=box_client_id,
+    box_client_secret=box_client_secret,
+    box_enterprise_id=box_enterprise_id
+)
+
+loader = BoxLoader(
+    box_auth=auth,
+    ...
+```
+
+**지정된 사용자를 사용한 CCG**
+
+```python
+from langchain_box.document_loaders import BoxLoader
+from langchain_box.utilities import BoxAuth, BoxAuthType
+
+auth = BoxAuth(
+    auth_type=BoxAuthType.CCG,
+    box_client_id=box_client_id,
+    box_client_secret=box_client_secret,
+    box_user_id=box_user_id
+)
+
+loader = BoxLoader(
+    box_auth=auth,
+    ...
+```
+
+authorization_code 플로우와 함께 OAuth2를 사용하려면, 획득한 토큰과 함께 `BoxAuthType.TOKEN`을 사용하세요.
+
+## Document loaders
+
+### BoxLoader
+
+[사용 예제 보기](/oss/python/integrations/document_loaders/box)
+
+```python
+from langchain_box.document_loaders import BoxLoader
+
+```
+
+## Retrievers
+
+### BoxRetriever
+
+[사용 예제 보기](/oss/python/integrations/retrievers/box)
+
+```python
+from langchain_box.retrievers import BoxRetriever
+
+```
+
+## Blob Loaders
+
+### BoxBlobLoader
+
+[사용 예제 보기](/oss/python/integrations/document_loaders/box)
+
+```python
+from langchain_box.blob_loaders import BoxBlobLoader
+
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/box.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

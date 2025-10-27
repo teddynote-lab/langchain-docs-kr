@@ -1,0 +1,52 @@
+---
+title: Huawei
+---
+
+>[Huawei Technologies Co., Ltd.](https://www.huawei.com/)는 중국의 다국적 디지털 통신 기술 기업입니다.
+>
+>[Huawei Cloud](https://www.huaweicloud.com/intl/en-us/product/)는 포괄적인 글로벌 클라우드 컴퓨팅 서비스 제품군을 제공합니다.
+
+
+## 설치 및 설정
+
+`Huawei Cloud`에 액세스하려면 access token이 필요합니다.
+
+또한 python 라이브러리를 설치해야 합니다:
+
+<CodeGroup>
+```bash pip
+pip install -U esdk-obs-python
+```
+
+```bash uv
+uv add esdk-obs-python
+```
+</CodeGroup>
+
+
+## Document Loader
+
+### Huawei OBS Directory
+
+[사용 예제](/oss/python/integrations/document_loaders/huawei_obs_directory)를 참조하세요.
+
+```python
+from langchain_community.document_loaders import OBSDirectoryLoader
+```
+
+### Huawei OBS File
+
+[사용 예제](/oss/python/integrations/document_loaders/huawei_obs_file)를 참조하세요.
+
+```python
+from langchain_community.document_loaders.obs_file import OBSFileLoader
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/huawei.mdx)
+</Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>
